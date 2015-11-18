@@ -59,7 +59,7 @@ $1 diss 'cd $HOME/Dropbox/proj/current_dissertation/write'
 $1 vimrc 'vi $HOME/.vimrc'
 $1 vip 'vi $HOME/.ipython/profile_default/ipython_config.py'
 $1 virc 'vi $HOME/.`echo $currentshell`rc'
-$1 virca 'vi $HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias.sh'
+$1 virca 'vi $HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_.sh'
 
 $1 cd.. 'cd ..'
 $1 .. 'cd ..'
@@ -206,16 +206,16 @@ $1 qstatn 'qstatn -d'
 $1 ssh 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)
 $1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'
 
-$1 cluster 'sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
-$1 001 'sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
-$1 002 'sshimmer -t glensk@cmmd002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+$1 cluster 'sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 001 'sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 002 'sshimmer -t glensk@cmmd002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 cmpc 'sshimmer -t glensk@$myhost.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"' # this loads tcsh twice due to the necessary tcsh at the end; once zsh is installed on the cmpc (and cmmd?) the tcsh can be left empty and instead of tcsh one could simply write zsh
 
-$1 gate 'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
-$1 gatelinux 'sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
-$1 gatehydra 'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+$1 gate 'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 gatelinux 'sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 gatehydra 'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 
-$1 gar 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
-$1 gar1 'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
-$1 gar2 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+$1 gar 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ]  && cd `th.sh`; zsh"'
+$1 gar1 'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 gar2 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 
