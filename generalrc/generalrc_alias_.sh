@@ -16,14 +16,18 @@
 ## ls alias
 ## -v sorts numerical
 ## -H follows symbolic links
+## -F shows control chars
+
+# for onmac: $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls --color=auto --group-directories-first --show-control-chars --hide="Icon?"' && \
 [ "$onmac" = "true" ] && \
-    $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls --color=auto --group-directories-first --show-control-chars --hide="Icon?"' && \
+    $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls' && \
     $1 trash "rmtrash" && \
     $1 del "rmtrash" && \
     $1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
     $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .'
     $1 mvim     'open /Applications/MacVim.app'
 
+$1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?"'
 #alias ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
 
 
