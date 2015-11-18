@@ -209,39 +209,38 @@ echo
 echo
 
 if [ "$linktcsh" = "true" ];then
-echo "###############################################################################"
-echo "#                     link tcsh                                               #"
-echo "###############################################################################"
-
+echo "#############################################################"
+echo "# link tcsh                                                 #"
+echo "#############################################################"
     file=$HOMEPATH/.tcshrc
     [ -h "$file" ] && unlink $file
     [ -f "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc $file
 
-    file=$HOMEPATH/.tcshrc.complete
-    [ -h $file ] && unlink $file
-    [ -e $file ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.complete $file
+    #file=$HOMEPATH/.tcshrc.complete
+    #[ -h $file ] && unlink $file
+    #[ -e $file ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.complete $file
     
-    file=$HOMEPATH/.tcshrc.alias
-    [ -h $file ] && unlink $file
-    [ -e $file ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.alias $file
+    #file=$HOMEPATH/.tcshrc.alias
+    #[ -h $file ] && unlink $file
+    #[ -e $file ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.alias $file
     
-    file=$HOMEPATH/.tcshrc.bindkey
-    [ -h $file ] && unlink $file
-    [ -e $file ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.bindkey $file
+    #file=$HOMEPATH/.tcshrc.bindkey
+    #[ -h $file ] && unlink $file
+    #[ -e $file ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.bindkey $file
     
-    file=$HOMEPATH/.tcshrc.set
-    [ -h $file ] && unlink $file
-    [ -e $file ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.set $file
+    #file=$HOMEPATH/.tcshrc.set
+    #[ -h $file ] && unlink $file
+    #[ -e $file ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.set $file
     
-    file=$HOMEPATH/.tcshrc.local
-    [ -h $file ] && unlink $file
-    [ -e $file ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.local $file
+    #file=$HOMEPATH/.tcshrc.local
+    #[ -h $file ] && unlink $file
+    #[ -e $file ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc.local $file
     
     #file=$HOMEPATH/.git-completion.tcsh    # seems unused in tcsh
     #[ -h $file ] && unlink $file
@@ -251,23 +250,23 @@ fi
 
 
 if [ "$linkbash" = "true" ];then
-    echo "###############################################################################"
-    echo "#                     link bash                                               #"
-    echo "###############################################################################"
+echo "#############################################################"
+echo "# link bash                                                 #"
+echo "#############################################################"
     file=$HOMEPATH/.bashrc
     [ -h "$file" ] && unlink $file
     [ -f "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bashrc $file
     
-    file=$HOMEPATH/.bash_profile
-    [ -h "$file" ] && unlink $file
-    [ -f "$file" ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_profile $file
-    
-    file=$HOMEPATH/.bash_alias
-    [ -h "$file" ] && unlink $file
-    [ -f "$file" ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_alias $file
+    #file=$HOMEPATH/.bash_profile
+    #[ -h "$file" ] && unlink $file
+    #[ -f "$file" ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_profile $file
+    #
+    #file=$HOMEPATH/.bash_alias
+    #[ -h "$file" ] && unlink $file
+    #[ -f "$file" ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_alias $file
 
     #file=$HOMEPATH/.git-completion.bash   # seems unused in bash
     #[ -h $file ] && unlink $file
@@ -279,36 +278,36 @@ if [ "$linkbash" = "true" ];then
     #[ -e $file ] && echo $file rm && rm -rf $file
     #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/git/git-completion.bash $file
 
-    file=$HOMEPATH/.inputrc      #only used in bashrc
-    [ -h "$file" ] && unlink $file 
-    [ -f "$file" ] && echo $file rm && rm -rf $file 
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/inputrc $file
+    #file=$HOMEPATH/.inputrc      #only used in bashrc
+    #[ -h "$file" ] && unlink $file 
+    #[ -f "$file" ] && echo $file rm && rm -rf $file 
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/inputrc $file
 fi
 
 if [ "$linkzsh" = "true" ];then
-    echo "###############################################################################"
-    echo "#                     link zsh                                                #"
-    echo "###############################################################################"
+echo "#############################################################"
+echo "# link zsh                                                  #"
+echo "#############################################################"
     file=$HOMEPATH/.zshrc
     [ -h "$file" ] && unlink $file
     [ -f "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/zshrc $file
 
-    file=$HOMEPATH/.oh-my-zsh
-    [ -h $file ] && unlink $file
-    [ -d $file ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/oh-my-zsh $file
+    #file=$HOMEPATH/.oh-my-zsh
+    #[ -h $file ] && unlink $file
+    #[ -d $file ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/oh-my-zsh $file
 
-    file=$HOMEPATH/.bash_alias    # here are also the zsh aliases stored
-    [ -h "$file" ] && unlink $file
-    [ -f "$file" ] && echo $file rm && rm -rf $file
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_alias $file
+    #file=$HOMEPATH/.bash_alias    # here are also the zsh aliases stored
+    #[ -h "$file" ] && unlink $file
+    #[ -f "$file" ] && echo $file rm && rm -rf $file
+    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_alias $file
 fi
 
 if [ "$host" = "$mylaptop" ];then 
-echo "###############################################################################"
-echo "#                     on mylaptop (local)                                     #"
-echo "###############################################################################"
+echo "###########################################################################"
+echo "#                 on mylaptop (local)                                     #"
+echo "###########################################################################"
     file=$HOMEPATH/.gvimrc
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
@@ -316,9 +315,9 @@ echo "##########################################################################
 fi
 
 
-echo "###############################################################################"
-echo "#                     load everywhere                                         #"
-echo "###############################################################################"
+echo "###########################################################################"
+echo "#                 load everywhere                                         #"
+echo "###########################################################################"
 file=$HOMEPATH/.vim
 [ -h $file ] && unlink $file
 [ -d $file ] && echo $file rm && rm -rf $file
