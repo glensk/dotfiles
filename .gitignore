@@ -23,3 +23,7 @@ vim/view/
 vim/.netrwhist
 zsh/oh-my-zsh/
 ipython-qt-console-solarized-syntax-highlighting/
+generalrc/generalrc_alias_oncmmd
+generalrc/generalrc_alias_oncmmc
+generalrc/generalrc_alias_oncmpc
+generalrc/generalrc_alias_onmac

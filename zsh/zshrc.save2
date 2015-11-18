@@ -1,5 +1,5 @@
 # in zsh first load compinit and bashcompinit (in first line)
-#autoload -U colors && colors                # necessary for prompt colors (0.00s)
+autoload -U colors && colors                # necessary for prompt colors (0.00s)
 #autoload -U +X compinit                     # (0.00s)
 autoload -U +X compinit && compinit     # (0.03s)  (seems I cant avoid compinit=Necessary)
 autoload -U +X bashcompinit && bashcompinit # make bash completion function work (complete) (0.00s)
