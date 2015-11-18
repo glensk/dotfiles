@@ -51,7 +51,7 @@ else
     if [ "`echo $host | grep -o cmmc`" = "cmmc" ];then
     onxxx="setenv oncmmc true"
     currenthost="setenv currenthost oncmmc"
-    myshell="setenv myshell tcsh"
+    myshell="setenv myshell zsh"
     myprompttime="setenv myprompttime turquoise"
     myprompthostuser="setenv myprompthostuser turquoise"
     mypromptpath="setenv mypromptpath turquoise"
@@ -61,7 +61,7 @@ else
     if [ "`echo $host | grep -o cmmd`" = "cmmd" ];then
     onxxx="setenv oncmmd true"
     currenthost="setenv currenthost oncmmd"
-    myshell="setenv myshell tcsh"
+    myshell="setenv myshell zsh"
     myprompttime="setenv myprompttime blue"
     myprompthostuser="setenv myprompthostuser blue"
     mypromptpath="setenv mypromptpath blue"
