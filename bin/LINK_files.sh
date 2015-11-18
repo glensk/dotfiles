@@ -410,3 +410,4 @@ if [ -e "$HOMEPATH/.config/terminator" ]; then
     [ -f "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/terminator/config $file
     fi
+chmod 600 ~/.ssh/config
