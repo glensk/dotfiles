@@ -1,0 +1,28 @@
+cd /data/glensk
+wget "https://www.dropbox.com/download?plat=lnx.x86_64"
+untargz downloadedfile
+
+THEN LOG IN TO cmmd001 where dropbox will run (hopefully)
+hmmm.... muss im endeffekt von cmpc auf data installiert werden.
+ssh -X cmmc001.mpie.de
+~/.drobox-dist/dropboxd
+
+this will install Dropbox in /home/glensk/Dropbox    There is no other way around as I see it, or is there?
+
+
+
+#Stop dropbox
+~/dropbox.py stop
+#Backup your Dropbox database.
+cp ~/.dropbox/dropbox.db dropbox.db.backup
+#Get the Python script for helping changing the directory location
+wget http://dl.dropbox.com/u/119154/permalink/dropboxdir.py
+#Change permission to to execute the new python script.
+chmod +x dropboxdir.py
+#Move your current Dropbox directory to a new location
+#”/path/to/newDropbox/location”
+mv ~/Dropbox /path/to/newDropbox/location
+#Tell Dropbox to use the new directory location
+./dropboxdir –setfolder=/path/to/newDropbox/location
+#Start Dropbox.
+~/dropbox start

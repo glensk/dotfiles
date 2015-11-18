@@ -1,0 +1,290 @@
+#
+#
+#
+#    vagubunt's .zshrc
+#    http://vagubunt.wordpress.com
+#   
+
+export host="`hostname`"
+export myhost=cmpc03
+export mylaptop=mac
+source $HOME/Dropbox/scripts/git_repos/z/z.sh 
+alias c='z'
+export thermodynamics=$HOME/Thermodynamics
+#if [ -e $thermodynamics/utilities/bashrc_add ]; then
+#    [ "$printbashinfo" = "True" ] && echo "--> .bashrc : $thermodynamics"
+#    source $thermodynamics/utilities/bashrc_add
+#    #echo '--> .bashrc : make autocompletion for python scripts available'
+#    # dont put this in bashrc_add in Thermodynaics svn since not everyone like to have this (and will need to install python-argcompletion)
+#    #eval "$(register-python-argcomplete pot_energy_forces.py)"
+#    #echo '--> .bashrc : make autocompletion for python scripts available done'
+#else
+#    [ "$printbashinfo" = "True" ] && echo "--> .bashrc : thermodynamics:$thermodynamics: folder not found !"
+#fi
+
+
+##### ENVIRONMENT
+
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/home/jmollowitz/git/phpctags
+export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/bin:$PATH"  
+
+# sed
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+
+# mac stuff for iterm2
+export PATH="$HOME/Dropbox/scripts/mac_tools/bin:$PATH" # to get finder scripts fo fls fcd ... 
+export PATH="$HOME/Dropbox/scripts/bin:$PATH" # to get finder scripts fo fls fcd ... 
+export PATH="$HOME/Dropbox/proj/current_dissertation/scripts:$PATH"  # to get finder scripts fo fls fcd ... 
+
+# PYTHONPATH
+if [[ ! -z "$PYTHONPATH" ]]; then
+    export PYTHONPATH="${PYTHONPATH}:$HOME/scripts/python/graceplot/"
+else
+    export PYTHONPATH=$HOME/scripts/python/graceplot/
+fi
+
+# added by Anaconda 2.1.0 installer
+export PATH="$HOME/anaconda/bin:$PATH"
+
+
+########################################################
+export EDITOR='vim'
+export GIT_EDITOR='vim'
+export PAGER='most'
+export SHELL="/bin/zsh"
+export BROWSER=firefox
+# colors for less without compiled termcap files (curses feature)
+  export LESS_TERMCAP_mb=$'\e[01;31m'
+  export LESS_TERMCAP_md=$'\e[01;31m'
+  export LESS_TERMCAP_me=$'\e[0m'
+  export LESS_TERMCAP_se=$'\e[0m'
+  export LESS_TERMCAP_so=$'\e[01;44;33m'
+  export LESS_TERMCAP_ue=$'\e[0m'
+  export LESS_TERMCAP_us=$'\e[01;32m'
+
+export LESS=XFRaeiM # the XFR is important here: don't mess with the terminal!export LESS=-cex3M
+export HELPDIR=/usr/local/lib/zsh/help
+
+# jetzt ist / Wortseperator, also path/file strg w loescht nur noch bis zum /, nicht mehr den gesamten pfad.
+WORDCHARS=${WORDCHARS//[&=\/;!#%]/}
+
+bindkey -e # emacs Tastatursteuerung
+
+setopt correctall
+setopt autopushd pushdminus pushd_ignore_dups
+setopt cdablevars
+setopt ignoreeof
+setopt interactivecomments
+setopt noclobber
+setopt HIST_REDUCE_BLANKS
+setopt HIST_IGNORE_SPACE
+setopt SH_WORD_SPLIT
+setopt nohup
+setopt NO_CASE_GLOB # Globbing ist nicht mehr casesensitive
+setopt ZLE
+
+setopt AUTO_CD # cd if no matching command
+setopt AUTO_PARAM_SLASH # adds slash at end of tabbed dirs
+setopt CHECK_JOBS # check bg jobs on exit
+setopt CORRECT # corrects spelling
+setopt EXTENDED_GLOB # globs #, ~ and ^
+#setopt EXTENDED_HISTORY # saves timestamps on history
+setopt GLOB_DOTS # find dotfiles easier
+setopt HASH_CMDS # save cmd location to skip PATH lookup
+#setopt HIST_EXPIRE_DUPS_FIRST # expire duped history first
+#setopt HIST_NO_STORE # don't save 'history' cmd in history
+#setopt INC_APPEND_HISTORY # append history as command are entered
+#setopt LIST_ROWS_FIRST # completion options left-to-right, top-to-bottom
+setopt LIST_TYPES # show file types in list
+setopt MARK_DIRS # adds slash to end of completed dirs
+setopt NUMERIC_GLOB_SORT # sort numerically first, before alpha
+setopt PROMPT_SUBST # sub values in prompt (though it seems to work anyway haha)
+#setopt SHARE_HISTORY # share history between open shells
+# Don't overwrite, append!
+setopt APPEND_HISTORY
+
+# Write after each command
+# setopt INC_APPEND_HISTORY
+
+# Killer: share history between multiple shells
+setopt SHARE_HISTORY
+
+# If I type cd and then cd again, only save the last one
+setopt HIST_IGNORE_DUPS
+
+# Even if there are commands inbetween commands that are the same, still only save the last one
+setopt HIST_IGNORE_ALL_DUPS
+
+# Pretty    Obvious.  Right?
+setopt HIST_REDUCE_BLANKS
+
+# If a line starts with a space, don't save it.
+setopt HIST_IGNORE_SPACE
+setopt HIST_NO_STORE
+
+# When using a hist thing, make a newline show the change before executing it.
+setopt HIST_VERIFY
+
+# Save the time and how long a command ran
+setopt EXTENDED_HISTORY
+
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+
+##### COMPLETION
+
+# die Completion aktivieren
+zmodload zsh/complist
+autoload -U compinit
+compinit
+
+
+#{{{ Completion Stuff
+
+bindkey -M viins '\C-i' complete-word
+
+# Faster! (?)
+zstyle ':completion::complete:*' use-cache 1
+
+# case insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' group-name ''
+
+# generate descriptions with magic.
+zstyle ':completion:*' auto-description 'specify: %d'
+
+# Don't prompt for a huge list, page it!
+zstyle ':completion:*:default' list-prompt '%S%M matches%s'
+
+# Have the newer files last so I see them first
+zstyle ':completion:*' file-sort modification reverse
+
+# color code completion!!!!  Wohoo!
+zstyle ':completion:*' list-colors "=(#b) #([0-9]#)*=36=31"
+
+unsetopt LIST_AMBIGUOUS
+setopt  COMPLETE_IN_WORD
+
+# Separate man page sections.  Neat.
+zstyle ':completion:*:manuals' separate-sections true
+
+# Egomaniac!
+zstyle ':completion:*' list-separator 'fREW'
+
+# complete with a menu for xwindow ids
+zstyle ':completion:*:windows' menu on=0
+zstyle ':completion:*:expand:*' tag-order all-expansions
+
+# more errors allowed for large words and fewer for small words
+zstyle ':completion:*:approximate:*' max-errors 'reply=(  $((  ($#PREFIX+$#SUFFIX)/3  ))  )'
+
+# Errors format
+zstyle ':completion:*:corrections' format '%B%d (errors %e)%b'
+
+# Don't complete stuff already on the line
+zstyle ':completion::*:(rm|vi):*' ignore-line true
+
+# Don't complete directory we are already in (../here)
+zstyle ':completion:*' ignore-parents parent pwd
+
+#zstyle ':completion::approximate*:*' prefix-needed false
+
+##### History
+
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+HOSTNAME="`hostname`"
+REPORTTIME=120 # print elapsed time when more than 10 seconds
+
+##### PROMPT
+
+# %T    System time (HH:MM)
+# %*    System time (HH:MM:SS)
+# %D    System date (YY-MM-DD)
+# %n    Your username
+# %B - %b    Begin - end bold print
+# %U - %u    Begin - end underlining
+# %d    Your current working directory
+# %~    Your current working directory, relative to ~
+# %M    The computer's hostname
+# %m    The computer's hostname (truncated before the first period)
+# %l    Your current tty
+
+
+# configure the following, or leave it commented out:
+#PROMPT=%T$' %n@%M %B%{$fg[white]%}%%d%b %# \n$'
+PROMPT=%T$' %n@%M %B%{$fg[white]%}% %d %{$reset_color%}\n$'
+#PROMPT=$' %B%{$fg[white]%}%~%b $(__git_prompt) %# '
+#setopt prompt_subst
+
+#export RPS1='%{$fg[white]%}%n%{$fg[cyan]%}%m%{$reset_color%}'
+
+
+##### WINDOW TITLE
+
+case $TERM in
+ *xterm*|rxvt|rxvt-unicode|rxvt-256color|rxvt-unicode-256color|(dt|k|E)term)
+ precmd () { print -Pn "\e]0;zsh %~\a" }
+ preexec () { print -Pn "\e]0;zsh %~ ($1)\a" }
+ ;;
+ screen)
+ precmd () {
+ print -Pn "\e]83;title \"$1\"\a"
+ print -Pn "\e]0;$TERM - (%L) zsh %~\a"
+ }
+ preexec () {
+ print -Pn "\e]83;title \"$1\"\a"
+ print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a"
+ }
+ ;;
+esac
+
+#source ~/.nonpubliczshrc
+#source ~/.zsh/aliases.zsh
+#source ~/.zsh/key-bindings.zsh
+source ~/Dropbox/scripts/dotfiles/bash/bash_alias
+
+### rails specific
+#source ~/.rvm/scripts/rvm
+
+#source ~/.zsh/git-prompt/loader.sh
+#PROMPT='%* %B%{[0;36m%}%n%{[0;34m%}@%m %{[0;33m%}%~%b $(git_super_status) %# '
+#RPROMPT='${vcs_info_msg_0_}'
+#
+#
+#
+autoload -U promptinit && promptinit
+
+autoload -U colors && colors
+autoload -U promptinit
+autoload -Uz compinit
+compinit
+
+
+zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
+autoload -Uz compinit
+compinit
+
+alias ls='/usr/local/opt/coreutils/libexec/gnubin/ls --color=auto'
+alias virc='vim ~/.zshrc'
+alias rl='source ~/.zshrc'
+alias :q='exit'
+
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
+# between quotation marks is the tool output for LS_COLORS
+# export
+#LS_COLORS="di=31;41:ln=31;41:so=31;41:pi=31;41:ex=31;41:bd=31;41:cd=31;41:su=31;41:sg=31;41:tw=31;41:ow=31;41:"
+set colored-stats on
+LS_COLORS='no=00:fi=00:di=01;34:ln=04;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=30;42:st=37;44:ex=01;32:*.tex=01;31:*.docx=01;34:*.pkl=01;31:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.agr=01;35:*.nb=01;35:*.pdf=01;33:*.eps=01;33:*.ps=01;33:*.jpg=01;33:*.jpeg=01;33:*.gif=01;33:*.bmp=01;33:*.pbm=01;33:*.pgm=01;33:*.ppm=01;33:*.tga=01;33:*.xbm=01;33:*.xpm=01;33:*.tif=01;33:*.tiff=01;33:*.png=01;33:*.mov=01;33:*.mpg=01;33:*.mpeg=01;33:*.avi=01;33:*.fli=01;33:*.gl=01;33:*.dl=01;33:*.xcf=01;33:*.xwd=01;33:*.flac=01;33:*.mp3=01;33:*.mpc=01;33:*.ogg=01;33:*.wav=01;33:';
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
+
+#alias ls='ls -F -H -v --color=tty --show-control-chars'

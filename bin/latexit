@@ -1,0 +1,10 @@
+#!/bin/sh
+# $1 has to be the file.tex
+[ "$1" = "" ] && echo '$1 has to be the *.tex file' && exit
+[ ! -e "$1" ] && echo "$1 does not exist" && exit
+texfile=`echo $1 | sed 's|.tex$||'`
+[ "$1" = "$texfile" ] && echo "$1 has to end with .tex" && exit
+
+
+#latex $texfile.tex ; dvips $texfile.dvi ; ps2pdf $texfile.ps; bibtex $texfile
+pdflatex $texfile.tex

@@ -1,0 +1,3 @@
+date +%s    gives unixtime
+
+stat -c %Y file gives timestempt (unixtime) of last modification of the file

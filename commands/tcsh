@@ -1,0 +1,2 @@
+tcsh -c 'ls'  ## fuehrt das in der tcsh aus
+bash -c 'ls'  ## in bash

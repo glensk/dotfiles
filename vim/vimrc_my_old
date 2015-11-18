@@ -1,0 +1,704 @@
+" 1 is True; 0 is False ||| WITHOUT NERDCOMMENTER AND VIMWIEW VIM IS SUPERFAST
+let pathogenbundle = 1  " YES       pathogen loads bundles (plugins)
+let nerdtree = 1        " , + m:    brows files
+let vimlatex = 1        "           vimlatex (gerard)
+let ctags = 0           "           INDEXES methods, classes, variables, and other identifiers, 
+let pymodexxx = 0          "           CHECKS python syntax: pylint, rope, rpdoc, pyflakes, pep8 ... ERROR: currently not in bundle
+let pymodexyz = 0          "           CHECKS python syntax: pylint, rope, rpdoc, pyflakes, pep8 ... ERROR: currently not in bundle
+let taglist = 0         " F8:       Displays the tags (functions, classes, structures, variables, etc.)  ERROR: when this plugin is in bundle folder and opening files
+let generalsets = 1     " YES       general settings
+let keybinding = 1      " YES   
+let nerdcommenter = 1   " YES
+let remember_marks = 0  " NO    viminfo (ERROR: uncommented set cursorline)
+let tabquestion = 0     " NO        ???? what does this do?
+
+let MUSCELMEMORY = 0    " THINGS TO REMEMBER
+let maplocalleader = ","
+
+
+
+if pathogenbundle
+    filetype off
+    call pathogen#infect()
+    call pathogen#helptags()
+    "call pathogen#runtime_append_all_bundles()
+    filetype plugin indent on
+    syntax on
+    endif
+
+
+
+if generalsets 
+    " GENERAL set 's
+
+
+    " change leader key from \ to ,
+    let mapleader = ","
+
+    " set nocompatible : This option stops vim from behaving in a strongly vi
+    " -compatible way. It should be at the start of any vimrc file as it can
+    "  affect lots of other options which you may want to override. 
+    "  note: pathogen bundel needs to be load first in order to make solarized
+    "  plugin work
+    set nocompatible    
+
+    " Use the OS clipboard by default (on versions compiled with `+clipboard`)
+    set clipboard=unnamed
+
+    " " Enhance command-line completion
+    set wildmenu
+
+    " ################################################
+    " TEMPLATES
+    " ################################################
+    au BufNewFile *.py 0r ~/Dropbox/scripts/dotfiles/vim/py.template    
+    au BufNewFile *.sh 0r ~/Dropbox/scripts/dotfiles/vim/sh.template    
+    au BufWritePost,BufFilePost *.py call system("chmod +x ".expand("%"))
+    au BufWritePost,BufFilePost *.sh call system("chmod +x ".expand("%"))
+
+    
+    " ################################################
+    " Remember FOLDS & VIEW
+    " ################################################
+    " to remember folds (next 2 lines)
+    autocmd BufWinLeave *.* mkview
+    autocmd BufWinEnter *.* silent loadview
+    " suggested by restore_view.vim plugin
+    set viewoptions=cursor,folds,slash,unix
+    set foldmethod=indent
+    set foldlevel=99
+
+
+    " ################################################
+    " LOOK ADN FEEL
+    " ################################################
+
+    " highlights the current line
+    set cursorline
+    " line at the bottom of vi showin linne number and char number  
+    set ruler
+
+    " If you lose track of the current mode, you get a convenient --INSERT-- indicator
+    set showmode
+	"Show (partial) command in the last line of the screen.
+    set showcmd
+    " set showbreak to make wrappled lines indent nicly
+    set showbreak=...
+
+    " switches in Insertmode between INSERT and INSERT paste
+    set pastetoggle=<F2>
+    " syntax highlighing
+    syntax on
+    " try to detect filetypes
+    filetype on
+    " enable loading indent file for filetype / necessary for file completition
+    filetype plugin indent on
+
+	" solarized  (http://ethanschoonover.com/solarized/vim-colors-solarized)
+	syntax enable
+	set background=dark
+    "set background=light
+	" the next line befor colors solarized
+	"let g:solarized_termcolors=256
+    colors solarized
+	" from solarized page, not necessary when using macvim
+	" also this did not work out in the current setup
+	"if has('gui_running')
+	"    set background=light
+	"else
+	"    set background=dark
+	"endif
+
+    
+    " always use 256 colors, necessary to define for screen
+    set t_Co=256
+    if has("mac")
+        set t_Co=256
+    endif
+
+    if version >= 703
+        " puts reltive numbers on left side
+        set relativenumber
+        " colorcolumn sets the marks the end of the document by a line
+        set colorcolumn=83
+    else
+        " puts linenumber on left sinde
+        set number
+    endif
+
+
+    " ################################################
+    " SEARCH
+    " ################################################
+    " if a search string contains UPPER letters than ignorecase is switched off
+    set smartcase
+    " highlight all search matches  | to turn off set nohlsearch
+    set hlsearch
+    " Press Space to turn off highlighting and clear any message already displayed.
+    nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
+    " Dont want case sensitive patterns
+    " If you dont care for case-sensitive searches and substitutions, you can turn it off completely:
+    set ignorecase
+    " Start searching before pressing enter.
+    set incsearch
+    " set show matching parenthesis (brackets)
+    set showmatch
+
+
+
+    " ################################################
+    " TAB behaviour
+    " ################################################
+    " The next 3 options are crucial for python (to be in line with Pep8)
+    " Each tab that you type is converted to an equivalent number of spaces (Pep8)
+    set expandtab
+    " To control the number of space characters that will be inserted when the
+    " tab key is pressed set the 'tabstop' option: == a tab is four spaces
+	set tabstop=4
+    " To change the number of space characters inserted for indentation, use the 'shiftwidth' option:  
+    " If you prefer to work with spaces, then it is preferable to ensure that softtabstop == shiftwidth. 
+    " This way, you can expect the same number of spaces to be inserted whether you press the tab key in 
+    " insert mode, or use the indentation commands in normal/visual modes.
+    set shiftwidth=4
+    " If you prefer to work with tab characters then it is a good idea to ensure that tabstop == softtabstop. 
+    " This makes it less likely that youll end up with a mixture of tabs and spaces for indentation.
+    set softtabstop=4
+    " always set autoindenting on (if tab in oneline tab will be inserted in next line)
+    set autoindent
+    " when press tab cursor moves to the appropriate location on the current
+    " line (not sorter)
+    set smarttab
+    " does the right thing (mostly) in programs
+    "set smartindent
+    set cindent
+
+	"Number of spaces to use for each step of (auto)indent.  Used for
+	set shiftround
+
+
+    " ################################################
+    " further from sensible.vim (stuff most people use with vim)
+    " ################################################
+    set complete-=i
+    set nrformats-=octal
+    set ttimeout
+    set ttimeoutlen=50
+    if !&scrolloff
+      set scrolloff=1
+    endif
+    if !&sidescrolloff
+      set sidescrolloff=5
+    endif
+    set display+=lastline
+    set autoread
+
+
+    " ################################################
+    " vim annoyances  http://blog.sanctum.geek.nz/vim-annoyances/
+    " ################################################
+    " Wrapping breaks words
+    "   By default, setting wrap displays lines by breaking words if necessary.
+    "   You can force it to preserve words instead by only breaking at certain
+    "   characters:
+    set linebreak
+    
+    " set nocompatible gets rid of all the crap that Vim does to be vi
+    " compatible. It’s 2010 — we don’t need to be compatible with
+    " vi at the expense of functionality any more.
+    set nocompatible
+
+    " Backup files are a nuisance
+    "   If you’re developing with a version control system, you might find
+    "   the in-place backups Vim keeps for saved files with the ~ suffix more
+    "   annoying than useful. You can turn them off completely with nobackup:
+    set nobackup 
+
+    " Swap files are a nuisance
+    "   Swap files can be similarly annoying, and unnecessary on systems with a
+    "   lot of memory. If you dont need them, you can turn them off
+    "   completely:
+    set noswapfile
+
+    " backspace behaves normal (:help 'bs') bs=2 : same as :set backspace=indent,eol,start"
+    "   If youre in insert mode, by default you cant use backspace to
+    "   delete text past the start of the insert operation; that is, you
+    "   cant backspace over where you first pressed insert. This is old vi
+    "   behavior, and if you dont like it, you can make backspace work
+    "   everywhere instead:
+    set backspace=indent,eol,start
+
+    " Cant move into blank space in visual block mode
+    "   If you need to define a block in visual block mode with bounds outside the actual text (that is, past the end of lines), you can allow this with:
+    "   This will let you move around the screen freely while in visual block mode to define your selections. As an example, 
+    "   this can make selecting the contents of the last column in a formatted table much easier.
+    set virtualedit=block
+
+    " Filename completion on command line is confusing
+    "   If youe used to the behavior of shell autocomplete functions for completing filenames, you can emulate it in Vim’s command mode:
+    "   With this set, the first Tab press (or whatever your wildchar is set to) will expand a filename or command in command mode to the 
+    "   longest common string it can, and a second press will display a list of all possible completions above the command line.
+    set wildmode=longest,list
+
+    " Enable mouse in all modes  # I DONT WANT THIS ... WITHOUT mouse=a EVERYTHING
+    " CAN BE COPIED :)
+    "if has("mouse")
+    "set mouse=a
+    "endif
+    " " Disable error bells
+    set noerrorbells
+    " " Don’t reset cursor to start of line when moving around.
+    set nostartofline
+
+    " Use UTF-8 without BOM
+    set encoding=utf-8 nobomb
+    set scrolloff=3
+
+    set showcmd
+    set complete-=i
+    " you can have unwritten changes to a file and open a new file using :e, without being forced to write or undo your changes first.
+    set hidden
+    
+    set wildmenu
+    set wildmode=list:longest
+    set visualbell
+    set ttyfast
+    set laststatus=2
+
+
+    " The next section makes Vim handle long lines correctly:
+    set wrap
+    " Wrap text after a certain number of characters python: 79
+    set textwidth=83
+    set formatoptions=qrn1
+
+    " Show “invisible” characters
+    " set list turnes on list mode
+	set list
+	set listchars=tab:▸\ ,eol:¬
+
+    "Invisible character colors
+    "You can customise the syntax highlighting colours of invisible characters
+    "with the NonText and SpecialKey keywords.
+    highlight NonText guifg=#4a4a59
+    highlight SpecialKey guifg=#4a4a59
+
+    " copy the previous indentation on autoindenting
+    set copyindent          " copy the previous indentation on autoindenting
+    " does the right thing (mostly) in programs
+    set smartindent         " does the right thing (mostly) in programs
+    "set shiftround          " use multiple of shiftwidth when indenting with '<' and '>'
+    "                  "    shiftwidth, not tabstop
+    "set history=1000         " remember more commands and search history
+    "set undolevels=1000      " use many muchos levels of undo
+    "set wildignore=*.swp,*.bak,*.pyc,*.class
+    "set title                " change the terminal's title
+    "set novisualbell         " don't beep
+    "set noerrorbells         " don't bee
+    "autocmd filetype python set expandtab
+
+    """"" folgende einstellungen sollen gut sein fuer python
+    "set modeline     "
+
+    " autocompletition for vim
+    " Omni completion provides smart autocompletion for programs. When invoked, the
+    " text before the cursor is inspected to guess what might follow. A popup menu
+    " offers word completion choices that may include struct and class members,
+    " system functions, and more. A similar feature in Microsoft Visual Studio is
+    " known as IntelliSense
+    filetype plugin on
+    set omnifunc=syntaxcomplete#Complete
+
+
+    "autocmd FileType python set omnifunc=pythoncomplete#Complete
+    "set completeopt=longest,menuone
+
+    "set wm=4
+    " ######## autocorrection #####################################
+    "map <Leader>c :PyLintAuto<CR>
+    " source vimrc directly:    :so after changing .vimrc
+    "autocmd! bufwritepost $HOME/.vimrc source %
+
+    "    " linebreaks
+    "    " set wrap                    " wrap existing lines as desired 
+    "    set linebreak               " tells Vim to only wrap at a character in the breakat option (by default, this includes " ^I!@*-+;:,./?" )
+    "    set nolist                  " list disables linebreak
+    "    set textwidth=0             " prevent Vim from automatically inserting line breaks in newly entered text
+    "    set wrapmargin=0            " prevent Vim from automatically inserting line breaks in newly entered text
+    endif
+if taglist
+    nnoremap <silent> <F8> :TlistToggle<CR>
+    filetype on                     " vims filetype detection
+    " use ":TlistUpdate" to update Taglist #############################
+    " DONT USE!!! --> let Tlist_Process_File_Always = 1   " DONT USE! (ERROR: tags: illegal option -- -^@usage: ctags [-BFadtuwvx] [-f tagsfile] file ...^@ )
+                                        " with a bit luckk this adds created tags automatically
+    "let Tlist_Auto_Update = 1       " this shoud be set to enalble automatic updating the file list
+    "let Tlist_Show_One_File = 1     " only displays tags from current file  
+    "let Tlist_Use_SingleClick = 1   " you need only to click once at the tag to get to definition
+    endif
+if nerdtree
+    set autochdir
+    let NERDTreeChDirMode=2
+    map <localleader>m :NERDTreeToggle %<CR>    " NerdtreeToggle
+    map <localleader>n :NERDTreeToggle<CR>      " NerdtreeToggle
+    map <leader>n :NERDTreeToggle<CR>
+    let g:NERDTreeDirArrows=0                   " crucial to make it work
+    nmap <esc>:nt<cr> :NERDTree<cr>B
+    autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif "close vim if the only NERDTree is open
+    endif
+if ctags
+    "           Ctags is a tool that will sift through your code, 
+    "           indexing methods, classes, variables, and other identifiers, 
+    "           storing the index in a tags file. The tags file contains a 
+    "           single tag per line. Depending on command line 
+    "           arguments and the language ctags is run against, a lot of 
+    "           information can be obtained from this index.
+    "           ctags error even if set to 0 if: ctags is not
+    "let hostname = substitute(system('hostname'), '\n', '', '')
+    "let myhost = substitute(system('echo $myhost'), '\n', '', '')
+    "let mylaptop = substitute(system('echo $mylaptop'), '\n', '', '')
+    "let $Tlist_Ctags_Cmd='$USER/scripts/dotfiles/vim/ctags-5.8`hostname`/'
+    endif 
+"if pymodexxx
+    "filetype plugin indent on
+    "syntax on
+    "let g:pymode_syntax = 1
+    "           Python-mode is a vim plugin that allows you to use the pylint, 
+    "           Python-mode required vim compiled with +python.
+    "           rope, pydoc, pyflakes, pep8, mccabe libraries in vim
+    "           to provide features like python code looking for bugs, refactoring 
+    "let g:pymode_doc_key = 'K'                      " Set key 'R' for run python code
+    "let g:pymode_run_key = 'E'
+    "" #############################
+    "" CODE CHECKING
+    "" #############################
+    "" Load pylint code plugin
+    "let g:pymode_lint = 1
+    "" Switch pylint, pyflakes, pep8, mccabe code-checkers
+    "" Can have multiply values "pep8,pyflakes,mcccabe"
+    "let g:pymode_lint_checker = "pyflakes,pep8,mccabe"
+    "" Skip errors and warnings
+    "" E.g. "E501,W002", "E2,W" (Skip all Warnings and Errors startswith E2) and etc
+    "let g:pymode_lint_ignore = "E501"
+    "" Select errors and warnings
+    "" E.g. "E4,W"
+    "let g:pymode_lint_select = ""
+    "" Run linter on the fly
+    "let g:pymode_lint_onfly = 0
+    "" Pylint configuration file
+    "" If file not found use 'pylintrc' from python-mode plugin directory
+    "let g:pymode_lint_config = "$HOME/.pylintrc"
+    "" Check code every save
+    "let g:pymode_lint_write = 1
+    "" Auto open cwindow if errors be finded
+    "let g:pymode_lint_cwindow = 1       " Show error message if cursor placed at the err -
+    "let g:pymode_lint_message = 1
+    "" Auto jump on first error
+    "let g:pymode_lint_jump = 0
+    "" Hold cursor in current window
+    "" when quickfix is open
+    "let g:pymode_lint_hold = 0                  " Place error sign
+    "let g:pymode_lint_signs = 1                 " Maximum allowed mccabe complexity
+    "let g:pymode_lint_mccabe_complexity = 8     " Minimal height of pylint error window
+    "let g:pymode_lint_minheight = 3             " Maximal height of pylint error window
+    "let g:pymode_lint_maxheight = 6
+    "" ##############################
+    "" ROPE REFACTORING / ROPE AUTOCOMPLETE  (strg+space   ... strg+n)
+    "" ##############################
+    "" Load rope plugin
+    "let g:pymode_rope = 1                       " Auto create and open ropeproject
+    "let g:pymode_rope_auto_project = 1          " Enable autoimport
+    "let g:pymode_rope_enable_autoimport = 1     " Auto generate global cache
+    "let g:pymode_rope_autoimport_generate = 1
+    "let g:pymode_rope_autoimport_underlineds = 0
+    "let g:pymode_rope_codeassist_maxfixes = 10
+    "let g:pymode_rope_sorted_completions = 1
+    "let g:pymode_rope_extended_complete = 1
+    "let g:pymode_rope_autoimport_modules = ["os","shutil","datetime"]
+    "let g:pymode_rope_confirm_saving = 1
+    "let g:pymode_rope_global_prefix = "<C-x>p"
+    "let g:pymode_rope_local_prefix = "<C-c>r"
+    "let g:pymode_rope_vim_completion = 1
+    "let g:pymode_rope_guess_project = 1
+    "let g:pymode_rope_goto_def_newwin = ""
+    "let g:pymode_rope_always_show_complete_menu = 1
+    "" ######################################
+    "" VIM PYTHON MOTIONS AND OPERATORS
+    "" ######################################
+    "" Enable python objects and motion
+    "let g:pymode_motion = 1
+    "" Auto fix vim python paths if virtualenv enabled
+    "let g:pymode_virtualenv = 1
+    "" ######################################
+    "" HIGHLIGHTING TEXT
+    "" ######################################
+    "" Enable pymode's custom syntax highlighting
+    "let g:pymode_syntax = 1
+    "" Enable all python highlightings
+    "let g:pymode_syntax_all = 1
+    "" Highlight "print" as function
+    "let g:pymode_syntax_print_as_function = 0
+    "" Highlight indentation errors
+    "let g:pymode_syntax_indent_errors = g:pymode_syntax_all
+    "" Highlight trailing spaces
+    "let g:pymode_syntax_space_errors = g:pymode_syntax_all
+    "" Highlight string formatting
+    "let g:pymode_syntax_string_formatting = g:pymode_syntax_all
+    "" Highlight str.format syntax
+    "let g:pymode_syntax_string_format = g:pymode_syntax_all
+    "" Highlight string.Template syntax
+    "let g:pymode_syntax_string_templates = g:pymode_syntax_all
+    "" Highlight doc-tests
+    "let g:pymode_syntax_doctests = g:pymode_syntax_all
+    "    " Highlight builtin objects (__doc__, self, etc)
+    "let g:pymode_syntax_builtin_objs = g:pymode_syntax_all
+    "    " Highlight builtin functions
+    "let g:pymode_syntax_builtin_funcs = g:pymode_syntax_all
+    "    " Highlight exceptions
+    "let g:pymode_syntax_highlight_exceptions = g:pymode_syntax_all
+    "    " For fast machines
+    "let g:pymode_syntax_slow_sync = 0
+"    endif
+if vimlatex
+    " REQUIRED. This makes vim invoke Latex-Suite when you open a tex file.
+    filetype plugin on
+    "
+    " IMPORTANT: win32 users will need to have 'shellslash' set so that latex
+    " can be called correctly.
+    set shellslash
+    
+    " IMPORTANT: grep will sometimes skip displaying the file name if you
+    " search in a singe file. This will confuse Latex-Suite. Set your grep
+    " program to always generate a file-name.
+    set grepprg=grep\ -nH\ $*
+    
+    " OPTIONAL: Starting with Vim 7, the filetype of empty .tex files defaults to
+    " 'plaintex' instead of 'tex', which results in vim-latex not being loaded.
+    " The following changes the default filetype back to 'tex':
+    let g:tex_flavor='latex'
+    
+    let g:Tex_DefaultTargetFormat='pdf'
+    let g:Tex_ViewRule_pdf='Skim'
+    
+    let g:Tex_MultipleCompileFormats='dvi,pdf'
+    endif
+
+
+if remember_marks
+    " COMMENTED OUT  --------------------------------
+    " Tell vim to remember certain things when we exit
+    " "  '10  :  marks will be remembered for up to 10 previously edited files
+    " "  "100 :  will save up to 100 lines for each register
+    " "  :20  :  up to 20 lines of command-line history will be remembered
+    " "  %    :  saves and restores the buffer list
+    " "  n... :  where to save the viminfo files
+    "set viminfo='10,\"100,:20,%,n~/.viminfo
+    endif
+if tabquestion
+    " COMMENTED OUT ----------------------------------------------
+    "if version >= 700
+    "    "set showtabline to show when more than one tab
+    "    set showtabline=1
+    "    "set tab labels to show at most 12 characters
+    "    set guitablabel=%-0.12t%M
+    "endif
+    "
+    "" don't show the toolbar in the GUI (only the menu)
+    "set guioptions-=T
+    "
+    "" don't show tear-off menus
+    "set guioptions-=t
+    "
+    "" Automatically quit Vim if quickfix window is the last
+    "au BufEnter * call MyLastWindow()
+    "function! MyLastWindow()
+    "      " if the window is quickfix go on
+    "      if &buftype=="quickfix"
+    "      "       " if this window is last on screen quit without warning
+    "        if winbufnr(2) == -1
+    "          quit!
+    "        endif
+    "      endif
+    "endfunction
+    "" When F5 is pressed, a numbered list of file names is printed, and the user
+    "" needs to type a single number based on the "menu" and press enter. The
+    "" "menu" disappears after choosing the number so it appears only when you need
+    "" it.
+    "nnoremap <F5> :buffers<CR>:buffer<Space>
+    endif
+
+if keybinding
+    " GENERAL keybindings
+    " some of this bindings need unmapping in SystemPreferences/Keyboard (see ~/.gvimrc)
+    " to see a mapping press control-k and than the key you want to have
+    " same mapping as in normal mode
+    
+    
+    " ######################################################
+    " stuff for macvim
+    " ######################################################
+    "map <^[[D> <Left>
+    "inoremap <M-h> <C-o>h   
+    "inoremap <D-h> <Left>
+    "inoremap '^[[D' <Left>
+    "inoremap <D-h> :echo 'yo'
+    "inoremap <M-h> <Left>
+    inoremap <D-l> <C-o>l
+    inoremap <D-l> <Right>
+    inoremap <D-j> <C-o>j
+    inoremap <D-k> <C-o>k
+    "" go to beginning of line (works)
+    "" go to end of line (works)
+    "inoremap <D-;> <C-o>^
+    "inoremap <D-'> <C-o>$
+    "nnoremap <D-;> <C-o>^
+    "nnoremap <D-'> <C-o>$
+    "map <D-;> <C-o>^
+    "map <D-'> <C-o>$
+
+    "" delete char back (works)
+    "" delete char next (works)
+    "inoremap <D-u> <BS>
+    "inoremap <D-i> <C-o>x
+
+    "" delete word next (works)
+    "" delete word last (SEEMS TO BE MAPPED BY MACVIM, CANT FIND HOW TO UNMAP ->  try with better touch tool?)
+    "inoremap <D-o> <C-o>dW
+    "inoremap <D-y> <C-o>dB
+
+    "" move word back (B by spaces) (b by punctuatioins)
+    "" move word next (W by spaces) (w by punctuatioins)
+    "inoremap <D-n> <C-o>B
+    "inoremap <D-m> <C-o>W
+   
+ 
+    " ################################################
+    " vim annoyances from http://blog.sanctum.geek.nz/vim-annoyances/
+    " ################################################
+    " Cursor jumps around while joining lines
+    "   If you want to keep the cursor in place when you join lines with J, you can do this, dropping a mark before the operation to which you return afterwards:
+    nnoremap J mzJ`z
+
+    "Jumping lands on top or bottom of screen
+    "   If you’d like to center the window automatically around the cursor 
+    "   after jumping to a location with motions like n (next search pattern occurrence) 
+    "   or } (end of next paragraph), you can arrange that by remapping to add a zz after the motion:
+    nnoremap n nzz
+    nnoremap } }zz
+
+    " Skipping lines when wrap is set
+    "   By default, the j and k keys don’t move by row; they move by line.
+    "   This means that if you have the wrap option set, you might skip across
+    "   several rows to reach the same point in an adjacent line.
+    "   This can be frustrating if you prefer the more intuitive behavior of
+    "   moving up to the character immediately above the current one. If you
+    "   don’t like this behavior, you can fix it by mapping j to gj, and k
+    "   to gk, which moves by rows rather than lines:
+    nnoremap j gj
+    nnoremap k gk
+
+
+    " Caps Lock sends Vim crazy
+    " Caps Lock in normal mode makes Vim go haywire. This isnt really Vims fault; Caps Lock is generally a pretty useless key. 
+    " Its often useful for Vim users to remap it, so that it sends the same signal as a more useful key; Control and Escape are 
+    " common choices. You might even find this reduces strain on your hands.
+    " edit ~/.vimrc on the fly directly
+    nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>
+
+    " To move faster in normal mode
+    "map <C-l> w
+    "map <C-h> b
+    "map <D-l> w
+
+    " folding
+    nmap FF zM
+    nmap ff za
+
+    nmap ; :
+    nmap - :bd<CR>
+
+    " want usually thw whole word
+    nmap w W
+    nmap b B
+
+    nmap <silent> <Leader>u :nohlsearch<CR>
+    " make intend not loose highlighing
+    vnoremap > >gv
+    noremap < <gv
+
+    " ############ tab mappings ######################
+    " open new tab, close tab, got tab to right/left
+    nmap tt <esc>:tabnew<cr>
+    nmap ct <esc>:tabclose<cr>
+    "nmap < <esc>:tabp<cr>
+    "nmap > <esc>:tabn<cr>
+
+    " ################ move between splits ###############
+    " This next set of mappings maps <C-[h/j/k/l]> to the commands needed to move 
+    " around your splits. If you remap your capslock key to Ctrl it makes for very 
+    " easy navigation.
+    nnoremap <C-h> <C-w>h
+    nnoremap <C-j> <C-w>j
+    nnoremap <C-k> <C-w>k
+    nnoremap <C-l> <C-w>l
+
+    "let label=v:lnum   " put number in tab
+    map t1 :tabn 1<CR>
+    map t2 :tabn 2<CR>
+    map t3 :tabn 3<CR>
+    map t4 :tabn 4<CR>
+    map t5 :tabn 5<CR>
+    map t6 :tabn 6<CR>
+    map t7 :tabn 7<CR>
+    map t8 :tabn 8<CR>
+    map t9 :tabn 9<CR>
+
+
+    " #################### GERARDS MAPS: My first attempt to turn vim into a python IDE
+    map <c-j> <c-w>j
+    map <c-k> <c-w>k
+    map <c-l> <c-w>l
+    map <c-h> <c-w>h
+    "map <leader>td <Plug>TaskList
+    "nmap qt <esc>:tabclose<cr>
+    "vmap <C-S-j> !par -w72<cr>
+
+    "
+    "map <leader>td <Plug>TaskList
+    "nmap <leader>a <Esc>:Ack!
+    "
+    " remove arrow keys to use vim correctly using hjkl
+    "nnoremap <up> <nop>
+    "nnoremap <down> <nop>
+    "nnoremap <left> <nop>
+    "nnoremap <right> <nop>
+    "inoremap <up> <nop>
+    "inoremap <down> <nop>
+    "inoremap <left> <nop>
+    "inoremap <right> <nop>
+
+    " This first mapping makes ,w open a new vertical split and switch over to
+    " it.
+    nnoremap <leader>w <C-w>v<C-w>l
+
+    " yank whole word -0.05 instead of just -
+    nnoremap yw yW
+
+    nnoremap <leader>u :redo<CR>
+    endif
+
+if MUSCELMEMORY
+    " Keystrokes to remember
+    " highlight text :!fmt    -> formats text
+    "
+    " vimlatex:
+    " \ll                       -> comile source
+    " \ls                       -> go to skim an show line
+    " :retab                    -> To change all the existing tab characters to match the current tab settings, use
+    " :s/pattern/replacement/             to replace stuff
+    " :s/pattern/replacement/g            to replace every instance
+    " :s/pattern/replacement/c(or s)      to be asked at every instance
+    " ,ev        -> open ~/.vimrc
+    endif
+
+"" syntax for mathematica
+au! BufRead,BufNewFile *.math       setfiletype mma

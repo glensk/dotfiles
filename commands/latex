@@ -1,0 +1,53 @@
+i> ./BetaT2.tex:271:  ==> Fatal error occurred, no output PDF file produced!
+> Transcript written on BetaT2.log.
+> execution error: Can’t make file ":BetaT2.pdf" into type alias. (-1700)
+> ~
+> Richard-Seguins-MacBookPro:~ richardseguin$ 
+
+
+Howdy,
+
+Did you create an updmap.cfg file for the MinionPro.map (or whatever it's called) and run
+
+sudo -H mktexlsr
+sudo -H updmap-sys
+
+(as discussed in TeXLive2012Changes available at <https://dl.dropbox.com/u/10932738/index.html>) or run
+
+sudo -H updmap-sys --enable Map MinionPro.map
+
+to enable the map file?
+
+Good Luck,
+
+Herb Schulz
+
+
+###########################################################
+# description of packages
+###########################################################
+-->> \usepackage{ulem}
+
+     folgende Befehle zu Verfügung:
+        
+        \uline{important}  % unterstreichen
+        \uuline{urgent}    % doppelt unterstreichen
+        \uwave{boat}       % unterschlängeln
+        \sout{wrong}       % durchstreichen
+        \xout{removed}     % ausstreichen mit //////.
+
+    
+-->> \usepackage{color}
+
+    Die möglichen neuen Befehle rem und add um die Textabschnitte, die entfernt bzw. hinzugefügt werden müssen, deutlicher zu markieren, werden exemplarisch durch
+        
+        \newcommand{\rem}[1]{\textcolor{red}{\sout{#1}}}
+        \newcommand{\add}[1]{\textcolor{blue}{\uline{#1}}}
+
+        eingeführt. Diese können ab sofort in einer tex-Datei eingesetzt werden:
+            
+            This is a text line. \rem{This text was removed.} \add{This text added.} This is another text line
+
+
+-->> \usepackage{multirow}
+    To enable multirows in Tables

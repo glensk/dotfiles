@@ -1,0 +1,8 @@
+remove control = Control_L Control_R
+remove Mod2 = Meta_L Meta_R
+keysym Meta_L = Control_L
+keysym Control_L = Meta_L
+keysym Meta_R = Control_R
+keysym Control_R = Meta_R
+add Mod2 = Meta_L Meta_R
+add Control = Control_L Control_R

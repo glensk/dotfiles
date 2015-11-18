@@ -1,0 +1,36 @@
+#################################################################
+# declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
+#################################################################
+if ( $?LD_LIBRARY_PATH == 0 ) setenv LD_LIBRARY_PATH ""
+if ( $?PYTHONPATH == 0 ) setenv PYTHONPATH ""
+
+#################################################################
+# read in general variables on{mac,cmmc,cmmd},printloadstat
+#################################################################
+setenv currentshell tcsh
+setenv generalrc $HOME/Dropbox/scripts/dotfiles/generalrc
+source $generalrc/generalrc_.sh
+
+
+#################################################################
+# tcsh dependent stuff to use on every system
+#################################################################
+#	settings  for interactive shells
+source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.set
+
+#	bindkeys   for interactive shells
+source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.bindkey
+
+#	completions for interactive shells
+source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.complete
+#	git settings  (makes problems at cmmc)
+#source $HOME/.git-completion.tcsh
+
+# set title to tab (makes problems at cmmc)
+#settitlepath.sh
+
+
+#setenv JPY $HOME/scripts/bin/j2/j.py # tells j.sh where the python script is
+#alias j $HOME'/scripts/bin/j2/j.sh $*'
+#. $HOME/scripts/bin/j2/j.sh          # provides the j() function
+#[[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh

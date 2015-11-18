@@ -1,0 +1,84 @@
+"set nocompatible              " required for vundle 
+"filetype off
+"set rtp+=~/.vim/bundle/Vundle.vim
+"call vundle#begin()
+"
+"" Let Vundle manage itself.
+"Plugin 'gmarik/Vundle.vim'
+"    " Brief help
+"    " https://github.com/gmarik/Vundle.vim
+"    " :BundleList          - list configured bundles
+"    " :BundleInstall(!)    - install (update) bundles
+"    " :BundleSearch(!) foo - search (or refresh cache first) for foo
+"    " :BundleClean(!)      - confirm (or auto-approve) removal of unused bundles
+"    "
+"    " see :h vundle for more details or wiki for FAQ
+"    " NOTE: comments after Bundle commands are not allowed.
+"
+"Plugin 'altercation/vim-colors-solarized'
+"
+"
+"
+"
+"" All of your Plugins must be added before the following line
+"call vundle#end()            " required
+"filetype plugin indent on    " required
+"
+""" all this has to to a
+"syntax on
+"set t_Co=16
+"let g:solarized_termcolors=256  
+"set background=dark  
+"colorscheme solarized
+
+"" Color-schemes           {{{
+"Plugin 'flazz/vim-colorschemes'
+"Plugin 'ColorSchemeMenuMaker'
+"Plugin 'desert-warm-256'
+"Plugin 'tomasr/molokai'
+"
+"syntax enable
+"syntax on
+"set background=dark
+""let g:solarized_termcolors=256    " in case of terminal (for not GUI)
+""colorscheme solarized
+""colorscheme solarized
+"set t_Co=256
+"call vundle#end()            " required
+"filetype plugin indent on    " required
+"" colorscheme Monokai          " has to be set after call vundle#end()
+"set t_Co=16
+"let g:solarized_termcolors=256  
+"set background=dark  
+"colorscheme solarized
+"
+source ~/.vim/startup/plugins.vim
+"
+"" Enable filetype plugins
+"filetype on
+"filetype plugin on 
+"filetype indent on
+"set autowrite
+"
+"" change leader key from \ to ,
+"let mapleader = ","
+"let maplocalleader = ","
+"
+"
+source ~/.vim/startup/settings.vim
+source ~/.vim/startup/keybindings.vim
+source ~/.vim/startup/spellcorrection.vim
+"" source ~/.vim/startup/notes.vim
+"
+"
+"" vim:fdm=marker
+"" to use this :set foldmethod=marker
+"
+"" set nocompatible is a must for vundle, solarized, ... and a lot of vi annoyances
+"set nocompatible
+"
+"
+"se t_Co=16
+"let g:solarized_termcolors=256  
+"set background=dark  
+"colorscheme solarized

@@ -1,0 +1,17 @@
+pdftk infos on: http://www.pdflabs.com/docs/pdftk-cli-examples/
+
+
+How to merge Pdfs:
+pdftk 10011948_57.pdf 10011948_*.pdf cat output landold.pdf
+
+how to split pdfs:
+pdftk infile.pdf cat 51-100 output outfile.pdf
+pdftk 1998_PR_Kraftmakher_Equilibrium_Vacancies_Thermal_prop_of_matter_Kraftmakher.pdf cat 5-5 output Kraftmakher_page83.pdf
+
+pdftk kan split pdfs 
+pdftk can rotate all or certain pages
+pdftk cann fill out pdfs
+
+
+remove certain page: (here remove page 10 to page 25)
+pdftk myDocument.pdf cat 1-9 26-end output removedPages.pdf

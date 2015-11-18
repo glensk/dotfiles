@@ -1,0 +1,18 @@
+⌃ + ⌘ + Arrow keys to move item up or down
+⌘ + '  To open add attachment of task
+
+
+how to make link to folder:
+    --> drag the folder / file from finder to the omnifocus address/bar / attachment place -> click on Alias
+
+how to make link from finder/terminal to omnifocus:
+    --> open  ~/scripts/commands/omnifocus.applescript
+    --> in omnifocus control click on the project and Copy as Link to get the link
+    --> in the opened applescript change the link(s) (one to open and one to close)
+    --> File/Export; File Format: Application --> Save  (maybe filename __link_omnifocus.app)
+    --> to open omnifocus: open ~/proj/results_/__2013.10_dilute_limit_al_si/__link_omnifocus.app/
+
+
+
+Do define if you see Projects (which usually dont have contexts) under contexts surf to following site
+omnifocus:///change-setting?ContextModeShowsParents=false

@@ -1,0 +1,152 @@
+" Vim syntax support file
+" Maintainer:	Bram Moolenaar <mool@oce.nl>
+" Last change:	1997 May 8
+
+" This is the startup file for syntax highlighting.
+" It sets the default highlighting methods, and installs autocommands for all
+" the available syntax files.
+
+if has("syntax")
+
+  " The default methods for highlighting.  Can be overridden later.
+  " There should be only six of these, because many terminals can only use
+  " six different colors (plus black and white).  It doesn't look nice with
+  " too many colors too.
+  " Careful with "cterm=bold", on rxvt it changes the color to bright.
+  highlight Comment	   term=bold       ctermfg=Red          guifg=Blue
+  highlight Constant	                   ctermfg=Magenta      guifg=Red
+  highlight Identifier	                ctermfg=Blue         guifg=DeepSkyBlue
+  highlight Statement	term=bold       ctermfg=Red          guifg=Red                    gui=bold        
+  highlight PreProc	                   ctermfg=Magenta      guifg=Blue                   gui=bold
+  highlight Type	                      ctermfg=DarkGreen    guifg=SeaGreen               gui=bold
+  highlight Special	   term=bold       ctermfg=DarkBlue     guifg=SlateBlue   
+  highlight String	   term=bold       ctermfg=Red          guifg=Orange                 gui=bold
+  highlight Todo        term=standout 	 cterm=bold           guifg=Magenta                gui=bold
+  highlight Error       term=reverse 	 ctermbg=Red          guifg=Yellow      guibg=Red  gui=bold
+
+  " Common groups that link to default highlighting.
+  " You can specify other highlighting easily.
+  highlight link String		   String
+  highlight link Character	   Constant
+  highlight link Number		   Constant
+  highlight link Boolean	   Constant
+  highlight link Float		   Number
+  highlight link Function	   Identifier
+  highlight link Conditional	Statement
+  highlight link Repeat		   Statement
+  highlight link Label		   Statement
+  highlight link Operator	   Statement
+  highlight link Keyword	   Statement
+  highlight link Include	   PreProc
+  highlight link Define		   PreProc
+  highlight link Macro		   PreProc
+  highlight link PreCondit	   PreProc
+  highlight link StorageClass	Type
+  highlight link Structure	   Type
+  highlight link Typedef	   Type
+  highlight link Tag		      Special
+
+  " Ada (83, 9X, 95)
+  au BufNewFile,BufReadPost *.adb,*.ads										so $VIM/syntax/ada.vim
+  " Assembly (GNU)
+  au BufNewFile,BufReadPost *.asm,*.s											so $VIM/syntax/asm.vim
+  " Batch file for MSDOS
+  au BufNewFile,BufReadPost *.bat,*.sys										so $VIM/syntax/dosbatch.vim
+  " C
+  au BufNewFile,BufReadPost *.c,*.h												so $VIM/syntax/c.vim
+  " C++
+  au BufNewFile,BufReadPost *.cpp,*.cc,*.h,*.cxx,*.c++,*.C,*.H,*.hh 	so $VIM/syntax/cpp.vim
+  " Century Term Command Scripts
+  au BufNewFile,BufReadPost *.cmd,*.con										so $VIM/syntax/cterm.vim
+  " Diff files
+  au BufNewFile,BufReadPost *.diff												so $VIM/syntax/diff.vim
+  " Fortran
+  au BufNewFile,BufReadPost *.f,*.for,*.fpp,*.ftn,*.f.h					so $VIM/syntax/fortran.vim
+  " HTML
+  au BufNewFile,BufReadPost *.html,*.htm,*.shtml							so $VIM/syntax/html.vim
+  " Java
+  au BufNewFile,BufReadPost *.java												so $VIM/syntax/java.vim
+  " JavaCC
+  au BufNewFile,BufReadPost *.jj													so $VIM/syntax/javacc.vim
+  " Lex
+  au BufNewFile,BufReadPost *.lex,*.l											so $VIM/syntax/lex.vim
+  " Lisp
+  au BufNewFile,BufReadPost *.lsp,*.L											so $VIM/syntax/lisp.vim
+  " Makefile
+  au BufNewFile,BufReadPost [mM]akefile*,[iI][mM]ake*						so $VIM/syntax/make.vim
+  " Maple V
+  au BufNewFile,BufReadPost *.mv													so $VIM/syntax/maple.vim
+  " Matlab
+  au BufNewFile,BufReadPost *.m													so $VIM/syntax/matlab.vim
+  " Pascal
+  au BufNewFile,BufReadPost *.p,*.pas											so $VIM/syntax/pascal.vim
+  " Perl
+  au BufNewFile,BufReadPost *.pl,*.pm,*.PL,*.perl							so $VIM/syntax/perl.vim
+  " PostScript
+  au BufNewFile,BufReadPost *.ps,*.eps											so $VIM/syntax/postscr.vim
+  " Sather
+  au BufNewFile,BufReadPost *.sa													so $VIM/syntax/sather.vim
+  " Shell script (until there is a csh.vim)
+  au BufNewFile,BufReadPost .profile,.login,.cshrc,.bashrc,*rc,*.sh 	so $VIM/syntax/sh.vim 
+  " Z-Shell script
+  au BufNewFile,BufReadPost .z*,zsh*,zlog*									so $VIM/syntax/zsh.vim
+  " SQL
+  au BufNewFile,BufReadPost *.sql												so $VIM/syntax/sql.vim
+  " TeX
+  au BufNewFile,BufReadPost *.tex,*.sty,*.latex,*.toc,*.ipe				so $VIM/syntax/tex.vim
+  " Verilog HDL
+  au BufNewFile,BufReadPost *.v													so $VIM/syntax/verilog.vim
+  " VHDL
+  au BufNewFile,BufReadPost *.hdl,*.vhd,*.vhdl_[0-9]* 					so $VIM/syntax/vhdl.vim
+  " Vim Help file
+  au BufNewFile,BufReadPost */vim*/doc/*.txt									so $VIM/syntax/help.vim
+  " Vim script
+  au BufNewFile,BufReadPost *.*vimrc,*.vim,.exrc,_*vimrc,_exrc 		so $VIM/syntax/vim.vim
+  " Xmath
+  au BufNewFile,BufReadPost *.ms,*.msc,*.msf									so $VIM/syntax/xmath.vim
+  " Yacc
+  au BufNewFile,BufReadPost *.y													so $VIM/syntax/yacc.vim
+  " Various scripts, without a specific extension
+  au BufNewFile,BufReadPost *														so $VIM/syntax/scripts.vim
+
+  if has("gui")
+    50nmenu Syntax.OFF				:syn clear<CR>
+    50nmenu Syntax.Ada				:so $VIM/syntax/ada.vim<CR>
+    50nmenu Syntax.assembly		:so $VIM/syntax/asm.vim<CR>
+    50nmenu Syntax.MS-DOS\ \.bat :so $VIM/syntax/dosbatch.vim<CR>
+	 50nmenu Syntax.C					:so $VIM/syntax/c.vim<CR>
+    50nmenu Syntax.C++				:so $VIM/syntax/cpp.vim<CR>
+    50nmenu Syntax.Century\ Term :so $VIM/syntax/cterm.vim<CR>
+    50nmenu Syntax.Diff				:so $VIM/syntax/diff.vim<CR>
+    50nmenu Syntax.Fortran			:so $VIM/syntax/fortran.vim<CR>
+    50nmenu Syntax.HTML				:so $VIM/syntax/html.vim<CR>
+    50nmenu Syntax.Java				:so $VIM/syntax/java.vim<CR>
+    50nmenu Syntax.JavaCC			:so $VIM/syntax/javacc.vim<CR>
+    50nmenu Syntax.Lex				:so $VIM/syntax/lex.vim<CR>
+    50nmenu Syntax.Lisp				:so $VIM/syntax/lisp.vim<CR>
+    50nmenu Syntax.Makefile		:so $VIM/syntax/make.vim<CR>
+    50nmenu Syntax.Maple			:so $VIM/syntax/maple.vim<CR>
+    50nmenu Syntax.Matlab			:so $VIM/syntax/matlab.vim<CR>
+    50nmenu Syntax.Mail				:so $VIM/syntax/mail.vim<CR>
+    50nmenu Syntax.Objective\ C	:so $VIM/syntax/objc.vim<CR>
+    50nmenu Syntax.Pascal			:so $VIM/syntax/pascal.vim<CR>
+    50nmenu Syntax.Perl				:so $VIM/syntax/perl.vim<CR>
+    50nmenu Syntax.PostScript		:so $VIM/syntax/postscr.vim<CR>
+    50nmenu Syntax.Prolog			:so $VIM/syntax/prolog.vim<CR>
+    50nmenu Syntax.Sather			:so $VIM/syntax/sather.vim<CR>
+    50nmenu Syntax.Shell\ script :so $VIM/syntax/sh.vim<CR>
+    50nmenu Syntax.Zsh\ script	:so $VIM/syntax/zsh.vim<CR>
+    50nmenu Syntax.SQL				:so $VIM/syntax/sql.vim<CR>
+    50nmenu Syntax.Tex				:so $VIM/syntax/tex.vim<CR>
+    50nmenu Syntax.Verilog\ HDL	:so $VIM/syntax/verilog.vim<CR>
+    50nmenu Syntax.VHDL				:so $VIM/syntax/vhdl.vim<CR>
+    50nmenu Syntax.Vim\ help		:so $VIM/syntax/help.vim<CR>
+    50nmenu Syntax.Vim\ script	:so $VIM/syntax/vim.vim<CR>
+    50nmenu Syntax.Xmath			:so $VIM/syntax/xmath.vim<CR>
+    50nmenu Syntax.Yacc				:so $VIM/syntax/yacc.vim<CR>
+  endif
+
+  " Execute the autocommands for the each buffer.
+  doautoall BufReadPost
+
+endif

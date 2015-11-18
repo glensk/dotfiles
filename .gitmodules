@@ -1,0 +1,81 @@
+[submodule "zsh/oh-my-zsh"]
+	path = zsh/oh-my-zsh
+	url = git://github.com/robbyrussell/oh-my-zsh.git
+[submodule "zsh/zsh-syntax-highlighting"]
+	path = zsh/zsh-syntax-highlighting
+	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "vim/bundle/Vundle.vim"]
+	path = vim/bundle/Vundle.vim
+	url = https://github.com/gmarik/Vundle.vim.git
+[submodule "vim/bundle/ctrlp.vim"]
+	path = vim/bundle/ctrlp.vim
+	url = https://github.com/kien/ctrlp.vim.git
+[submodule "vim/bundle/gundo.vim"]
+	path = vim/bundle/gundo.vim
+	url = https://github.com/sjl/gundo.vim
+[submodule "vim/bundle/latex-makefile"]
+	path = vim/bundle/latex-makefile
+	url = https://github.com/shiblon/latex-makefile.git
+[submodule "vim/bundle/mru"]
+	path = vim/bundle/mru
+	url = https://github.com/yegappan/mru.git
+[submodule "vim/bundle/neocomplete.vim"]
+	path = vim/bundle/neocomplete.vim
+	url = https://github.com/Shougo/neocomplete.vim
+[submodule "vim/bundle/rainbow_parentheses.vim"]
+	path = vim/bundle/rainbow_parentheses.vim
+	url = https://github.com/kien/rainbow_parentheses.vim.git
+[submodule "vim/bundle/supertab"]
+	path = vim/bundle/supertab
+	url = https://github.com/ervandew/supertab.git
+[submodule "vim/bundle/switch.vim"]
+	path = vim/bundle/switch.vim
+	url = https://github.com/AndrewRadev/switch.vim.git
+[submodule "vim/bundle/syntastic"]
+	path = vim/bundle/syntastic
+	url = https://github.com/scrooloose/syntastic.git
+[submodule "vim/bundle/tagbar"]
+	path = vim/bundle/tagbar
+	url = https://github.com/majutsushi/tagbar
+[submodule "vim/bundle/taglist.vim"]
+	path = vim/bundle/taglist.vim
+	url = https://github.com/vim-scripts/taglist.vim.git
+[submodule "vim/bundle/tcomment_vim"]
+	path = vim/bundle/tcomment_vim
+	url = https://github.com/tomtom/tcomment_vim.git
+[submodule "vim/bundle/vim-airline"]
+	path = vim/bundle/vim-airline
+	url = https://github.com/bling/vim-airline.git
+[submodule "vim/bundle/vim-colors-solarized"]
+	path = vim/bundle/vim-colors-solarized
+	url = https://github.com/altercation/vim-colors-solarized.git
+[submodule "vim/bundle/vim-easymotion"]
+	path = vim/bundle/vim-easymotion
+	url = https://github.com/Lokaltog/vim-easymotion.git
+[submodule "vim/bundle/vim-fakeclip"]
+	path = vim/bundle/vim-fakeclip
+	url = https://github.com/kana/vim-fakeclip
+[submodule "vim/bundle/vim-indexed-search"]
+	path = vim/bundle/vim-indexed-search
+	url = https://github.com/henrik/vim-indexed-search.git
+[submodule "vim/bundle/vim-latex-suite"]
+	path = vim/bundle/vim-latex-suite
+	url = https://github.com/gerw/vim-latex-suite.git
+[submodule "vim/bundle/vim-latex"]
+	path = vim/bundle/vim-latex
+	url = https://github.com/jcf/vim-latex.git
+[submodule "vim/bundle/vim-signature"]
+	path = vim/bundle/vim-signature
+	url = https://github.com/kshenoy/vim-signature.git
+[submodule "vim/bundle/vim-surround"]
+	path = vim/bundle/vim-surround
+	url = https://github.com/tpope/vim-surround.git
+[submodule "vim/bundle/vundle"]
+	path = vim/bundle/vundle
+	url = https://github.com/gmarik/vundle.git
+[submodule "z"]
+	path = z
+	url = https://github.com/rupa/z
+[submodule "zsh/zsh-history-substring-search"]
+	path = zsh/zsh-history-substring-search
+	url = git://github.com/zsh-users/zsh-history-substring-search.git

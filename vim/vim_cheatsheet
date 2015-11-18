@@ -1,0 +1,31 @@
+% Once on ( to go closing ) or {}[] 
+gf open file under cursor
+Ctrl+o go back to last file/place
+Ctrl-i (same as Tab) to jump forward to the next (newer) location.
+gd goto definition (to its local declaration.) 
+)  Move to start of next sentence
+(  Move to start of last sentence
+}  Move to start of next paragraph (as delimited by a blank line)
+{  Move to start of last paragraph (as delimited by a blank line)
+Shift + J Joint current line with next line
+
+guw - lowercase current word
+gUw - uppercase current word
+gU$ - uppercase to end of line
+g~w - swapcase current word
+v$~ - swapcase to end of line (if notildeop is set)
+~w  - swapcase of word (if tiildeop is set)
+
+dt. delete up to next . but without .
+df. delete up to next . including  .
+
+f  [char]Jump to next occurrence of [char].
+3f [char]Jump to third occurrence of [char].
+F  [char]Jump to previous occurrence of [char].
+t  [char]Jump to one character before the next occurrence of [char].
+T  [char]Jump to one character after the previous occurrence of [char].
+;  Repeat last f/F/t/T movement.
+,  Repeat last f/F/t/T movement in the opposite direction.
+
+
+<leader>pp chane past options

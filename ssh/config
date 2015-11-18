@@ -1,0 +1,25 @@
+Host cluster
+    HostbasedAuthentication yes
+    EnableSSHKeysign        yes
+    HostName cmmd002.mpie.de
+    User glensk
+    ServerAliveInterval 1600
+    ServerAliveCountMax 10
+    ForwardX11Trusted yes
+    TCPKeepAlive yes
+
+Host cmpc34
+    HostName cmpc34
+    User glensk
+    ServerAliveInterval 1600
+    ServerAliveCountMax 10
+    ForwardX11Trusted yes
+    TCPKeepAlive yes
+
+Host cmpc
+    HostName $myhost.mpie.de
+    User glensk
+    ServerAliveInterval 1600
+    ServerAliveCountMax 10
+    ForwardX11Trusted yes
+    TCPKeepAlive yes

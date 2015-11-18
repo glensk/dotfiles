@@ -1,0 +1,99 @@
+
+# scrolling in screen
+termcapinfo xterm* ti@:te@
+## gyaresu's .screenrc 2008-03-25
+# http://delicious.com/search?p=screenrc
+#
+# to get 256 colors in screen ... from http://robotsrule.us/vim/
+#attrcolor b ".I"
+#termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+defbce "on"
+
+
+shell tcsh
+# Don't display the copyright page
+startup_message off
+
+# detach on disconnect
+autodetach on
+
+# tab-completion flash in heading bar
+vbell off
+
+# keep scrollback n lines
+defscrollback 20000
+
+# Doesn't fix scrollback problem on xterm because if you scroll back
+# all you see is the other terminals history.
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+
+# These will let you use 
+bind -c selectHighs 0 select 10 #these three commands are 
+bind -c selectHighs 1 select 11 #added to the command-class
+bind -c selectHighs 2 select 12 #selectHighs
+bind -c selectHighs 3 select 13
+bind -c selectHighs 4 select 14
+bind -c selectHighs 5 select 15
+
+
+bind - command -c selectHighs   #bind the hyphen to 
+                                #command-class selectHighs 
+
+
+#screen -t rtorrent  0	rtorrent	
+#screen -t tunes    	1	ncmpc --host=192.168.1.4 --port=6600 #was for connecting to MPD music server.
+#screen -t stuff 	1
+#screen -t irssi 	2	irssi
+#screen -t dancing   4	    
+#screen -t python    5	python
+#screen -t giantfriend   6	these_are_ssh_to_server_scripts.sh
+#screen -t computerrescue    7	these_are_ssh_to_server_scripts.sh
+#screen -t BMon  	8	bmon -p eth0
+#screen -t htop  	9	htop
+#screen -t hellanzb  10	hellanzb
+#screen -t watching  3	
+#screen -t interactive.fiction  8
+#screen -t hellahella   8	paster serve --daemon  /home/gyaresu/downloads/hellahella/hella.ini	
+
+shelltitle "$ |bash"
+
+# THIS IS THE PRETTY BIT
+#change the hardstatus settings to give an window list at the bottom of the                                                                        
+##screen, with the time and date and with the current window highlighted                                                                            
+hardstatus             alwayslastline                                                                                                                          
+#hardstatus string '%{= mK}%-Lw%{= KW}%50>%n%f* %t%{= mK}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}'
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %d/%m %{W}%c %{g}]'
+
+##################################################
+# This is supposed to make scroll with mouse possible in Screen, it needs additonally the following entry in your ~/.Xresources file
+#XTerm*saveLines: 0
+#XTerm*vt100.translations: #override \n\
+#  Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+#  Lock Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+#  Lock @Num_Lock Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+#  @Num_Lock Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+#  <Btn4Down>: string(0x1b) string("[5S") \n\
+#  Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+#  Lock Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+#  Lock @Num_Lock Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+#  @Num_Lock Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+#  <Btn5Down>: string(0x1b) string("[5T") \n\
+#  Shift <KeyPress> Prior: string(0x1b) string("[25S") \n\
+#  Shift <KeyPress> Next: string(0x1b) string("[25T") \n
+
+
+# Scroll up
+bindkey -d "^[[5S" eval copy "stuff 5\025"
+bindkey -m "^[[5S" stuff 5\025
+
+# Scroll down
+bindkey -d "^[[5T" eval copy "stuff 5\004"
+bindkey -m "^[[5T" stuff 5\004
+
+# Scroll up more
+bindkey -d "^[[25S" eval copy "stuff \025"
+bindkey -m "^[[25S" stuff \025
+
+# Scroll down more
+bindkey -d "^[[25T" eval copy "stuff \004"
+bindkey -m "^[[25T" stuff \004

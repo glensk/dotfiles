@@ -1,0 +1,91 @@
+syntax on
+set ai
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set hlsearch
+set wm=4
+set relativenumber
+colors solarized
+set backspace=2
+
+if has("mouse")
+	set mouse=a
+endif
+if has("mac")
+	set t_Co=256
+endif
+
+nmap <esc>:nt<cr> :NERDTree<cr>B
+nmap < <esc>:tabp<cr>
+nmap > <esc>:tabn<cr>
+nmap tt <esc>:tabnew<cr>
+nmap qt <esc>:tabclose<cr>
+vmap <C-S-j> !par -w72<cr>
+
+" REQUIRED. This makes vim invoke Latex-Suite when you open a tex file.
+filetype plugin on
+"
+" IMPORTANT: win32 users will need to have 'shellslash' set so that latex
+" can be called correctly.
+set shellslash
+
+" IMPORTANT: grep will sometimes skip displaying the file name if you
+" search in a singe file. This will confuse Latex-Suite. Set your grep
+" program to always generate a file-name.
+set grepprg=grep\ -nH\ $*
+
+" OPTIONAL: Starting with Vim 7, the filetype of empty .tex files defaults to
+" 'plaintex' instead of 'tex', which results in vim-latex not being loaded.
+" The following changes the default filetype back to 'tex':
+let g:tex_flavor='latex'
+
+let g:Tex_DefaultTargetFormat='pdf'
+let g:Tex_ViewRule_pdf='Skim'
+
+let g:Tex_MultipleCompileFormats='dvi,pdf'
+
+au BufNewFile,BufRead *.in set ft=lammps
+
+filetype off
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+
+filetype plugin indent on
+
+" My first attempt to turn vim into a python IDE
+set foldmethod=indent
+set foldlevel=99
+map <c-j> <c-w>j
+map <c-k> <c-w>k
+map <c-l> <c-w>l
+map <c-h> <c-w>h
+
+map <leader>td <Plug>TaskList
+
+syntax on                           " syntax highlighing
+filetype on                          " try to detect filetypes
+filetype plugin indent on    " enable loading indent file for filetype
+" let g:pyflakes_use_quickfix = 0
+" let g:pep8_map='<leader>8'
+" au FileType python set omnifunc=pythoncomplete#Complete
+" let g:SuperTabDefaultCompletionType = "context"
+" set completeopt=menuone,longest,preview
+  
+map <leader>n :NERDTreeToggle<CR>
+nmap <leader>a <Esc>:Ack!
+
+vnoremap > >gv
+vnoremap  < <gv
+
+" map <leader>dt :set makeprg=python\ manage.py\ test\|:call MakeGreen()<CR>
+
+"" Execute the tests
+"nmap <silent><Leader>tf <Esc>:Pytest file<CR>
+"nmap <silent><Leader>tc <Esc>:Pytest class<CR>
+"nmap <silent><Leader>tm <Esc>:Pytest method<CR>
+"" cycle through test errors
+"nmap <silent><Leader>tn <Esc>:Pytest next<CR>
+"nmap <silent><Leader>tp <Esc>:Pytest previous<CR>
+"nmap <silent><Leader>te <Esc>:Pytest error<CR>
+

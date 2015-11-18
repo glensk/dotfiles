@@ -1,0 +1,41 @@
+#################################################################
+# declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
+#################################################################
+[ -z "$PYTHONPATH" ] && PYTHONPATH=""
+
+#################################################################
+# read in general variables on{mac,cmmc,cmmd},printloadstat
+#################################################################
+# for tcsh    : setenv currentshell tcsh
+# for bash/zsh: export currentshell='zsh'
+export currentshell='bash'
+export generalrc="$HOME/Dropbox/scripts/dotfiles/generalrc"
+source $generalrc/generalrc_.sh
+
+#################################################################
+# bash dependent stuff to use on every system
+#################################################################
+source $HOME/Dropbox/scripts/dotfiles/bash/bash_set
+
+
+## https://github.com/rupa/z
+## invoke this after fasd otherwise z function will be overwritten by fasd
+#source $HOME/Dropbox/scripts/dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
+#alias c='z'
+
+#@ timing bash:             sys     user
+#@ 0) completely empty      0.002   0.003
+#@ 0) 1+generalrc.sh empty  0.003   0.003
+#@ 1) +generalrc.sh         0.014   0.012 (=0.011s)
+#@ 2) +bash_set             0.018   0.015 (=0.004s)
+#@ 3) +source z             0.030   0.028 (=0.012s)
+
+#@ 1) 1+generalrc.sh empty  0.002   0.003
+#@ 2) 1+necessary_bash      0.003   0.003
+#@ 3) 2+hostdependent       0.006   0.006  =0.003
+#@ 4) 3+path                0.008   0.008  =0.002 
+#@ 5) 4+alias first 3       0.009   0.008  =0.001
+#@ 5) 4+alias all           0.010   0.008  =0.002
+#@ 6) 5+prompt              0.010   0.008  
+#@ 7) 6+thermodynamics      0.014   0.012  =0.004 (davon 0.003 fuer OUTCAR_complete stuff)
+#@ 8) 7+whole generalrc.sh  0.014   0.012  

@@ -1,0 +1,384 @@
+[ "$BASH_VERSION" != "" ] && export shell="bash"
+[ "$ZSH_VERSION" != "" ] && export shell="zsh"
+
+#################################################################
+# alias navigation
+#################################################################
+#[ "$printinfo" = "True" ] && echo "--> .bash_alias : navigation"
+
+#[ "$shell" = "bash" ] && alias ls='ls -F -H -v --color=tty --hide=Icon? --show-control-chars --ignore="*.log" --group-directories-first'
+#[ "$shell" = "zsh" ] && alias ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
+
+
+#alias la='ls -la'
+#alias ll='ls -l --color=auto'
+#alias rm='rm -f'
+#function cd { 
+#    builtin cd "$@" 
+#    #[ -e settitlepath.sh ] && settitlepath.sh 
+#    ls 
+#    }
+#function mcd () { mkdir $1;cd $1; }
+#alias finder-cd-to-current-finder-dir='cd `finder-list-current-finder-dir`'
+#alias -- -='cd -' #alias \\-='cd -' 
+#alias n='cd `tn.sh`'  # go to corresponding nas folder
+#alias d='cd `td.sh`'  # go to corresponding data folder
+#alias l='cd `ti_high_0_create_Folders_vasp.sh -l`'  # go to corresponding high folder
+#alias h='cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high folder
+#alias rl='source $HOME/.`echo $shell`rc'    # ist zsh unter zsh
+
+#################################################################
+# host specific
+#################################################################
+#[ "$printinfo" = "True" ] && echo "--> .bash_alias : host specific"
+## que (everywhere not @ submithost)
+#if [ "$host" != "$submithost" ]; then
+#    alias qhost='qhost.sh'
+#    alias qstat='qstat.sh'
+#    alias qdel='qdel.sh'
+#    alias qalter='qalter.sh'
+#    alias qsub='qsub.sh'
+#    alias qls='qls.sh -u'
+#    alias qhold='qhold.sh'
+#    alias qrls='qrls.sh'
+#fi
+
+#if [ "$host" = "cmmc001.mpie.de" ]; then
+#    alias vi='vi -v'
+#fi
+
+
+#if [ "$host" = "$mylaptop" ]; then
+#alias cat='colorize'  # colorize seems to have sometimes problems
+#alias xmgrace='$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace'
+#alias units='$HOME/scripts/dotfiles/bin/units/units-1.88/units'
+    #alias sed='$HOME/scripts/dotfiles/bin/sed/sed-4.2/build/bin/sed-4.2'
+#    alias top='top -o cpu'
+#alias mvim='open /Applications/MacVim.app'
+#fi
+
+
+#################################################################
+# moule sge ...
+#################################################################
+
+#alias qstatn='qstatn -d'
+
+#################################################################
+# general zsh
+#################################################################
+#alias -g H='| head'
+#alias -g T='| tail'
+#alias -g G='| grep'
+#alias -g X='| xargs'
+#alias -g B='| bc -l'
+#alias -g S='| awk '{sum+=$1} END{print sum}''
+
+# normal aliases
+#alias f='find . -name'
+#function f() { find . -iname "*$1*" ${@:2} }
+#alias fd='find . -type d -name'
+#alias ff='find . -type f -name'
+#alias fogrep='{ fc-list; xlsfonts } | grep -i'
+#alias h='history'
+#alias hgrep="fc -El 0 | grep"
+#alias help='man'
+#alias n='$EDITOR $HOME/.notes'
+
+#alias cd..='cd ..'
+#alias ..='cd ..'
+#alias ....='cd ../..'
+#alias ......='cd ../../..'
+#alias rmd='rm -rf'
+
+
+
+#################################################################
+# general 
+#################################################################
+#[ "$printinfo" = "True" ] && echo "--> .bash_alias : general"
+
+
+#alias du='echo ______better ncdu______;echo; du'
+#alias lstarfile='tar -ztvf'
+#alias diff='colordiff'
+#alias vim='vim -v'
+#alias vi='vim -v'
+#alias ep='epstopdf'
+#alias grep='grep --color=auto -d skip'    # skips directories
+#alias grep'echo use ack instead'
+#alias bc='bc -l'
+##alias cp='cp -a'  # this one did not copy symliks as files but as symlinks -> remove -a
+#alias xmgrace='xmgrace -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+#alias x='xmgrace -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+#[ "$shell" = "bash" ] && alias tarfolder='tar -zcvf \!*.tar.gz \!*'
+#[ "$shell" = "zsh" ] && tarfolder () { tar -zcvf "$1".tar.gz "$1" ; }
+#alias untargz='tar -xvf'
+#alias untar='tar xfv'
+#alias untarbz2='tar -xf'
+#alias ungz='gzip -d'
+#alias untgz='tar -xvf'
+#alias unz='uncompress'
+#alias unbz2='tar -jxvf'
+#zipf () { zip -r "$1".zip "$1" ; } 
+#alias killall='killall -9'
+
+#export texfile=version_curr
+#export texfile=diss
+#alias latexit='latex $texfile.tex ; dvips $texfile.dvi ; ps2pdf $texfile.ps; bibtex $texfile'
+#alias latexit='pdflatex $texfile.tex'
+
+#alias gnuplot='gnuplot -persist'
+#alias q='vi ~/scripts/commands/todo'
+#alias i='ipython'
+#alias load_last_saved_settings='$HOME/Dropbox/scripts/dotfiles/mac_KeyRemap4MacBook/load_last_saved_settings.sh'
+#alias cpdf='$HOME/Dropbox/scripts/dotfiles/bin/cpdf-binaries/OSX-Intel/cpdf'
+#alias df='df -h | grep glensk'
+#alias sp='settitlepath.sh'
+#alias con='google contacts list --fields name,email,phone_number,address,birthday --title "(?i).*\!*"'
+#alias pingtest='ping 69.20.11.136'
+#alias pingtestgoogle='ping 173.194.69.102'   # ping google.com   # this also get you directly to google.com in the browser without DNS\
+#alias pingmit='ping 18.62.0.96'				# this can be directly opened without DNS in google/firefox
+#alias echor='echo "\033[1;31m\!*\033[m"'
+#alias echog='echo "\033[1;32m\!*\033[m"'
+#alias echob='echo "\033[1;34m\!*\033[m"'
+#alias echoB='echo "\033[1m\!*\033[m"'
+#alias xc='xclock -d -brief -padding -8 -geometry 1x1-0+999'
+#alias undo='undo -i'
+
+#alias wc='/opt/local/bin/gwc'  # we currently use gnubin
+#alias wc='/opt/local/bin/gwc'  # we currently use gnubin
+#   extract:  Extract most know archives with one command
+#   ---------------------------------------------------------
+#extract () {
+#    if [ -f $1 ] ; then
+#      case $1 in
+#        *.tar.bz2)   tar xjf $1     ;;
+#        *.tar.gz)    tar xzf $1     ;;
+#        *.bz2)       bunzip2 $1     ;;
+#        *.rar)       unrar e $1     ;;
+#        *.gz)        gunzip $1      ;;
+#        *.tar)       tar xf $1      ;;
+#        *.tbz2)      tar xjf $1     ;;
+#        *.tgz)       tar xzf $1     ;;
+#        *.zip)       unzip $1       ;;
+#        *.Z)         uncompress $1  ;;
+#        *.7z)        7z x $1        ;;
+#        *)     echo "'$1' cannot be extracted via extract()" ;;
+#         esac
+#     else
+#         echo "'$1' is not a valid file"
+#     fi
+#}
+# Extract most types of archive
+#extract() {
+#    if [[ -z "$1" ]]; then
+#        print -P "usage: \e[1;36mextract\e[1;0m <filename>"
+#        print -P "       Extract the file specified based on the extension"
+#    elif [[ -f $1 ]]; then
+#        case ${(L)1} in
+#            *.tar.bz2)  tar -jxvf $1           ;;
+#            *.tar.gz)   tar -zxvf $1           ;;
+#            *.bz2)      bunzip2 $1             ;;
+#            *.gz)       gunzip $1              ;;
+#            *.jar)      unzip $1               ;;
+#            *.rar)      unrar x $1             ;;
+#            *.tar)      tar -xvf $1            ;;
+#            *.tbz2)     tar -jxvf $1           ;;
+#            *.tgz)      tar -zxvf $1           ;;
+#            *.zip)      unzip $1               ;;
+#            *.7z)       7za x $1               ;;
+#            *.gpg)      gpg --decrypt-files $1 ;;
+#            *.Z)        uncompress $1          ;;
+#            *)          echo "Unable to extract '$1' :: Unknown extension"
+#        esac
+#    else
+#        echo "File ('$1') does not exist!"
+#    fi
+#}
+#
+#
+#show-archive() {
+#   if [ -f $1 ]; then
+#         case $1 in
+#         *.tar.bz2)     tar -jtf $1 ;;
+#         *.tar.gz)      tar -ztf $1 ;;
+#         *.tar)         tar -tf $1  ;;
+#         *.tgz)         tar -ztf $1 ;;
+#         *.zip)         unzip -l $1 ;;
+#         *.rar)         rar vb $1   ;;
+#         *)             echo "'$1' Error. This ending is unkonwn!" ;;
+#         esac
+#         else
+#         echo "'$1' is not a valid archive"
+#  fi
+#  }
+#
+##################################################
+# to get setenv (and unsetenv) similar to bash
+##################################################
+#setenv () {
+#    if [ "x$1" = "x" ] ; then
+#      echo "$0: environment variable name required" >&2
+#    elif [ "x$2" = "x" ] ; then
+#      echo "$0: environment variable value required" >&2
+#    else
+#      export $1=$2
+#    fi
+#}
+#
+#unsetenv () {
+#    if [ "x$1" = "x" ] ; then
+#      echo "$0: environment variable name required" >&2
+#    else
+#      unset $1
+#    fi
+#}
+#   ---------------------------
+#   5.  PROCESS MANAGEMENT
+#   ---------------------------
+
+#   findPid: find out the pid of a specified process
+#   -----------------------------------------------------
+#       Note that the command name can be specified via a regex
+#       E.g. findPid '/d$/' finds pids of all processes with names ending in 'd'
+#       Without the 'sudo' it will only find processes of the current user
+#   -----------------------------------------------------
+    findPid () { lsof -t -c "$@" ; }
+
+#   memHogsTop, memHogsPs:  Find memory hogs
+#   -----------------------------------------------------
+#    alias memHogsTop='top -l 1 -o rsize | head -20'
+#    alias memHogsPs='ps wwaxm -o pid,stat,vsize,rss,time,command | head -10'
+
+#   cpuHogs:  Find CPU hogs
+#   -----------------------------------------------------
+#    alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
+
+#   cleanupDS:  Recursively delete .DS_Store files
+#   -------------------------------------------------------------------
+#    alias cleanupDS="find . -type f -name '*.DS_Store' -ls -delete"
+
+#################################################################
+# ssh
+#################################################################
+#[ "$printinfo" = "True" ] && echo "--> .bash_alias : ssh"
+# ssh per tunnel : ssh -X bzg@cmmc001.gc.rzg.mpg.de -R 47540:cmmc1.mpie.de:80    (wobei die 540 im tunnel der telefonnummer entsprechne sollen)
+#alias ssh='ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)
+#alias sshimmer='ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'
+#alias gate='sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gatelinux='sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gatehydra='sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias cluster='sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias cluster='sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gar='sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gar='sshgar.sh'
+#alias gar1='sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gar2='sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias 001='sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias 002='sshimmer -t glensk@cmmd002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias cmpc='sshimmer -t glensk@$myhost.mpie.de             "[ -e `th.sh` ] && cd `th.sh`; zsh"' # this loads tcsh twice due to the necessary tcsh at the end; once zsh is installed on the cmpc (and cmmd?) the tcsh can be left empty and instead of tcsh one could simply write zsh
+#alias $myhost='sshimmer -t glensk@$myhost.mpie.de             "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gatepow="ssh -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200 aglen@vip.rzg.mpg.de"
+
+##################################################################
+## olle stuff
+##################################################################
+#[ "$printinfo" = "True" ] && echo "--> .bash_alias : olle stuff"
+#alias olle_1_process_outcar='$olletrunk/bin/process_outcar_4.6.py'
+#alias olle_2_workflow='cat $olletrunkshared/WORKFLOW'
+#alias olle_2_workflowvi='vi $olletrunkshared/WORKFLOW'
+#alias olle_3_getforceconstants100='getforceconstants.skript infile.ucposcar infile.ssposcar 100'
+#alias olle_3_getforceconstants3='getforceconstants.skript infile.ucposcar infile.ssposcar 3'
+#alias olle_4_extract_forceconstants='./extract_forceconstants'
+#alias olle_5_link='ln -s {out,in}file.forceconstant'
+#alias olle_6_hessematrix='$olletrunk/remap_forceconstant/remap_forceconstant'
+#alias process_outcar_4.6.py='/Users/glensk/Dropbox/scripts/codes_to_try/olle_trunk_savefiles/process_outcar_4.6.py'
+#
+#################################################################
+# git / svn
+#################################################################
+#[ "$printinfo" = "True" ] && echo "--> .bash_alias : svn"
+#alias gu='gitup.sh'
+#alias gd='gitdown.sh'
+#alias gs='git status -u'
+#alias ss='svn status -u'
+#
+#alias sup='svn add ~/scripts/dotfiles/vim/view/*;echo;echo jo'
+#alias sv='$HOME/scripts/dotfiles/bin/sv.sh'
+
+#################################################################
+# garching
+#################################################################
+[ "$printinfo" = "True" ] && echo "--> .bash_alias : garching"
+#alias garmount='sshfs aglen@cmmc001.bc.rzg.mpg.de:/cmmc/u/aglen/v /nas/glensk/vgar/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc"'
+#alias garblazej='ssh bzg@cmmc001.bc.rzg.mpg.de'
+#alias scpfromcmmc='scp -r aglen@cmmc001.bc.rzg.mpg.de:\!:1 \!:2'
+#alias scptocmmc='scp -r \!:1 aglen@cmmc001.bc.rzg.mpg.de:\!:2'
+#alias s4='~/start.4.6.28.tid.quick.sh'
+#alias v4='~/start.4.6.28.tid.quick.sh'
+#alias s5='~/start.5.3.5.20cores.sh'
+#alias s52='~/start.5.3.5.20cores.sh'
+#alias v5='~/start.5.3.5.20cores.sh'
+#alias v52='~/start.5.3.5.20cores.sh'
+
+#export           mnas='umount /nas/glensk;sshfs glensk@$myhost:/nas/glensk /nas/glensk'
+#export          mdata='umount /data/glensk;sshfs glensk@$myhost:/data/glensk /data/glensk'
+#export  mnasgrabowski='umount /nas/grabowski;sshfs glensk@$myhost:/nas/grabowski /nas/grabowski'
+#export mnaskorbmacher='umount /nas/korbmacher;sshfs glensk@$myhost:/nas/korbmacher /nas/korbmacher'
+#export mdatagrabowski='umount /data/grabowski;sshfs glensk@$myhost:/data/grabowski /data/grabowski'
+#export       mnascmmc='umount /u/aglen;sshfs glensk@$myhost:/nas/glensk/cmmc /u/aglen'
+#export      mnascmmcu='umount /nas/glensk/cmmc;sshfs glensk@$myhost:/nas/glensk/cmmc /cmmc/u/aglen'
+
+
+#export        muaglen='sshfs aglen@cmmc001.bc.rzg.mpg.de:/u/aglen /u/aglen'
+export    mcmmcuaglen='sshfs aglen@cmmc001.bc.rzg.mpg.de:/u/aglen /cmmc/u/aglen'
+export    mountimmer=' -o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes'
+#export    mountimmer='mountpoint -C -o volname=nasglensk -o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes'
+#export mountimmer='-o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes,allow_other,default_permissions;'  # hilft auch nicht um auf dem cmmc zu schreiben
+
+#[ "$host" != "$mylaptop" ] && echo 'FF> .bash_alias : $host != $mylaptop' "host:$host  mylaptop:$mylaptop ==> NO mount{nas,gar,data,grabowski}"
+
+
+[ "$printinfo" = "True" ] && echo "--> .bash_alias : try mount{nas,gar,data,grabowski}"
+if [ "$host" = "$mylaptop" ]; then
+    [ "$printinfo" = "True" ] && echo "--> .bash_alias : mount{nas,gar,data,grabowski}"
+
+
+    # ueber garching; das geht noch nicht direkt
+    #alias mountgar="umount /u/algen; umount /cmmc/u/aglen;$muaglen $mountimmer;echo /u/aglen;$mcmmcuaglen $mountimmer;echo /cmmc/u/aglen"
+    #alias garmount="mountgar"
+                   
+    alias umountgar="umount -f /u/aglen; umount -f /cmmc/u/aglen;"
+    alias garumoung="umountgar"
+                 
+
+
+
+
+    # easy, direct mpie, geht immer auch ueber wlan
+    alias mountnas="$mnas $mountimmer;echo ls /nas/glensk;ls /nas/glensk/"
+    #alias nasmount='mountnas'
+    
+    alias mountdata="$mdata $mountimmer;echo ls /data/glensk; ls /data/glensk/"
+    alias datamount='mountdata'
+    
+    alias mountnasgrabowski="$mnasgrabowski $mountimmer;echo ls /nas/grabowski; ls /nas/grabowski"
+    alias nasmountgrabowski='mountnasgrabowski'
+    alias mountnaskorbmacher="$mnaskorbmacher $mountimmer;echo ls /nas/korbmacher; ls /nas/korbmacher"
+    alias nasmountkorbmacher='mountnaskorbmacher'
+
+    alias mountdatagrabowski="$mdatagrabowski $mountimmer;echo ls /data/grabowski; ls /data/grabowski"
+    alias datamountgrabowski='mountdatagrabowski'
+                   
+    #alias mountgarUebernas="$mnascmmc $mountimmer;echo ls /u/aglen;ls /u/aglen; $mnascmmcu $mountimmer; echo ls /cmmc/u/aglen/; ls /cmmc/u/aglen"
+    #alias garmountuebernas="mountgarUebernas"
+    # command above needs first to execute on cmpc:
+    # sshfs aglen@cmmc001.bc.rzg.mpg.de:/u/aglen /nas/glensk/cmmc -o reconnect -C -o workaround=all,transform_symlinks
+    
+    alias nasumount="umount -f /nas/glensk/"
+    #alias nasumount 'umount /nas/glensk; umount /u/aglen; umount /cmmc/u/aglen'
+    #alias umountnas 'umount /nas/glensk; umount /u/aglen; umount /cmmc/u/aglen'
+    #alias umountgar 'fusermount -u /nas/glensk/cmmc'
+    #alias garumount 'fusermount -u /nas/glensk/cmmc'
+fi

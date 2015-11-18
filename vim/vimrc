@@ -1,0 +1,83 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" plugins used     (before this version: ~/.vim/startup/plugins_OLD.vim) ""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ~/.vim/vim_cheatsheet
+source ~/.vim/startup/ctags.vim
+" in case deinstalled Vundle.vim: to to bundle folder and make 
+" git clone
+" https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+source ~/.vim/startup/vundle_start.vim
+source ~/.vim/startup/vundle_colors-solarized.vim                                         " MacVim:
+source ~/.vim/startup/vundle_ctrlp.vim        " ctrl+P                                      OK
+source ~/.vim/startup/vundle_tagbar.vim       " <leader>t                                   OK
+source ~/.vim/startup/vundle_supertab.vim     " tab completion for vim                      OK
+source ~/.vim/startup/vundle_syntastic.vim    " syntax checking
+"Plugin 'DamienCassou/textlint' 			  " Style checker for .tex (<leader>tl) !quite big!
+Plugin 'tpope/vim-surround.git'	              " delete:ds( create:ysiw] change:cst(
+Plugin 'https://github.com/yegappan/mru.git'  " open last opend files
+"Plugin 'https://github.com/tomtom/tcomment_vim.git'         " comment out/in ctrl+/  but breaks gcW (capitalize word)
+Plugin 'AndrewRadev/switch.vim' |  nnoremap - :Switch<cr>   " True->False 
+"Plugin 'godlygeek/tabular'                    " Aligns text.
+source ~/.vim/startup/vundle_latex.vim        " ,ll  und ,ls
+" !!! NEEDS CTAGS Plugin 'vim-scripts/taglist.vim'              " get *.tex labels  !! NEEDS CTAGS
+"let tlist_tex_settings = 'latex;l:labels;s:sections;t:subsections;u:subsubsections'
+set iskeyword=@,48-57,_,-,:,192-255
+Plugin 'kshenoy/vim-signature.git'            " set marks: m[a-zA-Z];delall marks :m<Space>
+source ~/.vim/startup/vundle_easymotion.vim   " <Leader><Leader>{w,b} :hi show all colors
+Plugin 'henrik/vim-indexed-search'            " results counter   (index-search)
+Plugin 'https://github.com/kana/vim-fakeclip' " pseudo clipboard register 
+                                              " for non-GUI Vim
+source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now tab)
+                                              " never change this to tab since this breaks 
+                                              " completion in :Plugin<TAB> command line mode
+source ~/.vim/startup/vundle_vim-airline.vim  " get some more colors for statusline 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plugins trying
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plugin 'https://github.com/shiblon/latex-makefile.git'
+Plugin 'https://github.com/Shougo/neocomplete.vim' 
+Plugin 'https://github.com/sjl/gundo.vim'     " 
+"Plugin 'https://github.com/MarcWeber/vim-addon-commandline-completion.git' 
+"Plugin 'amdt/vim-niji'
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" plugins unused
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"@source ~/.vim/startup/vundle_rainbow_parentheses.vim        " colorful parentheses DONT USE! BREAKS SPELLCHECKING IN CAPTIONS of .tex files
+" source ~/.vim/startup/vundle_jedi.vim           " tab completion for vim --> makes vim slow!
+" Plugin 'https://github.com/rkulla/pydiction.git'
+" let g:pydiction_location = '/Users/glensk/Dropbox/scripts/dotfiles/vim/bundle/pydiction/complete-dict'
+" Plugin 'https://github.com/klen/python-mode.git'
+" Plugin 'vim-scripts/restore_view.vim.git'     " restores view on files THIS CAN BE DONE WITH SIMPLE vim commands
+source ~/.vim/startup/vundle_end.vim
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" settings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+source ~/.vim/startup/keybindings.vim
+source ~/.vim/startup/settings0.vim   " general sets, remove trailing whitespaces
+source ~/.vim/startup/settings1.vim   " 
+source ~/.vim/startup/settings2.vim   " syntax, templates, look-and-feel 
+source ~/.vim/startup/settings3.vim   " Folding, Search, Tab-behavior, indentation
+set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl t in insert mode
+"source ~/.vim/startup/vundle_neocomplete.vim          " breaks spell correction
+""inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+source ~/.vim/startup/spellcorrection.vim
+
+" from
+" http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/
+function! NumberToggle()
+  if(&relativenumber == 1)
+    set number
+  else
+    set relativenumber
+  endif
+endfunc
+
+nnoremap <C-n> :call NumberToggle()<cr>
+
+:au FocusLost * :set number
+:au FocusGained * :set relativenumber
+
+" to capitalize words use 
+map da. df.
+map gb :e#<cr>   " to go to file type gf   to go back type gb

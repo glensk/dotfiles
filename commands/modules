@@ -1,0 +1,11 @@
+auf dem cmmd001
+
+env 	listet die module auf
+
+module avail zeigt die zur verfuegung stehenden module
+
+module load gnucomp/4.5.1		-> cpp
+
+fftw 	stat
+lib_i8	stat
+fft3d	stat

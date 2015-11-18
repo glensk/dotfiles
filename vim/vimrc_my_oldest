@@ -1,0 +1,832 @@
+" 1 is True; 0 is False
+let nerdtree = 1        " , + m:    brows files
+let ctags = 0           "           Ctags is a tool that will sift through your code, 
+                        "           indexing methods, classes, variables, and other identifiers, 
+                        "           storing the index in a tags file. The tags file contains a 
+                        "           single tag per line. Depending on command line 
+                        "           arguments and the language ctags is run against, a lot of 
+                        "           information can be obtained from this index.
+                        "           ctags error even if set to 0 if: ctags is not
+                        "           installed and taglist is on
+let pymode = 0          "           Python-mode is a vim plugin that allows you to use the pylint, 
+                        "           Python-mode required vim compiled with +python.
+" pymode currently not copied in bundle
+                        "           rope, pydoc, pyflakes, pep8, mccabe libraries in vim
+                        "           to provide features like python code looking for bugs, refactoring 
+                        "           and some other useful things.
+let taglist = 0         " F8:       Displays the tags (functions, classes, structures, variables, etc.)
+                        "           defined in a file in a vertically or horizontally split Vim window
+let vimlatex = 1        "           vimlatex (gerard)
+
+
+
+set t_Co=256                    " 
+set guifont=Andale\ Mono:h16    "set guifont=Bitstream Vera Sans Mono:h24
+
+" ############################################################################################
+" ############################################################################################
+" KEY REMAP (begin)
+" ############################################################################################
+" ############################################################################################
+" some of this bindings need unmapping in SystemPreferences/Keyboard (see ~/.gvimrc)
+" to see a mapping press control-k and than the key you want to have
+" same mapping as in normal mode
+"inoremap <D-h> <C-o>h   
+inoremap <D-h> <Left>
+"inoremap <D-l> <C-o>l
+inoremap <D-l> <Right>
+inoremap <D-j> <C-o>j
+inoremap <D-k> <C-o>k
+
+" go to beginning of line (works)
+" go to end of line (works)
+inoremap <D-;> <C-o>^
+inoremap <D-'> <C-o>$
+nnoremap <D-;> <C-o>^
+nnoremap <D-'> <C-o>$
+map <D-;> <C-o>^
+map <D-'> <C-o>$
+
+" delete char back (works)
+" delete char next (works)
+inoremap <D-u> <BS>
+inoremap <D-i> <C-o>x
+
+" delete word next (works)
+" delete word last (SEEMS TO BE MAPPED BY MACVIM, CANT FIND HOW TO UNMAP ->  try with better touch tool?)
+inoremap <D-o> <C-o>dW
+inoremap <D-y> <C-o>dB
+
+" move word back (B by spaces) (b by punctuatioins)
+" move word next (W by spaces) (w by punctuatioins)
+inoremap <D-n> <C-o>B
+inoremap <D-m> <C-o>W
+
+" To move faster in normal mode
+map <C-l> w
+map <C-h> b
+map <D-l> w
+map <D-h> b
+
+" ######## autocorrection #####################################
+map <Leader>c :PyLintAuto<CR>
+
+" ######## colores-solarized ##################################
+syntax enable
+
+" move between tabs
+"map ^[F <ESC>:tabp<CR>   
+"map <D-.> <ESC>:tabn<CR>
+"map <D-,> <ESC>:tabp<CR>
+
+" ####### execute code #######################################
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"map <Leader>e :!clear;%:p
+"map <Leader>p :PyLintAuto<CR>
+
+
+
+
+
+
+
+
+
+
+
+
+
+" ############################################################################################
+" ############################################################################################
+" KEY REMAP (end)
+" ############################################################################################
+" ############################################################################################
+
+set clipboard=unnamed
+""":map <ESC>h 10h
+"":map <ESC>h b
+"":map <ESC>l w
+
+
+"inoremap <C-l> <ESC>w;i
+"inoremap <C-h> <ESC>b;i
+""":map <ESC>l 10l
+"":map <ESC>k 7k
+"":map <ESC>j 7j
+""map <M-s> :echo 'Current time is ' . strftime('%c')<CR>
+""map <F2> :echo 'Current time is ' . strftime('%c')<CR>
+
+" make hjkl movements accessible from insert mode via the <Alt> modifier key
+"nnoremap <Right> w
+" sind dass die remps fuer die Command taste?
+"inoremap <A-h> <C-o>h
+"inoremap <A-j> <C-o>j
+"inoremap <A-k> <C-o>k
+"inoremap <A-l> <C-o>l
+
+"
+"map ^[F <ESC>:tabp<CR>   
+"map ^[B <ESC>:tabn<CR> 
+":PyLintAuto   # use this to autofix all pep8 errors
+"
+"
+" change cmpc  736
+so ${HOME}/.vim/syntax/syntax.vim
+sy on                                           "enables to detect syntax
+syntax on                                       "shoud be the same as above
+filetype plugin indent on
+
+
+" never set paste, it destroys the ii keymappint for <ESC> test jo ka
+" hallo wie
+"#####################################################################
+"######## pathogen ###########################################
+execute pathogen#infect()
+
+" Pathogen load
+filetype off
+call pathogen#infect()
+call pathogen#helptags()
+filetype plugin indent on                   
+syntax on
+
+" ######## Taglist <F8> #########################################################
+" ######## Taglist press u to update Taglist when cursor is in taglist ##########
+" ######## use ":TlistUpdate" to update Taglist #############################
+if taglist
+    nnoremap <silent> <F8> :TlistToggle<CR>
+    filetype on                     " vims filetype detection
+    "DONT USE!!! --> let Tlist_Process_File_Always = 1   " DONT USE! (ERROR: tags: illegal option -- -^@usage: ctags [-BFadtuwvx] [-f tagsfile] file ...^@ )
+                                        " with a bit luckk this adds created tags automatically
+    "let Tlist_Auto_Update = 1       " this shoud be set to enalble automatic updating the file list
+    "let Tlist_Show_One_File = 1     " only displays tags from current file  
+    "let Tlist_Use_SingleClick = 1   " you need only to click once at the tag to get to definition
+    endif
+
+" ######## nerdtree ###########################################
+if nerdtree
+    let mapleader = ","
+    set autochdir
+    let NERDTreeChDirMode=2
+    map <Leader>m :NERDTreeToggle $HOME<CR>   " NerdtreeToggle
+    map <Leader>n :NERDTreeToggle<CR>   " NerdtreeToggle
+    autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif "close vim if the only NERDTree is open
+    endif
+
+" ######## ctags <seems not necessary> ########################
+" ######## needs to be load ctags in .tcshrc
+if ctags
+    let hostname = substitute(system('hostname'), '\n', '', '')
+    let myhost = substitute(system('echo $myhost'), '\n', '', '')
+    let mylaptop = substitute(system('echo $mylaptop'), '\n', '', '')
+    let $Tlist_Ctags_Cmd='$USER/scripts/dotfiles/vim/ctags-5.8`hostname`/'
+    endif
+
+
+" ####################### python-mode ########################################
+if pymode
+
+    let g:pymode_doc_key = 'K'
+    " Set key 'R' for run python code
+    let g:pymode_run_key = 'E'
+    " #############################
+    " CODE CHECKING
+    " #############################
+    " Load pylint code plugin
+    let g:pymode_lint = 1
+    
+    " Switch pylint, pyflakes, pep8, mccabe code-checkers
+    " Can have multiply values "pep8,pyflakes,mcccabe"
+    let g:pymode_lint_checker = "pyflakes,pep8,mccabe"
+    
+    " Skip errors and warnings
+    " E.g. "E501,W002", "E2,W" (Skip all Warnings and Errors startswith E2) and etc
+    let g:pymode_lint_ignore = "E501"
+    
+    " Select errors and warnings
+    " E.g. "E4,W"
+    let g:pymode_lint_select = ""
+    
+    " Run linter on the fly
+    let g:pymode_lint_onfly = 0
+    
+    " Pylint configuration file
+    " If file not found use 'pylintrc' from python-mode plugin directory
+    let g:pymode_lint_config = "$HOME/.pylintrc"
+    
+    " Check code every save
+    let g:pymode_lint_write = 1
+    
+    " Auto open cwindow if errors be finded
+    let g:pymode_lint_cwindow = 1
+    
+    "Show error message if cursor placed at the error line
+    let g:pymode_lint_message = 1
+    
+    " Auto jump on first error
+    let g:pymode_lint_jump = 0
+    
+    " Hold cursor in current window
+    " when quickfix is open
+    let g:pymode_lint_hold = 0
+    
+    " Place error signs
+    let g:pymode_lint_signs = 1
+    
+    " Maximum allowed mccabe complexity
+    let g:pymode_lint_mccabe_complexity = 8
+    
+    " Minimal height of pylint error window
+    let g:pymode_lint_minheight = 3
+    
+    " Maximal height of pylint error window
+    let g:pymode_lint_maxheight = 6
+    
+    " ##############################
+    " ROPE REFACTORING / ROPE AUTOCOMPLETE  (strg+space   ... strg+n)
+    " ##############################
+    " Load rope plugin
+    let g:pymode_rope = 1
+    
+    " Auto create and open ropeproject
+    let g:pymode_rope_auto_project = 1
+    
+    " Enable autoimport
+    let g:pymode_rope_enable_autoimport = 1
+    
+    " Auto generate global cache
+    let g:pymode_rope_autoimport_generate = 1
+    let g:pymode_rope_autoimport_underlineds = 0
+    let g:pymode_rope_codeassist_maxfixes = 10
+    let g:pymode_rope_sorted_completions = 1
+    let g:pymode_rope_extended_complete = 1
+    let g:pymode_rope_autoimport_modules = ["os","shutil","datetime"]
+    let g:pymode_rope_confirm_saving = 1
+    let g:pymode_rope_global_prefix = "<C-x>p"
+    let g:pymode_rope_local_prefix = "<C-c>r"
+    let g:pymode_rope_vim_completion = 1
+    let g:pymode_rope_guess_project = 1
+    let g:pymode_rope_goto_def_newwin = ""
+    let g:pymode_rope_always_show_complete_menu = 1
+    
+    " ######################################
+    " VIM PYTHON MOTIONS AND OPERATORS
+    " ######################################
+    " Enable python objects and motion
+    let g:pymode_motion = 1
+    
+    " Auto fix vim python paths if virtualenv enabled
+    let g:pymode_virtualenv = 1
+    
+    " ######################################
+    " HIGHLIGHTING TEXT
+    " ######################################
+    " Enable pymode's custom syntax highlighting
+    let g:pymode_syntax = 1
+    
+    " Enable all python highlightings
+    let g:pymode_syntax_all = 1
+    
+    " Highlight "print" as function
+    let g:pymode_syntax_print_as_function = 0
+    
+    " Highlight indentation errors
+    let g:pymode_syntax_indent_errors = g:pymode_syntax_all
+    
+    " Highlight trailing spaces
+    let g:pymode_syntax_space_errors = g:pymode_syntax_all
+    
+    " Highlight string formatting
+    let g:pymode_syntax_string_formatting = g:pymode_syntax_all
+    
+    " Highlight str.format syntax
+    let g:pymode_syntax_string_format = g:pymode_syntax_all
+    
+    " Highlight string.Template syntax
+    let g:pymode_syntax_string_templates = g:pymode_syntax_all
+    
+    " Highlight doc-tests
+    let g:pymode_syntax_doctests = g:pymode_syntax_all
+    
+    " Highlight builtin objects (__doc__, self, etc)
+    let g:pymode_syntax_builtin_objs = g:pymode_syntax_all
+    
+    " Highlight builtin functions
+    let g:pymode_syntax_builtin_funcs = g:pymode_syntax_all
+    
+    " Highlight exceptions
+    let g:pymode_syntax_highlight_exceptions = g:pymode_syntax_all
+    
+    " For fast machines
+    let g:pymode_syntax_slow_sync = 0
+    endif
+
+
+
+"##############################################################################
+"XXX#####  KEYMAPPINGS  #######################################################
+"##############################################################################
+"XX SELECT MODE
+" gv : reselect block
+" V  : select entire line
+" ctrl-v: select columns
+" v  : select range of text
+" vip: visually select current paragraph
+"
+"XX INSERT MODE
+"i: insert mode
+"I: insert mode jump to beginning of line
+
+"XX APPEND MODE
+"a: append in current position
+"A: append at end of line
+"imap ii <ESC>
+"nmap ii <ESC> 
+" map   " mapping in normal, visual, select and operator pending modes
+" map!  " mappin in insert and command-line mode 
+"vmap ii <ESC> 
+"imap jj <ESC>
+"vmap jj <ESC>
+"inoremap <silent> <Esc> <C-O>:stopinsert<CR>
+inoremap jj <ESC>
+inoremap ii <ESC>
+"inoremap <silent> jj <C-O>:stopinsert<CR>   ... stopinsert makes problems
+"inoremap <silent> ii <C-O>:stopinsert<CR>
+"inoremap <silent> <Esc> <C-O>:stopinsert<CR>
+"imap kk <ESC>
+"vmap kk <ESC> 
+nmap ; :
+nmap - :bd<CR>
+"map <F2> :echo 'Current time is ' . strftime('%c')<CR>
+"map <Leader>e :!clear; ./%<CR>		"execute code
+"map <Leader>r : ./%<CR>		"execute code
+""" nmap <silent> <c-k> :wincmd k<CR>	"move in active splits works
+""" nmap <silent> <c-j> :wincmd j<CR>	"move in active splits works
+""" nmap <silent> <c-h> :wincmd h<CR>	"move in active splits !!! does not work
+""" nmap <silent> <c-l> :wincmd l<CR>	"move in active splits
+
+vnoremap > >gv				"make intend not loos highlighting
+noremap < <gv				"make intend not loose highlithtin
+
+" XXX ############ tab mappings ######################
+nmap tt <esc>:tabnew<cr>		"open new tab
+nmap ct <esc>:tabclose<cr>		"close tab
+nmap < <esc>:tabp<cr>			"go tab to right
+nmap > <esc>:tabn<cr>			"go tab to left
+
+
+""nmap <m-l> <esc>:tabn<cr>			"go tab to right not working 
+""nmap <c-.> <esc>:tabn<cr>			"go tab to right not working
+""nmap <c-,> <esc>:tabp<cr>			"go tab to right not working
+" clears the ghighlighting after the search
+nmap <silent> <Leader>u :nohlsearch<CR> 
+"let label=v:lnum   " put number in tab
+map t1 :tabn 1<CR>
+map t2 :tabn 2<CR>
+map t3 :tabn 3<CR>
+map t4 :tabn 4<CR>
+map t5 :tabn 5<CR>
+map t6 :tabn 6<CR>
+map t7 :tabn 7<CR>
+map t8 :tabn 8<CR>
+map t9 :tabn 9<CR>
+" u can generally use gt to jump to a tab
+
+"#####################################################################
+"xxx##### GENERAL STUFF  #############################################
+"#####################################################################
+set cursorline         " highlights the current line
+set pastetoggle=<F2>   " switches in Insertmode between INSERT and INSERT (paste) 
+autocmd! bufwritepost $HOME/.vimrc source %  ":so after changing .vimrc
+set relativenumber
+"set number   " put numbers on left side
+au BufNewFile *.py 0r ~/Dropbox/scripts/dotfiles/vim/py.template		"create templates		
+au BufNewFile *.sh 0r ~/Dropbox/scripts/dotfiles/vim/sh.template		"create templates
+au BufWritePost,BufFilePost *.py call system("chmod +x ".expand("%"))		"create templates
+au BufWritePost,BufFilePost *.sh call system("chmod +x ".expand("%"))		"create templates
+set nobackup			"don't do backups
+set noswapfile			"don't create swap files
+set ignorecase          "ignore case when search
+set incsearch           "search is directly started and not just after return
+set smartcase           "if a search string contains UPPER letters than ignorecase is switched off
+set hlsearch            " turns on search highlighting. | set nohlsearch
+set mouse=a             " when you select text you wont select numbers on the left (set number) allow mouse clicks to change cursor position
+"set mouse-=a
+set bs=2		        "backspace behaves normal
+set hidden		        "you can have unwritten changes to a file and open a new file using :e, without being forced to write or undo your changes first.	
+set tabstop=4           " a tab is four spaces
+set backspace=indent,eol,start   " allow backspacing over everything in insert mode
+"set autoindent          " always set autoindenting on (if tab in oneline tab will be inserted in next line)
+"set copyindent          " copy the previous indentation on autoindenting
+"set smartindent         " does the right thing (mostly) in programs
+set shiftwidth=4        " number of spaces to use for autoindenting
+set shiftround          " use multiple of shiftwidth when indenting with '<' and '>'
+set showmatch           " set show matching parenthesis (brackets)
+set smarttab            " insert tabs on the start of a line according to
+                  "    shiftwidth, not tabstop
+set history=1000         " remember more commands and search history
+set undolevels=1000      " use many muchos levels of undo
+set wildignore=*.swp,*.bak,*.pyc,*.class
+set title                " change the terminal's title
+set novisualbell         " don't beep
+set noerrorbells         " don't bee
+autocmd filetype python set expandtab
+
+" source code indenting
+set expandtab "set this to noexpandtab to make it a real tab and not white spaces
+set ruler
+set showcmd
+
+"set textwidth=79 "this wraps the line and makes an automatic newline while typing
+syntax on
+
+" after syntax on: comments will be gray  " not necessary when colorized
+hi Comment guifg=Gray     
+
+" set color of comments
+hi Constants guifg=Yellow
+
+"""" other stuff not from this page:
+"""" folgende einstellungen sollen gut sein fuer python
+set modeline     "
+set softtabstop=4
+set wildmode=longest,list,full
+set wildmenu
+"so ${HOME}/.vim/syntax/syntax.vim
+
+" autocompletition for vim
+filetype plugin indent on
+set ofu=syntaxcomplete#Complete
+autocmd FileType python set omnifunc=pythoncomplete#Complete
+set completeopt=longest,menuone
+
+set ttymouse=xterm2	"get mouse working in screen
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Use TAB to complete when typing words, else inserts TABs as usual.
+"Uses dictionary and source files to find matching words to complete.
+
+"See help completion for source,
+
+"Note: usual completion is on <C-n> but more trouble to press all the time.
+"Never type the same word twice and maybe learn a new spellings!
+"Use the Linux dictionary when spelling is in doubt.
+"Window users can copy the file to their machine.
+function! Tab_Or_Complete()
+  if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
+    return "\<C-N>"
+  else
+    return "\<Tab>"
+  endif
+endfunction
+inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
+set dictionary="/usr/dict/words"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"##############################################################################
+"XXX #####  spellchecking  #####################################################
+"##############################################################################
+" see help surce
+if has("spell")
+  " turn spelling on by default
+  set nospell
+
+  " toggle spelling with F4 key
+  map <F4> :set spell!<CR><Bar>:echo "Spell Check: " . strpart("OffOn", 3 * &spell, 3)<CR>
+
+  " they were using white on white
+  highlight PmenuSel ctermfg=black ctermbg=lightgray
+
+  " limit it to just the top 10 items
+  set sps=best,10                    
+endif
+
+
+"##############################################################################
+"XXX #####  autocorrection/debugging ##########################################
+"##############################################################################
+" copy this to your vimrc or source it
+
+" tells vim not to automatically reload changed files
+set noautoread 
+
+function! DiffWithSaved()
+  let filetype=&ft
+  diffthis
+  vnew | r # | normal! 1Gdd
+  diffthis
+  exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+endfunction
+
+" sets up mappings to function
+
+com! DiffSaved call DiffWithSaved()
+map <Leader>ds :DiffSaved<CR>
+
+
+"" run these commands after sourcing the above function
+"
+"" % expands to filename (also %:h to head, %:t to tail)
+"" if it throws an error, just do :cd %:h first
+"
+":!autopep8 --in-place %
+":DiffSaved
+
+"##############################################################################
+"XXX ##### tab ##########################################
+"##############################################################################
+if version >= 700
+    "set showtabline to show when more than one tab
+    set showtabline=1
+    "set tab labels to show at most 12 characters
+    set guitablabel=%-0.12t%M
+endif
+
+" don't show the toolbar in the GUI (only the menu)
+set guioptions-=T
+
+" don't show tear-off menus
+set guioptions-=t
+
+" Automatically quit Vim if quickfix window is the last
+au BufEnter * call MyLastWindow()
+function! MyLastWindow()
+      " if the window is quickfix go on
+      if &buftype=="quickfix"
+      "       " if this window is last on screen quit without warning
+        if winbufnr(2) == -1
+          quit!
+        endif
+      endif
+endfunction
+" When F5 is pressed, a numbered list of file names is printed, and the user
+" needs to type a single number based on the "menu" and press enter. The
+" "menu" disappears after choosing the number so it appears only when you need
+" it.
+nnoremap <F5> :buffers<CR>:buffer<Space>
+
+"##########################################################
+" Tell vim to remember certain things when we exit
+" "  '10  :  marks will be remembered for up to 10 previously edited files
+" "  "100 :  will save up to 100 lines for each register
+" "  :20  :  up to 20 lines of command-line history will be remembered
+" "  %    :  saves and restores the buffer list
+" "  n... :  where to save the viminfo files
+set viminfo='10,\"100,:20,%,n~/.viminfo
+
+"##########################################################
+" function to remember cursor position
+"##########################################################
+function! ResCur()
+  if line("'\"") <= line("$")
+    normal! g`"
+    return 1
+  endif
+endfunction
+
+augroup resCur
+  autocmd!
+  autocmd BufWinEnter * call ResCur()
+augroup END 
+
+
+"##########################################################
+" vimlatex
+"##########################################################
+if vimlatex
+    " REQUIRED. This makes vim invoke Latex-Suite when you open a tex file.
+    filetype plugin on
+    "
+    " IMPORTANT: win32 users will need to have 'shellslash' set so that latex
+    " can be called correctly.
+    set shellslash
+    
+    " IMPORTANT: grep will sometimes skip displaying the file name if you
+    " search in a singe file. This will confuse Latex-Suite. Set your grep
+    " program to always generate a file-name.
+    set grepprg=grep\ -nH\ $*
+    
+    " OPTIONAL: Starting with Vim 7, the filetype of empty .tex files defaults to
+    " 'plaintex' instead of 'tex', which results in vim-latex not being loaded.
+    " The following changes the default filetype back to 'tex':
+    let g:tex_flavor='latex'
+    
+    let g:Tex_DefaultTargetFormat='pdf'
+    let g:Tex_ViewRule_pdf='Skim'
+    
+    let g:Tex_MultipleCompileFormats='dvi,pdf'
+    endif
+
+
+
+" Vim syntax file
+" Language: Python
+" Maintainer:   Samuel Hoffstaetter <samuel@hoffstaetter.com>
+" Updated:  2006-10-15
+"       Added Python 2.4 features 2006 May 4 (Dmitry Vasiliev)
+"
+" Derived from python.vim by Neil Schemenauer <nas@python.ca>
+"
+" Options to control Python syntax highlighting:
+"
+" For highlighted numbers:
+"
+"    let python_highlight_numbers = 1
+"
+" For highlighted builtin functions:
+"
+"    let python_highlight_builtins = 1
+"
+" For highlighted standard exceptions:
+"
+"    let python_highlight_exceptions = 1
+"
+" Highlight erroneous whitespace:
+"
+"    let python_highlight_space_errors = 1
+"
+" If you want all possible Python highlighting (the same as setting the
+" preceding options):
+"
+"    let python_highlight_all = 1
+"
+
+" For version 5.x: Clear all syntax items
+" For version 6.x: Quit when a syntax file was already loaded
+if version < 600
+  syntax clear
+elseif exists("b:current_syntax")
+  finish
+endif
+
+setlocal foldmethod=syntax
+
+syn keyword pythonStatement break continue del
+syn keyword pythonStatement except exec finally
+syn keyword pythonStatement pass print raise
+syn keyword pythonStatement return try with
+syn keyword pythonStatement global assert
+syn keyword pythonStatement lambda yield
+
+syn match   pythonDefStatement  /^\s*\%(def\|class\)/
+  \ nextgroup=pythonFunction skipwhite
+syn region  pythonFunctionFold  start="^\z(\s*\)\%(def\|class\)\>"
+  \ end="\ze\%(\s*\n\)\+\%(\z1\s\)\@!." fold transparent
+syn match   pythonFunction  "[a-zA-Z_][a-zA-Z0-9_]*" contained
+
+syn match   pythonComment /#\%(.\%({{{\|}}}\)\@!\)*$/
+  \ contains=pythonTodo,@Spell
+syn region  pythonFold matchgroup=pythonComment
+  \ start='#.*{{{.*$' end='#.*}}}.*$' fold transparent
+
+syn keyword pythonRepeat    for while
+syn keyword pythonConditional   if elif else
+syn keyword pythonOperator  and in is not or
+" AS will be a keyword in Python 3
+syn keyword pythonPreCondit import from as
+syn keyword pythonTodo      TODO FIXME XXX contained
+
+" Decorators (new in Python 2.4)
+syn match   pythonDecorator "@" display nextgroup=pythonFunction skipwhite
+
+" strings
+syn region pythonString     start=+[uU]\='+ end=+'+ skip=+\\\\\|\\'+ contains=pythonEscape,@Spell
+syn region pythonString     start=+[uU]\="+ end=+"+ skip=+\\\\\|\\"+ contains=pythonEscape,@Spell
+syn region pythonString     start=+[uU]\="""+ end=+"""+ contains=pythonEscape,@Spell
+syn region pythonString     start=+[uU]\='''+ end=+'''+ contains=pythonEscape,@Spell
+syn region pythonRawString  start=+[uU]\=[rR]'+ end=+'+ skip=+\\\\\|\\'+ contains=@Spell
+syn region pythonRawString  start=+[uU]\=[rR]"+ end=+"+ skip=+\\\\\|\\"+ contains=@Spell
+syn region pythonRawString  start=+[uU]\=[rR]"""+ end=+"""+ contains=@Spell
+syn region pythonRawString  start=+[uU]\=[rR]'''+ end=+'''+ contains=@Spell
+syn match  pythonEscape     +\\[abfnrtv'"\\]+ contained
+syn match  pythonEscape     "\\\o\{1,3}" contained
+syn match  pythonEscape     "\\x\x\{2}" contained
+syn match  pythonEscape     "\(\\u\x\{4}\|\\U\x\{8}\)" contained
+syn match  pythonEscape     "\\$"
+
+if exists("python_highlight_all")
+  let python_highlight_numbers = 1
+  let python_highlight_builtins = 1
+  let python_highlight_exceptions = 1
+  let python_highlight_space_errors = 1
+endif
+
+if exists("python_highlight_numbers")
+  " numbers (including longs and complex)
+  syn match   pythonNumber  "\<0x\x\+[Ll]\=\>"
+  syn match   pythonNumber  "\<\d\+[LljJ]\=\>"
+  syn match   pythonNumber  "\.\d\+\([eE][+-]\=\d\+\)\=[jJ]\=\>"
+  syn match   pythonNumber  "\<\d\+\.\([eE][+-]\=\d\+\)\=[jJ]\=\>"
+  syn match   pythonNumber  "\<\d\+\.\d\+\([eE][+-]\=\d\+\)\=[jJ]\=\>"
+endif
+
+if exists("python_highlight_builtins")
+  " builtin functions, types and objects, not really part of the syntax
+  syn keyword pythonBuiltin True False bool enumerate set frozenset help
+  syn keyword pythonBuiltin reversed sorted sum
+  syn keyword pythonBuiltin Ellipsis None NotImplemented __import__ abs
+  syn keyword pythonBuiltin apply buffer callable chr classmethod cmp
+  syn keyword pythonBuiltin coerce compile complex delattr dict dir divmod
+  syn keyword pythonBuiltin eval execfile file filter float getattr globals
+  syn keyword pythonBuiltin hasattr hash hex id input int intern isinstance
+  syn keyword pythonBuiltin issubclass iter len list locals long map max
+  syn keyword pythonBuiltin min object oct open ord pow property range
+  syn keyword pythonBuiltin raw_input reduce reload repr round setattr
+  syn keyword pythonBuiltin slice staticmethod str super tuple type unichr
+  syn keyword pythonBuiltin unicode vars xrange zip
+endif
+
+if exists("python_highlight_exceptions")
+  " builtin exceptions and warnings
+  syn keyword pythonException   ArithmeticError AssertionError AttributeError
+  syn keyword pythonException   DeprecationWarning EOFError EnvironmentError
+  syn keyword pythonException   Exception FloatingPointError IOError
+  syn keyword pythonException   ImportError IndentationError IndexError
+  syn keyword pythonException   KeyError KeyboardInterrupt LookupError
+  syn keyword pythonException   MemoryError NameError NotImplementedError
+  syn keyword pythonException   OSError OverflowError OverflowWarning
+  syn keyword pythonException   ReferenceError RuntimeError RuntimeWarning
+  syn keyword pythonException   StandardError StopIteration SyntaxError
+  syn keyword pythonException   SyntaxWarning SystemError SystemExit TabError
+  syn keyword pythonException   TypeError UnboundLocalError UnicodeError
+  syn keyword pythonException   UnicodeEncodeError UnicodeDecodeError
+  syn keyword pythonException   UnicodeTranslateError
+  syn keyword pythonException   UserWarning ValueError Warning WindowsError
+  syn keyword pythonException   ZeroDivisionError
+endif
+
+if exists("python_highlight_space_errors")
+  " trailing whitespace
+  syn match   pythonSpaceError   display excludenl "\S\s\+$"ms=s+1
+  " mixed tabs and spaces
+  syn match   pythonSpaceError   display " \+\t"
+  syn match   pythonSpaceError   display "\t\+ "
+endif
+
+" This is fast but code inside triple quoted strings screws it up. It
+" is impossible to fix because the only way to know if you are inside a
+" triple quoted string is to start from the beginning of the file. If
+" you have a fast machine you can try uncommenting the "sync minlines"
+" and commenting out the rest.
+"syn sync match pythonSync grouphere NONE "):$"
+"syn sync maxlines=200
+syn sync minlines=2000
+syn sync linebreaks=1
+
+if version >= 508 || !exists("did_python_syn_inits")
+  if version <= 508
+    let did_python_syn_inits = 1
+    command -nargs=+ HiLink hi link <args>
+  else
+    command -nargs=+ HiLink hi def link <args>
+  endif
+
+  " The default methods for highlighting.  Can be overridden later
+  HiLink pythonStatement    Statement
+  HiLink pythonDefStatement Statement
+  HiLink pythonFunction     Function
+  HiLink pythonConditional  Conditional
+  HiLink pythonRepeat       Repeat
+  HiLink pythonString       String
+  HiLink pythonRawString    String
+  HiLink pythonEscape       Special
+  HiLink pythonOperator     Operator
+  HiLink pythonPreCondit    PreCondit
+  HiLink pythonComment      Comment
+  HiLink pythonTodo     Todo
+  HiLink pythonDecorator    Define
+  if exists("python_highlight_numbers")
+    HiLink pythonNumber Number
+  endif
+  if exists("python_highlight_builtins")
+    HiLink pythonBuiltin    Function
+  endif
+  if exists("python_highlight_exceptions")
+    HiLink pythonException  Exception
+  endif
+  if exists("python_highlight_space_errors")
+    HiLink pythonSpaceError Error
+  endif
+
+  delcommand HiLink
+endif
+
+let b:current_syntax = "python"
+
+" vim: ts=8
+

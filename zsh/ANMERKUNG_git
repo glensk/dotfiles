@@ -1,0 +1,4 @@
+git clone git://github.com/robbyrussell/oh-my-zsh.git
+git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
+
+git cone https://github.com/zsh-users/zsh-history-substring-search.git

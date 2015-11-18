@@ -1,0 +1,93 @@
+#################################################################################################
+# from: http://www.ndkhanh.com/type-less-do-more-with-inputrc-mac-os-x/
+# or http://brettterpstra.com/2015/07/09/shell-tricks-inputrc-binding-fun/
+#
+# inputrc is a file used to customize key-bindings defined by Readline, which is
+# a library that handles reading input when using an interactive shell. The name of
+# this file is taken from the value of the INPUTRC variable. If that variable is
+# unset, the default is ~/.inputrc. By default, .inputrc is not created, so go
+# ahead and create that file in your home directory. You can fill in something like
+# this.
+#
+# Examples for MacOSx and bash shell:
+# Key name  Meaning     Key name    Meaning
+# “\e[A”    Cursor Up       “\eOP”  F1
+# “\e[B”    Cursor Down     “\eOQ”  F2
+# “\e[C”    Cursor Left     “\eOR~”     F3
+# “\e[D”    Cursor Right    “\eOS”  F4
+# “\e[H”    Shift Home      “\e[15~”    F5
+#################################################################################################
+
+#set input-meta on
+#set output-meta on
+#set convert-meta off
+
+#################################################################################################
+# ALL EXPLAINED: http://cnswww.cns.cwru.edu/php/chet/readline/rluserman.html
+#################################################################################################
+# make tab expansion work by pressing only once not twice
+set show-all-if-ambiguous on 
+
+# bash list all files without annoying display all possibilities
+# set completion-query-items -1
+set completion-query-items 0
+set page-completions off
+
+# append '/' to dirnames
+set mark-directories on
+
+# append '/' to dirnames if those are linked
+set mark-symlinked-directories on
+
+# Ignore case while completing # Make tab-completion case-insensitive 
+set completion-ignore-case off
+# You can supplement this to make the completion apply similar insensitivity between hyphens and underscores:
+set completion-map-case on
+
+set mark-symlinked-directories on
+
+# Adding this to your /etc/inputrc or ~/.inputrc will result in a character
+# being appended to any file-names returned by completion, in much the same
+# way as ls -F works.
+set visible-stats on
+
+# makes tab show colors in bash (works just partly not for .agr files)
+set colored-stats on
+
+#set editing-mode vi   # this destroys cmd+h cmd+l cmd+; cmd+'
+
+
+# lets try
+# If set to `on', tilde expansion is performed when Readline attempts word
+# completion. The default is `off'.
+set expand-tilde on
+
+# display characters with the eighth bit set directly
+# rather than as meta-prefixed characters
+set output-meta on
+
+
+# what does this do?
+#set show-all-if-unmodified on
+# to expand ~/ with tab 
+Control-x: glob-expand-word
+# fills first complete on tab  -> i dont want this
+#"\C-i": menu-complete
+#
+"\e[5~": history-search-backward
+"\e[6~": history-search-forward
+
+# use ctrl+left/right arrow keys to jump over words
+#"\e[5C": forward-word
+#"\e[5D": backward-word
+ 
+# enable autocomplete (using up/down arrow keys)
+"\e[B": history-search-forward
+"\e[A": history-search-backward
+ 
+# moving to begining and end of line (using F1 and F2)
+"\eOP": beginning-of-line
+"\eOQ": end-of-line
+ 
+# kill a whole line (using F3)
+"\eOR": kill-whole-line

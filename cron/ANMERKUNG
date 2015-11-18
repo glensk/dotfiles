@@ -1,0 +1,11 @@
+launchctl load ~/Library/LaunchAgents/net.nathangrigg.archive-tweets.plist
+launchctl unload ~/Library/LaunchAgents/net.nathangrigg.archive-tweets.plist
+launchctl start net.nathangrigg.archive-tweets
+launchctl stop net.nathangrigg.archive-tweets
+launchctl list
+
+launchctl load /Users/glensk/Dropbox/scripts/dotfiles/cron/com.apple.weeklyupdate.plist 
+launchctl unload /Users/glensk/Dropbox/scripts/dotfiles/cron/com.apple.weeklyupdate.plist 
+launchctl start com.apple.weeklyupdate.plist 
+launchctl stop com.apple.weeklyupdate.plist 
+launchctl list
