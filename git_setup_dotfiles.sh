@@ -13,6 +13,7 @@ echo "##########"
 echo "#############"
 echo "# git add ..."
 echo "#############"
+git add generalrc
 git add bash 
 git add bin
 git add commands 
@@ -24,6 +25,9 @@ git add screen
 git add ssh
 git add subversion
 git add tcsh
+git add ANMERKUNG_important_commands
+git add ANMERKUNG_mac_fresh_install
+
 
 #######################################
 #git add vim                 # has git!
@@ -126,6 +130,7 @@ echo "#######################################"
 echo "#git add zsh                 # has git!"
 echo "#######################################"
 git add zsh/ANMERKUNG_git
+git add zsh/zsh_set
 git add zsh/zshrc
 git add zsh/zshrc.save1
 git add zsh/zshrc.save2

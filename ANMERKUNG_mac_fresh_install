@@ -1,0 +1,74 @@
+1) 
+mv $HOME/Dropbox/scripts/dotfiles/mac_keyboard/U.S.+c.keylayout to $HOME/Library/Keyboard\ Layouts/
+
+2)
+System Preferences changes: 
+- Keyboard: Reiter Keyboard, then select "Show Keyboard & Character Viewers in menu bar."
+- Keyboard, Input Sources, +, Others, U.S.+c auswaehlen, in menu bar dieses Keyboard als default einstellen
+- Keyboard: Reiter Text, Correct spelling automatically SWITCH OFF
+- Keyboard: Reiter Keyboard, Modifier Keys (bottom), change Capslock to control 
+- Dock: "Automatically hide and show the dock"
+- Energy Saver: Power Adapter, Computer Sleep: "never"
+- Trackpad: add Tap to klick; Tracking speed: 3/4
+- Language and Region: List sort order: German
+- Language and Regino: Advanced: Set what you like
+
+
+
+3) follow:
+http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/
+
+
+
+basiclly: 
+0) iterm (installed by homebrew in nr 5)) put preferences from scripts/dotfiles/mac_iterm/com.googlecode.iterm2.plist
+0) apps not installed by homebrew: vesta, mathematica, zattoo, adobe acrobat pro, 
+1) xcode-select --install   (in shell and click install)
+2) Go to http://developer.apple.com/downloads and sign in with your Apple ID Search for “command line tools” (in the search field on the left), then click on the latest version of “Command Line Tools (OS X Mountain Lion) for Xcode,” and click on the the .dmg link to download it. Install it.
+3) ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+4) runf from scripts/dotfiles/brew_installed.sh
+
+5) install monolingual to deinstall other unused languages
+
+6) install better toch tool and load prefences from scripts/mac_tools to get cmd+, and cmd+. for tab navigation in chrome
+
+7) go to Keyboards, shortcuts, remove all shortcuts for mission control;
+8) go to Keyboards, shortcuts, to to applications, add for iTerm application shortcut for menu entry: "Open Profiles..." to ^Shift= 
+   (this shortcut is necessary for delete-next-word) ( see: http://superuser.com/questions/382941/mac-iterm2-unbind-command-find-cursor-shortkey )
+8) go to Keyboards, shortcuts, to to applications, add for iTerm application shortcut for menu entry: "Edit Current Session..." to ^Shift= 
+8) go to Keyboards, shortcuts, to to Spotlight and change "change spotlight search to alt+Space" (necessary for alfred)
+8) go to Keyboards, shortcuts, AppShortcuts, click +, Application: OmniFocus; Command: "Clean Up"; Shortcut: cmd+shift+k
+
+9) install ifort from smb mpie drive (to be able to compile thermodynamics folder)
+
+10) evtl. git clone https://github.com/rupa/z.git (but possibly comes with zsh)
+
+11) printing defaults:
+    - Choose File > Print.
+    - If you see a Show Details button, click it to show all available options.
+    - Select the options you want to use.
+    - Choose “Save Current Settings as Preset” from the Presets pop-up menu.
+    - Type a name for the set of options.
+    - Choose whether this preset can be used with any printer or only the currently selected printer.
+    - in skim: choose : save current settings as preset and print.... 
+    - your done
+
+12) install graphclick by arizona-software
+
+############
+# cd /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources
+
+
+
+In MacVim, uncheck Prefer native fullscreen under Advanced settings
+Same as iTerm. The Lion style spaces navigation slows everything down for no reason.
+
+Keyboard problems: 
+- new keymap changed with http://www.macupdate.com/app/mac/14495/ukelele  # Ukelele_2.2.8.dmg
+- Anleitung: http://www.dotkam.com/2011/01/04/edit-keyboard-layout-on-mac/
+
+X11:
+- got to http://xquartz.macosforge.org/trac/wiki/Releases (if not already installed by homebrew)
+- download the latest x11 and install it
+
+

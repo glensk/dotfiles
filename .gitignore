@@ -20,4 +20,6 @@ solarized/
 vrome/
 cpdf-binaries/
 vim/view/
+vim/.netrwhist
+zsh/oh-my-zsh/
 ipython-qt-console-solarized-syntax-highlighting/

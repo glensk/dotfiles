@@ -171,9 +171,9 @@ dotfiles=$HOMEPATH/Dropbox/scripts/dotfiles
 
 
 unlinktcsh() {
-    echo "###############################################################################"
-    echo "#                     unlink tcsh                                               #"
-    echo "###############################################################################"
+echo "#############################################################"
+echo "# unlink tcsh                                                #"
+echo "#############################################################"
     [ -h "$HOMEPATH/.tcshrc" ] && unlink $HOMEPATH/.tcshrc
     [ -h "$HOMEPATH/.tcshrc.complete" ] && unlink $HOMEPATH/.tcshrc.complete
     [ -h "$HOMEPATH/.tcshrc.alias" ] && unlink $HOMEPATH/.tcshrc.alias
@@ -182,18 +182,18 @@ unlinktcsh() {
     [ -h "$HOMEPATH/.tcshrc.local" ] && unlink $HOMEPATH/.tcshrc.local
 }
 unlinkbash() {
-    echo "###############################################################################"
-    echo "#                     unlink bash                                               #"
-    echo "###############################################################################"
+echo "#############################################################"
+echo "# unlink bash                                               #"
+echo "#############################################################"
     [ -h "$HOMEPATH/.bashrc" ] && unlink $HOMEPATH/.bashrc
     [ -h "$HOMEPATH/.bash_profile" ] && unlink $HOMEPATH/.bash_profile
     [ -h "$HOMEPATH/.bash_alias" ] && unlink $HOMEPATH/.bash_alias
     [ -h "$HOMEPATH/.inputrc" ] && unlink $HOMEPATH/.inputrc
 }
 unlinkzsh() {
-    echo "###############################################################################"
-    echo "#                     unlink zsh                                               #"
-    echo "###############################################################################"
+echo "#############################################################"
+echo "# unlink zsh                                                #"
+echo "#############################################################"
     [ -h "$HOMEPATH/.zshrc" ] && unlink $HOMEPATH/.zshrc
     [ -h "$HOMEPATH/.oh-my-zsh" ] && unlink $HOMEPATH/.oh-my-zsh
     [ -h "$HOMEPATH/.bash_alias" ] && unlink $HOMEPATH/.bash_alias

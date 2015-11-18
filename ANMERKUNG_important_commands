@@ -1,0 +1,10 @@
+
+##### mpirun -np 24 ~/VASP_src/parallel_Langevin/vasp
+##### (skript > /dev/null ) > & /dev/null &
+##### (for_all_jobList1_do2.sh jobList mpirun -np 24 ~/progs/vasp/vasp.4.6.cmmd/parallel_Langevin/vasp > /dev/null ) > & /dev/null &
+##### qsub -pe mpi24 24 -l cmmd ./run-para.sh
+#
+## on cmpc: 
+## sshfs -o idmap=user,uid=10010,gid=10010 aglen@cmmc001.bc.rzg.mpg.de:/u/aglen/ /nas/glensk/cmmc/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
+## to unmount 
+## fusermount -u /nas/glensk/cmmc

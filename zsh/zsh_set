@@ -1,0 +1,244 @@
+
+zmodload zsh/complist               # about 0.00-0.01s
+zstyle ':completion:*' menu select
+
+DISABLE_UPDATE_PROMPT=true  # autoupdate zsh without asking
+# CASE_SENSITIVE="true"     # use case-sensitive completion.
+# DISABLE_AUTO_TITLE="true" # disable auto-setting terminal title.
+# ENABLE_CORRECTION="true"  # enable command auto-correction.
+# COMPLETION_WAITING_DOTS="true"  # display red dots whilst waiting for completion.
+DISABLE_UNTRACKED_FILES_DIRTY="true"  # disable marking untracked files under VCS as dirty. This makes repository status check for large repositories much, much faster.
+
+
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
+
+
+#autoload -U colors && colors
+#export CLICOLOR=1
+#export LSCOLORS=GxFxCxDxBxegedabagaced
+#eval `dircolors -b $HOME/.dir_colors`
+#set colored-stats on
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}   # tab colors
+
+
+## make autocompletion for python scripts available'
+## dont put this in bashrc_add in Thermodynaics svn since not everyone like 
+## to have this (and will need to install python-argcompletion)
+# eval "$(register-python-argcomplete pot_energy_forces.py)"
+
+# to add: after:   *.pptx=01;31:
+export LS_COLORS="no=00:fi=00:di=01;34:ln=04;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=30;42:st=37;44:ex=01;32:*.tex=01;31:*.pptx=01;31:*.docx=01;35:*.pkl=01;31:*.tar=01;31:*.tgz=01;31:*.npz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.agr=01;35:*.nb=01;35:*.pdf=01;33:*.eps=01;33:*.ps=01;33:*.jpg=01;33:*.jpeg=01;33:*.gif=01;33:*.bmp=01;33:*.pbm=01;33:*.pgm=01;33:*.ppm=01;33:*.tga=01;33:*.xbm=01;33:*.xpm=01;33:*.tif=01;33:*.tiff=01;33:*.png=01;33:*.mov=01;33:*.mpg=01;33:*.mpeg=01;33:*.avi=01;33:*.fli=01;33:*.gl=01;33:*.dl=01;33:*.xcf=01;33:*.xwd=01;33:*.flac=01;33:*.mp3=01;33:*.mpc=01;33:*.ogg=01;33:*.wav=01;33:"
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
+
+bindkey "^R" history-incremental-search-backward
+
+# show the title path in the tab
+precmd () { print -Pn "\e]2;%n@%M | %~\a" } # title bar prompt
+
+# next two lines found in internet
+#setopt AUTOLIST AUTOCD CORRECT EXTENDEDGLOB AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME PUSHD_IGNORE_DUPS NOBEEP APPEND_HISTORY SHARE_HISTORY NOBANGHIST NOTIFY ALWAYS_TO_END COMPLETE_IN_WORD
+#unset MAILCHECK
+
+# Even if there are commands inbetween commands that are the same, still only save the last one
+setopt HIST_IGNORE_ALL_DUPS # don't record dupes in history
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+
+setopt chase_links
+
+setopt NOCLOBBER    # Dont overwrite existing file with > file
+setopt GLOBDOTS     # Glob dot files  # ls ~/*pro* should display ~/.profile
+setopt interactivecomments # Comments after commands are acceptable # $ ls # Comment
+unsetopt listambiguous # necessary to press tab twice to comple ambigious files (ha.a ha.b)
+
+# Terminal Options
+#setopt AUTO_CD		        # implicate cd for non-commands
+#setopt CD_ABLE_VARS	    # read vars in cd
+#setopt CORRECT 		    # correct spelling
+#setopt COMPLETE_IN_WORD	# complete commands anywhere in the word
+#setopt NOTIFY              # Notify when jobs finish
+#setopt C_BASES             # 0xFF
+#setopt BASH_AUTO_LIST      # Autolist options on repeition of ambiguous args
+#setopt CHASE_LINKS         # Follow links in cds
+#setopt AUTO_PUSHD          # Push dirs into history
+#setopt ALWAYS_TO_END       # Move to the end on complete completion
+#setopt LIST_ROWS_FIRST     # Row orientation for menu
+#setopt MULTIOS             # Allow Multiple pipes
+#setopt MAGIC_EQUAL_SUBST   # Expand inside equals
+#setopt EXTENDED_GLOB
+
+
+
+############## zsh-syntax-highlighting ###################################### 0.02s
+############## zsh-history-substring-search ################################# 0.01s
+#if [ ${ZSH_VERSION//\./} -ge 430 ]; then   ## takes 0.02 sec to load .... too long!
+#source $HOME/Dropbox/scripts/dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#fi
+#[[ $(zsh --version | awk '{print $2}') > 4.3.17 ]] && source $HOME/scripts/dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# make commands colorfull (works with zsh > 4.3.17 )
+#@#ZSH_HIGHLIGHT_STYLES[default]=none
+#@#ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red,bold
+#@#ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=green
+#@#ZSH_HIGHLIGHT_STYLES[alias]=none
+#@#ZSH_HIGHLIGHT_STYLES[builtin]=none
+#@#ZSH_HIGHLIGHT_STYLES[function]=none
+#@#ZSH_HIGHLIGHT_STYLES[command]=none
+#@#ZSH_HIGHLIGHT_STYLES[precommand]=none
+#@#ZSH_HIGHLIGHT_STYLES[commandseparator]=none
+#@#ZSH_HIGHLIGHT_STYLES[hashed-command]=none
+#@#ZSH_HIGHLIGHT_STYLES[path]=none
+#@#ZSH_HIGHLIGHT_STYLES[globbing]=none
+#@#ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue
+#@#ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=none
+#@#ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=none
+#@#ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
+#@#ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+#@#ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+#@#ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
+#@#ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
+#@#ZSH_HIGHLIGHT_STYLES[assign]=none
+
+source $HOME/Dropbox/scripts/dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+
+# to secelt menue entro just once with out first leaving menu end then additional
+# enerter press  # when menu shows it would be nice to go directly down and not
+# have to press tab again: OUTCAR_A.sh OUTCAR_<TAB> cmd+j
+bindkey -M menuselect '^M' .accept-line  ### INCLUDE THIS !! Try with OUTCAR_A.sh OUT<TAB>
+
+
+#bindkey "[D" backward-word
+#bindkey "[n" backward-word
+#bindkey "[C" forward-word
+#bindkey "^[a" beginning-of-line
+#bindkey "^[e" end-of-line
+#
+#bindkey "\e\e[D" backward-word
+#bindkey "\e\e[C" forward-word
+
+
+bindkey -e   # Emacs mode; necessary for cmd+; and cmd+' to go to beginning/end of line
+# bind UP and DOWN arrow keys this has to be for zsh-history-substring-search so
+# that cmd+; or cmd+' still jumps to beginning or end of line
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
+# bind P and N for EMACS mode
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
+
+# bind k and j for VI mode
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
+# bind UP and DOWN arrow keys on OSX and unix
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+# @ # Key bindings
+# @ # Vi insert mode
+# @ bindkey -M viins 'jj' vi-cmd-mode
+# @ bindkey -M vicmd '^i' vi-down-line-or-history
+# @ bindkey -M vicmd '^k' vi-up-line-or-history
+# @ 
+# @ # Vi command mode
+# @ bindkey -M vicmd 'l' vi-forward-char
+# @ bindkey -M vicmd '^l' vi-forward-word
+# @ bindkey -M vicmd 'j' vi-backward-char
+# @ bindkey -M vicmd '^j' vi-backward-word
+# @ bindkey -M vicmd 'h' vi-insert
+# @ bindkey -M vicmd 'i' vi-down-line-or-history
+# @ bindkey -M vicmd 'k' vi-up-line-or-history
+# @ #bindkey '^[[1;9C' forward-word
+# @ #bindkey '^[[1;9D' backward-word
+
+# if going back go all the way to / and not to _ or other chars
+# from: http://zshwiki.org/home/zle/bindkeys
+# by default: export WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>'
+# we take out the slash, period, angle brackets, dash here.
+export WORDCHARS='*?_[]~=&;!#$%^(){}\.'   # this seems to take about 0.01 s
+
+# tab complete also in the middle of word
+bindkey '^i' expand-or-complete-prefix
+
+
+#tricks
+# ls **/*.txt  instead of find . -name *.txt
+#
+
+
+################################ Autosuggestions:  ! destroys good zsh behavior !
+# ls ~/proj/results_/<TAB> directly brings words! I want to start typing myself
+## Load zsh-autosuggestions.
+#source $ZSH/custom/plugins/zsh-autosuggestions/autosuggestions.zsh
+## to see all colors: for code in {000..255}; do print -P -- "$code: %F{$code}Test%f"; done
+#
+#AUTOSUGGESTION_HIGHLIGHT_COLOR='fg=237'  # needs $TERM=xterm-256color
+## Enable autosuggestions automatically.
+#zle-line-init() {
+#    zle autosuggest-start
+#}
+#zle -N zle-line-init
+
+
+
+######################################################################################
+# completion of bash commands
+######################################################################################
+# zsh completion rules for diffrent commands
+# zstyle ':completion:*:(all-|)files' ignored-patterns '(|*/)(CVS|.svn|.git)'  !! destroys custom completions!!!
+# zstyle ':completion:*:(all-|)files' ignored-patterns "(*.pyc|*~)"  !! destroys custom completions !!
+# zstyle ':completion:*:ls:*' ignore-line yes  !! this destroys to show ~/r_ if ~/r_other
+zstyle ':completion:*:cd:*' ignored-patterns '(*/)#(CVS|.svn|.git)'
+zstyle ':completion:*:(gvim|vim|vi):*' ignored-patterns '*.(tar.gz|o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|toc|class|pdf|ps|eps|pyc|DS_Store|log)'
+zstyle ':completion:*:(x|xmgrace):*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|eps|pyc|DS_Store|tex|sty|bib|txt|sh)'
+zstyle ':completion:*:(open):*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pyc|DS_Store|tex|sty|bib|dat|txt|agr)'
+zstyle ':completion:*:(epstopdf):*' ignored-patterns '*.(pdf|ps|o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pyc|DS_Store|tex|sty|bib|dat|txt|agr|graph|end|py|sh)'
+zstyle ':completion:*:(ls):*' ignored-patterns '*.(DS_Store)'
+zstyle ':completion:*:*:kill:*' menu yes select
+hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*})
+zstyle ':completion:*:(ssh|scp):*' hosts $hosts
+zstyle ':completion:*:default' list-prompt '%S%M matches%s'   # Don't prompt for a huge list, page it!
+
+# smartcase; default search is case insensitive; if you have CAPITAL letters in
+# search exactly this expression is looked for
+zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
+
+# ignore some files during completion like .pyc  # DOES NOT WORK YET
+zstyle ':completion:*:default' ignored-patterns '*.pyc'
+
+
+#################################################################
+# for every zsh : just type filename file.tex or file.agr to open with corresponding script
+#################################################################
+alias -s tex=vim
+alias -s url=open
+alias -s html=open
+alias -s txt=vim
+#alias -s py=vim   NEVER DO THIS! can run run python scripts from shell correctly
+alias -s agr=x
+alias -s pdf=open
+alias -s eps=open
+
+
+alias -g H='| head'
+alias -g T='| tail'
+alias -g G='| grep'
+alias -g X='| xargs'
+alias -g B='| bc -l'
+alias -g S='| awk '{sum+=$1} END{print sum}''
+
+
+# don't expand aliases _before_ completion has finished
+#   like: git comm-[tab]
+setopt complete_aliases
+
+if [ ${ZSH_VERSION//\./} -ge 420 ]; then
+    # open browser on urls
+    _browser_fts=(htm html de org net com at cx nl se dk dk php)
+    for ft in $_browser_fts ; do alias -s $ft=$BROWSER ; done
+fi
+
