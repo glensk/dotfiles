@@ -46,7 +46,7 @@ else
     mypromptpath="setenv mypromptpath red"
     module="module load mathematica1002/10.0.2"
     # christoph changed in /etc/profile.d/gxhivemgr.sh: if test x"$PS1" = x || echo
-    add="limit stacksize unlimited;setenv TMPDIR /scratch/$USER;setenv PRINTER cmcopy1166;"
+    add="limit stacksize unlimited;setenv TMPDIR /scratch/$USER;setenv PRINTER cmcopy1166"
 else
     if [ "`echo $host | grep -o cmmc`" = "cmmc" ];then
     onxxx="setenv oncmmc true"
