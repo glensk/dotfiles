@@ -25,9 +25,9 @@ echo
 [ "$host" = "$mylaptop" ] && linkbash="true"
 
 [ "$oncmmc" = "true" ]    && linkzsh="true"
-[ "$oncmmc" = "true" ]    && linktcsh="true"
+#[ "$oncmmc" = "true" ]    && linktcsh="true"
 
-[ "$oncmmd" = "true" ]    && linktcsh="true"
+#[ "$oncmmd" = "true" ]    && linktcsh="true"
 [ "$oncmmd" = "true" ]    && linkzsh="true"
 
 [ "$oncmpc" = "true" ]    && linkzsh="true"
