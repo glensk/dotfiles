@@ -342,6 +342,7 @@ file=$HOMEPATH/.dir_colors
 file=$HOMEPATH/.ipython/profile_default/ipython_config.py
 [ -h $file ] && unlink $file
 [ -e $file ] && echo $file rm && rm -rf $file
+[ ! -f $HOMEPATH/.ipython/profile_default ] && mkdir -p $HOMEPATH/.ipython/profile_default
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/ipython/profile_default/ipython_config.py $file
 
 #file=$HOMEPATH/.autojump
