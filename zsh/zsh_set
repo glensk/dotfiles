@@ -5,7 +5,6 @@ zstyle ':completion:*' menu select=2    # menu if nb items > 2
 DISABLE_UPDATE_PROMPT=true  # autoupdate zsh without asking
 # CASE_SENSITIVE="true"     # use case-sensitive completion.
 # DISABLE_AUTO_TITLE="true" # disable auto-setting terminal title.
-# ENABLE_CORRECTION="true"  # enable command auto-correction.
 # COMPLETION_WAITING_DOTS="true"  # display red dots whilst waiting for completion.
 DISABLE_UNTRACKED_FILES_DIRTY="true"  # disable marking untracked files under VCS as dirty. This makes repository status check for large repositories much, much faster.
 
@@ -60,7 +59,7 @@ setopt HIST_FIND_NO_DUPS
 setopt auto_cd                  # if command is a path, cd into it
 setopt auto_remove_slash        # self explicit
 setopt chase_links              # resolve symlinks = follow links in cds
-setopt correct                  # try to correct spelling of commands
+unsetopt correct                  # try to correct spelling of commands I DONT WANT THIS
 setopt extended_glob            # activate complex pattern globbing
 setopt glob_dots                # include dotfiles in globbing
 setopt print_exit_value         # print return value if non-zero
@@ -90,7 +89,6 @@ setopt ALWAYS_TO_END            # Move to the end on complete completion
 #setopt EXTENDED_GLOB
 #?? setxkbmap -option compose:ralt  # compose-key
 #?? print -Pn "\e]0; %n@%M: %~\a"   # terminal title
-#setopt CORRECT 		    # correct spelling
 
 
 

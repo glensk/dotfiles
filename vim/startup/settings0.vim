@@ -10,7 +10,7 @@ set hidden
 
 
 " Use the OS clipboard by default (on versions compiled with `+clipboard`)
-set clipboard=unnamed
+set clipboard=unnamedplus
 
 " Enhance command-line completion / Better? completion on command line
 set wildmenu

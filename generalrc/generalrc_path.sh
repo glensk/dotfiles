@@ -46,6 +46,7 @@ if [ "$currenthost" = "onmac" ];then
     # $LD_LIBRARY_PATH add on mac
     ldvasp="$HOME/local/lib"
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
+    #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
     #[ "$host" = "$mylaptop" ] && \
     PATH="$sed:$brew:$tdep:$phonopy:$phonopybin:$vasp:$PATH" #&& \
