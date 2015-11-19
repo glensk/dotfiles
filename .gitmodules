@@ -79,3 +79,6 @@
 [submodule "zsh/zsh-history-substring-search"]
 	path = zsh/zsh-history-substring-search
 	url = git://github.com/zsh-users/zsh-history-substring-search.git
+[submodule "autojump"]
+	path = autojump
+	url = git://github.com/joelthelion/autojump.git

@@ -115,6 +115,7 @@ cd $dotfiles && cd vim/bundle/vim-signature/           && git submodule init && 
 cd $dotfiles && cd vim/bundle/vim-surround/            && git submodule init && git submodule update && cd $dotfiles
 
 # the following give (untracked content) in git status  (after manual install seem to be ok)
+git submodule add git://github.com/joelthelion/autojump.git autojump
 git submodule add	https://github.com/vim-scripts/taglist.vim.git vim/bundle/taglist.vim/
 git submodule add	https://github.com/kana/vim-fakeclip vim/bundle/vim-fakeclip/
 git submodule add  https://github.com/gmarik/vundle.git vim/bundle/vundle
@@ -122,6 +123,7 @@ cd $dotfiles && cd vim/bundle/taglist.vim/             && git submodule init && 
 cd $dotfiles && cd vim/bundle/vim-fakeclip/            && git submodule init && git submodule update && cd $dotfiles
 cd $dotfiles && cd vim/bundle/vundle/                  && git submodule init && git submodule update && cd $dotfiles 
 
+cd $dotfiles && cd autojump                  && git submodule init && git submodule update && cd $dotfiles 
 
 git add xmgrace
 git add xmodmap
