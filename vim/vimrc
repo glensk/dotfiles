@@ -35,7 +35,9 @@ source ~/.vim/startup/vundle_vim-airline.vim  " get some more colors for statusl
 " Plugins trying
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plugin 'https://github.com/shiblon/latex-makefile.git'
-Plugin 'https://github.com/Shougo/neocomplete.vim' 
+if version >= 703
+    Plugin 'https://github.com/Shougo/neocomplete.vim'   "  requires Vim 7.3.885+ with Lua enabled
+endif
 Plugin 'https://github.com/sjl/gundo.vim'     " 
 "Plugin 'https://github.com/MarcWeber/vim-addon-commandline-completion.git' 
 "Plugin 'amdt/vim-niji'
