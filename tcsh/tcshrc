@@ -12,6 +12,9 @@ setenv generalrc $HOME/Dropbox/scripts/dotfiles/generalrc
 source $generalrc/generalrc_.sh
 
 
+source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
+alias c='j'
+
 #################################################################
 # tcsh dependent stuff to use on every system
 #################################################################

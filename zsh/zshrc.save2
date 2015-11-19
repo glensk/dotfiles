@@ -1,5 +1,5 @@
 [ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
-[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
+#[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)
 autoload -U colors && colors                # necessary for prompt colors (0.00s)
 #autoload -U +X compinit                     # (0.00s)
@@ -36,8 +36,10 @@ export currentshell='zsh'    # known are zsh / bash / tcsh
 export generalrc="$HOME/Dropbox/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_.sh
 
-source $HOME/Dropbox/scripts/dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
+#source $HOME/Dropbox/scripts/dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
 alias c='z'
+source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
+alias c='j'
 
 
 #################################################################

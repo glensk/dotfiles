@@ -411,3 +411,5 @@ if [ -e "$HOMEPATH/.config/terminator" ]; then
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/terminator/config $file
     fi
 chmod 600 ~/.ssh/config
+cd $dotfiles
+cd autojump && ./install.py && cd $dotfiles
