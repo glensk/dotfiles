@@ -1,6 +1,6 @@
 
-zmodload zsh/complist               # about 0.00-0.01s
-zstyle ':completion:*' menu select
+zmodload zsh/complist                   # about 0.00-0.01s
+zstyle ':completion:*' menu select=2    # menu if nb items > 2
 
 DISABLE_UPDATE_PROMPT=true  # autoupdate zsh without asking
 # CASE_SENSITIVE="true"     # use case-sensitive completion.
@@ -32,43 +32,65 @@ export LS_COLORS="no=00:fi=00:di=01;34:ln=04;36:pi=40;33:so=01;35:do=01;35:bd=40
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 
-bindkey "^R" history-incremental-search-backward
 
 # show the title path in the tab
 precmd () { print -Pn "\e]2;%n@%M | %~\a" } # title bar prompt
 
-# next two lines found in internet
-#setopt AUTOLIST AUTOCD CORRECT EXTENDEDGLOB AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME PUSHD_IGNORE_DUPS NOBEEP APPEND_HISTORY SHARE_HISTORY NOBANGHIST NOTIFY ALWAYS_TO_END COMPLETE_IN_WORD
-#unset MAILCHECK
-
-# Even if there are commands inbetween commands that are the same, still only save the last one
-setopt HIST_IGNORE_ALL_DUPS # don't record dupes in history
+##
+# History
+##
+HISTFILE=~/.zsh_history         # where to store zsh config
+HISTSIZE=1024                   # big history
+SAVEHIST=1024                   # big history
+setopt append_history           # append
+setopt hist_ignore_all_dups     # don't record dupes in history
+unsetopt hist_ignore_space      # ignore space prefixed commands
+setopt hist_reduce_blanks       # trim blanks
+setopt hist_verify              # show before executing history commands
+setopt inc_append_history       # add commands as they are typed, don't wait until
+setopt share_history            # share hist between sessions
+setopt bang_hist                # !keyword
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_EXPIRE_DUPS_FIRST
 setopt HIST_FIND_NO_DUPS
 
-setopt chase_links
+##
+# Various
+##
+setopt auto_cd                  # if command is a path, cd into it
+setopt auto_remove_slash        # self explicit
+setopt chase_links              # resolve symlinks = follow links in cds
+setopt correct                  # try to correct spelling of commands
+setopt extended_glob            # activate complex pattern globbing
+setopt glob_dots                # include dotfiles in globbing
+setopt print_exit_value         # print return value if non-zero
+unsetopt beep                   # no bell on error
+unsetopt bg_nice                # no lower prio for background jobs
+unsetopt clobber                # must use >| to truncate existing files
+setopt NOCLOBBER                # Dont overwrite existing file with > file
+unsetopt hist_beep              # no bell on error in history
+unsetopt hup                    # no hup signal at shell exit
+unsetopt ignore_eof             # do not exit on end-of-file
+unsetopt list_beep              # no bell on ambiguous completion
+unsetopt rm_star_silent         # ask for confirmation for `rm *' or `rm path/*'
+setopt GLOBDOTS                 # Glob dot files  # ls ~/*pro* should display ~/.profile
+setopt interactivecomments      # Comments after commands are acceptable # $ ls # Comment
+unsetopt listambiguous          # necessary to press tab twice to comple ambigious files (ha.a ha.b)
+setopt CD_ABLE_VARS	            # read vars in cd
+setopt COMPLETE_IN_WORD	        # complete commands anywhere in the word
+setopt BASH_AUTO_LIST           # Autolist options on repeition of ambiguous args
+setopt ALWAYS_TO_END            # Move to the end on complete completion
 
-setopt NOCLOBBER    # Dont overwrite existing file with > file
-setopt GLOBDOTS     # Glob dot files  # ls ~/*pro* should display ~/.profile
-setopt interactivecomments # Comments after commands are acceptable # $ ls # Comment
-unsetopt listambiguous # necessary to press tab twice to comple ambigious files (ha.a ha.b)
-
-# Terminal Options
-#setopt AUTO_CD		        # implicate cd for non-commands
-#setopt CD_ABLE_VARS	    # read vars in cd
-#setopt CORRECT 		    # correct spelling
-#setopt COMPLETE_IN_WORD	# complete commands anywhere in the word
 #setopt NOTIFY              # Notify when jobs finish
 #setopt C_BASES             # 0xFF
-#setopt BASH_AUTO_LIST      # Autolist options on repeition of ambiguous args
-#setopt CHASE_LINKS         # Follow links in cds
 #setopt AUTO_PUSHD          # Push dirs into history
-#setopt ALWAYS_TO_END       # Move to the end on complete completion
 #setopt LIST_ROWS_FIRST     # Row orientation for menu
 #setopt MULTIOS             # Allow Multiple pipes
 #setopt MAGIC_EQUAL_SUBST   # Expand inside equals
 #setopt EXTENDED_GLOB
+#?? setxkbmap -option compose:ralt  # compose-key
+#?? print -Pn "\e]0; %n@%M: %~\a"   # terminal title
+#setopt CORRECT 		    # correct spelling
 
 
 
@@ -107,7 +129,7 @@ source $HOME/Dropbox/scripts/dotfiles/zsh/zsh-history-substring-search/zsh-histo
 # enerter press  # when menu shows it would be nice to go directly down and not
 # have to press tab again: OUTCAR_A.sh OUTCAR_<TAB> cmd+j
 bindkey -M menuselect '^M' .accept-line  ### INCLUDE THIS !! Try with OUTCAR_A.sh OUT<TAB>
-
+bindkey "^R" history-incremental-search-backward
 
 #bindkey "[D" backward-word
 #bindkey "[n" backward-word
@@ -167,7 +189,6 @@ bindkey '^i' expand-or-complete-prefix
 
 #tricks
 # ls **/*.txt  instead of find . -name *.txt
-#
 
 
 ################################ Autosuggestions:  ! destroys good zsh behavior !
