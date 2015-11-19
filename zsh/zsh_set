@@ -19,7 +19,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"  # disable marking untracked files under VC
 #export LSCOLORS=GxFxCxDxBxegedabagaced
 #eval `dircolors -b $HOME/.dir_colors`
 #set colored-stats on
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}   # tab colors
+#zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}   # tab colors
 
 
 ## make autocompletion for python scripts available'
@@ -78,7 +78,7 @@ setopt interactivecomments      # Comments after commands are acceptable # $ ls 
 unsetopt listambiguous          # necessary to press tab twice to comple ambigious files (ha.a ha.b)
 setopt CD_ABLE_VARS	            # read vars in cd
 setopt COMPLETE_IN_WORD	        # complete commands anywhere in the word
-setopt BASH_AUTO_LIST           # Autolist options on repeition of ambiguous args
+unsetopt BASH_AUTO_LIST         # unset Autolist options on repeition of ambiguous args otherwise !!!! NEEDS TWO TABS !!
 setopt ALWAYS_TO_END            # Move to the end on complete completion
 
 #setopt NOTIFY              # Notify when jobs finish
@@ -231,6 +231,15 @@ zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
 # ignore some files during completion like .pyc  # DOES NOT WORK YET
 zstyle ':completion:*:default' ignored-patterns '*.pyc'
 
+#zstyle ':completion:*:warnings' format 'Too bad there is nothing'
+## format in bold red error messages
+#zstyle ':completion:*:warnings' format "%B$fg[red]%}---- no match for: $fg[white]%d%b"
+
+# let's use the tag name as group name
+zstyle ':completion:*' group-name ''
+
+# activate approximate completion, but only after regular completion (_complete)
+zstyle ':completion:::::' completer _complete _approximate
 
 #################################################################
 # for every zsh : just type filename file.tex or file.agr to open with corresponding script
