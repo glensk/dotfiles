@@ -65,3 +65,8 @@ mkalias () {
     eval `aliastcshtobash $1 "$2"`
 }
 
+if [ "$ZSH_VERSION" = "4.3.6" ];then
+module () {
+    eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
+}
+fi
