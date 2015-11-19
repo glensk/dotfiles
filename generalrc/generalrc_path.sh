@@ -11,6 +11,7 @@
 #########################################################################
 dropboxbin="$HOME/Dropbox/scripts/dotfiles/bin"       # Dropbox binaries
 anaconda="$HOME/anaconda/bin"
+#anaconda="/usr/local/bin"  # use this to install macvim on the mac otherwise interference with homebrew python
 svnctags="/usr/local/bin"
 homebrew="/usr/local/sbin"
 bin="/usr/bin"

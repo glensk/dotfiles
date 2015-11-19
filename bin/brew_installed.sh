@@ -86,7 +86,8 @@ brew install rmtrash #
 
 
 
-
+brew install ssh-copy-id   # to copy public key to remote host
+brew install macvim        # this will be used as macvim -v == gvim -v for clipboard support between cmmc/cmpc gvim sessions
 brew install git
 git config --global credential.helper osxkeychain
 
@@ -115,7 +116,7 @@ chsh -s /usr/local/bin/bash $USER   # change schell to brew shell
 brew install wget --with-iri
 brew install svn
 #brew install vim   # to get +clipboard on vim --version
-brew install vim --with-lua 
+brew install vim --with-client-server --with-lua --with-features=huge --with-xterm_clipboard
 brew install sshfs  # to make possible to mount nas / data  # also installes osxfuse!
                     # which is necessary to mout nas / data
                     # is this is not working (yosemite) then go to 
