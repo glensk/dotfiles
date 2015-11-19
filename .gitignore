@@ -19,6 +19,7 @@ makefiles/
 solarized/
 vrome/
 cpdf-binaries/
+cron/runtime*
 vim/view/
 vim/.netrwhist
 zsh/oh-my-zsh/

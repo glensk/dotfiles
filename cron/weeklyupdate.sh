@@ -1,5 +1,6 @@
 #!/bin/zsh
-echo "start:$(date)" >> /Users/glensk/Dropbox/scripts/dotfiles/cron/runtime
+host=`hostname`
+echo "start:$(date)" >> $HOME/Dropbox/scripts/dotfiles/cron/runtime_$host
 doit() {
 echo ""
 echo ""
@@ -26,12 +27,13 @@ echo ""
 
 doit conda update conda -y
 doit conda update anaconda -y
-doit brew update
-doit brew upgrade --all
-doit brew cleanup
-doit diskutil repairPermissions /
-#doit diskutil verifyvolume /
-#doit diskutil repairvolume /
+if [ "$host" = "mac" ];then
+    doit brew update
+    doit brew upgrade --all
+    doit brew cleanup
+    doit diskutil repairPermissions /
+    #doit diskutil verifyvolume /
+    #doit diskutil repairvolume /
+    fi
 
-
-echo "stop :$(date)" >> /Users/glensk/Dropbox/scripts/dotfiles/cron/runtime
+echo "stop :$(date)" >> $HOME/Dropbox/scripts/dotfiles/cron/runtime_$host
