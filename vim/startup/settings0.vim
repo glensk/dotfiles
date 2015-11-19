@@ -10,7 +10,8 @@ set hidden
 
 
 " Use the OS clipboard by default (on versions compiled with `+clipboard`)
-set clipboard=unnamedplus
+" on cmpc cmmd vi/vim have -clipboard but gvim -v can be used which has +clipboard
+set clipboard=unnamed,unnamedplus
 
 " Enhance command-line completion / Better? completion on command line
 set wildmenu
