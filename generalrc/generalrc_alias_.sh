@@ -19,14 +19,15 @@
 ## -F shows control chars
 
 # for onmac: $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls --color=auto --group-directories-first --show-control-chars --hide="Icon?"' && \
-[ "$onmac" = "true" ] && \
-    $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls' && \
-    $1 trash "rmtrash" && \
-    $1 del "rmtrash" && \
-    $1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
-    $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .'
-    $1 mvim     'open /Applications/MacVim.app'
+#[ "$onmac" = "true" ] && \
+#    $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls' && \
+#    $1 trash "rmtrash" && \
+#    $1 del "rmtrash" && \
+#    $1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
+#    $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .'
+#    $1 mvim     'open /Applications/MacVim.app'
 
+# This following ls command seems to work everywhere
 $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?"'
 #alias ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
 
@@ -171,7 +172,12 @@ $1 qstatn 'qstatn -d'
     $1 mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica' && \
     $1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
     $1 units '$HOME/scripts/dotfiles/bin/units/units-1.88/units' && \
-    $1 top 'top -o cpu'
+    $1 top 'top -o cpu' && \
+    $1 trash "rmtrash" && \
+    $1 del "rmtrash" && \
+    $1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
+    $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .' && \
+    $1 mvim     'open /Applications/MacVim.app'
 
 
     #alias sed='$HOME/scripts/dotfiles/bin/sed/sed-4.2/build/bin/sed-4.2'
@@ -198,8 +204,13 @@ $1 qstatn 'qstatn -d'
     $1 s5 '~/start.5.3.5.20cores.sh' && \
     $1 s52 '~/start.5.3.5.20cores.sh' && \
     $1 v5 '~/start.5.3.5.20cores.sh' && \
-    $1 v52 '~/start.5.3.5.20cores.sh'
+    $1 v52 '~/start.5.3.5.20cores.sh' && \
+    $1 vi 'gvim -v' && \
+    $1 vim 'gvim -v'
 
+[ "$oncmpc" = "true" ] && \
+    $1 vi 'gvim -v' && \
+    $1 vim 'gvim -v'
 
 [ "$host" = "cmmd001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v'
 #[ "$host" = "cmmc001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v' # check if cmmc has vim or only vi

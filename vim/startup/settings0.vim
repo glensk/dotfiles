@@ -11,6 +11,8 @@ set hidden
 
 " Use the OS clipboard by default (on versions compiled with `+clipboard`)
 " on cmpc cmmd vi/vim have -clipboard but gvim -v can be used which has +clipboard
+" to make this work on mac (vim) and cmpc (gvim) and cmmc (gvim) have to use
+" have to use unnamed,unnamedplus
 set clipboard=unnamed,unnamedplus
 
 " Enhance command-line completion / Better? completion on command line
