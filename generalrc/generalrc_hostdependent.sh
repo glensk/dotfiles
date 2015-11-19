@@ -52,9 +52,9 @@ else
     onxxx="setenv oncmmc true"
     currenthost="setenv currenthost oncmmc"
     myshell="setenv myshell zsh"
-    myprompttime="setenv myprompttime turquoise"
-    myprompthostuser="setenv myprompthostuser turquoise"
-    mypromptpath="setenv mypromptpath turquoise"
+    myprompttime="setenv myprompttime cyan"
+    myprompthostuser="setenv myprompthostuser cyan"
+    mypromptpath="setenv mypromptpath cyan"
     module="setenv ka kb" #module load git intel impi mkl grace mathematica/9.0.1 vasp/5.3.5" 
     add="limit stacksize unlimited;setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1"
 else
