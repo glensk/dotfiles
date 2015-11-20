@@ -73,7 +73,7 @@ if [ "`hostname`" = "$mylaptop" ];then
     echo "#######################################"
     echo "#### update cmpc (and cmmd) ###########"
     echo "#######################################"
-    ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/scripts/dotfiles;./bin/gitdown.sh"
+    ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/scripts/dotfiles;./bin/gitdown.sh;.generalrc/generalrc_alias_renew.sh"
     echo "#######################################"
     echo "#### update cmpc (and cmmd) DONE ######"
     echo "#######################################"

@@ -2,52 +2,27 @@
 
 
 #[ "$printloadstat" = "true" ] && echo ... alias before && alias && echo ... alias before done
-
 #echo ------------------- SHELL $currentshell WHICH $whichalias 
-#kkk="$mkalias"
 #[ "$currentshell" = "tcsh" ] && kkk="$alias"
 #[ "$currentshell"  = "bash" ] && unalias -a
-
 #whichalias=$1
 #currentshell=$2
-
 
 ####################################################################
 ## ls alias
 ## -v sorts numerical
 ## -H follows symbolic links
-## -F shows control chars
-
-# for onmac: $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls --color=auto --group-directories-first --show-control-chars --hide="Icon?"' && \
-#[ "$onmac" = "true" ] && \
-#    $1 ls '/usr/local/opt/coreutils/libexec/gnubin/ls' && \
-#    $1 trash "rmtrash" && \
-#    $1 del "rmtrash" && \
-#    $1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
-#    $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .'
-#    $1 mvim     'open /Applications/MacVim.app'
-
+## -F shows control chars like / or *
 # This following ls command seems to work everywhere
 $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?"'
-#alias ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
-
-
-#elif [ "$currentshell" = "tcsh" ];then
-#    #echo tcsh roxx
-#    alias ls 'ls -F -H -v --color=tty'    
-#elif [ "$currentshell" = "bash" ];then
-#    #echo bash roxx
-#    ls -F -H -v --color=tty --hide=Icon? --show-control-chars --ignore="*.log" --group-directories-first $*
-#fi
-
-
-# to specify cd, mcd, - (go back to last visited directory), ../
-
-
+#ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
+#ls -F -H -v --color=tty --hide=Icon? --show-control-chars --ignore="*.log" --group-directories-first $*
+#ls 'ls -F -H -v --color=tty'    
 
 #################################################################
 # alias navigation   use ' '  instead of ""  since only those work with `` correctly
 #################################################################
+$1 gar 'sshgar.sh'
 $1 finder-cd-to-current-finder-dir 'cd `finder-list-current-finder-dir`'
 $1 n 'cd `tn.sh`'  # go to corresponding nas folder
 $1 d 'cd `td.sh`'  # go to corresponding data folder
@@ -218,8 +193,8 @@ $1 qstatn 'qstatn -d'
 ##############################
 # ssh
 ##############################
-$1 ssh 'ssh.sh -Y -X -o ServerAliveInterval=16000 -o ServerAliveCountMax=12000'   # -X for loading locas stuff locally (xmgrace)
-$1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=16000 -o ServerAliveCountMax=12000'
+$1 ssh 'ssh.sh -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200000'   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc
+$1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200000'
 
 $1 cluster 'sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 001 'sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
@@ -230,7 +205,7 @@ $1 gate 'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; z
 $1 gatelinux 'sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 gatehydra 'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 
-$1 gar 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ]  && cd `th.sh`; zsh"'
-$1 gar1 'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-$1 gar2 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+#$1 gar 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ]  && cd `th.sh`; zsh"'
+#$1 gar1 'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+#$1 gar2 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 

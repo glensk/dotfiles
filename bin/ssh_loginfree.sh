@@ -1,5 +1,13 @@
 #!/bin/sh
 
+#Host cmmc*
+#    HostName %h.bc.rzg.mpg.de
+#    User aglen
+#    StrictHostKeyChecking no
+#    UserKnownHostsFile /dev/null
+#
+#\ssh aglen@cmmc002.bc.rzg.mpg.de  -> ssh cmmc002
+
 echo on mac do
 ssh-keygen -t rsa
 cat ~/.ssh/id_rsa.pub | ssh glensk@cmpc34 'cat >> .ssh/authorized_keys'

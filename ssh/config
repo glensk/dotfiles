@@ -1,3 +1,6 @@
+#Host *    # Warning: Permanently added ... to list of known hosts
+#    StrictHostKeyChecking no
+#    UserKnownHostsFile /dev/null
 Host cluster
     HostbasedAuthentication yes
     EnableSSHKeysign        yes
@@ -23,3 +26,7 @@ Host cmpc
     ServerAliveCountMax 10
     ForwardX11Trusted yes
     TCPKeepAlive yes
+
+#Host cmmc*
+#    HostName %h.bc.rzg.mpg.de
+#    User aglen
