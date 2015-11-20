@@ -37,3 +37,10 @@ source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.complete
 #alias j $HOME'/scripts/bin/j2/j.sh $*'
 #. $HOME/scripts/bin/j2/j.sh          # provides the j() function
 #[[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
+
+gplot () {
+    local fileexpr=$(printf "'%q'" $1)
+    shift
+    local plotexpr=$(printf '%b' "plot ${fileexpr} $*")
+    gnuplot -persist -raise -e "$plotexpr"
+}

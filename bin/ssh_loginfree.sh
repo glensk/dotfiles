@@ -31,3 +31,5 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@cmpc34
 #
 # ls: cannot open directory .: Key has expired
 # try now with cmpc where login is set to 16000 and not 1600 anymore
+#
+# https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys is very good
