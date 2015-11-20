@@ -27,10 +27,10 @@ Host cmpc
     ForwardX11Trusted yes
     TCPKeepAlive yes
 
-Host cmmc*
-    HostName %h.bc.rzg.mpg.de
-    User aglen
-    ServerAliveInterval 1600
-    ServerAliveCountMax 1000
-    ForwardX11Trusted yes
-    TCPKeepAlive yes
+#Host cmmc*
+#    HostName %h.bc.rzg.mpg.de
+#    User aglen
+#    ServerAliveInterval 1600
+#    ServerAliveCountMax 1000
+#    ForwardX11Trusted yes
+#    TCPKeepAlive yes
