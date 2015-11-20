@@ -20,7 +20,7 @@ if [ "$currenthost" = "" ];then
 fi
 aliasfile=$HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_$currenthost
 #source $HOME/Dropbox/scripts/dotfiles/generalrc_alias_.sh $whichalias $currentshell 
-source $HOME/Dropbox/scripts/dotfiles/generalrc_alias_.sh mkalias $currentshell 
+source $HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_.sh mkalias $currentshell 
 rm -f $aliasfile
 #alias | grep -v "^-" | grep -v "^../=" | sed 's|\(.*\)|alias \1|' > $aliasfile
 alias | grep -v "^-" | grep -v "^../=" > $aliasfile
