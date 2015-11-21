@@ -186,7 +186,8 @@ $1 qstatn 'qstatn -d'
 
 [ "$oncmpc" = "true" ] && \
     $1 vi 'gvim -v' && \
-    $1 vim 'gvim -v'
+    $1 vim 'gvim -v' && \
+    $1 tmux '/home/glensk/local/bin/tmux'
 
 [ "$host" = "cmmd001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v'
 #[ "$host" = "cmmc001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v' # check if cmmc has vim or only vi
