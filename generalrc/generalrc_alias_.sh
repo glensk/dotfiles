@@ -182,7 +182,8 @@ $1 qstatn 'qstatn -d'
     $1 v5 '~/start.5.3.5.20cores.sh' && \
     $1 v52 '~/start.5.3.5.20cores.sh' && \
     $1 vi 'gvim -v' && \
-    $1 vim 'gvim -v'
+    $1 vim 'gvim -v' && \
+    $1 tmux '/u/aglen/local/bin/tmux'
 
 [ "$oncmpc" = "true" ] && \
     $1 vi 'gvim -v' && \
