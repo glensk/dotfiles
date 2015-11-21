@@ -55,6 +55,7 @@ $1 cp 'source $HOME/Dropbox/scripts/dotfiles/bin/clearpath.sh'
 $1 ra '$HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_renew.sh'
 $1 la 'ls -la'
 $1 ll 'ls -la'
+$1 sl 'ls'
 #$1 rm 'rm -rf'   # too general and maybe too dangerous?
 $1 vi 'vim -v'
 $1 vim 'vim -v'
