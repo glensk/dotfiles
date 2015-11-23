@@ -12,7 +12,7 @@
 dropboxbin="$HOME/Dropbox/scripts/dotfiles/bin"       # Dropbox binaries
 anaconda="$HOME/anaconda/bin"
 #anaconda="/usr/local/bin"  # use this to install macvim on the mac otherwise interference with homebrew python
-svnctags="/usr/local/bin"
+svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
 PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$PATH"

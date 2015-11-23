@@ -70,3 +70,16 @@ module () {
     eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
 }
 fi
+
+
+tab-color() {
+    [ "$1" = "red" ] && a=255 b=0 c=0
+    [ "$1" = "gren" ] && a=0 b=255 c=0
+    [ "$1" = "blue" ] && a=0 b=0 c=255
+    [ "$1" = "cyan" ] && a=64 b=244 c=208
+    [ "$1" = "turquoise" ] && a=64 b=244 c=208
+echo -ne "\033]6;1;bg;red;brightness;$a\a"
+echo -ne "\033]6;1;bg;green;brightness;$b\a"
+echo -ne "\033]6;1;bg;blue;brightness;$c\a"
+}
+
