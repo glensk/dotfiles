@@ -51,7 +51,7 @@ $1 ...... 'cd ../../..'
 ##############################
 # system
 ##############################
-$1 cp 'source $HOME/Dropbox/scripts/dotfiles/bin/clearpath.sh'
+$1 clearpath 'source $HOME/Dropbox/scripts/dotfiles/bin/clearpath.sh'
 $1 ra '$HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_renew.sh'
 $1 la 'ls -la'
 $1 ll 'ls -la'

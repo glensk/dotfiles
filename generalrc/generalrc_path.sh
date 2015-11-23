@@ -16,6 +16,7 @@ svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
 PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$PATH"
+# ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
 #pythermodynamics=
@@ -31,7 +32,7 @@ if [ "$currenthost" = "onmac" ];then
     tdep="$HOME/Dropbox/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
     phonopybin="$phonopy/bin"
-    vasp="$HOME/local/bin"
+    vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
     #sphinx="$HOME/Dropbox/scripts/phonons/sphinx/bin"
 
