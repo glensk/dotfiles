@@ -385,6 +385,11 @@ file=$HOMEPATH/.xmgracerc
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/xmgrace/xmgracerc $file
 
+file=$HOMEPATH/.tmux.conf
+[ -h "$file" ] && unlink $file
+[ -f "$file" ] && echo $file rm && rm -rf $file
+[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tmux/tmux.conf $file
+
 [ ! -e "$HOMEPATH/.ssh" ] && mkdir $HOMEPATH/.ssh 
 file=$HOMEPATH/.ssh/config
 [ -h "$file" ] && unlink $file

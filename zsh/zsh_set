@@ -223,6 +223,9 @@ hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*})
 zstyle ':completion:*:(ssh|scp):*' hosts $hosts
 zstyle ':completion:*:default' list-prompt '%S%M matches%s'   # Don't prompt for a huge list, page it!
 
+
+compdef _path_commands vis # make completion for vis script to take all executables in $PATH 
+
 # smartcase; default search is case insensitive; if you have CAPITAL letters in
 # search exactly this expression is looked for
 zstyle ':completion:*'  matcher-list 'm:{a-z}={A-Z}'
