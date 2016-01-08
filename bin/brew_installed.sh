@@ -106,6 +106,7 @@ brew install imagemagick  # to change pdf to jpg
 brew install gnuplot --with-aquaterm
 brew install popper     # pdftops
 brew install shellcheck
+brew install ffmpeg     # to convert mp4 in mp3
 #brew install qscintilla2 # for joergs work bench: from PyQt4 import QtGui,QtCore, QtSql;PyQt4.Qsci import QsciScintilla 
 brew install bash       # to get latest version of bash; osx bash is too old (no colors of files on tab)
 echo /usr/local/bin/bash|sudo tee -a /etc/shells;chsh -s /usr/local/bin/bash
