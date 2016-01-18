@@ -34,7 +34,7 @@ $1 prx 'cd $HOME/Dropbox/proj/0000_paper_antraege/2013.12_PRX_Al_Cu_vakanz'
 $1 paper 'cd $HOME/dropbox/proj/0000_paper_antraege/2015.02_PRL_origin_anharmonicity'
 $1 pap 'paper'
 $1 prl 'paper'
-$1 diss 'cd $HOME/Dropbox/proj/current_dissertation/write'
+$1 diss 'cd $HOME/Dropbox/proj/0000_paper_antraege/2015.12_Dissertation'
 
 $1 vimrc 'vi $HOME/.vimrc'
 $1 vip 'vi $HOME/.ipython/profile_default/ipython_config.py'
@@ -146,7 +146,7 @@ $1 qstatn 'qstatn -d'
 [ "$onmac" = "true" ] && \
     $1 math '/Applications/Mathematica.app/Contents/MacOS/MathKernel' && \
     $1 mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica' && \
-    $1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
+    #$1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
     $1 units '$HOME/scripts/dotfiles/bin/units/units-1.88/units' && \
     $1 top 'top -o cpu' && \
     $1 trash "rmtrash" && \

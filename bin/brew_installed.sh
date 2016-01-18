@@ -82,6 +82,7 @@ brew tap homebrew/science
 #brew install lammps              # serial version
 brew install lammps --with-mpi   # mpi support 
 brew install rmtrash # 
+brew install fondu  # for matplotlib fonts
 
 
 

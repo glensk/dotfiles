@@ -34,7 +34,7 @@ if [ "$host" = "mac" ];then
     myprompttime="setenv myprompttime magenta"  # yellow green blue
     myprompthostuser="setenv myprompthostuser magenta"
     mypromptpath="setenv mypromptpath magenta"
-    module="setenv ka kb"   # an empty string ("") is not possible, better use dummy
+    module="setenv GZIP -9"   # an empty string ("") is not possible, better use dummy
     add="setenv ka kb"      # an empty string ("") is not possible, better use dummy
 else 
     if [ "`echo $host | grep -o cmpc`" = "cmpc" ];then
