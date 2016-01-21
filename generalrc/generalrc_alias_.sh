@@ -212,3 +212,7 @@ $1 gatehydra 'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.s
 #$1 gar1 'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 #$1 gar2 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 
+##############################
+# autocorrect
+##############################
+$1 moduel 'module'

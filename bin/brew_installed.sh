@@ -83,6 +83,7 @@ brew tap homebrew/science
 brew install lammps --with-mpi   # mpi support 
 brew install rmtrash # 
 brew install fondu  # for matplotlib fonts
+brew install lbzip2 # to parallel zip files
 
 
 
