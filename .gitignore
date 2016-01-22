@@ -30,3 +30,4 @@ generalrc/generalrc_alias_oncmpc
 generalrc/generalrc_alias_onmac
 generalrc/generalrc_alias_
 test.sh
+sources/atomsk_*/
