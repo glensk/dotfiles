@@ -15,6 +15,7 @@ anaconda="$HOME/anaconda/bin"
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
+bin2="$HOME/Dropbox/dotfiles/sources_bin"
 PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$PATH"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 

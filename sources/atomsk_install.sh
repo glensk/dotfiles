@@ -11,6 +11,10 @@ file=atomsk_b0.8.3
 tar -xvf $file.tar.gz
 cd $file/src
 make atomsk
-cp atomsk $sources/bin/
+cp atomsk $sources\_bin/atoms_$host
+cd $sources\_bin
+ln -s atomsk_$host atomsk
 cd $sources
 #rm -rf $file
+
+#### ALSO ADD $sources/atomsk_*/ to .gitignore
