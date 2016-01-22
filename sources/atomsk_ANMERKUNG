@@ -1,0 +1,2 @@
+from http://atomsk.univ-lille1.fr/dl.php
+to compile : go to src and type make atomsk (this was successful on mac with gfortran)
