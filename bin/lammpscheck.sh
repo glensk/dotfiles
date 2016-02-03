@@ -1,7 +1,12 @@
 #!/bin/sh
-
-
-echo "cd /usr/local/share/lammps/bench"
+echo
+echo "########### otool -L /usr/local/bin/lammps ##################"
+otool -L /usr/local/bin/lammps
+echo
+echo
+echo
+echo
+echo "######## cd /usr/local/share/lammps/bench"
 cd /usr/local/share/lammps/bench
 echo
 echo "##### starting ####"

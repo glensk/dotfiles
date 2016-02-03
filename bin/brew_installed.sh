@@ -76,6 +76,7 @@ brew cask install --appdir="/Applications" omnifocus-clip-o-tron
 brew cask install --appdir="/Applications" paintbrush
 brew cask install --appdir="/Applications" xquartz
 brew cask install --appdir="/Applications" seil
+brew cask install --appdir="/Applications" cuda   # necessary for vmd (make movies from VASP MD)
 
 # install lammps (from http://lammps.sandia.gov/download.html#git)
 brew tap homebrew/science
@@ -87,7 +88,7 @@ brew install lbzip2 # to parallel zip files
 
 
 
-
+brew install octave         # for phonon-lifetime code of michael leitner aus muenchen
 brew install ssh-copy-id   # to copy public key to remote host
 brew install macvim        # this will be used as macvim -v == gvim -v for clipboard support between cmmc/cmpc gvim sessions
 brew install git

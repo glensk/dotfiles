@@ -167,7 +167,7 @@ $1 qstatn 'qstatn -d'
     $1 qdel 'qdel.sh'   && \
     $1 qalter 'qalter.sh' && \
     $1 qsub 'qsub.sh'   && \
-    $1 qls 'qls.sh -u'  && \
+    $1 qls 'qls.alexej.cmmc.sh -u'  && \
     $1 qhold 'qhold.sh' && \
     $1 qrls 'qrls.sh'         
 
