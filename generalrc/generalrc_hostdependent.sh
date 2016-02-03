@@ -56,7 +56,7 @@ else
     myprompthostuser="setenv myprompthostuser cyan"
     mypromptpath="setenv mypromptpath cyan"
     module="module load git intel impi mkl grace mathematica/9.0.1 vasp/5.3.5" 
-    add="limit stacksize unlimited;setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1"
+    add="limit stacksize unlimited;setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;setenv submithost cmmc002"
 else
     if [ "`echo $host | grep -o cmmd`" = "cmmd" ];then
     onxxx="setenv oncmmd true"
