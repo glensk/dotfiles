@@ -31,9 +31,7 @@ $1 h 'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high fol
 $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh
 
 $1 prx 'cd $HOME/Dropbox/proj/0000_paper_antraege/2013.12_PRX_Al_Cu_vakanz'
-$1 paper 'cd $HOME/dropbox/proj/0000_paper_antraege/2015.02_PRL_origin_anharmonicity'
-$1 pap 'paper'
-$1 prl 'paper'
+$1 prl 'cd $HOME/dropbox/proj/0000_paper_antraege/2015.02_PRL_origin_anharmonicity'
 $1 diss 'cd $HOME/Dropbox/proj/0000_paper_antraege/2015.12_Dissertation'
 
 $1 vimrc 'vi $HOME/.vimrc'
@@ -41,10 +39,10 @@ $1 vip 'vi $HOME/.ipython/profile_default/ipython_config.py'
 $1 virc 'vi $HOME/.`echo $currentshell`rc'
 $1 virca 'vi $HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_.sh'
 
-$1 cd.. 'cd ..'
-$1 .. 'cd ..'
-$1 .... 'cd ../..'
-$1 ...... 'cd ../../..'
+$1 cd.. 'cd ..;ls'
+$1 .. 'cd ..;ls'
+$1 .... 'cd ../..;ls'
+$1 ...... 'cd ../../..;ls'
 
 
 
