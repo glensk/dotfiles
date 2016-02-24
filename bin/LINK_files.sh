@@ -324,6 +324,11 @@ file=$HOMEPATH/.zlogin  # can do this since I use zsh everywhere
 [ -f "$file" ] && echo $file rm && rm -rf $file 
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/zlogin $file
 
+file=$HOMEPATH/.iterm2_shell_integration.zsh  # can do this since I use zsh everywhere
+[ -h "$file" ] && unlink $file 
+[ -f "$file" ] && echo $file rm && rm -rf $file 
+[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/iterm2_shell_integration.zsh $file
+
 file=$HOMEPATH/.vim
 [ -h $file ] && unlink $file
 [ -d $file ] && echo $file rm && rm -rf $file
