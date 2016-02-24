@@ -21,12 +21,10 @@ http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac
 
 
 basiclly: 
-0) iterm (installed by homebrew in nr 5)) put preferences from scripts/dotfiles/mac_iterm/com.googlecode.iterm2.plist
+0) put iterm2 preferences from scripts/dotfiles/mac_iterm/com.googlecode.iterm2.plist
 0) apps not installed by homebrew: vesta, mathematica, zattoo, adobe acrobat pro, 
 1) xcode-select --install   (in shell and click install)
 2) Go to http://developer.apple.com/downloads and sign in with your Apple ID Search for “command line tools” (in the search field on the left), then click on the latest version of “Command Line Tools (OS X Mountain Lion) for Xcode,” and click on the the .dmg link to download it. Install it.
-3) ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-4) runf from scripts/dotfiles/brew_installed.sh
 
 5) install monolingual to deinstall other unused languages
 

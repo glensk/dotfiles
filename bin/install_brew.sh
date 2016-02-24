@@ -22,6 +22,31 @@ echo ""
 
 
 
+echoit "creating /nas /data /u"
+owner=$USER
+user=glensk;sys=nas;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=glensk;sys=data;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=grabowski;sys=nas;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=grabowski;sys=data;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=korbmacher;sys=nas;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=aglen;sys=u;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=aglen;sys=cmmc/u;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+read -p "Did everything go smoothly? If not ctrc+c; otherwise just press enter" 
+ln -s /nas/glensk/v $HOME/v
+
+
+
+
+
+
+
 echoit "brew intall all kind of stuff"
 # notes from http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/
 
@@ -45,6 +70,7 @@ brew cask install --appdir="/Applications" mendeley-desktop
 brew cask install --appdir="/Applications" gimp
 brew cask install --appdir="/Applications" anaconda
 brew cask install --appdir="/Applications" aquaterm
+brew cask install --appdir="/Applications" iterm2
 brew cask install --appdir="/Applications" macvim
 brew cask install --appdir="/Applications" djview
 brew cask install --appdir="/Applications" skim
@@ -59,7 +85,6 @@ brew cask install --appdir="/Applications" cuda   # necessary for vmd (make movi
 brew cask install --appdir="/Applications" flux 
 brew cask install --appdir="/Applications" bartender
 brew cask install --appdir="/Applications" bettertouchtool
-brew cask install --appdir="/Applications" textexpander
 
 
 
@@ -93,9 +118,6 @@ brew install imagemagick  # to change pdf to jpg
 #brew install gnuplot --with-x 
 brew install gnuplot --with-aquaterm
 brew install popper     # pdftops
-brew install tesseract  # get orc for pdfs (make pdfs readable)
-brew install gs         # also necessay for making pdfs readable  
-brew install qpdf       # to compresss pdfs
 brew install shellcheck
 brew install ffmpeg     # to convert mp4 in mp3
 #brew install qscintilla2 # for joergs work bench: from PyQt4 import QtGui,QtCore, QtSql;PyQt4.Qsci import QsciScintilla 

@@ -1,0 +1,3 @@
+echo -ne "\033]6;1;bg;red;brightness;0\a"
+#source ~/.iterm2_shell_integration.`basename $SHELL`
+source ~/.iterm2_shell_integration.zsh

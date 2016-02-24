@@ -312,12 +312,18 @@ echo "##########################################################################
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/vim/startup/gvimrc $file
+
 fi
 
 
 echo "###########################################################################"
 echo "#                 load everywhere                                         #"
 echo "###########################################################################"
+file=$HOMEPATH/.zlogin  # can do this since I use zsh everywhere
+[ -h "$file" ] && unlink $file 
+[ -f "$file" ] && echo $file rm && rm -rf $file 
+[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/zlogin $file
+
 file=$HOMEPATH/.vim
 [ -h $file ] && unlink $file
 [ -d $file ] && echo $file rm && rm -rf $file
