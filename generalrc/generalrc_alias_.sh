@@ -159,16 +159,16 @@ $1 qstatn 'qstatn -d'
     #alias mvim='open /Applications/MacVim.app'
     #alias cat 'colorize'  # colorize seems to have sometimes problems
 
-
-[ "$oncmmd" != "true" ] && \
-    $1 qhost 'qhost.sh' && \
-    $1 qstat 'qstat.sh' && \
-    $1 qdel 'qdel.sh'   && \
-    $1 qalter 'qalter.sh' && \
-    $1 qsub 'qsub.sh'   && \
-    $1 qls 'qls.alexej.cmmc -u'  && \
-    $1 qhold 'qhold.sh' && \
-    $1 qrls 'qrls.sh'         
+# cmmd does not exist anymore
+#[ "$oncmmd" != "true" ] && \
+#    $1 qhost 'qhost.sh' && \
+#    $1 qstat 'qstat.sh' && \
+#    $1 qdel 'qdel.sh'   && \
+#    $1 qalter 'qalter.sh' && \
+#    $1 qsub 'qsub.sh'   && \
+#    $1 qls 'qls.garching -u'  && \
+#    $1 qhold 'qhold.sh' && \
+#    $1 qrls 'qrls.sh'         
 
 [ "$oncmmc" = "true" ] && \
     $1 garblazej 'ssh bzg@cmmc001.bc.rzg.mpg.de' && \
