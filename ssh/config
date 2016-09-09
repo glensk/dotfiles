@@ -29,6 +29,17 @@ Host garching
     Hostname cmmc001.bc.rzg.mpg.de
     IdentityFile /home/glensk/.ssh/garching
 
+Host garching2
+    User aglen
+    Hostname cmmc001.bc.rzg.mpg.de
+    IdentityFile /Users/glensk/.ssh/garching2
+
+# make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
+# information how to set up passwordless login to cmmc see christophs mail: google
+# for keygen: https://mail.google.com/mail/ca/u/0/#search/keygen/1544e58f7bf9e136
+# @cmmc001: cat ./garching.pub >> ./authorized_keys   --> was for loginfree cmpc34
+# @cmmc001: cat ./garching2.pub >> ./authorized_keys --> was for  loginfree mac
+
 #Host cmmc*
 #    HostName %h.bc.rzg.mpg.de
 #    User aglen
