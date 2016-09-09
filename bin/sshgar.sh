@@ -21,7 +21,7 @@ if [[ "`hostname`" = "$myhost" || "`hostname`" = "$myhost.mpie.de" ]];then
 fi
 
 
-if [[ "`hostname`" != "$myhost" && "`hostname`" != "mac" ]];then
+if [[ "`hostname`" != "$myhost" && "`hostname`" != "$myhost.mpie.de" && "`hostname`" != "mac" ]];then
     echo host $host is neither mac nor $myhost
 fi
 
