@@ -15,6 +15,8 @@ fi
 # cmpc
 ##############################################################
 if [[ "`hostname`" = "$myhost" || "`hostname`" = "$myhost.mpie.de" ]];then
+    thsh=`th.sh`
+    echo thsh:$thsh
     ssh.sh -t -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200 aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"
 fi
 
