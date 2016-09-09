@@ -60,6 +60,7 @@ brew cask install --appdir="/Applications" flux
 brew cask install --appdir="/Applications" bartender
 brew cask install --appdir="/Applications" bettertouchtool
 brew cask install --appdir="/Applications" textexpander
+brew cask install --appdir="/Applications" calibre  # to get ebook-convert file.pdf file.epub --enable-heuristics
 
 
 

@@ -195,8 +195,8 @@ $1 qstatn 'qstatn -d'
 ##############################
 # ssh
 ##############################
-$1 ssh 'ssh.sh -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200000'   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc
-$1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200000'
+$1 ssh 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc  ... Blazej uses ServerAliveCountMax=1200 which seems to be good
+$1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'
 
 $1 cluster 'sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 001 'sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'

@@ -37,11 +37,14 @@ echo "############ mounting /$base/$USER #######################################
 echo USER:$USER:
 echo myhost:$myhost:
 echo base:$base:
+echo sshfs $USER@$myhost:/$base/$USER /$base/$USER #-o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes
+echo
 sshfs $USER@$myhost:/$base/$USER /$base/$USER #-o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes
 echo "############ mounting /nas/glensk done ###########################################"
 echo 
 echo
 echo "############ ls /$base/$USER ######################################################"
+echo "############ (if this does not work -> mounting problems) #########################"
 sleep 1
 ls --color /$base/$USER 1>&2
 echo "############ ls /$base/$USER done #################################################"

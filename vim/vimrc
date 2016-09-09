@@ -55,7 +55,7 @@ source ~/.vim/startup/vundle_end.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-source ~/.vim/startup/keybindings.vim
+source ~/.vim/startup/keybindings.vim " paste
 source ~/.vim/startup/settings0.vim   " general sets, remove trailing whitespaces
 source ~/.vim/startup/settings1.vim   " 
 source ~/.vim/startup/settings2.vim   " syntax, templates, look-and-feel 
@@ -64,6 +64,9 @@ set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl
 "source ~/.vim/startup/vundle_neocomplete.vim          " breaks spell correction
 ""inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 source ~/.vim/startup/spellcorrection.vim
+
+hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments
+autocmd FileType python,sh setlocal nospell         " No spellcorrection for vim
 
 " from
 " http://jeffkreeftmeijer.com/2012/relative-line-numbers-in-vim-for-super-fast-movement/

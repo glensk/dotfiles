@@ -31,6 +31,7 @@ if [ "$host" = "mac" ];then
     doit brew update
     doit brew upgrade --all
     doit brew cleanup
+    doit find -L ~/Dropbox -type l -exec unlink {} \;  # this removes dead symlinks wich make high cpuusage through opendirectoryd
     doit diskutil repairPermissions /
     #doit diskutil verifyvolume /
     #doit diskutil repairvolume /
