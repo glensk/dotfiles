@@ -1,6 +1,3 @@
-#Host *    # Warning: Permanently added ... to list of known hosts
-#    StrictHostKeyChecking no
-#    UserKnownHostsFile /dev/null
 Host cluster
     HostbasedAuthentication yes
     EnableSSHKeysign        yes
@@ -27,20 +24,10 @@ Host cmpc
     ForwardX11Trusted yes
     TCPKeepAlive yes
 
-#Host garching_from_mac
-#    User aglen
-#    Hostname cmmc001.bc.rzg.mpg.de
-#    IdentityFile /Users/glensk/.ssh/garching
-#
-#Host garching_from_cmpc
-#    User aglen
-#    Hostname cmmc001.bc.rzg.mpg.de
-#    IdentityFile /home/glensk/.ssh/garching
-
 Host garching
     User aglen
     Hostname cmmc001.bc.rzg.mpg.de
-    IdentityFile $HOME/.ssh/garching
+    IdentityFile /home/glensk/.ssh/garching
 
 #Host cmmc*
 #    HostName %h.bc.rzg.mpg.de
