@@ -27,15 +27,20 @@ Host cmpc
     ForwardX11Trusted yes
     TCPKeepAlive yes
 
-Host garching_from_mac
-    User aglen
-    Hostname cmmc001.bc.rzg.mpg.de
-    IdentityFile /Users/glensk/.ssh/garching
+#Host garching_from_mac
+#    User aglen
+#    Hostname cmmc001.bc.rzg.mpg.de
+#    IdentityFile /Users/glensk/.ssh/garching
+#
+#Host garching_from_cmpc
+#    User aglen
+#    Hostname cmmc001.bc.rzg.mpg.de
+#    IdentityFile /home/glensk/.ssh/garching
 
-Host garching_from_cmpc
+Host garching
     User aglen
     Hostname cmmc001.bc.rzg.mpg.de
-    IdentityFile /home/glensk/.ssh/garching
+    IdentityFile $HOME/.ssh/garching
 
 #Host cmmc*
 #    HostName %h.bc.rzg.mpg.de
