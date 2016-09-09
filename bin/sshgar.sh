@@ -2,7 +2,7 @@
 
 echo myhost:$myhost
 echo hostname:$hostname
-
+echo hostname:`hostname`
     
 ##############################################################
 # cmpc
