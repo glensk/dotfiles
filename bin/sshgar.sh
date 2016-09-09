@@ -17,6 +17,9 @@ if [ "`hostname`" = "mac" ];then
 fi
 
 
+if [ "`hostname`" = "mac" ];then
+    echo host $host is not mac
+fi
 
 # ssh.sh -t glensk@$myhost.mpie.de "[ -e `th.sh` ] && cd `th.sh`; zsh" works to logon to cmpc
 #

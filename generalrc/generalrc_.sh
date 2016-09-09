@@ -5,11 +5,15 @@
 # shell, all set variables will be loaded by either shell (bash or tcsh or zsh) 
 # since the setenv function is defined for the bash shell in the first loaded 
 # $generalrc/generalrc_necessary_bash.sh script.
-###################################################################################
 
+###################################################################################
 # this has to be the first line  (loads for zsh and bash)
-#
+###################################################################################
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
+
+###################################################################################
+# HOST dependent variables (prompt, module load, ...)
+###################################################################################
 eval `$generalrc/generalrc_hostdependent.sh`
 
 #echo ONMAC $onmac
@@ -17,10 +21,16 @@ eval `$generalrc/generalrc_hostdependent.sh`
 #echo CURRENTHOST $currenthost
 
 # printloadstat was defined in $generalrc/generalrc_hostdependent.sh
+
+###################################################################################
+# PATH  
+###################################################################################
 eval `$generalrc/generalrc_path.sh $currenthost` 
+
 #@# time without aliases          : 0.38
 #@# time with generalrc_alias_.sh : 0.62
 #@# time with    alias            : 0.38 (in zsh: alias > alias; add as 1st row alias)
+
 ##############################################
 # ALIASES
 ##############################################
