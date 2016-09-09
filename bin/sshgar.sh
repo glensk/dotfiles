@@ -17,7 +17,7 @@ if [ "`hostname`" = "mac" ];then
 fi
 
 
-if [ "`hostname`" = "mac" ];then
+if [ "`hostname`" != "mac" ];then
     echo host $host is not mac
 fi
 
