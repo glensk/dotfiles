@@ -1,5 +1,14 @@
 #!/bin/sh
 
+# on cmpc not all submodule were installed (probably due to the old version of the svn)
+# therefore made:
+# cd $dotfiles
+# cd zsh
+# git clone https://github.com/zsh-users/zsh-history-substring-search.git
+# git clone git://github.com/zsh-users/zsh-syntax-highlighting.gitgit 
+# cd $dotfiles
+# git clone git://github.com/joelthelion/autojump.git
+
 dotfiles=$HOME/Dropbox/scripts/dotfiles
 [ ! -e "$dotfiles" ] && echo Folder $dotfiles does not exist && exit
 
