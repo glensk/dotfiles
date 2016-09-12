@@ -20,7 +20,7 @@ echo "setenv host $host;
       setenv myhost cmpc34;
       setenv myhostmpie cmpc34.mpie.de;
       setenv mylaptop mac;
-      setenv submithost cmmd002.mpie.de;
+      setenv submithost cmmc001;
       setenv printloadstat false;"
 # cmpc25=wolfgang; cmpc07=biswanath;
 
@@ -57,17 +57,17 @@ else
     mypromptpath="setenv mypromptpath cyan"
     module="module load git intel impi mkl grace mathematica/10.3.1 vasp/5.3.5" 
     add="limit stacksize unlimited;setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;setenv submithost cmmc002"
-else
-    if [ "`echo $host | grep -o cmmd`" = "cmmd" ];then
-    onxxx="setenv oncmmd true"
-    currenthost="setenv currenthost oncmmd"
-    myshell="setenv myshell zsh"
-    myprompttime="setenv myprompttime blue"
-    myprompthostuser="setenv myprompthostuser blue"
-    mypromptpath="setenv mypromptpath blue"
-    module="module load sge vasp/parallel/4.6-tdi sphinx/serial/2.0.4"
-    add="setenv TMPDIR /scratch/$USER;limit stacksize unlimited;setenv GRACE_HOME /data/grabowski/xmgrace/grace-5.1.22/"
-fi;fi;fi;fi
+#else  # cmmd does not exist anymore
+#    if [ "`echo $host | grep -o cmmd`" = "cmmd" ];then
+#    onxxx="setenv oncmmd true"
+#    currenthost="setenv currenthost oncmmd"
+#    myshell="setenv myshell zsh"
+#    myprompttime="setenv myprompttime blue"
+#    myprompthostuser="setenv myprompthostuser blue"
+#    mypromptpath="setenv mypromptpath blue"
+#    module="module load sge vasp/parallel/4.6-tdi sphinx/serial/2.0.4"
+#    add="setenv TMPDIR /scratch/$USER;limit stacksize unlimited;setenv GRACE_HOME /data/grabowski/xmgrace/grace-5.1.22/"
+fi;fi;fi
 
 ###################################################
 # output defined variables

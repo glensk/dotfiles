@@ -61,23 +61,24 @@ fi
 
 #########################################################################
 # on cmmd: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
+# cmmd does not exist anymore
 #########################################################################
-if [ "$currenthost" = "oncmmd" ];then
-    
-    xmgracebin="/data/grabowski/xmgrace/bin/"
-    add1="/lib64"
-    PATH="$xmgracebin:$add1:$PATH" 
-
-    argparse="${HOME}/Dropbox/scripts/python/add_cmmd/argparse-1.2.1"
-    PYTHONPATH="$argparse:$PYTHONPATH" 
-
-    # ldgibbsform ist fuer getGibbsEnergyOfFormation.sh
-    ldgibbsform="/opt/intel/Compiler/11.1/073/mkl/lib/em64t/"   
-    ld1="/home/grabowski/libs/"
-    ld2="/home/glensk/"
-    ldxmgrace="/opt/intel/lib/intel64"
-    LD_LIBRARY_PATH="$ldgibbsform:$ld1:$ld2:$ldxmgrace:$LD_LIBRARY_PATH"
-fi
+#if [ "$currenthost" = "oncmmd" ];then
+#    
+#    xmgracebin="/data/grabowski/xmgrace/bin/"
+#    add1="/lib64"
+#    PATH="$xmgracebin:$add1:$PATH" 
+#
+#    argparse="${HOME}/Dropbox/scripts/python/add_cmmd/argparse-1.2.1"
+#    PYTHONPATH="$argparse:$PYTHONPATH" 
+#
+#    # ldgibbsform ist fuer getGibbsEnergyOfFormation.sh
+#    ldgibbsform="/opt/intel/Compiler/11.1/073/mkl/lib/em64t/"   
+#    ld1="/home/grabowski/libs/"
+#    ld2="/home/glensk/"
+#    ldxmgrace="/opt/intel/lib/intel64"
+#    LD_LIBRARY_PATH="$ldgibbsform:$ld1:$ld2:$ldxmgrace:$LD_LIBRARY_PATH"
+#fi
     
 #########################################################################
 # on cmmd001:  module load openmpi/1.5/intelcomp
