@@ -1,5 +1,7 @@
 #!/bin/sh
 
-tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 *
+tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 $*
 scp archive.tar.bzip2 aglen@gate.rzg.mpg.de:~/.exchange/
 rm archive.tar.bzip2
+
+

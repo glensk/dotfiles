@@ -39,6 +39,11 @@ Host gate
     Hostname gate.rzg.mpg.de
     IdentityFile /Users/glensk/.ssh/gate
 
+Host gatefromcmmc
+    User aglen
+    Hostname gate.rzg.mpg.de
+    IdentityFile /cmmc/u/aglen/.ssh/gatefromcmmc
+
 # make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
 # information how to set up passwordless login to cmmc see christophs mail: google
 # for keygen: https://mail.google.com/mail/ca/u/0/#search/keygen/1544e58f7bf9e136
