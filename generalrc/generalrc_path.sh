@@ -16,8 +16,9 @@ svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
 bin2="$HOME/Dropbox/scripts/dotfiles/sources_bin"
-PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$PATH"
-#PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$PATH"
+bin3="$HOME/Dropbox/scripts/dotfiles/bin/stefan"
+PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
+#PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
