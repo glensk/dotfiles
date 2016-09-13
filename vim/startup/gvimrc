@@ -24,3 +24,5 @@ function! ShowCount()
 endfunction
 set ruler
 let &statusline='%{ShowCount()} %<%f %h%m%r%=%-14.(%l,%c%V%) %P'
+
+autocmd VimLeave * macaction terminate:  " to make mvim quit as normal vim does after closing last window
