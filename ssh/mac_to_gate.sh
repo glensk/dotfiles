@@ -20,7 +20,7 @@ echo "touch ./authorized_keys"
 echo "chmod 644 ./authorized_keys"
 echo ")"
 echo
-echo "cat ./garching.pub >> ./authorized_keys"
+echo "cat ./gate.pub >> ./authorized_keys"
 echo
 echo "logout from gate:"
 echo "exit"
