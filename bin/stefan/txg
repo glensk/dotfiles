@@ -1,5 +1,6 @@
 #!/bin/sh
 
+[ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
 tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 $*
 scp archive.tar.bzip2 aglen@gate.rzg.mpg.de:~/.exchange/
 rm archive.tar.bzip2
