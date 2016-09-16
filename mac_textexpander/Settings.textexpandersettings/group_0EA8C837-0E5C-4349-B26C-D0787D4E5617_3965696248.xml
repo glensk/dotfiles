@@ -263,6 +263,29 @@
 			<key>uuidString</key>
 			<string>92052768-8DE5-4464-AE21-9E9A674354FA</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-09-16T09:47:09Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-09-16T09:47:09Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-09-16T09:47:09Z</date>
+			<key>plainText</key>
+			<string>gnuplot</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>002FE914-13DF-46EC-BDF5-852CF5D5FB16</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -277,6 +300,7 @@
 		<string>001EC2A6-3FB4-4EB4-871F-BFA37ECB20A1</string>
 		<string>7D7EBAE5-66A9-49BA-BE77-7584F32F098F</string>
 		<string>92052768-8DE5-4464-AE21-9E9A674354FA</string>
+		<string>002FE914-13DF-46EC-BDF5-852CF5D5FB16</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>
