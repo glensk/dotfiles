@@ -1,0 +1,10 @@
+#!/usr/bin/gnuplot -persist
+#set title "Walt pedometer" font ",14" textcolor rgbcolor "royalblue"
+#set timefmt "%y/%m/%d"
+#set xdata time
+set pointsize 2
+set terminal wxt  enhanced title "Walt's steps " persist raise
+#plot "out.dat" using 1:2
+name=system("echo $gnuplotfilename")
+plot name using 1:2 with linespoints notitle
+

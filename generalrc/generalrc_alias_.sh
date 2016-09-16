@@ -89,6 +89,7 @@ $1 bc 'bc -l'
 #alias cp='cp -a'  # this one did not copy symliks as files but as symlinks -> remove -a
 $1 xmgrace 'xmgrace -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 $1 x 'xmgrace -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+$1 g gnuplotfile
 $1 untargz 'tar -xvf'
 $1 untar 'tar xfv'
 $1 untarbz2 'tar -xf'

@@ -34,11 +34,16 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 ##############################################
 # ALIASES
 ##############################################
+# how to create a new and general alias (general=works on every host)
+# shell: virca  --> add the alias you need
 # to renew aliasfile: ra 
 [ ! -e "$generalrc/generalrc_alias_$currenthost" ] && $generalrc/generalrc_alias_renew.sh
+
+# general aliases (work) everywhere
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_alias_$currenthost
 [ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_alias_.sh $whichalias $currentshell
 
+# shell SPECIFIC aliases
 [ "$currentshell"  = "zsh" ] && source $generalrc/generalrc_alias_zsh.sh
 [ "$currentshell"  = "bash" ] && source $generalrc/generalrc_alias_bash.sh
 [ "$currentshell"  = "tcsh" ] && source $generalrc/generalrc_alias_tcsh.sh
