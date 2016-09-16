@@ -25,6 +25,8 @@ mediumturquoise="72 209 204"
 zomp="57 167 142"
 
 goto=""
+
+
 #echo myhost:$myhost:
 #[ "`echo $* | grep -o mac`" = "mac" ] && goto=$green
 [ "`echo $* | grep -o cmpc`" = "cmpc" ] && goto=$red

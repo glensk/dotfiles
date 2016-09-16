@@ -54,7 +54,7 @@ alias c='j'
 #################################################################
 # zsh dependent stuff to use on every system
 #################################################################
-source $HOME/Dropbox/scripts/dotfiles/zsh/zsh_set
+#source $HOME/Dropbox/scripts/dotfiles/zsh/zsh_set
 
 # timing zsh:
 # 0) completely empty             : 0.01s
@@ -66,3 +66,7 @@ source $HOME/Dropbox/scripts/dotfiles/zsh/zsh_set
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
 
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+
+#################################################################
+# after this file ~/.zlogin is loaded 
+#################################################################

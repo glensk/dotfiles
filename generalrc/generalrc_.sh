@@ -44,11 +44,13 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 [ "$currentshell"  = "tcsh" ] && source $generalrc/generalrc_alias_tcsh.sh
 
 ##############################################
-# PROMPT 
+# PROMPT & tabcolor
 ##############################################
 [ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_prompt_tcsh.sh
 [ "$currentshell" = "zsh" ] && source $generalrc/generalrc_prompt_zsh.sh
 [ "$currentshell" = "bash" ] && source $generalrc/generalrc_prompt_bash.sh
+[ "$onmac" = "true" ] && tab-color magenta
+
 
 #echo
 #echo MYSHELL $myshell;

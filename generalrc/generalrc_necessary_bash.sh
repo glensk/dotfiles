@@ -77,7 +77,8 @@ tab-color() {
     [ "$1" = "gren" ] && a=0 b=255 c=0
     [ "$1" = "blue" ] && a=0 b=0 c=255
     [ "$1" = "cyan" ] && a=64 b=244 c=208
-    [ "$1" = "turquoise" ] && a=64 b=244 c=208
+    [ "$1" = "magenta" ] && a=255 b=0 c=255
+    #[ "$1" = "turquoise" ] && a=100 b=100 c=208
 echo -ne "\033]6;1;bg;red;brightness;$a\a"
 echo -ne "\033]6;1;bg;green;brightness;$b\a"
 echo -ne "\033]6;1;bg;blue;brightness;$c\a"

@@ -194,6 +194,75 @@
 			<key>uuidString</key>
 			<string>B944C224-3FE0-4B8E-8BA0-BB6313F7BFA6</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-09-14T08:29:34Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-09-14T08:29:34Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-09-14T08:29:34Z</date>
+			<key>plainText</key>
+			<string>du -sh *</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>001EC2A6-3FB4-4EB4-871F-BFA37ECB20A1</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-09-14T13:04:48Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-09-14T13:04:48Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-09-14T13:04:48Z</date>
+			<key>plainText</key>
+			<string>make clean</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>7D7EBAE5-66A9-49BA-BE77-7584F32F098F</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-09-15T15:13:56Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-09-15T15:13:56Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-09-15T15:13:56Z</date>
+			<key>plainText</key>
+			<string>cd ../../</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>92052768-8DE5-4464-AE21-9E9A674354FA</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -205,6 +274,9 @@
 		<string>412B8A81-10EF-4FD0-B4B5-6D577F5CB7F7</string>
 		<string>181818DE-101E-4560-A523-53E0CA0F23C1</string>
 		<string>B944C224-3FE0-4B8E-8BA0-BB6313F7BFA6</string>
+		<string>001EC2A6-3FB4-4EB4-871F-BFA37ECB20A1</string>
+		<string>7D7EBAE5-66A9-49BA-BE77-7584F32F098F</string>
+		<string>92052768-8DE5-4464-AE21-9E9A674354FA</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

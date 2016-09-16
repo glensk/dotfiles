@@ -1,3 +1,3 @@
-echo -ne "\033]6;1;bg;red;brightness;0\a"
+#echo -ne "\033]6;1;bg;red;brightness;0\a"  # #hat do i need this for?
 #source ~/.iterm2_shell_integration.`basename $SHELL`
-source ~/.iterm2_shell_integration.zsh
+#source ~/.iterm2_shell_integration.zsh # this is already loaded in .zshrc
