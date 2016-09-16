@@ -1,4 +1,4 @@
-#!/usr/bin/env gnuplot -persist
+#!/usr/bin/env gnuplot
 #set title "Walt pedometer" font ",14" textcolor rgbcolor "royalblue"
 #set timefmt "%y/%m/%d"
 #set xdata time
