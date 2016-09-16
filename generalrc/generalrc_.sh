@@ -36,7 +36,8 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 ##############################################
 # how to create a new and general alias (general=works on every host)
 # shell: virca  --> add the alias you need
-# to renew aliasfile: ra 
+# to renew aliasfile: ra   (this only creates a new alias file)
+# START A NEW SHELL (also you typed ra!) 
 [ ! -e "$generalrc/generalrc_alias_$currenthost" ] && $generalrc/generalrc_alias_renew.sh
 
 # general aliases (work) everywhere
