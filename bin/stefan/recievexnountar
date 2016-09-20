@@ -1,0 +1,11 @@
+#!/bin/sh
+
+scp aglen@gate.rzg.mpg.de:~/.exchange/archive.tar.bzip2 .
+
+#if [ "`hostname`" = "mac" ];then
+#    tar -jxvf archive.tar.bzip2
+#else
+#    tar --use-compress-program=lbzip2 -xvf archive.tar.bzip2
+#fi
+#rm archive.tar.bzip2
+#

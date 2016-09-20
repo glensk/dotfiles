@@ -7,7 +7,7 @@
 # $generalrc/generalrc_necessary_bash.sh script.
 
 ###################################################################################
-# this has to be the first line  (loads for zsh and bash)
+# this has to be the first line  (loads for zsh and bash); defines: tab-color; module; mkalias
 ###################################################################################
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
 
