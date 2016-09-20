@@ -493,6 +493,52 @@
 			<key>uuidString</key>
 			<string>C790D8AB-47C2-4FC1-9055-2CD314CB8FAE</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-09-20T11:52:54Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-09-20T11:52:54Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-09-20T11:52:54Z</date>
+			<key>plainText</key>
+			<string>jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>71F546AC-3D0C-4CD8-A998-5325849FEEF1</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-09-20T12:19:56Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-09-20T12:19:56Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-09-20T12:19:56Z</date>
+			<key>plainText</key>
+			<string>ggjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>0415F6B0-30C7-4A7A-81D7-FD5FDF310A88</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -517,6 +563,8 @@
 		<string>2436FA56-D1E3-4BB5-88BE-32710983D14C</string>
 		<string>FA28E2AC-F387-43FD-BD19-62EE180DDE40</string>
 		<string>C790D8AB-47C2-4FC1-9055-2CD314CB8FAE</string>
+		<string>71F546AC-3D0C-4CD8-A998-5325849FEEF1</string>
+		<string>0415F6B0-30C7-4A7A-81D7-FD5FDF310A88</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>
