@@ -35,6 +35,7 @@ if [ "$host" = "mac" ];then
     doit diskutil repairPermissions /
     #doit diskutil verifyvolume /
     #doit diskutil repairvolume /
+    doit sudo /usr/libexec/repair_packages --repair --standard-pkgs --volume /
     fi
 
 echo "stop :$(date)" >> $HOME/Dropbox/scripts/dotfiles/cron/runtime_$host
