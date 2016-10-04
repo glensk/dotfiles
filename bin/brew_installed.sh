@@ -40,7 +40,6 @@ brew cask install --appdir="/Applications" dropbox
 brew cask install --appdir="/Applications" alfred
 brew cask install --appdir="/Applications" vlc 
 brew cask install --appdir="/Applications" pdftk
-#brew cask install --appdir="/Applications" evernote
 brew cask install --appdir="/Applications" mendeley-desktop
 brew cask install --appdir="/Applications" gimp
 brew cask install --appdir="/Applications" anaconda
@@ -74,7 +73,7 @@ brew install lbzip2 # to parallel zip files
 
 
 
-brew install octave         # for phonon-lifetime code of michael leitner aus muenchen
+brew install octave        # for phonon-lifetime code of michael leitner aus muenchen
 brew install ssh-copy-id   # to copy public key to remote host
 brew install macvim        # this will be used as macvim -v == gvim -v for clipboard support between cmmc/cmpc gvim sessions
 brew install git

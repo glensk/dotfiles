@@ -562,6 +562,75 @@
 			<key>uuidString</key>
 			<string>8E1E7FF0-2AF5-4347-A95D-D1AA0D4B72F0</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-10-04T09:16:16Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-10-04T09:16:16Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-10-04T09:16:16Z</date>
+			<key>plainText</key>
+			<string>mcd redo</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>87918F2C-050F-4E62-9298-7E4663BA5736</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-10-04T09:16:16Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-10-04T09:16:16Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-10-04T09:16:16Z</date>
+			<key>plainText</key>
+			<string>gvinp ../</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>8CA8129F-4591-470B-8B83-50B17A79F91E</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-10-04T11:30:07Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-10-04T11:30:07Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-10-04T11:30:07Z</date>
+			<key>plainText</key>
+			<string>bcc supercell</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>60B745C9-4E75-4991-8461-B27559A919E8</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -589,6 +658,9 @@
 		<string>71F546AC-3D0C-4CD8-A998-5325849FEEF1</string>
 		<string>0415F6B0-30C7-4A7A-81D7-FD5FDF310A88</string>
 		<string>8E1E7FF0-2AF5-4347-A95D-D1AA0D4B72F0</string>
+		<string>87918F2C-050F-4E62-9298-7E4663BA5736</string>
+		<string>8CA8129F-4591-470B-8B83-50B17A79F91E</string>
+		<string>60B745C9-4E75-4991-8461-B27559A919E8</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

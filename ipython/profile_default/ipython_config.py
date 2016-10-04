@@ -1,1 +1,0 @@
-/u/aglen/Dropbox/scripts/dotfiles/ipython/profile_default/ipython_config.py

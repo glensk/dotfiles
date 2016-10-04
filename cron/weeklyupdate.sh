@@ -29,8 +29,9 @@ doit conda update conda -y
 doit conda update anaconda -y
 if [ "$host" = "mac" ];then
     doit brew update
-    doit brew upgrade --all
+    doit brew upgrade 
     doit brew cleanup
+    doit brew prune
     doit find -L ~/Dropbox -type l -exec unlink {} \;  # this removes dead symlinks wich make high cpuusage through opendirectoryd
     doit diskutil repairPermissions /
     #doit diskutil verifyvolume /

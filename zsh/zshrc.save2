@@ -71,6 +71,7 @@ source $HOME/Dropbox/scripts/dotfiles/zsh/zsh_set
 # 4) 3+ zsh_set                   : 0.06s (zsh_set  ) = 0.01s
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
 
+# this is for iterm2!!
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
 
 #################################################################
