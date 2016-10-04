@@ -24,6 +24,7 @@ autoload -U +X bashcompinit && bashcompinit     # make bash completion function 
 plugins=(zsh-syntax-highlighting history-substring-search)
 DISABLE_LS_COLORS="true"   # this is necessary to not ignore custom ls aliases
 export ZSH=$HOME/Dropbox/scripts/dotfiles/zsh/oh-my-zsh   # has to be loaded after plugins!
+[ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $HOME/Dropbox/scripts/dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
 source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 
 
