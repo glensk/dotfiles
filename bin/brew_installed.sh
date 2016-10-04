@@ -87,7 +87,7 @@ brew install unrar      # to unrar *.rar files
 brew install colordiff
 brew install gcc        # which now also installs gfortran gfortran-4.9
 brew install mmv        # --> requires XQUARTZ
-brew install grace      # xmgrace
+brew install grace      # xmgrace  (needs openmotif)
 brew install youtube-dl
 brew install imagemagick  # to change pdf to jpg
 #brew install gnuplot --with-x 
