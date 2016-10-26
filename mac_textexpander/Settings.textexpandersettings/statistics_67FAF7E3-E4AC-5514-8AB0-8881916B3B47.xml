@@ -39,6 +39,28 @@
 			<key>startSnippetCount</key>
 			<integer>5</integer>
 		</dict>
+		<key>2016-10-06</key>
+		<dict>
+			<key>endCharactersSaved</key>
+			<integer>114</integer>
+			<key>endSnippetCount</key>
+			<integer>9</integer>
+			<key>startCharactersSaved</key>
+			<integer>94</integer>
+			<key>startSnippetCount</key>
+			<integer>7</integer>
+		</dict>
+		<key>2016-10-14</key>
+		<dict>
+			<key>endCharactersSaved</key>
+			<integer>124</integer>
+			<key>endSnippetCount</key>
+			<integer>10</integer>
+			<key>startCharactersSaved</key>
+			<integer>114</integer>
+			<key>startSnippetCount</key>
+			<integer>9</integer>
+		</dict>
 	</dict>
 	<key>SnippetLastUsed</key>
 	<dict>
@@ -47,7 +69,7 @@
 		<key>88A5859C-26A7-4D8D-904D-30AAAE53A5CB</key>
 		<date>2016-07-31T22:18:00Z</date>
 		<key>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</key>
-		<date>2016-08-03T15:48:31Z</date>
+		<date>2016-10-13T16:30:28Z</date>
 	</dict>
 	<key>SnippetUseCount</key>
 	<dict>
@@ -56,7 +78,7 @@
 		<key>88A5859C-26A7-4D8D-904D-30AAAE53A5CB</key>
 		<integer>1</integer>
 		<key>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</key>
-		<integer>3</integer>
+		<integer>6</integer>
 	</dict>
 </dict>
 </plist>

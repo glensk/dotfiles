@@ -22,6 +22,30 @@ echo ""
 
 
 
+echoit "creating /nas /data /u"
+owner=$USER
+user=glensk;sys=nas;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=glensk;sys=data;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=grabowski;sys=nas;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=grabowski;sys=data;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=korbmacher;sys=nas;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=aglen;sys=u;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+user=aglen;sys=cmmc/u;
+sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /cmmc/ptmp/aglen;sudo chown $owner /cmmc/ptmp; sudo chown $owner /cmmc/ptmp/aglen
+read -p "Did everything go smoothly? If not ctrc+c; otherwise just press enter" 
+ln -s /nas/glensk/v $HOME/v
+
+
+
+
+
 echoit "brew intall all kind of stuff"
 # notes from http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/
 
@@ -40,6 +64,7 @@ brew cask install --appdir="/Applications" dropbox
 brew cask install --appdir="/Applications" alfred
 brew cask install --appdir="/Applications" vlc 
 brew cask install --appdir="/Applications" pdftk
+#brew cask install --appdir="/Applications" evernote
 brew cask install --appdir="/Applications" mendeley-desktop
 brew cask install --appdir="/Applications" gimp
 brew cask install --appdir="/Applications" anaconda
@@ -70,7 +95,7 @@ brew install lammps --with-mpi   # mpi support
 brew install rmtrash # 
 brew install fondu  # for matplotlib fonts
 brew install lbzip2 # to parallel zip files
-
+brew install boost  # c libraries necessary fot fftw (for phonon lifetimes project)
 
 
 brew install octave        # for phonon-lifetime code of michael leitner aus muenchen

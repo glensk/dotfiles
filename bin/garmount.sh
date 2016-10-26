@@ -2,7 +2,8 @@
 #########################################################
 ## in case executed on cmpc
 #########################################################
-[ "`hostname | \grep -o cmpc`" = "cmpc" ] && echo dont umount nas ... this is not cecessary && echo "unmounting would be fusermount -u /nas/glensk/cmmc" && echo "now mount nas" && sshfs -o idmap=user,uid=10010,gid=10010 aglen@cmmc001.bc.rzg.mpg.de:/u/aglen/ /nas/glensk/cmmc/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
+[ "`hostname | \grep -o cmpc`" = "cmpc" ] && echo dont umount /nas/glensk/cmmc ... this is not cecessary && echo "unmounting would be fusermount -u /nas/glensk/cmmc" && echo "now mount nas" && sshfs -o idmap=user,uid=10010,gid=10010 aglen@cmmc001.bc.rzg.mpg.de:/u/aglen/ /nas/glensk/cmmc/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
+[ "`hostname | \grep -o cmpc`" = "cmpc" ] && echo dont umount /nas/glensk/ptmp ... this is not cecessary && echo "unmounting would be fusermount -u /nas/glensk/ptmp" && echo "now mount nas" && sshfs -o idmap=user,uid=10010,gid=10010 aglen@cmmc001.bc.rzg.mpg.de:/cmmc/ptmp/aglen /nas/glensk/ptmp/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
 
 # to umount
 #fusermount -u /nas/glensk/cmmc
@@ -18,10 +19,17 @@ if [ "`hostname | \grep -o mac`" = "mac" ];then
     echo "########### ---->> in"
     echo "This seems currently to work!"
     #ssh glensk@$myhost "cd /nas/glensk;./garmount.sh"  # this seems currently to work and loads /nas/glensk/cmmc also from mac
-    ssh glensk@$myhost "garmount.sh"  # this seems currently to work and loads /nas/glensk/cmmc also from mac
-    # the next command is only necessary to map /nas/glensk/cmmc onto /u/aglen 
+    echo myhost:$myhost
+    echo "####################  --> performing ssh glensk@$myhost \"garmount.sh\""
+    ssh glensk@$myhost "garmount.sh"  # this seems currently to work and loads /nas/glensk/{cmmc/ptmp} also from mac
+    echo "####################  --> did ssh glensk@$myhost \"garmount.sh\" work?"
+    echo
+    echo
+    echo "# the next command is only necessary to map /nas/glensk/cmmc onto /u/aglen "
+    echo "# this works from command line"
     sshfs glensk@`echo $myhost.mpie.de`:/nas/glensk/cmmc /u/aglen/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
     sshfs glensk@`echo $myhost.mpie.de`:/nas/glensk/cmmc /cmmc/u/aglen/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
+    sshfs glensk@`echo $myhost.mpie.de`:/nas/glensk/ptmp /cmmc/ptmp/aglen/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc",transform_symlinks,BatchMode=yes
     #ssh glensk@$myhost "fusermount -u /nas/glensk/cmmc && sshfs -o idmap=user,uid=10010,gid=10010 aglen@cmmc001.bc.rzg.mpg.de:/u/aglen/ /nas/glensk/cmmc/ -o reconnect -C -o workaround=all,Ciphers=\"blowfish-cbc\",transform_symlinks,BatchMode=yes"
     echo "########### ----->> out"
     # aternative

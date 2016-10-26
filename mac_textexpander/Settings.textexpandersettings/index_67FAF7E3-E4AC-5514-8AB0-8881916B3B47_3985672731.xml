@@ -25,7 +25,7 @@
 	<key>Snippet Menu Item Width</key>
 	<integer>370</integer>
 	<key>Status Item</key>
-	<true/>
+	<false/>
 	<key>TutorialWasOffered</key>
 	<true/>
 	<key>autoCapExceptionApps</key>
