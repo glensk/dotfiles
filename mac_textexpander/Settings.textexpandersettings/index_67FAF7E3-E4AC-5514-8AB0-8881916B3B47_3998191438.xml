@@ -69,6 +69,16 @@
 		<string>0EA7C738-0E5C-4349-B26C-D0878D4E5618</string>
 		<string>0EA8C837-0E5C-4349-B26C-D0787D4E5617</string>
 	</array>
+	<key>rejectedHashes</key>
+	<array>
+		<integer>5287274499239225733</integer>
+		<integer>2863553197352881770</integer>
+		<integer>4136606329029463917</integer>
+		<integer>1163864615090116425</integer>
+		<integer>6596351750774168296</integer>
+		<integer>6762414601849348241</integer>
+		<integer>2057569273075615542</integer>
+	</array>
 	<key>suggestExceptionApps</key>
 	<array>
 		<dict>

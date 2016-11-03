@@ -52,3 +52,17 @@ This may be wanted after using :set ignorecase to make searches case insensitive
 
 
 indent (when not wording in python): :set foldmethod=indent
+
+
+
+
+# vim copy paste colun block
+# vim copy paste colun block
+# vim copy paste colun block
+
+go to column one of row one.
+press CTRL + V (block select) 
+select the column and press y (to yank)
+to to where you want to insert the columnt (use space,space ...)
+press esc (escape)   ! important this is to get into normal mode
+press p (to paste)
