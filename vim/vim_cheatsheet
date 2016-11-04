@@ -50,7 +50,7 @@ Change each 'foo' (case sensitive due to the I flag) to 'bar'; ask for confirmat
 This may be wanted after using :set ignorecase to make searches case insensitive.
 
 
-
+##################################################################
 indent (when not wording in python): :set foldmethod=indent
 
 

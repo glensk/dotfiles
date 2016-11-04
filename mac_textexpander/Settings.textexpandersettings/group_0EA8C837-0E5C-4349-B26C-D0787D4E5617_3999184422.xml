@@ -2862,6 +2862,52 @@
 			<key>uuidString</key>
 			<string>33220093-EA45-488B-8610-BB028E706E07</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-03T12:02:58Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-03T12:02:58Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-03T12:02:58Z</date>
+			<key>plainText</key>
+			<string>svn update</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>506288D3-F819-4BFB-ADAE-8780C8AFC7D6</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-03T20:34:10Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-03T20:34:10Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-03T20:34:10Z</date>
+			<key>plainText</key>
+			<string>ListPlot</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>B1B5C398-BA03-4F0B-9826-189C9EBD3D25</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -2989,6 +3035,8 @@
 		<string>AD5FFC3B-A223-4387-B5C3-DEA7C902E3E7</string>
 		<string>DE4689E6-6A23-46FF-8226-012FD7B18CDC</string>
 		<string>33220093-EA45-488B-8610-BB028E706E07</string>
+		<string>506288D3-F819-4BFB-ADAE-8780C8AFC7D6</string>
+		<string>B1B5C398-BA03-4F0B-9826-189C9EBD3D25</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

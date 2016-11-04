@@ -106,4 +106,6 @@ exit
 # Stuff which has to be run only once and is working now
 ##########################################################################################
 
-
+# make scroll in pycharm work (holding j will scroll down)
+defaults write com.jetbrains.intellij.ce ApplePressAndHoldEnabled -bool false
+defaults write com.jetbrains.PyCharm ApplePressAndHoldEnabled -bool false

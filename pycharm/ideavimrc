@@ -1,0 +1,35 @@
+" vim:fdm=marker
+let mapleader = ","
+let maplocalleader = ","
+
+
+" Ctrl+[ works in general; 
+" other way to avoid esc
+imap jj <Esc>
+inoremap jj <Esc>
+
+
+" NAVIGATION moving in vim (general / splits / tabs /{{{
+
+" general: go to next row instead of go to next line
+nnoremap j gj
+nnoremap k gk
+
+" general: want usually the whole word
+nmap w W
+nmap b B
+
+" folding
+nmap FF zM
+nmap ff za
+
+
+" when deleting a line go to the biginning of line since it most time does not make
+" sence to stat at the same spot
+nmap dd dd^
+
+
+" yank whole word -0.05 instead of just -
+nnoremap yw yW
+
+nnoremap <leader>u :redo<CR>

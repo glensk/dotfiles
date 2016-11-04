@@ -312,6 +312,11 @@ echo "##########################################################################
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/vim/startup/gvimrc $file
+    
+    file=$HOMEPATH/.ideavimrc
+    [ -h "$file" ] && unlink $file 
+    [ -f "$file" ] && echo $file rm && rm -rf $file 
+    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/pycharm/ideavimrc $file
 
 fi
 
