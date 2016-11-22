@@ -101,6 +101,9 @@ defaults write com.apple.dashboard mcx-disabled -bool true
 # Don’t show Dashboard as a Space
 defaults write com.apple.dock dashboard-in-overlay -bool true
 
+# prevent mac from freezing after wakeup (keep everything in memory for this many seconds before writing to hd)
+sudo pmset -a standbydelay 61200
+
 exit
 ##########################################################################################
 # Stuff which has to be run only once and is working now

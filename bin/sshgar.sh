@@ -8,8 +8,16 @@
 # mac -> cmmc001 
 ##############################################################
 if [ "`hostname`" = "mac" ];then
+    #########################################################
+    # from within mpie or loged in via sslvpn/forticlient
+    #########################################################
     #echo host:`hostname`
     ssh.sh -t -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200 -i $HOME/.ssh/garching2 aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh /u/aglen` ] && cd `th.sh /u/aglen`;ls -F --color=auto --group-directories-first --show-control-chars --hide=\"Icon?\"; zsh"
+    #########################################################
+    # from anywhere in the world (no forticlient or sslvpn)
+    #########################################################
+    #ssh -t aglen@gate.rzg.mpg.de ssh aglen@cmmc001.bc.rzg.mpg.de
+
 fi
 
 ##############################################################

@@ -10,14 +10,15 @@
 # on every system: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ...)
 #########################################################################
 dropboxbin="$HOME/Dropbox/scripts/dotfiles/bin"       # Dropbox binaries
-anaconda="$HOME/anaconda/bin"
-#anaconda="/usr/local/bin"  # use this to install macvim on the mac otherwise interference with homebrew python
+#anacondaold="/usr/local/bin"  # use this to install macvim on the mac otherwise interference with homebrew python
+#anaconda="$HOME/anaconda/bin"                       # don't load anaconda on cmmc since the module is available
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
 bin2="$HOME/Dropbox/scripts/dotfiles/sources_bin"
 bin3="$HOME/Dropbox/scripts/dotfiles/bin/stefan"
-PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
+PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
+#PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 #PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
@@ -31,6 +32,7 @@ if [ "$currenthost" = "onmac" ];then
     # $PATH (on mac)
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
+    anaconda="$HOME/anaconda/bin"                       # don't load anaconda on cmmc since the module is available
     brew="/usr/local/opt/coreutils/libexec/gnubin" 
     tdep="$HOME/Dropbox/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
@@ -54,7 +56,7 @@ if [ "$currenthost" = "onmac" ];then
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
     #[ "$host" = "$mylaptop" ] && \
-    PATH="$sed:$brew:$tdep:$phonopy:$phonopybin:$vasp:$PATH" #&& \
+    PATH="$sed:$brew:$anaconda:$tdep:$phonopy:$phonopybin:$vasp:$PATH" #&& \
     PYTHONPATH="$pygraceplot:$pylammps1:$pylammps2:$pyphonopy1:$PYTHONPATH" #&& \
     LD_LIBRARY_PATH="$ldvasp:$LD_LIBRARY_PATH"
 fi
