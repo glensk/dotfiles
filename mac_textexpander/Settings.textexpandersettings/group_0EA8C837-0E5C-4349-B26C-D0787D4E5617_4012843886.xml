@@ -4449,6 +4449,144 @@
 			<key>uuidString</key>
 			<string>0A963AAC-E009-430A-A6ED-DA976151672A</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-23T10:36:18Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-23T10:36:18Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-23T10:36:18Z</date>
+			<key>plainText</key>
+			<string>tail -32</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>2497D1A7-6E64-4065-B13F-DB8750CB2529</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-23T10:36:30Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-23T10:36:30Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-23T10:36:30Z</date>
+			<key>plainText</key>
+			<string>print $1,$2</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>44D4B53B-C530-4DDB-9639-2E69ACA3C3EF</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-23T14:41:57Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-23T14:41:57Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-23T14:41:57Z</date>
+			<key>plainText</key>
+			<string>vi sim</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>76C52874-D1FD-4B5D-86DC-87C7A89CA03D</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-23T14:48:35Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-23T14:48:35Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-23T14:48:35Z</date>
+			<key>plainText</key>
+			<string>module avail</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>31C26564-4E3C-43BD-8355-E561C69501DB</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-23T14:48:35Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-23T14:48:35Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-23T14:48:35Z</date>
+			<key>plainText</key>
+			<string>which python</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>510D2E84-7F38-4E42-A3E1-7DB7145468A2</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-11-23T14:51:22Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-11-23T14:51:22Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-23T14:51:22Z</date>
+			<key>plainText</key>
+			<string>module unload</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>0A3FB747-F9F6-41F6-AB75-74B5001DAAAA</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -4645,6 +4783,12 @@
 		<string>9CD5E2DD-8EC7-4114-B6E9-47F7F106001E</string>
 		<string>E25FB804-E4F3-445F-AF34-3C5BD333B6A5</string>
 		<string>0A963AAC-E009-430A-A6ED-DA976151672A</string>
+		<string>2497D1A7-6E64-4065-B13F-DB8750CB2529</string>
+		<string>44D4B53B-C530-4DDB-9639-2E69ACA3C3EF</string>
+		<string>76C52874-D1FD-4B5D-86DC-87C7A89CA03D</string>
+		<string>31C26564-4E3C-43BD-8355-E561C69501DB</string>
+		<string>510D2E84-7F38-4E42-A3E1-7DB7145468A2</string>
+		<string>0A3FB747-F9F6-41F6-AB75-74B5001DAAAA</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>
