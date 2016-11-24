@@ -17,7 +17,8 @@ homebrew="/usr/local/sbin"
 bin="/usr/bin"
 bin2="$HOME/Dropbox/scripts/dotfiles/sources_bin"
 bin3="$HOME/Dropbox/scripts/dotfiles/bin/stefan"
-PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
+#PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
+PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3"
 #PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 #PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
@@ -115,9 +116,8 @@ fi
 #PATH=$(echo "$PATH" | awk -v RS=':' -v ORS=":" '!a[$1]++')  DONT!! INCLUDES : at the end
 
 #########################################################################
-# export $PATH / $PYTHONPATH / $LD_LIBRARY_PATH
+# export $PATH / $PYTHONPATH / $LD_LIBRARY_PATH   (dies sollte VOR! module load geschehen!)
 #########################################################################
-
 if [ "$currentshell" != "tcsh" ];then
     echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"'
 else

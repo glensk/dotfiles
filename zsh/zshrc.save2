@@ -27,7 +27,6 @@ export ZSH=$HOME/Dropbox/scripts/dotfiles/zsh/oh-my-zsh   # has to be loaded aft
 [ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $HOME/Dropbox/scripts/dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
 source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 
-
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
 #################################################################
