@@ -30,10 +30,12 @@ $1 l 'cd `ti_high_0_create_Folders_vasp.sh -l`'  # go to corresponding high fold
 $1 h 'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high folder
 $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh
 
+
 $1 prx 'cd $HOME/Dropbox/proj/0000_paper_antraege/2013.12_PRX_Al_Cu_vakanz'
 $1 prl 'cd $HOME/dropbox/proj/0000_paper_antraege/2015.02_PRL_origin_anharmonicity'
 $1 diss 'cd $HOME/Dropbox/proj/0000_paper_antraege/2015.12_Dissertation'
 $1 curr 'cd $HOME/Dropbox/proj/proj_current'
+$1 ptmp 'cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes'
 
 $1 vimrc 'vi $HOME/.vimrc'
 $1 vip 'vi $HOME/.ipython/profile_default/ipython_config.py'
