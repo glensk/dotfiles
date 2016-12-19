@@ -68,10 +68,9 @@ mkalias () {
 if [ "$ZSH_VERSION" = "5.0.5" ];then
 module () {
     #eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
-    #eval `/afs/ipp-garching.mpg.de/common/usr/modules.2017/amd64_sles12/Modules/3.2.10 sh $*`
     # log in to garching by \ssh aglen@cmmc001.bc.rzg.mpg.de
     # echo $SHELL -> /bin/bash
-    # echo $MODULEHOME
+    # echo $MODULEHOME  ## !! and add .../bin/modulecmd
     eval `/afs/ipp-garching.mpg.de/common/usr/modules.2017/amd64_sles12/Modules/current/bin/modulecmd sh $*`
 
 }
