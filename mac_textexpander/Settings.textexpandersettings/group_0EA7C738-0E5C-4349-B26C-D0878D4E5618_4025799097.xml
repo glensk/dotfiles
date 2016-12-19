@@ -163,6 +163,57 @@ Mobil: +49 (0)160 950 46896</string>
 			<key>uuidString</key>
 			<string>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;mpie</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-12-12T08:38:08Z</date>
+			<key>label</key>
+			<string>MPIE address</string>
+			<key>modificationDate</key>
+			<date>2016-12-12T08:41:25Z</date>
+			<key>plainText</key>
+			<string>-------------------------------------------------------------
+Dr. Albert Glensk
+Computational Materials Design
+Max-Planck-Institut für Eisenforschung
+Düsseldorf, Germany
+
+Tel: +49 211 6792 540
+
+-------------------------------------------------
+Max-Planck-Institut für Eisenforschung GmbH
+Max-Planck-Straße 1
+D-40237 Düsseldorf
+
+Handelsregister B 2533
+Amtsgericht Düsseldorf
+
+Geschäftsführung
+Prof. Dr. Gerhard Dehm
+Prof. Dr. Jörg Neugebauer
+Prof. Dr. Dierk Raabe
+Dr. Kai de Weldige
+
+Ust.-Id.-Nr.: DE 11 93 58 514
+Steuernummer: 105 5891 1000
+
+
+Please consider that invitations and e-mails of our institute are
+only valid if they end with …@mpie.de.
+If you are not sure of the validity please contact rco@mpie.de
+
+Bitte beachten Sie, dass Einladungen zu Veranstaltungen und E-Mails
+aus unserem Haus nur mit der Endung …@mpie.de gültig sind.
+In Zweifelsfällen wenden Sie sich bitte an rco@mpie.de
+-------------------------------------------------</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>BC33ECF7-628D-494F-98CC-D3E4F666D93C</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -174,6 +225,7 @@ Mobil: +49 (0)160 950 46896</string>
 		<string>28CFFBFB-3224-4068-9DFB-73B242EFEEAA</string>
 		<string>CE101F5A-C5CC-43C0-B75D-81F13AC134B1</string>
 		<string>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</string>
+		<string>BC33ECF7-628D-494F-98CC-D3E4F666D93C</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

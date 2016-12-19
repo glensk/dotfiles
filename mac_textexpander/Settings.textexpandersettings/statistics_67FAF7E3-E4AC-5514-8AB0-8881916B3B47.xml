@@ -72,24 +72,50 @@
 			<key>startSnippetCount</key>
 			<integer>10</integer>
 		</dict>
+		<key>2016-12-05</key>
+		<dict>
+			<key>endCharactersSaved</key>
+			<integer>226</integer>
+			<key>endSnippetCount</key>
+			<integer>19</integer>
+			<key>startCharactersSaved</key>
+			<integer>184</integer>
+			<key>startSnippetCount</key>
+			<integer>16</integer>
+		</dict>
+		<key>2016-12-12</key>
+		<dict>
+			<key>endCharactersSaved</key>
+			<integer>295</integer>
+			<key>endSnippetCount</key>
+			<integer>22</integer>
+			<key>startCharactersSaved</key>
+			<integer>226</integer>
+			<key>startSnippetCount</key>
+			<integer>19</integer>
+		</dict>
 	</dict>
 	<key>SnippetLastUsed</key>
 	<dict>
+		<key>19A04825-34B2-4514-91F3-E9C31ECE7ADC</key>
+		<date>2016-12-12T08:37:19Z</date>
 		<key>4AEA8CB9-0360-4508-9DAB-EF22D91BB4C4</key>
 		<date>2016-09-15T13:48:34Z</date>
 		<key>88A5859C-26A7-4D8D-904D-30AAAE53A5CB</key>
-		<date>2016-07-31T22:18:00Z</date>
+		<date>2016-11-30T10:22:26Z</date>
 		<key>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</key>
-		<date>2016-11-02T10:03:30Z</date>
+		<date>2016-12-12T08:36:29Z</date>
 	</dict>
 	<key>SnippetUseCount</key>
 	<dict>
+		<key>19A04825-34B2-4514-91F3-E9C31ECE7ADC</key>
+		<integer>2</integer>
 		<key>4AEA8CB9-0360-4508-9DAB-EF22D91BB4C4</key>
 		<integer>3</integer>
 		<key>88A5859C-26A7-4D8D-904D-30AAAE53A5CB</key>
-		<integer>1</integer>
+		<integer>2</integer>
 		<key>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</key>
-		<integer>12</integer>
+		<integer>15</integer>
 	</dict>
 </dict>
 </plist>
