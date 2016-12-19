@@ -68,7 +68,9 @@ mkalias () {
 if [ "$ZSH_VERSION" = "5.0.5" ];then
 module () {
     #eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
-    eval `/afs/ipp/common/usr/modules.current/amd64_sles11/Modules/current/bin/modulecmd sh $*`
+    # echo $MODULEHOME
+    #eval `/afs/ipp-garching.mpg.de/common/usr/modules.2017/amd64_sles12/Modules/3.2.10 sh $*`
+    eval `/afs/ipp-garching.mpg.de/common/usr/modules.2017/amd64_sles12/Modules/current sh $*`
 }
 fi
 

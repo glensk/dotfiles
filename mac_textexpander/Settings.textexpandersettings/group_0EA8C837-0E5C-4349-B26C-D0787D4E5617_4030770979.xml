@@ -6887,6 +6887,29 @@
 			<key>uuidString</key>
 			<string>40582791-D498-4EF8-B184-B85EBC54E4F6</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-12-19T13:19:29Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-12-19T13:19:29Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-12-19T13:19:29Z</date>
+			<key>plainText</key>
+			<string>which module</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>A3902D98-A767-4E86-BB6A-F45A08F85F0D</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -7189,6 +7212,7 @@
 		<string>AA3E515C-306C-4B8D-8374-03853DA64A37</string>
 		<string>5B53AD38-72A8-49E3-A1B8-1841ADA3E3CF</string>
 		<string>40582791-D498-4EF8-B184-B85EBC54E4F6</string>
+		<string>A3902D98-A767-4E86-BB6A-F45A08F85F0D</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>
