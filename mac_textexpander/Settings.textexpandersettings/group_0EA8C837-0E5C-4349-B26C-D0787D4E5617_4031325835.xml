@@ -6910,6 +6910,75 @@
 			<key>uuidString</key>
 			<string>A3902D98-A767-4E86-BB6A-F45A08F85F0D</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-12-19T16:07:37Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-12-19T16:07:37Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-12-19T16:07:37Z</date>
+			<key>plainText</key>
+			<string>recievex</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>D0B3C8E0-4D20-4E26-8E1B-70E78F8F8B53</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-12-19T16:26:42Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-12-19T16:26:42Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-12-19T16:26:42Z</date>
+			<key>plainText</key>
+			<string>lmp_cmmc</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>C205A5BF-5171-4710-BE3C-1124DC7EAE0C</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-12-20T08:35:27Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2016-12-20T08:35:27Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-12-20T08:35:27Z</date>
+			<key>plainText</key>
+			<string>_copiedmv</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>37C6F280-2CF3-4069-994B-4D0EC6534CFD</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -7213,6 +7282,9 @@
 		<string>5B53AD38-72A8-49E3-A1B8-1841ADA3E3CF</string>
 		<string>40582791-D498-4EF8-B184-B85EBC54E4F6</string>
 		<string>A3902D98-A767-4E86-BB6A-F45A08F85F0D</string>
+		<string>D0B3C8E0-4D20-4E26-8E1B-70E78F8F8B53</string>
+		<string>C205A5BF-5171-4710-BE3C-1124DC7EAE0C</string>
+		<string>37C6F280-2CF3-4069-994B-4D0EC6534CFD</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

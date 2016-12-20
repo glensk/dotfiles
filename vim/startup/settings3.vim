@@ -40,6 +40,7 @@ nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
 set ignorecase " If you dont care for case-sensitive searches and substitutions, turn it off completely
 set incsearch  " Start searching before pressing enter.
 " set showmatch " Show matching [] and {} by jumping to first one on closing .... not cool 
+setlocal iskeyword-=:  " when searching for abc also find abc in abc:  from http://superuser.com/questions/552781/prevent-whole-word-search-from-matching-colon
 " }}}
 
 
