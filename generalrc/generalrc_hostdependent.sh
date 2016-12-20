@@ -55,7 +55,8 @@ else
     myprompttime="setenv myprompttime cyan"
     myprompthostuser="setenv myprompthostuser cyan"
     mypromptpath="setenv mypromptpath cyan"
-    module="module load git intel impi mkl grace mathematica/10.3.1 vasp/5.3.5 python27/python/2.7 python27/scipy/2015.10"  # anaconda
+    #module="module load git intel impi mkl grace mathematica/10.3.1 vasp/5.3.5 python27/python/2.7 python27/scipy/2015.10"  # anaconda
+    module="module load git intel impi mkl grace mathematica/10.3.1 vasp/5.3.5 anaconda"
     add="limit stacksize unlimited;setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;setenv submithost cmmc002"
 #else  # cmmd does not exist anymore
 #    if [ "`echo $host | grep -o cmmd`" = "cmmd" ];then
