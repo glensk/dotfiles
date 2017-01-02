@@ -1,6 +1,6 @@
 http://en.wikipedia.org/wiki/Sort_%28Unix%29
 
-
+sort -g         # sorts alseo with exponential number 1.45342e-12
 sort +1 -2		#sortiert nach der 2ten spalte (+1) und hoert vor der dirtten spalte wieder auf (-2) um dann nach der ersten ....spalte zu sortieren
 #######
 !!!!!!!!!!!!!!!!

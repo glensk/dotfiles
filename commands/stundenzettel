@@ -1,0 +1,8 @@
+
+novaTime.sh  -u glensk -p 76680
+novaTime.sh  -u glensk -p 76680 -i (if to include this month) 
+
+personalnr: 5630
+
+
+    HOLYDAYS are automatically considered :)

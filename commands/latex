@@ -51,3 +51,9 @@ Herb Schulz
 
 -->> \usepackage{multirow}
     To enable multirows in Tables
+
+
+###########################################################
+# Sonderzeichen
+###########################################################
+\AA             Angstrom

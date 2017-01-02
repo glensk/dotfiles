@@ -3,7 +3,7 @@ svn co http://cmcc1.mpie.de/data/pyCMD ~/svn
 ##########################################################
 
 #####################################################################################
-svn co http://cmcc1.mpie.de/data/Thermodynamics    #checkout == update/download
+svn co http://cmcc1.mpie.de/data/Thermodynamics    #checkout == update/download # at cmpc # first time give username and pw (it is the password for the wiki/not the computer account cluster)
 svn co --username glensk http://localhost:48540/data/Thermodynamics  # at cmmc
 #####################################################################################
 

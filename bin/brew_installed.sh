@@ -158,6 +158,8 @@ brew install macvim --with-cscope --custom-icons --override-system-vim --with-lu
 #mp3info  -> does not??? support id3v2
 #id3tool  -> does not support id3v2
 #id3lib  ----> installs id3tag
+brew install homebrew/science/armadillo  # for phonon linewidths
+
 
 
 echo "Force the Dock to only show running applications System"

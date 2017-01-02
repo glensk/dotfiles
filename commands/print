@@ -29,7 +29,7 @@ mac
 under system preferences got to printer
 than add ip (since in defaults the cmcopy1166 did not appear)
 ip reiter
-add ip: 172.16.6.246
+add ip: 192.12.81.35
 everything else is fine =-> printer works now
     Protocol: Was set : Line Printer Daemon -LPD
     Queue: EMPTY! (Leave blank for default queue)

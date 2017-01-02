@@ -12,3 +12,7 @@ to generally (not only in screen) suspend a job
 control+z
 
 to resume: fg
+
+to scroll in screen: crtl+a then escape
+
+screen -rd (attaches to a screen which is already attached)

@@ -1,61 +1,38 @@
 cat reg_white_dots.dat | awk '{print 1357/$1,exp(-$2/($1*0.086173422))}'  ## Temp(K) and Gform(meV) --> conz and Tm/Temp
 
-cal / g / K  to >> J/K/mol     1cal = 4.1868Joule; mg = 24.305u = 24.305g/mol >> 1J/K/mol=1cal/g/K * 4.1868 * 24.305
+1cal = 4.1868joule
+1cal/(g K) = 4.1868 * atommasse   1J/(K mol)
 
-cu = 63.546u >> 1J/K/mol=1cal/g/K * 4.1868 * 63.546
+mg = 24.305    u = 24.305    g/mol (=atommasse) = 4.1868 * 24.305     J/(mol K) = 4.0359395e-26kg  (you have:24.305u you want:kg)
+au = 196.966569u = 196.966569g/mol              = 4.1868 * 196.966569 J/(mol K)
+pt = 195.084   u = 195.084   g/mol              = 4.1868 * 195.084    J/(mol K)
+cu = 63.546    u
+al = 26.9815385
+ir = 192.217
+rh = 102.9055
+pd = 106.42
+ag = 107.8682
+pb = 207.2
 
-pt = 195.084u >> 1J/K/mol=1cal/g/K * 4.1868 * 195.084; 
-You have: 4.1868 195.084 joule / mol K N_A
-You want: k
-    * 98.235666
-    *   / 0.010179602
---> also die tabellendaten in cal/g/K * 98.235666
+Bei 1/kg oder 1/g muss die atommasse mit angegeben werden um auf k(Bolzmann zu kommen)
 
-
-
-Silver (Ag):
-    You have:
-    You have: 4.1868 * 107.8682 joule / mol K N_A
-    You want: k
-        * 54.31765
-    *   / 0.018410222
---> also die tabellendaten in cal/g/K * 54.31765
-
-Palladium (Pd):
-You have: 4.1868 106.42 joule / mol K N_A
-You want: k
-    * 53.588401
-    *   / 0.018660755
-    *
-
-you have: k			(Bolzmann const)
-you want: joule / mol K N_A	(J/mol K) 	--> * 8.314472
-
-you have: joule / mol K N_A	(J/mol K)  k			(Bolzmann const)
-you want:  k			(Bolzmann const)	--> * 0.12027222
-
-You have: joule / mol K N_A
-You want: k
-	* 0.12027222
-	/ 8.314472
-
-you have: k			(Bolzmann const)
-you want: meV/K							--> * 0.086173422
-
-you have: joule / mol K N_A	(J/mol K) 
-you want: meV/K			(meV/K)				-->	* 0.010364269
-
-you have: kjoule / mol N_A 	(kJ/mol)
-you want: meV			(meV)				--> 	*10.364269
-
-you have: joule / mol N_A	(J/mol K) 
-you want: meV							-->	* 0.010364269
-
-you have: k (bolz)
-you want: eV/K							--> *8.6173422e-05
-
-You have: eV/K			(eV to Kelvin no, rather not)
-You want: k							--> * 11604.506
+You have: joule/(g-atom deg)-> k    You have: joule/(g K)          You want: k/u     --> * 0.12027222
+You have: joule/(K kg)      -> k    You have: 195.084 joule/(K kg) You want: k/u     --> * 0.023463186
+You have: joule/(K  g)      -> k    You have: 195.084 joule/(K  g) You want: k/u     --> * 23.463186
+You have: cal  /(K kg)      -> k    You have: 195.084 cal/(K kg)   You want: k/u     --> * 0.023463186
+You have: cal  /(K g)       -> k    You have: 102.9055 cal/(K  g)  You want: k/u     --> * 51.818654  (TOULOUKIAN)
+You have: cal  /(gm deg)    -> k    You have: 207.2 cal/(K  g)     You want: k/u     --> * 104.33675
+You have: cal  /(K mol)     -> k    You have: cal/(K mol N_A)      You want: k       --> * 0.50355573 (Mauro)
+You have: joule/(mol K)     -> k    You have: joule/(K mol N_A)    You want: k       --> * 0.12027222 (Mauro)
+You have: joule/K           -> k    You have: joule/K              You want: k       --> * 7.2429716e+22
+You have: g (relative mass) -> u                    --> * 6.0221413e+23
+You have: k                 -> joule/(mol K N_A)    --> * 8.314472
+you have: k                 -> meV/K		        --> * 0.086173422
+you have: joule/(mol K N_A) -> meV/K			    -->	* 0.010364269
+you have: kjoule/(mol N_A)  -> meV			        -->	* 10.364269
+you have: joule/(mol N_A)   -> meV			        -->	* 0.010364269
+you have: k                 -> eV/K				    --> * 8.6173422e-05
+You have: eV/K	            -> k                    --> * 11604.506
 	
 You have: Hartree 2 / 93 k	(Hartree to Kelvin)
 You want: K
@@ -215,10 +192,20 @@ You want: eV
 see for this paper of hehenkamp (Cu_vakancies_1994 paper experimental)
 
         1.6021765e-22 kg m^2 / s^2
-You have: THz h
+You have: THz h            Right!
 You want: meV
         * 4.1356673
         / 0.24179895
+
+You have: 0.4 THz h        Right!
+You want: meV
+	* 1.6542669
+	/ 0.60449736
+
+    You have: THz hbar   !!!! WRONG
+You want: meV
+	* 0.6582119
+	/ 1.5192676
 
 
 $units

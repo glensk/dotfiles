@@ -104,3 +104,6 @@ git submodule add https://github.com/jcf/vim-latex.git dotfiles/vim/bundle/vim-l
 ###################################################################################
 git co https://glensk@bitbucket.org/glensk/scriptsnew.git
 ###################################################################################
+#
+# git get remote url: 
+git config --get remote.origin.url

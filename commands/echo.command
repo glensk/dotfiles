@@ -36,4 +36,7 @@ both on mac and cmpc(fedora):
 start script with #!/bin/bash
 echo -e "\n\033[1;32m   only bash and -e: Light Colors\033[0m  \t\t\033[1;4;31m  Dark Colors\033[0m"
 echo -e "\033[1;4;31m  RED \033[0m"
-echo -e "\033[1;4;32m  RED \033[0m"
+echo -e "\033[1;4;32m  GREEN \033[0m"
+
+echo "\033[1;4;31m  RED \033[0m"
+echo "\033[1;4;32m  GREEN \033[0m"

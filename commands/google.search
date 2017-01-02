@@ -1,3 +1,7 @@
+0) Use Google to Search Certain Sites:
+site:mpie.de security
+
+
 1) Explicit Phrase
     Let's say you're looking for content about inbound marketing. Instead of just
     typing inbound marketing into the Google search box, you will likely be better
@@ -7,10 +11,6 @@
     Example Search: "inbound marketing"
 
 2) Exclude Words
-    Let's say you want to search for content about inbound marketing, but you want
-    to exclude any results that contain the term advertising. To do this, simply
-    use the "-" sign in front of the word you want to exclude.
-    
     Example Search: inbound marketing -advertising
 
 3) Site-Specific Search
