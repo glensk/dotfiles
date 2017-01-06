@@ -35,6 +35,8 @@ qsub -pe mpi* $cores /home/glensk/scripts/vasp_/runvasp/vasp.cmmd.par ## submitt
 
 
 qconf -spl                  show all parallel environments
+qconf -sql                  show a list of all queues
+
 qconf -sp mpi               einstellungen fuer parallel environmet mpi
 
 in der sge (sungridengine) gibt es 
@@ -55,3 +57,6 @@ qstat -pri
 
 if job is in Eqw (eqw) error status:
     qmod -cj <jobID>          to clear the error status
+
+qacct -j 611595  # show info of finished job 
+qacct -j 611595  | grep mem # show memusage of finished job (did it ask for too much memory?)

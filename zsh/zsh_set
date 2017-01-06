@@ -35,6 +35,9 @@ zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 # show the title path in the tab
 precmd () { print -Pn "\e]2;%n@%M | %~\a" } # title bar prompt
 
+preexec() { ODIR="$(pwd)" }          
+precmd() { [[ "$(pwd)" != $ODIR ]] && ls }
+
 ##
 # History
 ##

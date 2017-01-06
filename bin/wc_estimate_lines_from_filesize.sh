@@ -5,7 +5,9 @@
 l1=`head -1 $1 | wc -c`
 l2=`head -2 $1 | tail -1 | wc -c`
 l3=`head -3 $1 | tail -1 | wc -c`
+l100=`tail -1000000 $1 | wc -c`
 la=`echo $l1 $l2 $l3 | awk '{print ($1+$2+$3)/3}'`
+la=`echo $l100 | awk '{print $1/1000000}'`
 #echo l1:$l1 l2:$l2 l3:$l3 la:$la
 fs=`stat --format=%s $1`
 #echo fs:$fs

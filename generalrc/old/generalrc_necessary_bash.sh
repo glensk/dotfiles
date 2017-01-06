@@ -31,9 +31,9 @@ eval `aliastcshtobash $1 $2`
 ##########################################################
 # convenience functions
 ##########################################################
-function cd { 
-    builtin cd "$@" 
-    #[ -e settitlepath.sh ] && settitlepath.sh 
-    ls 
-}
+# function cd {   # not necessary when generalrc/generalrc_alias_zsh.sh 
+#     builtin cd "$@" 
+#     #[ -e settitlepath.sh ] && settitlepath.sh 
+#     ls 
+# }
 

@@ -76,7 +76,6 @@ module () {
 }
 fi
 
-
 tab-color() {
     [ "$1" = "red" ] && a=255 b=0 c=0
     [ "$1" = "gren" ] && a=0 b=255 c=0

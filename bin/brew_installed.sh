@@ -96,7 +96,7 @@ brew install lammps --with-mpi   # mpi support
 brew install rmtrash # 
 brew install fondu  # for matplotlib fonts
 brew install lbzip2 # to parallel zip files
-brew install boost  # c libraries necessary fot fftw (for phonon lifetimes project)
+brew install boost  # c libraries necessary fot fftw (for phonon lifetimes project), also for saschas c++ skrpit 
 
 
 brew install octave        # for phonon-lifetime code of michael leitner aus muenchen

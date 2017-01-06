@@ -13,8 +13,8 @@
 ## -v sorts numerical
 ## -H follows symbolic links
 ## -F shows control chars like / or *
-# This following ls command seems to work everywhere
-$1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?"'
+# This following ls command seems to work everywhere  (-v added to sort numbered files by true numerical number)
+$1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?" -v'
 #ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
 #ls -F -H -v --color=tty --hide=Icon? --show-control-chars --ignore="*.log" --group-directories-first $*
 #ls 'ls -F -H -v --color=tty'    
