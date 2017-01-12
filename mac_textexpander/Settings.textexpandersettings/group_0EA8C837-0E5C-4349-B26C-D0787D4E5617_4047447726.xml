@@ -9509,6 +9509,144 @@
 			<key>uuidString</key>
 			<string>4B7F57C7-2C6F-4597-BC04-D6B5EE2653DC</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-12T09:50:17Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-12T09:50:17Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-12T09:50:17Z</date>
+			<key>plainText</key>
+			<string>numpy as np</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>266D78DE-B38D-4F8F-897A-14F869790A71</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-12T13:13:43Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-12T13:13:43Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-12T13:13:43Z</date>
+			<key>plainText</key>
+			<string>Albert Glensk</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>17A7ED32-C5C4-422B-99CE-3F0DB77EA699</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-12T14:57:16Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-12T14:57:16Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-12T14:57:16Z</date>
+			<key>plainText</key>
+			<string>jjjjjjjjjjjjjjjjjjjj</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>B3DB95EE-1C3C-4681-8C0C-50DBCBA045D6</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-12T15:02:48Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-12T15:02:48Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-12T15:02:48Z</date>
+			<key>plainText</key>
+			<string>new.shape</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>D746EE89-6DD5-425B-AE2F-1FA5269DB288</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-12T15:09:37Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-12T15:09:37Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-12T15:09:37Z</date>
+			<key>plainText</key>
+			<string>ps10_0_0_1200000.dat.lifetimesgood.dat</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>47857311-3E48-4622-B9ED-7672F79831BE</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-12T16:22:43Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-12T16:22:43Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-12T16:22:43Z</date>
+			<key>plainText</key>
+			<string>kkkkkkkkkkkkkkk</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>FBE19936-FDAA-401C-94BE-1A751C7A9DC8</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -9925,6 +10063,12 @@
 		<string>DF17272D-B1A1-4C1E-9FDA-E7C547F4255A</string>
 		<string>E9CE37F1-244C-45F7-9FCA-85FE0580EF96</string>
 		<string>4B7F57C7-2C6F-4597-BC04-D6B5EE2653DC</string>
+		<string>266D78DE-B38D-4F8F-897A-14F869790A71</string>
+		<string>17A7ED32-C5C4-422B-99CE-3F0DB77EA699</string>
+		<string>B3DB95EE-1C3C-4681-8C0C-50DBCBA045D6</string>
+		<string>D746EE89-6DD5-425B-AE2F-1FA5269DB288</string>
+		<string>47857311-3E48-4622-B9ED-7672F79831BE</string>
+		<string>FBE19936-FDAA-401C-94BE-1A751C7A9DC8</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

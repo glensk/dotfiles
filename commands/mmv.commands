@@ -41,4 +41,4 @@ mmv -r ";*dudl" "#2dUdL"
 ##################################################################################################
 mmv \*.new \#1   # rename all *.new files to *
 mmv -r sum_all_new_\?\?\?.npy sum_all_new_\#1_\#2_\#3.npy    # first, second, thirc number/ character
-
+mmv ps10_0_0_1200000.dat\* save.ps10_0_0_1200000.dat\#10_0_0_1200000.dat\* save.ps10_0_0_1200000.dat\#1
