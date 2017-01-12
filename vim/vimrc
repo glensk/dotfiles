@@ -11,7 +11,7 @@ source ~/.vim/startup/vundle_colors-solarized.vim                               
 source ~/.vim/startup/vundle_ctrlp.vim        " ctrl+P                                      OK
 source ~/.vim/startup/vundle_tagbar.vim       " <leader>t                                   OK
 source ~/.vim/startup/vundle_supertab.vim     " tab completion for vim                      OK
-source ~/.vim/startup/vundle_syntastic.vim    " syntax checking
+"@source ~/.vim/startup/vundle_syntastic.vim    " syntax checking  (currently slow on cmmc !!!!
 "Plugin 'DamienCassou/textlint' 			  " Style checker for .tex (<leader>tl) !quite big!
 Plugin 'tpope/vim-surround.git'	              " delete:ds( create:ysiw] change:cst(
 Plugin 'https://github.com/yegappan/mru.git'  " open last opend files
