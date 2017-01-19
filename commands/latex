@@ -57,3 +57,36 @@ Herb Schulz
 # Sonderzeichen
 ###########################################################
 \AA             Angstrom
+
+###########################################################
+# citations 
+###########################################################
+to get correct citations instead of ? : run in command line: bibtex Paper    # where you have the Paper.txt file
+
+
+###########################################################
+# make citations clickable include
+###########################################################
+\usepackage{hyperref}
+\hypersetup{
+        linktoc=all,
+        colorlinks=true,
+        linkcolor=black,
+        citecolor=black,
+        filecolor=black,
+        pagecolor=black,
+        urlcolor=blue,
+        bookmarks=true,
+        pdfborder={0 0 0 0},
+        pdftitle={\dissTitle},
+        pdfauthor={Albert Glensk},
+        pdfkeywords={Finite temperature DFT, Ab initio, Thermodynamics, Anharmonicity, Local Anharmonic Approximation, Point defects},
+        pdfsubject={Finite temperature DFT, Ab initio, Thermodynamics, Anharmonicity, Local Anharmonic Approximation, Point defects},
+        pdfdisplaydoctitle=true,
+        pdftoolbar=true,                % Anzeigen der Acrobat toolbar oder nicht
+        pdfmenubar=true,                % Anzeigen des Acrobat menu oder nicht
+        bookmarksopen=true,
+        bookmarksnumbered=true,
+        % pdfstartview=X Y Z ! DONT USE DESTROYS TO OPEN WITH ACROBAT
+        }
+\definecolor{maroon}{cmyk}{0,0.87,0.68,0.32}

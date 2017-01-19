@@ -1,7 +1,8 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""" plugins used     (before this version: ~/.vim/startup/plugins_OLD.vim) ""
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ~/.vim/vim_cheatsheet
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" VUNDLE START """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" VUNDLE PLUGINS USED (before this version: ~/.vim/startup/plugins_OLD.vim) """"""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ~/.vim/vim_cheatsheet     " move, lowercase, search, indent, copy-paste, 
 source ~/.vim/startup/ctags.vim
 " in case deinstalled Vundle.vim: to to bundle folder and make 
 " git clone
@@ -16,7 +17,7 @@ source ~/.vim/startup/vundle_supertab.vim     " tab completion for vim          
 Plugin 'tpope/vim-surround.git'	              " delete:ds( create:ysiw] change:cst(
 Plugin 'https://github.com/yegappan/mru.git'  " open last opend files
 "Plugin 'https://github.com/tomtom/tcomment_vim.git'         " comment out/in ctrl+/  but breaks gcW (capitalize word)
-Plugin 'AndrewRadev/switch.vim' |  nnoremap - :Switch<cr>   " True->False 
+Plugin 'AndrewRadev/switch.vim' |  nnoremap - :Switch<cr>   " False->True 
 "Plugin 'godlygeek/tabular'                    " Aligns text.
 source ~/.vim/startup/vundle_latex.vim        " ,ll  und ,ls
 " !!! NEEDS CTAGS Plugin 'vim-scripts/taglist.vim'              " get *.tex labels  !! NEEDS CTAGS
@@ -32,7 +33,7 @@ source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now 
                                               " completion in :Plugin<TAB> command line mode
 source ~/.vim/startup/vundle_vim-airline.vim  " get some more colors for statusline 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plugins trying
+" VUNDLE PLUGINS TRYING """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plugin 'https://github.com/shiblon/latex-makefile.git'
 if version >= 703
@@ -42,15 +43,19 @@ endif
 "Plugin 'https://github.com/MarcWeber/vim-addon-commandline-completion.git' 
 "Plugin 'amdt/vim-niji'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" plugins unused
+" VUNDLE PLUGINS UNUSED """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"@source ~/.vim/startup/vundle_rainbow_parentheses.vim        " colorful parentheses DONT USE! BREAKS SPELLCHECKING IN CAPTIONS of .tex files
-" source ~/.vim/startup/vundle_jedi.vim           " tab completion for vim --> makes vim slow!
+"@source ~/.vim/startup/vundle_rainbow_parentheses.vim      " colorful parentheses DONT USE! BREAKS SPELLCHECKING IN CAPTIONS of .tex files
+" source ~/.vim/startup/vundle_jedi.vim                     " tab completion for vim --> makes vim slow!
 " Plugin 'https://github.com/rkulla/pydiction.git'
 " let g:pydiction_location = '/Users/glensk/Dropbox/scripts/dotfiles/vim/bundle/pydiction/complete-dict'
 " Plugin 'https://github.com/klen/python-mode.git'
-" Plugin 'vim-scripts/restore_view.vim.git'     " restores view on files THIS CAN BE DONE WITH SIMPLE vim commands
+" Plugin 'vim-scripts/restore_view.vim.git'                 " restores view on files THIS CAN BE DONE WITH SIMPLE vim commands
 source ~/.vim/startup/vundle_end.vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" VUNDLE END   """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " settings
@@ -63,7 +68,7 @@ source ~/.vim/startup/settings3.vim   " Folding, Search, Tab-behavior, indentati
 set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl t in insert mode
 "source ~/.vim/startup/vundle_neocomplete.vim          " breaks spell correction
 ""inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
-source ~/.vim/startup/spellcorrection.vim
+source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung, 
 
 hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments
 autocmd FileType python,sh setlocal nospell         " No spellcorrection for vim
