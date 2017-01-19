@@ -217,7 +217,7 @@ bindkey '^i' expand-or-complete-prefix
 # zstyle ':completion:*:ls:*' ignore-line yes  !! this destroys to show ~/r_ if ~/r_other
 zstyle ':completion:*:cd:*' ignored-patterns '(*/)#(CVS|.svn|.git)'
 zstyle ':completion:*:(gvim|vim|vi):*' ignored-patterns '*.(tar.gz|o|a|so|aux|dvi|swp|fig|bbl|blg|bst|idx|ind|toc|class|pdf|ps|eps|pyc|DS_Store|log)'
-zstyle ':completion:*:(x|xmgrace):*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|eps|pyc|DS_Store|tex|sty|bib|txt|sh)'
+zstyle ':completion:*:(x|xmgrace):*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pdf|ps|eps|pyc|DS_Store|tex|sty|jpg|pptx|nb|py|xcf|html|png|docx|bib|txt|sh)'
 zstyle ':completion:*:(open):*' ignored-patterns '*.(o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pyc|DS_Store|tex|sty|bib|dat|txt|agr)'
 zstyle ':completion:*:(epstopdf):*' ignored-patterns '*.(pdf|ps|o|a|so|aux|dvi|log|swp|fig|bbl|blg|bst|idx|ind|out|toc|class|pyc|DS_Store|tex|sty|bib|dat|txt|agr|graph|end|py|sh)'
 zstyle ':completion:*:(ls):*' ignored-patterns '*.(DS_Store)'
