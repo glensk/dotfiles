@@ -112,3 +112,10 @@ def xx(n):
     else:
         print "out"
 
+############# to measure time .... example in pot_energy_forces.py
+python -m cProfile -o prof /Users/glensk/Thermodynamics/python_thermodynamics/pot_energy_forces.py -dudlref -s 20 -> writes fiel 'prof'
+python -m cProfile -o prof ~/Thermodynamics/python_thermodynamics/lammps_pos_to_sum.py -N 10 -a 4.14 -dt 40 -q 8 8 20 -ps -calclast   -> schreibt file 'prof'
+python -m cProfile -s cumtime ~/Thermodynamics/python_thermodynamics/lammps_pos_to_sum.py -N 10 -a 4.14 -dt 40 -q 8 8 20 -ps -calclast  -> writes timings to screen
+
+to evaluate file 'prof'
+pstats.Stats('prof').strip_dirs().sort_stats("cumulative").print_stats(30)'

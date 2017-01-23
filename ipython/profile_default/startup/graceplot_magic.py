@@ -5,9 +5,13 @@ import GracePlot as gp
 #y=np.array([9,2,1,1,5,8,7,8,9,10])
 
 
-def plotx(x,y):
+def plotxy(x,y):
     #xplot = gp.GracePlot() # A grace session opens
     gp.GracePlot().plot(gp.Data(x=x,y=y))
+
+def ploty(y):
+    #xplot = gp.GracePlot() # A grace session opens
+    gp.GracePlot().plot(gp.Data(x=np.arange(len(y)),y=y))
 
 #plotx(x,y)
 
