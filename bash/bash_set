@@ -57,9 +57,9 @@ shopt -u mailwarn
 unset MAILCHECK        # Don't want my shell to warn me of incoming mail.
 
 #Setup history searches
-bind '&quot;\e[A&quot;:history-search-backward'
-bind '&quot;\e[B&quot;:history-search-forward'
-bind 'set match-hidden-files off'  # dont show dot files on tab
+#bind '&quot;\e[A&quot;:history-search-backward'                      # makes error message
+#bind '&quot;\e[B&quot;:history-search-forward'                     # makes error message
+#bind 'set match-hidden-files off'  # dont show dot files on tab # makes error message
 
 #[ "$host" = "$mylaptop" ] && bash -c 'echo -ne "\033]6;1;bg;green;brightness;255\a"'  # sets default tab color to green, for other colors see ssh.sh
 #[ "$host" = "$mylaptop" ] && echo -ne "\033]6;1;bg;green;brightness;255\a"  # sets default tab color to green, for other colors see ssh.sh
@@ -81,7 +81,7 @@ set visible-stats on
 #Setting the following makes bash erase duplicate commands in your history:
 export HISTCONTROL="erasedups:ignoreboth"
 
-set colored-stats on
+#set colored-stats on
 
 # # autojump 
 # echo autojump
