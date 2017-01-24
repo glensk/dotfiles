@@ -6,6 +6,8 @@ cd $HOME/Dropbox/scripts/dotfiles
 
 linktcsh="false"
 linkbash="false"
+linkbash="true"
+linkbash="false"
 linkzsh="false"
 oncmmc='false'
 oncmmd='false'

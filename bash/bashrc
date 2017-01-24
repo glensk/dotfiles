@@ -22,6 +22,13 @@ alias c='j'
 source $HOME/Dropbox/scripts/dotfiles/bash/bash_set
 
 
+#################################################################
+# for pyron jupyter hub (juypter notebook)
+#################################################################
+module unload anaconda
+module load pyiron/dev
+
+
 ## https://github.com/rupa/z
 ## invoke this after fasd otherwise z function will be overwritten by fasd
 #source $HOME/Dropbox/scripts/dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
