@@ -1,5 +1,15 @@
 #!/bin/sh
 
+##############################################
+# ALIASES
+##############################################
+# how to create a new alias (which works on every host)
+# 1. shell: virca  --> add the alias you need to this file here
+# 2. to renew aliasfile: ra   (this only creates a new alias file)
+# 3. START A NEW SHELL (also you typed ra!) 
+
+
+
 
 #[ "$printloadstat" = "true" ] && echo ... alias before && alias && echo ... alias before done
 #echo ------------------- SHELL $currentshell WHICH $whichalias 
@@ -49,6 +59,9 @@ $1 ...... 'cd ../../..'
 
 $1 rx 'recievex'
 $1 sx 'sendx'
+$1 sxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; cp ../lammps_pos_to_sum.py .; sendx lammps_pos_to_sum.py;cd $hier'
+$1 rxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; recievex; cp lammps_pos_to_sum.py .. ;cd $hier'
+
 
 
 ##############################
