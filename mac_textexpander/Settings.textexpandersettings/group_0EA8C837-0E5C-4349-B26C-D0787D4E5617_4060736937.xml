@@ -11050,6 +11050,98 @@
 			<key>uuidString</key>
 			<string>8DDF0F34-74A5-4DDD-A209-7FD5C056D58E</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-31T12:04:11Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-31T12:04:11Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-31T12:04:11Z</date>
+			<key>plainText</key>
+			<string>c ab2017</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>789CD6A3-A636-49BC-9F4C-469783410318</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-31T15:07:59Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-31T15:07:59Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-31T15:07:59Z</date>
+			<key>plainText</key>
+			<string>np.arange(10</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>393D2540-0679-4D85-94E8-F02C1FCE29A0</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-31T17:03:45Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-31T17:03:45Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-31T17:03:45Z</date>
+			<key>plainText</key>
+			<string>path+file</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>B6B86236-B265-420F-BDF2-5D7CDE483CFE</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string></string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-01-31T21:48:34Z</date>
+			<key>extraInfo</key>
+			<dict>
+				<key>pendingSuggestionDate</key>
+				<date>2017-01-31T21:48:34Z</date>
+			</dict>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-01-31T21:48:34Z</date>
+			<key>plainText</key>
+			<string>qstatn -q</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>2AC5B904-D17B-4DEC-ADCD-E42D22165B01</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -11533,6 +11625,10 @@
 		<string>D58FD4F7-197B-42D6-874C-6E58C025399C</string>
 		<string>976DAC7E-524F-447F-A57E-155E398809E5</string>
 		<string>8DDF0F34-74A5-4DDD-A209-7FD5C056D58E</string>
+		<string>789CD6A3-A636-49BC-9F4C-469783410318</string>
+		<string>393D2540-0679-4D85-94E8-F02C1FCE29A0</string>
+		<string>B6B86236-B265-420F-BDF2-5D7CDE483CFE</string>
+		<string>2AC5B904-D17B-4DEC-ADCD-E42D22165B01</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

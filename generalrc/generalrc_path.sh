@@ -17,8 +17,9 @@ homebrew="/usr/local/sbin"
 bin="/usr/bin"
 bin2="$HOME/Dropbox/scripts/dotfiles/sources_bin"
 bin3="$HOME/Dropbox/scripts/dotfiles/bin/stefan"
+bin4="$HOME/Dropbox/scripts/dotfiles/lammps_scripts"
 #PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
-PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3"
+PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4"
 #PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 #PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
