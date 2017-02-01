@@ -16,6 +16,7 @@ fi
 #echo "#### now in `pwd` #####################";echo;\\
 #echor : \033[1;31m\!*\033[m
 dot=$HOME/Dropbox/scripts/dotfiles
+cd $dot
 echo `pwd`
 echo `pwd` | sed 's|^/cmmc/||'
 [ "`pwd | sed 's|^/cmmc/|/|'`" != "$dot" ] && echo you have to be in $dot directory and you are not && exit
