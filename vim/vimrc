@@ -17,7 +17,7 @@ source ~/.vim/startup/vundle_supertab.vim     " tab completion for vim          
 Plugin 'tpope/vim-surround.git'	              " delete:ds( create:ysiw] change:cst(
 Plugin 'https://github.com/yegappan/mru.git'  " open last opend files
 "Plugin 'https://github.com/tomtom/tcomment_vim.git'         " comment out/in ctrl+/  but breaks gcW (capitalize word)
-Plugin 'AndrewRadev/switch.vim' |  nnoremap - :Switch<cr>   " False->True 
+Plugin 'AndrewRadev/switch.vim' |  nnoremap - :Switch<cr>   " False->True  (press einfach minus)
 "Plugin 'godlygeek/tabular'                    " Aligns text.
 source ~/.vim/startup/vundle_latex.vim        " ,ll  und ,ls
 " !!! NEEDS CTAGS Plugin 'vim-scripts/taglist.vim'              " get *.tex labels  !! NEEDS CTAGS
