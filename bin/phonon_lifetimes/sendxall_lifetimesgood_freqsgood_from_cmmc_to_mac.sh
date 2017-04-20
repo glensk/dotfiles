@@ -14,6 +14,6 @@ if [ "$host" = "mac" ];then
     echo "in",`hostname`
     if [ -e "/Users/glensk/Dropbox/proj/proj_current/__2017.01_phonon_linewidth_al/__2017.01_phonon_lifetimes_4_ab2017/check_20_python_plotting" ];then
         cd /Users/glensk/Dropbox/proj/proj_current/__2017.01_phonon_linewidth_al/__2017.01_phonon_lifetimes_4_ab2017/check_20_python_plotting
-        rx
+        recievex
     fi
 fi
