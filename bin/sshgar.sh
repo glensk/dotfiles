@@ -3,8 +3,8 @@
 #echo myhost:$myhost
 #echo hostname:$hostname
 #echo hostname:`hostname`
-to="cmmc001"
-[ "$1" != "" ] && to="cmmc002"
+to="cmmc002"
+[ "$1" != "" ] && to="cmmc001"
 echo to:$to
 ##############################################################
 # mac -> cmmc001 

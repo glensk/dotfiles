@@ -118,6 +118,7 @@ brew install youtube-dl
 brew install imagemagick  # to change pdf to jpg
 #brew install gnuplot --with-x 
 brew install gnuplot --with-aquaterm
+brew install p7zip      # necessary to unzip michael leitners zipped files
 brew install popper     # pdftops
 brew install tesseract  # get orc for pdfs (make pdfs readable)
 brew install gs         # also necessay for making pdfs readable  

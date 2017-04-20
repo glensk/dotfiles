@@ -1,0 +1,17 @@
+Instructions for 1Password 6.5.3 compatibility
+
+1) Install using homebrew (uninstall and reinstall if needed)
+    $ brew tap ravenac95/sudolikeaboss
+    $ brew install sudolikeaboss
+2) Download sudolikeaboss_0.3.0-beta1_darwin_amd64.zip (originally posted here)
+    https://github.com/ravenac95/sudolikeaboss/files/615148/sudolikeaboss_0.3.0-beta1_darwin_amd64.zip
+3) Install it to /usr/local/bin/sudolikeboss (or /usr/local/Cellar/sudolikeaboss/0.2.1/bin or wherever you previously had it)
+    $ cp sudolikeaboss /usr/local/Cellar/sudolikeaboss/0.2.1/bin
+    $ cd /usr/local/Cellar/sudolikeaboss/0.2.1/bin
+    $ ./sudolikeaboss
+4) You must now run the registration process before you use sudolikeaboss. Make sure Chrome and 1Password are running.
+    $ sudolikeaboss register (click the verification in the 1Password interface.)
+5) Make sure iTerm is setup correctly for this version: iTerm > Preferences > Keys
+    Key: ⌘\
+    Action: Run Coprocess
+    /usr/local/bin/sudolikeaboss
