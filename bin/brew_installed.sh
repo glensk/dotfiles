@@ -111,7 +111,7 @@ brew install fftw --with-fortran
 brew install cpulimit   # to limit dropbox usage
 brew install unrar      # to unrar *.rar files
 brew install colordiff
-brew install gcc        # which now also installs gfortran gfortran-4.9
+brew install gcc --without-multilib       # which now also installs gfortran gfortran-4.9, --without-multilib is necessary for openmp which is necessary for phono3py
 brew install mmv        # --> requires XQUARTZ
 brew install grace      # xmgrace  (needs openmotif)
 brew install youtube-dl
