@@ -39,7 +39,8 @@ if [ "$currenthost" = "onmac" ];then
     brew="/usr/local/opt/coreutils/libexec/gnubin" 
     tdep="$HOME/Dropbox/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
-    phonopybin="$phonopy/bin"
+    #phonopybin="$phonopy/bin"
+    phonopybin="$HOME/.local/bin"
     vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
     #sphinx="$HOME/Dropbox/scripts/phonons/sphinx/bin"
@@ -52,6 +53,8 @@ if [ "$currenthost" = "onmac" ];then
     pylammps2=""                                        # this is too general an might import libs from non anaconda python 
     pyphonopy1="$phonopy/lib/python"     # may be lib64 instead
     pyphonopy2="$phonopy/lib64/python"   # may be lib64 instead
+    pyphonopy1=""     # may be lib64 instead
+    pyphonopy2=""   # may be lib64 instead  no path needed now when using phono3py
 
 
     # $LD_LIBRARY_PATH add on mac
