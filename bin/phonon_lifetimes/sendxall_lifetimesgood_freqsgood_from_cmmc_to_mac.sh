@@ -3,8 +3,10 @@
 host=`hostname`
 if [[ "$host" = "cmmc002" || "$host" == "cmmc001" ]];then
     echo "in",`hostname`
+    echo 'cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes'
     cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes
     pwd
+    echo 'sendx all lifetimesgood_* and frqsgood_*'
     sendx `find . -type f \( -name "lifetimesgood_*" -o -name "freqsgood_*" \) | xargs`
     echo "done"
     fi
