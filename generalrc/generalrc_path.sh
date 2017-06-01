@@ -41,6 +41,7 @@ if [ "$currenthost" = "onmac" ];then
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
     #phonopybin="$phonopy/bin"
     phonopybin="$HOME/.local/bin"
+    phonopybin2="$HOME/.miniconda2/bin"
     vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
     #sphinx="$HOME/Dropbox/scripts/phonons/sphinx/bin"
@@ -51,21 +52,25 @@ if [ "$currenthost" = "onmac" ];then
     pylammps1="/usr/local/Cellar/lammps/2014.02.12/lib/python2.7/site-packages"
     pylammps2="/usr/local/lib/python2.7/site-packages"  # this is too general an might import libs from non anaconda python 
     pylammps2=""                                        # this is too general an might import libs from non anaconda python 
-    pyphonopy1="$phonopy/lib/python"     # may be lib64 instead
-    pyphonopy2="$phonopy/lib64/python"   # may be lib64 instead
-    pyphonopy1=""     # may be lib64 instead
+    #pyphonopy1="$phonopy/lib/python"     # may be lib64 instead
+    #pyphonopy2="$phonopy/lib64/python"   # may be lib64 instead
+    pyphonopy1="$HOME/.local/lib/python2.7"     # may be lib64 instead
     pyphonopy2=""   # may be lib64 instead  no path needed now when using phono3py
 
 
     # $LD_LIBRARY_PATH add on mac
     ldvasp="$HOME/local/lib"
+    ldphonopylapack="/usr/local/opt/lapack/lib"
+    ldphonopyopenblas="/usr/local/opt/openblas/lib"
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
     #[ "$host" = "$mylaptop" ] && \
-    PATH="$sed:$brew:$anaconda:$tdep:$phonopy:$phonopybin:$vasp:$PATH" #&& \
-    PYTHONPATH="$pygraceplot:$pylammps1:$pylammps2:$pyphonopy1:$PYTHONPATH" #&& \
-    LD_LIBRARY_PATH="$ldvasp:$LD_LIBRARY_PATH"
+    PATH="$sed:$brew:$anaconda:$tdep:$phonopy:$phonopybin:$phonopybin2:$vasp:$PATH" #&& \
+    #PYTHONPATH="$pygraceplot:$pylammps1:$pylammps2:$pyphonopy1:$PYTHONPATH" #&& \
+    # for Miniconda2 use:
+    PYTHONPATH="/Users/glensk/.miniconda2"
+    LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
 fi
 
 
@@ -125,13 +130,15 @@ fi
 # export $PATH / $PYTHONPATH / $LD_LIBRARY_PATH   (dies sollte VOR! module load geschehen!)
 #########################################################################
 if [ "$currentshell" != "tcsh" ];then
-    echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"'
+    #echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"'
+    echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"'
 else
     tcshpath=`echo $PATH | sed 's|:| |g'`
     tcshpythonpath=`echo $PYTHONPATH | sed 's|:| |g'`
-    echo 'set path = ( '"$tcshpath"' ); set PYTHONPATH = ( '"$tcshpythonpath"' );'
+    echo 'set path = ( '"$tcshpath"' ); set PYTHONPATH = ( '"$tcshpythonpath"' );' # export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include";'
 fi
 
+#export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 
 #########################################################################
 # unused / oldstuff 

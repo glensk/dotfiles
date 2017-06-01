@@ -40,6 +40,7 @@ source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 export currentshell='zsh'    # known are zsh / bash / tcsh
 export generalrc="$HOME/Dropbox/scripts/dotfiles/generalrc"
 
+#export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 #################################################################
 # ###################  !!!!!!!!!!!!!!!!!!!!
 # ###################  !!!!!!!!!!!!!!!!!!!!

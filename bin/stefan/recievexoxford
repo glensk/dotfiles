@@ -1,0 +1,6 @@
+#!/bin/sh
+
+scp aglen@gate.rzg.mpg.de:~/.exchange/mytarfile.tgz .
+
+tar -xvzf mytarfile.tgz
+rm mytarfile.tgz

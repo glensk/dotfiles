@@ -30,6 +30,7 @@ eval `$generalrc/generalrc_hostdependent.sh`
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $currenthost` 
 
+#export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 #@# time without aliases          : 0.38
 #@# time with generalrc_alias_.sh : 0.62
 #@# time with    alias            : 0.38 (in zsh: alias > alias; add as 1st row alias)
