@@ -12,7 +12,7 @@
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
 
 ###################################################################################
-# HOST dependent variables (prompt, module load, ...)
+# HOST dependent variables (prompt, module load, anaconda, ...)
 ###################################################################################
 eval `$generalrc/generalrc_hostdependent.sh`  
 # defines:  {onmac, oncmmc, oncmdft} to true or false
