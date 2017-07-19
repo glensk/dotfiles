@@ -88,3 +88,13 @@ echo -ne "\033]6;1;bg;green;brightness;$b\a"
 echo -ne "\033]6;1;bg;blue;brightness;$c\a"
 }
 
+load_local_anaconda() {
+    echo 'module unload anaconda'
+    module unload anaconda
+    echo
+    echo 'export PATH="/u/aglen/conda-envs/my_root/bin:$PATH"'
+    export PATH="/u/aglen/conda-envs/my_root/bin:$PATH"
+    echo
+    echo 'source activate /u/aglen/conda-envs/my_root'
+    source activate /u/aglen/conda-envs/my_root
+}
