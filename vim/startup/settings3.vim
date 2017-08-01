@@ -6,7 +6,8 @@ autocmd BufWinLeave *.* mkview
 autocmd BufWinEnter *.* silent loadview
 " suggested by restore_view.vim plugin
 set viewoptions=cursor,folds,slash,unix
-set foldmethod=indent   " foldmethod=marker 
+"set foldmethod=indent   " foldmethod=marker   
+set foldmethod=syntax    " now trying for c code
 set foldmarker={,}
 set foldnestmax=2
 set foldlevel=99
@@ -30,7 +31,6 @@ hi Folded term=NONE cterm=NONE gui=NONE ctermbg=0
 " sometimes in other files, therefore comment out next line
 " "set foldtext="" 
 " }}}
-
 
 " ================ SEARCH ================== {{{
 set smartcase  " if a search string contains UPPER letters than ignorecase is switched off
@@ -42,105 +42,6 @@ set incsearch  " Start searching before pressing enter.
 " set showmatch " Show matching [] and {} by jumping to first one on closing .... not cool 
 setlocal iskeyword-=:  " when searching for abc also find abc in abc:  from http://superuser.com/questions/552781/prevent-whole-word-search-from-matching-colon
 " }}}
-
-
-" ================ TAB behaviour | INDENTATION ================== {{{
-" The next 3 options are crucial for python (to be in line with Pep8)
-" Each tab that you type is converted to an equivalent number of spaces (Pep8)
-set expandtab
-" To control the number of space characters that will be inserted when the
-" tab key is pressed set the 'tabstop' option: == a tab is four spaces
-" ================ Foldind (best without plugins) / Remember FOLDS & VIEW DEFINE AFTER SYNTAX ON ! (LOOK AND FEEL) ================== {{{
-" to remember folds (next 2 lines)
-autocmd BufWinLeave *.* mkview
-autocmd BufWinEnter *.* silent loadview
-" suggested by restore_view.vim plugin
-set viewoptions=cursor,folds,slash,unix
-set foldmethod=indent   " foldmethod=marker 
-set foldmarker={,}
-set foldnestmax=2
-set foldlevel=99
-" only fold if more than 3 ines are indented (2 are not enoug)
-set foldminlines=3
-" open folds when search or jump to specific line (:22)
-"set foldopen=all
-set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
-"set foldopen=jump
-" foldcolumn will display a sidebar that indicates what will be folded.
-" I stopped liking it, not useful to me
-" set foldcolumn=2
-" no markers like -------------------- to be in folds (default)
-set fillchars="fold: " 
-" ctermbg=0 (for iterm2) makes the folded line appear slightly brighter compared to normal background
-" :hi Folded            returns            term=bold,underline cterm=bold,underline ctermfg=12 ctermbg=0 guifg=Cyan guibg=DarkGrey
-":hi Folded term=NONE cterm=NONE gui=NONE ctermbg=None ctermfg=12 ctermbg=0 guifg=Cyan guibg=DarkGrey
-":hi Folded term=NONE cterm=NONE gui=NONE ctermbg=None ctermbg=0 guibg=DarkGrey
-hi Folded term=NONE cterm=NONE gui=NONE ctermbg=0
-" often the text of the first line is not usefull but in .vimrc it is and can be
-" sometimes in other files, therefore comment out next line
-" "set foldtext="" 
-" }}}
-
-
-" ================ SEARCH ================== {{{
-set smartcase  " if a search string contains UPPER letters than ignorecase is switched off
-set hlsearch  " highlight all search matches  | to turn off set nohlsearch
-" Press Space to turn off highlighting and clear any message already displayed.
-nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
-set ignorecase " If you dont care for case-sensitive searches and substitutions, turn it off completely
-set incsearch  " Start searching before pressing enter.
-" set showmatch " Show matching [] and {} by jumping to first one on closing .... not cool 
-" }}}
-
-
-" ================ TAB behaviour | INDENTATION ================== {{{
-" The next 3 options are crucial for python (to be in line with Pep8)
-" Each tab that you type is converted to an equivalent number of spaces (Pep8)
-set expandtab
-" To control the number of space characters that will be inserted when the
-" tab key is pressed set the 'tabstop' option: == a tab is four spaces
-" ================ Foldind (best without plugins) / Remember FOLDS & VIEW DEFINE AFTER SYNTAX ON ! (LOOK AND FEEL) ================== {{{
-" to remember folds (next 2 lines)
-autocmd BufWinLeave *.* mkview
-autocmd BufWinEnter *.* silent loadview
-" suggested by restore_view.vim plugin
-set viewoptions=cursor,folds,slash,unix
-set foldmethod=indent   " foldmethod=marker 
-set foldmarker={,}
-set foldnestmax=2
-set foldlevel=99
-" only fold if more than 3 ines are indented (2 are not enoug)
-set foldminlines=3
-" open folds when search or jump to specific line (:22)
-"set foldopen=all
-set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
-"set foldopen=jump
-" foldcolumn will display a sidebar that indicates what will be folded.
-" I stopped liking it, not useful to me
-" set foldcolumn=2
-" no markers like -------------------- to be in folds (default)
-set fillchars="fold: " 
-" ctermbg=0 (for iterm2) makes the folded line appear slightly brighter compared to normal background
-" :hi Folded            returns            term=bold,underline cterm=bold,underline ctermfg=12 ctermbg=0 guifg=Cyan guibg=DarkGrey
-":hi Folded term=NONE cterm=NONE gui=NONE ctermbg=None ctermfg=12 ctermbg=0 guifg=Cyan guibg=DarkGrey
-":hi Folded term=NONE cterm=NONE gui=NONE ctermbg=None ctermbg=0 guibg=DarkGrey
-hi Folded term=NONE cterm=NONE gui=NONE ctermbg=0
-" often the text of the first line is not usefull but in .vimrc it is and can be
-" sometimes in other files, therefore comment out next line
-" "set foldtext="" 
-" }}}
-
-
-" ================ SEARCH ================== {{{
-set smartcase  " if a search string contains UPPER letters than ignorecase is switched off
-set hlsearch  " highlight all search matches  | to turn off set nohlsearch
-" Press Space to turn off highlighting and clear any message already displayed.
-nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
-set ignorecase " If you dont care for case-sensitive searches and substitutions, turn it off completely
-set incsearch  " Start searching before pressing enter.
-" set showmatch " Show matching [] and {} by jumping to first one on closing .... not cool 
-" }}}
-
 
 " ================ TAB behaviour | INDENTATION ================== {{{
 " The next 3 options are crucial for python (to be in line with Pep8)

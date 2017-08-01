@@ -67,4 +67,4 @@ sed -e's/  */ /g'   ### multiple blanks/spaces to one
 --> try sed -i 's|sed -i|sed -i $add|g' file
 --> try sed -i "s|wc -\([wlc]\)|wc -\1 \| sed 's\|[ ]\*\|\|g'|g" file
 
-
+sed -i 's/\r//g' md_long_tox.c     #to remove ^M
