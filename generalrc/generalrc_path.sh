@@ -10,8 +10,8 @@
 # on every system: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ...)
 #########################################################################
 dropboxbin="$HOME/Dropbox/scripts/dotfiles/bin"       # Dropbox binaries
-#anacondaold="/usr/local/bin"  # use this to install macvim on the mac otherwise interference with homebrew python
-#anaconda="$HOME/anaconda/bin"                       # don't load anaconda on cmmc since the module is available
+#anacondaold="/usr/local/bin"   # use this to install macvim @mac otherwise interference with homebrew python
+#anaconda="$HOME/anaconda/bin"  # don't load anaconda on cmmc since the module is available
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
@@ -35,7 +35,7 @@ if [ "$currenthost" = "onmac" ];then
     # $PATH (on mac)
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
-    anaconda="$HOME/anaconda2/bin"  #anacond/bin"                       # don't load anaconda on cmmc since the module is available
+    anaconda="$HOME/anaconda2/bin"  # don't load anaconda on cmmc since the module is available
     brew="/usr/local/opt/coreutils/libexec/gnubin" 
     tdep="$HOME/Dropbox/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"

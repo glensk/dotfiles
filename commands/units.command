@@ -198,10 +198,11 @@ You want: meV
         * 4.1356673
         / 0.24179895
 
-You have: 0.4 THz h        Right!
-You want: meV
-	* 1.6542669
-	/ 0.60449736
+You have: THz h
+You want: meV              Right! 
+	* 4.1356673
+	/ 0.24179895
+You have:
 
     You have: THz hbar   !!!! WRONG
 You want: meV

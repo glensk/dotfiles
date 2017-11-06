@@ -12,7 +12,7 @@
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
 
 ###################################################################################
-# HOST dependent variables (prompt, module load, anaconda, ...)
+# HOST dependent variables (prompt, module load, anaconda (on cmmc with module load) ...)
 ###################################################################################
 #eval `$generalrc/generalrc_hostdependent.sh`  
 # defines:  {onmac, oncmmc, oncmdft} to true or false
@@ -26,7 +26,7 @@
 # printloadstat was defined in $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
-# PATH  
+# PATH  (anaconda)
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $currenthost` 
 

@@ -14,6 +14,8 @@ osascript -e 'quit app "1Password mini"'
 echo "Open 1Password again. (make this script do so)"
 open -a 1Password 
 echo "Restart your browser."
+open /Applications/Google\ Chrome.app/
+
 #cd ~/Library/Application Support/Google/Chrome/NativeMessagingHosts/
 #cp 2bua8c4s2c.com.agilebits.1password.json ~/
 
