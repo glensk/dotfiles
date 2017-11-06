@@ -46,6 +46,7 @@ export generalrc="$HOME/Dropbox/scripts/dotfiles/generalrc"
 # ###################  !!!!!!!!!!!!!!!!!!!!
 #################################################################
 source $generalrc/generalrc_.sh
+
 # source activate /u/aglen/conda-envs/my_root
 #################################################################
 # ###################  !!!!!!!!!!!!!!!!!!!!
@@ -75,7 +76,7 @@ source $HOME/Dropbox/scripts/dotfiles/zsh/zsh_set
 
 # this is for iterm2!!
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
-
+#source ~/.iterm2_shell_integration.`basename $SHELL`
 #################################################################
 # after this file ~/.zlogin is loaded 
 #################################################################

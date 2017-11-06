@@ -14,7 +14,7 @@
 ###################################################################################
 # HOST dependent variables (prompt, module load, anaconda, ...)
 ###################################################################################
-eval `$generalrc/generalrc_hostdependent.sh`  
+#eval `$generalrc/generalrc_hostdependent.sh`  
 # defines:  {onmac, oncmmc, oncmdft} to true or false
 #           currenthost to {onmac, oncmmc, oncmdft}
 #           myshell to {zsh,bash, tcsh}
@@ -71,6 +71,8 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 #echo MYPROMPTTIME $myprompttime;
 #echo 
 
+#[ "$oncmmc" = "true" ] && load_local_anaconda DOES NOT WORK
+[ "`hostname`" = "cmmc002" ] && load_local_anaconda
 ##############################################
 # set host unspecific variables  
 ##############################################
