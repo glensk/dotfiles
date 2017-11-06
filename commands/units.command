@@ -23,6 +23,7 @@ You have: cal  /(K kg)      -> k    You have: 195.084 cal/(K kg)   You want: k/u
 You have: cal  /(K g)       -> k    You have: 102.9055 cal/(K  g)  You want: k/u     --> * 51.818654  (TOULOUKIAN)
 You have: cal  /(gm deg)    -> k    You have: 207.2 cal/(K  g)     You want: k/u     --> * 104.33675
 You have: cal  /(K mol)     -> k    You have: cal/(K mol N_A)      You want: k       --> * 0.50355573 (Mauro)
+You have: kcal /(mol)       -> meV  You have: kcal/(mol N_A)       You want: meV     --> * 43.393121  (meV)       
 You have: joule/(mol K)     -> k    You have: joule/(K mol N_A)    You want: k       --> * 0.12027222 (Mauro)
 You have: joule/K           -> k    You have: joule/K              You want: k       --> * 7.2429716e+22
 You have: g (relative mass) -> u                    --> * 6.0221413e+23

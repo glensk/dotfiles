@@ -3,10 +3,11 @@ ssh bzg@cmmc001.bc.rzg.mpg.de (is passwordfree)
 
 
 loging to cmpc
-ssh grabowski@cmpc35
+ssh grabowski@cmpc35   Nivacancy!
 
 from cmpc:
-sshoxford
+sshoxford oder
+ssh -X bgrabowski@oscgate.arc.ox.ac.uk
 
 from sshoxford: (ist ein gate)
 
