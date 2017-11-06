@@ -14,7 +14,7 @@
 ###################################################################################
 # HOST dependent variables (prompt, module load, anaconda (on cmmc with module load) ...)
 ###################################################################################
-#eval `$generalrc/generalrc_hostdependent.sh`  
+eval `$generalrc/generalrc_hostdependent.sh`  
 # defines:  {onmac, oncmmc, oncmdft} to true or false
 #           currenthost to {onmac, oncmmc, oncmdft}
 #           myshell to {zsh,bash, tcsh}
@@ -45,6 +45,7 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 [ ! -e "$generalrc/generalrc_alias_$currenthost" ] && $generalrc/generalrc_alias_renew.sh
 
 # general aliases (work) everywhere
+#echo "currenthost :$currenthost:"
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_alias_$currenthost
 [ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_alias_.sh $whichalias $currentshell
 
