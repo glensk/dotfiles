@@ -30,7 +30,7 @@ eval `$generalrc/generalrc_hostdependent.sh`
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $currenthost` 
 #[ "$oncmmc" = "true" ] && load_local_anaconda DOES NOT WORK
-[ "`hostname`" = "cmmc002" ] && load_local_anaconda
+#[ "`hostname`" = "cmmc002" ] && load_local_anaconda
 
 #export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 #@# time without aliases          : 0.38
@@ -74,6 +74,7 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 #echo MYPROMPTTIME $myprompttime;
 #echo 
 
+[ "`hostname`" = "cmmc002" ] && load_local_anaconda
 ##############################################
 # set host unspecific variables  
 ##############################################
