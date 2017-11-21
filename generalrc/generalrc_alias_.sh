@@ -201,14 +201,16 @@ $1 qstatn 'qstatn -d'
     $1 s52 '~/start.5.3.5.20cores.sh' && \
     $1 v5 '~/start.5.3.5.20cores.sh' && \
     $1 v52 '~/start.5.3.5.20cores.sh' && \
-    #$1 vi 'gvim -v' && \
-    #$1 vim 'gvim -v' && \
     $1 tmux '/u/aglen/local/bin/tmux'
 
+#$1 vi 'gvim -v' && \
+#$1 vim 'gvim -v' && \
+
 [ "$oncmpc" = "true" ] && \
-    #$1 vi 'gvim -v' && \
-    #$1 vim 'gvim -v' && \
     $1 tmux '/home/glensk/local/bin/tmux'
+
+#$1 vi 'gvim -v' && \
+#$1 vim 'gvim -v' && \
 
 [ "$host" = "cmmd001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v'
 #[ "$host" = "cmmc001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v' # check if cmmc has vim or only vi
