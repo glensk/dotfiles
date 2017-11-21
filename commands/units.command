@@ -209,6 +209,12 @@ You want: meV
 	* 0.6582119
 	/ 1.5192676
 
+You have: meV
+You want: THz h
+  * 0.24179895
+  *   / 4.1356673
+ 
+lifetime (ps) = 1/(pi * FWHM(THz))    (0.06 Thz == 5.3ps)
 
 $units
 2526 units, 72 prefixes, 56 nonlinear units

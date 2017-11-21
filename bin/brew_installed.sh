@@ -78,7 +78,7 @@ brew cask install --appdir="/Applications" omnifocus
 brew cask install --appdir="/Applications" omnifocus-clip-o-tron
 brew cask install --appdir="/Applications" paintbrush
 brew cask install --appdir="/Applications" xquartz
-brew cask install --appdir="/Applications" seil
+#brew cask install --appdir="/Applications" seil  # not working anymore
 brew cask install --appdir="/Applications" cuda   # necessary for vmd (make movies from VASP MD)
 brew cask install --appdir="/Applications" flux 
 brew cask install --appdir="/Applications" bartender
@@ -86,6 +86,7 @@ brew cask install --appdir="/Applications" bettertouchtool
 brew cask install --appdir="/Applications" textexpander
 brew cask install --appdir="/Applications" spyder
 brew cask install --appdir="/Applications" calibre  # to get ebook-convert file.pdf file.epub --enable-heuristics
+brew cask install --appdir="/Applications" mactex   # necessary when making bibliography for *.tex files
 
 
 
@@ -187,16 +188,17 @@ echo "#################### reboot system once :) ######################"
 echo "#################### reboot system once :) ######################"
 
 # latex (necessary for general latex commands)
-hier=`pwd`
-echo " get MacTex package which should be installed then manually if the MacTex.pkg was not exected (should be .... since open)"
-echo " go to $HOME/Downloads and install the MacTeX.pkg (just klick on it)"
-cd $HOME/Downloads
-echo
-echo BETTER DOWNLOAD WITH SAFARI SINCE MUCH QUICKER THAN CHROME
-echo
-wget -r http://mirror.ctan.org/systems/mac/mactex/MacTeX.pkg
-cd $hier
-open $HOME/Downloads/mirror.ctan.org/systems/mac/mactex/MacTex.pkg
+echo "check if mactex was installed successfully by homebrew, otherwise uncommnet the following"
+    #hier=`pwd`
+    #echo " get MacTex package which should be installed then manually if the MacTex.pkg was not exected (should be .... since open)"
+    #echo " go to $HOME/Downloads and install the MacTeX.pkg (just klick on it)"
+    #cd $HOME/Downloads
+    #echo
+    #echo BETTER DOWNLOAD WITH SAFARI SINCE MUCH QUICKER THAN CHROME
+    #echo
+    #wget -r http://mirror.ctan.org/systems/mac/mactex/MacTeX.pkg
+    #cd $hier
+    #open $HOME/Downloads/mirror.ctan.org/systems/mac/mactex/MacTex.pkg
 
 echo " also try texstudio, i did like it better working at the cmpc"
 

@@ -75,8 +75,8 @@ $1 la 'ls -la'
 $1 ll 'ls -la'
 $1 sl 'ls'
 #$1 rm 'rm -rf'   # too general and maybe too dangerous?
-$1 vi 'vim -v'
-$1 vim 'vim -v'
+#$1 vi 'vim -v'   # is way too slow, better use plain vi
+#$1 vim 'vim -v'  # is way too slow, better use plain vi
 
 $1 gu 'gitup.sh'
 $1 gd 'gitdown.sh'
