@@ -201,7 +201,8 @@ $1 qstatn 'qstatn -d'
     $1 s52 '~/start.5.3.5.20cores.sh' && \
     $1 v5 '~/start.5.3.5.20cores.sh' && \
     $1 v52 '~/start.5.3.5.20cores.sh' && \
-    $1 tmux '/u/aglen/local/bin/tmux'
+    $1 tmux '/u/aglen/local/bin/tmux' && \
+    $1 tar 'gtar'
 
 #$1 vi 'gvim -v' && \
 #$1 vim 'gvim -v' && \
