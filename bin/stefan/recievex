@@ -1,11 +1,15 @@
 #!/bin/sh
 
-scp aglen@gate.rzg.mpg.de:~/.exchange/archive.tar.bzip2 .
+#scp aglen@gate.rzg.mpg.de:~/.exchange/archive.tar.bzip2 .
+scp aglen@gate.rzg.mpg.de:~/.exchange/name-of-archive.tar.gz .
 
 if [ "`hostname`" = "mac" ];then
-    tar -jxvf archive.tar.bzip2
+    #tar -jxvf archive.tar.bzip2
+    gtar -xzvf name-of-archive.tar.gz
 else
-    tar --use-compress-program=lbzip2 -xvf archive.tar.bzip2
+    #tar --use-compress-program=lbzip2 -xvf archive.tar.bzip2
+    tar -xzvf name-of-archive.tar.gz
 fi
-rm archive.tar.bzip2
+#rm archive.tar.bzip2
+rm name-of-archive.tar.gz
 
