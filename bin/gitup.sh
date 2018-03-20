@@ -17,13 +17,15 @@ fi
 #echor : \033[1;31m\!*\033[m
 dot=$HOME/Dropbox/scripts/dotfiles/
 dot=$dotfiles
+
 cd $dot
 echo `pwd`
 one=`pwd | sed 's|^/cmmc/||'`
 one=`echo $one/`
 if [ "$one" != "$dot" ];then
-    echo "you have to be in: $dot"
+    echo "pwd              : `pwd`"
     echo "but you are in   : $one" 
+    echo "you have to be in: $dot"
     exit
 fi
 
