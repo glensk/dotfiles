@@ -23,8 +23,9 @@ autoload -U +X bashcompinit && bashcompinit     # make bash completion function 
 #plugins=(web-search osx colored-man python vi-mode wd autojump z colorize copyfile zsh-syntax-highlighting history-substring-search)
 plugins=(zsh-syntax-highlighting history-substring-search)
 DISABLE_LS_COLORS="true"   # this is necessary to not ignore custom ls aliases
-export ZSH=$HOME/Dropbox/scripts/dotfiles/zsh/oh-my-zsh   # has to be loaded after plugins!
-[ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $HOME/Dropbox/scripts/dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
+export dotfiles=$HOME/Dropbox/Albert/scripts/dotfiles/
+export ZSH=$dotfiles/zsh/oh-my-zsh   # has to be loaded after plugins!
+[ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
 source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 
 #################################################################
@@ -38,7 +39,7 @@ source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 # for tcsh    : setenv currentshell tcsh
 # for bash/zsh: export currentshell='zsh'
 export currentshell='zsh'    # known are zsh / bash / tcsh
-export generalrc="$HOME/Dropbox/scripts/dotfiles/generalrc"
+export generalrc="$dotfiles/generalrc"
 
 #export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 #################################################################
@@ -53,7 +54,7 @@ source $generalrc/generalrc_.sh
 # ###################  !!!!!!!!!!!!!!!!!!!!
 #################################################################
 
-#source $HOME/Dropbox/scripts/dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
+#source $dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
 #alias c='z'
 source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
 alias c='j'
@@ -63,7 +64,7 @@ alias c='j'
 # zsh dependent stuff to use on every system (braucht nur 0.01s)
 # - define colors for ls
 #################################################################
-source $HOME/Dropbox/scripts/dotfiles/zsh/zsh_set
+source $dotfiles/zsh/zsh_set
 
 # time zsh
 # 0) completely empty             : 0.01s

@@ -25,7 +25,7 @@ set grid back ls 12
 
 set pointsize 2
 set terminal x11  enhanced title "Walt's steps " persist raise  # terminal wxt does not work at mac
-name=system("echo $gnuplotfilename")
-plot name using 1:2 with linespoints notitle
+name1=system("echo $gnuplotfilename")
+plot name1 using 1:2 with linespoints notitle
 ##########  #!/usr/bin/gnuplot -persist
 

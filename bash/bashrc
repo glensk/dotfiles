@@ -9,7 +9,8 @@
 # for tcsh    : setenv currentshell tcsh
 # for bash/zsh: export currentshell='zsh'
 export currentshell='bash'
-export generalrc="$HOME/Dropbox/scripts/dotfiles/generalrc"
+export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
+export generalrc="$dotfiles/generalrc"
 source $generalrc/generalrc_.sh
 
 
@@ -19,7 +20,7 @@ alias c='j'
 #################################################################
 # bash dependent stuff to use on every system
 #################################################################
-source $HOME/Dropbox/scripts/dotfiles/bash/bash_set
+source $dotfiles/bash/bash_set
 
 
 #################################################################
@@ -31,7 +32,7 @@ module load pyiron/dev
 
 ## https://github.com/rupa/z
 ## invoke this after fasd otherwise z function will be overwritten by fasd
-#source $HOME/Dropbox/scripts/dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
+#source $dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
 #alias c='z'
 
 #@ timing bash:             sys     user
