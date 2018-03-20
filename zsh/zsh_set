@@ -98,9 +98,9 @@ setopt ALWAYS_TO_END            # Move to the end on complete completion
 ############## zsh-syntax-highlighting ###################################### 0.02s
 ############## zsh-history-substring-search ################################# 0.01s
 #if [ ${ZSH_VERSION//\./} -ge 430 ]; then   ## takes 0.02 sec to load .... too long!
-#source $HOME/Dropbox/scripts/dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #fi
-#[[ $(zsh --version | awk '{print $2}') > 4.3.17 ]] && source $HOME/scripts/dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#[[ $(zsh --version | awk '{print $2}') > 4.3.17 ]] && source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # make commands colorfull (works with zsh > 4.3.17 )
 #@#ZSH_HIGHLIGHT_STYLES[default]=none
 #@#ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red,bold
@@ -124,7 +124,7 @@ setopt ALWAYS_TO_END            # Move to the end on complete completion
 #@#ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
 #@#ZSH_HIGHLIGHT_STYLES[assign]=none
 
-source $HOME/Dropbox/scripts/dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # to secelt menue entro just once with out first leaving menu end then additional
 # enerter press  # when menu shows it would be nice to go directly down and not

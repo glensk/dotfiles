@@ -2,7 +2,7 @@
 
 host=`hostname`
 mylaptop="mac"
-cd $HOME/Dropbox/scripts/dotfiles
+cd $HOME/Dropbox/Albert/scripts/dotfiles
 
 linktcsh="false"
 linkbash="false"
@@ -16,7 +16,6 @@ oncmpc='false'
 onhost=`echo $host | sed 's/\..*$//'`
 echo host  :$host:
 echo onhost:$onhost:
-echo
 
 [ "`echo $onhost | grep -o cmmc`" = "cmmc" ] && oncmmc="true"
 [ "`echo $onhost | grep -o cmmd`" = "cmmd" ] && oncmmd="true"
@@ -45,108 +44,76 @@ echo linkzsh  :$linkzsh:
 echo
 [ "$linkcsh" = "false" ] && [ "$linkcsh" = "false" ] && [ "$linkcsh" = "false" ] && echo "all, {tcsh,bash,zsh}link are false, WHICH SYSTEM?" && exit
 
-#file=/home/$USER/v
-#[ -e $file ] && echo $file unlink && unlink $file
-#[ ! -e "$file" ] && echo $file link && ln -s /nas/glensk/v /home/$USER
-#echo ""
 ####################################################################
-##  Dropbox
+## checking if Dropbox folder exist
 ####################################################################
-#file=/home/$USER/doc 
-#[ -e $file ] && echo $file unlink && unlink $file
-#[ ! -e "$file" ] && echo $file link && ln -s /home/$USER/Dropbox/doc /home/$USER/doc
-#echo ""
-
-
-########################## dotfiles ################################
-## .vim
-## .vimrc
-## .tcshrc
-## .screenrc
-## .xmgracerc
-## .ctags
-## konsole
-########################## dotfiles ################################
-
-
-
-####################################################################
-## Dropbox
-####################################################################
-echo;echo linking Dropbox ...;
+echo "checking if Dropbox folder exist ..."
 HOMEPATH=$HOME   # can be /home/glensk or /Users/glensk
+DB=$HOME/Dropbox
+ME=$DB/Albert
 DATAPATH=/data/$USER
+dotfiles=$ME/scripts/dotfiles
+[ ! -e "$ME/scripts" ] && echo "$ME/scripts does not exist!" && exit
+[ ! -e "$dotfiles" ] && echo "$dotfiles does not exist!" && exit
+echo "                                 ... successfull"
 # @cmmd: folder exist, created by hand
 # @cmpc: folder is linked to /data/glensk/Dropbox by hand
 # @ mac: folder exists, created by dropbox.app
 
-[ ! -e "$HOMEPATH/Dropbox" ] && [ "$oncmpc" = "true" ] && [ -e "/data/glensk/Dropbox" ] && ln -s /data/glensk/Dropbox ~/Dropbox 
-[ ! -e "$HOMEPATH/Dropbox" ] && echo $HOMEPATH/Drobpox folder does not exist && exit
-
-
-
+####################################################################
+## Dropbox
+####################################################################
+echo linking Dropbox ...;
+[ ! -e "$DB" ] && [ "$oncmpc" = "true" ] && [ -e "/data/glensk/Dropbox" ] && ln -s /data/glensk/Dropbox ~/Dropbox 
+[ ! -e "$DB" ] && echo $DB folder does not exist && exit
+[ -e "$DB" ] && echo "                                 ... successfull"
 
 ####################################################################
-# scripts (this i want to link to Dropbox/scripts not to $HOMEPATH/Dropbox/scripts)
+# scripts (this i want to link to Dropbox/Albert/scripts not to $HOMEPATH/Dropbox/Albert/scripts)
 ####################################################################
-if [ -e "$HOMEPATH/scripts" ];then
-    # $HOMEPATH @ mac:  /Users/glensk
-    # $HOMEPATH @ cmpc: /home/glensk
-    # $HOMEPATH @ cmmd: /home/glensk
-    # scripts exist (in every of the above mentioned homefolders the scripts folder should exist)
-     echo;echo linking scripts ...;echo
-     hier=`pwd`
-     cd $HOMEPATH
-     unlink scripts 
-     ln -s Dropbox/scripts scripts
-     cd $hier
-else
-    # scripts does not exist
-    if [ -e "$HOMEPATH/Dropbox/scripts" ];then
-        echo;echo linking scripts ...;echo 
-        hier=`pwd`
-        cd $HOMEPATH
-        #unlink scripts 
-        ln -s Dropbox/scripts scripts
-        cd $hier
-    else
-        echo;echo "!!!!!!!!!!!!!!! scripts could not be linked !!!!!!!!!!!!!!";echo
-    fi
-fi
+echo "linking scripts ..."
+hier=`pwd`
+cd $HOMEPATH
+[ -h scripts ] && unlink scripts
+[ -e scripts ] && echo "$HOMEPATH/scripts seems to exist and not be a link!" && exit
+ln -s $ME/scripts scripts
+[ -h scripts ] && echo "                                 ... successfull"
+cd $hier
    
 ####################################################################
 # Thermodynamics
 ####################################################################
-echo HOMEPATH:$HOMEPATH
-#if [ -e "$HOMEPATH/Dropbox/scripts/Thermodynamics" ];then
-#    echo "linking Thermodynamics (home)...";echo
-#    [ -h $HOMEPATH/Thermodynamics ] && echo unlink $HOMEPATH/Thermodynamics
-#    hier=`pwd`
-#    cd $HOMEPATH   # /home/glensk @ cmpc
-#    [ -e Dropbox/scripts/Thermodynamics ] && [ ! -e Thermodynamics ] && ln -s Dropbox/scripts/Thermodynamics Thermodynamics
-#    [ -e Dropbox/Thermodynamics ] && [ ! -e Thermodynamics ] && ln -s Dropbox/Thermodynamics Thermodynamics
-#    [ ! -e Thermodynamics ] && echo "!!!!!!!!!!!!!!! Thermodynamics could not be linked1 !!!!!!!!!!!!!!"
-#    cd $hier
-#else
-    if [ -e "$HOMEPATH/Thermodynamics" ];then
-        echo "$HOMEPATH/Thermodynamics DOES already exist!!! can not be linked!!!";echo
-    else
-        if [ ! -e "$HOMEPATH/Dropbox/Thermodynamics" ];then
-            echo $HOMEPATH/Dropbox/Thermodynamics not found
-        else
-            # here we know the we dont have the Thermodynamics folder linked but it is available
-            cd $HOMEPATH   # /home/glensk @ cmpc
-            ln -s $HOMEPATH/Dropbox/Thermodynamics $HOMEPATH/Thermodynamics
-            [ ! -e "$HOMEPATH/Thermodynamics" ] && echo "!!!!!!!!!!!!!!! Thermodynamics could not be linked1 !!!!!!!!!!!!!!"
-            [ -e "$HOMEPATH/Thermodynamics" ] && echo "Thermodynamics was correctly linked"
-            #[ -e Dropbox/scripts/Thermodynamics ] && [ ! -e Thermodynamics ] && unlink Thermodynamics && ln -s Dropbox/scripts/Thermodynamics Thermodynamics
-            #[ -e Dropbox/Thermodynamics ] && [ ! -e Thermodynamics ] && unlink Thermodynamics && ln -s Dropbox/Thermodynamics Thermodynamics
-            #[ ! -e Thermodynamics ] && echo "!!!!!!!!!!!!!!! Thermodynamics could not be linked1 !!!!!!!!!!!!!!"
-            cd $hier
-        
-        fi
-    fi
-#fi
+echo "linking Thermodynamics ..."
+hier=`pwd`
+cd $HOMEPATH
+[ -h Thermodynamics ] && unlink Thermodynamics
+[ -e Thermodynamics ] && echo "$HOMEPATH/Thermodynamics seems to exist and not be a link!" && exit
+ln -s $ME/Thermodynamics Thermodynamics
+[ -h Thermodynamics ] && echo "                                 ... successfull"
+cd $hier
+
+
+
+#@ echo HOMEPATH:$HOMEPATH
+#@     if [ -e "$HOMEPATH/Thermodynamics" ];then
+#@         echo "$HOMEPATH/Thermodynamics DOES already exist!!! can not be linked!!!";echo
+#@     else
+#@         if [ ! -e "$HOMEPATH/Albert/Dropbox/Thermodynamics" ];then
+#@             echo $HOMEPATH/Albert/Dropbox/Thermodynamics not found
+#@         else
+#@             # here we know the we dont have the Thermodynamics folder linked but it is available
+#@             cd $HOMEPATH   # /home/glensk @ cmpc
+#@             ln -s $HOMEPATH/Albert/Dropbox/Thermodynamics $HOMEPATH/Thermodynamics
+#@             [ ! -e "$HOMEPATH/Thermodynamics" ] && echo "!!!!!!!!!!!!!!! Thermodynamics could not be linked1 !!!!!!!!!!!!!!"
+#@             [ -e "$HOMEPATH/Thermodynamics" ] && echo "Thermodynamics was correctly linked"
+#@             #[ -e Dropbox/scripts/Thermodynamics ] && [ ! -e Thermodynamics ] && unlink Thermodynamics && ln -s Dropbox/scripts/Thermodynamics Thermodynamics
+#@             #[ -e Dropbox/Thermodynamics ] && [ ! -e Thermodynamics ] && unlink Thermodynamics && ln -s Dropbox/Thermodynamics Thermodynamics
+#@             #[ ! -e Thermodynamics ] && echo "!!!!!!!!!!!!!!! Thermodynamics could not be linked1 !!!!!!!!!!!!!!"
+#@             cd $hier
+#@         
+#@         fi
+#@     fi
+#@ #fi
 if [ -e "/data/glensk" ];then
     echo "linking Thermodynamics (data)...";echo
     # this exists at mac and cmpc
@@ -158,17 +125,20 @@ if [ -e "/data/glensk" ];then
     cd $hier
 fi
 
-[ ! -e "$HOMEPATH/proj" ] && [ -e "$HOMEPATH/Dropbox/proj" ] && echo "linking ~/proj" && ln -s $HOMEPATH/Dropbox/proj $HOMEPATH/proj
+####################################################################
+# 
+####################################################################
+echo "linking diverses ..."
+[ ! -e "$ME/proj" ] && [ -e "$ME/proj" ] && echo "linking ~/proj" && ln -s $ME/proj $HOMEPATH/proj
 
-[ ! -e "$HOMEPATH/Documents" ] && [ -e "$HOMEPATH/Dropbox/Documents" ] && echo "~/linking ~/Documents" && ln -s $HOMEPATH/Dropbox/Documents $HOMEPATH/Documents
+[ ! -e "$HOMEPATH/Documents" ] && [ -e "$ME/Documents" ] && echo "~/linking ~/Documents" && ln -s $ME/Documents $HOMEPATH/Documents
 
-[ -e "$HOMEPATH/scripts/dotfiles/commands" ] && [ ! -e "$HOMEPATH/scripts/commands" ] && echo "linking ~/scripts/commands" && ln -s $HOMEPATH/scripts/dotfiles/commands $HOMEPATH/scripts/commands
-
-
+[ -e "$HOMEPATH/scripts/dotfiles/commands" ] && [ ! -e "$HOMEPATH/scripts/commands" ] && echo "linking ~/scripts/commands" && ln -s $dotfiles/commands $HOMEPATH/scripts/commands
 
 
 
-dotfiles=$HOMEPATH/Dropbox/scripts/dotfiles
+
+
 
 
 

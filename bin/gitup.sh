@@ -15,11 +15,17 @@ fi
 #echo "#### cd $HOME/scripts #################";cd $HOME/scripts | echo "";\\
 #echo "#### now in `pwd` #####################";echo;\\
 #echor : \033[1;31m\!*\033[m
-dot=$HOME/Dropbox/scripts/dotfiles
+dot=$HOME/Dropbox/scripts/dotfiles/
+dot=$dotfiles
 cd $dot
 echo `pwd`
-echo `pwd` | sed 's|^/cmmc/||'
-[ "`pwd | sed 's|^/cmmc/|/|'`" != "$dot" ] && echo you have to be in $dot directory and you are not && exit
+one=`pwd | sed 's|^/cmmc/||'`
+one=`echo $one/`
+if [ "$one" != "$dot" ];then
+    echo "you have to be in: $dot"
+    echo "but you are in   : $one" 
+    exit
+fi
 
 if [ "$1" != "-oo" ];then
 echo "#######################################"
@@ -76,7 +82,8 @@ if [ "`hostname`" = "$mylaptop" ];then
     echo "#######################################"
     echo "#### update cmpc (and cmmd) ###########"
     echo "#######################################"
-    ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
+    #ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
+    ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/Albert/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
     echo "#######################################"
     echo "#### update cmpc (and cmmd) DONE ######"
     echo "#######################################"
@@ -88,7 +95,7 @@ if [ "`hostname`" = "$mylaptop" ];then
     #echo "#######################################"
     #echo "#### update cmmc ######################"
     #echo "#######################################"
-    #ssh.sh -t glensk@$myhost.mpie.de "/home/glensk/Dropbox/scripts/dotfiles/bin/ssh.sh -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd /cmmc/u/aglen/Dropbox/scripts/dotfiles;module load git;./bin/gitdown.sh\""
+    #ssh.sh -t glensk@$myhost.mpie.de "/home/glensk/Dropbox/Albert/scripts/dotfiles/bin/ssh.sh -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd /cmmc/u/aglen/Dropbox/Albert/scripts/dotfiles;module load git;./bin/gitdown.sh\""
     #echo
     #echo
     #echo

@@ -178,3 +178,19 @@ echo "#######################################"
 git commit -m "first commit"
 git remote add origin https://github.com/glensk/dotfiles.git
 git push -u origin master
+
+
+
+echo "#######################################"
+echo "# conda install"
+echo "#######################################"
+echo 'bash Downloads/Miniconda3-latest-MacOSX-x86_64.sh'
+conda install -c conda-forge lmfit   # for phonon_lifetimes.py
+conda install -c conda-forge ase
+conda install --channel matsci pymatgen
+conda install scikit-learn
+conda install -c conda-forge lightgbm
+conda install ipython
+conda install h5py
+conda install jupyter
+conda install -c anaconda future 

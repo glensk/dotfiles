@@ -14,7 +14,7 @@
 ###################################################################################
 # HOST dependent variables (prompt, module load, anaconda (on cmmc with module load) ...)
 ###################################################################################
-eval `$generalrc/generalrc_hostdependent.sh`  
+eval `$generalrc/generalrc_hostdependent.sh`   
 # defines:  {onmac, oncmmc, oncmdft} to true or false
 #           currenthost to {onmac, oncmmc, oncmdft}
 #           myshell to {zsh,bash, tcsh}
@@ -26,7 +26,7 @@ eval `$generalrc/generalrc_hostdependent.sh`
 # printloadstat was defined in $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
-# PATH  (anaconda)
+# PATH  (anaconda on mac)
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $currenthost` 
 #[ "$oncmmc" = "true" ] && load_local_anaconda DOES NOT WORK
@@ -94,7 +94,8 @@ setenv LANG C     # necessary for perl
     
 setenv GIT_EDITOR vim
 setenv PAGER most
-setenv BROWSER chrome
+#setenv BROWSER chrome
+setenv BROWSER open # is necessary for opening jupyter notebook files
 setenv LC_ALL en_US.UTF-8
 setenv GREP_COLOR 31    # red; some greps have colorized ouput. enable...
 setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green

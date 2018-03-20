@@ -41,16 +41,16 @@ $1 h 'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high fol
 $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh
 
 
-$1 prx 'cd $HOME/Dropbox/proj/0000_paper_antraege/2013.12_PRX_Al_Cu_vakanz'
-$1 prl 'cd $HOME/dropbox/proj/0000_paper_antraege/2015.02_PRL_origin_anharmonicity'
-$1 diss 'cd $HOME/Dropbox/proj/0000_paper_antraege/2015.12_Dissertation'
-$1 curr 'cd $HOME/Dropbox/proj/proj_current'
+$1 prx  'cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2013.12_PRX_Al_Cu_vakanz'
+$1 prl  'cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.02_PRL_origin_anharmonicity'
+$1 diss 'cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.12_Dissertation'
+$1 curr 'cd $HOME/Dropbox/Albert/proj/proj_current'
 $1 ptmp 'cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes'
 
 $1 vimrc 'vi $HOME/.vimrc'
 $1 vip 'vi $HOME/.ipython/profile_default/ipython_config.py'
 $1 virc 'vi $HOME/.`echo $currentshell`rc'
-$1 virca 'vi $HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_.sh'
+$1 virca 'vi $dotfiles/generalrc/generalrc_alias_.sh'
 
 $1 cd.. 'cd ..'
 $1 .. 'cd ..'
@@ -58,8 +58,8 @@ $1 .... 'cd ../..'
 $1 ...... 'cd ../../..'
 
 #$1 rx 'recievex'
-$1 rx '$HOME/Dropbox/scripts/dotfiles/bin/stefan/recievex'
-$1 rxo '$HOME/Dropbox/scripts/dotfiles/bin/stefan/recievexoxford'
+$1 rx '$dotfiles/bin/stefan/recievex'
+$1 rxo '$dotfiles/bin/stefan/recievexoxford'
 $1 sx 'sendx'
 $1 sxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; cp ../lammps_pos_to_sum.py .; sendx lammps_pos_to_sum.py;cd $hier'
 $1 rxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; recievex; cp lammps_pos_to_sum.py .. ;cd $hier'
@@ -69,8 +69,8 @@ $1 rxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; recievex
 ##############################
 # system
 ##############################
-$1 clearpath 'source $HOME/Dropbox/scripts/dotfiles/bin/clearpath.sh'
-$1 ra '$HOME/Dropbox/scripts/dotfiles/generalrc/generalrc_alias_renew.sh'
+$1 clearpath 'source $dotfiles/bin/clearpath.sh'
+$1 ra '$dotfiles/generalrc/generalrc_alias_renew.sh'
 $1 la 'ls -la'
 $1 ll 'ls -la'
 $1 sl 'ls'
@@ -93,9 +93,9 @@ $1 s './run.sh'
 $1 pu 'pushd `pwd`'
 $1 po 'popd'
 
-$1 extract '$HOME/Dropbox/scripts/dotfiles/bin/extract.sh'
+$1 extract '$dotfiles/bin/extract.sh'
 
-$1 weekly_update 'cd $HOME/Dropbox/scripts/dotfiles/cron;./weeklyupdate.sh'
+$1 weekly_update 'cd $dotfiles/cron;./weeklyupdate.sh'
 
 
 $1 du 'echo ______better ncdu______;echo; du'
@@ -120,8 +120,8 @@ $1 killall 'killall -9'
 
 $1 gnuplot 'gnuplot -persist'
 $1 i 'ipython'
-#$1 load_last_saved_settings='$HOME/Dropbox/scripts/dotfiles/mac_KeyRemap4MacBook/load_last_saved_settings.sh'
-$1 cpdf '$HOME/Dropbox/scripts/dotfiles/bin/cpdf-binaries/OSX-Intel/cpdf'
+#$1 load_last_saved_settings='$dotfiles/mac_KeyRemap4MacBook/load_last_saved_settings.sh'
+$1 cpdf '$dotfiles/bin/cpdf-binaries/OSX-Intel/cpdf'
 $1 df 'df -h' # | grep $USER'
 $1 sp 'settitlepath.sh'
 #$1 con 'google contacts list --fields name,email,phone_number,address,birthday --title "(?i).*\!*"'
@@ -166,7 +166,7 @@ $1 qstatn 'qstatn -d'
     $1 math '/Applications/Mathematica.app/Contents/MacOS/MathKernel' && \
     $1 mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica' && \
     #$1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
-    $1 units '$HOME/scripts/dotfiles/bin/units/units-1.88/units' && \
+    $1 units '$dotfiles/bin/units/units-1.88/units' && \
     $1 top 'top -o cpu' && \
     $1 trash "rmtrash" && \
     $1 del "rmtrash" && \
@@ -176,7 +176,7 @@ $1 qstatn 'qstatn -d'
     $1 mvim     'open /Applications/MacVim.app'
 
 
-    #alias sed='$HOME/scripts/dotfiles/bin/sed/sed-4.2/build/bin/sed-4.2'
+    #alias sed='$dotfiles/bin/sed/sed-4.2/build/bin/sed-4.2'
     #alias mvim='open /Applications/MacVim.app'
     #alias cat 'colorize'  # colorize seems to have sometimes problems
 

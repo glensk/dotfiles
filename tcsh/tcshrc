@@ -8,7 +8,8 @@ if ( $?PYTHONPATH == 0 ) setenv PYTHONPATH ""
 # read in general variables on{mac,cmmc,cmmd},printloadstat
 #################################################################
 setenv currentshell tcsh
-setenv generalrc $HOME/Dropbox/scripts/dotfiles/generalrc
+setenv dotfiles $HOME/Dropbox/Albert/scripts/dotfiles/
+setenv generalrc $dotfiles/generalrc
 source $generalrc/generalrc_.sh
 
 
@@ -19,13 +20,13 @@ source $generalrc/generalrc_.sh
 # tcsh dependent stuff to use on every system
 #################################################################
 #	settings  for interactive shells
-source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.set
+source $dotfiles/tcsh/tcshrc.set
 
 #	bindkeys   for interactive shells
-source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.bindkey
+source $dotfiles/tcsh/tcshrc.bindkey
 
 #	completions for interactive shells
-source $HOME/Dropbox/scripts/dotfiles/tcsh/tcshrc.complete
+source $dotfiles/tcsh/tcshrc.complete
 #	git settings  (makes problems at cmmc)
 #source $HOME/.git-completion.tcsh
 

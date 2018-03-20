@@ -9,16 +9,16 @@
 #########################################################################
 # on every system: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ...)
 #########################################################################
-dropboxbin="$HOME/Dropbox/scripts/dotfiles/bin"       # Dropbox binaries
+dropboxbin="$dotfiles/bin"       # Dropbox binaries
 #anacondaold="/usr/local/bin"   # use this to install macvim @mac otherwise interference with homebrew python
 #anaconda="$HOME/anaconda/bin"  # don't load anaconda on cmmc since the module is available
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
 bin="/usr/bin"
-bin2="$HOME/Dropbox/scripts/dotfiles/sources_bin"
-bin3="$HOME/Dropbox/scripts/dotfiles/bin/stefan"
-bin4="$HOME/Dropbox/scripts/dotfiles/lammps_scripts"
-bin5="$HOME/Dropbox/scripts/dotfiles/bin/phonon_lifetimes"
+bin2="$dotfiles/sources_bin"
+bin3="$dotfiles/bin/stefan"
+bin4="$dotfiles/lammps_scripts"
+bin5="$dotfiles/bin/phonon_lifetimes"
 #PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
 PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5"
 #PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
@@ -35,9 +35,10 @@ if [ "$currenthost" = "onmac" ];then
     # $PATH (on mac)
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
-    anaconda="$HOME/anaconda2/bin"  # don't load anaconda on cmmc since the module is available
+    #anaconda="$HOME/anaconda2/bin"  # don't load anaconda on cmmc since the module is available
+    anaconda="$HOME/miniconda3/bin"  # don't load anaconda on cmmc since the module is available
     brew="/usr/local/opt/coreutils/libexec/gnubin" 
-    tdep="$HOME/Dropbox/scripts/phonons/tdep-devel/bin"
+    tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
     #phonopybin="$phonopy/bin"
     phonopybin="$HOME/.local/bin"

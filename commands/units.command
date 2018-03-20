@@ -225,3 +225,12 @@ You want: meV
         / 0.0015690234
 You have: ^C
 
+was ist der beitrag von vakanzen zur freieen energie bei hohen temperatruen?
+bei 2000Kelvin und einer conzentration von 10^-2 (schon relativ hohe conzentration an vakanzen)
+
+    You have: 10^-2*k*2000K
+    You want: meV
+      * 1.7234685
+      *   / 0.5802253
+      *   You have:
+      --> Beitrag ist um die 1.7meV zur freien Energie.
