@@ -75,6 +75,7 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 #echo 
 
 [ "`hostname`" = "cmmc002" ] && load_local_anaconda
+[ "`hostname`" = "cmmc001" ] && load_local_anaconda
 ##############################################
 # set host unspecific variables  
 ##############################################
