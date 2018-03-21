@@ -3,13 +3,12 @@
 [ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
 #tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 $*
 #tar -cvf archive.tar.bzip2 $*
-rm name-of-archive.tar.gz
+[ -e "name-of-archive.tar.gz" ] && rm name-of-archive.tar.gz
 tar -czvf name-of-archive.tar.gz $*
 #scp archive.tar.bzip2 aglen@gate.rzg.mpg.de:~/.exchange/
 echo 'scp name-of-archive.tar.gz aglen@gate.rzg.mpg.de:~/.exchange/'
 scp name-of-archive.tar.gz aglen@gate.rzg.mpg.de:~/.exchange/
 #rm archive.tar.bzip2
-echo 'rm name-of-archive.tar.gz'
-#rm name-of-archive.tar.gz
+[ -e "name-of-archive.tar.gz" ] && echo 'rm name-of-archive.tar.gz' && rm name-of-archive.tar.gz
 
 
