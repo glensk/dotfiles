@@ -326,7 +326,7 @@ file=$HOMEPATH/.dir_colors
 [ -h $file ] && unlink $file
 [ -e $file ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/terminal_colors $file
-
+echo 'nnnnnnnn'
 file=$HOMEPATH/.ipython/profile_default/ipython_config.py
 [ -h $file ] && unlink $file
 [ -e $file ] && echo $file rm && rm -rf $file
