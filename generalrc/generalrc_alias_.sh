@@ -101,7 +101,7 @@ $1 po 'popd'
 
 $1 extract '$dotfiles/bin/extract.sh'
 
-$1 weekly_update 'cd $dotfiles/cron;./weeklyupdate.sh'
+$1 monthly_update 'cd $dotfiles/cron;./monthlyupdate.sh'
 
 
 $1 du 'echo ______better ncdu______;echo; du'
