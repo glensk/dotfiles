@@ -353,6 +353,11 @@ file=$HOMEPATH/.subversion/config
 [ -e $file ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/subversion/config $file
 
+file=$HOMEPATH/.pyiron
+[ -h $file ] && unlink $file
+[ -e $file ] && echo $file rm && rm -rf $file
+[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/other_dotfiles/pyiron $file
+
 file=$HOMEPATH/.vimrc
 [ -h "$file" ] && unlink $file 
 [ -f "$file" ] && echo $file rm && rm -rf $file 
