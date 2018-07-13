@@ -87,9 +87,12 @@ echo "linking Thermodynamics ..."
 hier=`pwd`
 cd $HOMEPATH
 [ -h Thermodynamics ] && unlink Thermodynamics
-[ -e Thermodynamics ] && echo "$HOMEPATH/Thermodynamics seems to exist and not be a link!" && exit
-ln -s $ME/Thermodynamics Thermodynamics
-[ -h Thermodynamics ] && echo "                                 ... successfull"
+if [ -e Thermodynamics ];then 
+    echo "$HOMEPATH/Thermodynamics seems to exist and not be a link!" && exit
+else
+    ln -s $ME/Thermodynamics Thermodynamics
+    [ -h Thermodynamics ] && echo "                                 ... successfull"
+fi
 cd $hier
 
 
