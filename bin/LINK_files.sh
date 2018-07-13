@@ -88,7 +88,7 @@ hier=`pwd`
 cd $HOMEPATH
 [ -h Thermodynamics ] && unlink Thermodynamics
 if [ -e Thermodynamics ];then 
-    echo "$HOMEPATH/Thermodynamics seems to exist and not be a link!" && exit
+    echo "$HOMEPATH/Thermodynamics seems to exist and not be a link! (before this was a reason to exit....)"
 else
     ln -s $ME/Thermodynamics Thermodynamics
     [ -h Thermodynamics ] && echo "                                 ... successfull"
