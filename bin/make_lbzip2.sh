@@ -1,5 +1,5 @@
 #!/bin/sh
-filenameall="OUTCAR vasprun.xml XDATCAR POTCAR OSZICAR ion_energies dUdLallInfo_noJumps dUdLallInfo"
+filenameall="OUTCAR XDATCAR POTCAR OSZICAR ion_energies dUdLallInfo_noJumps dUdLallInfo XDATCAR vasprun.xml"
 for filename in $filenameall;do
         echo ""
         echo "############## $filename ############"
