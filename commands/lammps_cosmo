@@ -1,0 +1,16 @@
+cd /Users/glensk/Dropbox/Albert/scripts/lammps_cosmo
+git clone https://github.com/cosmo-epfl/lammps.git
+git checkout runner-lammps
+cd src
+make ps
+make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RIGID yes-USER-MISC
+make yes-USER-RUNNER
+make serial
+
+
+cd /Users/glensk/Dropbox/Albert/scripts/lammps_cosmo/first_input_natascha/test_1
+../../lammps/src/lmp_serial -i in.lmp
+
+
+data.lmp: structure (fcc 4x4x4 supercell with 216 atoms)
+scaling.data and weiths.028xxx and input.nn define the NN potential 

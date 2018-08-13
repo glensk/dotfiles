@@ -293,6 +293,24 @@ Mobil: +49 (0)160 950 46896</string>
 			<key>uuidString</key>
 			<string>17255D19-8848-4C4F-9588-1DE4EFFCA491</string>
 		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;ch</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2018-07-27T05:47:54Z</date>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2018-07-27T05:48:46Z</date>
+			<key>plainText</key>
+			<string>Chemin de la Pommeraie 21</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>2913FC2D-C95F-4180-B65C-16AFC1D28221</string>
+		</dict>
 	</array>
 	<key>snippetUUIDs</key>
 	<array>
@@ -309,6 +327,7 @@ Mobil: +49 (0)160 950 46896</string>
 		<string>BD409DA0-899D-4904-A16A-AB705D2383DB</string>
 		<string>5658D12E-1C53-45FE-8A11-3B785F183405</string>
 		<string>17255D19-8848-4C4F-9588-1DE4EFFCA491</string>
+		<string>2913FC2D-C95F-4180-B65C-16AFC1D28221</string>
 	</array>
 	<key>suggestAbbreviations</key>
 	<integer>1</integer>

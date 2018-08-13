@@ -1,0 +1,3 @@
+cd /Users/glensk/Dropbox/Albert/scripts
+git clone https://github.com/ceriottm/i-pi-mc
+git checkout kmc-al6xxx
