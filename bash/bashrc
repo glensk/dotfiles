@@ -9,7 +9,7 @@
 # for tcsh    : setenv currentshell tcsh
 # for bash/zsh: export currentshell='zsh'
 export currentshell='bash'
-export dotfiles="$HOME/Dropbox/Albert/google_drive/dotfiles/"
+export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 export generalrc="$dotfiles/generalrc"
 source $generalrc/generalrc_.sh
 
