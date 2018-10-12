@@ -1,0 +1,2 @@
+echo now:$1:
+open -a MacVim.app $1

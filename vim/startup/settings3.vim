@@ -6,8 +6,8 @@ autocmd BufWinLeave *.* mkview
 autocmd BufWinEnter *.* silent loadview
 " suggested by restore_view.vim plugin
 set viewoptions=cursor,folds,slash,unix
-"set foldmethod=indent   " foldmethod=marker   
-set foldmethod=syntax    " now trying for c code
+set foldmethod=indent   " foldmethod=marker   
+"set foldmethod=syntax    " now trying for c code
 set foldmarker={,}
 set foldnestmax=2
 set foldlevel=99

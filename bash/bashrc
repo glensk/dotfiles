@@ -9,25 +9,30 @@
 # for tcsh    : setenv currentshell tcsh
 # for bash/zsh: export currentshell='zsh'
 export currentshell='bash'
-export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
+export dotfiles="$HOME/Dropbox/Albert/google_drive/dotfiles/"
 export generalrc="$dotfiles/generalrc"
 source $generalrc/generalrc_.sh
 
-
-source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
+if [ "1" = "1" ];then
+#source $HOME/.autojump/etcrofile.d/autojump.sh  # =0.005-0.006s
+[[ -s /home/glensk/.autojump/etc/profile.d/autojump.sh ]] && echo "jojo" && source /home/glensk/.autojump/etc/profile.d/autojump.sh
 alias c='j'
+fi
 
 #################################################################
 # bash dependent stuff to use on every system
-#################################################################
+#
+################################################################
 source $dotfiles/bash/bash_set
 
 
 #################################################################
 # for pyron jupyter hub (juypter notebook)
 #################################################################
+if [ "`which module`" != "" ];then
 module unload anaconda
 module load pyiron/dev
+fi
 
 
 ## https://github.com/rupa/z
@@ -51,3 +56,5 @@ module load pyiron/dev
 #@ 6) 5+prompt              0.010   0.008  
 #@ 7) 6+thermodynamics      0.014   0.012  =0.004 (davon 0.003 fuer OUTCAR_complete stuff)
 #@ 8) 7+whole generalrc.sh  0.014   0.012  
+
+#export PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "

@@ -1,0 +1,5 @@
+su local
+sudo apt-get install terminator
+sudo apt-get install vim-gnome
+sudo apt-get install tmux
+

@@ -34,15 +34,57 @@ Host garching2
     Hostname cmmc001.bc.rzg.mpg.de
     IdentityFile /Users/glensk/.ssh/garching2
 
-Host gate
-    User aglen
-    Hostname gate.rzg.mpg.de
-    IdentityFile /Users/glensk/.ssh/gate
 
 Host gatefromcmmc
     User aglen
     Hostname gate.rzg.mpg.de
     IdentityFile /cmmc/u/aglen/.ssh/gatefromcmmc
+
+Host gate
+ HostName gate.rzg.mpg.de
+ User aglen
+ IdentityFile /Users/glensk/.ssh/gate
+
+#Host gar
+# HostName cmmc002.bc.rzg.mpg.de
+# User aglen
+# ProxyCommand ssh -q -Y aglen@gate.rzg.mpg.de -W %h:%p
+
+Host ela
+ HostName ela.cscs.ch
+ User aglensk
+
+Host daint
+ HostName daint.cscs.ch
+ User aglensk
+ ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
+
+Host cmmc002
+HostName cmmc002.bc.rzg.mpg.de
+User aglen
+ProxyCommand ssh -W %h:%p gatezero.rzg.mpg.de 2>/dev/null
+GSSAPIAuthentication yes
+GSSAPIDelegateCredentials yes
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub aglen@gatezero.rzg.mpg.de (after running ssh-keygen)
+Host gar
+HostName gatezero.rzg.mpg.de
+User aglen
+GSSAPIAuthentication yes
+GSSAPIDelegateCredentials yes
+ControlMaster auto
+ControlPath ~/.ssh/control:%h:%p:%r
+
+#ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@lsmxsrv2.epfl.ch
+Host lsmx
+ HostName lsmxsrv2.epfl.ch
+ User glensk
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
+Host fidis
+ HostName fidis.epfl.ch
+ User glensk
+
 
 # make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
 # information how to set up passwordless login to cmmc see christophs mail: google

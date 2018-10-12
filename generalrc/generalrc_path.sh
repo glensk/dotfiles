@@ -19,15 +19,19 @@ bin2="$dotfiles/sources_bin"
 bin3="$dotfiles/bin/stefan"
 bin4="$dotfiles/lammps_scripts"
 bin5="$dotfiles/bin/phonon_lifetimes"
-#PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
-PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5"
+bin6="$HOME/.local/bin"
+ipi="$HOME/google_drive/scripts_epfl/i-pi-mc/bin"
+kmc="$HOME/google_drive/Glensk/KMC-Tutorial/scripts"
+runnertools="$HOME/google_drive/scripts_epfl/runner_tools/runner_tools"
+#PATH="$dropboxbin:$kmc:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
+PATH="$PATH:$kmc:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+#PATH="$PATH:$dropboxbin:$ipi:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 #PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 #PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
 #pythermodynamics=
-#PYTHONPATH="$PYTHONPATH:"
 #########################################################################
 # on mac: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
 #########################################################################
@@ -36,19 +40,21 @@ if [ "$currenthost" = "onmac" ];then
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
     #anaconda="$HOME/anaconda2/bin"  # don't load anaconda on cmmc since the module is available
-    anaconda="$HOME/miniconda3/bin"  # don't load anaconda on cmmc since the module is available
+    #anaconda="$HOME/miniconda3/bin"  # don't load anaconda on cmmc since the module is available
+    #anaconda=""  # don't load anaconda on cmmc since the module is available
     brew="/usr/local/opt/coreutils/libexec/gnubin" 
-    tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
+    #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
     #phonopybin="$phonopy/bin"
-    phonopybin="$HOME/.local/bin"
-    phonopybin2="$HOME/.miniconda2/bin"
+    #phonopybin="$HOME/.local/bin"
+    #phonopybin2="$HOME/.miniconda2/bin"
+    #phonopybin2=""
     vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
     #sphinx="$HOME/Dropbox/scripts/phonons/sphinx/bin"
 
 
-    # $PYTHONPATH (on mac)
+    # (on mac)
     pygraceplot="$HOME/scripts/python/graceplot"
     pylammps1="/usr/local/Cellar/lammps/2014.02.12/lib/python2.7/site-packages"
     pylammps2="/usr/local/lib/python2.7/site-packages"  # this is too general an might import libs from non anaconda python 
@@ -67,10 +73,12 @@ if [ "$currenthost" = "onmac" ];then
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
     #[ "$host" = "$mylaptop" ] && \
-    PATH="$sed:$brew:$anaconda:$tdep:$phonopy:$phonopybin:$phonopybin2:$vasp:$PATH" #&& \
+    PATH="$sed:$brew:$phonopy:$vasp:$PATH" #&& \
+    #PATH="$sed:$brew:$tdep:$phonopy:$vasp:$PATH" #&& \
+    #PATH="$sed:$brew:$anaconda:$tdep:$phonopy:$phonopybin:$phonopybin2:$vasp:$PATH" #&& \
     #PYTHONPATH="$pygraceplot:$pylammps1:$pylammps2:$pyphonopy1:$PYTHONPATH" #&& \
     # for Miniconda2 use:
-    PYTHONPATH="/Users/glensk/.miniconda2"
+    #PYTHONPATH="/Users/glensk/.miniconda2"
     LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
 fi
 

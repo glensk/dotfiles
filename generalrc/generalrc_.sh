@@ -26,7 +26,8 @@ eval `$generalrc/generalrc_hostdependent.sh`
 # printloadstat was defined in $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
-# PATH  (anaconda on mac)
+# PATH, PYTHONPATH  (anaconda on mac)
+# PYTHONPATH should not be set (according to anaconda/miniconda)
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $currenthost` 
 #[ "$oncmmc" = "true" ] && load_local_anaconda DOES NOT WORK
@@ -59,11 +60,15 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 ##############################################
 # PROMPT & tabcolor
 ##############################################
+#echo 
+#echo
+#echo "currentshell $currentshell"
+#echo 
+#echo
 [ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_prompt_tcsh.sh
 [ "$currentshell" = "zsh" ] && source $generalrc/generalrc_prompt_zsh.sh
 [ "$currentshell" = "bash" ] && source $generalrc/generalrc_prompt_bash.sh
 [ "$onmac" = "true" ] && tab-color magenta
-
 
 #echo
 #echo MYSHELL $myshell;
@@ -81,9 +86,10 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 ##############################################
 setenv thermodynamics "$HOME/Thermodynamics"
 setenv convcrit 0.5
+if [ -e "$thermodynamics/utilities/" ];then
 [ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add
 [ "$currentshell" != "tcsh" ] && source $thermodynamics/utilities/bashrc_add
-
+fi
 
 [ "$currentshell" != "bash" ] && limit coredumpsize 0    # Disable core dumps
 setenv EDITOR vim   

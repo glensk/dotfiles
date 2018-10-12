@@ -31,7 +31,8 @@ Plugin 'https://github.com/kana/vim-fakeclip' " pseudo clipboard register
 source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now tab)
                                               " never change this to tab since this breaks 
                                               " completion in :Plugin<TAB> command line mode
-source ~/.vim/startup/vundle_vim-airline.vim  " get some more colors for statusline 
+"source ~/.vim/startup/vundle_vim-airline.vim  " get some more colors for statusline  --> standard is better
+set statusline="%f%m%r%h%w [%Y] [0x%02.2B]%< %F%=%4v,%4l %3p%% of %L"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " VUNDLE PLUGINS TRYING """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -70,7 +71,10 @@ set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl
 ""inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung, 
 
-hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments
+hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (darkred)
+"hi Comment  guifg=#80a0ff ctermfg=gray " Color for comments (darkred)
+"hi Comment  guifg=#80a0ff ctermfg=darkgray " Color for comments (darkred)
+"hi Comment  guifg=#80a0ff ctermfg=lightgray " Color for comments (darkred)
 autocmd FileType python,sh setlocal nospell         " No spellcorrection for vim
 
 " from

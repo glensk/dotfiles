@@ -10,7 +10,6 @@ local user_host="%{$fg[$myprompthostuser]%}%n@%m%{$reset_color%}"
 local current_dir="%{$fg[$mypromptpath]%}%d%{$reset_color%}"
 PROMPT="${prompttime} ${user_host} ${current_dir} ${svn_branch}
 %#"
-
 #PS1=$'\e[0;31m$ \e[0m'
 #PS1=$'\e[0;31m$ \e[0m'
 

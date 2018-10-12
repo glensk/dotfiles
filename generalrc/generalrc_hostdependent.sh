@@ -27,6 +27,18 @@ echo "setenv host $host;
 # Prompt colors: use 
 # time:             zsh: magenta;    bash: orange;      tcsh: green
 # host& path:       mac: magenta;    cmpc: red;       cmmd: blue;    cmmc:turquoise
+
+##############################################################################
+# fall back options
+##############################################################################
+onxxx="setenv ka kb"
+currenthost="setenv currenthost unknown"
+myshell="setenv myshell bash"
+myprompttime="setenv myprompttime magenta"
+myprompthostuser="setenv myprompthostuser red"
+mypromptpath="setenv mypromptpath red"
+module="setenv GZIP -9"   # an empty string ("") is not possible, better use dummy
+add="setenv ka kb"      # an empty string ("") is not possible, better use dummy
 if [ "$host" = "mac" ];then
     onxxx="setenv onmac true"
     currenthost="setenv currenthost onmac"
@@ -70,7 +82,10 @@ else
 #    mypromptpath="setenv mypromptpath blue"
 #    module="module load sge vasp/parallel/4.6-tdi sphinx/serial/2.0.4"
 #    add="setenv TMPDIR /scratch/$USER;limit stacksize unlimited;setenv GRACE_HOME /data/grabowski/xmgrace/grace-5.1.22/"
-fi;fi;fi
+else
+    if [ "`echo $host | grep -o cosmopc`" = "cosmopc" ];then
+    myshell="setenv myshell zsh"
+fi;fi;fi;fi
 
 ###################################################
 # output defined variables

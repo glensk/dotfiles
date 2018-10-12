@@ -73,6 +73,9 @@ set myprompthostuser=33
 #PS1="[\j] \A \e[04;34m\u\e[m@\e[04;33m\H $PWD\e[m\n$"
 #PS1="$Yellow[\j] \t $Red\u@\H $PWD\e[m\n$"
 #PS1="$Yellow\t $myprompthostuser\u@\H $PWD\e[m\n$"
-PS1="$Yellow\t $myprompthostuser\u@\H $PWD\e[m\n$"
+#PS1="$Yellow\t $myprompthostuser\u@\H $PWD\e[m\n$"
+#PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "
+#PS1="${RESET}${YELLOW}\t \u@\H \`${SELECT}\` ${YELLOW}PWD >${NORMAL} "
+PS1='\[`[ $? = 0 ] && X=2 || X=1; tput setaf $X`\]\t \u@\H\[`tput sgr0`\] $PWD\n\$ '
 #\H Host
 

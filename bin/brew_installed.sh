@@ -148,7 +148,7 @@ brew install ctags  # for tags in vim
 #brew install macvim --with-cscope --with-lua --HEAD
 #brew install macvim --custom-icons --override-system-vim --with-lua --with-luajit
 brew install macvim --with-cscope --custom-icons --override-system-vim --with-lua --with-luajit
-
+brew install wdiff # vorgeschlagen vom michael um differenzen zu checken zwischen texfiles
 #    CMake (also for macvim and youcompleteme)
 #            in /Users/glensk/ycm_build:
 #            /usr/local/Cellar/cmake/2.8.12.2/bin/cmake -G "Unix Makefiles" . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp

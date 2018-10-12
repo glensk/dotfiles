@@ -124,7 +124,7 @@ setopt ALWAYS_TO_END            # Move to the end on complete completion
 #@#ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
 #@#ZSH_HIGHLIGHT_STYLES[assign]=none
 
-source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+[ -e "$dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh" ] && source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # to secelt menue entro just once with out first leaving menu end then additional
 # enerter press  # when menu shows it would be nice to go directly down and not
@@ -138,9 +138,25 @@ bindkey '^[[Z' reverse-menu-complete   # using shift-Tab to go bakc in menues
 #bindkey "[C" forward-word
 #bindkey "^[a" beginning-of-line
 #bindkey "^[e" end-of-line
-#
 #bindkey "\e\e[D" backward-word
 #bindkey "\e\e[C" forward-word
+
+# this is for linux systems and ideally should not interfere with iterm2 for mac
+bindkey "^[n" backward-word
+bindkey "^[m" forward-word
+bindkey "^[l" forward-char 
+bindkey "^[h" backward-char 
+bindkey "^[;" beginning-of-line
+bindkey "^['" end-of-line
+#bindkey "^[j" up-line-or-beginning-search 
+#bindkey "^[k" down-line-or-beginning-search 
+bindkey "^[j" history-substring-search-down
+bindkey "^[k" history-substring-search-up
+#bindkey "^[o" backward-delete-word 
+#bindkey "^[o" delete-char-or-list 
+bindkey "^[o" kill-word   
+bindkey "^[i" delete-char-or-list  # delets char forward
+bindkey "^[u" backward-delete-char  
 
 
 bindkey -e   # Emacs mode; necessary for cmd+; and cmd+' to go to beginning/end of line

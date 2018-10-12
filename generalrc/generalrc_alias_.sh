@@ -28,7 +28,11 @@ $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide=
 #ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
 #ls -F -H -v --color=tty --hide=Icon? --show-control-chars --ignore="*.log" --group-directories-first $*
 #ls 'ls -F -H -v --color=tty'    
-
+#################################################################
+# i-pi 
+#################################################################
+$1 i-pi-dev-venkat '$HOME/google_drive/scripts_epfl/i-pi-dev/bin/i-pi'
+$1 i-pi-kmc '$HOME/google_drive/scripts_epfl/i-pi-mc/bin/i-pi'
 #################################################################
 # alias navigation   use ' '  instead of ""  since only those work with `` correctly
 #################################################################
@@ -41,7 +45,7 @@ $1 h 'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high fol
 $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh
 
 $1 scripts 'cd $HOME/Dropbox/Albert/scripts'
-$1 dot     'cd $HOME/Dropbox/Albert/scripts/dotfiles'
+$1 dot     'cd $dotfiles'
 $1 v       'cd $HOME/Dropbox/Albert/v'
 
 
@@ -54,8 +58,8 @@ $1 diss  'cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.12_Dissertation'
 $1 ptmp  'cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes'
 
 $1 vimrc 'vi $HOME/.vimrc'
-$1 vip 'vi $HOME/.ipython/profile_default/ipython_config.py'
-$1 virc 'vi $HOME/.`echo $currentshell`rc'
+$1 vip   'vi $HOME/.ipython/profile_default/ipython_config.py'
+$1 virc  'vi $HOME/.`echo $currentshell`rc'
 $1 virca 'vi $dotfiles/generalrc/generalrc_alias_.sh'
 
 $1 cd.. 'cd ..'
@@ -179,7 +183,9 @@ $1 qstatn 'qstatn -d'
     #$1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
     $1 rm 'del' && \
     $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .' && \
-    $1 mvim     'open /Applications/MacVim.app'
+    $1 mvim     'open /Applications/MacVim.app' 
+    #$1 edit "open -a MacVim.app $1"
+    #$1 vi       'vim' 
 
 
     #alias sed='$dotfiles/bin/sed/sed-4.2/build/bin/sed-4.2'

@@ -8,7 +8,7 @@ if ( $?PYTHONPATH == 0 ) setenv PYTHONPATH ""
 # read in general variables on{mac,cmmc,cmmd},printloadstat
 #################################################################
 setenv currentshell tcsh
-setenv dotfiles $HOME/Dropbox/Albert/scripts/dotfiles/
+setenv dotfiles $HOME/Dropbox/Albert/google_drive/dotfiles/
 setenv generalrc $dotfiles/generalrc
 source $generalrc/generalrc_.sh
 
