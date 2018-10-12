@@ -215,21 +215,30 @@ fi
 
 
 echo "###########################################################################"
-echo "#                 load everywhere                                         #"
+echo "#                 LOAD EVERYWHERE                                         #"
 echo "###########################################################################"
 loadeverywhere () {
 file=$1
 from=$2
-echo "linking $file"
+echo "LOAD EVERYWHERE $file"
 echo "             from $from"
 [ -h "$file" ] && unlink $file 
 [ -f "$file" ] && echo $file rm && rm -rf $file 
 [ ! -e "$file" ] && ln -s $from $file
+[ ! -e "$file" ] && echo "$file was not linked!" && exit
+if [ "$3" = "checklinkdir" ];then
+	if [[ -L "$file" && -d "$file" ]];then
+	echo "$file is a symlink to a directory"
+	else
+	echo "$file NOT a symlink to a directory (check what it is and evlt. delete it)"
+	exit
+	fi
+fi
 }
 
 loadeverywhere $HOMEPATH/.zlogin                        $dotfiles/zsh/zlogin
 loadeverywhere $HOMEPATH/.iterm2_shell_integration.zsh  $dotfiles/zsh/iterm2_shell_integration.zsh
-loadeverywhere $HOMEPATH/.vim                           $dotfiles/vim/
+loadeverywhere $HOMEPATH/.vim                           $dotfiles/vim/             "checklinkdir"
 loadeverywhere $HOMEPATH/.ctags                         $dotfiles/vim/ctags             
 loadeverywhere $HOMEPATH/.Xmodmap                       $dotfiles/xmodmap/Xmodmap 
 loadeverywhere $HOMEPATH/.dir_colors                    $dotfiles/terminal_colors
@@ -242,6 +251,7 @@ file=$HOMEPATH/.ipython/profile_default/ipython_config.py
 
 loadeverywhere $HOMEPATH/.gitignore                     $dotfiles/git/gitignore_global
 loadeverywhere $HOMEPATH/.gitconfig                     $dotfiles/git/gitconfig
+[ ! -e "$HOMEPATH/.subversion" ] &&  loadeverywhere $HOMEPATH/.subversion             	$dotfiles/subversion/      "checklinkdir"
 loadeverywhere $HOMEPATH/.subversion/config             $dotfiles/subversion/config
 loadeverywhere $HOMEPATH/.pyiron                        $dotfiles/other_dotfiles/pyiron
 loadeverywhere $HOMEPATH/.vimrc                         $dotfiles/vim/vimrc
@@ -278,6 +288,7 @@ echo "##########################################################################
 echo "#                         autojump                                        #"
 echo "###########################################################################"
 echo "autojump .... (if autojump is not working enable this in the LINK_files.sh skript"
+#git clone https://github.com/wting/autojump.git
 #cd $dotfiles/autojump && ./install.py && cd $dotfiles
 #echo "installing autojump .... successfull"
 
