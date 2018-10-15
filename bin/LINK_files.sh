@@ -288,9 +288,14 @@ echo "##########################################################################
 echo "#                         autojump                                        #"
 echo "###########################################################################"
 echo "autojump .... (if autojump is not working enable this in the LINK_files.sh skript"
-#git clone https://github.com/wting/autojump.git
-#cd $dotfiles/autojump && ./install.py && cd $dotfiles
-#echo "installing autojump .... successfull"
+if [ ! -e "autojump" ];then
+    echo "installing autojump"
+    cd $dotfiles
+    git clone https://github.com/wting/autojump.git
+    cd $dotfiles/autojump 
+    ./install.py 
+    cd $dotfiles
+fi
 
 echo "###########################################################################"
 echo "#                 zsh-history-substring-search                            #"
