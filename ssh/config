@@ -50,15 +50,6 @@ Host gate
 # User aglen
 # ProxyCommand ssh -q -Y aglen@gate.rzg.mpg.de -W %h:%p
 
-Host ela
- HostName ela.cscs.ch
- User aglensk
-
-Host daint
- HostName daint.cscs.ch
- User aglensk
- ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
-
 Host cmmc002
 HostName cmmc002.bc.rzg.mpg.de
 User aglen
@@ -75,6 +66,10 @@ GSSAPIDelegateCredentials yes
 ControlMaster auto
 ControlPath ~/.ssh/control:%h:%p:%r
 
+####################################################################################
+# epfl
+####################################################################################
+
 #ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@lsmxsrv2.epfl.ch
 Host lsmx
  HostName lsmxsrv2.epfl.ch
@@ -84,6 +79,20 @@ Host lsmx
 Host fidis
  HostName fidis.epfl.ch
  User glensk
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
+Host cosmopc
+ HostName cosmopc15.epfl.ch
+ User glensk
+
+Host ela
+ HostName ela.cscs.ch
+ User aglensk
+
+Host daint
+ HostName daint.cscs.ch
+ User aglensk
+ ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
 
 
 # make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
