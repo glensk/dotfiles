@@ -21,6 +21,7 @@ vrome/
 cpdf-binaries/
 cron/runtime*
 vim/view/
+vim/bundle/
 vim/.netrwhist
 zsh/oh-my-zsh/
 ipython-qt-console-solarized-syntax-highlighting/
