@@ -21,9 +21,11 @@ vrome/
 cpdf-binaries/
 cron/runtime*
 vim/view/
+vim/bundle/
 vim/.netrwhist
 autojump/
 zsh/oh-my-zsh/
+zsh/zsh-syntax-highlighting/
 ipython-qt-console-solarized-syntax-highlighting/
 generalrc/generalrc_alias_oncmmd
 generalrc/generalrc_alias_oncmmc
