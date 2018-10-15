@@ -22,6 +22,7 @@ cpdf-binaries/
 cron/runtime*
 vim/view/
 vim/.netrwhist
+autojump/
 zsh/oh-my-zsh/
 ipython-qt-console-solarized-syntax-highlighting/
 generalrc/generalrc_alias_oncmmd
