@@ -251,3 +251,8 @@ $1 gatehydra 'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.s
 # autocorrect
 ##############################
 $1 moduel 'module'
+
+################################
+# Slurm que jobsceduler
+# #############################
+$1 q 'squeue -u "glensk" --format "%A %t %N %C %Z"'

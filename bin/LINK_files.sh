@@ -251,7 +251,7 @@ file=$HOMEPATH/.ipython/profile_default/ipython_config.py
 
 loadeverywhere $HOMEPATH/.gitignore                     $dotfiles/git/gitignore_global
 loadeverywhere $HOMEPATH/.gitconfig                     $dotfiles/git/gitconfig
-[ ! -e "$HOMEPATH/.subversion" ] &&  loadeverywhere $HOMEPATH/.subversion             	$dotfiles/subversion/      "checklinkdir"
+[ ! -e "$HOMEPATH/.subversion" ] && mkdir $HOMEPATH/.subversion 
 loadeverywhere $HOMEPATH/.subversion/config             $dotfiles/subversion/config
 loadeverywhere $HOMEPATH/.pyiron                        $dotfiles/other_dotfiles/pyiron
 loadeverywhere $HOMEPATH/.vimrc                         $dotfiles/vim/vimrc
