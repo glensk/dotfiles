@@ -11,6 +11,7 @@
     <ffsocket name="lmpserial" mode="inet">
         <address>f099</address> <port> 12345 </port>
     </ffsocket>
+    <total_time> 258800 </total_time>
     <system>
         <initialize nbeads="1">
             <file mode="xyz" units="angstrom"> al10x10x10_alat4.057_988al_6si_5mg_1va_999atoms.ipi </file>
