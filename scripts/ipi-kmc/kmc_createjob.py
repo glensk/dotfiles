@@ -2,6 +2,7 @@
 import os,sys
 from shutil import copyfile
 import numpy as np
+from subprocess import call
 scripts = os.getenv("HOME")+'/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/'
 
 # import massedit in python 2.7
@@ -54,7 +55,7 @@ def get_positions_files(scripts,ncell,nmg,nsi,nvac,a0):
     nva=nvac
     number_of_atoms = sc**3 - nva
     nal = number_of_atoms - nmg - nsi
-    path=scripts+'/kmc_positions/
+    path=scripts+'/kmc_positions/'
     filename = "al"+str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str(nsi)+"si_"+str(nmg)+"mg_"+str(nva)+"va_"+str(number_of_atoms)+"atoms"+".xyz"
     print('filename',filename)
     filepath = path+filename
@@ -97,3 +98,6 @@ for seed in seeds:
     sed(jobdir+"/submit.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
     sed(jobdir+"/submit.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --men')
     sed(jobdir+"/submit.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
+
+    os.chdir(jobdir)
+    call(["sbatch","submit.sh"]) #,shell=True)
