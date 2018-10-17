@@ -2,13 +2,15 @@
 import os,sys
 from shutil import copyfile
 import numpy as np
-scripts = os.getenv("HOME")+'/Dropbox/Albert/scripts/dotfiles/python_skripts/'
+scripts = os.getenv("HOME")+'/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/'
 
 # import massedit in python 2.7
 python2 = True
 if python2:
     import imp
-    massedit = imp.load_source('massedit', skripts+'/massedit.py')
+    masseditpath = scripts+'/massedit.py'
+    print('me',masseditpath)
+    massedit = imp.load_source('massedit', masseditpath)
 
 
 
@@ -46,13 +48,13 @@ def mkdir(directory):
 def sed(file,str_find,str_replace):
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
 
-def get_positions_files(ncell,nmg,nsi,nvac,a0):
+def get_positions_files(scripts,ncell,nmg,nsi,nvac,a0):
     sc=ncell
     alat=a0
     nva=nvac
     number_of_atoms = sc**3 - nva
     nal = number_of_atoms - nmg - nsi
-    path='/home/glensk/vorlagen/'
+    path=scripts+'/kmc_positions/
     filename = "al"+str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str(nsi)+"si_"+str(nmg)+"mg_"+str(nva)+"va_"+str(number_of_atoms)+"atoms"+".xyz"
     print('filename',filename)
     filepath = path+filename
@@ -68,8 +70,7 @@ def get_positions_files(ncell,nmg,nsi,nvac,a0):
 directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si"
 mkdir(directory)
 seeds=np.arange(nseeds)+32345
-print("seeds",seeds)
-xyzpath,xyzname = get_positions_files(ncell,nmg,nsi,nvac,a0)
+xyzpath,xyzname = get_positions_files(scripts,ncell,nmg,nsi,nvac,a0)
 print('xyzpath',xyzpath)
 for seed in seeds:
     #print('seed:',seed)
@@ -78,10 +79,10 @@ for seed in seeds:
     if os.path.exists(jobdir):
         sys.exit("jobdirectory "+str(jobdir)+" already exists!")
     mkdir(jobdir)
-    copyfile("input-runner.xml", jobdir+"/input-runner.xml")
+    copyfile(scripts+"input-runner.xml", jobdir+"/input-runner.xml")
     copyfile(xyzpath, jobdir+"/"+xyzname)
-    copyfile("in.lmp", jobdir+"/in.lmp")
-    copyfile("submit.sh", jobdir+"/submit.sh")
+    copyfile(scripts+"in.lmp", jobdir+"/in.lmp")
+    copyfile(scripts+"submit.sh", jobdir+"/submit.sh")
     sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(steps)+' </total_steps>')
     sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
     sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
