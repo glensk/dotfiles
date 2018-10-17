@@ -96,7 +96,7 @@ for seed in seeds:
 
     sed(jobdir+"/submit.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
     sed(jobdir+"/submit.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-    sed(jobdir+"/submit.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --men')
+    sed(jobdir+"/submit.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
     sed(jobdir+"/submit.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
 
     os.chdir(jobdir)
