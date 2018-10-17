@@ -2,7 +2,7 @@
 	name = glensk
 	email = albert.glensk@gmail.com
 [credential]
-	helper = osxkeychain
+	helper = cache
 [core]
 [push]
 	default = matching
