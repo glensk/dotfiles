@@ -255,4 +255,4 @@ $1 moduel 'module'
 ################################
 # Slurm que jobsceduler
 # #############################
-$1 q 'squeue -u "glensk" --format "%A %t %N %C %Z"'
+$1 q 'squeue -u "glensk" --format "%A %t %N %C %M %Z"'
