@@ -11,10 +11,15 @@ echo $* >> $filename
 garching="false"
 epfl="true"
 
+##### TAR the file ######################################
 #tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 $filename $*
 #tar -cvf archive.tar.bzip2 $filename $*
 [ -e "name-of-archive.tar.gz" ] && rm name-of-archive.tar.gz
 tar -czvf name-of-archive.tar.gz $filename $*
+
+
+
+####### move to ~/.exchange ############################
 if [ "$garching" = "true" ];then
     #scp archive.tar.bzip2 aglen@gate.rzg.mpg.de:~/.exchange/
     echo 'scp name-of-archive.tar.gz aglen@gate.rzg.mpg.de:~/.exchange/'
@@ -26,7 +31,8 @@ if [ "$epfl" = "true" ];then
     mv name-of-archive.tar.gz ~/.exchange/
 
 fi
-#rm archive.tar.bzip2
+
+###### remove the rm archive.tar.bzip2 ######################
 [ -e "name-of-archive.tar.gz" ] && echo 'rm name-of-archive.tar.gz' && rm name-of-archive.tar.gz
 [ -e "$filename" ] && echo "rm $filename" && rm $filename 
 

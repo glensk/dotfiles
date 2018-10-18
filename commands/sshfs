@@ -33,3 +33,6 @@ Where X is the username.
 ##################################################
 #found:
 sshfs#username@myserver:/storage/Data    /home/myuser/Documents/Data        fuse comment=sshfs,rw,exec,uid=1000,allow_other,reconnect,transform_symlinks,BatchMode=yes,nonempty,noauto 0 0
+
+################################################## fidis
+sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /Users/glensk/fidis -o reconnect -C
