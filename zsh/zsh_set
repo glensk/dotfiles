@@ -64,6 +64,7 @@ setopt auto_remove_slash        # self explicit
 setopt chase_links              # resolve symlinks = follow links in cds
 unsetopt correct                  # try to correct spelling of commands I DONT WANT THIS
 setopt extended_glob            # activate complex pattern globbing
+setopt null_glob                # zsh will now not complain if it cant macht glob and: rm -f existingfile nonexistingfile* will work if nonexistingfile is not available
 setopt glob_dots                # include dotfiles in globbing
 unsetopt print_exit_value         # print return value if non-zero
 unsetopt beep                   # no bell on error
