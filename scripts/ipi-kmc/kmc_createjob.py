@@ -16,6 +16,9 @@ ncell=8
 nmg=6
 nsi=6
 
+ncell=6
+nmg=6
+nsi=6
 
 nvac=2
 a0=4.057
