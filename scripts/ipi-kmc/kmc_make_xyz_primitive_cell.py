@@ -184,7 +184,9 @@ ase.io.write(filenameoutxyz,atomsc)
 
 # WRITE XYZ FILE for i-pi
 filenameoutipi = 'al'+scstr+'.ipi'
+filenameoutposcar = 'al'+scstr+'.POSCAR'
 ase.io.write(filenameoutipi,atomsc,format='xyz')
+ase.io.write(filenameoutposcar,atomsc,format='vasp')
 laa = atomsc.get_cell_lengths_and_angles()
 print('atomsc.get_cell_lengths_and_angles',laa)
 
