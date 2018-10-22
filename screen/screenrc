@@ -10,7 +10,8 @@ termcapinfo xterm* ti@:te@
 defbce "on"
 
 
-shell tcsh
+#shell tcsh
+shell bash
 # Don't display the copyright page
 startup_message off
 
