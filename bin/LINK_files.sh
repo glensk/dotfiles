@@ -236,6 +236,8 @@ if [ "$3" = "checklinkdir" ];then
 fi
 }
 
+[ ! -e "$dotfiles/vim/bundle" ] && cd $dotfiles/vim/bundle && echo 'install vim/bundle' && git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
 loadeverywhere $HOMEPATH/.zlogin                        $dotfiles/zsh/zlogin
 loadeverywhere $HOMEPATH/.iterm2_shell_integration.zsh  $dotfiles/zsh/iterm2_shell_integration.zsh
 loadeverywhere $HOMEPATH/.vim                           $dotfiles/vim/             "checklinkdir"
