@@ -4,7 +4,7 @@
 <simulation verbosity="low">
     <output prefix="simulation">
         <properties stride="1" filename="out"> [ step, potential] </properties>
-        <trajectory filename="pos" stride="1" cell_units="angstrom" format="xyz" bead="0"> positions{angstrom} </trajectory>
+        <trajectory filename="pos" stride="100" cell_units="angstrom" format="xyz" bead="0"> positions{angstrom} </trajectory>
     </output>
     <total_steps>200000</total_steps>
     <prng> <seed>32345</seed> </prng>
