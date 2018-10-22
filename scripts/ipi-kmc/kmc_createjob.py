@@ -7,18 +7,20 @@ scripts = os.getenv("HOME")+'/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/'
 pot_nn_1 = "/home/glensk/nn_potentials/v1_daniele_giofre"
 pot_nn_2 = "/home/glensk/nn_potentials/v2_daniele_giofre"
 
+if False:
+    ncell=10
+    nmg=12
+    nsi=12
 
-ncell=10
-nmg=12
-nsi=12
+if False:
+    ncell=8
+    nmg=6
+    nsi=6
 
-ncell=8
-nmg=6
-nsi=6
-
-ncell=6
-nmg=6
-nsi=6
+if True:
+    ncell=6
+    nmg=6
+    nsi=6
 
 nvac=2
 a0=4.057
@@ -26,8 +28,8 @@ a0=4.057
 nseeds=2
 seedplus=32345
 steps=200000
-pot=pot_nn_1
-add_to_name="_nn1"
+pot=pot_nn_2
+add_to_name="_nn2"
 submit=True
 #nseeds=2 # for testing
 #steps=200 # for testing

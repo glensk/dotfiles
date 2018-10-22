@@ -110,7 +110,7 @@ $1 monthly_update 'cd $dotfiles/cron;./monthlyupdate.sh'
 
 $1 du 'echo ______better ncdu______;echo; du'
 $1 lstarfile 'tar -ztvf'
-$1 diff 'colordiff'
+#$1 diff 'colordiff'
 $1 ep 'epstopdf'
 $1 grep 'grep --color=auto -d skip'    # skips directories
 #$1 grep'echo use ack instead'
