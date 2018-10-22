@@ -23,22 +23,35 @@ echo ""
 
 
 echoit "creating /nas /data /u"
-owner=$USER
 user=glensk;sys=nas;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# data cmmd
 user=glensk;sys=data;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# nas/grawowski
 user=grabowski;sys=nas;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# data/grabowski
 user=grabowski;sys=data;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# nas/korbmacher
 user=korbmacher;sys=nas;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# u/aglen (cmmc001)
 user=aglen;sys=u;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# cmmc/u/aglen
 user=aglen;sys=cmmc/u;
-sudo mkdir -p /$sys/$user;sudo chown $owner /$sys;sudo chown $owner /$sys/$user; echo /$sys/$user
-sudo mkdir -p /cmmc/ptmp/aglen;sudo chown $owner /cmmc/ptmp; sudo chown $owner /cmmc/ptmp/aglen
+sudo mkdir -p /$sys/$user;sudo chown $USER /$sys;sudo chown $USER /$sys/$user; echo /$sys/$user
+
+# ptmp
+sudo mkdir -p /cmmc/ptmp/aglen;sudo chown $USER /cmmc/ptmp; sudo chown $USER /cmmc/ptmp/aglen
 read -p "Did everything go smoothly? If not ctrc+c; otherwise just press enter" 
 ln -s /nas/glensk/v $HOME/v
 

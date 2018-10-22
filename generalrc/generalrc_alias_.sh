@@ -256,4 +256,6 @@ $1 moduel 'module'
 # Slurm que jobsceduler
 # #############################
 $1 q 'squeue -u "glensk" --format "%A %t %N %C %M %Z"'
-$1 mount_fidis 'sshfs -o idmap=user glensk@fidis@epfl.ch:/scratch/glensk ~/fidis'
+#$1 mount_fidis 'sshfs -o idmap=user glensk@fidis@epfl.ch:/scratch/glensk ~/fidis'
+$1 mount_fidis 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o reconnect -C' 
+$1 umount_fidis 'umount -f /scratch/glensk'

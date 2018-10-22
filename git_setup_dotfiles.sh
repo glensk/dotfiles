@@ -9,7 +9,7 @@
 # cd $dotfiles
 # git clone git://github.com/joelthelion/autojump.git
 
-dotfiles=$HOME/Dropbox/scripts/dotfiles
+dotfiles=$HOME/Dropbox/Albert/scripts/dotfiles
 [ ! -e "$dotfiles" ] && echo Folder $dotfiles does not exist && exit
 
 cd $dotfiles
