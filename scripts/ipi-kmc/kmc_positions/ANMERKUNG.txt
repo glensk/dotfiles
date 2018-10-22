@@ -1,0 +1,5 @@
+kmc_make_xyz_primitive_cell.py -sc 6 -nsi 6 -nmg 6 -nvac 2 -alat 4.057
+kmc_make_xyz_primitive_cell.py -sc 8 -nsi 6 -nmg 6 -nvac 2 -alat 4.057
+kmc_make_xyz_primitive_cell.py -sc 8 -nsi 6 -nmg 6 -nvac 1 -alat 4.057
+kmc_make_xyz_primitive_cell.py -sc 10 -nsi 12 -nmg 12 -nvac 1 -alat 4.057
+kmc_make_xyz_primitive_cell.py -sc 10 -nsi 12 -nmg 12 -nvac 2 -alat 4.057

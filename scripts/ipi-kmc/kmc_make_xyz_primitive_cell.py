@@ -173,8 +173,8 @@ scstr = str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str
 if delrandom is True:
     scstr = scstr + "_random"
 #print('kk',scstr)
-filenameout = 'al'+scstr+'.xyz'
-ase.io.write(filenameout,atomsc)
+filenameoutxyz = 'al'+scstr+'.xyz'
+ase.io.write(filenameoutxyz,atomsc)
 
 #filenameoutlammps = 'al'+scstr+'.lammpsdata'
 #ase.io.write(filenameoutlammps,atomsc,format='lammps-dump')
@@ -198,3 +198,8 @@ data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  
 # and write everything back
 with open(filenameoutipi, 'w') as file:
     file.writelines( data )
+
+
+from subprocess import call
+file_to_exec = '/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/kmc_xyz_or_ase_to_lammpsinput.py'
+call(["python", file_to_exec,filenameoutxyz ])
