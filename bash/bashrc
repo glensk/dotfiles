@@ -29,10 +29,12 @@ source $dotfiles/bash/bash_set
 #################################################################
 # for pyron jupyter hub (juypter notebook)
 #################################################################
-if [ "`which module`" != "" ];then
-module unload anaconda
-module load pyiron/dev
-fi
+#echo 'vor module'
+#if [ "`which module`" != "" ];then
+#module unload anaconda
+#module load pyiron/dev
+#fi
+#echo 'nach  module'
 
 
 ## https://github.com/rupa/z

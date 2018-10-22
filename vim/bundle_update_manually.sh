@@ -1,6 +1,6 @@
 #!/bin/sh
 
-hier=$HOME/Dropbox/scripts/dotfiles/vim/bundle
+hier=$HOME/Dropbox/Albert/scripts/dotfiles/vim/bundle
 cd $hier
 folder=`ls -1d */`
 for i in $folder;do
