@@ -23,6 +23,7 @@ blue="0 0 255"
 turquoise="64 224 208"   # seems too blue, needs to get greener
 mediumturquoise="72 209 204"
 zomp="57 167 142"
+magenta="255 0 255"
 
 goto=""
 
@@ -34,6 +35,8 @@ goto=""
 [ "`echo $* | grep -o cmmc`" = "cmmc" ] && goto=$turquoise
 
 [ "`echo $* | grep -o daint`" = "daint" ] && goto=$blue
+[ "`echo $* | grep -o cosmopc`" = "cosmopc" ] && goto=$red
+[ "`echo $* | grep -o fidis`" = "fidis" ] && goto=$turquoise
 
 
 currenthost=""
@@ -41,7 +44,8 @@ currenthost=""
 [ "`echo $host | grep -o cmmd`" = "cmmd" ] && currenthost=$blue
 [ "`echo $host | grep -o cmmc`" = "cmmc" ] && currenthost=$turquoise
 #[ "`echo $host | grep -o cmdft`" = "cmdft" ] && currenthost=$blue
-[ "`echo $host | grep -o mac`" = "mac" ] && currenthost=$black
+
+[ "`echo $host | grep -o mac`" = "mac" ] && currenthost=$magenta
 
 
 #echo goto:$goto:
