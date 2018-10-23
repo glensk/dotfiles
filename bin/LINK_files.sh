@@ -12,16 +12,18 @@ mylaptop="mac"
 
 oncmmc='false'
 oncmmd='false'
+ondaint='false'
 oncmpc='false'
 oncosmopc='false'
 DB='false'  # Dropbox is installed?
 GD="false"  # google_drive is installed?
 
-[ "`echo $onhost | grep -o mac`" = "mac" ]          && oncmmc="true"    && DB="true"  && GD="true" 
-[ "`echo $onhost | grep -o cmmc`" = "cmmc" ]        && oncmmc="true"    && DB="false" && GD="false"
-[ "`echo $onhost | grep -o cmmd`" = "cmmd" ]        && oncmmd="true"    && DB="false" && GD="false"
-[ "`echo $onhost | grep -o cmpc`" = "cmpc" ]        && oncmpc="true"    && DB="false" && GD="false"
-[ "`echo $onhost | grep -o cosmopc`" = "cosmopc" ]  && oncosmopc="true" && DB="true"  && GD="true"
+[ "`echo $onhost | grep -o mac`" = "mac" ]         && oncmmc="true"    && DB="true"  && GD="true" 
+[ "`echo $onhost | grep -o cmmc`" = "cmmc" ]       && oncmmc="true"    && DB="false" && GD="false"
+[ "`echo $onhost | grep -o cmmd`" = "cmmd" ]       && oncmmd="true"    && DB="false" && GD="false"
+[ "`echo $onhost | grep -o cmpc`" = "cmpc" ]       && oncmpc="true"    && DB="false" && GD="false"
+[ "`echo $onhost | grep -o daint`" = "daint" ]     && ondaint="true"   && DB="false" && GD="false"
+[ "`echo $onhost | grep -o cosmopc`" = "cosmopc" ] && oncosmopc="true" && DB="true"  && GD="true"
 
 echo "host      :$host:"
 echo "onhost    :$onhost:"

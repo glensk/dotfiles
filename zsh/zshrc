@@ -1,4 +1,16 @@
-#echo zshin
+##echo zshin
+getms() {
+    #echo $(($(date +%s%N)/1000000))
+    date +%s%N 
+}
+
+export tin=`getms`
+gt() {
+    export tnow=`getms`
+    diff=`echo $tin $tnow | awk '{print ($2-$1)}'`
+    echo $tin $tnow $diff
+    export tin=`getms`
+}
 #[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)
@@ -6,6 +18,7 @@ autoload -U colors && colors                    # necessary for prompt colors (0
 autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
 autoload -U +X bashcompinit && bashcompinit     # make bash completion function work (complete) (0.00s)
 
+echo zsh1 `gt`
 #################################################################
 # oh-my-zsh: DONT USE IT!!! do this first in zsh; IT IS WAY TOO SLOW!!!!!! DONT USE IT !!!!!
 # but the way it colors the history-substring-search is great!
@@ -33,7 +46,9 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 #################################################################
 export ZSH="$dotfiles/zsh/oh-my-zsh"   # has to be loaded after plugins!
 [ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
+echo zsh3 `gt`
 source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
+#echo zsh3
 
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
@@ -47,12 +62,15 @@ source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 # for bash/zsh: export currentshell='zsh'
 export currentshell='zsh'    # known are zsh / bash / tcsh
 export generalrc="$dotfiles/generalrc"
+#echo zsh4
 source $generalrc/generalrc_.sh
+#echo zsh5
 
 #source $dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
 #alias c='z'
 source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
 alias c='j'
+#echo zsh6
 
 #export LAMMPS_COMMAND="/usr/local/bin/lmp_serial" #(path to binary file) 
 #export LAMMPS_COMMAND="/Users/glensk/miniconda3/bin/lmp_serial" #(path to binary file) 
@@ -67,6 +85,7 @@ alias c='j'
 # - define colors for ls
 #################################################################
 source $dotfiles/zsh/zsh_set
+#echo zsh7
 
 #################################################################
 # conda / anaconda / miniconda
@@ -75,6 +94,10 @@ if [ -e "$HOME/miniconda3" ];then
     . $HOME/miniconda3/etc/profile.d/conda.sh
     conda activate # activates the default conda python (3.x)
 fi
+
+
+#echo zsh88 `gt`
+
 
 # time zsh
 # 0) completely empty             : 0.01s

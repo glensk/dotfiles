@@ -69,6 +69,7 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 [ "$currentshell" = "zsh" ] && source $generalrc/generalrc_prompt_zsh.sh
 [ "$currentshell" = "bash" ] && source $generalrc/generalrc_prompt_bash.sh
 [ "$onmac" = "true" ] && tab-color magenta
+[ "$ondaint" = "true" ] && tab-color blue
 
 #echo
 #echo MYSHELL $myshell;

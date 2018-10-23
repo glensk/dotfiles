@@ -1,2 +1,5 @@
 open fortigateclient (using alfred)
     pw: one double s nothing else
+
+dann:
+ssh cmpc01.mpie.de
