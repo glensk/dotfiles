@@ -94,7 +94,7 @@ else
     myprompthostuser="setenv myprompthostuser blue"
     mypromptpath="setenv mypromptpath blue"
     #module="module load mathematica1002/10.0.2"
-fi;fi;fi;fi
+fi;fi;fi;fi;fi
 
 ###################################################
 # output defined variables
