@@ -1,7 +1,7 @@
 ##echo zshin
 
 gettime="true"
-#gettime="false"
+gettime="false"
 if [ "$gettime" = "true" ];then
     getms() {
         /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
