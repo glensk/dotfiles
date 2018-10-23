@@ -85,6 +85,15 @@ else
 else
     if [ "`echo $host | grep -o cosmopc`" = "cosmopc" ];then
     myshell="setenv myshell zsh"
+else
+    if [ "`echo $host | grep -o daint`" = "daint" ];then
+    myshell="setenv myshell zsh"
+    currenthost="setenv currenthost ondaint"
+    myshell="setenv myshell zsh"
+    myprompttime="setenv myprompttime blue"
+    myprompthostuser="setenv myprompthostuser blue"
+    mypromptpath="setenv mypromptpath blue"
+    #module="module load mathematica1002/10.0.2"
 fi;fi;fi;fi
 
 ###################################################
