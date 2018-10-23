@@ -1,0 +1,2 @@
+squeue -u "$USER" --format "%A %t %N %C %M %Z" | awk '{printf "%8s %3s %20s %4s %6s %10s\n",$1,$2,$3,$4,$5,$6}'
+

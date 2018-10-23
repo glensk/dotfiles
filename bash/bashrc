@@ -1,3 +1,4 @@
+#echo anfang
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
 #################################################################
@@ -24,6 +25,10 @@ fi
 #
 ################################################################
 source $dotfiles/bash/bash_set
+bind '"\C-j": history-search-backward'
+bind '"\C-k": history-search-forward'
+set show-all-if-ambiguous on
+set completion-ignore-case on
 
 
 #################################################################
@@ -60,3 +65,4 @@ source $dotfiles/bash/bash_set
 #@ 8) 7+whole generalrc.sh  0.014   0.012  
 
 #export PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "
+#echo ende
