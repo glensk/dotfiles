@@ -37,6 +37,10 @@ PATH="$PATH:$aliases:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bi
 #########################################################################
 # on mac: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
 #########################################################################
+if [ "$currenthost" = "ondaint" ];then
+    tab-color blue
+fi
+
 if [ "$currenthost" = "onmac" ];then
     # $PATH (on mac)
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
