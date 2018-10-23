@@ -33,6 +33,8 @@ goto=""
 [ "`echo $* | grep -o cmmd`" = "cmmd" ] && goto=$blue
 [ "`echo $* | grep -o cmmc`" = "cmmc" ] && goto=$turquoise
 
+[ "`echo $* | grep -o daint`" = "daint" ] && goto=$blue
+
 
 currenthost=""
 [ "`echo $host | grep -o cmpc`" = "cmpc" ] && currenthost=$red
