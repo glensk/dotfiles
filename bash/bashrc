@@ -30,7 +30,7 @@ source $dotfiles/bash/bash_set
 #jbindkey ^[j history-substring-search-down
 bind '"\e[A"':history-search-backward  # this makes it work with cmd+j
 bind '"\e[B"':history-search-forward   # this makes it work with cmd+k
-bind Space:magic-space
+#bind Space:magic-space
 set show-all-if-ambiguous on
 set completion-ignore-case on
 

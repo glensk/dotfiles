@@ -1,17 +1,21 @@
 ##echo zshin
-getms() {
-    /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
-}
 
-export tin=`getms`
-gt() {
-    export tnow=`getms`
-    diff=`echo $tin $tnow | awk '{print ($2-$1)}'`
-    echo $diff
-    export tin=`getms`
-}
 gettime="true"
-gettime="false"
+#gettime="false"
+if [ "$gettime" = "true" ];then
+    getms() {
+        /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+        #date +%s%N
+    }
+    export tin=`getms`
+    gt() {
+        export tnow=`getms`
+        diff=`echo $tin $tnow | awk '{print ($2-$1)}'`
+        echo $diff | awk '{print $1/1000000}'
+        export tin=`getms`
+    }
+fi
+
 #[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)

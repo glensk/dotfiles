@@ -65,23 +65,24 @@ mkalias () {
     eval `aliastcshtobash $1 "$2"`
 }
 
-if [ "$ZSH_VERSION" = "5.0.5" ];then
-module () {
-    #eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
-    # log in to garching by \ssh aglen@cmmc001.bc.rzg.mpg.de
-    # echo $SHELL -> /bin/bash
-    # echo $MODULEHOME  ## !! and add .../bin/modulecmd
-    eval `/afs/ipp-garching.mpg.de/common/usr/modules.2017/amd64_sles12/Modules/current/bin/modulecmd sh $*`
-
-}
-fi
+# THis was ment only for garching
+# if [ "$ZSH_VERSION" = "5.0.5" ];then
+# module () {
+#     #eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
+#     # log in to garching by \ssh aglen@cmmc001.bc.rzg.mpg.de
+#     # echo $SHELL -> /bin/bash
+#     # echo $MODULEHOME  ## !! and add .../bin/modulecmd
+#     eval `/afs/ipp-garching.mpg.de/common/usr/modules.2017/amd64_sles12/Modules/current/bin/modulecmd sh $*`
+# 
+# }
+# fi
 
 tab-color() {
-    [ "$1" = "red" ] && a=255 b=0 c=0
+    [ "$1" = "red" ] && a=255 b=0 c=0               # works
     [ "$1" = "gren" ] && a=0 b=255 c=0
-    [ "$1" = "blue" ] && a=0 b=0 c=255
-    [ "$1" = "cyan" ] && a=64 b=244 c=208
-    [ "$1" = "magenta" ] && a=255 b=0 c=255
+    [ "$1" = "blue" ] && a=0 b=0 c=255              # works
+    [ "$1" = "cyan" ] && a=64 b=244 c=208           # works
+    [ "$1" = "magenta" ] && a=255 b=0 c=255         # works but you need to write it correctly
     #[ "$1" = "turquoise" ] && a=100 b=100 c=208
 echo -ne "\033]6;1;bg;red;brightness;$a\a"
 echo -ne "\033]6;1;bg;green;brightness;$b\a"
