@@ -25,8 +25,12 @@ fi
 #
 ################################################################
 source $dotfiles/bash/bash_set
-bind '"\C-j": history-search-backward'
-bind '"\C-k": history-search-forward'
+#bind '"\C-j": history-search-backward'
+#bind '"\C-k": history-search-forward'
+#jbindkey ^[j history-substring-search-down
+bind '"\e[A"':history-search-backward  # this makes it work with cmd+j
+bind '"\e[B"':history-search-forward   # this makes it work with cmd+k
+bind Space:magic-space
 set show-all-if-ambiguous on
 set completion-ignore-case on
 
