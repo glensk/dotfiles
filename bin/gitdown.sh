@@ -1,4 +1,5 @@
 #!/bin/bash
+cd $dotfiles/
 echo "#### now in `pwd` #####################";echo
 echo '#### git remote -v update #############';echo;git remote -v update;echo
 echo ""
