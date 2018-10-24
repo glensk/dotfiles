@@ -23,8 +23,8 @@
 /
 &ELECTRONS
   conv_thr =   1.0000000000d-12   	! EDIFF
-  mixing_beta =   7.0000000000d-01      ! MIXING
-  mixing_mode = 'plain'                 ! MIXING
+  mixing_beta =  4.0000000000d-01      ! MIXING
+  mixing_mode = 'local-TF'                 ! MIXING
 /
 &IONS
   !press_conv_thr = 0.05                 ! just for volume relaxations
