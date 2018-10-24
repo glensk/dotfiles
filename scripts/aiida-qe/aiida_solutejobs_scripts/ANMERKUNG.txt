@@ -1,0 +1,23 @@
+module load daint-mc
+mkdir raw_data
+pip install -r ~/scripts/ase_env.txt
+
+
+
+cd /users/aglensk/raw_data/first_test
+python ~/scripts/generate_structure.py 4.04 4,4,4 Al Si 3 test   # stest is the positions files
+~/scripts/qe_pos_setting_merge.sh aiida.settings test inputforcalc
+
+mv inputforcalc aiida.in
+mv test aiida.pos
+
+
+mkdir ../tmp
+
+get si pos
+https://www.materialscloud.org/discover/sssp/table/efficiency
+
+sbatch _aiidasubmit.sh
+watch squeue -u aglensk
+
+salloc --constraint=mc --partition=debug  # control d to exit

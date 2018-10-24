@@ -37,9 +37,9 @@ set statusline="%f%m%r%h%w [%Y] [0x%02.2B]%< %F%=%4v,%4l %3p%% of %L"
 " VUNDLE PLUGINS TRYING """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plugin 'https://github.com/shiblon/latex-makefile.git'
-if version >= 703
-    Plugin 'https://github.com/Shougo/neocomplete.vim'   "  requires Vim 7.3.885+ with Lua enabled
-endif
+"if version >= 703
+"    Plugin 'https://github.com/Shougo/neocomplete.vim'   "  requires Vim 7.3.885+ with Lua enabled
+"endif
 "Plugin 'https://github.com/sjl/gundo.vim'     " 
 "Plugin 'https://github.com/MarcWeber/vim-addon-commandline-completion.git' 
 "Plugin 'amdt/vim-niji'

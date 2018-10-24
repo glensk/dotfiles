@@ -26,6 +26,7 @@ kmc2="$dotfiles/scripts/ipi-kmc"
 aiida="$dotfiles/aiida"
 runnertools="$HOME/google_drive/scripts_epfl/runner_tools/runner_tools"
 aliases="$dotfiles/aliases"
+aiida="$dotfiles/scripts/aiida-qe/aiida_solutejobs_scripts"
 #PATH="$dropboxbin:$kmc:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
 PATH="$PATH:$aiida:$aliases:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 #PATH="$PATH:$dropboxbin:$ipi:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"

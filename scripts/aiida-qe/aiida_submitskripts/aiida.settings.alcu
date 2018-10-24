@@ -1,0 +1,36 @@
+&CONTROL
+  calculation = 'relax'     	! SCF relax and VlumeCell relax
+  outdir = './out/'
+  prefix = 'aiida'
+  pseudo_dir = '/users/aglensk/scripts/qe_pseudos'
+  tprnfor = .true.             	! calculate the pressure of the cell
+  tstress = .true.
+  verbosity = 'high'
+  wf_collect = .true.
+  etot_conv_thr = 2.5d-4    ! EDIFFG positive atomic units
+  forc_conv_thr = 2.0d-5    ! EDIFFG negative atomic units *51.422063 gives eV/ang
+/
+&SYSTEM
+  degauss =   4.4100000000d-02  ! SIGMA in Rydberg  so, 0.60001101eV
+  ecutrho = 400                 ! AUGMENTATION charges
+  ecutwfc =  40                 ! ENCUT in Rydberg, so 544eV
+  ibrav = 0                     ! no symmetry
+  nat = 4                       ! number of atoms
+  ntyp = 2                      ! type of atoms
+  occupations = 'smearing'      ! using smearing 
+  smearing = 'mp'               ! methfessel paxton
+  nosym= .true. 		! no symmetry
+/
+&ELECTRONS
+  conv_thr =   1.0000000000d-12   	! EDIFF
+  mixing_beta =   7.0000000000d-01      ! MIXING
+  mixing_mode = 'plain'                 ! MIXING
+/
+&IONS
+  press_conv_thr = 0.05                 ! just for volume relaxations
+/
+ATOMIC_SPECIES
+Al     26.9815385 Al.pbe-n-kjpaw_psl.1.0.0.UPF
+Cu     63.54 Cu.pbe-dn-kjpaw_psl.1.0.0.UPF
+K_POINTS automatic
+5 5 5 0 0 0                  	! in a 4x4x4 supercell
