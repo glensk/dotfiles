@@ -21,6 +21,13 @@ fi
 # in zsh first load compinit and bashcompinit (in first line)
 autoload -U colors && colors                    # necessary for prompt colors (0.00s)
 autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
+#autoload -Uz compinit
+#if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
+#  compinit
+#else
+#  compinit -C
+#fi
+
 autoload -U +X bashcompinit && bashcompinit     # make bash completion function work (complete) (0.00s)
 
 [ "$gettime" = "true" ] && echo zsh1 `gt`
