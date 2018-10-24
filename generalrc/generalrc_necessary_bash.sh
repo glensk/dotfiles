@@ -99,3 +99,13 @@ load_local_anaconda() {
     echo 'source activate /u/aglen/conda-envs/my_root'
     source activate /u/aglen/conda-envs/my_root
 }
+
+virtualenv_activate () {
+     ACTIVATE_SCRIPT=$HOME/virtualenvs/$1/bin/activate;
+     if [[ ! -f "$ACTIVATE_SCRIPT" ]]; then
+         echo $1 is not a valid virtual env environment;
+         echo Try one of: $(ls $HOME/virtualenvs/);
+         return;
+     fi;
+     source $ACTIVATE_SCRIPT
+}
