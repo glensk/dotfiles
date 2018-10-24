@@ -14,10 +14,10 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 export generalrc="$dotfiles/generalrc"
 source $generalrc/generalrc_.sh
 
-if [ "1" = "1" ];then
-#source $HOME/.autojump/etcrofile.d/autojump.sh  # =0.005-0.006s
-[[ -s /home/glensk/.autojump/etc/profile.d/autojump.sh ]] && echo "jojo" && source /home/glensk/.autojump/etc/profile.d/autojump.sh
-alias c='j'
+if [[ $- == *i* ]]    # only in interactive shell
+then
+    [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && echo "jojo" && source $HOME/.autojump/etc/profile.d/autojump.sh
+    alias c='j'
 fi
 
 #################################################################
@@ -28,8 +28,8 @@ source $dotfiles/bash/bash_set
 #bind '"\C-j": history-search-backward'
 #bind '"\C-k": history-search-forward'
 #jbindkey ^[j history-substring-search-down
-bind '"\e[A"':history-search-backward  # this makes it work with cmd+j
-bind '"\e[B"':history-search-forward   # this makes it work with cmd+k
+#bind '"\e[A"':history-search-backward  # this makes it work with cmd+j  # warnings with scp
+#bind '"\e[B"':history-search-forward   # this makes it work with cmd+k  # warnings with scp
 #bind Space:magic-space
 set show-all-if-ambiguous on
 set completion-ignore-case on

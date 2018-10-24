@@ -14,7 +14,8 @@ export BASH_CONF="bashrc"
 #set -o vi #  vi editing mode instead of emacs editing mode  # NO ! DESTROYS MAPPINGS IN ITERM
 
 # http://blog.sanctum.geek.nz/terminal-annoyances/
-stty -ixon
+#stty -ixon   # can sometimes 
+[[ $- == *i* ]] && stty -ixon
 
 # Disk is cheap. Memory is cheap. My memory isn't! Keep a lot of
 # history by default. 10K lines seems to go back about 6 months, and
