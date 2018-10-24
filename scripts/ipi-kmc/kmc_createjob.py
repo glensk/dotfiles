@@ -48,7 +48,7 @@ if False:
 # kmc_make_xyz_primitive_cell.py  -sc 6 -nmg 6 -nsi 6 -nvac 2
 # kmc_make_xyz_primitive_cell.py  -sc 8 -nmg 6 -nsi 6 -nvac 2
 # kmc_make_xyz_primitive_cell.py  -sc 10 -nmg 6 -nsi 6 -nvac 2
-# python ./kmc_xyz_or_ase_to_lammpsinput.py al6x6x6_alat4.057_202al_6si_6mg_2va_214atoms.xyz
+# python ./kmc_make_xyz_file_to_lammpsinput.py al6x6x6_alat4.057_202al_6si_6mg_2va_214atoms.xyz
 ######################### stop editing #############################
 ntasks = cores = nodes * 28
 neval = ipi_inst*2
@@ -110,13 +110,13 @@ for seed in seeds:
     copyfile(ipi, jobdir+"/"+positionsname+".ipi")
     copyfile(lmp, jobdir+"/data.lmp")
     copyfile(scripts+"in.lmp", jobdir+"/in.lmp")
-    copyfile(scripts+"submit.sh", jobdir+"/submit.sh")
+    copyfile(scripts+"submit-ipi-kmc.sh", jobdir+"/submit-ipi-kmc.sh")
 
     # change in.lmp
     sed(jobdir+"/in.lmp",'variable runnerDir       string ".*','variable runnerDir       string "'+pot+'"')
 
 
-    # change submit.sh
+    # change submit-ipi-kmc.sh
     sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(steps)+' </total_steps>')
     sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
     sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
@@ -127,14 +127,14 @@ for seed in seeds:
     sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str(positionsname)+'.ipi </file>')
     sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
 
-    # change submit.sh
-    sed(jobdir+"/submit.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
-    sed(jobdir+"/submit.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-    sed(jobdir+"/submit.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-    sed(jobdir+"/submit.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
+    # change submit-ipi-kmc.sh
+    sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
+    sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
+    sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
+    sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
 
     if submit is True:
         cwd = os.getcwd()
         os.chdir(jobdir)
-        call(["sbatch","submit.sh"])
+        call(["sbatch","submit-ipi-kmc.sh"])
         os.chdir(cwd)
