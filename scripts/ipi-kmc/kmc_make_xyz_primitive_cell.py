@@ -203,5 +203,5 @@ with open(filenameoutipi, 'w') as file:
 
 
 from subprocess import call
-file_to_exec = '/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/kmc_xyz_or_ase_to_lammpsinput.py'
+file_to_exec = '/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/kmc_make_xyz_file_to_lammpsinput.py'
 call(["python", file_to_exec,filenameoutxyz ])
