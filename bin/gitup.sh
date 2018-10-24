@@ -15,7 +15,7 @@ fi
 #echo "#### cd $HOME/scripts #################";cd $HOME/scripts | echo "";\\
 #echo "#### now in `pwd` #####################";echo;\\
 #echor : \033[1;31m\!*\033[m
-dot=$HOME/Dropbox/scripts/dotfiles/
+#dot=$HOME/Dropbox/scripts/dotfiles/
 dot=$dotfiles
 
 cd $dot
