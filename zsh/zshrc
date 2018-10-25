@@ -25,7 +25,7 @@ fi
 
 tlast=`getms`
 [ "$gettime" = "true" ] && gett=`gt $tlast $tlast` && echo "zsh0:start: $gett"
-[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH
+#[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH
 
 
 #[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
