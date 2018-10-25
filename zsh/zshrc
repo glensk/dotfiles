@@ -7,9 +7,11 @@ loadzsh="true"
 
 if [ "$loadzsh" = "true" ];then
 if [ "$gettime" = "true" ];then
+    date=`which date`
+    [ "`hostname | grep -o mac`" = "mac" ] && date=/usr/local/opt/coreutils/libexec/gnubin/date
     getms() {
-        /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
-        #date +%s%N
+        #/usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+        $date +%s%N
     }
 
     gt() {
