@@ -15,6 +15,11 @@ rybohr3_2_kbar () {
 
 echo $RESULT_FILE_HEADER >> $RESULT_FILE
 
+for WORKDIR in ./calculations/*;do
+    echo $WORKDIR
+done
+echo
+#exit
 for WORKDIR in ./calculations/*;
   do
   DISTANCE=$(echo $(basename $WORKDIR) | cut -d _ -f 2)
@@ -25,9 +30,10 @@ for WORKDIR in ./calculations/*;
     continue
   fi
   FINISHED=$(grep "JOB DONE" $WORKDIR/aiida.out)
-  if [ -z "$FINISHED" ] && [ ! $CHECK_FINISHED -eq 0 ]; then
+  #if [ -z "$FINISHED" ] && [ ! $CHECK_FINISHED -eq 0 ]; then
+  if [ -z "$FINISHED" ]; then
     echo $WORKDIR has not yet converged!
-    continue
+    #continue
   fi
 
   ENERGY_RY=$(grep -iE "! +total +energy" $WORKDIR/aiida.out | tail -n 1 | awk {'print $5'})
@@ -53,5 +59,6 @@ for WORKDIR in ./calculations/*;
   PYZ=$(rybohr3_2_kbar $PYZ)
   TIME=$(grep -i time $WORKDIR/aiida.out | tail -n 1 | awk {'print $9'})
 
-  echo "$DISTANCE,$ENERGY,$ENTROPY,$PXX,$PYY,$PZZ,$PXY,$PYZ,$PZX" >> $RESULT_FILE
+  #echo "$DISTANCE,$ENERGY,$ENTROPY,$PXX,$PYY,$PZZ,$PXY,$PYZ,$PZX" >> $RESULT_FILE
+  echo "$DISTANCE,$ENERGY"  >> $RESULT_FILE
 done
