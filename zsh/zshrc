@@ -34,13 +34,13 @@ autoload -U colors && colors                    # necessary for prompt colors (0
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:color: $gett"
 
 
-#autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
-autoload -Uz compinit   # is 12-4=8 instad of 16-4=12
-if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
-  compinit
-else
-  compinit -C
-fi
+autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
+#autoload -Uz compinit   # is 12-4=8 instad of 16-4=12
+#if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
+#  compinit
+#else
+#  compinit -C
+#fi
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
 #autoload -Uz compinit
