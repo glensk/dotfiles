@@ -16,7 +16,7 @@ source $generalrc/generalrc_.sh
 
 if [[ $- == *i* ]]    # only in interactive shell
 then
-    [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && echo "jojo" && source $HOME/.autojump/etc/profile.d/autojump.sh
+    [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
     alias c='j'
 fi
 
