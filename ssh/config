@@ -93,6 +93,7 @@ Host daint
  HostName daint.cscs.ch
  User aglensk
  ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
+ 
 
 
 # make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34

@@ -25,7 +25,6 @@ fi
 
 tlast=`getms`
 [ "$gettime" = "true" ] && gett=`gt $tlast $tlast` && echo "zsh0:start: $gett"
-#[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH
 
 
 #[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
@@ -72,11 +71,15 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 #################################################################
 # oh-my-zsh 
 #################################################################
-export ZSH="$dotfiles/zsh/oh-my-zsh"   # has to be loaded after plugins!
-[ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:?????: $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:ohmyl: $gett"
+#export ZSH="$dotfiles/zsh/oh-my-zsh"   # has to be loaded after plugins!
+#[ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:ohmyl: $gett"
 
-source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
+#source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
+#it seems faster to load the plugins manually then via oh-my-zsh
+source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-my: $gett"
 
 #################################################################
@@ -91,7 +94,6 @@ source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 # for bash/zsh: export currentshell='zsh'
 export currentshell='zsh'    # known are zsh / bash / tcsh
 export generalrc="$dotfiles/generalrc"
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh4:genrc: $gett"
 source $generalrc/generalrc_.sh
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh5:genrc: $gett"
 
