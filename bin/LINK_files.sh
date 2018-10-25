@@ -311,3 +311,13 @@ if [ ! -e "$dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-sear
     git clone https://github.com/zsh-users/zsh-history-substring-search.git
 fi
 
+echo "###########################################################################"
+echo "#                 zsh-syntax-highlighting                                 #"
+echo "###########################################################################"
+if [ ! -e "$dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ];then
+    echo installing zsh-syntax-highlighting since it is not available
+    cd $dotfiles/zsh
+    rm -rf zsh-syntax-highlighting
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+fi
+
