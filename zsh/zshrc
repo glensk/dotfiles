@@ -1,7 +1,7 @@
 ##echo zshin
 
 gettime="true"
-#gettime="false"
+gettime="false"
 loadzsh="true"
 #loadzsh="false"
 
@@ -23,8 +23,8 @@ if [ "$gettime" = "true" ];then
     }
 fi
 
-tlast=`getms`
-[ "$gettime" = "true" ] && gett=`gt $tlast $tlast` && echo "zsh0:start: $gett"
+#tlast=`getms`
+[ "$gettime" = "true" ] && gett=`gt getms getms` && echo "zsh0:start: $gett"
 
 
 #[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
@@ -34,7 +34,14 @@ autoload -U colors && colors                    # necessary for prompt colors (0
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:color: $gett"
 
 
-autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
+#autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
+autoload -Uz compinit   # is 12-4=8 instad of 16-4=12
+if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
+  compinit
+else
+  compinit -C
+fi
+
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
 #autoload -Uz compinit
 #if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
@@ -78,9 +85,14 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 
 #source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 #it seems faster to load the plugins manually then via oh-my-zsh
-source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+#####################################################################
+# SOMEHOW I STILL HAVE A SYNTAX HIGHLIGHTING and SUBSTRING SEARCH EVEN WITHOT LOADING THE FOLLOWING LINES
+
+#source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh  # 13timeunits (4without)
+#source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh  # 4timeunits (4without)
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-my: $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-m2: $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-m3: $gett"
 
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
@@ -95,12 +107,14 @@ source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.z
 export currentshell='zsh'    # known are zsh / bash / tcsh
 export generalrc="$dotfiles/generalrc"
 source $generalrc/generalrc_.sh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh5:genrc: $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh5:MYMYM: $gett https://carlosbecker.com/posts/speeding-up-zsh/"
 
 #######################################################################
-# autojump
+# autojump 
+# auskommentieren von if command -v brew makes it much faster on mac!
 #######################################################################
-source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
+#source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
+source ~/.autojump/share/autojump/autojump.zsh
 alias c='j'
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh6:autoj: $gett"
 

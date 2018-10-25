@@ -70,3 +70,4 @@ set completion-ignore-case on
 
 #export PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "
 #echo ende
+[ "$ondaint" = "true" ] && echo bin on daint
