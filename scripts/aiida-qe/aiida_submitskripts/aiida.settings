@@ -2,7 +2,7 @@
   calculation = 'relax'     	! SCF relax and VlumeCell relax
   outdir = './out/'
   prefix = 'aiida'
-  pseudo_dir = '/users/aglensk/scripts/qe_pseudos'
+  pseudo_dir = '/users/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/aiida-qe/qe_pseudopotentials'
   tprnfor = .true.             	! calculate the pressure of the cell
   tstress = .true.
   verbosity = 'high'
