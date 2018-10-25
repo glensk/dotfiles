@@ -1,26 +1,40 @@
 ##echo zshin
 
 gettime="true"
-gettime="false"
+#gettime="false"
+loadzsh="true"
+#loadzsh="false"
+
+if [ "$loadzsh" = "true" ];then
 if [ "$gettime" = "true" ];then
     getms() {
         /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
         #date +%s%N
     }
-    export tin=`getms`
+
     gt() {
-        export tnow=`getms`
-        diff=`echo $tin $tnow | awk '{print ($2-$1)}'`
-        echo $diff | awk '{print $1/1000000}'
-        export tin=`getms`
+        ka=$*
+        tlast=`echo "$ka" | awk '{print $1}'`
+        tnow=`getms`
+        diff=`echo $tlast $tnow | awk '{printf "%.1f\n", ($2-$1)/10000000}'`
+        echo $tnow $tlast $diff
     }
 fi
+
+tlast=`getms`
+[ "$gettime" = "true" ] && gett=`gt $tlast $tlast` && echo "zsh0:start: $gett"
+[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH
+
 
 #[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)
 autoload -U colors && colors                    # necessary for prompt colors (0.00s)
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:color: $gett"
+
+
 autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
 #autoload -Uz compinit
 #if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ~/.zcompdump) ]; then
 #  compinit
@@ -30,7 +44,7 @@ autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid c
 
 autoload -U +X bashcompinit && bashcompinit     # make bash completion function work (complete) (0.00s)
 
-[ "$gettime" = "true" ] && echo zsh1 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:bash : $gett"
 #################################################################
 # oh-my-zsh: DONT USE IT!!! do this first in zsh; IT IS WAY TOO SLOW!!!!!! DONT USE IT !!!!!
 # but the way it colors the history-substring-search is great!
@@ -58,9 +72,10 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 #################################################################
 export ZSH="$dotfiles/zsh/oh-my-zsh"   # has to be loaded after plugins!
 [ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
-[ "$gettime" = "true" ] && echo zsh2 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:?????: $gett"
+
 source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
-[ "$gettime" = "true" ] && echo zsh3 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-my: $gett"
 
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
@@ -74,15 +89,16 @@ source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
 # for bash/zsh: export currentshell='zsh'
 export currentshell='zsh'    # known are zsh / bash / tcsh
 export generalrc="$dotfiles/generalrc"
-[ "$gettime" = "true" ] && echo zsh4 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh4:genrc: $gett"
 source $generalrc/generalrc_.sh
-[ "$gettime" = "true" ] && echo zsh5 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh5:genrc: $gett"
 
-#source $dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
-#alias c='z'
+#######################################################################
+# autojump
+#######################################################################
 source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
 alias c='j'
-[ "$gettime" = "true" ] && echo zsh6 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh6:autoj: $gett"
 
 #export LAMMPS_COMMAND="/usr/local/bin/lmp_serial" #(path to binary file) 
 #export LAMMPS_COMMAND="/Users/glensk/miniconda3/bin/lmp_serial" #(path to binary file) 
@@ -97,18 +113,18 @@ alias c='j'
 # - define colors for ls
 #################################################################
 source $dotfiles/zsh/zsh_set
-[ "$gettime" = "true" ] && echo zsh7 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh7:zhset: $gett"
 
 #################################################################
-# conda / anaconda / miniconda
+# conda / anaconda / miniconda  -> takes too much time when opening new shell
 #################################################################
-if [ -e "$HOME/miniconda3" ];then
-    . $HOME/miniconda3/etc/profile.d/conda.sh
-    conda activate # activates the default conda python (3.x)
-fi
+#if [ -e "$HOME/miniconda3" ];then
+#    . $HOME/miniconda3/etc/profile.d/conda.sh
+#    conda activate # activates the default conda python (3.x)
+#fi
 
 
-[ "$gettime" = "true" ] && echo zsh8 `gt`
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh8:conda: $gett"
 
 
 # time zsh
@@ -127,3 +143,4 @@ fi
 #@# after this file ~/.zlogin is loaded 
 #@#################################################################
 #echo zshout
+fi
