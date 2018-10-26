@@ -137,7 +137,7 @@ source $dotfiles/zsh/zsh_set
 # conda / anaconda / miniconda  -> takes too much time when opening new shell
 #################################################################
 #if [ -e "$HOME/miniconda3" ];then
-#    . $HOME/miniconda3/etc/profile.d/conda.sh
+#    source $HOME/miniconda3/etc/profile.d/conda.sh
 #    conda activate # activates the default conda python (3.x)
 #fi
 

@@ -261,3 +261,5 @@ $1 mount_fidis 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o r
 $1 umount_fidis 'umount -f /scratch/glensk'
 $1 mount_daint 'sshfs aglensk@ela.cscs.ch:/users/aglensk/ ~/daint -o reconnect -C'
 $1 make_home_accessible 'chmod -R ga+r $HOME'
+
+$1 getconda ". $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
