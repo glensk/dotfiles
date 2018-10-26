@@ -70,4 +70,15 @@ set completion-ignore-case on
 
 #export PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "
 #echo ende
-[ "`hostname | grep -o daint`" = "daint" ] && echo bin on dint && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
+
+#case "$-" in
+#    *i*)  echo This shell is interactive ;;
+#    *)  echo This shell is not interactive ;;
+#esac
+
+#[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
+# This is grat breaks however scp
+case "$-" in
+    *i*)  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
+esac
+
