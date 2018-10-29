@@ -137,7 +137,7 @@ def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
     fout = open(outputfile,'w')
     #print('jo',outputfile)
 
-    fout.write("LAMMPS data file generated get_lammps_data.py\n")
+    fout.write("LAMMPS positionsfile from: "+str(filename)+"\n")
     fout.write("\n")
     fout.write(str(len(species))+" atoms\n")
     fout.write(str(len(unique_species))+" atom types\n")
@@ -168,13 +168,13 @@ if __name__ == "__main__":
     #p = argparse.ArgumentParser(description=pp.pprint(x),
     p = argparse.ArgumentParser(description='',
             formatter_class=argparse.RawTextHelpFormatter) #ArgumentDefaultsHelpFormatter)
-    string='''e.g. convert_fileformats.py /Users/glensk/Dropbox/Albert/google_drive/Glensk/KMC-Tutorial/raw_data/20181024_test_si-si-vac-stability_qe_vs_nn/second_test/calculations/wkdir_2.868732211/aiida.out --formatin 'espresso-out' --formatout lmp --outfile tmp'''
+    string='''e.g. convert_fileformats.py PathToInputfile.out --formatin 'espresso-out' --formatout lmp'''
     parser = argparse.ArgumentParser(description=string)
     parser.add_argument("infile", type = str, help = "The name of the file")
     parser.add_argument("--showformats",'-sf', action='store_true', default=False, help = "show the possible in/outputformats (not showing lammps) and exit")
     parser.add_argument("--formatin",'-fi', type=str,default="lmp", help="Format of the input file, this can be all of the listed using --showformats, e.g. espresso-out,xyz,vasp, ...; default:lmp")
     parser.add_argument("--formatout",'-fo', type=str,default="lmp", help="Format of the output file, this can be most of the listed using --showformats and additionally lmp for LAMMPS, e.g. lmp,xyz,vasp, ...; default:lmp")
-    parser.add_argument("--outfile", type=str,default=False, help="if nothing is provided --> default=infile+.lmp")
+    parser.add_argument("--outfilename", type=str,default=False, help="if nothing is provided --> default=infile+.lmp")
 
 
     args = parser.parse_args()
@@ -185,15 +185,16 @@ if __name__ == "__main__":
         pp.pprint(x)
         sys.exit()
 
-    if args.outfile == False:
-        args.outfile = args.infile+'.'+args.formatout
+    if args.outfilename == False:
+        #args.outfilename = args.infile+'.'+args.formatout
+        args.outfilename = os.getcwd()+'/'+os.path.basename(args.infile)+'.'+args.formatout
     else:
-        args.outfile = os.path.basename(args.infile)+"."+args.formatout  #args.outfile #+'.'+args.formatout
+        args.outfilename = os.getcwd()+'/'+args.outfilename+"."+args.formatout  #args.outfilename #+'.'+args.formatout
 
     print()
     print('infile       :',args.infile)
     print('infileformat :',args.formatin)
     print('outfileformat:',args.formatout)
-    print('outfile      :',args.outfile)
+    print('outfilename  :',args.outfilename)
     print()
-    sys.exit(main(args.infile, args.formatin, args.formatout,args.outfile))
+    sys.exit(main(args.infile, args.formatin, args.formatout,args.outfilename))
