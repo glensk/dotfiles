@@ -135,11 +135,12 @@ source $dotfiles/zsh/zsh_set
 
 #################################################################
 # conda / anaconda / miniconda  -> takes too much time when opening new shell
+#                               -> but is necessary when opening ipython notebooks
 #################################################################
-#if [ -e "$HOME/miniconda3" ];then
-#    source $HOME/miniconda3/etc/profile.d/conda.sh
-#    conda activate # activates the default conda python (3.x)
-#fi
+if [ -e "$HOME/miniconda3" ];then
+    source $HOME/miniconda3/etc/profile.d/conda.sh
+    conda activate # activates the default conda python (3.x)
+fi
 
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh8:conda: $gett"

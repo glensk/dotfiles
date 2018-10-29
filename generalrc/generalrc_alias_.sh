@@ -116,8 +116,8 @@ $1 grep 'grep --color=auto -d skip'    # skips directories
 #$1 grep'echo use ack instead'
 $1 bc 'bc -l'
 #alias cp='cp -a'  # this one did not copy symliks as files but as symlinks -> remove -a
-$1 xmgrace 'xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
-$1 x 'xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+$1 xmgrace 'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+$1 x 'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 $1 g gnuplotfile
 $1 untargz 'tar -xvf'
 $1 untar 'tar xfv'
@@ -262,4 +262,5 @@ $1 umount_fidis 'umount -f /scratch/glensk'
 $1 mount_daint 'sshfs aglensk@ela.cscs.ch:/users/aglensk/ ~/daint -o reconnect -C'
 $1 make_home_accessible 'chmod -R ga+r $HOME'
 
-$1 getconda ". $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
+$1 condaactivate ". $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
+$1 gp 'condaactivate'

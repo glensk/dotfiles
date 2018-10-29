@@ -1,8 +1,9 @@
-#!/usr/bin/python
-import sys
+#!/usr/bin/env python
+import sys,os
 import argparse
 import numpy as np
 from numpy.linalg import norm
+import ase
 from ase.io import read,write
 
 
@@ -105,14 +106,18 @@ def write_lammps_data(filename, atoms, atom_types, comment=None, cutoff=None,
 
 
 
-def main(filename, fileformat="xyz",outputfile=False):
-    if outputfile == False:
-        outputfile = filename+'.lmp'
-    frame = read(filename,format=fileformat)
+def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
+    #if outputfile == False:
+    #    outputfile = filename+'.lmp'
+    frame = read(filename,format=fileformat_in)
+    if fileformat_out != 'lmp':
+        write(outputfile,frame,format=fileformat_out)
+        print('written '+outputfile)
+        sys.exit()
     #print('fc',frame.cell)
     #print()
     #sys.exit()
-    print('fp',frame.positions)
+    #print('fp',frame.positions)
     newcell, newpos = convert_cell(frame.cell, frame.positions)
     frame.set_cell(newcell)
     frame.set_positions(newpos)
@@ -130,38 +135,65 @@ def main(filename, fileformat="xyz",outputfile=False):
 
 
     fout = open(outputfile,'w')
+    #print('jo',outputfile)
 
-    print("LAMMPS data file generated get_lammps_data.py", file=fout)
-    print("", file=fout)
-    print(len(species), "atoms", file=fout)
-    print(len(unique_species), "atom types", file=fout)
-    print("", file=fout)
-    print("0.0", hxx, "xlo xhi", file=fout)
-    print("0.0", hyy, "ylo yhi", file=fout)
-    print("0.0", hzz, "zlo zhi", file=fout)
-    print(hxy, hxz, hyz, "xy xz yz", file=fout)
-    print("", file=fout)
-    print("Masses", file=fout)
-    print("", file=fout)
+    fout.write("LAMMPS data file generated get_lammps_data.py\n")
+    fout.write("\n")
+    fout.write(str(len(species))+" atoms\n")
+    fout.write(str(len(unique_species))+" atom types\n")
+    fout.write("\n")
+    fout.write("0.0 "+str(hxx)+" xlo xhi\n")
+    fout.write("0.0 "+str(hyy)+" ylo yhi\n")
+    fout.write("0.0 "+str(hzz)+" zlo zhi\n")
+    fout.write(str(hxy)+" "+str(hxz)+" "+str(hyz)+" xy xz yz\n")
+    fout.write("\n")
+    fout.write("Masses\n")
+    fout.write("\n")
     for ii in range(len(unique_species)):
-        print(lammps_indices[i_unique_species[ii]], masses[i_unique_species[ii]], file=fout)
-    print("", file=fout)
-    print("Atoms", file=fout)
-    print("", file=fout)
+        #print(lammps_indices[i_unique_species[ii]], masses[i_unique_species[ii]])
+        fout.write(str(lammps_indices[i_unique_species[ii]])+" "+str(masses[i_unique_species[ii]])+"\n")
+    fout.write("\n")
+    fout.write("Atoms\n")
+    fout.write("\n")
     for ii in range(len(species)):
-        print(("%5d %5d %s" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) ), file=fout)
-    print("", file=fout)
+        fout.write(("%5d %5d %s" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
+        #fout.write(("%5d %5d %.10f %.10f %.10f" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
+    fout.write("\n")
 
     fout.close()
 
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Whatever this is going to do")
-    parser.add_argument("filename", type = str, help = "The name of the file")
-    parser.add_argument("--format", type=str,default="xyz", help="Format of the input file")
-    parser.add_argument("--outfile", type=str,default=False, help="Name of the output file; default=inputfilename+lmp")
+    #p = argparse.ArgumentParser(description=pp.pprint(x),
+    p = argparse.ArgumentParser(description='',
+            formatter_class=argparse.RawTextHelpFormatter) #ArgumentDefaultsHelpFormatter)
+    string='''e.g. convert_fileformats.py /Users/glensk/Dropbox/Albert/google_drive/Glensk/KMC-Tutorial/raw_data/20181024_test_si-si-vac-stability_qe_vs_nn/second_test/calculations/wkdir_2.868732211/aiida.out --formatin 'espresso-out' --formatout lmp --outfile tmp'''
+    parser = argparse.ArgumentParser(description=string)
+    parser.add_argument("infile", type = str, help = "The name of the file")
+    parser.add_argument("--showformats",'-sf', action='store_true', default=False, help = "show the possible in/outputformats (not showing lammps) and exit")
+    parser.add_argument("--formatin",'-fi', type=str,default="lmp", help="Format of the input file, this can be all of the listed using --showformats, e.g. espresso-out,xyz,vasp, ...; default:lmp")
+    parser.add_argument("--formatout",'-fo', type=str,default="lmp", help="Format of the output file, this can be most of the listed using --showformats and additionally lmp for LAMMPS, e.g. lmp,xyz,vasp, ...; default:lmp")
+    parser.add_argument("--outfile", type=str,default=False, help="if nothing is provided --> default=infile+.lmp")
 
 
     args = parser.parse_args()
-    sys.exit(main(args.filename, args.format, args.outfile))
+    if args.showformats:
+        x = ase.io.formats.all_formats
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(x)
+        sys.exit()
+
+    if args.outfile == False:
+        args.outfile = args.infile+'.'+args.formatout
+    else:
+        args.outfile = os.path.basename(args.infile)+"."+args.formatout  #args.outfile #+'.'+args.formatout
+
+    print()
+    print('infile       :',args.infile)
+    print('infileformat :',args.formatin)
+    print('outfileformat:',args.formatout)
+    print('outfile      :',args.outfile)
+    print()
+    sys.exit(main(args.infile, args.formatin, args.formatout,args.outfile))
