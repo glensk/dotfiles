@@ -5,7 +5,7 @@ folder_lammps_save=$dotfiles/scripts/executables
 
 echo "folder_lammps_sources $folder_lammps_sources"
 echo "folder_lammps_save $folder_lammps_save"
-exit
+
 #[ "$1" != "" ] && folder_lammps_sources=$1
 #echo folder_lammps_sources $folder_lammps_sources
 #exit
@@ -39,3 +39,7 @@ if [ -e "lmp_serial" ];then
         mv lmp_serial $folder_lammps_save/lmp_serial_`hostname`_runner_`date +"%Y_%m_%d"`
     fi
 fi
+
+# mac: done (serial)
+# cosmopc:  
+# fidis:
