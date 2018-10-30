@@ -42,6 +42,6 @@ if [ -e "lmp_serial" ];then
 fi
 
 # mac:      done    (serial)
-# cosmopc:  running (serial)  
+# cosmopc:  done    (serial)  
 # fidis:            (parallel since makefile exists)
-# still to anser the question weather lammps sources sould be kept or not 
+# still to anser the question weather lammps sources sould be kept or not ...
