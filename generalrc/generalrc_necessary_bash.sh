@@ -15,6 +15,9 @@ setenv () {
       export $1=$2
 }
 
+function iterm_title {
+        echo -ne "\033]0;"$*"\007"
+}
 #setenv () { export $1=$2 }
 
 #aliastcshtobash () {
