@@ -30,7 +30,7 @@ make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RI
 make yes-USER-RUNNER
 sed -i 's|^#define MAXNEIGH.*|#define MAXNEIGH 500|' pair_runner.h
 rm -f lmp_serial
-make serial
+make serial | tee -a make_serial_out_`date +"%Y_%m_%d"`
 pwd
 [ ! -e "lmp_serial" ] && echo "lmp_serial was NOT CREATED! THE COMPILATION FAILED!"
 if [ -e "lmp_serial" ];then
@@ -40,6 +40,6 @@ if [ -e "lmp_serial" ];then
     fi
 fi
 
-# mac: done (serial)
-# cosmopc:  
+# mac:      done    (serial)
+# cosmopc:  running (serial)  
 # fidis:
