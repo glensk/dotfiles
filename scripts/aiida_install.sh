@@ -19,5 +19,20 @@ mkdir $HOME/aiida
 cd $HOME/aiida 
 git clone https://github.com/aiidateam/aiida_core
 pip install -e aiida_core  # was not available with conda
---> here i can not install the aiida_core also with pip ...
+verdi quicksetup  # albert.glensk@gmail.com,Albert,Glensk,EPFL COSMO, 
+
+Password:
+Detected no known postgres setup, some information is needed to create the aiida database and grant
+aiida access to it. If you feel unsure about the following parameters, first check if postgresql is
+installed. If postgresql is not installed please exit and install it, then run verdi quicksetup again.
+If postgresql is installed, please ask your system manager to provide you with the following parameters:
+    postgres host [localhost]:
+    postgres port [5432]:
+    template [template1]:
+    postgres super user [postgres]:
+PW: Standard tow nix
+%verdi profile list
+%Info: configuration folder: /Users/glensk/.aiida
+%Critical: no default profile configured yet, run `verdi setup`
+
 

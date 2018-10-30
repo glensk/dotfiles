@@ -36,10 +36,12 @@ pwd
 if [ -e "lmp_serial" ];then
     echo "lmp_serial SUCCESSFULLY compiled!"
     if [ -e "$folder_lammps_save" ];then
+        echo mv lmp_serial $folder_lammps_save/lmp_serial_`hostname`_runner_`date +"%Y_%m_%d"`
         mv lmp_serial $folder_lammps_save/lmp_serial_`hostname`_runner_`date +"%Y_%m_%d"`
     fi
 fi
 
 # mac:      done    (serial)
 # cosmopc:  running (serial)  
-# fidis:
+# fidis:            (parallel since makefile exists)
+# still to anser the question weather lammps sources sould be kept or not 
