@@ -17,7 +17,7 @@ Host cmpc34
     TCPKeepAlive yes
 
 Host cmpc
-    HostName $myhost.mpie.de
+    HostName cmpc03.mpie.de
     User glensk
     ServerAliveInterval 1600
     ServerAliveCountMax 1000

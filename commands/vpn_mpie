@@ -3,3 +3,7 @@ open fortigateclient (using alfred)
 
 dann:
 ssh cmpc01.mpie.de
+oder
+ssh cmpc
+
+ssh -D 1234 cmpc

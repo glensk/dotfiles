@@ -81,8 +81,23 @@ nva=args.nvac
 #    nva = 1        # 0.001953125
 
 
+primitive_cell = True
+if primitive_cell:
+    atom = ase.build.bulk('Al',crystalstructure='fcc',a=alat)
 
-atom = ase.build.bulk('Al',crystalstructure='fcc',a=alat)
+if cubic_cell:
+	a1 = np.array([a0,0.,0.])
+	a2 = np.array([0.,a0,0.])
+	a3 = np.array([0.,0.,a0])
+	t1 = np.array([0.0,0.0,0.0])
+	t2 = np.array([0.0,0.5,0.5])
+	t3 = np.array([0.5,0.0,0.5])
+	t4 = np.array([0.5,0.5,0.0])
+
+	atom = ase.Atoms('{}4'.format(matrix),
+	                  cell=[a1,a2,a3], pbc=True,
+	                  scaled_positions=[t1,t2,t3,t4])
+
 atomsc = atom.repeat(sc)
 
 number_of_atoms = atomsc.get_number_of_atoms()

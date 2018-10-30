@@ -92,6 +92,7 @@ echo
 cd $dotfiles
 chmod u+x $dotfiles/generalrc/*
 chmod u+x $dotfiles/bin/*
+chmod u+x $dotfiles/lammps_scripts/*
 
 
 ####################################################################
