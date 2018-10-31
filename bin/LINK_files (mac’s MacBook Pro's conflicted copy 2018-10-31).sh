@@ -223,21 +223,18 @@ echo "##########################################################################
 loadeverywhere () {
 file=$1
 from=$2
-echo "LINK $file from $from check:$3:" | sed 's|'"$HOME"'/|~/|' | sed 's| from.*Albert/scripts/| from $|' | awk '{printf "%4s %32s %5s %53s %10s\n",$1,$2,$3,$4,$5}'
+echo "LOAD EVERYWHERE $file from $from" | sed 's| from .*Albert/scripts/| from $|'
 [ -h "$file" ] && unlink $file 
 [ -f "$file" ] && echo $file rm && rm -rf $file 
 [ ! -e "$file" ] && ln -s $from $file
 [ ! -e "$file" ] && echo "$file was not linked!" && exit
 if [ "$3" = "checklinkdir" ];then
-	if [ -L "$file" ];then
-	if [ -d "$file" ];then
-	#echo "$file is a symlink to a directory"
-	k=k # pass since this is ok
+	if [[ -L "$file" && -d "$file" ]];then
+	echo "$file is a symlink to a directory"
 	else
-	    echo "$file NOT a symlink to a directory (check what it is and evlt. delete it)"
-	    exit
+	echo "$file NOT a symlink to a directory (check what it is and evlt. delete it)"
+	exit
 	fi
-    fi
 fi
 }
 
