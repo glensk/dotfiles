@@ -42,6 +42,9 @@ echo
 [ "$oncosmopc" = "true" ] && [ ! -e "$HOME/google_drive" ] && ln -s /local/scratch/glensk/google_drive $HOME/google_drive
 
 
+[ "$DB" = "true" ] && echo checking if Dropbox folder exists .... && [ ! -e "$HOME/google_drive" ] && echo $HOME/google_drive does not exist && exit
+[ "$GD" = "true" ] && echo checking if google_drive exists folder .... && [ ! -e "$HOME/google_drive" ] && echo $HOME/google_drive does not exist && exit
+
 createfolder () {
     echo "please create once the folder $1"
     echo
@@ -69,7 +72,7 @@ echo "dotfiles are in $dotfiles"
 ####################################################################
 # checking Dropbox folder
 ####################################################################
-echo "checking if Dropbox folder exist ... (can be created here if it not exists)"
+echo "checking if Dropbox folder exist ... (will be created here if it not exists)"
 if [ "$DB" = "false" ];then
     [ ! -e "$DROPBOX" ]              && createfolder $DROPBOX              
     [ ! -e "$DROPBOXME" ]            && createfolder $DROPBOXME            
@@ -77,14 +80,13 @@ if [ "$DB" = "false" ];then
     [ ! -e "$DROPBOXMESCRIPTS" ]     && createfolder $DROPBOXMESCRIPTS
 fi
 
-echo "checking if Dropbox folder exist ... (will exit here if it not exists)"
+#echo "checking if Dropbox folder exist ... (will exit here if it not exists)"
 [ ! -e "$DROPBOX" ]              && echo "no DROPBOX              folder $DROPBOX"              && exit
 [ ! -e "$DROPBOXME" ]            && echo "no DROPBOXME            folder $DROPBOXME"            && exit
 #[ ! -e "$DROPBOXMEGOOGLEDRIVE" ] && echo "no DROPBOXMEGOOGLEDRIVE folder $DROPBOXMEGOOGLEDRIVE" && exit
 [ ! -e "$DROPBOXMESCRIPTS" ]     && echo "no DROPBOXMESCRIPTS     folder $DROPBOXMEGOOGLEDRIVE" && exit
 [ ! -e "$dotfiles" ]             && echo "no dotfiles             folder $dotfiles"             && exit
 echo "                                 ... successfull"
-echo
 cd $dotfiles
 chmod u+x $dotfiles/generalrc/*
 chmod u+x $dotfiles/bin/*
@@ -94,19 +96,11 @@ chmod u+x $dotfiles/lammps_scripts/*
 ####################################################################
 # checking dotfiles
 ####################################################################
-echo "checking dotfiles                ..."
+echo
+echo "# checking dotfiles ... ###########################################################"
 [ ! -e "$dotfiles" ] && echo "$dotfiles does not exist!" && exit
-echo "                                 ... successfull, dotfiles from: $dotfiles"
+echo "                    ... successfull, dotfiles from: $dotfiles"
 
-
-####################################################################
-## Google Drive
-####################################################################
-#echo "checking Google_Drive            ..."
-#[ "$host" = "mac" ] && [ ! -e "$GOOGLEDRIVEtarget" ] && [ -e "$DROPBOXMEGOOGLEDRIVE" ] && ln -s $DROPBOXMEGOOGLEDRIVE $GOOGLEDRIVEtarget
-#[ ! -e "$GOOGLEDRIVEtarget" ] && echo $GOOGLEDRIVEtarget folder does not exist && exit
-#[ -e "$GOOGLEDRIVEtarget" ] && echo "                                 ... successfully linked to (or existing) ~/google_drive"
-#echo
 
 #####################################################################
 # this was for cmmc
@@ -123,9 +117,8 @@ if [ -e "/data/glensk" ];then
     cd $hier
 fi
 
-####################################################################
-# 
-####################################################################
+echo
+echo "# linking ... #####################################################################"
 linkdropbox_home () {
     if [ "$DB" = "true" ];then     # dropbox path is there
         echo "trying to link $1 ..."
@@ -136,17 +129,15 @@ linkdropbox_home () {
                 echo "(did already exist) linking $HOME/$1 ... from ... `readlink -f $HOME/$1`"
             fi;fi;fi
 }
-
-
-echo "linking ..."
 linkdropbox_home proj 
 linkdropbox_home scripts
 linkdropbox_home v
 linkdropbox_home Thermodynamics
 
 
+echo
+echo "# unlink tcsh,bash,zsh ############################################################"
 unlinktcsh() {
-echo "# unlink tcsh                                                #"
     [ -h "$HOME/.tcshrc" ] && unlink $HOME/.tcshrc
     [ -h "$HOME/.tcshrc.complete" ] && unlink $HOME/.tcshrc.complete
     [ -h "$HOME/.tcshrc.alias" ] && unlink $HOME/.tcshrc.alias
@@ -155,31 +146,22 @@ echo "# unlink tcsh                                                #"
     [ -h "$HOME/.tcshrc.local" ] && unlink $HOME/.tcshrc.local
 }
 unlinkbash() {
-echo "# unlink bash                                               #"
     [ -h "$HOME/.bashrc" ] && unlink $HOME/.bashrc
     [ -h "$HOME/.bash_profile" ] && unlink $HOME/.bash_profile
     [ -h "$HOME/.bash_alias" ] && unlink $HOME/.bash_alias
     [ -h "$HOME/.inputrc" ] && unlink $HOME/.inputrc
 }
 unlinkzsh() {
-echo "# unlink zsh                                                #"
     [ -h "$HOME/.zshrc" ] && unlink $HOME/.zshrc
     [ -h "$HOME/.oh-my-zsh" ] && unlink $HOME/.oh-my-zsh
     [ -h "$HOME/.bash_alias" ] && unlink $HOME/.bash_alias
 }
-echo
-echo
-echo
-echo "#############################################################"
-echo "# unlink tcsh,bash,zsh                                      #"
-echo "#############################################################"
 unlinktcsh
 unlinkbash
 unlinkzsh
 
-echo "#############################################################"
-echo "# link tcsh,bash,zsh                                        #"
-echo "#############################################################"
+echo
+echo "# link tcsh,bash,zsh ##############################################################"
 file=$HOME/.tcshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
@@ -192,14 +174,10 @@ file=$HOME/.zshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/zshrc $file
-echo
-echo
-echo
 
 if [ "$host" = "$mylaptop" ];then 
-echo "###########################################################################"
-echo "#                 on mylaptop (local)                                     #"
-echo "###########################################################################"
+echo
+echo "# on mylaptop (local) #############################################################"
     file=$HOME/.gvimrc
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
@@ -209,13 +187,10 @@ echo "##########################################################################
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/pycharm/ideavimrc $file
-
 fi
 
-
-echo "###########################################################################"
-echo "#                 LOAD EVERYWHERE                                         #"
-echo "###########################################################################"
+echo
+echo "# LINK EVERYTHING #################################################################"
 loadeverywhere () {
 file=$1
 from=$2
@@ -287,10 +262,9 @@ if [ -e "$HOME/.config/terminator" ]; then
     fi
 chmod 600 ~/.ssh/config
 
-echo "###########################################################################"
-echo "#                         autojump                                        #"
-echo "###########################################################################"
-echo "autojump .... (if autojump is not working enable this in the LINK_files.sh skript"
+echo
+echo "# autojump ########################################################################"
+echo "# autojump .... (if autojump is not working enable this in the LINK_files.sh skript"
 if [ ! -e "autojump" ];then
     echo "installing autojump"
     cd $dotfiles
@@ -300,9 +274,8 @@ if [ ! -e "autojump" ];then
     cd $dotfiles
 fi
 
-echo "###########################################################################"
-echo "#                 zsh-history-substring-search                            #"
-echo "###########################################################################"
+echo
+echo "# zsh-history-substring-search ####################################################"
 if [ ! -e "$dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh" ];then
     echo installing zsh-history-substring-search since it is not available
     cd $dotfiles/zsh
@@ -310,9 +283,8 @@ if [ ! -e "$dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-sear
     git clone https://github.com/zsh-users/zsh-history-substring-search.git
 fi
 
-echo "###########################################################################"
-echo "#                 zsh-syntax-highlighting                                 #"
-echo "###########################################################################"
+echo
+echo "# zsh-syntax-highlighting #########################################################"
 if [ ! -e "$dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ];then
     echo installing zsh-syntax-highlighting since it is not available
     cd $dotfiles/zsh
