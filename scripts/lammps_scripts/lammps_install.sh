@@ -51,5 +51,6 @@ fi
 
 # mac:      done    (serial) WORKS, energy checked
 # cosmopc:  done    (serial) WORKS, energy checked 
-# fidis:            (parallel since makefile exists)
-# still to anser the question weather lammps sources sould be kept or not ... no ... just delete it!
+# fidis:    done    (parallel since makefile exists), check weahther it works by redoing one oldjob
+#
+# in general, dont remove the ~/sources/lammps_source_cosmo folder 
