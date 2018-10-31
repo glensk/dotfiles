@@ -6,9 +6,6 @@ folder_lammps_save=$dotfiles/scripts/executables
 echo "folder_lammps_sources $folder_lammps_sources"
 echo "folder_lammps_save $folder_lammps_save"
 
-#[ "$1" != "" ] && folder_lammps_sources=$1
-#echo folder_lammps_sources $folder_lammps_sources
-#exit
 
 if [ ! -e "$folder_lammps_sources" ];then
     read -p "Should I crate the folder $folder_lammps_sources ? [yes y no n] " yn
@@ -30,6 +27,8 @@ make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RI
 make yes-USER-RUNNER
 sed -i 's|^#define MAXNEIGH.*|#define MAXNEIGH 500|' pair_runner.h
 rm -f lmp_serial
+pwd
+exit
 make serial | tee -a make_serial_out_`date +"%Y_%m_%d"`
 pwd
 [ ! -e "lmp_serial" ] && echo "lmp_serial was NOT CREATED! THE COMPILATION FAILED!"
@@ -41,7 +40,7 @@ if [ -e "lmp_serial" ];then
     fi
 fi
 
-# mac:      done    (serial)
-# cosmopc:  done    (serial)  
+# mac:      done    (serial) WORKS, energy checked
+# cosmopc:  done    (serial) WORKS, energy checked 
 # fidis:            (parallel since makefile exists)
 # still to anser the question weather lammps sources sould be kept or not ... no ... just delete it!
