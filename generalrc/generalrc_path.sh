@@ -17,7 +17,6 @@ homebrew="/usr/local/sbin"
 bin="/usr/bin"
 bin2="$dotfiles/sources_bin"
 bin3="$dotfiles/bin/stefan"
-bin4="$dotfiles/lammps_scripts"
 bin5="$dotfiles/bin/phonon_lifetimes"
 bin6="$HOME/.local/bin"
 ipi="$HOME/google_drive/scripts_epfl/i-pi-mc/bin"
@@ -28,9 +27,11 @@ runnertools="$HOME/google_drive/scripts_epfl/runner_tools/runner_tools"
 aliases="$dotfiles/aliases"
 aiida="$dotfiles/scripts/aiida-qe/aiida_solutejobs_scripts"
 aiida2="$dotfiles/scripts/aiida-qe/aiida_analyze"
-lammps="$dotfiles/scripts/executables"
+lammps1="$dotfiles/scripts/lammps_executables"
+lammps2="$dotfiles/scripts/lammps_scripts"
+
 #PATH="$dropboxbin:bin3:$PATH"  !! not like this! $PATH first !!! 
-PATH="$PATH:$aiida:$aiida2:$aliases:$lammps:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+PATH="$PATH:$aiida:$aiida2:$aliases:$lammps1:$lammps2:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
