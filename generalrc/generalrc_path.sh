@@ -28,11 +28,9 @@ runnertools="$HOME/google_drive/scripts_epfl/runner_tools/runner_tools"
 aliases="$dotfiles/aliases"
 aiida="$dotfiles/scripts/aiida-qe/aiida_solutejobs_scripts"
 aiida2="$dotfiles/scripts/aiida-qe/aiida_analyze"
-#PATH="$dropboxbin:$kmc:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"  !! not like this! this destroys (on cmmc) the module load python (PATH is there but wrong python is started up)
-PATH="$PATH:$aiida:$aiida2:$aliases:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
-#PATH="$PATH:$dropboxbin:$ipi:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
-#PATH="$dropboxbin:$anaconda:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
-#PATH="$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$PATH"
+lammps="$dotfiles/scripts/executables"
+#PATH="$dropboxbin:bin3:$PATH"  !! not like this! $PATH first !!! 
+PATH="$PATH:$aiida:$aiida2:$aliases:$lammps:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 

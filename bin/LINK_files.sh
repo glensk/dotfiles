@@ -223,8 +223,7 @@ echo "##########################################################################
 loadeverywhere () {
 file=$1
 from=$2
-echo "LOAD EVERYWHERE $file"
-echo "             from $from"
+echo "LOAD EVERYWHERE $file from $from"
 [ -h "$file" ] && unlink $file 
 [ -f "$file" ] && echo $file rm && rm -rf $file 
 [ ! -e "$file" ] && ln -s $from $file
