@@ -1,15 +1,14 @@
 #!/bin/sh
 
-echo 'This script assumes that Dropbox folder is        @ $HOME/Dropbox'
-echo '                          if it is somewhere else, link it to $HOME/Dropbox'
-echo '                          if Dropbox does not exist, copy it there and possibly use git for that'
-echo 'This script assumes that Google Drive folder is   @ $HOME/google_drive'
-echo 'This script assumes that Google Drive folder is   @ $HOME/Dropbox/Albert/google_drive (on mac, to save Google drive files to Dropbox)'
+echo 'Dropbox (DB) folder (required) is $HOME/Dropbox (either real or linked)'
+echo 'If Dropbox does not exist: mkdir -p $HOME/Dropbox/Albert/scripts and checkout dotfiles from git'
+echo 'Google Drive (GD) (not required) is $HOME/google_drive (either real or linked)'
 echo 
 host=`hostname`
 onhost=`echo $host | sed 's/\..*$//'`
 mylaptop="mac"
 
+onmac='false'
 oncmmc='false'
 oncmmd='false'
 ondaint='false'
@@ -18,26 +17,29 @@ oncosmopc='false'
 DB='false'  # Dropbox is installed?
 GD="false"  # google_drive is installed?
 
-[ "`echo $onhost | grep -o mac`" = "mac" ]         && oncmmc="true"    && DB="true"  && GD="true" 
-[ "`echo $onhost | grep -o cmmc`" = "cmmc" ]       && oncmmc="true"    && DB="false" && GD="false"
-[ "`echo $onhost | grep -o cmmd`" = "cmmd" ]       && oncmmd="true"    && DB="false" && GD="false"
-[ "`echo $onhost | grep -o cmpc`" = "cmpc" ]       && oncmpc="true"    && DB="false" && GD="false"
-[ "`echo $onhost | grep -o daint`" = "daint" ]     && ondaint="true"   && DB="false" && GD="false"
+[ "`echo $onhost | grep -o mac`"     = "mac"     ] && onmac="true"     && DB="true"  && GD="true" 
+[ "`echo $onhost | grep -o cmmc`"    = "cmmc"    ] && oncmmc="true"    && DB="false" && GD="false"
+[ "`echo $onhost | grep -o cmmd`"    = "cmmd"    ] && oncmmd="true"    && DB="false" && GD="false"
+[ "`echo $onhost | grep -o cmpc`"    = "cmpc"    ] && oncmpc="true"    && DB="false" && GD="false"
+[ "`echo $onhost | grep -o daint`"   = "daint"   ] && ondaint="true"   && DB="false" && GD="false"
 [ "`echo $onhost | grep -o cosmopc`" = "cosmopc" ] && oncosmopc="true" && DB="true"  && GD="true"
+
 
 echo "host      :$host:"
 echo "onhost    :$onhost:"
 echo
+echo "onmac     :$onmac:" 
 echo "oncmmc    :$oncmmc:" 
 echo "oncmmd    :$oncmmd:"
 echo "oncmpc    :$oncmpc:"
 echo "oncosmopc :$oncosmopc:"
 echo
-echo
-echo "dropboxinstalled:$dropboxinstalled:"
-echo "googledriveinstalled:$googledriveinstalled:"
+echo "DB        :$DB"
+echo "GD        :$GD"
 echo
 
+[ "$oncosmopc" = "true" ] && [ ! -e "$HOME/Dropbox" ]      && ln -s /local/scratch/glensk/Dropbox $HOME/Dropbox 
+[ "$oncosmopc" = "true" ] && [ ! -e "$HOME/google_drive" ] && ln -s /local/scratch/glensk/google_drive $HOME/google_drive
 
 
 createfolder () {
@@ -53,12 +55,6 @@ createfolder () {
     fi
 }
 
-echo
-echo
-HOMEPATH=$HOME              # can be /home/glensk or /Users/glensk
-[ "$oncosmopc" = "true" ] && [ ! -e "$HOME/Dropbox" ] && ln -s /local/scratch/glensk/Dropbox $HOME/Dropbox 
-
-# This should be kept fix since Dropbox should always be in $HOME/Dropbox, even if only link
 DROPBOX=$HOME/Dropbox
 DROPBOXME=$DROPBOX/Albert
 DROPBOXMESCRIPTS=$DROPBOX/Albert/scripts
@@ -101,7 +97,6 @@ chmod u+x $dotfiles/lammps_scripts/*
 echo "checking dotfiles                ..."
 [ ! -e "$dotfiles" ] && echo "$dotfiles does not exist!" && exit
 echo "                                 ... successfull, dotfiles from: $dotfiles"
-echo
 
 
 ####################################################################
@@ -135,12 +130,13 @@ linkdropbox_home () {
     if [ "$DB" = "true" ];then     # dropbox path is there
         echo "trying to link $1 ..."
         if [ -e "$DROPBOXME/$1" ];then           # the true dropbox path is there
-            if [ ! -e "$HOMEPATH/$1" ];then
-                echo "making new link     linking $HOMEPATH/$1 ... from ... $DROPBOXME/$1" && ln -s $DROPBOXME/$1 $HOMEPATH/$1
+            if [ ! -e "$HOME/$1" ];then
+                echo "making new link     linking $HOME/$1 ... from ... $DROPBOXME/$1" && ln -s $DROPBOXME/$1 $HOME/$1
             else
-                echo "(did already exist) linking $HOMEPATH/$1 ... from ... `readlink -f $HOMEPATH/$1`"
+                echo "(did already exist) linking $HOME/$1 ... from ... `readlink -f $HOME/$1`"
             fi;fi;fi
 }
+
 
 echo "linking ..."
 linkdropbox_home proj 
@@ -151,25 +147,25 @@ linkdropbox_home Thermodynamics
 
 unlinktcsh() {
 echo "# unlink tcsh                                                #"
-    [ -h "$HOMEPATH/.tcshrc" ] && unlink $HOMEPATH/.tcshrc
-    [ -h "$HOMEPATH/.tcshrc.complete" ] && unlink $HOMEPATH/.tcshrc.complete
-    [ -h "$HOMEPATH/.tcshrc.alias" ] && unlink $HOMEPATH/.tcshrc.alias
-    [ -h "$HOMEPATH/.tcshrc.bindkey" ] && unlink $HOMEPATH/.tcshrc.bindkey
-    [ -h "$HOMEPATH/.tcshrc.set" ] && unlink $HOMEPATH/.tcshrc.set
-    [ -h "$HOMEPATH/.tcshrc.local" ] && unlink $HOMEPATH/.tcshrc.local
+    [ -h "$HOME/.tcshrc" ] && unlink $HOME/.tcshrc
+    [ -h "$HOME/.tcshrc.complete" ] && unlink $HOME/.tcshrc.complete
+    [ -h "$HOME/.tcshrc.alias" ] && unlink $HOME/.tcshrc.alias
+    [ -h "$HOME/.tcshrc.bindkey" ] && unlink $HOME/.tcshrc.bindkey
+    [ -h "$HOME/.tcshrc.set" ] && unlink $HOME/.tcshrc.set
+    [ -h "$HOME/.tcshrc.local" ] && unlink $HOME/.tcshrc.local
 }
 unlinkbash() {
 echo "# unlink bash                                               #"
-    [ -h "$HOMEPATH/.bashrc" ] && unlink $HOMEPATH/.bashrc
-    [ -h "$HOMEPATH/.bash_profile" ] && unlink $HOMEPATH/.bash_profile
-    [ -h "$HOMEPATH/.bash_alias" ] && unlink $HOMEPATH/.bash_alias
-    [ -h "$HOMEPATH/.inputrc" ] && unlink $HOMEPATH/.inputrc
+    [ -h "$HOME/.bashrc" ] && unlink $HOME/.bashrc
+    [ -h "$HOME/.bash_profile" ] && unlink $HOME/.bash_profile
+    [ -h "$HOME/.bash_alias" ] && unlink $HOME/.bash_alias
+    [ -h "$HOME/.inputrc" ] && unlink $HOME/.inputrc
 }
 unlinkzsh() {
 echo "# unlink zsh                                                #"
-    [ -h "$HOMEPATH/.zshrc" ] && unlink $HOMEPATH/.zshrc
-    [ -h "$HOMEPATH/.oh-my-zsh" ] && unlink $HOMEPATH/.oh-my-zsh
-    [ -h "$HOMEPATH/.bash_alias" ] && unlink $HOMEPATH/.bash_alias
+    [ -h "$HOME/.zshrc" ] && unlink $HOME/.zshrc
+    [ -h "$HOME/.oh-my-zsh" ] && unlink $HOME/.oh-my-zsh
+    [ -h "$HOME/.bash_alias" ] && unlink $HOME/.bash_alias
 }
 echo
 echo
@@ -184,15 +180,15 @@ unlinkzsh
 echo "#############################################################"
 echo "# link tcsh,bash,zsh                                        #"
 echo "#############################################################"
-file=$HOMEPATH/.tcshrc
+file=$HOME/.tcshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc $file
-file=$HOMEPATH/.bashrc
+file=$HOME/.bashrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bashrc $file
-file=$HOMEPATH/.zshrc
+file=$HOME/.zshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/zshrc $file
@@ -204,12 +200,12 @@ if [ "$host" = "$mylaptop" ];then
 echo "###########################################################################"
 echo "#                 on mylaptop (local)                                     #"
 echo "###########################################################################"
-    file=$HOMEPATH/.gvimrc
+    file=$HOME/.gvimrc
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/vim/startup/gvimrc $file
     
-    file=$HOMEPATH/.ideavimrc
+    file=$HOME/.ideavimrc
     [ -h "$file" ] && unlink $file 
     [ -f "$file" ] && echo $file rm && rm -rf $file 
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/pycharm/ideavimrc $file
@@ -243,48 +239,48 @@ fi
 
 [ ! -e "$dotfiles/vim/bundle" ] && cd $dotfiles/vim && echo 'install vim/bundle' && git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
-loadeverywhere $HOMEPATH/.zlogin                        $dotfiles/zsh/zlogin
-loadeverywhere $HOMEPATH/.iterm2_shell_integration.zsh  $dotfiles/zsh/iterm2_shell_integration.zsh
-loadeverywhere $HOMEPATH/.vim                           $dotfiles/vim/             "checklinkdir"
-loadeverywhere $HOMEPATH/.ctags                         $dotfiles/vim/ctags             
-loadeverywhere $HOMEPATH/.Xmodmap                       $dotfiles/xmodmap/Xmodmap 
-loadeverywhere $HOMEPATH/.dir_colors                    $dotfiles/terminal_colors
+loadeverywhere $HOME/.zlogin                        $dotfiles/zsh/zlogin
+loadeverywhere $HOME/.iterm2_shell_integration.zsh  $dotfiles/zsh/iterm2_shell_integration.zsh
+loadeverywhere $HOME/.vim                           $dotfiles/vim/             "checklinkdir"
+loadeverywhere $HOME/.ctags                         $dotfiles/vim/ctags             
+loadeverywhere $HOME/.Xmodmap                       $dotfiles/xmodmap/Xmodmap 
+loadeverywhere $HOME/.dir_colors                    $dotfiles/terminal_colors
 
-file=$HOMEPATH/.ipython/profile_default/ipython_config.py
+file=$HOME/.ipython/profile_default/ipython_config.py
 [ -h $file ] && unlink $file
 [ -e $file ] && echo $file rm && rm -rf $file
-[ ! -f $HOMEPATH/.ipython/profile_default ] && mkdir -p $HOMEPATH/.ipython/profile_default
+[ ! -f $HOME/.ipython/profile_default ] && mkdir -p $HOME/.ipython/profile_default
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/ipython/profile_default/ipython_config.py $file
 
-loadeverywhere $HOMEPATH/.gitignore                     $dotfiles/git/gitignore_global
-loadeverywhere $HOMEPATH/.gitconfig                     $dotfiles/git/gitconfig
-[ ! -e "$HOMEPATH/.subversion" ] && mkdir $HOMEPATH/.subversion 
-loadeverywhere $HOMEPATH/.subversion/config             $dotfiles/subversion/config
-loadeverywhere $HOMEPATH/.pyiron                        $dotfiles/other_dotfiles/pyiron
-loadeverywhere $HOMEPATH/.vimrc                         $dotfiles/vim/vimrc
-loadeverywhere $HOMEPATH/.screenrc                      $dotfiles/screen/screenrc
-loadeverywhere $HOMEPATH/.Xresources                    $dotfiles/screen/Xresources
-loadeverywhere $HOMEPATH/.xmgracerc                     $dotfiles/xmgrace/xmgracerc
-loadeverywhere $HOMEPATH/.tmux.conf                     $dotfiles/tmux/tmux.conf
+loadeverywhere $HOME/.gitignore                     $dotfiles/git/gitignore_global
+loadeverywhere $HOME/.gitconfig                     $dotfiles/git/gitconfig
+[ ! -e "$HOME/.subversion" ] && mkdir $HOME/.subversion 
+loadeverywhere $HOME/.subversion/config             $dotfiles/subversion/config
+loadeverywhere $HOME/.pyiron                        $dotfiles/other_dotfiles/pyiron
+loadeverywhere $HOME/.vimrc                         $dotfiles/vim/vimrc
+loadeverywhere $HOME/.screenrc                      $dotfiles/screen/screenrc
+loadeverywhere $HOME/.Xresources                    $dotfiles/screen/Xresources
+loadeverywhere $HOME/.xmgracerc                     $dotfiles/xmgrace/xmgracerc
+loadeverywhere $HOME/.tmux.conf                     $dotfiles/tmux/tmux.conf
 
-[ ! -e "$HOMEPATH/.ssh" ] && mkdir $HOMEPATH/.ssh 
-loadeverywhere $HOMEPATH/.ssh/config                    $dotfiles/ssh/config 
+[ ! -e "$HOME/.ssh" ] && mkdir $HOME/.ssh 
+loadeverywhere $HOME/.ssh/config                    $dotfiles/ssh/config 
 [ ! -e "$dotfiles/ssh/known_hosts" ] && touch $dotfiles/ssh/known_hosts
 
-if [ -e "$HOMEPATH/.kde/share/apps/konsole" ];then
-    file=$HOMEPATH/.kde/share/apps/konsole
+if [ -e "$HOME/.kde/share/apps/konsole" ];then
+    file=$HOME/.kde/share/apps/konsole
     [ -h "$file" ] && unlink $file 
     [ -d "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/konsole/ $file
     fi
-if [ -e "$HOMEPATH/.kde/share/config" ];then
-    file=$HOMEPATH/.kde/share/config/yakuakerc
+if [ -e "$HOME/.kde/share/config" ];then
+    file=$HOME/.kde/share/config/yakuakerc
     [ -h "$file" ] && unlink $file
     [ -f "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/yakuake/yakuakerc $file
     fi
-if [ -e "$HOMEPATH/.config/terminator" ]; then
-    file=$HOMEPATH/.config/terminator/config
+if [ -e "$HOME/.config/terminator" ]; then
+    file=$HOME/.config/terminator/config
     [ -h "$file" ] && unlink $file
     [ -f "$file" ] && echo $file rm && rm -rf $file
     [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/terminator-solarized/config $file
