@@ -110,14 +110,22 @@ def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
     #if outputfile == False:
     #    outputfile = filename+'.lmp'
     frame = read(filename,format=fileformat_in)
-    if fileformat_out != 'lmp':
+    otherlist = ['lmp', 'lmp.runner','ipi']
+    if fileformat_out not in otherlist:
         write(outputfile,frame,format=fileformat_out)
         print('written '+outputfile)
         sys.exit()
-    #print('fc',frame.cell)
-    #print()
-    #sys.exit()
-    #print('fp',frame.positions)
+    elif fileformat_out is 'lmp':
+        save_ase_object_as_lmp(frame,outputfile,comment=filename,runner=False)
+    elif fileformat_out is 'lmp.runner':
+        save_ase_object_as_lmp_runner(frame,outputfile,comment=filename)
+
+
+def save_ase_object_as_lmp_runner(frame,outputfile,comment=""):
+    save_ase_object_as_lmp(frame,outputfile,comment=comment,runner=True)
+
+
+def save_ase_object_as_lmp(frame,outputfile,comment="",runner=False):
     newcell, newpos = convert_cell(frame.cell, frame.positions)
     frame.set_cell(newcell)
     frame.set_positions(newpos)
@@ -137,10 +145,17 @@ def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
     fout = open(outputfile,'w')
     #print('jo',outputfile)
 
-    fout.write("LAMMPS positionsfile from: "+str(filename)+"\n")
+    fout.write("LAMMPS positionsfile from: "+str(comment)+"\n")
     fout.write("\n")
     fout.write(str(len(species))+" atoms\n")
-    fout.write(str(len(unique_species))+" atom types\n")
+    if runner is False:
+        fout.write(str(len(unique_species))+" atom types\n")
+    elif runner is True:
+        # in principle this can be automatically obtained from the nn potential,
+        # for now however I am lazy
+        fout.write("3 atom types\n")
+    else:
+        sys.exit('variable runner is neigher True nor False; Exit.')
     fout.write("\n")
     fout.write("0.0 "+str(hxx)+" xlo xhi\n")
     fout.write("0.0 "+str(hyy)+" ylo yhi\n")
@@ -149,9 +164,16 @@ def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
     fout.write("\n")
     fout.write("Masses\n")
     fout.write("\n")
-    for ii in range(len(unique_species)):
-        #print(lammps_indices[i_unique_species[ii]], masses[i_unique_species[ii]])
-        fout.write(str(lammps_indices[i_unique_species[ii]])+" "+str(masses[i_unique_species[ii]])+"\n")
+    if runner is False:
+        for ii in range(len(unique_species)):
+            #print(lammps_indices[i_unique_species[ii]], masses[i_unique_species[ii]])
+            fout.write(str(lammps_indices[i_unique_species[ii]])+" "+str(masses[i_unique_species[ii]])+"\n")
+    elif runner is True:
+        # in principle this can be automatically obtained from the nn potential,
+        # for now however I am lazy
+        fout.write("1 24.305\n")
+        fout.write("2 26.9815385\n")
+        fout.write("3 28.085\n")
     fout.write("\n")
     fout.write("Atoms\n")
     fout.write("\n")

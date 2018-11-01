@@ -12,7 +12,7 @@ def help(p = None):
     description
     '''
     p = argparse.ArgumentParser(description=description,formatter_class=argparse.RawTextHelpFormatter) #ArgumentDefaultsHelpFormatter)
-    p.add_argument('-sc',   '--sc',default=8,type=int,help="supercell size")
+    p.add_argument('-sc',   '--sc',  default=8,type=int,help="supercell size")
     p.add_argument('-nmg',   '--nmg',default=0,type=int,help="number of Mg atoms")
     p.add_argument('-nsi',   '--nsi',default=0,type=int,help="number of Si atoms")
     p.add_argument('-nvac', '--nvac',default=0,type=int,help="number of vacancies")

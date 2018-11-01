@@ -10,4 +10,5 @@ source ~/.zshrc
 conda activate
 conda install colorama
 conda install -c conda-forge pyfftw=0.10.4
+conda install argcomplete           # to get argcompletion of python scripts in bash/zsh
 
