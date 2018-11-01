@@ -190,6 +190,10 @@ echo "# on mylaptop (local) ####################################################
 fi
 
 echo
+echo "# vim/bundle #################################################################"
+[ ! -e "$dotfiles/vim/bundle" ] && cd $dotfiles/vim && echo 'install vim/bundle' && git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+echo
 echo "# LINK EVERYTHING #################################################################"
 loadeverywhere () {
 file=$1
@@ -212,7 +216,6 @@ if [ "$3" = "checklinkdir" ];then
 fi
 }
 
-[ ! -e "$dotfiles/vim/bundle" ] && cd $dotfiles/vim && echo 'install vim/bundle' && git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 loadeverywhere $HOME/.zlogin                        $dotfiles/zsh/zlogin
 loadeverywhere $HOME/.iterm2_shell_integration.zsh  $dotfiles/zsh/iterm2_shell_integration.zsh
