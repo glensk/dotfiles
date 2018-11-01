@@ -3,10 +3,28 @@ import os,sys
 from shutil import copyfile
 import numpy as np
 from subprocess import call
-scripts = os.getenv("HOME")+'/Dropbox/Albert/scripts/dotfiles/scripts/ipi-kmc/'
-pot_nn_1 = "/home/glensk/nn_potentials/v1_daniele_giofre"
-pot_nn_2 = "/home/glensk/nn_potentials/v2_daniele_giofre"
+#import click
+#
+#
+#@click.command()
+#@click.option('--count', default=1, help='Number of greetings.')
+#@click.option('--name',  prompt='Your name',help='The person to greet.')
+#@click.option('--ncell', default=6, help='Supercell sice of primitive fcc supercell.')
 
+
+scripts = os.environ['scripts']
+scriptsipi = os.environ['scripts'] + 'ipi-kmc/'
+print('scripts   ',scripts)
+print('scriptsipi',scriptsipi)
+if not os.path.isfile(scripts):
+    sys.exit('missing environment variable scripts')
+if not os.path.isfile(scriptsipi):
+    sys.exit('missing folder '+scriptsipi)
+
+pot_nn_1 = os.environ['scripts'] + 'ipi-kmc/nn_potentials/v1_daniele_giofre'
+pot_nn_2 = os.environ['scripts'] + 'ipi-kmc/nn_potentials/v2_daniele_giofre'
+
+sys.exit()
 if False:
     ncell=10
     nmg=12
@@ -61,21 +79,22 @@ def mkdir(directory):
 # import massedit in python 2.7
 python2 = True
 if python2:
+    masseditpath = os.environ['scripts'] + 'ipi-kmc/massedit.py'
+    if not os.path.isfile(masseditpath):
+        sys.exit(masseditpath+' is missing')
     import imp
-    masseditpath = scripts+'/massedit.py'
-    print('me',masseditpath)
     massedit = imp.load_source('massedit', masseditpath)
 
 def sed(file,str_find,str_replace):
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
 
-def get_positions_files(scripts,ncell,nmg,nsi,nvac,a0):
+def get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0):
     sc=ncell
     alat=a0
     nva=nvac
     number_of_atoms = sc**3 - nva
     nal = number_of_atoms - nmg - nsi
-    path=scripts+'/kmc_positions/'
+    path=scriptsipi+'/kmc_positions/'
     filename = "al"+str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str(nsi)+"si_"+str(nmg)+"mg_"+str(nva)+"va_"+str(number_of_atoms)+"atoms"
     print('filename',filename)
     xyz = path+filename+'.xyz'
@@ -93,7 +112,7 @@ def get_positions_files(scripts,ncell,nmg,nsi,nvac,a0):
 directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si"+add_to_name
 mkdir(directory)
 seeds=np.arange(nseeds)+seedplus
-xyz,ipi,lmp,positionsname = get_positions_files(scripts,ncell,nmg,nsi,nvac,a0)
+xyz,ipi,lmp,positionsname = get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0)
 print('xyz',xyz)
 print('ipi',ipi)
 print('lmp',lmp)
@@ -105,12 +124,12 @@ for seed in seeds:
     if os.path.exists(jobdir):
         sys.exit("jobdirectory "+str(jobdir)+" already exists!")
     mkdir(jobdir)
-    copyfile(scripts+"input-runner.xml", jobdir+"/input-runner.xml")
+    copyfile(scriptsipi+"input-runner.xml", jobdir+"/input-runner.xml")
     #copyfile(xyz, jobdir+"/"+positionsname+".xyz")
     copyfile(ipi, jobdir+"/"+positionsname+".ipi")
     copyfile(lmp, jobdir+"/data.lmp")
-    copyfile(scripts+"in.lmp", jobdir+"/in.lmp")
-    copyfile(scripts+"submit-ipi-kmc.sh", jobdir+"/submit-ipi-kmc.sh")
+    copyfile(scriptsipi+"in.lmp", jobdir+"/in.lmp")
+    copyfile(scriptsipi+"submit-ipi-kmc.sh", jobdir+"/submit-ipi-kmc.sh")
 
     # change in.lmp
     sed(jobdir+"/in.lmp",'variable runnerDir       string ".*','variable runnerDir       string "'+pot+'"')
