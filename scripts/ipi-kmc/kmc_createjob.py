@@ -63,7 +63,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
     directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+nn_pot+"_"+\
                 str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
-                str(pcvac)+"pcVac_"+str(pcmg)+"pcMg_"+str(pcsi)+"pcSi_"+\
+                str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi_"+\
                 str(runnercutoff)+"rcut"
     seeds = random.sample(range(1, 999999), nseeds)
     seednumber = list(seednumber)
@@ -74,7 +74,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
     print('--------------------------- check the input --------------------------------')
     #print('seednumber   ',seednumber,type(seednumber))
-    print('JOBS:        ',nseeds,'!! defined by nseeds')
+    print('JOBS:        ',nseeds,'!! defined by -nseeds / or -seednumber')
     print()
     print('ncell        ',ncell,"(",ncell**3,"atoms )")
     print('nsi          ',nsi,  "(",pcsi,"%)")
