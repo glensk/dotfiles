@@ -1,5 +1,6 @@
 #!/bin/sh
 
+[ ! -e "$HOME/Downloads" ] && mkdir $HOME/Downloads 
 [ ! -e "$HOME/Downloads" ] && echo not folder $HOME/Downloads && exit
 cd $HOME/Downloads
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
