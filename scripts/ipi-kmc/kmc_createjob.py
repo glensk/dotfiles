@@ -32,6 +32,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-a0'   ,default = 4.057, type=float, help="fcc lattice constant for Al")
 @click.option('-temp' ,default = 300, type=int, help="KMC temperature")
 @click.option('-nseeds',type=int, default=3, help="number of different seeds")
+@click.option('-seednumber',default=False,multiple=True, type=int,help="define seed number manually (can be defined multiple times)")
 @click.option('-nsteps',type=int, default=200000, help="number of KMC steps to make")
 @click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
 
@@ -45,7 +46,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 
-def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,i_pi_mc,lmp,submit):
+def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit):
     """This is an script to submit KMC jobs quickly."""
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
@@ -65,8 +66,14 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
                 str(pcvac)+"pcVac_"+str(pcmg)+"pcMg_"+str(pcsi)+"pcSi_"+\
                 str(runnercutoff)+"rcut"
     seeds = random.sample(range(1, 999999), nseeds)
+    seednumber = list(seednumber)
+    if len(seednumber) is not 0:
+        seeds = seednumber
+        nseeds = len(seednumber)
+
 
     print('--------------------------- check the input --------------------------------')
+    #print('seednumber   ',seednumber,type(seednumber))
     print('JOBS:        ',nseeds,'!! defined by nseeds')
     print()
     print('ncell        ',ncell,"(",ncell**3,"atoms )")
@@ -74,6 +81,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
     print('nmg          ',nmg,"(",pcmg,"%)")
     print('nvac         ',nvac,"(",pcvac,"%)")
     print('a0           ',a0)
+    print('temp         ',temp)
     print()
     print('nn_pot       ',nn_pot)
     print('nn_pot_dir   ',nn_pot_dir)
@@ -83,6 +91,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
     print()
     print('directory    ',directory)
     print('--------------------------- check the input --------------------------------')
+    sys.exit()
     if os.path.isdir(directory):
         check_prompt("This directory exists already, shall I add jobs? [y]es: ")
 
