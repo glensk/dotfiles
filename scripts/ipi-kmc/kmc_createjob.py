@@ -91,7 +91,6 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
     print()
     print('directory    ',directory)
     print('--------------------------- check the input --------------------------------')
-    sys.exit()
     if os.path.isdir(directory):
         check_prompt("This directory exists already, shall I add jobs? [y]es: ")
 
