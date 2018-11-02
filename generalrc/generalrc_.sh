@@ -82,7 +82,7 @@ setenv i_pi_mc "$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi"
 setenv scripts "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/"
 setenv convcrit 0.5
 [ "$host" = "fidis" ] && setenv lmp "$scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31"
-[ "$host" = "mac" ]   && setenv lmp "$scripts/lammps_executables/%lmp_serial_mac_runner_2018_10_30"
+[ "$host" = "mac" ]   && setenv lmp "$scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30"
 
 if [ -e "$thermodynamics/utilities/" ];then
 [ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add

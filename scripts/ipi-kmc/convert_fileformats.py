@@ -119,10 +119,26 @@ def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
         save_ase_object_as_lmp(frame,outputfile,comment=filename,runner=False)
     elif fileformat_out is 'lmp.runner':
         save_ase_object_as_lmp_runner(frame,outputfile,comment=filename)
+    elif fileformat_out is 'ipi':
+        save_ase_object_as_ipi_format(frame,outputfile)
+
+
+def save_ase_object_as_ipi_format(frame,outputfile):
+    ase.io.write(outputfile,frame,format='xyz')
+    laa = frame.get_cell_lengths_and_angles()
+    with open(outputfile, 'r') as file:
+        # read a list of lines into data
+        data = file.readlines()
+        data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step:           4  Bead:       0 positions{angstrom}  cell{angstrom}"+'\n'
+        # and write everything back
+        with open(outputfile, 'w') as file:
+            file.writelines( data )
+    return
 
 
 def save_ase_object_as_lmp_runner(frame,outputfile,comment=""):
     save_ase_object_as_lmp(frame,outputfile,comment=comment,runner=True)
+    return
 
 
 def save_ase_object_as_lmp(frame,outputfile,comment="",runner=False):
@@ -183,6 +199,7 @@ def save_ase_object_as_lmp(frame,outputfile,comment="",runner=False):
     fout.write("\n")
 
     fout.close()
+    return
 
 
 

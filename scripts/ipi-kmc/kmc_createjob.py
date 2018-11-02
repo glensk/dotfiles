@@ -41,15 +41,17 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-nn_pot',type=str, default="v2dg", help="foldername for neural network potential")
 @click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
 @click.option('-lmp', envvar='lmp',help='path to lammps executable (or environment variable $lmp)')
+@click.option('-submit/-no-submit', default=False)
 
 
 
-def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,i_pi_mc,lmp):
+def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,i_pi_mc,lmp,submit):
     """This is an script to submit KMC jobs quickly."""
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
     file_inlmp = scripts + "ipi-kmc/in.lmp"
     file_submit = scripts + "ipi-kmc/submit-ipi-kmc.sh"
+    file_ipi_input_runner = scripts + "ipi-kmc/input-runner.xml"
     check_isdir([nn_pot_dir,scripts])
     check_isfile(\
 		[file_inlmp,file_submit,i_pi_mc,lmp],
@@ -97,6 +99,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
 
         # get data.lmp
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp')
+        convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
 
         # get and adapt in.lmp
         copyfile(file_inlmp, jobdir+"/in.lmp")
@@ -107,24 +110,21 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
         sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
         sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
 
-        #copyfile(scriptsipi+"input-runner.xml", jobdir+"/input-runner.xml")
-        ##copyfile(xyz, jobdir+"/"+positionsname+".xyz")
-        #copyfile(ipi, jobdir+"/"+positionsname+".ipi")
 
+        # get submit-ipi-kmc.sh
+        copyfile(file_ipi_input_runner, jobdir+"/input-runner.xml")
+        sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(nsteps)+' </total_steps>')
+        sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
+        sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
+        sed(jobdir+"/input-runner.xml",'<ncell>.*</ncell>','<ncell> '+str(ncell)+' </ncell>')
+        sed(jobdir+"/input-runner.xml",'<nsi>.*</nsi>','<nsi> '+str(nsi)+' </nsi>')
+        sed(jobdir+"/input-runner.xml",'<nmg>.*</nmg>','<nmg> '+str(nmg)+' </nmg>')
+        sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
+        sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
+        sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
+        sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str("data")+'.ipi </file>')
 
-
-        ## change submit-ipi-kmc.sh
-        #sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(steps)+' </total_steps>')
-        #sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
-        #sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
-        #sed(jobdir+"/input-runner.xml",'<ncell>.*</ncell>','<ncell> '+str(ncell)+' </ncell>')
-        #sed(jobdir+"/input-runner.xml",'<nsi>.*</nsi>','<nsi> '+str(nsi)+' </nsi>')
-        #sed(jobdir+"/input-runner.xml",'<nmg>.*</nmg>','<nmg> '+str(nmg)+' </nmg>')
-        #sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
-        #sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str(positionsname)+'.ipi </file>')
-        #sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
-
-        # change submit-ipi-kmc.sh
+        # get submit-ipi-kmc.sh
         copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
@@ -133,9 +133,9 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
         sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
         sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(i_pi_mc)+' input-runner')
 
-        with open(jobdir+"/submit-ipi-kmc.sh", 'r') as fin:
-            print(fin.read())
-        sys.exit()
+        #with open(jobdir+"/submit-ipi-kmc.sh", 'r') as fin:
+        #    print(fin.read())
+        #sys.exit()
 
         if submit is True:
             cwd = os.getcwd()
@@ -239,52 +239,48 @@ if __name__ == "__main__":
 
     ntasks = cores = nodes * 28
     neval  = ipi_inst*2
-    submit = False
 
 
 
     main()
 
-    sys.exit()
-
-
-
-sys.exit()
-
-
-
-# kmc_make_xyz_primitive_cell.py  -sc 6 -nmg 6 -nsi 6 -nvac 2
-# kmc_make_xyz_primitive_cell.py  -sc 8 -nmg 6 -nsi 6 -nvac 2
-# kmc_make_xyz_primitive_cell.py  -sc 10 -nmg 6 -nsi 6 -nvac 2
-# python ./kmc_make_xyz_file_to_lammpsinput.py al6x6x6_alat4.057_202al_6si_6mg_2va_214atoms.xyz
-######################### stop editing #############################
-
-
-
-# import massedit in python 2.7
-python2 = True
-if python2:
-    masseditpath = os.environ['scripts'] + 'ipi-kmc/massedit.py'
-    if not os.path.isfile(masseditpath):
-        sys.exit(masseditpath+' is missing')
-    import imp
-    massedit = imp.load_source('massedit', masseditpath)
-
-
-
-
-
-
-
-
-
-
-directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si"+add_to_name
-mkdir(directory)
-seeds=np.arange(nseeds)+seedplus
-xyz,ipi,lmp,positionsname = get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0)
-print('xyz',xyz)
-print('ipi',ipi)
-print('lmp',lmp)
-print('positionsname',positionsname)
-print()
+#    sys.exit()
+# sys.exit()
+#
+#
+#
+# # kmc_make_xyz_primitive_cell.py  -sc 6 -nmg 6 -nsi 6 -nvac 2
+# # kmc_make_xyz_primitive_cell.py  -sc 8 -nmg 6 -nsi 6 -nvac 2
+# # kmc_make_xyz_primitive_cell.py  -sc 10 -nmg 6 -nsi 6 -nvac 2
+# # python ./kmc_make_xyz_file_to_lammpsinput.py al6x6x6_alat4.057_202al_6si_6mg_2va_214atoms.xyz
+# ######################### stop editing #############################
+#
+#
+#
+# # import massedit in python 2.7
+# python2 = True
+# if python2:
+#     masseditpath = os.environ['scripts'] + 'ipi-kmc/massedit.py'
+#     if not os.path.isfile(masseditpath):
+#         sys.exit(masseditpath+' is missing')
+#     import imp
+#     massedit = imp.load_source('massedit', masseditpath)
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si"+add_to_name
+# mkdir(directory)
+# seeds=np.arange(nseeds)+seedplus
+# xyz,ipi,lmp,positionsname = get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0)
+# print('xyz',xyz)
+# print('ipi',ipi)
+# print('lmp',lmp)
+# print('positionsname',positionsname)
+# print()
