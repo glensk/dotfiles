@@ -12,6 +12,8 @@ import convert_fileformats
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command(context_settings=CONTEXT_SETTINGS)
+
+# setting KMC
 @click.option('-ncell',required=True, prompt=True, type=int,
         help="supercell size of primitive cell")
 @click.option('-nsi'  ,required=True, prompt=True, type=int, help="number of Si atoms")
@@ -19,26 +21,25 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-nvac' ,required=True, prompt=True, type=int, help="number of vacancies")
 @click.option('-a0'   ,default = 4.057, type=float, help="fcc lattice constant for Al")
 @click.option('-temp' ,default = 300, type=int, help="KMC temperature")
-@click.option('-scripts', envvar='scripts',help='environment variable $scripts or path to scriptsfolder')
-@click.option('-nn_pot',type=str, default="v2dg", help="foldername for neural network potential")
 @click.option('-nseeds',type=int, default=3, help="number of different seeds")
 @click.option('-nsteps',type=int, default=200000, help="number of KMC steps to make")
 @click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
-@click.option('-ipi', envvar='i-pi-kmc',help='environment variable i-pi-kmc')
-@click.argument('src', envvar='i-pi-kmc', type=click.File('r'))
+
+# environment variables
+@click.option('-scripts', envvar='scripts',help='environment variable $scripts or path to scriptsfolder')
+@click.option('-nn_pot',type=str, default="v2dg", help="foldername for neural network potential")
+@click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable i_pi_mc)')
 
 
 
-def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,ipi):
+def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,i_pi_mc):
     """This is an script to submit KMC jobs quickly."""
-    print('ipi',ipi)
-    sys.exit()
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
     file_inlmp = scripts + "ipi-kmc/in.lmp"
     file_submit = scripts + "ipi-kmc/submit-ipi-kmc.sh"
     check_isdir([nn_pot_dir,scripts])
-    check_isfile([file_inlmp,file_submit])
+    check_isfile([file_inlmp,file_submit,i_pi_mc])
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
@@ -115,6 +116,11 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
         sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
         sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
+        sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(i_pi_mc)+' input-runner')
+
+        with open(jobdir+"/submit-ipi-kmc.sh", 'r') as fin:
+            print(fin.read())
+        sys.exit()
 
         if submit is True:
             cwd = os.getcwd()

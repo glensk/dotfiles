@@ -78,8 +78,10 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 ##############################################
 setenv thermodynamics "$HOME/Thermodynamics"
 setenv userme "glensk"
+setenv i_pi_mc "$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi"
 setenv scripts "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/"
 setenv convcrit 0.5
+[ "$host" = "fidis" ] && setenv lmp "$scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31"
 if [ -e "$thermodynamics/utilities/" ];then
 [ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add
 [ "$currentshell" != "tcsh" ] && source $thermodynamics/utilities/bashrc_add
