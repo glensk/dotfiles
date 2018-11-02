@@ -1,3 +1,2 @@
 #!/bin/sh
-
-vi `which $1`
+vim `which $1`

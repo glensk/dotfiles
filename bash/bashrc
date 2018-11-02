@@ -82,3 +82,6 @@ case "$-" in
     *i*)  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
 esac
 
+
+# added by Miniconda3 installer
+#export PATH="/home/glensk/miniconda3/bin:$PATH"
