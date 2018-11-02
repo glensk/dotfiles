@@ -64,6 +64,7 @@ $1 vimrc 'vi $HOME/.vimrc'
 $1 vip   'vi $HOME/.ipython/profile_default/ipython_config.py'
 $1 virc  'vi $HOME/.`echo $currentshell`rc'
 $1 virca 'vi $dotfiles/generalrc/generalrc_alias_.sh'
+$1 vircg 'vi $dotfiles/generalrc/generalrc_.sh'
 
 $1 cd.. 'cd ..'
 $1 .. 'cd ..'

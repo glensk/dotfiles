@@ -2,10 +2,9 @@
 
 folder_lammps_sources=$HOME/sources
 folder_lammps_save=$scripts/lammps_executables
-folder_lammps_makefiles=$scripts/lammps_makefiles
 makeversion="serial"
 makefile=""
-[ "`hostname`" = "fidis" ] && makeversion="fidis" && makefile=$folder_lammps_makefiles/fidis_deneb_2018-10-31/MINE
+[ "`hostname`" = "fidis" ] && makeversion="fidis" && makefile=$scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
 
 
 [ "$makeversion" != "serial" ] && [ ! -e "$makefile" ] && echo makefile $makefile not found && exit
@@ -43,6 +42,8 @@ pwd
 [ ! -e "lmp_$makeversion" ] && echo "lmp_$makeversion was NOT CREATED! THE COMPILATION FAILED!"
 if [ -e "lmp_$makeversion" ];then
     echo "lmp_$makeversion SUCCESSFULLY compiled!"
+    
+    # move the makefile if possible  
     if [ -e "$folder_lammps_save" ];then
         echo mv lmp_$makeversion $folder_lammps_save/lmp_$makeversion\_`hostname`_runner_`date +"%Y_%m_%d"`
         mv lmp_$makeversion $folder_lammps_save/lmp_$makeversion\_`hostname`_runner_`date +"%Y_%m_%d"`
