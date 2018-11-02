@@ -9,10 +9,20 @@ import click
 # from scripts folder
 import convert_fileformats
 
+# show default values in click
+orig_init = click.core.Option.__init__
+def new_init(self, *args, **kwargs):
+    orig_init(self, *args, **kwargs)
+    self.show_default = True
+click.core.Option.__init__ = new_init
 
+
+# get help also with -h
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command(context_settings=CONTEXT_SETTINGS)
 
+
+# input variables (get those with click)
 # setting KMC
 @click.option('-ncell',required=True, prompt=True, type=int,
         help="supercell size of primitive cell")
@@ -25,21 +35,25 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-nsteps',type=int, default=200000, help="number of KMC steps to make")
 @click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
 
+
 # environment variables
-@click.option('-scripts', envvar='scripts',help='environment variable $scripts or path to scriptsfolder')
+@click.option('-scripts', envvar='scripts',help='path to scripts folder (or environment variable $scripts)')
 @click.option('-nn_pot',type=str, default="v2dg", help="foldername for neural network potential")
-@click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable i_pi_mc)')
+@click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
+@click.option('-lmp', envvar='lmp',help='path to lammps executable (or environment variable $lmp)')
 
 
 
-def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,i_pi_mc):
+def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,i_pi_mc,lmp):
     """This is an script to submit KMC jobs quickly."""
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
     file_inlmp = scripts + "ipi-kmc/in.lmp"
     file_submit = scripts + "ipi-kmc/submit-ipi-kmc.sh"
     check_isdir([nn_pot_dir,scripts])
-    check_isfile([file_inlmp,file_submit,i_pi_mc])
+    check_isfile(\
+		[file_inlmp,file_submit,i_pi_mc,lmp],
+		["file_inlmp","file_submit","i_pi_mc","lmp"])
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
@@ -115,6 +129,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
         sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
+        sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(lmp)+' < in.lmp')
         sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
         sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(i_pi_mc)+' input-runner')
 
@@ -163,15 +178,19 @@ def check_isdir(path):
                 sys.exit('missing directory '+i)
     return
 
-def check_isfile(path):
+def check_isfile(path,pathnames):
     if type(path) is str:
         if not os.path.isfile(path):
             sys.exit('missing file '+path)
-
-    if type(path) is list:
-        for i in path:
+    elif type(path) is list:
+        for idx,i in enumerate(path):
+            #print('ii',i,idx,pathnames[idx])
+            if i is None:
+                sys.exit('(environment) variable "'+pathnames[idx]+'" is not defined!')
             if not os.path.isfile(i):
                 sys.exit('missing file '+i)
+    else:
+        sys.exit('unknown type file type path '+str(path))
     return
 
 def check_prompt(check):
