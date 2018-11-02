@@ -33,6 +33,6 @@ fi
 
 
 cd $folder_sources
-[ ! -e "i-pi-mc" ] && git clone https://github.com/ceriottm/i-pi-mc
+[ ! -e "i-pi-mc" ] && echo "git clone https://github.com/ceriottm/i-pi-mc" && git clone https://github.com/ceriottm/i-pi-mc
 cd i-pi-mc
 git checkout kmc-al6xxx
