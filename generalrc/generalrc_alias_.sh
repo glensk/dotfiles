@@ -32,7 +32,7 @@ $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide=
 # i-pi 
 #################################################################
 $1 i-pi-dev-venkat '$HOME/Dropbox/Albert/scripts/i-pi-dev/bin/i-pi'
-$1 i-pi-kmc        '$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi'
+#$1 i-pi-mc        '$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi'
 #################################################################
 # alias navigation   use ' '  instead of ""  since only those work with `` correctly
 #################################################################
