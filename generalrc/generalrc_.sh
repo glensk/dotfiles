@@ -77,6 +77,7 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 # set host unspecific variables  
 ##############################################
 setenv thermodynamics "$HOME/Thermodynamics"
+setenv userme "glensk"
 setenv scripts "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/"
 setenv convcrit 0.5
 if [ -e "$thermodynamics/utilities/" ];then

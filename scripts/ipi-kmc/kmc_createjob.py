@@ -18,23 +18,35 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-nmg'  ,required=True, prompt=True, type=int, help="number of Mg atoms")
 @click.option('-nvac' ,required=True, prompt=True, type=int, help="number of vacancies")
 @click.option('-a0'   ,default = 4.057, type=float, help="fcc lattice constant for Al")
+@click.option('-temp' ,default = 300, type=int, help="KMC temperature")
 @click.option('-scripts', envvar='scripts',help='environment variable $scripts or path to scriptsfolder')
 @click.option('-nn_pot',type=str, default="v2dg", help="foldername for neural network potential")
 @click.option('-nseeds',type=int, default=3, help="number of different seeds")
 @click.option('-nsteps',type=int, default=200000, help="number of KMC steps to make")
+@click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
+@click.option('-ipi', envvar='i-pi-kmc',help='environment variable i-pi-kmc')
+@click.argument('src', envvar='i-pi-kmc', type=click.File('r'))
 
 
-def main(ncell, nmg, nsi,nvac,a0,scripts,nn_pot,nseeds,nsteps):
+
+def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,nsteps,runnercutoff,ipi):
     """This is an script to submit KMC jobs quickly."""
+    print('ipi',ipi)
+    sys.exit()
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
+    file_inlmp = scripts + "ipi-kmc/in.lmp"
+    file_submit = scripts + "ipi-kmc/submit-ipi-kmc.sh"
     check_isdir([nn_pot_dir,scripts])
+    check_isfile([file_inlmp,file_submit])
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
     directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+nn_pot+"_"+\
+                str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
-                str(pcvac)+"pcVac_"+str(pcmg)+"pcMg_"+str(pcsi)+"pcSi"
+                str(pcvac)+"pcVac_"+str(pcmg)+"pcMg_"+str(pcsi)+"pcSi_"+\
+                str(runnercutoff)+"rcut"
     seeds = random.sample(range(1, 999999), nseeds)
 
     print('--------------------------- check the input --------------------------------')
@@ -68,15 +80,22 @@ def main(ncell, nmg, nsi,nvac,a0,scripts,nn_pot,nseeds,nsteps):
             sys.exit("jobdirectory "+str(jobdir)+" already exists!")
         mkdir(jobdir)
 
+        # get data.lmp
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp')
+
+        # get and adapt in.lmp
+        copyfile(file_inlmp, jobdir+"/in.lmp")
+        sed(jobdir+"/in.lmp",'variable runnerDir       string ".*','variable runnerDir       string "'+nn_pot_dir+'"')
+        sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
+        sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
+        sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
+        sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
+        sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
+
         #copyfile(scriptsipi+"input-runner.xml", jobdir+"/input-runner.xml")
         ##copyfile(xyz, jobdir+"/"+positionsname+".xyz")
         #copyfile(ipi, jobdir+"/"+positionsname+".ipi")
-        #copyfile(scriptsipi+"in.lmp", jobdir+"/in.lmp")
-        #copyfile(scriptsipi+"submit-ipi-kmc.sh", jobdir+"/submit-ipi-kmc.sh")
 
-        ## change in.lmp
-        #sed(jobdir+"/in.lmp",'variable runnerDir       string ".*','variable runnerDir       string "'+pot+'"')
 
 
         ## change submit-ipi-kmc.sh
@@ -90,22 +109,25 @@ def main(ncell, nmg, nsi,nvac,a0,scripts,nn_pot,nseeds,nsteps):
         #sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str(positionsname)+'.ipi </file>')
         #sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
 
-        ## change submit-ipi-kmc.sh
-        #sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
-        #sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-        #sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-        #sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
+        # change submit-ipi-kmc.sh
+        copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
+        sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
+        sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
+        sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
+        sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
 
-        #if submit is True:
-        #    cwd = os.getcwd()
-        #    os.chdir(jobdir)
-        #    call(["sbatch","submit-ipi-kmc.sh"])
-        #    os.chdir(cwd)
-
-
-
+        if submit is True:
+            cwd = os.getcwd()
+            os.chdir(jobdir)
+            call(["sbatch","submit-ipi-kmc.sh"])
+            os.chdir(cwd)
 
 
+
+
+
+def sed(file,str_find,str_replace):
+    massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
 
 
 def get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0):
@@ -135,6 +157,17 @@ def check_isdir(path):
                 sys.exit('missing directory '+i)
     return
 
+def check_isfile(path):
+    if type(path) is str:
+        if not os.path.isfile(path):
+            sys.exit('missing file '+path)
+
+    if type(path) is list:
+        for i in path:
+            if not os.path.isfile(i):
+                sys.exit('missing file '+i)
+    return
+
 def check_prompt(check):
     #isok = raw_input(check)  # Python 2
     isok = input(check) # Python 3
@@ -144,23 +177,23 @@ def check_prompt(check):
         sys.exit('Exist since not Y or y as first letter!')
     return
 
-def get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0):
-    sc=ncell
-    alat=a0
-    nva=nvac
-    number_of_atoms = sc**3 - nva
-    nal = number_of_atoms - nmg - nsi
-    path=scriptsipi+'/kmc_positions/'
-    filename = "al"+str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str(nsi)+"si_"+str(nmg)+"mg_"+str(nva)+"va_"+str(number_of_atoms)+"atoms"
-    print('filename',filename)
-    xyz = path+filename+'.xyz'
-    ipi = path+filename+'.ipi'
-    lmp = path+filename+'.xyz.lmp'
-    if os.path.exists(xyz):
-        return xyz,ipi,lmp,filename
-    else:
-        sys.exit('xyz files '+xyz+" not found!")
-
+#def get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0):
+#    sc=ncell
+#    alat=a0
+#    nva=nvac
+#    number_of_atoms = sc**3 - nva
+#    nal = number_of_atoms - nmg - nsi
+#    path=scriptsipi+'/kmc_positions/'
+#    filename = "al"+str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str(nsi)+"si_"+str(nmg)+"mg_"+str(nva)+"va_"+str(number_of_atoms)+"atoms"
+#    print('filename',filename)
+#    xyz = path+filename+'.xyz'
+#    ipi = path+filename+'.ipi'
+#    lmp = path+filename+'.xyz.lmp'
+#    if os.path.exists(xyz):
+#        return xyz,ipi,lmp,filename
+#    else:
+#        sys.exit('xyz files '+xyz+" not found!")
+#
 
 def mkdir(directory):
     if not os.path.exists(directory):
@@ -168,6 +201,23 @@ def mkdir(directory):
 
 
 if __name__ == "__main__":
+    # submitoptions
+    if True:
+        nodes=2
+        ipi_inst = 4
+        lmp_par = 14
+
+    if False:
+        nodes=3
+        ipi_inst = 7
+        lmp_par = 12
+
+    ntasks = cores = nodes * 28
+    neval  = ipi_inst*2
+    submit = False
+
+
+
     main()
 
     sys.exit()
@@ -177,30 +227,12 @@ if __name__ == "__main__":
 sys.exit()
 
 
-nseeds=2
-seedplus=32345
-steps=200000
-pot=pot_nn_2
-add_to_name="_nn2"
-submit=True
-
-if True:
-    nodes=2
-    ipi_inst = 4
-    lmp_par = 14
-
-if False:
-    nodes=3
-    ipi_inst = 7
-    lmp_par = 12
 
 # kmc_make_xyz_primitive_cell.py  -sc 6 -nmg 6 -nsi 6 -nvac 2
 # kmc_make_xyz_primitive_cell.py  -sc 8 -nmg 6 -nsi 6 -nvac 2
 # kmc_make_xyz_primitive_cell.py  -sc 10 -nmg 6 -nsi 6 -nvac 2
 # python ./kmc_make_xyz_file_to_lammpsinput.py al6x6x6_alat4.057_202al_6si_6mg_2va_214atoms.xyz
 ######################### stop editing #############################
-ntasks = cores = nodes * 28
-neval = ipi_inst*2
 
 
 
@@ -213,8 +245,6 @@ if python2:
     import imp
     massedit = imp.load_source('massedit', masseditpath)
 
-def sed(file,str_find,str_replace):
-    massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
 
 
 

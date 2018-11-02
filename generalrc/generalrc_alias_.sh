@@ -31,8 +31,8 @@ $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide=
 #################################################################
 # i-pi 
 #################################################################
-$1 i-pi-dev-venkat '$HOME/google_drive/scripts_epfl/i-pi-dev/bin/i-pi'
-$1 i-pi-kmc '$HOME/google_drive/scripts_epfl/i-pi-mc/bin/i-pi'
+$1 i-pi-dev-venkat '$HOME/Dropbox/Albert/scripts/i-pi-dev/bin/i-pi'
+$1 i-pi-kmc        '$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi'
 #################################################################
 # alias navigation   use ' '  instead of ""  since only those work with `` correctly
 #################################################################
@@ -47,6 +47,9 @@ $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh
 $1 scripts 'cd $HOME/Dropbox/Albert/scripts'
 $1 dot     'cd $dotfiles'
 $1 v       'cd $HOME/Dropbox/Albert/v'
+$1 db      'cd $HOME/Dropbox/Albert/'
+$1 kmc     'cd $HOME/Dropbox/Albert/kmc'
+$1 td      'cd $HOME/Dropbox/Albert/Thermodynamics'
 
 
 $1 proj  'cd $HOME/Dropbox/Albert/proj'
