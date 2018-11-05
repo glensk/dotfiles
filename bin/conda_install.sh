@@ -11,6 +11,7 @@ source ~/.zshrc
 conda config --add channels intel 
 conda activate
 conda install colorama
+conda install click  # actually comes with ase
 conda install -c conda-forge ase
 
 #conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 

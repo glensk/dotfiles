@@ -116,10 +116,10 @@ if delrandom:
 
 print()
 if True: # 8x8x8 supercell of daniele
-    for i in np.arange(nsi):
-        atomsc[i].symbol = 'Si'
-    for i in np.arange(nsi,nmg+nsi):
+    for i in np.arange(nmg):
         atomsc[i].symbol = 'Mg'
+    for i in np.arange(nmg,nmg+nsi):
+        atomsc[i].symbol = 'Si'
     #for i in np.arange(nmg+nsi,nmg+nsi+nva):
     #    del atomsc[i]
     for i in np.arange(nva):

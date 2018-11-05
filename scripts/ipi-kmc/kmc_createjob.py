@@ -43,10 +43,11 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
 @click.option('-lmp', envvar='lmp',help='path to lammps executable (or environment variable $lmp)')
 @click.option('-submit/-no-submit', default=False)
+@click.option('-submitdebug/-no-submitdebug', default=False)
 
 
 
-def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit):
+def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit,submitdebug='kk'):
     """This is an script to submit KMC jobs quickly."""
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
@@ -90,7 +91,11 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
     print('nsteps       ',nsteps)
     print()
     print('directory    ',directory)
+    print('submit       ',submit)
+    print('submitdebug  ',submitdebug)
     print('--------------------------- check the input --------------------------------')
+
+
     if os.path.isdir(directory):
         check_prompt("This directory exists already, shall I add jobs? [y]es: ")
 
@@ -98,12 +103,22 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
     atomsc = get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
+
+    strout=" ".join(sys.argv)
+    started_with_name="README.md"
+    with open(started_with_name, "w") as text_file:
+        print(f"{strout}", file=text_file)
+
     for seed in seeds:
+
         jobdir = directory+'/seed'+str(seed)
         print('jobdir',jobdir)
         if os.path.exists(jobdir):
             sys.exit("jobdirectory "+str(jobdir)+" already exists!")
         mkdir(jobdir)
+
+        # get README.md
+        copyfile(started_with_name, jobdir+"/"+started_with_name)
 
         # get data.lmp
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp')
@@ -145,10 +160,13 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
         #    print(fin.read())
         #sys.exit()
 
-        if submit is True:
+        if submit is True or submitdebug is True:
             cwd = os.getcwd()
             os.chdir(jobdir)
-            call(["sbatch","submit-ipi-kmc.sh"])
+            if submitdebug is True:  # this works on fidis even with 2 nodes!
+                call(["sbatch","-p","debug","submit-ipi-kmc.sh"])
+            if submit is True:
+                call(["sbatch","submit-ipi-kmc.sh"])
             os.chdir(cwd)
 
 
@@ -164,10 +182,11 @@ def get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0):
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
-    for i in np.arange(nsi):
-        atomsc[i].symbol = 'Si'
-    for i in np.arange(nsi,nmg+nsi):
+
+    for i in np.arange(nmg):
         atomsc[i].symbol = 'Mg'
+    for i in np.arange(nmg,nmg+nsi):
+        atomsc[i].symbol = 'Si'
     for i in np.arange(nvac):
         del atomsc[-1]
     number_of_atoms = atomsc.get_number_of_atoms()
@@ -234,6 +253,7 @@ def mkdir(directory):
 
 
 if __name__ == "__main__":
+    #sys.exit()
     # submitoptions
     if True:
         nodes=2
