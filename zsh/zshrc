@@ -140,7 +140,7 @@ source $dotfiles/zsh/zsh_set
 #################################################################
 if [ -e "$HOME/miniconda3" ];then
     source $HOME/miniconda3/etc/profile.d/conda.sh
-    conda activate # activates the default conda python (3.x)
+    [ "$onmac" = "true" ] && conda activate intelpy # activates the default conda python (3.x)
 fi
 
 
