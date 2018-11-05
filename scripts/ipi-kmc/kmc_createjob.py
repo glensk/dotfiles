@@ -53,6 +53,9 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
     if submit is True or submitdebug is True and socket.gethostname() is not "fidis":
         print('hostname',socket.gethostname())
+        print('ype',type(socket.gethostname()))
+        if socket.gethostname() is "fidis":
+            print('you are on fidis')
         sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
