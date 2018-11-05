@@ -164,7 +164,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
             cwd = os.getcwd()
             os.chdir(jobdir)
             if submitdebug is True:  # this works on fidis even with 2 nodes!
-                call(["sbatch","-p","debug","submit-ipi-kmc.sh"])
+                call(["sbatch","-p","debug","-t","01:00:00","submit-ipi-kmc.sh"])
             if submit is True:
                 call(["sbatch","submit-ipi-kmc.sh"])
             os.chdir(cwd)
