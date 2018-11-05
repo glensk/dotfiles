@@ -123,6 +123,7 @@ def main(filename, fileformat_in=False,fileformat_out=False,outputfile=False):
         save_ase_object_as_ipi_format(frame,outputfile)
 
 
+
 def save_ase_object_as_ipi_format(frame,outputfile):
     ase.io.write(outputfile,frame,format='xyz')
     laa = frame.get_cell_lengths_and_angles()

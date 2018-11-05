@@ -97,12 +97,11 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
 
     if os.path.isdir(directory):
-        check_prompt("This directory exists already, shall I add jobs? [y]es: ")
+        check_prompt("This main directory exists already, shall I add jobs? [y]es: ")
 
     check_prompt("Are the ine input variables ok? [y]es: ")
 
     atomsc = get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
-
 
     strout=" ".join(sys.argv)
     started_with_name="README.md"
@@ -191,6 +190,7 @@ def get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0):
         del atomsc[-1]
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
+    #ase.io.write('kalmp',atomsc,format='lammps-dump')
     return atomsc
 
 
