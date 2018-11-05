@@ -8,10 +8,11 @@ bash Miniconda3-latest-Linux-x86_64.sh
 
 
 source ~/.zshrc
+conda config --add channels intel 
 conda activate
 conda install colorama
 conda install -c conda-forge ase
-conda config --add channels intel 
-#conda install -c conda-forge pyfftw=0.10.4
+
+#conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 
 #conda install argcomplete           # to get argcompletion of python scripts in bash/zsh
 
