@@ -51,12 +51,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit,submitdebug='kk'):
     """This is an script to submit KMC jobs quickly."""
 
-    if submit is True or submitdebug is True and socket.gethostname() is not "fidis":
-        print('hostname',socket.gethostname())
-        print('ype',type(socket.gethostname()))
-        if socket.gethostname() is "fidis":
-            print('you are on fidis')
-        sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
+    if submit is True or submitdebug is True and socket.gethostname() == "fidis":
+        if socket.gethostname() != "fidis":    # use != and not: is not
+            print('you are NOT on fidis')
+            sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
     file_inlmp = scripts + "ipi-kmc/in.lmp"
@@ -111,10 +109,6 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
     atomsc = get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
-    strout=" ".join(sys.argv)
-    started_with_name="README.md"
-    with open(started_with_name, "w") as text_file:
-        print(f"{strout}", file=text_file)
 
     for seed in seeds:
 
@@ -125,15 +119,16 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
         mkdir(jobdir)
 
         # get README.md
-        copyfile(started_with_name, jobdir+"/"+started_with_name)
+        create_READMEmd(jobdir+'/README.md')
 
         # get data.lmp
-        convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp')
+        convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
         convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
 
         # get and adapt in.lmp
         copyfile(file_inlmp, jobdir+"/in.lmp")
-        sed(jobdir+"/in.lmp",'variable runnerDir       string ".*','variable runnerDir       string "'+nn_pot_dir+'"')
+        sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+nn_pot_dir+'"')
+        sed(jobdir+"/in.lmp",'variable nameStartCfg .*','variable nameStartCfg string "data.lmp.runner"')
         sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
         sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
         sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
@@ -178,6 +173,11 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
 
 
+def create_READMEmd(filepath = "README.md"):
+    strout=" ".join(sys.argv)
+    with open(filepath, "w") as text_file:
+        print(f"{strout}", file=text_file)
+    return
 
 
 def sed(file,str_find,str_replace):
