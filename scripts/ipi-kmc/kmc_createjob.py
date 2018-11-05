@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os,sys,random,massedit,ase
+import socket
 from ase.lattice.cubic import FaceCenteredCubic
 from shutil import copyfile
 import numpy as np
@@ -49,6 +50,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit,submitdebug='kk'):
     """This is an script to submit KMC jobs quickly."""
+
+    if submit is True or submitdebug is True and socket.gethostname() is not "fidis":
+        sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
     nn_pot_dir = scripts + "pot_nn/" + nn_pot
     file_inlmp = scripts + "ipi-kmc/in.lmp"
@@ -269,46 +273,4 @@ if __name__ == "__main__":
     neval  = ipi_inst*2
 
 
-
     main()
-
-#    sys.exit()
-# sys.exit()
-#
-#
-#
-# # kmc_make_xyz_primitive_cell.py  -sc 6 -nmg 6 -nsi 6 -nvac 2
-# # kmc_make_xyz_primitive_cell.py  -sc 8 -nmg 6 -nsi 6 -nvac 2
-# # kmc_make_xyz_primitive_cell.py  -sc 10 -nmg 6 -nsi 6 -nvac 2
-# # python ./kmc_make_xyz_file_to_lammpsinput.py al6x6x6_alat4.057_202al_6si_6mg_2va_214atoms.xyz
-# ######################### stop editing #############################
-#
-#
-#
-# # import massedit in python 2.7
-# python2 = True
-# if python2:
-#     masseditpath = os.environ['scripts'] + 'ipi-kmc/massedit.py'
-#     if not os.path.isfile(masseditpath):
-#         sys.exit(masseditpath+' is missing')
-#     import imp
-#     massedit = imp.load_source('massedit', masseditpath)
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si"+add_to_name
-# mkdir(directory)
-# seeds=np.arange(nseeds)+seedplus
-# xyz,ipi,lmp,positionsname = get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0)
-# print('xyz',xyz)
-# print('ipi',ipi)
-# print('lmp',lmp)
-# print('positionsname',positionsname)
-# print()

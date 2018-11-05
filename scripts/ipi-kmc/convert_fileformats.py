@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys,os
+import sys,os,copy
 import argparse
 import numpy as np
 from numpy.linalg import norm
@@ -143,20 +143,24 @@ def save_ase_object_as_lmp_runner(frame,outputfile,comment=""):
 
 
 def save_ase_object_as_lmp(frame,outputfile,comment="",runner=False):
-    newcell, newpos = convert_cell(frame.cell, frame.positions)
-    frame.set_cell(newcell)
-    frame.set_positions(newpos)
+    # important not to change frame (aseobject), i dont know why but when this is called
+    # externally it changes external frame (aseobject)
+    framework = copy.deepcopy(frame)
+    #framework = frame
+    newcell, newpos = convert_cell(framework.cell, framework.positions)
+    framework.set_cell(newcell)
+    framework.set_positions(newpos)
 
-    species = frame.get_atomic_numbers()
+    species = framework.get_atomic_numbers()
     unique_species, i_unique_species = np.unique(species, return_index=True)
-    masses = frame.get_masses()
-    positions = frame.get_positions()
+    masses = framework.get_masses()
+    positions = framework.get_positions()
 
     lammps_indices = species.copy()
     for ii in range(len(unique_species)):
         lammps_indices[species == unique_species[ii]] = ii + 1
 
-    ((hxx, hxy, hxz), (hyx, hyy, hyz) , (hzx, hzy, hzz)) = frame.get_cell()
+    ((hxx, hxy, hxz), (hyx, hyy, hyz) , (hzx, hzy, hzz)) = framework.get_cell()
 
 
     fout = open(outputfile,'w')
