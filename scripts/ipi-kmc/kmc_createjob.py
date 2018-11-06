@@ -241,23 +241,6 @@ def check_prompt(check):
         sys.exit('Exist since not Y or y as first letter!')
     return
 
-#def get_positions_files(scriptsipi,ncell,nmg,nsi,nvac,a0):
-#    sc=ncell
-#    alat=a0
-#    nva=nvac
-#    number_of_atoms = sc**3 - nva
-#    nal = number_of_atoms - nmg - nsi
-#    path=scriptsipi+'/kmc_positions/'
-#    filename = "al"+str(sc)+"x"+str(sc)+"x"+str(sc)+"_alat"+str(alat)+"_"+str(nal)+"al_"+str(nsi)+"si_"+str(nmg)+"mg_"+str(nva)+"va_"+str(number_of_atoms)+"atoms"
-#    print('filename',filename)
-#    xyz = path+filename+'.xyz'
-#    ipi = path+filename+'.ipi'
-#    lmp = path+filename+'.xyz.lmp'
-#    if os.path.exists(xyz):
-#        return xyz,ipi,lmp,filename
-#    else:
-#        sys.exit('xyz files '+xyz+" not found!")
-#
 
 def mkdir(directory):
     if not os.path.exists(directory):
@@ -265,7 +248,6 @@ def mkdir(directory):
 
 
 if __name__ == "__main__":
-    #sys.exit()
     # submitoptions
     if True:
         nodes=2
