@@ -1,5 +1,6 @@
 #!/bin/sh
 atoms=`head -100 $1 | grep "number of atoms/cell" | awk '{print $5}'`
+
 #line=`grep -n "^     Forces acting on atoms (cartesian axes, Ry/au):" aiida.out | tail -1 | sed 's|:.*||' | awk '{print $1+2}'`
 #lineend=`echo $line $atoms | awk '{print $1+$2-1}'`
 ##echo atoms: $atoms, $line $lineend
