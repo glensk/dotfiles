@@ -13,6 +13,9 @@ conda activate
 conda install colorama
 conda install click  # actually comes with ase
 conda install -c conda-forge ase
+conda install seaborn
+[ "`hostname`" = "mac" ] && conda install -c conda-forge jupyter_contrib_nbextensions   # get the notebook extensions for jupyter notebooks
+[ "`hostname`" = "mac" ] && jupyter contrib nbextension install --user                  # also necessary to get the notebook extensions working
 
 #conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 
 #conda install argcomplete           # to get argcompletion of python scripts in bash/zsh
