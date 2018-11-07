@@ -13,7 +13,7 @@
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
 
 ###################################################################################
-# HOST dependent variables (prompt, module load, anaconda (on cmmc with module load) ...)
+# HOST dependent variables (module load, anaconda (on cmmc with module load) ...)
 ###################################################################################
 eval `$generalrc/generalrc_hostdependent.sh`   
             # defines:  
@@ -21,7 +21,7 @@ eval `$generalrc/generalrc_hostdependent.sh`
             # onmac, oncmmc, oncmdft} to true or false
             # currenthost to {onmac, oncmmc, oncmdft}
             # myshell to {zsh,bash, tcsh}
-            # prompt, promptcolor
+            # promptcolor
             # printloadstats
             # echo ONMAC $onmac
             # echo WHICHALIAS $whichalias  

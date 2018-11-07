@@ -78,9 +78,10 @@ set completion-ignore-case on
 
 #[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
 # This is grat breaks however scp
-case "$-" in
-    *i*)  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
-esac
+
+#case "$-" in
+#    *i*)  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
+#esac
 
 
 # added by Miniconda3 installer

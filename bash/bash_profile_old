@@ -1,0 +1,42 @@
+
+export printbashinfo=False
+export BASH_CONF="bash_profile"
+# brew
+### http://en.wikipedia.org/wiki/GNU_Core_Utilities ((g)ls, (g)cp, ...)
+export PATH="$(brew --prefix coreutils)/libexec/gnubin:/usr/local/bin:$PATH"  
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
+
+# sed
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+
+# mac stuff for iterm2
+export PATH="$HOME/Dropbox/scripts/mac_tools/bin:$PATH" # to get finder scripts fo fls fcd ... 
+export PATH="$HOME/Dropbox/scripts/bin:$PATH" # to get finder scripts fo fls fcd ... 
+export PATH="$HOME/Dropbox/proj/current_dissertation/scripts:$PATH"  # to get finder scripts fo fls fcd ... 
+
+# xmgrace now install via brew and the following line can be skipped
+#export PATH="$HOME/Dropbox/scripts/mac_tools/apps/xmgrace/xmgrace_bin:$PATH"
+
+
+# has to be loaded after all path's are exported
+#source ~/.profile       # Get the paths
+[ "$printbashinfo" = "True" ] && echo "--> .bash_profile : source ~/.bashrc"
+source ~/.bashrc        # get aliases this 
+[ "$printbashinfo" = "True" ] && echo "--> .bash_profile : source ~/.bash_alias"
+source ~/.bash_alias        # get aliases this 
+
+
+# PYTHONPATH
+if [[ ! -z "$PYTHONPATH" ]]; then
+    export PYTHONPATH="${PYTHONPATH}:$HOME/scripts/python/graceplot/"
+else
+    export PYTHONPATH=$HOME/scripts/python/graceplot/
+fi
+
+# added by Anaconda 2.1.0 installer
+export PATH="$HOME/anaconda/bin:$PATH"
+
+#echo " !!!!!!!! colored-stats on!"
+#set colored-stats on

@@ -170,6 +170,10 @@ file=$HOME/.bashrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bashrc $file
+file=$HOME/.bash_profile
+[ -h "$file" ] && unlink $file
+[ -f "$file" ] && echo mv $file $file.save && mv $file $file.save
+[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bash_profile $file
 file=$HOME/.zshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
