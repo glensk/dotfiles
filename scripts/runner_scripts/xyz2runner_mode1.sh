@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# for instance in /scratch/glensk/raw_data/test_3_at_1000K_for_fps
+
 filename="input.data.all"
 rm -f $filename  
 touch $filename 
