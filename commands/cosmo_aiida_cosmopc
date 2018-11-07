@@ -1,0 +1,204 @@
+https://aiida-core.readthedocs.io/en/latest/install/details/database.html
+
+ssh cosmopc
+su local
+sudo apt install rabbitmq-server
+sudo apt install postgresql postgresql-server-dev-all postgresql-client
+sudo su - postgres
+psql
+CREATE USER aiida WITH PASSWORD 'aiidadb';   
+CREATE DATABASE aiida_al6xxx OWNER aiida ENCODING 'UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8' TEMPLATE=template0; # create the database
+CREATE DATABASE aiida_al6xxx_test OWNER aiida ENCODING 'UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='en_US.UTF-8' TEMPLATE=template0;
+\l # to see db's
+GRANT ALL PRIVILEGES ON DATABASE aiida_al6xxx to aiida;
+GRANT ALL PRIVILEGES ON DATABASE aiida_al6xxx_test to aiida;
+\q # to quit
+psql -h localhost -d aiida_al6xxx -U aiida -W  # pw: aiidadb
+
+# rest can now be done as user
+ssh cosmopc
+pip install --user virtualenv
+virtualenv aiida
+source aiida/bin/activate
+cd aiida
+mkdir .aiida
+vi bin/activate # add at last line: export AIIDA_PATH="${VIRTUAL_ENV}/.aiida"
+deactivate
+source aiida/bin/activate
+
+cd $HOME
+mcd code/aiida
+#git clone git@github.com:aiidateam/aiida_core aiida-core
+git clone https://github.com/aiidateam/aiida_core aiida-core
+cd aiida-core
+pip install -e .'[atomic_tools]'
+
+# read https://aiida-core.readthedocs.io/en/latest/working_with_aiida/index.html#command-line-interface (concept section)
+
+
+verdi profile list
+verdi setup  --help
+verdi setup al6xxx
+
+
+%verdi setup al6xxx
+Email Address (identifies your data when sharing): albert.glensk@gmail.com
+First name: Albert
+Last name: Glensk
+Institution: EPFL
+Setting up profile al6xxx.
+AiiDA backend (available: django, sqlalchemy - sqlalchemy is in beta mode): sqlalchemy
+Default user email: albert.glensk@gmail.com
+Database engine (available: postgresql_psycopg2 - mysql is deprecated): postgresql_psycopg2
+PostgreSQL host: localhost
+PostgreSQL port: 5432
+AiiDA Database name: aiida_al6xxx
+AiiDA Database user: aiida
+AiiDA Database password: aiidadb
+AiiDA repository directory: /home/glensk/aiida/.aiida/repository-al6xxx/
+The repository /home/glensk/aiida/.aiida/repository-al6xxx/ will be created.
+Executing now a migrate command...
+
+Info: enter "?" for help
+First name: Albert
+Last name: Glensk
+Institution: EPFL
+Password [***]:  (aiidadb)
+Repeat for confirmation:
+>> User Albert Glensk (albert.glensk@gmail.com) created. <<
+Setup finished.
+
+verdi profile list
+verdi profile show
+
+vi ~/aiida/bin/activate
+ 80 # This will set the aiida instance
+ 81 export AIIDA_PATH="${VIRTUAL_ENV}/.aiida"
+ 82
+ 83 # this will enable autocompletion for verdi
+ 84 eval "$(_VERDI_COMPLETE=source verdi)"
+
+
+%verdi setup al6xxx_test
+Email Address (identifies your data when sharing): albert.glensk@gmail.com
+First name: Albert
+Last name: Glensk
+Institution: EPFL
+Setting up profile al6xxx_test.
+AiiDA backend (available: django, sqlalchemy - sqlalchemy is in beta mode): sqlalchemy
+Default user email: albert.glensk@gmail.com
+Database engine (available: postgresql_psycopg2 - mysql is deprecated): postgresql_psycopg2
+PostgreSQL host: localhost
+PostgreSQL port: 5432
+AiiDA Database name: aiida_al6xxx_test
+AiiDA Database user: aiida
+AiiDA Database password: aiidadb
+AiiDA repository directory: /home/glensk/aiida/.aiida/repository-al6xxx_test/
+The repository /home/glensk/aiida/.aiida/repository-al6xxx_test/ will be created.
+Executing now a migrate command...
+...for SQLAlchemy backend
+It is time to perform your first SQLAlchemy migration.
+Migrating to the last version
+Warning: Invalidating all the hashes of all the nodes. Please run verdi rehash
+Database was created successfully
+Loading new environment...
+Installing default AiiDA user...
+Starting user configuration for albert.glensk@gmail.com...
+Info: enter "?" for help
+First name: Albert
+Last name: Glensk
+Institution: EPFL
+Password [***]:
+Repeat for confirmation:
+>> User Albert Glensk (albert.glensk@gmail.com) created. <<
+Setup finished.
+
+# to make backup of database: psql -U aiida -h localhost -p 5432 -d aiida_al6xxx > aida.psql
+# the repository needs also to be saved
+verdi profile show shows aiidadb_repository_uri  file:///home/glensk/aiida/.aiida/repository-al6xxx/
+as the repository
+verdi profile list
+verdi profile setdefault PROFILENAME # to change profile
+
+
+%verdi computer setup
+Info: enter "?" for help
+Computer label: cosmopc18
+Hostname: cosmopc18
+Description []: cosmopc18
+Enable the computer? [True]:
+Transport plugin: local
+Scheduler plugin: ?
+Info: Scheduler type.
+Select one of:
+  direct
+  lsf
+  pbspro
+  sge
+  slurm
+  torque
+Scheduler plugin: direct
+Shebang line (first line of each script, starting with #!) [#!/bin/bash]:
+Work directory on the computer [/scratch/{username}/aiida/]: /local/scratch/glensk/aiida_scratch
+Mpirun command [mpirun -np {tot_num_mpiprocs}]:
+Default number of CPUs per machine: 1
+
+# :wq to sve the vim file
+
+
+%verdi computer configure local cosmopc18
+Info: enter "?" for help
+Connection cooldown time (sec) [2.0]: 0
+Info: Configuring computer cosmopc18 for user albert.glensk@gmail.com.
+Success: cosmopc18 successfully configured for albert.glensk@gmail.com
+
+%verdi computer configure show cosmopc18
+* safe_interval  0
+
+verdi computer test cosmopc18
+
+
+(aiida) 11:56:09 glensk@lammm@cosmopc18 /home/glensk/code/aiida/aiida-core
+%verdi computer setup
+Info: enter "?" for help
+Computer label: daint
+Hostname: daint.cscs.ch
+Description []: daint
+Enable the computer? [True]:
+Transport plugin: ssh
+/s|u\-
+Scheduler plugin: Shebang line (first line of each script, starting with #!) [#!/bin/bash]:
+Work directory on the computer [/scratch/{username}/aiida/]: /scratch/snx3000/aglensk/aiida_scratch
+Mpirun command [mpirun -np {tot_num_mpiprocs}]: srun
+Default number of CPUs per machine: 18
+
+
+# on cosmopc: %ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/glensk/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/glensk/.ssh/id_r
+
+
+
+%verdi computer configure ssh daint
+Info: enter "?" for help
+User name [aglensk]:
+port Nr [22]:
+Look for keys [True]:
+SSH key file [/home/glensk/.ssh/id_rsa]:
+Connection timeout in s [60]:
+Allow ssh agent [True]:
+SSH proxy command [ssh aglensk@ela.cscs.ch /usr/bin/netcat daint.cscs.ch 22]:
+Compress file transfers [True]:
+GSS auth [False]:
+GSS kex [False]:
+GSS deleg_creds [False]:
+GSS host [daint.cscs.ch]:
+Load system host keys [True]:
+Key policy [RejectPolicy]:
+Connection cooldown time (sec) [30]:
+Info: Configuring computer daint for user albert.glensk@gmail.com.
+Success: daint successfully configured for albert.glensk@gmail.com
+

@@ -89,11 +89,15 @@ Host ela
  HostName ela.cscs.ch
  User aglensk
 
-Host daint
+#Host daint
+# HostName daint.cscs.ch
+# User aglensk
+# ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
+
+Host daint*
  HostName daint.cscs.ch
  User aglensk
- ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
- 
+ ProxyCommand ssh aglensk@ela.cscs.ch /usr/bin/netcat %h %p 2> /dev/null
 
 
 # make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
