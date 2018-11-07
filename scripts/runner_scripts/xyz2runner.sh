@@ -18,4 +18,7 @@ printf("%s%f\t%f\t%f\n", "lattice\t\t",h02,h12,h22);
 }
 }
 
-' $1
+' $1 | sed '1,3d'
+echo "energy      0.000000"
+echo "charge      0.000000"
+echo "end"
