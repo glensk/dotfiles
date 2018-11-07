@@ -202,3 +202,5 @@ Connection cooldown time (sec) [30]:
 Info: Configuring computer daint for user albert.glensk@gmail.com.
 Success: daint successfully configured for albert.glensk@gmail.com
 
+
+verdi computer test daint
