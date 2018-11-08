@@ -31,7 +31,7 @@ $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide=
 #################################################################
 # i-pi 
 #################################################################
-$1 i-pi-dev-venkat '$HOME/Dropbox/Albert/scripts/i-pi-dev/bin/i-pi'
+#$1 i-pi-dev-venkat '$HOME/Dropbox/Albert/scripts/i-pi-dev/bin/i-pi'
 #$1 i-pi-mc        '$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi'
 #################################################################
 # alias navigation   use ' '  instead of ""  since only those work with `` correctly
@@ -261,10 +261,22 @@ $1 moduel 'module'
 # #############################
 #$1 q 'squeue -u "$USER" --format "%A %t %N %C %M %Z" | awk '{printf "%8s %3s %20s %4s %6s %10s\n",$1,$2,$3,$4,$5,$6}''
 #$1 mount_fidis 'sshfs -o idmap=user glensk@fidis@epfl.ch:/scratch/glensk ~/fidis'
-$1 mount_fidis 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o reconnect -C' 
-$1 umount_fidis 'umount -f /scratch/glensk'
-$1 mount_daint 'sshfs aglensk@ela.cscs.ch:/users/aglensk/ ~/daint -o reconnect -C'
+$1 mount_fidis_scratch 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o reconnect -C; echo mounted /scratch/glensk' 
+$1 umount_fidis_scratch 'umount -f /scratch/glensk; umounted /scratch/glensk'
+
+$1 mound_pc_scratch 'sshfs glensk@cosmopc15.epfl.ch:/local/scratch/glensk/ /local/scratch/glensk -o reconnect -C; echo mounted /local/scratch/glensk/'
+$1 umount_pc_scratch 'umount -f /local/scratch/glensk'
+
+$1 mount_daint 'sshfs aglensk@ela.cscs.ch:/users/aglensk/ ~/daint -o reconnect -C; echo mounted '
+$1 umount_daint 'umount -f /users/aglensk'
+
 $1 make_home_accessible 'chmod -R ga+r $HOME'
 
 $1 condaactivate ". $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
 $1 gp 'condaactivate'
+
+$1 daint 'ssh daint'
+$1 fidis 'ssh fidis'
+$1 cosmopc 'ssh cosmopc'
+$1 pc 'ssh cosmopc'
+$1 aiida 'source aiida/bin/activate'

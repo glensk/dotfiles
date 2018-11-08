@@ -1,3 +1,4 @@
+from
 https://aiida-core.readthedocs.io/en/latest/install/details/database.html
 
 ssh cosmopc
@@ -40,7 +41,9 @@ verdi profile list
 verdi setup  --help
 verdi setup al6xxx
 
-
+##########################################################################################
+# setup the databases
+##########################################################################################
 %verdi setup al6xxx
 Email Address (identifies your data when sharing): albert.glensk@gmail.com
 First name: Albert
@@ -115,12 +118,25 @@ Setup finished.
 
 # to make backup of database: psql -U aiida -h localhost -p 5432 -d aiida_al6xxx > aida.psql
 # the repository needs also to be saved
+
+
+
+##########################################################################################
+# setup the profiles
+##########################################################################################
 verdi profile show shows aiidadb_repository_uri  file:///home/glensk/aiida/.aiida/repository-al6xxx/
 as the repository
 verdi profile list
 verdi profile setdefault PROFILENAME # to change profile
 
 
+##########################################################################################
+# setup the computers
+##########################################################################################
+
+###########################
+# setup the local computer
+###########################
 %verdi computer setup
 Info: enter "?" for help
 Computer label: cosmopc18
@@ -146,6 +162,9 @@ Default number of CPUs per machine: 1
 # :wq to sve the vim file
 
 
+###########################
+# configure the local computer
+###########################
 %verdi computer configure local cosmopc18
 Info: enter "?" for help
 Connection cooldown time (sec) [2.0]: 0
@@ -158,6 +177,9 @@ Success: cosmopc18 successfully configured for albert.glensk@gmail.com
 verdi computer test cosmopc18
 
 
+###########################
+# setup computer daint 
+###########################
 (aiida) 11:56:09 glensk@lammm@cosmopc18 /home/glensk/code/aiida/aiida-core
 %verdi computer setup
 Info: enter "?" for help
@@ -168,7 +190,7 @@ Enable the computer? [True]:
 Transport plugin: ssh
 /s|u\-
 Scheduler plugin: Shebang line (first line of each script, starting with #!) [#!/bin/bash]:
-Work directory on the computer [/scratch/{username}/aiida/]: /scratch/snx3000/aglensk/aiida_scratch
+Work directory on the computer [/scratch/{username}/aiida/]: /scratch/snx3000/aglensk/aiida_scratch      # is apparently created by the setup
 Mpirun command [mpirun -np {tot_num_mpiprocs}]: srun
 Default number of CPUs per machine: 18
 
@@ -182,6 +204,9 @@ Your identification has been saved in /home/glensk/.ssh/id_r
 
 
 
+###########################
+# configure computer daint 
+###########################
 %verdi computer configure ssh daint
 Info: enter "?" for help
 User name [aglensk]:

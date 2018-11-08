@@ -81,6 +81,12 @@ setenv userme "glensk"
 setenv i_pi_mc "$HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi"
 setenv scripts "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/"
 setenv convcrit 0.5
+
+# completion goo for commands
+export PATH="$dotfiles/commands/:$PATH"  # if this is loaded before: complete -W ... $tocomplete the commands are executed which is not intended
+tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
+complete -W "n/*/`echo $tocomplete `/" goo
+
 [ "$host" = "fidis" ] && setenv lmp "$scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31"
 [ "$host" = "mac" ]   && setenv lmp "$scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30"
 
