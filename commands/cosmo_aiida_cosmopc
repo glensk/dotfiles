@@ -314,3 +314,31 @@ Computer: daint
 Remote absolute path: /users/dmarchan/Install/software/QuantumESPRESSO/6.3-backports-20181003-CrayIntel-18.08/bin/pw.x
 
 verdi code list
+
+11:03:40 glensk@lammm@cosmopc18 /local/scratch/glensk
+%source ~/aiida/bin/activate
+(aiida) 11:06:36 glensk@lammm@cosmopc18 /local/scratch/glensk
+%verdi data upf uploadfamily --help
+Usage: verdi data upf uploadfamily [OPTIONS] FOLDER GROUP_NAME
+                                   GROUP_DESCRIPTION
+
+  Upload a new pseudopotential family.
+
+  Returns the numbers of files found and the number of nodes uploaded.
+
+  Call without parameters to get some help.
+
+Options:
+  --stop-if-existing  Interrupt pseudos import if a pseudo was already present
+                      in the AiiDA database
+  -h, --help          Show this message and exit.
+(aiida) 11:07:02 glensk@lammm@cosmopc18 /local/scratch/glensk
+%mv pseudo_SSSPefV1.1_alalloy ~/Dropbox/Albert/scripts/
+(aiida) 11:08:49 glensk@lammm@cosmopc18 /local/scratch/glensk
+%verdi data upf uploadfamily pseudo_SSSPefV1.1_alalloy 'SSSP_v1.1_eff_custom' 'SSSP v1.1 efficiency with custom Cu pseudo'
+
+
+
+
+verdi process list
+verdi process list -a

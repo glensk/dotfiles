@@ -267,6 +267,9 @@ $1 umount_fidis_scratch 'umount -f /scratch/glensk; umounted /scratch/glensk'
 $1 mound_pc_scratch 'sshfs glensk@cosmopc15.epfl.ch:/local/scratch/glensk/ /local/scratch/glensk -o reconnect -C; echo mounted /local/scratch/glensk/'
 $1 umount_pc_scratch 'umount -f /local/scratch/glensk'
 
+$1 mound_pc_home 'sshfs glensk@cosmopc15.epfl.ch:/home/glensk /home/glensk -o reconnect -C; echo mounted /home/glensk/'
+$1 umount_pc_home 'umount -f /home/glensk'
+
 $1 mount_daint 'sshfs aglensk@ela.cscs.ch:/users/aglensk/ ~/daint -o reconnect -C; echo mounted '
 $1 umount_daint 'umount -f /users/aglensk'
 

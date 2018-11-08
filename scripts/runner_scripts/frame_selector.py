@@ -7,8 +7,9 @@ import os
 def ReadIndex(inputfile):
     """This function reads the input file to extract the index of the first line of each frame to use later"""
     frame_line = []
+    print('inputfile',inputfile)
     with open(inputfile) as datafile:
-        if inputfile.endswith('.data'): 
+        if inputfile.endswith('.data') or inputfile.endswith('.data.all'):
             for i, line in enumerate(datafile):
                 if line.split()[0] == 'begin': # If the datafile is RuNNer-like it will look for the keyword "begin"
                     frame_line.append(i)
@@ -33,7 +34,7 @@ def Precomputed(precomp_file, frame_line):
     return np.array(sel_frames)
 
 
-def Random(nframes, frame_line): 
+def Random(nframes, frame_line):
     """A random selection among the frames is done"""
     if nframes > len(frame_line):
         raise ValueError('The number of randomly chosen frames is higher than the total number of frames in the input file')
@@ -44,14 +45,14 @@ def Random(nframes, frame_line):
 
 
 def Stride(nstride, frame_line): # !TODO Should add option to choose starting and ending frame
-    """A selection of every n-th frame""" 
+    """A selection of every n-th frame"""
     stride_frames = np.arange(0,frame_line[-1],nstride)
     return stride_frames
 
 
 def Print_frames(inputfile, frames, frame_line, split, prefix):
     """Prints in a new file (or two new files, with the splitting flag active) the chosen structures. If no prefix is given, the standard output is DATAFILE_selected.EXTENSION"""
-    if inputfile.endswith('.data'):
+    if inputfile.endswith('.data') or inputfile.endswith('.data.all'):
         suffix = '.data'
         if prefix == '':
             prefix = inputfile[:-5]
