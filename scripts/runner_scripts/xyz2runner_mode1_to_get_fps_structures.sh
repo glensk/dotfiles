@@ -11,10 +11,6 @@
 
 # sudo mkdir -p /home/glensk/
 # sudo chown -R glensk /home/
-echo for just doing fps no atom_energy
-echo for fps:
-echo global_nodes_short  15 15 // 20 20 ?? does not matter, erste wenn mode 1 for fitting potential.
-rename this skript and vorlage template for fps
 get $scripts from click. make defulat ones
 exit
 

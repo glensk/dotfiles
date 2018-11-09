@@ -242,7 +242,7 @@ verdi work plugins
 
 launch_calculation_pw --help
 
-vim aiida_quantumespresso/cli/calculations/pw/base.py # have a look at the click stuff !
+vim /home/glensk/code/aiida/aiida-quantumespresso/aiida_quantumespresso/cli/calculations/pw/base.py # have a look at the click stuff !
 
 verdi computer list
 
