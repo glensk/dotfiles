@@ -112,6 +112,7 @@ CurSel.py -t 1e-3 --landmarks `grep -c begin input.data` function.data logfile_m
 # took 22 secons on 113 structures 
 # took 525 secons on 2455 structures
 # this will create a file cursel.landmarks which contains indexes;
+# x cursel.distances.dat (out.dat) will then give the distances
 cp cursel.landmarks cursel.landmarks.all
 # and in cursel.landmarks delete everythin after line 100 to get only first 100 structures.
 frame_selector.py input.data precomp cursel.landmarks

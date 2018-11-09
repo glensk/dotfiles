@@ -38,9 +38,9 @@ mac)
   ;;
 cosmopc)
 	echo "setenv myshell zsh;"
-    echo "setenv myprompttime red;"
-    echo "setenv myprompthostuser red;"
-    echo "setenv mypromptpath red;"
+    echo "setenv myprompttime green ;"
+    echo "setenv myprompthostuser green;"
+    echo "setenv mypromptpath green;"
 	echo "setenv SCRATCH /local/scratch/glensk;"
 
   ;;
@@ -72,9 +72,9 @@ daint)
   ;;
 fidis)
 	echo "setenv myshell zsh;"
-    echo "setenv myprompttime green;"
-    echo "setenv myprompthostuser green;"
-    echo "setenv mypromptpath green;"
+    echo "setenv myprompttime cyan;"
+    echo "setenv myprompthostuser cyan;"
+    echo "setenv mypromptpath cyan;"
 	echo "setenv SCRATCH /scratch/glensk;"
   ;;
 *)
