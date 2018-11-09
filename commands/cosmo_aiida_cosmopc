@@ -2,7 +2,7 @@ from
 https://aiida-core.readthedocs.io/en/latest/install/details/database.html
 
 ssh cosmopc
-su local
+su local  (115 urgences)
 sudo apt install rabbitmq-server
 sudo apt install postgresql postgresql-server-dev-all postgresql-client
 sudo su - postgres
@@ -139,8 +139,8 @@ verdi profile setdefault PROFILENAME # to change profile
 ###########################
 %verdi computer setup
 Info: enter "?" for help
-Computer label: cosmopc18
-Hostname: cosmopc18
+Computer label: cosmopc18            # now this is localhost
+Hostname: cosmopc18                  # now this is localhost
 Description []: cosmopc18
 Enable the computer? [True]:
 Transport plugin: local
@@ -342,3 +342,255 @@ Options:
 
 verdi process list
 verdi process list -a
+
+iverdi calculation show 106
+verdi profile show
+verdi calculation inputcat 106 aiida.in
+verdi calculation outputls
+launch_calculation_pw -c pw-v6.3@daint -p SSSP_v1.1_eff_custom -s 87 -d
+verdi shell
+verdi work plugins # shows workflows
+
+launch_calculation_pw -c pw-v6.3@daint -p SSSP_v1.1_eff_custom -s 87 -d
+launch_workflow_pw_base -c pw-v6.3@daint -p SSSP_v1.1_eff_custom -s 87 -d
+
+ 1704  xyz2runner_mode1.sh
+ 1705  wc -l symfun.output
+ 1707  dropbox_.py status
+ 1708  cd Downloads/
+ 1709  which verdi
+ 1710  which aiida
+ 1711  /scratch/glensk/raw_data/test_3_at_1000K_for_fps
+ 1712  cd runner_scratch/
+ 1713  aiida
+ 1715  cd co
+ 1716  cd code
+ 1717  cd ai
+ 1718  cd aiida
+ 1719  git clone https://github.com/aiidateam/aiida-quantumespresso
+ 1720  cd aiida-quantumespresso
+ 1721  pip install -e .
+ 1722  verdi calculation plugins
+ 1724  vim aiida_quantumespresso/cli/calculations/pw/base.py
+ 1726  git branch
+ 1727  -
+ 1728  mv /local/scratch/glensk/runner_scratch ~/
+ 1729  ls ~/
+ 1730  untargz pseudo_SSSPefV1.1_alalloy.tar.gz
+ 1731  source ~/aiida/bin/activate
+ 1733  verdi data upf uploadfamily pseudo_SSSPefV1.1_alalloy 'SSSP_v1.1_eff_custom' 'SSSP v1.1 efficiency with custom Cu pseudo'
+ 1734  verdi data upf listfamilies
+ 1737  verdi data structure list
+ 1738  launch_calculation_pw --help
+ 1740  ssh daint -c 'sbatch /scratch/snx3000/aglensk/aiida_scratch/fb/10/56f1-8185-44b2-a583-2d369f31f201/_aiidasubmit.sh'
+ 1741  ssh --help
+ 1742  which ssh
+ 1743  ssh daint 'sbatch /scratch/snx3000/aglensk/aiida_scratch/fb/10/56f1-8185-44b2-a583-2d369f31f201/_aiidasubmit.sh'
+ 1744  verdi calculation gotocomputer 91
+ 1745  cd ../aiida-core
+ 1746  verdi devel setproperty logging.aiida_loglevel DEBUG
+ 1750  verdi calculation logshow 91
+ 1751  launch_calculation_pw -c pw-v6.3@daint -p SSSP_v1.1_eff_custom -s 87
+ 1754  verdi calculation list
+ 1755  /ssh daint "cd '/scratch/snx3000/aglensk/aiida_scratch/dc/04/71a5-40da-4226-96af-5eae749aacb1' && sbatch '_aiidasubmit.sh'"
+ 1756  verdi calculation gotocomputer 101
+ 1757  unalias ssh
+ 1758  ssh daint "cd '/scratch/snx3000/aglensk/aiida_scratch/dc/04/71a5-40da-4226-96af-5eae749aacb1' && sbatch '_aiidasubmit.sh'"
+ 1759  /local/scratch/glensk/runner_scratch
+ 1760  rm pseudo_SSSPefV1.1_alalloy.tar.gz
+ 1761  iterm_title runner mode 1
+ 1762  cd Dropbox
+ 1763  ..
+ 1764  cd glensk
+ 1765  diff input.nn $dotfiles/scripts/runner_scripts/input.nn
+ 1766  vimdiff input.nn $dotfiles/scripts/runner_scripts/input.nn
+ 1767  goo sed.commands
+ 1768  cat ~/scripts/dotfiles/commands/sed.commands
+ 1769  ls ~/google_drive
+ 1770  ls ~/google_drive/
+ 1771  ls ~/google_drive/KMC
+ 1772  ls ~/google_drive/KMC/
+ 1773  ls /local/scratch/glensk/google_drive_from_dropbox_to_delete/
+ 1774  ls /local/scratch/glensk/google_drive_from_dropbox_to_delete/KMC
+ 1775  cd
+ 1776  rm *
+ 1777  rm -rf save
+ 1778  ls /local/scratch/glensk
+ 1779  mv runner_scratch /local/scratch/glensk
+ 1780  cd /local/scratch/glensk/runner_scratch/
+ 1781  rm debug.out gmon.out
+ 1783  cp -r runner_scratch/ runner_scratch_tmp
+ 1784  cp -r runner_scratch/ runner_scratch_loesch
+ 1785  screen -r
+ 1786  RuNNer.serial.x > logfile_mode1.1
+ 1787  rm logfile_mode1.1
+ 1788  ./RuNNer.serial.cosmopc.natascha.x > logfile_mode1.1
+ 1789  tail -f logfile_mode1.1
+ 1790  ps aux | grep RuNNer
+ 1791  grep nelem input.nn
+ 1792  grep number_of_elements input.nn
+ 1793  grep "number_of_elements" input.nn
+ 1794  cp input.nn ../runner_scratch/
+ 1795  cp input.nn ../runner_scratch_tmp
+ 1796  ./RuNNer.serial.cosmopc.natascha.x
+ 1797  rm -rf runner_scratch_loesch/
+ 1798  cd runner_scratch
+ 1799  vi input.nn
+ 1800  grep begin input.data.all | wc -l
+ 1801  cd google_drive
+ 1802  cd KMC
+ 1803  cd results
+ 1804  cd 20171114_Al6xxxDB_NN_training_runner/
+ 1805  cd training-set
+ 1806  cd RuNNer
+ 1807  grep -c begin input.nn
+ 1808  grep -c begin training_input.data
+ 1809  mv runner_scratch runner_scratch_new_data
+ 1810  cp -r runner_scratch_new_data runner_scratch_old_data
+ 1811  /local/scratch/glensk
+ 1812  cd runner_scratch_new_data
+ 1813  cp -r runner_scratch_new_data_all
+ 1814  cp -r /runner_scratch_old_data runner_scratch_new_data_all
+ 1815  cp -r runner_scratch_old_data/ runner_scratch_new_data_all
+ 1816  cd runner_scratch_new_data_all
+ 1817  grep input.data input.nn
+ 1818  mv input.data.all input.data
+ 1819  cd runner_scratch_old_data/
+ 1820  rm input.data*
+ 1821  cd ..
+ 1822  cd 20181003_Al6xxxDB_recalculate_formation_energies/
+ 1823  cd 20181017_Al6xxxDB_NN_training_runner_5000inputstructures_from_giulio/
+ 1824  vi fps-5000.data
+ 1825  cp /local/scratch/glensk/google_drive/KMC/results/20181017_Al6xxxDB_NN_training_runner_5000inputstructures_from_giulio/fps-5000.data input.data
+ 1826  ./RuNNer.serial.cosmopc.natascha.x > logfile_mode1.1&
+ 1827  gd
+ 1828  ecgd
+ 1829  dot
+ 1830  gs
+ 1831  cd scratch
+ 1832  cd /local/scratch/glensk
+ 1833  ssh fidis
+ 1834  zsh
+ 1835  hostname
+ 1836  echo cosmopc18 | sed 's/\..*$//'
+ 1837  echo cmmd018 | sed 's/\..*$//'
+ 1838  echo cmmd018 | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'
+ 1839  bash
+ 1840  top
+ 1841  c
+ 1842  which c
+ 1843  cd runner_scratch_new_data/
+ 1844  grep -c begin input.data.all
+ 1846  runner_scratch_new_data_all/
+ 1847  du -sh *
+ 1848  grep -c begin input.data
+ 1849  python CurSel.py -t 1e-3 --landmarks `grep -c begin input.data` function.data logfile_mode1.1
+ 1850  iterm_title fps kmc
+ 1851  CurSel.py -h
+ 1852  ll -rtl
+ 1853  du -sh cursel*
+ 1854  wc -l cursel*
+ 1855  CurSel.py -t 1e-3 --landmarks `grep -c begin input.data` function.data logfile_mode1.1
+ 1856  mcd tmp
+ 1857  cp ../* .
+ 1858  CurSel.py -t 1e-3 --landmarks 200 function.data logfile_mode1.1
+ 1860  cd ../
+ 1861  frame_selector.py -h
+ 1862  cp cursel.landmarks cursel.landmarks.all
+ 1863  vi cursel.landmarks
+ 1864  frame_selector.py input.data precomp cursel.landmarks
+ 1865  ls -rtl
+ 1866  vi input_selected.data
+ 1867  grep -c input_selected.data
+ 1868  grep -c begin input_selected.data
+ 1869  gu
+ 1870  vi $scripts/runner_scripts/xyz2runner_mode1.sh
+ 1871  exit
+ 1873  htop
+ 1874  cd code/aiida/
+ 1875  cd aiida-core
+ 1876  vim aiida/transport/plugins/local.py
+ 1878  ssh daintr
+ 1880  ssh ela
+ 1892  verdi process list -a -p2
+ 1901  vim aiida/scheduler/plugins/slurm.py
+ 1905  vim aiida/scheduler/__init__.py
+ 1906  verdi daemon restart --reset
+ 1907  verdi calculation gotocomputer 106
+ 1909  \ssh daint
+ 1911  ssh daiont
+ 1912  ssh daint
+ 1914  verdi process list
+ 1915  daint
+ 1916  verdi devel setproperty logging.aiida_loglevel INFO
+ 1917  verdi daemon restart
+ 1918  launch_calculation_pw -c pw-v6.3@daint -p SSSP_v1.1_eff_custom -s 87 -d
+ 1919  pwd
+ 1920  git status
+ 1921  git diff .
+ 1922  git checkout -- .
+ 1924  verdi node delete 91 96 101
+ 1925  verdi process list -a
+ 1926  verdi calculation show 106
+ 1928  verdi calculation inputls 106
+ 1929  verdi calculation inputcat 106 aiida.in
+ 1930  verdi calculation inputcat 106 aiida.in | less
+ 1931  verdi calculation inputcat 106 aiida.in | vi
+ 1932  verdi calculation inputcat 106 aiida.in | vi -
+ 1933  verdi calculation outputls 106
+ 1934  verdi calculation outputcat 106 aiida.out | less
+ 1935  verdi data parameter show 110
+ 1936  verdi calculation
+ 1937  verdi calculation logshow 106
+ 1938  history
+ 1939  history -100
+ 1943* verdi work plugins
+ 1944* verdi daemon logshow
+ 1945* launch_workflow_pw_base -c pw-v6.3@daint -p SSSP_v1.1_eff_custom -s 87 -d
+ 1947  history -100 | grep launch
+ 1948* verdi work show 127
+ 1949* verdi work report 127
+ 1950* verdi work status 127
+ 1952  source aiida/bin/activate
+ 1953  verdu work status 138
+ 1954  verdi work status 138
+ 1957* verdi daemon stop
+ 1958* verdi profile show
+ 1959* rm -rf /home/glensk/aiida/.aiida/repository-al6xxx/repository
+ 1960* sudo su - postgres
+ 1962  cat ~/scripts/dotfiles/commands/cosmo_cosmopc_setup
+ 1964* ssh cosmopc
+ 1965* su local
+ 1973* verdi computer setup
+ 1976* verdi code setup
+ 1978* verdi export create --help
+ 1979* verdi export create -Y localhost daint -C pw-v6.3 -- base_computers_code.aiida
+ 1980* verdi export create -Y localhost daint -X pw-v6.3 -- base_computers_code.aiida
+ 1982* ls -al
+ 1983* ls
+ 1985* verdi profile setdefault al6xxx
+ 1988* verdi import base_computers_code.aiida
+ 1989* verdi computer list
+ 1990* verdi computer list -A
+ 1991* verdi computer list -a
+ 1992* verdi computer configure localhost
+ 1993* verdi computer configure local localhost
+ 1994* verdi computer configure ssh daint
+ 1995* verdi computer test localhost
+ 1996* verdi computer test daint
+ 1997* verdi code list
+ 1999* verdi profile setdefault al6xxx_test
+ 2000* ll
+ 2001  /s
+ 2002  s
+ 2003  untargz pseudo_SSSPefV1.1_alalloy
+ 2004* verdi data upf uploadfamily --help
+ 2005* verdi data upf uploadfamily /local/scratch/glensk/pseudo_SSSPefV1.1_alalloy SSSP_v1.1_eff 'SSSP v1.1 efficiency PBE with updated Cu pseudo'
+ 2006* verdi shell
+ 2007* verdi daemon status
+ 2008* verdi daemon start
+ 2009* launch_workflow_pw_base -c pw-v6.3@daint -p SSSP_v1.1_eff -s 87 -d
+ 2011* verdi profile list
+ 2012* verdi process list -a -p1
+ 2013  history -200
+ 2014  history -200 > ~/scripts/dotfiles/commands/cosmo_aiida_cosmopc

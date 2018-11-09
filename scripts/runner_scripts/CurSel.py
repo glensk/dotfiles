@@ -191,17 +191,21 @@ def GetLandmarks(nsyms, nlandmarks):
     print "Selecting the %d most important frames" % nlandmarks
     #This computes the distance and outputs the selected frames
     sel_frames = [0]
+    distances = [0]
     mindist = np.zeros(nframes)
     for k in xrange(nframes):
         mindist[k] = np.linalg.norm(frame_sf[k] - frame_sf[sel_frames[0]])
     while len(sel_frames) < nlandmarks-1:
         sel_frames.append(np.argmax(mindist))
+        distances.append(np.max(mindist))
         sys.stdout.write("\rSelecting frame:\t%d" % (len(sel_frames)+1))
         sys.stdout.flush()
         for k in xrange(nframes):
             mindist[k] = min(mindist[k],np.linalg.norm(frame_sf[k] - frame_sf[sel_frames[-1]]) )
     sel_frames.append(np.argmax(mindist))
+    distances.append(np.max(mindist))
     sys.stdout.write("\n")
+    np.savetxt('out.arr',np.array(distance))
 
     return sel_frames
 
