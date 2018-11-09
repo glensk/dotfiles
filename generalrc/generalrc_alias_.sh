@@ -93,7 +93,8 @@ $1 sl 'ls'
 #$1 vim 'vim -v'  # is way too slow, better use plain vi
 
 $1 gu 'gitup.sh'
-$1 gd 'gitdown.sh'
+#$1 gd 'gitdown.sh'
+$1 gd 'gitup.sh'
 $1 ggd 'git clone --recursive https://github.com/glensk/dotfiles.git'
 $1 gurl 'git config --get remote.origin.url'
 $1 gs 'git status -u'
