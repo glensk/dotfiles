@@ -205,7 +205,8 @@ def GetLandmarks(nsyms, nlandmarks):
     sel_frames.append(np.argmax(mindist))
     distances.append(np.max(mindist))
     sys.stdout.write("\n")
-    np.savetxt('out.arr',np.array(distances))
+    #print('dist',distances,type(distances))
+    np.savetxt('cursel.distances.dat',np.array(distances))
 
     return sel_frames
 
