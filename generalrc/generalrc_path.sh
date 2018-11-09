@@ -38,7 +38,7 @@ PATH="$PATH:$aiida:$aiida2:$aliases:$lammps1:$lammps2:$kmc:$kmc2:$dropboxbin:$ru
 #########################################################################
 # on mac: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
 #########################################################################
-if [ "$currenthost" = "onmac" ];then
+if [ "$onhost" = "mac" ];then
     # $PATH (on mac)
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
@@ -90,7 +90,7 @@ fi
 # on cmmd: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
 # cmmd does not exist anymore
 #########################################################################
-#if [ "$currenthost" = "oncmmd" ];then
+#if [ "$onhost" = "cmmd" ];then
 #    
 #    xmgracebin="/data/grabowski/xmgrace/bin/"
 #    add1="/lib64"

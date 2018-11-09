@@ -12,27 +12,22 @@
 ###################################################################################
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
 
+host=`hostname`   # 0.001s
+onhost=`echo $host | sed 's/\..*$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
+setenv host $host;
+setenv onhost $onhost;
+
 ###################################################################################
 # HOST dependent variables (module load, anaconda (on cmmc with module load) ...)
 ###################################################################################
 eval `$generalrc/generalrc_hostdependent.sh`   
-            # defines:  
-            # --------
-            # onmac, oncmmc, oncmdft} to true or false
-            # currenthost to {onmac, oncmmc, oncmdft}
-            # myshell to {zsh,bash, tcsh}
-            # promptcolor
-            # printloadstats
-            # echo ONMAC $onmac
-            # echo WHICHALIAS $whichalias  
-            # echo CURRENTHOST $currenthost
-
+            # myshell to {zsh,bash, tcsh}; promptcolor; whichalias = {alias or mkalias}
 
 ###################################################################################
 # PATH, PYTHONPATH  (anaconda on mac)
 # PYTHONPATH should not be set (according to anaconda/miniconda)
 ###################################################################################
-eval `$generalrc/generalrc_path.sh $currenthost` 
+eval `$generalrc/generalrc_path.sh $onhost` 
 
 #export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 #@# time without aliases          : 0.38
@@ -42,10 +37,10 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 ##############################################
 # ALIASES
 ##############################################
-[ ! -e "$generalrc/generalrc_alias_$currenthost" ] && $generalrc/generalrc_alias_renew.sh
+[ ! -e "$generalrc/generalrc_alias_$onhost" ] && $generalrc/generalrc_alias_renew.sh
 
 # aliases which worc everywhere
-[ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_alias_$currenthost
+[ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_alias_$onhost
 [ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_alias_.sh $whichalias $currentshell
 
 # shell SPECIFIC aliases
@@ -59,8 +54,8 @@ eval `$generalrc/generalrc_path.sh $currenthost`
 [ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_prompt_tcsh.sh
 [ "$currentshell" = "zsh" ] && source $generalrc/generalrc_prompt_zsh.sh
 [ "$currentshell" = "bash" ] && source $generalrc/generalrc_prompt_bash.sh
-[ "$onmac" = "true" ] && tab-color magenta
-[ "$ondaint" = "true" ] && tab-color blue
+[ "$onhost" = "mac" ] && tab-color magenta
+[ "$ohhost" = "daint" ] && tab-color blue
 
 #echo
 #echo MYSHELL $myshell;
@@ -114,6 +109,4 @@ setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green
 # set host variables  
 ##############################################
 [ "$printloadstat" = "true" ] && \
-    echo " +onmac $onmac"   && echo " +oncmmc $oncmmc" && \
-    echo " +oncmmd $oncmmd" && echo " +oncmpc $oncmpc"
-
+    echo " onhost $onhost"

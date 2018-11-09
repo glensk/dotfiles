@@ -176,7 +176,7 @@ $1 qstatn 'qstatn -d'
 ##############################
 # on mac
 ##############################
-[ "$onmac" = "true" ] && \
+[ "$onhost" = "mac" ] && \
     $1 math '/Applications/Mathematica.app/Contents/MacOS/MathKernel' && \
     $1 mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica' && \
     #$1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
@@ -196,18 +196,7 @@ $1 qstatn 'qstatn -d'
     #alias mvim='open /Applications/MacVim.app'
     #alias cat 'colorize'  # colorize seems to have sometimes problems
 
-# cmmd does not exist anymore
-#[ "$oncmmd" != "true" ] && \
-#    $1 qhost 'qhost.sh' && \
-#    $1 qstat 'qstat.sh' && \
-#    $1 qdel 'qdel.sh'   && \
-#    $1 qalter 'qalter.sh' && \
-#    $1 qsub 'qsub.sh'   && \
-#    $1 qls 'qls.garching -u'  && \
-#    $1 qhold 'qhold.sh' && \
-#    $1 qrls 'qrls.sh'         
-
-[ "$oncmmc" = "true" ] && \
+[ "$onhost" = "cmmc" ] && \
     $1 garblazej 'ssh bzg@cmmc001.bc.rzg.mpg.de' && \
     $1 scpfromcmmc 'scp -r aglen@cmmc001.bc.rzg.mpg.de:\!:1 \!:2' && \
     $1 scptocmmc 'scp -r \!:1 aglen@cmmc001.bc.rzg.mpg.de:\!:2' && \
@@ -223,25 +212,22 @@ $1 qstatn 'qstatn -d'
 #$1 vi 'gvim -v' && \
 #$1 vim 'gvim -v' && \
 
-[ "$oncmpc" = "true" ] && \
+[ "$onhost" = "cmpc" ] && \
     $1 tmux '/home/glensk/local/bin/tmux'
 
 #$1 vi 'gvim -v' && \
 #$1 vim 'gvim -v' && \
 
-[ "$host" = "cmmd001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v'
 #[ "$host" = "cmmc001.mpie.de" ] && $1 vi 'vi -v' && $1 vim 'vi -v' # check if cmmc has vim or only vi
 
 ##############################
 # ssh
 ##############################
-$1 ssh 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc  ... Blazej uses ServerAliveCountMax=1200 which seems to be good
+$1 ssh      'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc  ... Blazej uses ServerAliveCountMax=1200 which seems to be good
 $1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'
 
-$1 cluster 'sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-$1 001 'sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-$1 002 'sshimmer -t glensk@cmmd002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-$1 cmpc 'sshimmer -t glensk@$myhost.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"' # this loads tcsh twice due to the necessary tcsh at the end; once zsh is installed on the cmpc (and cmmd?) the tcsh can be left empty and instead of tcsh one could simply write zsh
+$1 cluster 'sshimmer -t glensk@cmmc002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 cmpc 'sshimmer -t glensk@cmpc34.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"' # this loads tcsh twice due to the necessary tcsh at the end; once zsh is installed on the cmpc (and cmmd?) the tcsh can be left empty and instead of tcsh one could simply write zsh
 
 $1 gate 'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 gatelinux 'sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; zsh"'

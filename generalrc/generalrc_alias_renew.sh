@@ -9,16 +9,13 @@ mkalias () {
     eval `aliastcshtobash $1 "$2"`
 }
 
-#echo $currenthost
+
 #echo $whichalias
 #echo $currentshell
 
-if [ "$currenthost" = "" ];then
-[ "`echo $host | grep -o cmpc`" = "cmpc" ] && currenthost=cmpc
-[ "`echo $host | grep -o cmmd`" = "cmmd" ] && currenthost=cmmd
-[ "`echo $host | grep -o cmmc`" = "cmmc" ] && currenthost=cmmc
-fi
-aliasfile=$dotfiles/generalrc/generalrc_alias_$currenthost
+[ "$onhost" = "UNKNOWN" ] && echo "onhost is UNKNOWN" && exit
+
+aliasfile=$dotfiles/generalrc/generalrc_alias_$onhost
 #source $dotfiles/generalrc_alias_.sh $whichalias $currentshell 
 source $dotfiles/generalrc/generalrc_alias_.sh mkalias $currentshell 
 rm -f $aliasfile
