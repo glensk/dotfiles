@@ -50,8 +50,7 @@ tcsh)
   ;;
 esac
 
-[ "$onhost" = "mac" ] && tab-color magenta
-[ "$ohhost" = "daint" ] && tab-color blue
+tab-color $mypromptpath
 
 ##############################################
 # set host unspecific variables  

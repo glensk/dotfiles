@@ -22,11 +22,11 @@ echo "setenv mylaptop mac;"
 ##############################################################################
 # defaults / fall back options
 ##############################################################################
-myshell="setenv myshell bash"
 myprompttime="setenv myprompttime magenta"
 myprompthostuser="setenv myprompthostuser red"
 mypromptpath="setenv mypromptpath red"
 module="setenv GZIP -9"   # an empty string ("") is not possible, better use dummy
+echo "setenv myshell zsh;"
 
 case $onhost in
 mac)
@@ -71,6 +71,10 @@ daint)
 	#echo "setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
   ;;
 fidis)
+	echo "setenv myshell zsh;"
+    echo "setenv myprompttime green;"
+    echo "setenv myprompthostuser green;"
+    echo "setenv mypromptpath green;"
 	echo "setenv SCRATCH /scratch/glensk;"
   ;;
 *)
