@@ -5,4 +5,3 @@
 function mcd () { mkdir -p $1 && cd $1 }
 alias -- -='cd -' #alias \\-='cd -' 
 alias "../"="cd .."
-

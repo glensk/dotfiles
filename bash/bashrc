@@ -1,4 +1,5 @@
-#echo anfang
+if [[ $- == *i* ]];then
+    #echo anfang
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
 #################################################################
@@ -86,3 +87,4 @@ set completion-ignore-case on
 
 # added by Miniconda3 installer
 #export PATH="/home/glensk/miniconda3/bin:$PATH"
+fi

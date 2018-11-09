@@ -16,4 +16,5 @@ if [ "`hostname | grep -o daint`" = "daint" ];then
 case "$-" in
   *i*) export SHELL=/bin/zsh;export currentshell="zsh";unset FPATH; exec /bin/zsh -l
   ;;
+esac
 fi
