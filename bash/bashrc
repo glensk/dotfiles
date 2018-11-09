@@ -1,90 +1,90 @@
-if [[ $- == *i* ]];then
-    #echo anfang
-#################################################################
-# declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
-#################################################################
-[ -z "$PYTHONPATH" ] && PYTHONPATH=""
-
-#################################################################
-# read in general variables on{mac,cmmc,cmmd},printloadstat
-#################################################################
-# for tcsh    : setenv currentshell tcsh
-# for bash/zsh: export currentshell='zsh'
-export currentshell='bash'
-export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
-export generalrc="$dotfiles/generalrc"
-source $generalrc/generalrc_.sh
-
-if [[ $- == *i* ]]    # only in interactive shell
-then
-    [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
-    alias c='j'
-fi
-
-#################################################################
-# bash dependent stuff to use on every system
+#if [[ $- == *i* ]];then
+#    #echo anfang
+##################################################################
+## declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
+##################################################################
+#[ -z "$PYTHONPATH" ] && PYTHONPATH=""
 #
-################################################################
-source $dotfiles/bash/bash_set
-#bind '"\C-j": history-search-backward'
-#bind '"\C-k": history-search-forward'
-#jbindkey ^[j history-substring-search-down
-#bind '"\e[A"':history-search-backward  # this makes it work with cmd+j  # warnings with scp
-#bind '"\e[B"':history-search-forward   # this makes it work with cmd+k  # warnings with scp
-#bind Space:magic-space
-set show-all-if-ambiguous on
-set completion-ignore-case on
-
-
-#################################################################
-# for pyron jupyter hub (juypter notebook)
-#################################################################
-#echo 'vor module'
-#if [ "`which module`" != "" ];then
-#module unload anaconda
-#module load pyiron/dev
+##################################################################
+## read in general variables on{mac,cmmc,cmmd},printloadstat
+##################################################################
+## for tcsh    : setenv currentshell tcsh
+## for bash/zsh: export currentshell='zsh'
+#export currentshell='bash'
+#export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
+#export generalrc="$dotfiles/generalrc"
+#source $generalrc/generalrc_.sh
+#
+#if [[ $- == *i* ]]    # only in interactive shell
+#then
+#    [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
+#    alias c='j'
 #fi
-#echo 'nach  module'
-
-
-## https://github.com/rupa/z
-## invoke this after fasd otherwise z function will be overwritten by fasd
-#source $dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
-#alias c='z'
-
-#@ timing bash:             sys     user
-#@ 0) completely empty      0.002   0.003
-#@ 0) 1+generalrc.sh empty  0.003   0.003
-#@ 1) +generalrc.sh         0.014   0.012 (=0.011s)
-#@ 2) +bash_set             0.018   0.015 (=0.004s)
-#@ 3) +source z             0.030   0.028 (=0.012s)
-
-#@ 1) 1+generalrc.sh empty  0.002   0.003
-#@ 2) 1+necessary_bash      0.003   0.003
-#@ 3) 2+hostdependent       0.006   0.006  =0.003
-#@ 4) 3+path                0.008   0.008  =0.002 
-#@ 5) 4+alias first 3       0.009   0.008  =0.001
-#@ 5) 4+alias all           0.010   0.008  =0.002
-#@ 6) 5+prompt              0.010   0.008  
-#@ 7) 6+thermodynamics      0.014   0.012  =0.004 (davon 0.003 fuer OUTCAR_complete stuff)
-#@ 8) 7+whole generalrc.sh  0.014   0.012  
-
-#export PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "
-#echo ende
-
-#case "$-" in
-#    *i*)  echo This shell is interactive ;;
-#    *)  echo This shell is not interactive ;;
-#esac
-
-#[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
-# This is grat breaks however scp
-
-#case "$-" in
-#    *i*)  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
-#esac
-
-
-# added by Miniconda3 installer
-#export PATH="/home/glensk/miniconda3/bin:$PATH"
-fi
+#
+##################################################################
+## bash dependent stuff to use on every system
+##
+#################################################################
+#source $dotfiles/bash/bash_set
+##bind '"\C-j": history-search-backward'
+##bind '"\C-k": history-search-forward'
+##jbindkey ^[j history-substring-search-down
+##bind '"\e[A"':history-search-backward  # this makes it work with cmd+j  # warnings with scp
+##bind '"\e[B"':history-search-forward   # this makes it work with cmd+k  # warnings with scp
+##bind Space:magic-space
+#set show-all-if-ambiguous on
+#set completion-ignore-case on
+#
+#
+##################################################################
+## for pyron jupyter hub (juypter notebook)
+##################################################################
+##echo 'vor module'
+##if [ "`which module`" != "" ];then
+##module unload anaconda
+##module load pyiron/dev
+##fi
+##echo 'nach  module'
+#
+#
+### https://github.com/rupa/z
+### invoke this after fasd otherwise z function will be overwritten by fasd
+##source $dotfiles/z/z.sh   # =0.012s works for zsh but not for bash!
+##alias c='z'
+#
+##@ timing bash:             sys     user
+##@ 0) completely empty      0.002   0.003
+##@ 0) 1+generalrc.sh empty  0.003   0.003
+##@ 1) +generalrc.sh         0.014   0.012 (=0.011s)
+##@ 2) +bash_set             0.018   0.015 (=0.004s)
+##@ 3) +source z             0.030   0.028 (=0.012s)
+#
+##@ 1) 1+generalrc.sh empty  0.002   0.003
+##@ 2) 1+necessary_bash      0.003   0.003
+##@ 3) 2+hostdependent       0.006   0.006  =0.003
+##@ 4) 3+path                0.008   0.008  =0.002 
+##@ 5) 4+alias first 3       0.009   0.008  =0.001
+##@ 5) 4+alias all           0.010   0.008  =0.002
+##@ 6) 5+prompt              0.010   0.008  
+##@ 7) 6+thermodynamics      0.014   0.012  =0.004 (davon 0.003 fuer OUTCAR_complete stuff)
+##@ 8) 7+whole generalrc.sh  0.014   0.012  
+#
+##export PS1="${RESET}${YELLOW}\u@\h${NORMAL} \`${SELECT}\` ${YELLOW}\w \$(__git_ps1) >${NORMAL} "
+##echo ende
+#
+##case "$-" in
+##    *i*)  echo This shell is interactive ;;
+##    *)  echo This shell is not interactive ;;
+##esac
+#
+##[ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
+## This is grat breaks however scp
+#
+##case "$-" in
+##    *i*)  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && zsh # ohne $ !!! weis auch nicht warum 
+##esac
+#
+#
+## added by Miniconda3 installer
+##export PATH="/home/glensk/miniconda3/bin:$PATH"
+#fi
