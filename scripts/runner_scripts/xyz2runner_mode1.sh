@@ -104,6 +104,15 @@ mv AlMgSi_selected.data input.data
 echo "start runner in mode 1 (on cosmopc)"
 ###################################################
 
+
 ###################################################
 echo "make fps to get structures to calculate"
 ###################################################
+CurSel.py -t 1e-3 --landmarks `grep -c begin input.data` function.data logfile_mode1.1
+# took 22 secons on 113 structures 
+# took 525 secons on 2455 structures
+# this will create a file cursel.landmarks which contains indexes;
+cp cursel.landmarks cursel.landmarks.all
+# and in cursel.landmarks delete everythin after line 100 to get only first 100 structures.
+frame_selector.py input.data precomp cursel.landmarks
+
