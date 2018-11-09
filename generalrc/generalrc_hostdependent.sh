@@ -27,7 +27,6 @@ myprompttime="setenv myprompttime magenta"
 myprompthostuser="setenv myprompthostuser red"
 mypromptpath="setenv mypromptpath red"
 module="setenv GZIP -9"   # an empty string ("") is not possible, better use dummy
-add="setenv ka kb"      # an empty string ("") is not possible, better use dummy
 
 case $onhost in
 mac)
@@ -39,12 +38,15 @@ mac)
   ;;
 cosmopc)
 	echo "setenv myshell zsh;"
+    echo "setenv myprompttime red;"
+    echo "setenv myprompthostuser red;"
+    echo "setenv mypromptpath red;"
 	echo "setenv SCRATCH /local/scratch/glensk;"
 
   ;;
 cmpc)
    	myshell="setenv myshell zsh"
-   	myprompttime="setenv myprompttime magenta"
+   	myprompttime="setenv myprompttime red"
    	myprompthostuser="setenv myprompthostuser red"
    	mypromptpath="setenv mypromptpath red"
    	module="module load mathematica1002/10.0.2"
@@ -63,10 +65,10 @@ cmmc)
   ;;
 daint)
 	echo "setenv myshell zsh;"
-	#echo "setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
   	myprompttime="setenv myprompttime blue"
   	myprompthostuser="setenv myprompthostuser blue"
   	mypromptpath="setenv mypromptpath blue;"
+	#echo "setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
   ;;
 fidis)
 	echo "setenv SCRATCH /scratch/glensk;"

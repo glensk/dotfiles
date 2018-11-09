@@ -35,39 +35,24 @@ eval `$generalrc/generalrc_path.sh $onhost`
 #@# time with    alias            : 0.38 (in zsh: alias > alias; add as 1st row alias)
 
 ##############################################
-# ALIASES
+# ALIASES & PROMPT & tabcolor
 ##############################################
 [ ! -e "$generalrc/generalrc_alias_$onhost" ] && $generalrc/generalrc_alias_renew.sh
+source $generalrc/generalrc_alias_$myshell.sh
+source $generalrc/generalrc_prompt_$myshell.sh
 
-# aliases which worc everywhere
-[ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_alias_$onhost
-[ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_alias_.sh $whichalias $currentshell
+case $currentshell in 
+tcsh)
+    source $generalrc/generalrc_alias_.sh $whichalias $currentshell
+ ;;
+*)  # for zsh and bash
+    source $generalrc/generalrc_alias_$onhost
+  ;;
+esac
 
-# shell SPECIFIC aliases
-[ "$currentshell"  = "zsh" ] && source $generalrc/generalrc_alias_zsh.sh
-[ "$currentshell"  = "bash" ] && source $generalrc/generalrc_alias_bash.sh
-[ "$currentshell"  = "tcsh" ] && source $generalrc/generalrc_alias_tcsh.sh
-
-##############################################
-# PROMPT & tabcolor
-##############################################
-[ "$currentshell" = "tcsh" ] && source $generalrc/generalrc_prompt_tcsh.sh
-[ "$currentshell" = "zsh" ] && source $generalrc/generalrc_prompt_zsh.sh
-[ "$currentshell" = "bash" ] && source $generalrc/generalrc_prompt_bash.sh
 [ "$onhost" = "mac" ] && tab-color magenta
 [ "$ohhost" = "daint" ] && tab-color blue
 
-#echo
-#echo MYSHELL $myshell;
-#echo CURRENTSHELL $currentshell;
-#echo MYPROMPTTIME $myprompttime;
-#eval `$generalrc/generalrc_prompt.sh`
-#[ "$printloadstat" = "true" ] && echo "... generalrc_prompt.sh done"
-#echo MYPROMPTTIME $myprompttime;
-#echo 
-
-#[ "`hostname`" = "cmmc002" ] && load_local_anaconda
-#[ "`hostname`" = "cmmc001" ] && load_local_anaconda
 ##############################################
 # set host unspecific variables  
 ##############################################
