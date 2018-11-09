@@ -13,7 +13,7 @@
 [ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
 
 host=`hostname`   # 0.001s
-onhost=`echo $host | sed 's/\..*$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
+onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
 setenv host $host;
 setenv onhost $onhost;
 
