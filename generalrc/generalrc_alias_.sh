@@ -283,3 +283,5 @@ $1 fidis 'ssh fidis'
 $1 cosmopc 'ssh cosmopc'
 $1 pc 'ssh cosmopc'
 $1 aiida 'source aiida/bin/activate'
+
+$1 s 'cd $SCRATCH'
