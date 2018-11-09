@@ -66,8 +66,8 @@ export PATH="$dotfiles/commands/:$PATH"  # if this is loaded before: complete -W
 tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
 complete -W "n/*/`echo $tocomplete `/" goo
 
-[ "$host" = "fidis" ] && setenv lmp "$scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31"
-[ "$host" = "mac" ]   && setenv lmp "$scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30"
+[ "$onhost" = "fidis" ] && setenv lmp "$scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31"
+[ "$onhost" = "mac" ]   && setenv lmp "$scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30"
 
 if [ -e "$thermodynamics/utilities/" ];then
 [ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add

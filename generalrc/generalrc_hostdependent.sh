@@ -65,9 +65,9 @@ cmmc)
   ;;
 daint)
 	echo "setenv myshell zsh;"
-  	myprompttime="setenv myprompttime blue"
-  	myprompthostuser="setenv myprompthostuser blue"
-  	mypromptpath="setenv mypromptpath blue;"
+    echo "setenv myprompttime blue;"
+    echo "setenv myprompthostuser blue;"
+    echo "setenv mypromptpath blue;"
 	#echo "setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
   ;;
 fidis)
