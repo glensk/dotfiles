@@ -23,6 +23,7 @@ GD="false"  # google_drive is installed?
 [ "`echo $onhost | grep -o cmpc`"    = "cmpc"    ] && oncmpc="true"    && DB="false" && GD="false"
 [ "`echo $onhost | grep -o daint`"   = "daint"   ] && ondaint="true"   && DB="false" && GD="false"
 [ "`echo $onhost | grep -o cosmopc`" = "cosmopc" ] && oncosmopc="true" && DB="true"  && GD="true"
+[ "`echo $onhost | grep -o fidis`"   = "fidis"   ] && oncfidis="true"  && DB="false" && GD="false"
 
 
 echo "host      :$host:"
