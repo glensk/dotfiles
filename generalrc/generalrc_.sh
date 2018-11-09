@@ -38,8 +38,8 @@ eval `$generalrc/generalrc_path.sh $onhost`
 # ALIASES & PROMPT & tabcolor
 ##############################################
 [ ! -e "$generalrc/generalrc_alias_$onhost" ] && $generalrc/generalrc_alias_renew.sh
-source $generalrc/generalrc_alias_$myshell.sh
-source $generalrc/generalrc_prompt_$myshell.sh
+source $generalrc/generalrc_alias_$currentshell.sh
+source $generalrc/generalrc_prompt_$currentshell.sh
 
 case $currentshell in 
 tcsh)
