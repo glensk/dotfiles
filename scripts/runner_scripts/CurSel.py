@@ -205,7 +205,7 @@ def GetLandmarks(nsyms, nlandmarks):
     sel_frames.append(np.argmax(mindist))
     distances.append(np.max(mindist))
     sys.stdout.write("\n")
-    np.savetxt('out.arr',np.array(distance))
+    np.savetxt('out.arr',np.array(distances))
 
     return sel_frames
 
