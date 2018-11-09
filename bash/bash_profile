@@ -13,8 +13,7 @@ export PATH
 
 
 if [ "`hostname | grep -o daint`" = "daint" ];then
-export SHELL=/bin/zsh
-export currentshell="zsh"
-unset FPATH           # necessary on daint to get correct zsh and make colors work etc
-exec /bin/zsh -l
+case "$-" in
+  *i*) export SHELL=/bin/zsh;export currentshell="zsh";unset FPATH; exec /bin/zsh -l
+  ;;
 fi
