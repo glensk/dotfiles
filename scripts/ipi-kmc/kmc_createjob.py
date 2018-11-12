@@ -5,6 +5,7 @@ from ase.lattice.cubic import FaceCenteredCubic
 from shutil import copyfile
 import numpy as np
 from subprocess import call
+from subprocess import check_output
 import click
 
 # from scripts folder
@@ -39,16 +40,31 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 # environment variables
-@click.option('-scripts', envvar='scripts',help='path to scripts folder (or environment variable $scripts)')
-@click.option('-nn_pot',type=str, default="v2dg", help="foldername for neural network potential")
+@click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
+@click.option('-nn_pot',type=str, default="v2dg", help="foldername in $scripts containing the neural network potential (can be separately set here for different path)")
 @click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
-@click.option('-lmp', envvar='lmp',help='path to lammps executable (or environment variable $lmp)')
+@click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
 
 
-
-def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit,submitdebug='kk'):
+def main(
+        ncell,
+        nmg,
+        nsi,
+        nvac,
+        a0,
+        temp,
+        scripts,
+        nn_pot,
+        nseeds,
+        seednumber,
+        nsteps,
+        runnercutoff,
+        i_pi_mc,
+        lmp_exec,
+        submit,
+        submitdebug='kk'):
     """
     This is an script to submit KMC jobs quickly.
 
@@ -57,19 +73,28 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
     kmc_createjob.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
     """
 
+    ####################################
+    # a few checks
+    ####################################
     if submit is True or submitdebug is True and socket.gethostname() == "fidis":
         if socket.gethostname() != "fidis":    # use != and not: is not
             print('you are NOT on fidis')
             sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
-    nn_pot_dir = scripts + "pot_nn/" + nn_pot
-    file_inlmp = scripts + "ipi-kmc/in.lmp"
-    file_submit = scripts + "ipi-kmc/submit-ipi-kmc.sh"
-    file_ipi_input_runner = scripts + "ipi-kmc/input-runner.xml"
+    nn_pot_dir              = scripts + "pot_nn/" + nn_pot
+    file_inlmp              = scripts + "ipi-kmc/in.lmp"
+    file_submit             = scripts + "ipi-kmc/submit-ipi-kmc.sh"
+    file_ipi_input_runner   = scripts + "ipi-kmc/input-runner.xml"
     check_isdir([nn_pot_dir,scripts])
     check_isfile(\
-		[file_inlmp,file_submit,i_pi_mc,lmp],
-		["file_inlmp","file_submit","i_pi_mc","lmp"])
+		[file_inlmp,file_submit,i_pi_mc,lmp_exec],
+		["file_inlmp","file_submit","i_pi_mc","lmp_exec"])
+
+    sha = get_scripts_sha(scripts)
+
+    ####################################
+    # get directoryname
+    ####################################
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
@@ -105,6 +130,7 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
     print('directory    ',directory)
     print('submit       ',submit)
     print('submitdebug  ',submitdebug)
+    print('scripts sha  ',sha)
     print('--------------------------- check the input --------------------------------')
 
 
@@ -126,9 +152,9 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
         # get README.md
         # a) get $dotfiles variable
-        # b) get sha by git rev-parse master
+        # b) get sha by: git rev-parse master
         # c) write sha to readme.
-        create_READMEtxt(jobdir+'/README.txt')
+        create_READMEtxt(jobdir+'/README.txt',sha=sha)
 
 
         # get data.lmp
@@ -142,15 +168,15 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
         # get and adapt in.lmp
         copyfile(file_inlmp, jobdir+"/in.lmp")
         sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+nn_pot_dir+'"')
+        sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
         sed(jobdir+"/in.lmp",'variable nameStartCfg .*','variable nameStartCfg string "data.lmp.runner"')
         sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
         sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
         sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
         sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
-        sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
 
 
-        # get submit-ipi-kmc.sh
+        # get submit-ipi-kmc.sh (could be made without copying)
         copyfile(file_ipi_input_runner, jobdir+"/input-runner.xml")
         sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(nsteps)+' </total_steps>')
         sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
@@ -163,12 +189,12 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
         sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
         sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str("data")+'.ipi </file>')
 
-        # get submit-ipi-kmc.sh
+        # get submit-ipi-kmc.sh (could be made without copying)
         copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
         sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
         sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-        sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(lmp)+' < in.lmp')
+        sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(lmp_exec)+' < in.lmp')
         sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
         sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(i_pi_mc)+' input-runner')
 
@@ -186,13 +212,22 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
             os.chdir(cwd)
 
 
+def get_scripts_sha(scripts):
+    hier = os.getcwd()
+    os.chdir(scripts)
+    sha = check_output(["git","rev-parse","master"]).decode('utf-8')
+    os.chdir(hier)
+    return sha
 
-def create_READMEtxt(filepath = "README.txt"):
-    # get git sha
 
+def create_READMEtxt(filepath = "README.txt",sha=""):
     # write sys.argv
     strout=" ".join(sys.argv)
     with open(filepath, "w") as text_file:
+        print("# using https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
+        print("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
+        print("# used sha: "+sha, file=text_file)
+        print("# skript: "+os.path.basename(__file__), file=text_file)
         print(f"{strout}", file=text_file)
     return
 

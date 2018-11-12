@@ -48,7 +48,7 @@ $1 scripts 'cd $HOME/Dropbox/Albert/scripts'
 $1 dot     'cd $dotfiles'
 $1 v       'cd $HOME/Dropbox/Albert/v'
 $1 db      'cd $HOME/Dropbox/Albert/'
-$1 kmc     'cd $HOME/Dropbox/Albert/kmc'
+$1 kmc_    'cd $HOME/Dropbox/Albert/kmc'
 $1 td      'cd $HOME/Dropbox/Albert/Thermodynamics'
 
 

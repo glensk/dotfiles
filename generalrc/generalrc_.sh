@@ -21,6 +21,7 @@ onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, c
 setenv host $host;
 setenv onhost $onhost;
 setenv scripts "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/"
+source $scripts/source_to_add_to_path.sh
 
 ###################################################################################
 # HOST dependent variables (module load, (on cmmc with module load) ...)
@@ -34,6 +35,7 @@ eval `$generalrc/generalrc_hostdependent.sh`
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $onhost` 
 
+#eval "$(_kmc_createjob_py_COMPLETE=source kmc_createjob.py)"
 #@# time without aliases          : 0.38
 #@# time with generalrc_alias_.sh : 0.62
 #@# time with    alias            : 0.38 (in zsh: alias > alias; add as 1st row alias)

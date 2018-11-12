@@ -31,7 +31,7 @@ mac)
     echo "setenv myprompttime magenta;"
     echo "setenv myprompthostuser magenta;"
     echo "setenv mypromptpath magenta;"
-    echo "setenv LMP_EXEC $scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30;"
+    echo "setenv lmp_exec $scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30;"
   ;;
 cosmopc)
     echo "setenv myprompttime green ;"
@@ -44,7 +44,7 @@ fidis)
     echo "setenv myprompthostuser cyan;"
     echo "setenv mypromptpath cyan;"
 	echo "setenv SCRATCH /scratch/glensk;"
-    echo "setenv LMP_EXEC $scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31;"
+    echo "setenv lmp_exec $scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31;"
   ;;
 daint)
     echo "setenv myprompttime blue;"
