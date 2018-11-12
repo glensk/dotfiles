@@ -11,8 +11,8 @@
 
 # sudo mkdir -p /home/glensk/
 # sudo chown -R glensk /home/
-get $scripts from click. make defulat ones
-exit
+echo "get environment scripts variable from click. make defulat ones"
+exit 
 
 ###################################################
 echo "define source folder (on fidis)"

@@ -49,7 +49,13 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,runnercutoff,i_pi_mc,lmp,submit,submitdebug='kk'):
-    """This is an script to submit KMC jobs quickly."""
+    """
+    This is an script to submit KMC jobs quickly.
+
+    e.g.
+
+    kmc_createjob.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
+    """
 
     if submit is True or submitdebug is True and socket.gethostname() == "fidis":
         if socket.gethostname() != "fidis":    # use != and not: is not
@@ -119,7 +125,11 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
         mkdir(jobdir)
 
         # get README.md
-        create_READMEmd(jobdir+'/README.md')
+        # a) get $dotfiles variable
+        # b) get sha by git rev-parse master
+        # c) write sha to readme.
+        create_READMEtxt(jobdir+'/README.txt')
+
 
         # get data.lmp
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
@@ -177,7 +187,10 @@ def main(ncell, nmg, nsi,nvac,a0,temp,scripts,nn_pot,nseeds,seednumber,nsteps,ru
 
 
 
-def create_READMEmd(filepath = "README.md"):
+def create_READMEtxt(filepath = "README.txt"):
+    # get git sha
+
+    # write sys.argv
     strout=" ".join(sys.argv)
     with open(filepath, "w") as text_file:
         print(f"{strout}", file=text_file)

@@ -20,8 +20,7 @@ bin3="$dotfiles/bin/stefan"
 bin5="$dotfiles/bin/phonon_lifetimes"
 bin6="$HOME/.local/bin"
 ipi="$HOME/google_drive/scripts_epfl/i-pi-mc/bin"
-kmc="$HOME/google_drive/Glensk/KMC-Tutorial/scripts"
-kmc2="$dotfiles/scripts/ipi-kmc"
+kmc="$dotfiles/scripts/ipi-kmc"
 runnertools="$dotfiles/scripts/runner_scripts"
 aliases="$dotfiles/aliases"
 aiida="$dotfiles/scripts/qe-aiida/aiida_solutejobs_scripts"
@@ -30,7 +29,8 @@ lammps1="$dotfiles/scripts/lammps_executables"
 lammps2="$dotfiles/scripts/lammps_scripts"
 
 #PATH="$dropboxbin:bin3:$PATH"  !! not like this! $PATH first !!! 
-PATH="$PATH:$aiida:$aiida2:$aliases:$lammps1:$lammps2:$kmc:$kmc2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+#PATH="$PATH:$aiida:$aiida2:$aliases:$lammps1:$lammps2:$kmc:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+PATH="$PATH:$aiida:$aiida2:$aliases:$lammps1:$lammps2:$dropboxbin:$runnertools:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 

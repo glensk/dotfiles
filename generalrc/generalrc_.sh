@@ -89,7 +89,8 @@ setenv LC_ALL C   # necessary for perl git svn
 setenv LANG C     # necessary for perl
     
 setenv GIT_EDITOR vim
-setenv PAGER most
+#setenv PAGER most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
+setenv PAGER less 
 setenv BROWSER chrome
 setenv BROWSER open # is necessary for opening jupyter notebook files
 setenv LC_ALL en_US.UTF-8
