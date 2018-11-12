@@ -7,20 +7,22 @@
 # $generalrc/generalrc_necessary_bash.sh script.
 ###################################################################################
 
+###################################################################################
+# this has to be the first line  (loads senenv for zsh/bash); defines: tab-color; module; mkalias
+###################################################################################
 
 ###################################################################################
-# this has to be the first line  (loads for zsh and bash); defines: tab-color; module; mkalias
+# set global variables: currentshell, host, onhost, scripts, dotfiles
 ###################################################################################
-[ "$currentshell" != "tcsh" ] && source $generalrc/generalrc_necessary_bash.sh
-
-###################################################################################
-# set important variables 
-###################################################################################
+case "$0" in bash) export currentshell="bash";;tcsh) setenv currentshell "tcsh";;*) export currentshell="zsh";esac
+export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
+source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh
 host=`hostname`   # 0.001s
 onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
 setenv host $host;
 setenv onhost $onhost;
-setenv scripts "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/"
+setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
+setenv scripts  "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/";
 source $scripts/source_to_add_to_path.sh
 
 ###################################################################################
@@ -47,15 +49,12 @@ eval `$generalrc/generalrc_path.sh $onhost`
 source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
 
-case $currentshell in 
-tcsh)
-    source $generalrc/generalrc_alias_.sh $whichalias $currentshell
- ;;
-*)  # for zsh and bash
-    source $generalrc/generalrc_alias_$onhost
-    limit coredumpsize 0    # Disable core dumps
-  ;;
-esac
+# this works only for bash and zsh
+source $generalrc/generalrc_alias_$onhost
+#limit coredumpsize 0    # Disable core dumps # limit command is not know in bash
+
+# this would be for tcsh which will not be enabled since I curretnly dont use tcsh
+#source $generalrc/generalrc_alias_.sh $whichalias $currentshell
 
 tab-color $mypromptpath
 
@@ -98,6 +97,20 @@ setenv BROWSER open # is necessary for opening jupyter notebook files
 setenv LC_ALL en_US.UTF-8
 setenv GREP_COLOR 31    # red; some greps have colorized ouput. enable...
 setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green
+
+
+##############################################
+# autojump 
+##############################################
+case "$currentshell" in 
+    zsh) source ~/.autojump/share/autojump/autojump.zsh;;
+    bash) [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh;;
+esac
+
+##############################################
+# shell dependent settings; defines colors for ls; bindkeys for history-search-bakcward ...
+##############################################
+source $dotfiles/$currentshell/$currentshell\_set
 
 ##############################################
 # set host variables  

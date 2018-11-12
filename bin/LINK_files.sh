@@ -17,7 +17,7 @@ oncosmopc='false'
 DB='false'  # Dropbox is installed?
 GD="false"  # google_drive is installed?
 
-[ "`echo $onhost | grep -o mac`"     = "mac"     ] && onmac="true"     && DB="true"  && GD="true" 
+[ "`echo $onhost | grep -o mac`"     = "mac"     ] && onmac="true"     && DB="true"  && GD="false" 
 [ "`echo $onhost | grep -o cmmc`"    = "cmmc"    ] && oncmmc="true"    && DB="false" && GD="false"
 [ "`echo $onhost | grep -o cmmd`"    = "cmmd"    ] && oncmmd="true"    && DB="false" && GD="false"
 [ "`echo $onhost | grep -o cmpc`"    = "cmpc"    ] && oncmpc="true"    && DB="false" && GD="false"
@@ -43,7 +43,7 @@ echo
 [ "$oncosmopc" = "true" ] && [ ! -e "$HOME/google_drive" ] && ln -s /local/scratch/glensk/google_drive $HOME/google_drive
 
 
-[ "$DB" = "true" ] && echo checking if Dropbox folder exists .... && [ ! -e "$HOME/google_drive" ] && echo $HOME/google_drive does not exist && exit
+[ "$DB" = "true" ] && echo checking if Dropbox folder exists .... && [ ! -e "$HOME/Dropbox" ] && echo $HOME/Dropbox does not exist && exit
 [ "$GD" = "true" ] && echo checking if google_drive exists folder .... && [ ! -e "$HOME/google_drive" ] && echo $HOME/google_drive does not exist && exit
 
 createfolder () {
@@ -91,7 +91,7 @@ echo "                                 ... successfull"
 cd $dotfiles
 chmod u+x $dotfiles/generalrc/*
 chmod u+x $dotfiles/bin/*
-chmod u+x $dotfiles/lammps_scripts/*
+chmod u+x $dotfiles/scripts/lammps_scripts/*
 
 
 ####################################################################
@@ -162,7 +162,7 @@ unlinkbash
 unlinkzsh
 
 echo
-echo "# link tcsh,bash,zsh ##############################################################"
+echo "# link tcsh,bash,zsh,generalrc ####################################################"
 file=$HOME/.tcshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
@@ -179,6 +179,10 @@ file=$HOME/.zshrc
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo $file rm && rm -rf $file
 [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/zsh/zshrc $file
+file=$HOME/.generalrc
+[ -h "$file" ] && unlink $file
+[ -f "$file" ] && echo $file rm && rm -rf $file
+[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/generalrc/generalrc_.sh $file
 
 if [ "$host" = "$mylaptop" ];then 
 echo

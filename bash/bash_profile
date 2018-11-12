@@ -12,10 +12,10 @@ PATH=$PATH:$HOME/.local/bin:$HOME/bin
 export PATH
 
 
-if [ "`hostname | grep -o daint`" = "daint" ];then
 case "$-" in
+  #[ "`hostname | grep -o daint`" = "daint" ];then
   #*i*) export SHELL=/bin/zsh;export currentshell="zsh";unset FPATH; exec /bin/zsh -l
-  *i*) unset FPATH; exec /bin/zsh -l
+  #*i*) unset FPATH; exec /bin/zsh -l
+  *i*) [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l
   ;;
 esac
-fi

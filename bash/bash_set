@@ -39,6 +39,9 @@ set -o notify
 set -o noclobber
 set -o ignoreeof
 
+set show-all-if-ambiguous on
+set completion-ignore-case on
+
 # Enable options: to check in bash:  shopt cdable_vars
 shopt -s cdspell        # autocorrection of misspelled folder
 shopt -s cdable_vars    # may define vars as folders and do cd $var1

@@ -1,3 +1,4 @@
+if [[ $- == *i* ]];then  # only in interactive shell
 ##echo zshin
 
 gettime="true"
@@ -25,18 +26,17 @@ if [ "$gettime" = "true" ];then
 fi
 
 #tlast=`getms`
-[ "$gettime" = "true" ] && gett=`gt getms getms` && echo "zsh0:start: $gett"
+#[ "$gettime" = "true" ] && gett=`gt getms getms` && echo "zsh0:start  : $gett"
 
 
-#[ "$ZSH_VERSION" = "4.3.10" ] && export FPATH="/usr/share/zsh/4.3.10/functions:$FPATH"  ## this is only for cmmd
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)
 autoload -U colors && colors                    # necessary for prompt colors (0.00s)
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:color: $gett"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:color: $gett"
 autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
 autoload -U +X bashcompinit && bashcompinit     # make bash completion function work (complete) (0.00s)
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:bash : $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "compinit    : $gett"
 
 #################################################################
 # oh-my-zsh: DONT USE IT!!! do this first in zsh; IT IS WAY TOO SLOW!!!!!! DONT USE IT !!!!!
@@ -45,39 +45,8 @@ autoload -U +X bashcompinit && bashcompinit     # make bash completion function 
 # time zsh (ohne oh-my-zsh): 0.07-0.07 
 # time zsh (mit zsh-syntax-highlighting history-substring-search): 0.14 
 #################################################################
-# history-substring-search is awesom: write part of the command and then UP
-# wd autojump fasd z: to jump around 
-# copyfile : copy 
-# git: adds aliases 
-# extract: Unzip all types of compressed files. extracted this as separete script
-# web-search: adds aliases
-# for an overwiew and descriptsions: https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins-Overview
-#plugins=(web-search osx colored-man python vi-mode wd autojump z colorize copyfile zsh-syntax-highlighting history-substring-search)
-plugins=(zsh-syntax-highlighting history-substring-search)
-DISABLE_LS_COLORS="true"   # this is necessary to not ignore custom ls aliases
-#################################################################
-# dotfiles location 
-#################################################################
-export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
-
-#################################################################
-# oh-my-zsh 
-#################################################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:ohmyl: $gett"
-#export ZSH="$dotfiles/zsh/oh-my-zsh"   # has to be loaded after plugins!
-#[ ! -e "$ZSH/oh-my-zsh.sh" ] && cd $dotfiles/zsh/ && git clone git://github.com/robbyrussell/oh-my-zsh.git
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:ohmyl: $gett"
-
-#source $ZSH/oh-my-zsh.sh      # has to be loaded after plugins!
-#it seems faster to load the plugins manually then via oh-my-zsh
-#####################################################################
-# SOMEHOW I STILL HAVE A SYNTAX HIGHLIGHTING and SUBSTRING SEARCH EVEN WITHOT LOADING THE FOLLOWING LINES
-
 #source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh  # 13timeunits (4without)
 #source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh  # 4timeunits (4without)
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-my: $gett"
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-m2: $gett"
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:oh-m3: $gett"
 
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
@@ -87,28 +56,9 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
 #################################################################
 # read in general variables on{mac,cmmc,cmmd},printloadstat
 #################################################################
-# for tcsh    : setenv currentshell tcsh
-# for bash/zsh: export currentshell='zsh'
-export currentshell='zsh'    # known are zsh / bash / tcsh
-export generalrc="$dotfiles/generalrc"
-source $generalrc/generalrc_.sh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh5:MYMYM: $gett https://carlosbecker.com/posts/speeding-up-zsh/"
-
-#######################################################################
-# autojump 
-# auskommentieren von if command -v brew makes it much faster on mac!
-#######################################################################
-#source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s
-source ~/.autojump/share/autojump/autojump.zsh
-alias c='j'
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh6:autoj: $gett"
-
-#################################################################
-# zsh dependent stuff to use on every system (braucht nur 0.01s)
-# - define colors for ls
-#################################################################
-source $dotfiles/zsh/zsh_set
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh7:zhset: $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "PHYTHONPATH : $gett https://carlosbecker.com/posts/speeding-up-zsh/"
+source ~/.generalrc
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.generalrc: $gett https://carlosbecker.com/posts/speeding-up-zsh/"
 
 # time zsh
 # 0) completely empty             : 0.01s
@@ -118,12 +68,5 @@ source $dotfiles/zsh/zsh_set
 # 3) 2+ . generalrc               : 0.05s (generalrc) = 0.011s (from bashrc)
 # 4) 3+ zsh_set                   : 0.06s (zsh_set  ) = 0.01s
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
-
-#@# this is for iterm2!!
-#@test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
-#@#source ~/.iterm2_shell_integration.`basename $SHELL`
-#@#################################################################
-#@# after this file ~/.zlogin is loaded 
-#@#################################################################
-#echo zshout
+fi
 fi

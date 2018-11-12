@@ -10,7 +10,9 @@ if ( $?PYTHONPATH == 0 ) setenv PYTHONPATH ""
 setenv currentshell tcsh
 setenv dotfiles $HOME/Dropbox/Albert/scripts/dotfiles/
 setenv generalrc $dotfiles/generalrc
+echo jo
 source $generalrc/generalrc_.sh
+echo ja
 
 
 #source $HOME/.autojump/etc/profile.d/autojump.sh  # =0.005-0.006s

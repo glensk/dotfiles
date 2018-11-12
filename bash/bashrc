@@ -1,5 +1,5 @@
-if [[ $- == *i* ]];then
-    #echo anfang
+if [[ $- == *i* ]];then  # only in interactive shell
+
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
 #################################################################
@@ -8,33 +8,7 @@ if [[ $- == *i* ]];then
 #################################################################
 # read in general variables on{mac,cmmc,cmmd},printloadstat
 #################################################################
-# for tcsh    : setenv currentshell tcsh
-# for bash/zsh: export currentshell='zsh'
-export currentshell='bash'
-export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/"
-export generalrc="$dotfiles/generalrc"
-source $generalrc/generalrc_.sh
-
-if [[ $- == *i* ]]    # only in interactive shell
-then
-    [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
-    alias c='j'
-fi
-
-#################################################################
-# bash dependent stuff to use on every system
-#
-################################################################
-source $dotfiles/bash/bash_set
-#bind '"\C-j": history-search-backward'
-#bind '"\C-k": history-search-forward'
-#jbindkey ^[j history-substring-search-down
-#bind '"\e[A"':history-search-backward  # this makes it work with cmd+j  # warnings with scp
-#bind '"\e[B"':history-search-forward   # this makes it work with cmd+k  # warnings with scp
-#bind Space:magic-space
-set show-all-if-ambiguous on
-set completion-ignore-case on
-
+source ~/.generalrc
 
 #################################################################
 # for pyron jupyter hub (juypter notebook)
