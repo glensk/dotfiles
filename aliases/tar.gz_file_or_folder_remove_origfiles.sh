@@ -8,7 +8,7 @@ saveas=""
 [ -e "$saveas.tar.gz" ] && echo $saveas.tar.gz does already exist && exit
 echo saveas $saveas
 #exit
-tar -zcvf $saveas.tar.gz $*
+tar --remove-files -zcvf $saveas.tar.gz $*
 
 # tar from other folder (here /media/glensk@lammm/My\ Passport\ White/v/pp/) the PROJECT_eqalats_fcc_bcc_lda folder
 #tar -cjf PROJECT_eqalats_fcc_bcc_lda.tar.gz -C /media/glensk@lammm/My\ Passport\ White/v/pp/ PROJECT_eqalats_fcc_bcc_lda
