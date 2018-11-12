@@ -22,60 +22,54 @@ echo "setenv mylaptop mac;"
 ##############################################################################
 # defaults / fall back options
 ##############################################################################
-myprompttime="setenv myprompttime magenta"
-myprompthostuser="setenv myprompthostuser red"
-mypromptpath="setenv mypromptpath red"
-module="setenv GZIP -9"   # an empty string ("") is not possible, better use dummy
-echo "setenv myshell zsh;"
+echo "setenv GZIP -9;"   # an empty string ("") is not possible, better use dummy
+echo "setenv myshell zsh;" # set this specifically for other cases
+echo "setenv i_pi_mc $HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi;"
 
 case $onhost in
 mac)
-    echo "setenv myshell zsh;"
     echo "setenv myprompttime magenta;"
     echo "setenv myprompthostuser magenta;"
     echo "setenv mypromptpath magenta;"
-    echo "setenv GZIP -9;"
+    echo "setenv LMP_EXEC $scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30;"
   ;;
 cosmopc)
-	echo "setenv myshell zsh;"
     echo "setenv myprompttime green ;"
     echo "setenv myprompthostuser green;"
     echo "setenv mypromptpath green;"
 	echo "setenv SCRATCH /local/scratch/glensk;"
-
   ;;
-cmpc)
-   	myshell="setenv myshell zsh"
-   	myprompttime="setenv myprompttime red"
-   	myprompthostuser="setenv myprompthostuser red"
-   	mypromptpath="setenv mypromptpath red"
-   	module="module load mathematica1002/10.0.2"
-   	# christoph changed in /etc/profile.d/gxhivemgr.sh: if test x"$PS1" = x || echo
-   	add="limit stacksize unlimited;setenv TMPDIR /scratch/$USER;setenv PRINTER cmcopy1166"
-  ;;
-cmmc)
-	myshell="setenv myshell zsh"
-	myprompttime="setenv myprompttime cyan"
-	myprompthostuser="setenv myprompthostuser cyan"
-	mypromptpath="setenv mypromptpath cyan"
-	module="module load git intel impi mkl grace mathematica/10.3.1 lammps vasp/5.3.5 anaconda"
-	#add="limit stacksize unlimited;"
-    #add2="setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
-	add="setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1"
+fidis)
+    echo "setenv myprompttime cyan;"
+    echo "setenv myprompthostuser cyan;"
+    echo "setenv mypromptpath cyan;"
+	echo "setenv SCRATCH /scratch/glensk;"
+    echo "setenv LMP_EXEC $scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31;"
   ;;
 daint)
-	echo "setenv myshell zsh;"
     echo "setenv myprompttime blue;"
     echo "setenv myprompthostuser blue;"
     echo "setenv mypromptpath blue;"
 	#echo "setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
   ;;
-fidis)
-	echo "setenv myshell zsh;"
+cmpc)
+    echo "setenv myprompttime red;"
+    echo "setenv myprompthostuser red;"
+    echo "setenv mypromptpath red;"
+   	echo "module load mathematica1002/10.0.2;"
+   	# christoph changed in /etc/profile.d/gxhivemgr.sh: if test x"$PS1" = x || echo
+   	echo "limit stacksize unlimited;"
+   	echo "setenv TMPDIR /scratch/$USER;"
+   	echo "setenv PRINTER cmcopy1166;"
+  ;;
+cmmc)
     echo "setenv myprompttime cyan;"
     echo "setenv myprompthostuser cyan;"
     echo "setenv mypromptpath cyan;"
-	echo "setenv SCRATCH /scratch/glensk;"
+	echo "module load git intel impi mkl grace mathematica/10.3.1 lammps vasp/5.3.5 anaconda;"
+	#add="limit stacksize unlimited;"
+    #add2="setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
+	echo "setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
   ;;
 *)
 	echo "setenv onhost UNKNOWN;"
@@ -83,4 +77,4 @@ fidis)
 esac
 
 echo "setenv whichalias mkalias;"
-[ "$currentshell" = "tcsh" ] && whichalias="setenv whichalias alias"
+[ "$currentshell" = "tcsh" ] && echo "setenv whichalias alias;"

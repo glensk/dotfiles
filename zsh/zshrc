@@ -103,33 +103,12 @@ source ~/.autojump/share/autojump/autojump.zsh
 alias c='j'
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh6:autoj: $gett"
 
-#export LAMMPS_COMMAND="/usr/local/bin/lmp_serial" #(path to binary file) 
-#export LAMMPS_COMMAND="/Users/glensk/miniconda3/bin/lmp_serial" #(path to binary file) 
-#export LAMMPS_COMMAND="/Users/glensk/Dropbox/Albert/Google_Drive/scripts_epfl/lammps_cosmo/lammps_macbook_20180814/src/lmp_serial_mac_2018_08_17" #(path to binary file) 
-#export LAMMPSPATH="/Users/glensk/Dropbox/Albert/Google_Drive/scripts_epfl/lammps_cosmo/lammps_macbook_20180814"
-#export PYTHONPATH="$LAMMPSPATH/python:$PYTHONPATH"
-#export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$LAMMPSPATH/src"
-
-
 #################################################################
 # zsh dependent stuff to use on every system (braucht nur 0.01s)
 # - define colors for ls
 #################################################################
 source $dotfiles/zsh/zsh_set
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh7:zhset: $gett"
-
-#################################################################
-# conda / anaconda / miniconda  -> takes too much time when opening new shell
-#                               -> but is necessary when opening ipython notebooks
-#################################################################
-if [ -e "$HOME/miniconda3" ];then
-    source $HOME/miniconda3/etc/profile.d/conda.sh
-    [ "$onmac" = "true" ] && conda activate intelpy # activates the default conda python (3.x)
-fi
-
-
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh8:conda: $gett"
-
 
 # time zsh
 # 0) completely empty             : 0.01s
