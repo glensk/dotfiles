@@ -1,7 +1,7 @@
 export BASH_CONF="bashrc"
 [ -z "$PS1" ] && return    # If not running interactively, don't do anything
 [ -f /etc/bash_completion ] && source /etc/bash_completion  # Enable programmable completion features.
-complete -d cd
+complete -d cd   # cd goo<TAB> suggest only all directories which start with goo...
 #!!!! MUCH TOO SLOW [ -f /usr/local/etc/bash_completion ] &&  source /usr/local/etc/bash_completion  # Enable programmable completion features. DONT USE $(brew --prefix) !!!!!! TAKES TOO MUCH TIME TO LOAD ## but also without this takes 0.16s time to load
 
 

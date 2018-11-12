@@ -59,6 +59,7 @@ setopt HIST_FIND_NO_DUPS
 ##
 # Various
 ##
+complete -d cd   # cd goo<TAB> suggest only all directories which start with goo...
 setopt auto_cd                  # if command is a path, cd into it
 setopt auto_remove_slash        # self explicit
 setopt chase_links              # resolve symlinks = follow links in cds
