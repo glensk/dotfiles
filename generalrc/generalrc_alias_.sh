@@ -263,8 +263,8 @@ $1 umount_daint 'umount -f /users/aglensk'
 
 $1 make_home_accessible 'chmod -R ga+r $HOME'
 
-$1 condaactivate ". $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
-$1 gp 'condaactivate'
+$1 conda_activate ". $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
+$1 gp 'conda_activate'
 
 $1 daint 'ssh daint'
 $1 fidis 'ssh fidis'
@@ -275,3 +275,4 @@ $1 aiida 'source aiida/bin/activate'
 $1 s 'cd $SCRATCH'
 $1 aiida_activate "source $HOME/aiida/bin/activate"
 $1 aiida_deactivate "deactivate"
+
