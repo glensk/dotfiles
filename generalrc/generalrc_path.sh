@@ -20,15 +20,10 @@ bin3="$dotfiles/bin/stefan"
 bin5="$dotfiles/bin/phonon_lifetimes"
 bin6="$HOME/.local/bin"
 ipi="$HOME/google_drive/scripts_epfl/i-pi-mc/bin"
-#runnertools="$dotfiles/scripts/runner_scripts"
 aliases="$dotfiles/aliases"
-aiida="$dotfiles/scripts/qe-aiida/aiida_solutejobs_scripts"
-aiida2="$dotfiles/scripts/qe-aiida/aiida_analyze"
-lammps1="$dotfiles/scripts/lammps_executables"
-lammps2="$dotfiles/scripts/lammps_scripts"
 
 #PATH="$dropboxbin:bin3:$PATH"  !! not like this! $PATH first !!! 
-PATH="$PATH:$aiida:$aiida2:$aliases:$lammps1:$lammps2:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+PATH="$PATH:$aliases:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
@@ -43,7 +38,7 @@ if [ "$onhost" = "mac" ];then
     #anaconda="$HOME/anaconda2/bin"  # don't load anaconda on cmmc since the module is available
     #anaconda="$HOME/miniconda3/bin"  # don't load anaconda on cmmc since the module is available
     #anaconda=""  # don't load anaconda on cmmc since the module is available
-    brew="/usr/local/opt/coreutils/libexec/gnubin" 
+    brew="/usr/local/opt/coreutils/libexec/gnubin"   # without brew ls options -- are not working
     #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
     #phonopybin="$phonopy/bin"
@@ -75,11 +70,7 @@ if [ "$onhost" = "mac" ];then
     
     #[ "$host" = "$mylaptop" ] && \
     PATH="$sed:$brew:$phonopy:$vasp:$PATH" #&& \
-    #PATH="$sed:$brew:$tdep:$phonopy:$vasp:$PATH" #&& \
-    #PATH="$sed:$brew:$anaconda:$tdep:$phonopy:$phonopybin:$phonopybin2:$vasp:$PATH" #&& \
-    #PYTHONPATH="$pygraceplot:$pylammps1:$pylammps2:$pyphonopy1:$PYTHONPATH" #&& \
-    # for Miniconda2 use:
-    #PYTHONPATH="/Users/glensk/.miniconda2"
+    #PATH="$sed:$phonopy:$vasp:$PATH" #&& \
     LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
 fi
 
@@ -139,14 +130,14 @@ fi
 #########################################################################
 # export $PATH / $PYTHONPATH / $LD_LIBRARY_PATH   (dies sollte VOR! module load geschehen!)
 #########################################################################
-if [ "$currentshell" != "tcsh" ];then
+#if [ "$currentshell" != "tcsh" ];then
     #echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"'
-    echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"'
-else
-    tcshpath=`echo $PATH | sed 's|:| |g'`
-    tcshpythonpath=`echo $PYTHONPATH | sed 's|:| |g'`
-    echo 'set path = ( '"$tcshpath"' ); set PYTHONPATH = ( '"$tcshpythonpath"' );' # export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include";'
-fi
+echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include"'
+#else
+#    tcshpath=`echo $PATH | sed 's|:| |g'`
+#    tcshpythonpath=`echo $PYTHONPATH | sed 's|:| |g'`
+#    echo 'set path = ( '"$tcshpath"' ); set PYTHONPATH = ( '"$tcshpythonpath"' );' # export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include";'
+#fi
 
 #export C_INCLUDE_PATH="/Users/glensk/.miniconda2/include"
 

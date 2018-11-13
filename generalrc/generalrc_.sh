@@ -59,7 +59,7 @@ source $generalrc/generalrc_alias_$onhost
 tab-color $mypromptpath
 
 ##############################################
-# conda anaconda virtualenv
+# conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
 [ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy 
 
@@ -71,16 +71,17 @@ setenv thermodynamics "$HOME/Thermodynamics"
 setenv userme "glensk"
 setenv convcrit 0.5
 if [ -e "$thermodynamics/utilities/" ];then
-[ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add
-[ "$currentshell" != "tcsh" ] && source $thermodynamics/utilities/bashrc_add
+#[ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add
+#[ "$currentshell" != "tcsh" ] && source $thermodynamics/utilities/bashrc_add
+source $thermodynamics/utilities/bashrc_add
 fi
 
 ##############################################
 # completion goo for commands
 ##############################################
 export PATH="$dotfiles/commands/:$PATH"  # if this is loaded before: complete -W ... $tocomplete the commands are executed which is not intended
-tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
-complete -W "n/*/`echo $tocomplete `/" goo
+#tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
+#complete -W "n/*/`echo $tocomplete `/" goo
 
 
 setenv EDITOR vim   
