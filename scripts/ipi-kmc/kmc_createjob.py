@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os,sys,random,massedit,ase
 import socket
+import datetime
 from ase.lattice.cubic import FaceCenteredCubic
 from shutil import copyfile
 import numpy as np
@@ -109,7 +110,7 @@ def main(
         seeds = seednumber
         nseeds = len(seednumber)
 
-
+    # show the input variables
     print('--------------------------- check the input --------------------------------')
     #print('seednumber   ',seednumber,type(seednumber))
     print('JOBS:        ',nseeds,'!! defined by -nseeds / or -seednumber')
@@ -132,29 +133,29 @@ def main(
     print('submitdebug  ',submitdebug)
     print('scripts sha  ',sha)
     print('--------------------------- check the input --------------------------------')
-
-
-    if os.path.isdir(directory):
-        check_prompt("This main directory exists already, shall I add jobs? [y]es: ")
-
     check_prompt("Are the ine input variables ok? [y]es: ")
 
+    # make the atomic structure
     atomsc = get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
+    # make the directory
+    if os.path.isdir(directory):
+        check_prompt("This main directory exists already, shall I add jobs? [y]es: ")
+    mkdir(directory)
+
+    # get README.md
+    now = datetime.datetime.now()
+    create_READMEtxt(directory+'/README_'+now.strftime("%Y-%m-%d_%H:%M")+'.txt',sha=sha)
 
     for seed in seeds:
 
+        # make jobdirectory
         jobdir = directory+'/seed'+str(seed)
         print('jobdir',jobdir)
         if os.path.exists(jobdir):
             sys.exit("jobdirectory "+str(jobdir)+" already exists!")
         mkdir(jobdir)
 
-        # get README.md
-        # a) get $dotfiles variable
-        # b) get sha by: git rev-parse master
-        # c) write sha to readme.
-        create_READMEtxt(jobdir+'/README.txt',sha=sha)
 
 
         # get data.lmp
