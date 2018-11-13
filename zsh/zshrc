@@ -1,32 +1,25 @@
 if [[ $- == *i* ]];then  # only in interactive shell
-##echo zshin
 
 gettime="true"
-#gettime="false"
-
 loadzsh="true"          # shuts all zst settings on/off
-#loadzsh="false"        # shuts all zsh settings on/off
 
 if [ "$loadzsh" = "true" ];then
-if [ "$gettime" = "true" ];then
-    date=`which date`
-    [ "`hostname | grep -o mac`" = "mac" ] && date=/usr/local/opt/coreutils/libexec/gnubin/date
-    getms() {
-        #/usr/local/opt/coreutils/libexec/gnubin/date +%s%N
-        $date +%s%N
-    }
-
-    gt() {
-        ka=$*
-        tlast=`echo "$ka" | awk '{print $1}'`
-        tnow=`getms`
-        diff=`echo $tlast $tnow | awk '{printf "%.1f\n", ($2-$1)/10000000}'`
-        echo $tnow $tlast $diff
-    }
-fi
-
-#tlast=`getms`
-#[ "$gettime" = "true" ] && gett=`gt getms getms` && echo "zsh0:start  : $gett"
+    if [ "$gettime" = "true" ];then
+        date=`which date`
+        [ "`hostname | grep -o mac`" = "mac" ] && date=/usr/local/opt/coreutils/libexec/gnubin/date
+        getms() {
+            #/usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+            $date +%s%N
+        }
+    
+        gt() {
+            ka=$*
+            tlast=`echo "$ka" | awk '{print $1}'`
+            tnow=`getms`
+            diff=`echo $tlast $tnow | awk '{printf "%.1f\n", ($2-$1)/10000000}'`
+            echo $tnow $tlast $diff
+        }
+    fi
 
 
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
