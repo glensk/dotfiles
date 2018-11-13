@@ -273,3 +273,4 @@ $1 pc 'ssh cosmopc'
 $1 aiida 'source aiida/bin/activate'
 
 $1 s 'cd $SCRATCH'
+$1 aiida_activate "source $HOME/aiida/bin/activate"
