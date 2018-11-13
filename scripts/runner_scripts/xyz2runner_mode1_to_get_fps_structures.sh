@@ -37,7 +37,6 @@ echo "check if target folder exist $target_folder"
 echo "check if executable exist $executable"
 ###################################################
 [ ! -e "$executable" ] && echo "executable $executable does not exist; Exit" && exit
-cp $executable $target_folder
 
 ###################################################
 echo "cd to source_folder $source_folder"
@@ -96,10 +95,11 @@ echo "frame selector   --> is probably not what we need since we want to do FPS,
 frame_selector.py --prefix AlMgSi input.data.all random 113
 mv AlMgSi_selected.data input.data
 
+exit
 ###################################################
 echo "start runner in mode 1 (on cosmopc)"
 ###################################################
-
+$executable > logfile_mode1.1&
 
 ###################################################
 echo "make fps to get structures to calculate"
