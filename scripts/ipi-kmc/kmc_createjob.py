@@ -48,8 +48,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
 
-
-def main(
+def createjob(
         ncell,
         nmg,
         nsi,
@@ -312,4 +311,4 @@ if __name__ == "__main__":
     neval  = ipi_inst*2
 
 
-    main()
+    createjob()
