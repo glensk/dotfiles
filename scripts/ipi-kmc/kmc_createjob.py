@@ -81,7 +81,7 @@ def createjob(
             print('you are NOT on fidis')
             sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
-    nn_pot_dir              = scripts + "pot_nn/" + nn_pot
+    nn_pot_dir              = scripts + "potentials/runner_lammps_nn/" + nn_pot
     file_inlmp              = scripts + "ipi-kmc/in.lmp"
     file_submit             = scripts + "ipi-kmc/submit-ipi-kmc.sh"
     file_ipi_input_runner   = scripts + "ipi-kmc/input-runner.xml"
