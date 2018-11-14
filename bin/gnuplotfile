@@ -2,4 +2,4 @@
 
 [ "$1" = "" ] && echo 'you need to specity a file as first argument $1' && exit -1
 export gnuplotfilename=$1
-$HOME/Dropbox/scripts/dotfiles/bin/gnuplotfile_plot_gnuplotfilename
+$HOME/Dropbox/Albert/scripts/dotfiles/bin/gnuplotfile_plot_gnuplotfilename

@@ -258,7 +258,11 @@ if __name__ == "__main__":
     #p = argparse.ArgumentParser(description=pp.pprint(x),
     p = argparse.ArgumentParser(description='',
             formatter_class=argparse.RawTextHelpFormatter) #ArgumentDefaultsHelpFormatter)
-    string='''e.g. convert_fileformats.py PathToInputfile.out --formatin 'espresso-out' --formatout lmp'''
+    string='''
+    e.g. convert_fileformats.py PathToInputfile.out --formatin 'espresso-out' --formatout lmp
+
+    it would be ideal if this script could do this for one and several structrues (not yet implemented).
+    '''
     parser = argparse.ArgumentParser(description=string)
     parser.add_argument("infile", type = str, help = "The name of the file")
     parser.add_argument("--showformats",'-sf', action='store_true', default=False, help = "show the possible in/outputformats (not showing lammps) and exit")

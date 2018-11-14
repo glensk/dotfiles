@@ -1,3 +1,4 @@
+#!/bin/sh
 # runner wants all the positions in bohrradius (as are the lattice vectors)
 # runner wants all the energies in hartree
 awk '{if (NF ==4){

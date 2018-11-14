@@ -43,7 +43,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 # environment variables
 @click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
 @click.option('-nn_pot',type=str, default="v2dg", help="foldername in $scripts containing the neural network potential (can be separately set here for different path)")
-@click.option('-ipi_mc', envvar='ipi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
+@click.option('-ipi_mc', envvar='ipi_mc',help='path to i-pi-mc (or environment variable $ipi_mc)')
 @click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
@@ -61,7 +61,7 @@ def createjob(
         seednumber,
         nsteps,
         runnercutoff,
-        i_pi_mc,
+        ipi_mc,
         lmp_exec,
         submit,
         submitdebug='kk'):
@@ -81,16 +81,15 @@ def createjob(
             print('you are NOT on fidis')
             sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
-    nn_pot_dir              = scripts + "potentials/runner_lammps_nn/" + nn_pot
-    file_inlmp              = scripts + "ipi-kmc/in.lmp"
-    file_submit             = scripts + "ipi-kmc/submit-ipi-kmc.sh"
-    file_ipi_input_runner   = scripts + "ipi-kmc/input-runner.xml"
+    nn_pot_dir              = scripts + "/potentials/runner_lammps_nn/" + nn_pot
+    file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
+    file_submit             = scripts + "/i-pi-mc_scripts/submit-ipi-kmc.sh"
+    file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
     check_isdir([nn_pot_dir,scripts])
     check_isfile(\
-		[file_inlmp,file_submit,i_pi_mc,lmp_exec],
-		["file_inlmp","file_submit","i_pi_mc","lmp_exec"])
+		[file_inlmp,file_submit,ipi_mc,lmp_exec],
+		["file_inlmp","file_submit","ipi_mc","lmp_exec"])
 
-    sha = get_scripts_sha(scripts)
 
     ####################################
     # get directoryname
@@ -130,7 +129,6 @@ def createjob(
     print('directory    ',directory)
     print('submit       ',submit)
     print('submitdebug  ',submitdebug)
-    print('scripts sha  ',sha)
     print('--------------------------- check the input --------------------------------')
     check_prompt("Are the ine input variables ok? [y]es: ")
 
@@ -142,9 +140,8 @@ def createjob(
         check_prompt("This main directory exists already, shall I add jobs? [y]es: ")
     mkdir(directory)
 
-    # get README.md
-    now = datetime.datetime.now()
-    create_READMEtxt(directory+'/README_'+now.strftime("%Y-%m-%d_%H:%M")+'.txt',sha=sha)
+    # create README.md
+    create_READMEtxt(directory)
 
     for seed in seeds:
 
@@ -160,7 +157,7 @@ def createjob(
         # get data.lmp
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
         convert_fileformats.save_ase_object_as_lmp(atomsc,jobdir+'/data.lmp')
-        #convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
+        convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.POSCAR','vasp')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.xyz','xyz')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.extxyz','extxyz')
@@ -196,7 +193,7 @@ def createjob(
         sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
         sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(lmp_exec)+' < in.lmp')
         sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
-        sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(i_pi_mc)+' input-runner')
+        sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(ipi_mc)+' input-runner')
 
         #with open(jobdir+"/submit-ipi-kmc.sh", 'r') as fin:
         #    print(fin.read())
@@ -212,23 +209,30 @@ def createjob(
             os.chdir(cwd)
 
 
-def get_scripts_sha(scripts):
+def create_READMEtxt(directory):
+    ''' wiretes a README.txt file '''
+    # get sha
     hier = os.getcwd()
-    os.chdir(scripts)
+    os.chdir(os.environ['scripts'])
     sha = check_output(["git","rev-parse","master"]).decode('utf-8')
     os.chdir(hier)
-    return sha
 
+    # get time
+    time_now = datetime.datetime.now()
 
-def create_READMEtxt(filepath = "README.txt",sha=""):
-    # write sys.argv
-    strout=" ".join(sys.argv)
+    # name of RADME
+    filepath = directory+'/README_'+time_now.strftime("%Y-%m-%d_%H:%M")+'.txt'
+
+    # write README.txt
+    strout=os.path.basename(sys.argv[0])+" "+" ".join(sys.argv[1:])
     with open(filepath, "w") as text_file:
         print("# using https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
         print("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
         print("# used sha: "+sha, file=text_file)
-        print("# skript: "+os.path.basename(__file__), file=text_file)
         print(f"{strout}", file=text_file)
+
+    print()
+    print('written ',filepath)
     return
 
 
@@ -265,6 +269,7 @@ def check_isdir(path):
                 sys.exit('missing directory '+i)
     return
 
+
 def check_isfile(path,pathnames):
     if type(path) is str:
         if not os.path.isfile(path):
@@ -279,6 +284,7 @@ def check_isfile(path,pathnames):
     else:
         sys.exit('unknown type file type path '+str(path))
     return
+
 
 def check_prompt(check):
     #isok = raw_input(check)  # Python 2
@@ -296,6 +302,7 @@ def mkdir(directory):
 
 
 if __name__ == "__main__":
+    print('give an error if python / env is nt 3.5 or so....')
     # submitoptions
     if True:
         nodes=2

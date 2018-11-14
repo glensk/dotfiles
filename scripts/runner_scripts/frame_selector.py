@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import argparse
 import numpy as np
-import os
+import os,sys
 
 
 def ReadIndex(inputfile):
@@ -52,11 +52,11 @@ def Stride(nstride, frame_line): # !TODO Should add option to choose starting an
 
 def Print_frames(inputfile, frames, frame_line, split, prefix):
     """Prints in a new file (or two new files, with the splitting flag active) the chosen structures. If no prefix is given, the standard output is DATAFILE_selected.EXTENSION"""
-    if inputfile.endswith('.data') or inputfile.endswith('.data.all'):
+    if inputfile.endswith('.data') or inputfile.endswith('.data.all'):  # this is for runner files
         suffix = '.data'
         if prefix == '':
             prefix = inputfile[:-5]
-    elif inputfile.endswith('.xyz'):
+    elif inputfile.endswith('.xyz'):  # this is for xyz files
         suffix = '.xyz'
         if prefix == '':
             prefix = inputfile[:-4]
@@ -108,4 +108,6 @@ if __name__ == '__main__':
         frames = Random(args.N_rand, frame_line)
     elif args.mode == 'stride':
         frames = Stride(args.N_stride, frame_line)
+    # frames: [  10  120  369  371  377  388 1008 1208 1219 1223 1230 1683 1721 1729 1735 ]
+    # frames: is just the sorted cursel.landmarks file
     Print_frames(args.inputfile, frames, frame_line, args.split, args.prefix)

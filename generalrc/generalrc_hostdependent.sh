@@ -39,6 +39,7 @@ cosmopc)
     echo "setenv mypromptpath green;"
 	echo "setenv SCRATCH /local/scratch/glensk;"
 	echo "complete -d cd;"
+    echo "setenv lmp_exec $scripts/lammps_executables/lmp_serial_cosmopc18_runner_2018_10_30;"
   ;;
 fidis)
     echo "setenv myprompttime cyan;"

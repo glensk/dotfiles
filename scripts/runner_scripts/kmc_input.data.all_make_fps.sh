@@ -11,56 +11,20 @@
 
 # sudo mkdir -p /home/glensk/
 # sudo chown -R glensk /home/
-echo "get environment scripts variable from click. make defulat ones"
-exit 
+
+echo "here, a README.txt is missing..."
+echo "scripts: $scripts"
 
 ###################################################
-echo "define source folder (on fidis)"
-echo "define target folder (on cosmopc, where Runner Mode 1 calculation will be done)"
+echo "make sure input.data.all is available"
+###################################################
+[ ! -e "input.data.all" ] && echo 'run fist kmc_gather_all_xyz.py on the kmc folder(s)' && exit
+
+###################################################
 echo "define executable"
 ###################################################
-source_folder="/scratch/glensk/raw_data/test_3_at_1000K_for_fps"
-target_folder="/local/scratch/glensk/runner_scratch"
 executable="$HOME/Dropbox/Albert/scripts/runner_source/RuNNer.serial.cosmopc.natascha.x"
-
-###################################################
-echo "check if source folder exist $source_folder"
-###################################################
-[ ! -e "$source_folder" ] && echo "source_folder $source_folder does not exist (mount it); Exit" && exit
-
-###################################################
-echo "check if target folder exist $target_folder"
-###################################################
-[ ! -e "$target_folder" ] && echo "target_folder $target_folder does not exist (mount it); Exit" && exit
-
-###################################################
-echo "check if executable exist $executable"
-###################################################
 [ ! -e "$executable" ] && echo "executable $executable does not exist; Exit" && exit
-
-###################################################
-echo "cd to source_folder $source_folder"
-###################################################
-cd $source_folder 
-
-###################################################
-echo "get input.data.all"
-###################################################
-filename="input.data.all"
-rm -f $filename  
-touch $filename 
-files=`find . -maxdepth 4 -name simulation.pos_0.xyz`
-for i in $files;do
-    echo $i
-    xyz2runner.sh $i >> $filename
-done
-
-###################################################
-echo "cp $filename to target_folder $folfer_folder"
-echo "cd target_folder $target_folder"
-###################################################
-cp $filename $target_folder
-cd $target_folder
 
 ###################################################
 echo "get symmetry functions"
@@ -89,27 +53,39 @@ sed -i 's|^runner_mode .*|runner_mode 1|g' input.nn
 sed -i 's|^number_of_elements .*|number_of_elements 3|' input.nn
 sed -i 's|^elements .*|elements Al Mg Si|' input.nn
 
-###################################################
-echo "frame selector   --> is probably not what we need since we want to do FPS, or?"
-###################################################
-frame_selector.py --prefix AlMgSi input.data.all random 113
-mv AlMgSi_selected.data input.data
 
-exit
+####################################################
+#echo "frame selector   --> is probably not what we need since we want to do FPS, or?"
+####################################################
+#frame_selector.py --prefix AlMgSi input.data.all random 113
+#mv AlMgSi_selected.data input.data
+
 ###################################################
 echo "start runner in mode 1 (on cosmopc)"
+echo "this took 16h for 2435 structures 18:21 - 10:46 of next day (teststruct.data and debug.out)"
+echo "this took  1h for  113 structures 18:10 - 18:56 of same day (teststruct.data and debug.out)"
 ###################################################
 $executable > logfile_mode1.1&
 
 ###################################################
 echo "make fps to get structures to calculate"
+echo "cursel.distances.dat shows the distances"
 ###################################################
+#CurSel.py -t 1e-3 --landmarks 40 ../runner_scratch_new_data_all/function.data ../runner_scratch_new_data_all/logfile_mode1.1
+# tool 490 seconds on 40 structures from function.data of 3.2GB
+#frame_selector.py input.data.all precomp cursel.landmarks  # crates input.dat_selected.data with 40 strut
+
 CurSel.py -t 1e-3 --landmarks `grep -c begin input.data` function.data logfile_mode1.1
+head -20 cursel.landmarks > cursel.landmarks.20
+head -40 cursel.landmarks > cursel.landmarks.40
+
+frame_selector.py input.data precomp cursel.landmarks.20
+mv input_selected.data input_selected.data.20
+
+frame_selector.py input.data precomp cursel.landmarks.40
+mv input_selected.data input_selected.data.40
+
 # took 22 secons on 113 structures 
 # took 525 secons on 2455 structures
 # this will create a file cursel.landmarks which contains indexes;
 # x cursel.distances.dat (out.dat) will then give the distances
-cp cursel.landmarks cursel.landmarks.all
-# and in cursel.landmarks delete everythin after line 100 to get only first 100 structures.
-frame_selector.py input.data precomp cursel.landmarks
-

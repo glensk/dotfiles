@@ -25,4 +25,4 @@ lammps2="$SCR/scripts/lammps_scripts"
 
 PATH="$PATH:$ipi:$runner:$aiida_s:$aiida_a:$lammps1:$lammps2"
 export scripts=$SCR
-export ipi_mc=$CR/i-pi-mc/bin/i-pi
+export ipi_mc=$SCR/i-pi-mc/bin/i-pi
