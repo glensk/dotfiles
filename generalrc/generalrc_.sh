@@ -22,8 +22,7 @@ onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, c
 setenv host $host;
 setenv onhost $onhost;
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
-setenv scripts  "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/";
-source $scripts/source_to_add_to_path.sh
+source $dotfiles/scripts/source_to_add_to_path.sh
 
 ###################################################################################
 # HOST dependent variables (module load, (on cmmc with module load) ...)
@@ -80,8 +79,8 @@ fi
 # completion goo for commands
 ##############################################
 export PATH="$dotfiles/commands/:$PATH"  # if this is loaded before: complete -W ... $tocomplete the commands are executed which is not intended
-#tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
-#complete -W "n/*/`echo $tocomplete `/" goo
+tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
+complete -W "n/*/`echo $tocomplete `/" goo
 
 
 setenv EDITOR vim   
