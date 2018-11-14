@@ -23,6 +23,7 @@ fi
 [ -e "$folder_sources/i-pi-mc" ] && echo "$folder_sources/i-pi-mc does already exist; Exit" && exit
 
 cd $folder_sources
+# git clone --depth 1 -b kmc-al6xxx https://github.com/ceriottm/i-pi-mc i-pi-mc  # 33 mb
 [ ! -e "ipi-mc" ] && echo "git clone https://github.com/ceriottm/i-pi-mc" && git clone https://github.com/ceriottm/i-pi-mc i-pi-mc
 cd i-pi-mc
 git checkout kmc-al6xxx

@@ -38,6 +38,7 @@ cosmopc)
     echo "setenv myprompthostuser green;"
     echo "setenv mypromptpath green;"
 	echo "setenv SCRATCH /local/scratch/glensk;"
+	echo "complete -d cd;"
   ;;
 fidis)
     echo "setenv myprompttime cyan;"
