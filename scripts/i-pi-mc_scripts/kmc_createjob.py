@@ -43,7 +43,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 # environment variables
 @click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
 @click.option('-nn_pot',type=str, default="v2dg", help="foldername in $scripts containing the neural network potential (can be separately set here for different path)")
-@click.option('-i_pi_mc', envvar='i_pi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
+@click.option('-ipi_mc', envvar='ipi_mc',help='path to i-pi-mc (or environment variable $i_pi_mc)')
 @click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)

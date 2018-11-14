@@ -24,7 +24,7 @@ echo "setenv mylaptop mac;"
 ##############################################################################
 echo "setenv GZIP -9;"   # an empty string ("") is not possible, better use dummy
 echo "setenv myshell zsh;" # set this specifically for other cases
-echo "setenv i_pi_mc $HOME/Dropbox/Albert/scripts/i-pi-mc/bin/i-pi;"
+#echo "setenv ipi_mc $scripts/i-pi-mc/bin/i-pi;"
 
 case $onhost in
 mac)
