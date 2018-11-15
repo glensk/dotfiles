@@ -158,6 +158,7 @@ def createjob(
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
         convert_fileformats.save_ase_object_as_lmp(atomsc,jobdir+'/data.lmp')
         convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
+        convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.qe','espresso-in')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.POSCAR','vasp')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.xyz','xyz')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.extxyz','extxyz')

@@ -5,6 +5,8 @@ import numpy as np
 from numpy.linalg import norm
 import ase
 from ase.io import read,write
+#print(ase.io.__file__)
+#sys.exit()
 
 
 def is_upper_triangular(arr, atol=1e-8):
@@ -104,12 +106,7 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
         fh.close()
 
 
-
-
-def main(infile, formatin=False,formatout=False,outfilename=False):
-
-
-
+def convert_file(infile, formatin=False,formatout=False,outfilename=False):
     # get all known formats from ase; all known formats can be read.
     known_formats = []
     for i in ase.io.formats.all_formats:
@@ -120,6 +117,8 @@ def main(infile, formatin=False,formatout=False,outfilename=False):
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
         frame = read(infile,format=formatin)
+        #frame = read(infile,':',format=formatin)
+        #frame = read(infile,'0',format=formatin)
         print('infile (read in) :',infile,"(successfully)")
         print("cell:",frame.cell)
         print("positions:",frame.positions)
@@ -286,4 +285,4 @@ if __name__ == "__main__":
     else:
         args.outfilename = os.getcwd()+'/'+args.outfilename+"."+args.formatout  #args.outfilename #+'.'+args.formatout
 
-    sys.exit(main(args.infile, args.formatin, args.formatout,args.outfilename))
+    sys.exit(convert_file(args.infile, args.formatin, args.formatout,args.outfilename))
