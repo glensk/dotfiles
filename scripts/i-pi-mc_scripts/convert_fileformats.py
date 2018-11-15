@@ -7,7 +7,8 @@ import ase
 from ase.io import read,write
 #print(ase.io.__file__)
 #sys.exit()
-
+if sys.version_info[0] < 3:
+    raise Exception("Must be using Python 3")
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""
@@ -106,7 +107,12 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
         fh.close()
 
 
-def convert_file(infile, formatin=False,formatout=False,outfilename=False):
+def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=False):
+
+    ###########################################################################
+    # read the inputfile
+    ###########################################################################
+
     # get all known formats from ase; all known formats can be read.
     known_formats = []
     for i in ase.io.formats.all_formats:
@@ -116,13 +122,28 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False):
 
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
-        frame = read(infile,format=formatin)
-        #frame = read(infile,':',format=formatin)
-        #frame = read(infile,'0',format=formatin)
+        # case of once structure only
+        #frame = read(infile,format=formatin)  # only first structure (or last?)
+        #print('frame',frame)
+        #print("cell:",frame.cell)
+
+        # maybe more general
+        frame = read(infile,':',format=formatin) # all structures
         print('infile (read in) :',infile,"(successfully)")
-        print("cell:",frame.cell)
-        print("positions:",frame.positions)
-        print("potential energy (eV):",frame.get_potential_energy())
+        print('frames           :',len(frame))
+        #frame = read(infile,'0',format=formatin)  # only first structure
+        if args.verbose == True:
+            if len(frame) == 1:
+                print('frame',frame)
+                print("cell:",frame[0].cell)
+                print("positions:",frame[0].positions)
+
+                # POTCAR does not have energy...
+                print("potential energy (eV):",frame[0].get_potential_energy())
+            elif len(frame) >= 1:
+                print("cell[-1]     :",frame[-1].cell)
+                print("positions[-1]:",frame[-1].positions)
+                print("potential energy (eV) [-1]:",frame[-1].get_potential_energy())
     elif formatin == 'ipi':
         frame = read(infile,format='extxyz')
         print('fc',frame.cell)
@@ -136,34 +157,42 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False):
     else:
         sys.exit('formatin '+formatin+' not in the list of known formats! Exit.')
 
+
+    ###########################################################################
+    # write the outputfile
+    ###########################################################################
     print('formatout        :',formatout)
 
-    otherlist = ['lmp', 'lmp.runner','ipi','runner']
-    if formatout in otherlist:
-        print('0 fo',formatout)
-        if formatout == 'lmp':
-            save_ase_object_as_lmp(frame,outfilename,comment=infile,runner=False)
-        if formatout == 'lmp.runner':
-            save_ase_object_as_lmp_runner(frame,outfilename,comment=infile)
-        if formatout == 'ipi':
-            print('0.1 fo',formatout)
-            save_ase_object_as_ipi_format(frame,outfilename)
-        if formatout == 'runner':
-            sys.exit('runner not implemented yet...')
-    else:
-        print('1 fo',formatout)
-        if formatout in known_formats:
-            print('2 fo',formatout)
-            save_ase_object_in_ase_format(frame,outfilename,formatout)
-        else:
-            sys.exit('unknown format '+formatout)
 
-    print('written '+outfilename)
+    otherlist = ['lmp', 'lmp.runner','ipi']
+
+
+    for idx,frameone in enumerate(frame):
+
+        if len(frame) == 1:
+            idx = ""
+        #print('idx:',idx,type(idx))
+        outfilename = get_outfilename(args,idx)
+        #print('aaa',outfilename)
+        if formatout in otherlist:
+            if formatout == 'lmp':
+                save_ase_object_as_lmp(frameone,outfilename,comment=infile,runner=False)
+            if formatout == 'lmp.runner':
+                save_ase_object_as_lmp_runner(frameone,outfilename,comment=infile)
+            if formatout == 'ipi':
+                save_ase_object_as_ipi_format(frameone,outfilename)
+
+        elif formatout in known_formats:
+            save_ase_object_in_ase_format(frameone,outfilename,formatout)
+        else:
+            sys.exit('unknown output format '+formatout)
+
     return
 
 
 def save_ase_object_in_ase_format(ase_object,outfilename,formatout):
-    write(outfilename,ase_object,format=formatout)
+    ase.io.write(outfilename,ase_object,format=formatout)
+    print('written (2)      : '+outfilename)
 
 
 def save_ase_object_as_ipi_format(frame,outfilename):
@@ -178,7 +207,7 @@ def save_ase_object_as_ipi_format(frame,outfilename):
     # and write everything back
     with open(outfilename, 'w') as file:
         file.writelines( data )
-    print('written '+outfilename)
+    print('written (3)      : '+outfilename)
     return
 
 
@@ -249,6 +278,7 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     fout.write("\n")
 
     fout.close()
+    print('written (4)      : '+outfilename)
     return
 
 
@@ -258,16 +288,20 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description='',
             formatter_class=argparse.RawTextHelpFormatter) #ArgumentDefaultsHelpFormatter)
     string='''
-    e.g. convert_fileformats.py PathToInputfile.out --formatin 'espresso-out' --formatout lmp
+    e.g.
+    convert_fileformats.py PathToInputfile.out --formatin 'espresso-out' --formatout lmp
+    convert_fileformats.py -fi runner -fo espresso-in input_selected.data.20
+    convert_fileformats.py -fi runner -fo espresso-in input_selected.data.1
 
-    it would be ideal if this script could do this for one and several structrues (not yet implemented).
+
     '''
     parser = argparse.ArgumentParser(description=string)
     parser.add_argument("infile", type = str, help = "The name of the file")
     parser.add_argument("--showformats",'-sf', action='store_true', default=False, help = "show the possible in/outputformats (not showing lammps) and exit")
     parser.add_argument("--formatin",'-fi', type=str,default="lmp", help="Format of the input file, this can be all of the listed using --showformats, e.g. espresso-out,xyz,vasp, ...; default:lmp")
     parser.add_argument("--formatout",'-fo', type=str,default="lmp", help="Format of the output file, this can be most of the listed using --showformats and additionally lmp for LAMMPS, e.g. lmp,xyz,vasp, ...; default:lmp")
-    parser.add_argument("--outfilename", type=str,default=False, help="if nothing is provided --> default=infile+.lmp")
+    parser.add_argument("--outfilename", type=str,default=False, help="if nothing is provided --> default=infile+.lmp or when split option: infile+NUMBER+.lmp")
+    parser.add_argument('-v','--verbose', help='verbose', action='count', default=False)
 
 
     args = parser.parse_args()
@@ -278,11 +312,18 @@ if __name__ == "__main__":
         pp.pprint(x)
         sys.exit()
 
+    def get_outfilename(args,frame=""):
+        if frame == "":
+            addidx =""
+        elif type(frame) is int:
+            addidx = "_"+str(frame)
 
-    if args.outfilename == False:
-        #args.outfilename = args.infile+'.'+args.formatout
-        args.outfilename = os.getcwd()+'/'+os.path.basename(args.infile)+'.'+args.formatout
-    else:
-        args.outfilename = os.getcwd()+'/'+args.outfilename+"."+args.formatout  #args.outfilename #+'.'+args.formatout
+        if args.outfilename == False:
+            outfilename = os.getcwd()+'/'+os.path.basename(args.infile)+addidx+'.'+args.formatout
+        else:
+            outfilename = os.getcwd()+'/'+args.outfilename+addidx+"."+args.formatout  #args.outfilename #+'.'+args.formatout
+        return outfilename
 
-    sys.exit(convert_file(args.infile, args.formatin, args.formatout,args.outfilename))
+    outfilename = get_outfilename(args,frame="")
+
+    sys.exit(convert_file(args.infile, args.formatin, args.formatout,outfilename,args))

@@ -3,6 +3,11 @@ import click
 import glob
 import os,sys
 from subprocess import call
+python_version = sys.version_info[0]
+if python_version < 3:
+    sys.exit('Your python environment uses a python < 3; Exit;')
+print(python_version)
+sys.exit()
 
 # from scripts folder
 import kmc_createjob

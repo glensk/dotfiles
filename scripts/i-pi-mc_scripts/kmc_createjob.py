@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import os,sys,random,massedit,ase
+#if sys.version_info[0] < 3:
+#    raise Exception("Must be using Python 3")
+
 import socket
 import datetime
 from ase.lattice.cubic import FaceCenteredCubic
@@ -47,6 +50,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
+@click.option('-t','--test/--no-test', default=False)
 
 def createjob(
         ncell,
@@ -64,7 +68,8 @@ def createjob(
         ipi_mc,
         lmp_exec,
         submit,
-        submitdebug='kk'):
+        submitdebug,
+        test):
     """
     This is an script to submit KMC jobs quickly.
 
@@ -72,7 +77,6 @@ def createjob(
 
     kmc_createjob.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
     """
-
     ####################################
     # a few checks
     ####################################
@@ -97,12 +101,18 @@ def createjob(
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
-    directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+nn_pot+"_"+\
+    directory = "ipi_kmc_"+\
+                str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+nn_pot+"_"+\
                 str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
                 str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi_"+\
                 str(runnercutoff)+"rcut"
     seeds = random.sample(range(1, 999999), nseeds)
+
+    if test == True:
+        nseeds = 1
+        seeds = [1]
+        print()
     seednumber = list(seednumber)
     if len(seednumber) is not 0:
         seeds = seednumber
@@ -129,6 +139,7 @@ def createjob(
     print('directory    ',directory)
     print('submit       ',submit)
     print('submitdebug  ',submitdebug)
+    print('pytohon      ',sys.version_info[0])
     print('--------------------------- check the input --------------------------------')
     check_prompt("Are the ine input variables ok? [y]es: ")
 
@@ -155,13 +166,16 @@ def createjob(
 
 
         # get data.lmp
-        convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
-        convert_fileformats.save_ase_object_as_lmp(atomsc,jobdir+'/data.lmp')
         convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
-        convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.qe','espresso-in')
-        #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.POSCAR','vasp')
-        #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.xyz','xyz')
-        #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.extxyz','extxyz')
+        convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
+        if test == True:
+            convert_fileformats.save_ase_object_as_lmp(atomsc,jobdir+'/data.lmp')
+            convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.qe','espresso-in')
+            convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.POSCAR','vasp')
+            convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.xyz','xyz')
+            convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.extxyz','extxyz')
+            # will only work once giulio send me the new runner.py file
+            #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.runner','runner')
 
         # get and adapt in.lmp
         copyfile(file_inlmp, jobdir+"/in.lmp")
@@ -303,7 +317,6 @@ def mkdir(directory):
 
 
 if __name__ == "__main__":
-    print('give an error if python / env is nt 3.5 or so....')
     # submitoptions
     if True:
         nodes=2
