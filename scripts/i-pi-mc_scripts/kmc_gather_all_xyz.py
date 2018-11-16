@@ -6,11 +6,9 @@ from subprocess import call
 python_version = sys.version_info[0]
 if python_version < 3:
     sys.exit('Your python environment uses a python < 3; Exit;')
-print(python_version)
-sys.exit()
 
 # from scripts folder
-import kmc_createjob
+import kmc_createjob   # python skripts in the same folder can be found, but not other folder
 
 # show default values in click
 orig_init = click.core.Option.__init__
@@ -26,13 +24,13 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.argument('folder')
 @click.option('-ff','--filename_find',required=False,default="simulation.pos_0.xyz",help="Filename or extension of the searched file")
-@click.option('-fo','--filename_out',required=False,default="input.data.all",help="Filename of the output file")
+@click.option('-fo','--filename_out',required=False,default="input.data",help="Filename of the output file")
 
 def gather_xyz(folder,filename_find,filename_out):
     '''
     This scipt looks for all files ($filename_find; default: simulation.pos_0.xyz) in
     $folder and converts content to RuNNer readable fileformat $filename_out
-    (default: input.data.all).
+    (default: input.data).
     '''
     print('folder:',folder)
     print()

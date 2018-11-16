@@ -14,7 +14,9 @@
 ###################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ###################################################################################
-case "$0" in bash) export currentshell="bash";;tcsh) setenv currentshell "tcsh";;*) export currentshell="zsh";esac
+case "$0" in bash) export currentshell="bash";;
+             tcsh) setenv currentshell "tcsh";;
+             *)    export currentshell="zsh";esac
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh
 host=`hostname`   # 0.001s
@@ -25,21 +27,15 @@ setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 source $dotfiles/scripts/source_to_add_to_path.sh
 
 ###################################################################################
-# HOST dependent variables (module load, (on cmmc with module load) ...)
+# HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
 ###################################################################################
 eval `$generalrc/generalrc_hostdependent.sh`   
-            # myshell to {zsh,bash, tcsh}; promptcolor; whichalias = {alias or mkalias}
 
 ###################################################################################
 # PATH, PYTHONPATH
 # PYTHONPATH should not be set (according to anaconda/miniconda)
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $onhost` 
-
-#eval "$(_kmc_createjob_py_COMPLETE=source kmc_createjob.py)"
-#@# time without aliases          : 0.38
-#@# time with generalrc_alias_.sh : 0.62
-#@# time with    alias            : 0.38 (in zsh: alias > alias; add as 1st row alias)
 
 ##############################################
 # ALIASES & PROMPT & tabcolor

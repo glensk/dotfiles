@@ -93,6 +93,7 @@ def createjob(
     check_isfile(\
 		[file_inlmp,file_submit,ipi_mc,lmp_exec],
 		["file_inlmp","file_submit","ipi_mc","lmp_exec"])
+    if not test: check_isfile([lmp_exec],["lmp_exec"],environment=True)
 
 
     ####################################
@@ -224,7 +225,7 @@ def createjob(
             os.chdir(cwd)
 
 
-def create_READMEtxt(directory):
+def create_READMEtxt(directory,add=False):
     ''' wiretes a README.txt file '''
     # get sha
     hier = os.getcwd()
@@ -245,6 +246,9 @@ def create_READMEtxt(directory):
         print("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
         print("# used sha: "+sha, file=text_file)
         print(f"{strout}", file=text_file)
+        if add:
+            print(add, file=text_file)
+
 
     print()
     print('written ',filepath)
@@ -285,7 +289,7 @@ def check_isdir(path):
     return
 
 
-def check_isfile(path,pathnames):
+def check_isfile(path,pathnames,environment=False):
     if type(path) is str:
         if not os.path.isfile(path):
             sys.exit('missing file '+path)
@@ -293,7 +297,9 @@ def check_isfile(path,pathnames):
         for idx,i in enumerate(path):
             #print('ii',i,idx,pathnames[idx])
             if i is None:
-                sys.exit('(environment) variable "'+pathnames[idx]+'" is not defined!')
+                add=""
+                if environment == True: add = "environment "
+                sys.exit(add+'variable "'+pathnames[idx]+'" is not defined!')
             if not os.path.isfile(i):
                 sys.exit('missing file '+i)
     else:

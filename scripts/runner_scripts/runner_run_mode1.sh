@@ -42,12 +42,13 @@ mv tmp symfun.output
 echo "get and adapt input.nn"
 ###################################################
 cp $scripts/runner_scripts/inputAlMgSi.nn input.nn
-linebegin=`grep -n "^symfunction_short" input.nn | head -1 | sed 's|:.*||'`
-lineend=`grep -n "^symfunction_short" input.nn | tail -1 | sed 's|:.*||'`
+linebegin=`grep -n -m 1 "^symfunction_short" input.nn | cut -f1 -d:`
+lineend=`grep -n "^symfunction_short" input.nn | tail -1 | cut -f1 -d:`
 echo "     ... linebegin $linebegin"
 echo "     ... lineend $lineend"
-sed -i ''"$linebegin"','"$lineend"'d' input.nn 
-sed -i '/cutoff_type 2/r symfun.output' input.nn
+
+sed -i ''"$linebegin"','"$lineend"'d' input.nn   # delete everything inbetween
+sed -i '/cutoff_type 2/r symfun.output' input.nn # past instead the symfun.output
 sed -i 's|^test_fraction .*|test_fraction 0|g' input.nn
 sed -i 's|^runner_mode .*|runner_mode 1|g' input.nn
 sed -i 's|^number_of_elements .*|number_of_elements 3|' input.nn
@@ -65,6 +66,7 @@ echo "start runner in mode 1 (on cosmopc)"
 echo "this took 16h for 2435 structures 18:21 - 10:46 of next day (teststruct.data and debug.out)"
 echo "this took  1h for  113 structures 18:10 - 18:56 of same day (teststruct.data and debug.out)"
 ###################################################
+exit
 $executable > logfile_mode1.1&
 
 ###################################################

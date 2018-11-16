@@ -40,6 +40,7 @@ cosmopc)
 	echo "setenv SCRATCH /local/scratch/glensk;"
 	echo "complete -d cd;"
     echo "setenv lmp_exec $scripts/lammps_executables/lmp_serial_cosmopc18_runner_2018_10_30;"
+    echo "setenv runner_exec $scripts/runner_scripts/RuNNer.serial.cosmopc.natascha.x;"
   ;;
 fidis)
     echo "setenv myprompttime cyan;"

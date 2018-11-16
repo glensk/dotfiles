@@ -24,5 +24,10 @@ lammps1="$SCR/scripts/lammps_executables"
 lammps2="$SCR/scripts/lammps_scripts"
 
 PATH="$PATH:$ipi:$runner:$aiida_s:$aiida_a:$lammps1:$lammps2"
+if [ "$PYTHONPATH" = "" ];then
+    PYTHONPATH="$ipi:$runner:$aiida_s:$aiida_a"
+else
+    PYTHONPATH="$PYTHONPATH:$ipi:$runner:$aiida_s:$aiida_a"
+fi
 export scripts=$SCR
-export ipi_mc=$SCR/i-pi-mc/bin/i-pi
+export ipi_mc=$SCR/i-pi-mc/bin/i-pi   

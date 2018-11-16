@@ -22,30 +22,26 @@ bin6="$HOME/.local/bin"
 ipi="$HOME/google_drive/scripts_epfl/i-pi-mc/bin"
 aliases="$dotfiles/aliases"
 
-#PATH="$dropboxbin:bin3:$PATH"  !! not like this! $PATH first !!! 
 PATH="$PATH:$aliases:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
-#pythermodynamics=
 #########################################################################
 # on mac: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
 #########################################################################
 if [ "$onhost" = "mac" ];then
     # $PATH (on mac)
     sed="/usr/local/opt/gnu-sed/libexec/gnubin"
+    
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
-    #anaconda="$HOME/anaconda2/bin"  # don't load anaconda on cmmc since the module is available
-    #anaconda="$HOME/miniconda3/bin"  # don't load anaconda on cmmc since the module is available
-    #anaconda=""  # don't load anaconda on cmmc since the module is available
     brew="/usr/local/opt/coreutils/libexec/gnubin"   # without brew ls options -- are not working
-    #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     phonopy="$HOME/scripts/phonons/phonopy_at_$host"
+    #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     #phonopybin="$phonopy/bin"
     #phonopybin="$HOME/.local/bin"
     #phonopybin2="$HOME/.miniconda2/bin"
     #phonopybin2=""
-    vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
+    #vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
     #sphinx="$HOME/Dropbox/scripts/phonons/sphinx/bin"
 
@@ -68,9 +64,7 @@ if [ "$onhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
-    #[ "$host" = "$mylaptop" ] && \
-    PATH="$sed:$brew:$phonopy:$vasp:$PATH" #&& \
-    #PATH="$sed:$phonopy:$vasp:$PATH" #&& \
+    PATH="$sed:$brew:$phonopy:$PATH" 
     LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
 fi
 
@@ -132,7 +126,21 @@ fi
 #########################################################################
 #if [ "$currentshell" != "tcsh" ];then
     #echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"'
-echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include"'
+
+
+# this somehow wipes the PYTHONPATH on cosmopc
+#echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include"'
+
+# try this, ... this also wipes the PYTHONPATH
+#PYTHONPATH="$PYTHONPATH" 
+#echo 'export PATH="'"$PATH"'"; export PYTHONPATH="'"$PYTHONPATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include"'
+
+# whithout this brew coreutis will not load...
+echo 'export PATH="'"$PATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include"'
+
+
+
+
 #else
 #    tcshpath=`echo $PATH | sed 's|:| |g'`
 #    tcshpythonpath=`echo $PYTHONPATH | sed 's|:| |g'`

@@ -7,8 +7,10 @@ import ase
 from ase.io import read,write
 #print(ase.io.__file__)
 #sys.exit()
-if sys.version_info[0] < 3:
-    raise Exception("Must be using Python 3")
+
+python_version = sys.version_info[0]
+if python_version < 3:
+    sys.exit('Your python environment uses a python < 3; Exit;')
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""

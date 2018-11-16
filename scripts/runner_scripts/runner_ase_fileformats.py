@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import re
 import numpy as np
+import sys
 
 from ase.atoms import Atoms
 from ase.calculators.calculator import all_properties, Calculator
@@ -83,7 +84,6 @@ def read_runner(fileobj, index=-1):
         # comment line
         line = fileobj.readline() 
         # Is there any valuable info to strip from the comment line?
-        # Is the comment line always present?
         # info = key_val_str_to_dict(line)
 
         info = {}
@@ -95,7 +95,7 @@ def read_runner(fileobj, index=-1):
             line = fileobj.readline()
             vals = line.split()
             cell.append(vals[1:4])
-        cell = np.array(cell,dtype='float')*units.Bohr # This should convert to Angstrom
+        cell = np.array(cell,dtype='float')*units.Bohr # This converts to Angstrom, which is the default unit in ASE
 
         positions = []
         symbols = []
@@ -123,7 +123,7 @@ def read_runner(fileobj, index=-1):
 
 
         line = fileobj.readline()
-        energy = float(line.split()[1])
+        energy = float(line.split()[1])*units.Hartree
         line = fileobj.readline()
         charge = float(line.split()[1])
 
@@ -143,3 +143,52 @@ def read_runner(fileobj, index=-1):
         #              info=info)
 
         yield structure
+
+def write_runner(fileobj,images,comment=None,append=False):
+    """
+    Write output in runner format. Written quickly with no regard to the form
+    """
+    if isinstance(fileobj, basestring):
+        mode = 'w'
+        if append:
+            mode = 'a'
+        fileobj = open(fileobj,mode)
+
+    if hasattr(images, 'get_positions'):
+        images = [images]
+
+    for atoms in images:
+
+        try: forces = atoms.get_forces()/units.Hartree * units.Bohr
+        except: 
+            sys.stderr.write("No forces found, setting them to 0\n")
+            forces = np.zeros((nat,3))
+
+        try: energy = atoms.get_potential_energy()/units.Hartree
+        except:
+            sys.stderr.write("No energy found, setting it to 0\n")
+            energy = 0
+
+        #atoms.wrap()
+        fileobj.write('begin\n')
+        if comment is None:
+            fileobj.write('c ' + str(atoms.get_number_of_atoms())  + ' atoms, species ' + str(atoms.get_chemical_formula()) + "\n")
+        else:
+            fileobj.write('c ' + comment)
+
+        cell = atoms.get_cell()/units.Bohr
+        for idx in xrange(3):
+            fileobj.write("lattice " + str(cell[idx][0]) + " " + str(cell[idx][1]) + " " + str(cell[idx][2]) + "\n")
+
+        nat = atoms.get_number_of_atoms()
+
+        positions = atoms.get_positions(wrap=True)/units.Bohr
+
+        for idx in xrange(nat):
+            #fileobj.write('atom ' + atoms[idx].position + atoms[idx].symbol + '0.000000 0.000000 ' + forces[idx])
+            fileobj.write("atom " + str(positions[idx,0]) + " " + str(positions[idx,1]) + " " + str(positions[idx,2]) + " " + atoms[idx].symbol + " " + str(0.0000000) + " " + str(0.000000) + " " + str(forces[idx][0]) + " " + str(forces[idx][1]) + " " + str(forces[idx][2]) + "\n")
+
+
+        fileobj.write('energy ' + str(energy) + "\n")
+        fileobj.write('charge 0.0000\n')
+        fileobj.write('end\n')
