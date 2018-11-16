@@ -77,7 +77,8 @@ def make_fps(filename_in,runner_exec,scripts,test):
             test_fraction= 0,
             runner_mode= 1,
             number_of_elements= 3,
-            elements = "Al Mg Si")
+            elements = "Al Mg Si",
+            test_input_data=filename_in)
 
     ######################################
     # write README
@@ -92,8 +93,22 @@ def make_fps(filename_in,runner_exec,scripts,test):
     return
 
 
+def file_len(fname):
+    i = 0
+    with open(fname) as f:
+        for i, l in enumerate(f,1):
+            pass
+    return i
+
+
 def get_input_runner(template,filename,symfun_delete=True,symfun_file=False,
-        test_fraction=0,runner_mode=1,number_of_elements=3,elements="Al Mg Si"):
+        test_fraction=0,runner_mode=1,number_of_elements=3,elements="Al Mg Si",test_input_data=True):
+    if test_input_data:
+        len = file_len(test_input_data)
+        #print('len',len)
+        if len <= 3:sys.exit('file '+test_input_data+' seems too short! Exit;')
+
+    # read in the runner.in template
     f = open(template,"r")
     lines = f.readlines()
     f.close()
