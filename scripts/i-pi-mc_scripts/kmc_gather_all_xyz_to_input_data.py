@@ -50,7 +50,7 @@ def gather_xyz(folder,filename_find,filename_out):
 
 def findfiles(directory,extension_or_filename):
     listout=[]
-    for filename in glob.iglob(directory+'**/*'+extension_or_filename, recursive=True):
+    for filename in glob.iglob(directory+'/**/*'+extension_or_filename, recursive=True):
         #print(filename)
         listout.append(filename)
     return listout

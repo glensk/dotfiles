@@ -5,7 +5,6 @@ python_version = sys.version_info[0]
 if python_version < 3:
     sys.exit('Your python environment uses a python < 3; Exit;')
 
-
 import click
 import glob
 from shutil import copyfile
@@ -88,8 +87,11 @@ def make_fps(filename_in,runner_exec,scripts,test):
     ######################################
     # run runner (whoever not in testmode)
     ######################################
-    print("now starting RuNNer ...")
-    run([runner_exec+" > logfile_mode1.1&"],shell=True)
+    if test == True:
+        sys.exit('Not starting RuNNer in testmode')
+    else:
+        print("now starting RuNNer ...")
+        run([runner_exec+" > logfile_mode1.1&"],shell=True)
     return
 
 

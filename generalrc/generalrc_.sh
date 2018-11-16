@@ -14,6 +14,7 @@
 ###################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ###################################################################################
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 case "$0" in bash) export currentshell="bash";;
              tcsh) setenv currentshell "tcsh";;
              *)    export currentshell="zsh";esac
@@ -29,7 +30,7 @@ source $dotfiles/scripts/source_to_add_to_path.sh
 ###################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
 ###################################################################################
-eval `$generalrc/generalrc_hostdependent.sh`   
+source $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
 # PATH, PYTHONPATH
@@ -53,10 +54,12 @@ source $generalrc/generalrc_alias_$onhost
 
 tab-color $mypromptpath
 
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda"
 ##############################################
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
 [ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy 
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 
 ##############################################
@@ -113,3 +116,5 @@ source $dotfiles/$currentshell/$currentshell\_set
 ##############################################
 [ "$printloadstat" = "true" ] && \
     echo " onhost $onhost"
+
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett after conda"

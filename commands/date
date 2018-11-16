@@ -1,5 +1,5 @@
-date +%s    gives unixtime
-
+date +%s    gives unixtime (only seconds)
+date +%s%N  gives unixtime (nanoseconds) 
 stat -c %Y file gives timestempt (unixtime) of last modification of the file
 
 date +"%m-%d-%y"                --> 10-26-16
