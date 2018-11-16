@@ -197,6 +197,12 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
 
 def save_ase_object_in_ase_format(ase_object,outfilename,formatout):
     ase.io.write(outfilename,ase_object,format=formatout)
+    if formatout == 'espresso-in':
+        f = open(outfilename,"r")
+        lines = f.readlines()
+        f.close()
+        print('change some stuff')
+        settings = os.environ['scripts']+"/qe-aiida/aiida_submitskripts/aiida.in.top"
     print('written (2)      : '+outfilename)
 
 

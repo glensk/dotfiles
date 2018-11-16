@@ -20,4 +20,5 @@ else
     export PYTHONPATH="$PYTHONPATH:$ipi:$runner:$aiida_s:$aiida_a"  # need "export" for python
 fi
 export scripts=$SCR
-export ipi_mc=$SCR/i-pi-mc/bin/i-pi   
+export ipi_mc=$SCR/i-pi-mc/bin/i-pi  
+export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
