@@ -15,6 +15,7 @@ mac_iterm/
 mac_keyboard/
 mac_osx_terminal_app/
 mac_skype/
+__pycache__/
 makefiles/
 solarized/
 vrome/
