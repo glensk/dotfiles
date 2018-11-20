@@ -14,6 +14,7 @@ conda install colorama
 conda install click  # actually comes with ase
 conda install -c conda-forge ase
 conda install seaborn
+conda install -c conda-forge lmfit # for phonon_lifetimes.py kette.py ...
 [ "`hostname`" = "mac" ] && conda install -c conda-forge jupyter_contrib_nbextensions   # get the notebook extensions for jupyter notebooks
 [ "`hostname`" = "mac" ] && jupyter contrib nbextension install --user                  # also necessary to get the notebook extensions working
 

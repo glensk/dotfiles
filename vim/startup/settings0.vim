@@ -13,13 +13,16 @@ set hidden
 " on cmpc cmmd vi/vim have -clipboard but gvim -v can be used which has +clipboard
 " to make this work on mac (vim) and cmpc (gvim) and cmmc (gvim) have to use
 " after installing on mac brew install vim --with-client-server --with-lua --with-features=huge --with-xterm_clipboard  IT WAS WORKING BOTH WAYS!!!
-if has("clipboard")
-  set clipboard=unnamed " copy to the system clipboard
 
-  if has("unnamedplus") " X11 support
-    set clipboard+=unnamedplus
-  endif
-endif
+"set clipboard=unnamed " copy to the system clipboard
+"set clipboard=unnamedplus
+
+"if has("clipboard")
+"  set clipboard=unnamed " copy to the system clipboard
+"  if has("unnamedplus") " X11 support
+"    set clipboard+=unnamedplus
+"  endif
+"endif
 
 " Enhance command-line completion / Better? completion on command line
 set wildmenu

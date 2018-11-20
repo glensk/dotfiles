@@ -1,3 +1,5 @@
+PermitLocalCommand yes
+
 Host cluster
     HostbasedAuthentication yes
     EnableSSHKeysign        yes

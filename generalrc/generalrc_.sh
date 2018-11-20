@@ -25,7 +25,9 @@ onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, c
 setenv host $host;
 setenv onhost $onhost;
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
-source $dotfiles/scripts/source_to_add_to_path.sh
+
+# ipi_mc, scripts, ESPRESSO_PSEUDO, PATH, PYTHONPATH
+source $dotfiles/scripts/source_to_add_to_path.sh;
 
 ###################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)

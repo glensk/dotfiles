@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 import click
-import glob
 import os,sys
 from subprocess import call
-python_version = sys.version_info[0]
-if python_version < 3:
-    sys.exit('Your python environment uses a python < 3; Exit;')
 
 # from scripts folder
-import kmc_createjob   # python skripts in the same folder can be found, but not other folder
+import myutils
 
 # show default values in click
 orig_init = click.core.Option.__init__
@@ -35,7 +31,7 @@ def gather_xyz(folder,filename_find,filename_out):
     print('folder:',folder)
     print()
     print('files:')
-    files = findfiles(folder,filename_find)
+    files = myutils.findfiles(folder,extension_or_filename=filename_find)
 
     if os.path.isfile(filename_out):
         sys.exit('The file '+filename_out+' does already exist! Exit.')
@@ -45,15 +41,9 @@ def gather_xyz(folder,filename_find,filename_out):
         print(i)
         call(["xyz2runner.sh",i],stdout=f)
 
-    kmc_createjob.create_READMEtxt(os.getcwd())
+    myutils.create_READMEtxt(os.getcwd())
     return filename_out
 
-def findfiles(directory,extension_or_filename):
-    listout=[]
-    for filename in glob.iglob(directory+'/**/*'+extension_or_filename, recursive=True):
-        #print(filename)
-        listout.append(filename)
-    return listout
 
 if __name__ == "__main__":
     gather_xyz()

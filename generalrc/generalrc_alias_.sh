@@ -225,19 +225,22 @@ $1 qstatn 'qstatn -d'
 ##############################
 # ssh
 ##############################
-$1 ssh      'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc  ... Blazej uses ServerAliveCountMax=1200 which seems to be good
+$1 ssh      "ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200"   # -X for loading locas stuff locally (xmgrace)  ServerAliveInterval=1600 is now enough for cmpc  ... Blazej uses ServerAliveCountMax=1200 which seems to be good
 $1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'
 
-$1 cluster 'sshimmer -t glensk@cmmc002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-$1 cmpc 'sshimmer -t glensk@cmpc34.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; zsh"' # this loads tcsh twice due to the necessary tcsh at the end; once zsh is installed on the cmpc (and cmmd?) the tcsh can be left empty and instead of tcsh one could simply write zsh
+$1 pc        'sshimmer -t glensk@cosmopc15.epfl.ch   "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 cosmopc   'sshimmer -t glensk@cosmopc15.epfl.ch   "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 
-$1 gate 'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 cluster   'sshimmer -t glensk@cmmc002.mpie.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+$1 cmpc      'sshimmer -t glensk@cmpc34.mpie.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"' 
+$1 gate      'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 gatelinux 'sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 gatehydra 'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-
-#$1 gar 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ]  && cd `th.sh`; zsh"'
-#$1 gar1 'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-#$1 gar2 'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; zsh"'
+#
+#$1 daint 'ssh daint'
+#$1 fidis 'ssh fidis'
+#$1 cosmopc 'ssh cosmopc'
+#$1 pc 'ssh cosmopc'
 
 ##############################
 # autocorrect
@@ -252,10 +255,10 @@ $1 moduel 'module'
 $1 mount_fidis_scratch 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o reconnect -C; echo mounted /scratch/glensk' 
 $1 umount_fidis_scratch 'umount -f /scratch/glensk; umounted /scratch/glensk'
 
-$1 mound_pc_scratch 'sshfs glensk@cosmopc15.epfl.ch:/local/scratch/glensk/ /local/scratch/glensk -o reconnect -C; echo mounted /local/scratch/glensk/'
+$1 mount_pc_scratch 'sshfs glensk@cosmopc15.epfl.ch:/local/scratch/glensk/ /local/scratch/glensk -o reconnect -C; echo mounted /local/scratch/glensk/'
 $1 umount_pc_scratch 'umount -f /local/scratch/glensk'
 
-$1 mound_pc_home 'sshfs glensk@cosmopc15.epfl.ch:/home/glensk /home/glensk -o reconnect -C; echo mounted /home/glensk/'
+$1 mount_pc_home 'sshfs glensk@cosmopc15.epfl.ch:/home/glensk /home/glensk -o reconnect -C; echo mounted /home/glensk/'
 $1 umount_pc_home 'umount -f /home/glensk'
 
 $1 mount_daint 'sshfs aglensk@ela.cscs.ch:/users/aglensk/ ~/daint -o reconnect -C; echo mounted '
@@ -266,10 +269,6 @@ $1 make_home_accessible 'chmod -R ga+r $HOME'
 $1 conda_activate "source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate"
 $1 gp 'conda_activate'
 
-$1 daint 'ssh daint'
-$1 fidis 'ssh fidis'
-$1 cosmopc 'ssh cosmopc'
-$1 pc 'ssh cosmopc'
 $1 aiida 'source aiida/bin/activate'
 
 $1 s 'cd $SCRATCH'

@@ -8,11 +8,9 @@ from ase.io import read,write
 #print(ase.io.__file__)
 #sys.exit()
 
-import kmc_createjob
+import myutils
 
-python_version = sys.version_info[0]
-if python_version < 3:
-    sys.exit('Your python environment uses a python < 3; Exit;')
+myutils.exit_if_not_python3()
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""
@@ -112,7 +110,6 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
 
 
 def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=False):
-
     ###########################################################################
     # read the inputfile
     ###########################################################################
@@ -191,7 +188,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
         else:
             sys.exit('unknown output format '+formatout)
 
-    kmc_createjob.create_READMEtxt(os.getcwd())
+    myutis.create_READMEtxt(os.getcwd())
     return
 
 

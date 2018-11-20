@@ -26,7 +26,7 @@ set iskeyword=@,48-57,_,-,:,192-255
 Plugin 'kshenoy/vim-signature.git'            " set marks: m[a-zA-Z];delall marks :m<Space>
 source ~/.vim/startup/vundle_easymotion.vim   " <Leader><Leader>{w,b} :hi show all colors
 Plugin 'henrik/vim-indexed-search'            " results counter   (index-search)
-Plugin 'https://github.com/kana/vim-fakeclip' " pseudo clipboard register 
+"Plugin 'https://github.com/kana/vim-fakeclip' " pseudo clipboard register 
                                               " for non-GUI Vim
 source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now tab)
                                               " never change this to tab since this breaks 
@@ -62,7 +62,7 @@ source ~/.vim/startup/vundle_end.vim
 " settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 source ~/.vim/startup/keybindings.vim " paste
-source ~/.vim/startup/settings0.vim   " general sets, remove trailing whitespaces
+source ~/.vim/startup/settings0.vim   " general sets, remove trailing whitespaces, currently breaks yanking on mac!
 source ~/.vim/startup/settings1.vim   " 
 source ~/.vim/startup/settings2.vim   " syntax, templates, look-and-feel 
 source ~/.vim/startup/settings3.vim   " Folding, Search, Tab-behavior, indentation
@@ -95,3 +95,10 @@ nnoremap <C-n> :call NumberToggle()<cr>
 " to capitalize words use 
 map da. df.
 map gb :e#<cr>   " to go to file type gf   to go back type gb
+
+
+
+noremap <Leader>y "*y
+noremap <Leader>p "*p
+noremap <Leader>Y "+y
+noremap <Leader>P "+p

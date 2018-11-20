@@ -51,7 +51,7 @@ currenthost=""
 #echo goto:$goto:
 [ "$goto" = "" ] && tab-reset
 [ "$goto" != "" ] && tab-color $goto
-ssh $*
+ssh $* 
 
 ########################################################################
 ## revert color depends on hostname current

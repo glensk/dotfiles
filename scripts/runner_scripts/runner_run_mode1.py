@@ -34,7 +34,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
 @click.option('-t','--test/--no-test', default=False)
 
-def make_fps(filename_in,runner_exec,scripts,test):
+def runner_run_mode_1(filename_in,runner_exec,scripts,test):
     '''
     This scipt ....
     '''
@@ -164,4 +164,4 @@ def get_input_runner(template,filename,symfun_delete=True,symfun_file=False,
 
 
 if __name__ == "__main__":
-    make_fps()
+    runner_run_mode_1()
