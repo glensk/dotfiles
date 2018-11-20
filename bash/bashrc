@@ -1,5 +1,7 @@
 if [[ $- == *i* ]];then  # only in interactive shell
-
+if [ "`hostname | grep -o daint`" = "daint" ];then
+    ka="kb" # dont do anyting
+else
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
 #################################################################
@@ -61,4 +63,5 @@ source ~/.generalrc
 
 # added by Miniconda3 installer
 #export PATH="/home/glensk/miniconda3/bin:$PATH"
+fi
 fi

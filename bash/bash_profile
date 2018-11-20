@@ -11,7 +11,7 @@ PATH=$PATH:$HOME/.local/bin:$HOME/bin
 
 export PATH
 
-
+echo "in .bash_profile"
 case "$-" in
   #[ "`hostname | grep -o daint`" = "daint" ];then
   #*i*) export SHELL=/bin/zsh;export currentshell="zsh";unset FPATH; exec /bin/zsh -l
