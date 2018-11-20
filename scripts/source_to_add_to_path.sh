@@ -10,14 +10,16 @@ ipi="$SCR/i-pi-mc_scripts"
 runner="$SCR/runner_scripts"
 aiida_s="$SCR/qe-aiida/aiida_solutejobs_scripts"
 aiida_a="$SCR/qe-aiida/aiida_analyze"
+aiida_b="$SCR/qe-aiida/aiida_submitskripts"
 lammps1="$SCR/scripts/lammps_executables"
 lammps2="$SCR/scripts/lammps_scripts"
 
-export PATH="$PATH:$ipi:$runner:$aiida_s:$aiida_a:$lammps1:$lammps2"
+addeverywhere="$ipi:$runner:$aiida_s:$aiida_a:$aiida_b:$lammps1:$lammps2"
+export PATH="$PATH:$addeverywhere"
 if [ "$PYTHONPATH" = "" ];then
-    export PYTHONPATH="$ipi:$runner:$aiida_s:$aiida_a"              # need "export" for python
+    export PYTHONPATH="$addeverywhere"              # need "export" for python
 else
-    export PYTHONPATH="$PYTHONPATH:$ipi:$runner:$aiida_s:$aiida_a"  # need "export" for python
+    export PYTHONPATH="$PYTHONPATH:$addeverywhere"  # need "export" for python
 fi
 export scripts=$SCR
 export ipi_mc=$SCR/i-pi-mc/bin/i-pi  

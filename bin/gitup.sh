@@ -18,7 +18,9 @@ fi
 #dot=$HOME/Dropbox/scripts/dotfiles/
 dot=$dotfiles
 
-cd $dot
+#cd $dot
+
+
 echo `pwd`
 one=`pwd | sed 's|^/cmmc/||'`
 one=`echo $one/`

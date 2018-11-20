@@ -8,9 +8,9 @@ from ase.io import read,write
 #print(ase.io.__file__)
 #sys.exit()
 
-import myutils
+import myutils as my
 
-myutils.exit_if_not_python3()
+my.exit_if_not_python3()
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""
@@ -188,7 +188,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
         else:
             sys.exit('unknown output format '+formatout)
 
-    myutis.create_READMEtxt(os.getcwd())
+    my.create_READMEtxt(os.getcwd())
     return
 
 

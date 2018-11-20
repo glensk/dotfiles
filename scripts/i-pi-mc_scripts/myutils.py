@@ -193,6 +193,14 @@ def qe_parse_numelectrons_upfpath(upfpath):
                 raise Exception("Could not parse {}".format(upfpath))
     return num_e
 
+def qe_full_get_path_to_potential(element,path_to_pseudos):
+    potential = findfiles(path_to_pseudos,begin=element,extension_or_filename="UPF")
+    if len(potential) != 1:
+        print('found potential',potential)
+        sys.exit('found more than one or none potential; Exit.')
+    return potential
+
+
 def qe_get_numelectrons(structure_ase, path_to_pseudos):
     element_nume_dict = {}
     for element in structure_ase.get_chemical_symbols():
