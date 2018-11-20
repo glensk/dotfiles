@@ -21,6 +21,9 @@ CurSel.py -t 1e-3 --landmarks `grep -c begin input.data` function.data logfile_m
 head -20 cursel.landmarks > cursel.landmarks.20
 head -40 cursel.landmarks > cursel.landmarks.40
 
+frame_selector.py --prefix "input20" input.data precomp cursel.landmarks.20
+frame_selector.py --prefix "input2509" input.data precomp cursel.landmarks.2509
+
 frame_selector.py input.data precomp cursel.landmarks.20
 mv input_selected.data input_selected.data.20
 

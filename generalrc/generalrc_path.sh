@@ -9,17 +9,18 @@
 #########################################################################
 # on every system: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ...)
 #########################################################################
-dropboxbin="$dotfiles/bin"       # Dropbox binaries
 #anacondaold="/usr/local/bin"   # use this to install macvim @mac otherwise interference with homebrew python
 #anaconda="$HOME/anaconda/bin"  # don't load anaconda on cmmc since the module is available
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
-bin="/usr/bin"
+bin="/usr/bin"              # on mac it is there anyhow.
+bin6="$HOME/.local/bin"
+
+
+dropboxbin="$dotfiles/bin"       # Dropbox binaries
 bin2="$dotfiles/sources_bin"
 bin3="$dotfiles/bin/stefan"
 bin5="$dotfiles/bin/phonon_lifetimes"
-bin6="$HOME/.local/bin"
-ipi="$HOME/google_drive/scripts_epfl/i-pi-mc/bin"
 aliases="$dotfiles/aliases"
 
 PATH="$PATH:$aliases:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"

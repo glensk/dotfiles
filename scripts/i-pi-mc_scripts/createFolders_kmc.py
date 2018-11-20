@@ -1,19 +1,15 @@
 #!/usr/bin/env python
-import os,sys,random,massedit,ase
+import os,sys,random
 #if sys.version_info[0] < 3:
 #    raise Exception("Must be using Python 3")
 
 import socket
-import datetime
-from ase.lattice.cubic import FaceCenteredCubic
 from shutil import copyfile
-import numpy as np
-from subprocess import call
-from subprocess import check_output
 import click
 
 # from scripts folder
 import convert_fileformats
+import myutils as mu
 
 # show default values in click
 orig_init = click.core.Option.__init__
@@ -71,15 +67,18 @@ def createjob(
         submitdebug,
         test):
     """
-    This is an script to submit KMC jobs quickly.
+    This is an script to create KMC jobs quickly (and submit).
 
     e.g.
 
-    kmc_createjob.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
+    createFolder_kmc.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
     """
+    verbose = True
     ####################################
     # a few checks
     ####################################
+    if verbose:
+        print("a few checks")
     if submit is True or submitdebug is True and socket.gethostname() == "fidis":
         if socket.gethostname() != "fidis":    # use != and not: is not
             print('you are NOT on fidis')
@@ -89,16 +88,17 @@ def createjob(
     file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
     file_submit             = scripts + "/i-pi-mc_scripts/submit-ipi-kmc.sh"
     file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
-    check_isdir([nn_pot_dir,scripts])
-    check_isfile(\
-		[file_inlmp,file_submit,ipi_mc,lmp_exec],
-		["file_inlmp","file_submit","ipi_mc","lmp_exec"])
-    if not test: check_isfile([lmp_exec],["lmp_exec"],environment=True)
+    mu.check_isdir_or_isdirs([nn_pot_dir,scripts])
+    mu.check_isfile_or_isfiles([file_inlmp,file_submit],["file_inlmp","file_submit"])
+    if not test:
+        mu.check_isfile_or_isfiles([ipi_mc,lmp_exec],["ipi_mc","lmp_exec"],envvar=True)
 
 
     ####################################
     # get directoryname
     ####################################
+    if verbose:
+        print("get directoryname")
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
@@ -142,18 +142,18 @@ def createjob(
     print('submitdebug  ',submitdebug)
     print('pytohon      ',sys.version_info[0])
     print('--------------------------- check the input --------------------------------')
-    check_prompt("Are the ine input variables ok? [y]es: ")
+    mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
 
     # make the atomic structure
-    atomsc = get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
+    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
     # make the directory
     if os.path.isdir(directory):
-        check_prompt("This main directory exists already, shall I add jobs? [y]es: ")
-    mkdir(directory)
+        mu.get_from_prompt_Yy_orexit("This main directory exists already, shall I add jobs? [y]es: ")
+    mu.mkdir(directory)
 
     # create README.md
-    create_READMEtxt(directory)
+    mu.create_READMEtxt(directory)
 
     for seed in seeds:
 
@@ -162,7 +162,7 @@ def createjob(
         print('jobdir',jobdir)
         if os.path.exists(jobdir):
             sys.exit("jobdirectory "+str(jobdir)+" already exists!")
-        mkdir(jobdir)
+        mu.mkdir(jobdir)
 
 
 
@@ -180,146 +180,41 @@ def createjob(
 
         # get and adapt in.lmp
         copyfile(file_inlmp, jobdir+"/in.lmp")
-        sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+nn_pot_dir+'"')
-        sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
-        sed(jobdir+"/in.lmp",'variable nameStartCfg .*','variable nameStartCfg string "data.lmp.runner"')
-        sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
-        sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
-        sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
-        sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
+        mu.sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+nn_pot_dir+'"')
+        mu.sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
+        mu.sed(jobdir+"/in.lmp",'variable nameStartCfg .*','variable nameStartCfg string "data.lmp.runner"')
+        mu.sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
+        mu.sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
+        mu.sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
+        mu.sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
 
 
         # get submit-ipi-kmc.sh (could be made without copying)
         copyfile(file_ipi_input_runner, jobdir+"/input-runner.xml")
-        sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(nsteps)+' </total_steps>')
-        sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
-        sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
-        sed(jobdir+"/input-runner.xml",'<ncell>.*</ncell>','<ncell> '+str(ncell)+' </ncell>')
-        sed(jobdir+"/input-runner.xml",'<nsi>.*</nsi>','<nsi> '+str(nsi)+' </nsi>')
-        sed(jobdir+"/input-runner.xml",'<nmg>.*</nmg>','<nmg> '+str(nmg)+' </nmg>')
-        sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
-        sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
-        sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
-        sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str("data")+'.ipi </file>')
+        mu.sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(nsteps)+' </total_steps>')
+        mu.sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
+        mu.sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
+        mu.sed(jobdir+"/input-runner.xml",'<ncell>.*</ncell>','<ncell> '+str(ncell)+' </ncell>')
+        mu.sed(jobdir+"/input-runner.xml",'<nsi>.*</nsi>','<nsi> '+str(nsi)+' </nsi>')
+        mu.sed(jobdir+"/input-runner.xml",'<nmg>.*</nmg>','<nmg> '+str(nmg)+' </nmg>')
+        mu.sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
+        mu.sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
+        mu.sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
+        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str("data")+'.ipi </file>')
 
         # get submit-ipi-kmc.sh (could be made without copying)
         copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
-        sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
-        sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-        sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-        sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(lmp_exec)+' < in.lmp')
-        sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
-        sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(ipi_mc)+' input-runner')
+        mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
+        mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
+        mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
+        mu.sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(lmp_exec)+' < in.lmp')
+        mu.sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
+        mu.sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(ipi_mc)+' input-runner')
 
-        #with open(jobdir+"/submit-ipi-kmc.sh", 'r') as fin:
-        #    print(fin.read())
-        #sys.exit()
+        mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
 
-        if submit is True or submitdebug is True:
-            cwd = os.getcwd()
-            os.chdir(jobdir)
-            if submitdebug is True:  # this works on fidis even with 2 nodes!
-                call(["sbatch","-p","debug","-t","01:00:00","submit-ipi-kmc.sh"])
-            if submit is True:
-                call(["sbatch","submit-ipi-kmc.sh"])
-            os.chdir(cwd)
-
-
-def create_READMEtxt(directory,add=False):
-    ''' wiretes a README.txt file '''
-    # get sha
-    hier = os.getcwd()
-    os.chdir(os.environ['scripts'])
-    sha = check_output(["git","rev-parse","master"]).decode('utf-8')
-    os.chdir(hier)
-
-    # get time
-    time_now = datetime.datetime.now()
-
-    # name of RADME
-    filepath = directory+'/README_'+time_now.strftime("%Y-%m-%d_%H:%M")+'.txt'
-
-    # write README.txt
-    strout=os.path.basename(sys.argv[0])+" "+" ".join(sys.argv[1:])
-    with open(filepath, "w") as text_file:
-        print("# using https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
-        print("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
-        print("# used sha: "+sha, file=text_file)
-        print(f"{strout}", file=text_file)
-        if add:
-            print(add, file=text_file)
-
-
-    print()
-    print('written ',filepath)
+    print('done')
     return
-
-
-def sed(file,str_find,str_replace):
-    massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
-
-
-def get_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0):
-    atom = ase.build.bulk('Al',crystalstructure='fcc',a=a0)
-    atomsc = atom.repeat(ncell)
-    number_of_atoms = atomsc.get_number_of_atoms()
-    nal = number_of_atoms - nsi - nmg
-
-    for i in np.arange(nmg):
-        atomsc[i].symbol = 'Mg'
-    for i in np.arange(nmg,nmg+nsi):
-        atomsc[i].symbol = 'Si'
-    for i in np.arange(nvac):
-        del atomsc[-1]
-    number_of_atoms = atomsc.get_number_of_atoms()
-    nal = number_of_atoms - nsi - nmg
-    #ase.io.write('kalmp',atomsc,format='lammps-dump')
-    return atomsc
-
-
-def check_isdir(path):
-    if type(path) is str:
-        if not os.path.isdir(path):
-            sys.exit('missing directory '+path)
-
-    if type(path) is list:
-        for i in path:
-            if not os.path.isdir(i):
-                sys.exit('missing directory '+i)
-    return
-
-
-def check_isfile(path,pathnames,environment=False):
-    if type(path) is str:
-        if not os.path.isfile(path):
-            sys.exit('missing file '+path)
-    elif type(path) is list:
-        for idx,i in enumerate(path):
-            #print('ii',i,idx,pathnames[idx])
-            if i is None:
-                add=""
-                if environment == True: add = "environment "
-                sys.exit(add+'variable "'+pathnames[idx]+'" is not defined!')
-            if not os.path.isfile(i):
-                sys.exit('missing file '+i)
-    else:
-        sys.exit('unknown type file type path '+str(path))
-    return
-
-
-def check_prompt(check):
-    #isok = raw_input(check)  # Python 2
-    isok = input(check) # Python 3
-    if isok == "":
-        sys.exit()
-    if isok[0] not in [ 'Y', 'y' ]:
-        sys.exit('Exist since not Y or y as first letter!')
-    return
-
-
-def mkdir(directory):
-    if not os.path.exists(directory):
-            os.makedirs(directory)
 
 
 if __name__ == "__main__":
