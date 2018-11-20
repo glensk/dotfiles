@@ -31,7 +31,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('-nsi'  ,required=True, prompt=True, type=int, help="number of Si atoms")
 @click.option('-nmg'  ,required=True, prompt=True, type=int, help="number of Mg atoms")
 @click.option('-nvac' ,required=True, prompt=True, type=int, help="number of vacancies")
-@click.option('-a0'   ,default = 4.057, type=float, help="fcc lattice constant for Al")
+@click.option('-a0'   ,default = 4.057, type=float, help="fcc lattice constant for Al.")
 @click.option('-temp' ,default = 300, type=int, help="KMC temperature")
 @click.option('-nseeds',type=int, default=3, help="number of different seeds")
 @click.option('-seednumber',default=False,multiple=True, type=int,help="define seed number manually (can be defined multiple times)")
@@ -119,12 +119,16 @@ def createjob(
         seeds = seednumber
         nseeds = len(seednumber)
 
+    # make the atomic structure
+    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
+
+
     # show the input variables
     print('--------------------------- check the input --------------------------------')
     #print('seednumber   ',seednumber,type(seednumber))
     print('JOBS:        ',nseeds,'!! defined by -nseeds / or -seednumber')
     print()
-    print('ncell        ',ncell,"(",ncell**3,"atoms )")
+    print('ncell        ',ncell,"(",atomsc.get_number_of_atoms(),"atoms )")
     print('nsi          ',nsi,  "(",pcsi,"%)")
     print('nmg          ',nmg,"(",pcmg,"%)")
     print('nvac         ',nvac,"(",pcvac,"%)")
@@ -143,9 +147,6 @@ def createjob(
     print('pytohon      ',sys.version_info[0])
     print('--------------------------- check the input --------------------------------')
     mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
-
-    # make the atomic structure
-    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
     # make the directory
     if os.path.isdir(directory):

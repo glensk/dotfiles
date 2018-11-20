@@ -23,6 +23,8 @@ echo -e   "SLURM_NNODES       =" $SLURM_NNODES
 echo -e   "SLURM_SUBMIT_DIR   =" $SLURM_SUBMIT_DIR
 echo -e "\nsystem info:\n" `uname -a` "\n" `head -n 1 /etc/issue` "\n"
 echo -e "work dir:\n" `pwd` "\n"
+echo -e "ESPRESSO_PSEUDO      =" $ESPRESSO_PSEUDO
 
-'srun' 'pw.x' '-nk' 2 '-in' 'aiida.in'  > 'aiida.out'
+#'srun' 'pw.x' '-nk' 2 '-in' 'aiida.in'  > 'aiida.out'
+'srun' '/users/dmarchan/Install/software/QuantumESPRESSO/6.3-backports-20181003-CrayIntel-18.08/bin/pw.x' '-nk' 4 '-in' 'aiida.in'  > 'aiida.out'
 rm -rf ./out

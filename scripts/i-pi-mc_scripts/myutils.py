@@ -92,8 +92,32 @@ def check_isfile_or_isfiles(path,pathnames,envvar=False):
     return
 
 
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0):
-    atom = ase_build_bulk('Al',crystalstructure='fcc',a=a0)
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False):
+    """Creating bulk systems.
+
+        Crystal structure and lattice constant(s) will be guessed if not
+        provided.
+
+        name: str
+            Chemical symbol or symbols as in 'MgO' or 'NaCl'.
+        crystalstructure: str
+            Must be one of sc, fcc, bcc, hcp, diamond, zincblende,
+            rocksalt, cesiumchloride, fluorite or wurtzite.
+        a: float
+            Lattice constant.
+        c: float
+            Lattice constant.
+        covera: float
+            c/a ratio used for hcp.  Default is ideal ratio: sqrt(8/3).
+        u: float
+            Internal coordinate for Wurtzite structure.
+        orthorhombic: bool
+            Construct orthorhombic unit cell instead of primitive cell
+            which is the default.
+        cubic: bool
+            Construct cubic unit cell if possible.
+    """
+    atom = ase_build_bulk('Al',crystalstructure='fcc',a=a0,cubic=False)
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
@@ -127,7 +151,7 @@ def get_prompt_irrespective_of_python_version(text):
 
 
 def get_from_prompt_Yy_orexit(text):
-    getfromprompt = mu.get_prompt_irrespective_of_python_version(text)
+    getfromprompt = get_prompt_irrespective_of_python_version(text)
     if getfromprompt == "":
         sys.exit()
     if getfromprompt[0] not in [ 'Y', 'y' ]:
@@ -149,7 +173,47 @@ def findfiles(directory=False,begin="",contains="",extension_or_filename=""):
             listout.append(os.path.join(root, filename))
     return listout
 
+def get_kmesh_size_daniel(ase_structure, kmesh_l):
+    reci_cell = ase_structure.get_reciprocal_cell()
+    #print("ase_structure.get_cell()",ase_structure.get_cell())
+    #print("ase_structure.get_reciprocal_cell()",ase_structure.get_reciprocal_cell())
+    kmesh = [np.ceil(kmesh_l * np.linalg.norm(reci_cell[i]))
+             for i in range(len(reci_cell))]
+    return kmesh
 
+def qe_parse_numelectrons_upfpath(upfpath):
+    ''' parses the number of electrons from a quantum espresso potential '''
+    for line in open(upfpath):
+        if "valence" in line.lower() and "z" in line.lower():
+            if len(line.split("=")) == 2:
+                num_e = int(float((line.split("=")[-1].strip().strip('"'))))
+            elif len(line.split()) == 3:
+                num_e = int(float(line.split()[0]))
+            else:
+                raise Exception("Could not parse {}".format(upfpath))
+    return num_e
+
+def qe_get_numelectrons(structure_ase, path_to_pseudos):
+    element_nume_dict = {}
+    for element in structure_ase.get_chemical_symbols():
+        if element in element_nume_dict:
+            continue
+        if element not in element_nume_dict:
+            potential = findfiles(path_to_pseudos,begin=element,extension_or_filename="UPF")
+            if len(potential) != 1:
+                print('found potential',potential)
+                sys.exit('found more than one or none potential; Exit.')
+            #pot = os.path.basename(potential[0])
+            num_elec = qe_parse_numelectrons_upfpath(potential[0])
+            element_nume_dict[element] = num_elec
+    number_electrons = 0
+    for element in structure_ase.get_chemical_symbols():
+        number_electrons+= element_nume_dict[element]
+    return number_electrons
+
+def scripts():
+    ''' return environment variable scripts '''
+    return os.environ['scripts']
 
 
 if __name__ == "__main__":

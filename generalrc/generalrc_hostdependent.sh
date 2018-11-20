@@ -13,13 +13,17 @@
 setenv mylaptop mac;
 setenv GZIP -9;   # an empty string ("") is not possible, better use dummy
 setenv myshell zsh; # set this specifically for other cases
+setenv myhome_mac /Users/glensk;
+setenv myhome_daint /users/aglensk;
+setenv myhome_fidis TOBESET;
+setenv myhome_cosmopc /home/glensk;
 
 case $onhost in
 mac)
     setenv myprompttime magenta;
     setenv myprompthostuser magenta;
     setenv mypromptpath magenta;
-    setenv lmp_exec $scripts/lammps_executables/lmp_serial_mac_runner_2018_10_30;
+    setenv lmp_exec $scripts/executables/lmp_mac_serial_runner_2018_10_30;
   ;;
 cosmopc)
     setenv myprompttime green ;
@@ -27,7 +31,7 @@ cosmopc)
     setenv mypromptpath green;
 	setenv SCRATCH /local/scratch/glensk;
 	complete -d cd;
-    setenv lmp_exec $scripts/lammps_executables/lmp_serial_cosmopc18_runner_2018_10_30;
+    setenv lmp_exec $scripts/executables/lmp_serial_cosmopc18_runner_2018_10_30;
     setenv runner_exec $scripts/runner_scripts/RuNNer.serial.cosmopc.natascha.x;
   ;;
 fidis)
@@ -35,7 +39,7 @@ fidis)
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
-    setenv lmp_exec $scripts/lammps_executables/lmp_fidis_fidis_runner_2018_10_31;
+    setenv lmp_exec $scripts/executables/lmp_fidis_fidis_runner_2018_10_31;
   ;;
 daint)
     setenv myprompttime blue;
