@@ -177,7 +177,9 @@ def adapt_ase_qe_file(
         ###############################################
         # submit
         ###############################################
-        #my.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-skript.sh")
+        my.submitjob(submit=submit,submitdebug=submitdebug,jobdir=dirname,submitskript="submit.sh")
+
+        my.create_READMEtxt(os.getcwd())
     return
 
 if __name__ == "__main__":

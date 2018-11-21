@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os,sys
 import numpy as np
-from subprocess import check_output
+from subprocess import check_output,call
 import datetime
 from ase.build import bulk as ase_build_bulk
 
@@ -44,7 +44,7 @@ def create_READMEtxt(directory,add=False):
 
 def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
     if submit is True or submitdebug is True:
-        check_isdir(jobdir)
+        check_isdir_or_isdirs(jobdir)
         cwd = os.getcwd()
         os.chdir(jobdir)
         if submitdebug is True:  # this works on fidis even with 2 nodes!

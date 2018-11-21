@@ -18,7 +18,7 @@ fi
 #dot=$HOME/Dropbox/scripts/dotfiles/
 dot=$dotfiles
 
-#cd $dot
+cd $dot
 
 
 echo `pwd`
