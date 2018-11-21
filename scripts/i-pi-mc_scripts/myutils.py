@@ -28,11 +28,11 @@ def create_READMEtxt(directory,add=False):
     strout=os.path.basename(sys.argv[0])+" "+" ".join(sys.argv[1:])
     with open(filepath, "w") as text_file:
         text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts")
-        #print("# using https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
+        print("# using https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
         text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts")
-        #print("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
-        #print("# used sha: "+sha, file=text_file)
-        #print(f"{strout}", file=text_file)
+        print("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts",file=text_file)
+        print("# used sha: "+sha, file=text_file)
+        print(f"{strout}", file=text_file)
         if add:
             text_file.write(add)
             #print(add, file=text_file)

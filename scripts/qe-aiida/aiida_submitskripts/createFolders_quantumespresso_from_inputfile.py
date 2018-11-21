@@ -62,6 +62,14 @@ def adapt_ase_qe_file(
     settings = f.readlines()
     f.close()
 
+    ###############################################
+    # README
+    ###############################################
+    my.create_READMEtxt(os.getcwd())
+
+    # get all structures as ase_object
+
+
     ######################################################
     # go over every inputfile
     ######################################################
@@ -174,12 +182,12 @@ def adapt_ase_qe_file(
         f.close()
         print('written '+dirname+'/aiida.in')
 
+
         ###############################################
         # submit
         ###############################################
         my.submitjob(submit=submit,submitdebug=submitdebug,jobdir=dirname,submitskript="submit.sh")
 
-        my.create_READMEtxt(os.getcwd())
     return
 
 if __name__ == "__main__":

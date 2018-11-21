@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import os,sys,random
-#if sys.version_info[0] < 3:
-#    raise Exception("Must be using Python 3")
 
 import socket
 from shutil import copyfile

@@ -108,56 +108,59 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
     if isinstance(filename, str):
         fh.close()
 
-
-def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=False):
-    ###########################################################################
-    # read the inputfile
-    ###########################################################################
+def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=False):
+    ''' reads in a file (or several files) and creates out of it one
+    ase object containing one (or several) frames
+    '''
 
     # get all known formats from ase; all known formats can be read.
     known_formats = []
     for i in ase.io.formats.all_formats:
         known_formats.append(i)
 
-    #print('known_formats:',known_formats)
-
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
         # case of once structure only
-        #frame = read(infile,format=formatin)  # only first structure (or last?)
-        #print('frame',frame)
-        #print("cell:",frame.cell)
+        #frame_or_frames = read(infile,format=formatin)  # only first structure (or last?)
+        #print('frame_or_frames',frame_or_frames)
+        #print("cell:",frame_or_frames.cell)
 
         # maybe more general
-        frame = read(infile,':',format=formatin) # all structures
+        frame_or_frames = read(infile,':',format=formatin) # all structures
         print('infile (read in) :',infile,"(successfully)")
-        print('frames           :',len(frame))
-        #frame = read(infile,'0',format=formatin)  # only first structure
+        print('frames           :',len(frame_or_frames))
+        #frame_or_frames = read(infile,'0',format=formatin)  # only first structure
         if args.verbose == True:
-            if len(frame) == 1:
-                print('frame',frame)
-                print("cell:",frame[0].cell)
-                print("positions:",frame[0].positions)
+            if len(frame_or_frames) == 1:
+                print('frame_or_frames',frame_or_frames)
+                print("cell:",frame_or_frames[0].cell)
+                print("positions:",frame_or_frames[0].positions)
 
                 # POTCAR does not have energy...
-                print("potential energy (eV):",frame[0].get_potential_energy())
-            elif len(frame) >= 1:
-                print("cell[-1]     :",frame[-1].cell)
-                print("positions[-1]:",frame[-1].positions)
-                print("potential energy (eV) [-1]:",frame[-1].get_potential_energy())
+                print("potential energy (eV):",frame_or_frames[0].get_potential_energy())
+            elif len(frame_or_frames) >= 1:
+                print("cell[-1]     :",frame_or_frames[-1].cell)
+                print("positions[-1]:",frame_or_frames[-1].positions)
+                print("potential energy (eV) [-1]:",frame_or_frames[-1].get_potential_energy())
     elif formatin == 'ipi':
-        frame = read(infile,format='extxyz')
-        print('fc',frame.cell)
-        print('fp',frame.positions)
-        with open(outfilename, 'r') as file:
-            # read a list of lines into data
-            data = file.readlines()
-        print('d0',data[0])
-        print('d1',data[1])
-        print('d2',data[2])
+        frame_or_frames = read(infile,format='extxyz')
+        print('fc',frame_or_frames.cell)
+        print('fp',frame_or_frames.positions)
+        #with open(outfilename, 'r') as file:
+        #    # read a list of lines into data
+        #    data = file.readlines()
+        #print('d0',data[0])
+        #print('d1',data[1])
+        #print('d2',data[2])
     else:
         sys.exit('formatin '+formatin+' not in the list of known formats! Exit.')
+    return frame_or_frames
 
+def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=False):
+    ###########################################################################
+    # read the inputfile
+    ###########################################################################
+    frame = read_in_file_or_files_and_make_ase_object(infile=infile,formatin=formatin,verbose=args.verbose)
 
     ###########################################################################
     # write the outputfile

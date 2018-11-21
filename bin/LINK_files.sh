@@ -200,7 +200,7 @@ fi
 
 echo
 echo "# vim/bundle #################################################################"
-[ ! -e "$dotfiles/vim/bundle" ] && cd $dotfiles/vim && echo 'install vim/bundle' && git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+$dotfiles/vim/vim_install_plugins.py
 
 echo
 echo "# LINK EVERYTHING #################################################################"

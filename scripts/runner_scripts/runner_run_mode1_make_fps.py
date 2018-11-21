@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
 import os,sys
-#python_version = sys.version_info[0]
-#if python_version < 3:
-#    sys.exit('Your python environment uses a python < 3; Exit;')
 
 import click
 import glob
