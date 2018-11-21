@@ -50,9 +50,11 @@ vimlatex = "https://github.com/jcf/vim-latex.git"
 #git submodule add https://github.com/jcf/vim-latex.git dotfiles/vim/bundle/vim-latex
 tabcompletion = "https://github.com/ervandew/supertab.git"
 toggletruefalse = "https://github.com/AndrewRadev/switch.vim.git"
+searchcounter = "https://github.com/henrik/vim-indexed-search.git"
 checkit(vundle)         # necessary
 checkit(vimsignature)   # necessary  set a mark (prss m c in normal mode)
 checkit(toggletruefalse) # necessary switsches True to False and so non
 checkit(tabcompletion)   # necesary comletes words when <TAB>
+checkit(searchcounter)   # necesary counts the instances of the search
 
 #checkit()
