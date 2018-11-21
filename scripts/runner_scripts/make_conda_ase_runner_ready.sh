@@ -1,1 +1,0 @@
-runner_make_ase_ready_for_conda.sh
