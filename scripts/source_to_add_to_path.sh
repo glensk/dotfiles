@@ -22,5 +22,6 @@ else
     export PYTHONPATH="$PYTHONPATH:$addeverywhere"  # need "export" for python
 fi
 export scripts=$SCR
-export ipi_mc=$SCR/i-pi-mc/bin/i-pi  
+#export ipi_mc=$SCR/i-pi-mc/bin/i-pi  
+export ipi_mc=/Users/glensk/tmp_ipi_merge_ipi_kmc/i-pi/bin/i-pi
 export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os,sys,random
-
 import socket
 from shutil import copyfile
 import click
@@ -186,6 +186,7 @@ def createjob(
         mu.sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
         mu.sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
         mu.sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
+        mu.sed(jobdir+"/in.lmp",'^fix 1 all.*','fix 1 all ipi mac 77776 unix')
 
 
         # get submit-ipi-kmc.sh (could be made without copying)
@@ -200,6 +201,8 @@ def createjob(
         mu.sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
         mu.sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
         mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str("data")+'.ipi </file>')
+        mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="unix">')  # for mac (for fidis is changed in submit.sh)
+        mu.sed(jobdir+"/input-runner.xml",'<address.*','<address> mac </address>')  # for mac (for fidis is changed in submit.sh)
 
         # get submit-ipi-kmc.sh (could be made without copying)
         copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")

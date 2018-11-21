@@ -17,6 +17,7 @@ touch time.out
 date +"%y.%m.%d %H:%M:%S" >> time.out
 
 # sets up the internet socket for connections both for i-PI and on the lammps side
+sed -i 's/<ffsocket.*/<ffsocket name="lmpserial" mode="inet">/' input-runner.xml
 sed -i 's/address>.*<.addr/address>'$(hostname)'<\/addr/' input-runner.xml
 sed -i 's/all ipi [^ ]*/all ipi '$(hostname)'/' in.lmp
 
