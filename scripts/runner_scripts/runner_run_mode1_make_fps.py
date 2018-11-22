@@ -29,7 +29,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 def make_fps():
     '''
-    This scipt ....
+    - This scipt uses CurSel.py
+    - CurSel.py will choose the most important symmetry functions
+
     '''
     ######################################
     # check weather input.data exists

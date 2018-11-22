@@ -5,6 +5,7 @@ import numpy as np
 from subprocess import check_output,call
 import datetime
 from ase.build import bulk as ase_build_bulk
+from socket import gethostname
 
 
 # from scripts folder
@@ -35,7 +36,11 @@ def create_READMEtxt(directory,add=False):
         text_file.write("# used sha: "+sha)
         text_file.write(strout)
         if add:
-            text_file.write(add)
+            if type(add) == str:
+                text_file.write(add)
+            elif type(add) == list:
+                for i in add:
+                    text_file.write(i)
 
 
     print()
@@ -219,10 +224,95 @@ def qe_get_numelectrons(structure_ase, path_to_pseudos):
         number_electrons+= element_nume_dict[element]
     return number_electrons
 
+
+def get_inputfile_runner(template,filename,
+        symfun_old_delete=True,symfun_file=False,
+        test_fraction=0,runner_mode=1,number_of_elements=3,
+        elements="Al Mg Si",test_input_data=True):
+    ''' this creates the runner inputfile
+    '''
+    if test_input_data:
+        len = file_len_linecount(test_input_data)
+        #print('len',len)
+        if len <= 3:sys.exit('file '+test_input_data+' seems too short! Exit;')
+
+    # read in the runner.in template
+    f = open(template,"r")
+    lines = f.readlines()
+    f.close()
+
+    if symfun_old_delete == True:
+        listdelete = []
+
+        # delete the old symmetry functioins
+        for idx,line in enumerate(lines):
+            #print()
+            #print('idx',idx,line)
+            #print('idk',idx,line[:18])
+            if line[:18] == "symfunction_short ":
+                listdelete.append(idx)
+            if line[:24] == "# symfunctions for type ":
+                listdelete.append(idx)
+
+        for i in np.array(listdelete)[::-1]:
+            del lines[i]
+
+        # insert the new symmetry functions
+        if symfun_file != False:
+            s = open(symfun_file,"r")
+            sym = s.readlines()
+            s.close()
+            for idj,symline in enumerate(np.array(sym)[::-1]):
+                #print('sl',symline)
+                lines.insert(listdelete[0],symline)
+
+        # set other options
+        print('test_fraction        :',test_fraction)
+        print('runner_mode          :',runner_mode)
+        print('number_of_elements   :',number_of_elements)
+        print('elements             :',elements)
+        for idx,line in enumerate(lines):
+            if line[:14] == "test_fraction ":
+                lines[idx] = "test_fraction "+str(test_fraction)+"\n"
+            if line[:12] == "runner_mode ":
+                lines[idx] = "runner_mode "+str(runner_mode)+"\n"
+            if line[:19] == "number_of_elements ":
+                lines[idx] = "number_of_elements "+str(number_of_elements)+"\n"
+            if line[:9] == "elements ": lines[idx] = "elements "+str(elements)+"\n"
+
+
+        # write the file
+        f = open(filename,"w")
+        f.writelines(lines)
+        f.close()
+        print('written '+filename)
+        return
+
+def file_len_linecount(fname):
+    i = 0
+    with open(fname) as f:
+        for i, l in enumerate(f,1):
+            pass
+    return i
+
+
 def scripts():
     ''' return environment variable scripts '''
-    return os.environ['scripts']
+    scripts = os.environ['scripts']
+    if not os.path.isdir('scripts'):
+        sys.exit('$scripts variable is not defined or is not an existing folder')
+    return scripts
 
+def runner_exec():
+    ''' return environment variable runner_exec (RuNNer executable)'''
+    runner_exec = os.environ['runner_exec']
+    if not os.path.isfile('runner_exec'):
+        sys.exit('$runner_exec variable is not defined or is not an existing file')
+    return runner_exec
+
+def hostname():
+    hostname = getgethostname()
+    return hostname
 
 if __name__ == "__main__":
     pass
