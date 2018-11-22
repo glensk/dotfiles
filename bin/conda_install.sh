@@ -1,12 +1,35 @@
 
+condaversion=2 # currently I dont see a reason to use python3
+
+
 [ ! -e "$HOME/Downloads" ] && mkdir $HOME/Downloads 
 [ ! -e "$HOME/Downloads" ] && echo not folder $HOME/Downloads && exit
 cd $HOME/Downloads
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b -f 
+Linux_or_MacOSX=`uname -a | awk '{print $1}'`
+if [ "$Linux_or_MacOSX" == "Linux" ];then
+    Linux_or_MacOSX="Linux"
+elif [ "$Linux_or_MacOSX" == "Darwin" ];then 
+    Linux_or_MacOSX="MacOSX"
+else
+    uname -a
+    echo "is neither Linux nor Darwin" 
+    exit
+fi
+echo "Linux_or_MacOSX: $Linux_or_MacOSX"
+exit
+if [ "condaversion" == "3" ];then
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-$Linux_or_MacOSX-x86_64.sh
+bash Miniconda3-latest-$Linux_or_MacOSX-x86_64.sh -b -f 
+fi
+
+if [ "condaversion" == "2" ];then
+wget https://repo.continuum.io/miniconda/Miniconda2-latest-$Linux_or_MacOSX-x86_64.sh
+bash Miniconda2-latest-$Linux_or_MacOSX-x86_64.sh -b -f 
+fi
+
 
 echo "now source"
-source $HOME/miniconda3/etc/profile.d/conda.sh && conda
+source $HOME/miniconda$condaversion/etc/profile.d/conda.sh && conda
 #source ~/.zshrc
 echo "now conda config"
 conda config --add channels intel    # this makes probs;

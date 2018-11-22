@@ -36,7 +36,7 @@ source $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
 # PATH, PYTHONPATH
-# PYTHONPATH should not be set (according to anaconda/miniconda)
+# PYTHONPATH should not be set
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $onhost` 
 
@@ -56,11 +56,11 @@ source $generalrc/generalrc_alias_$onhost
 
 tab-color $mypromptpath
 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda"
 ##############################################
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
-[ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy 
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda"
+[ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate python2
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 
