@@ -5,8 +5,6 @@ import numpy as np
 from numpy.linalg import norm
 import ase
 from ase.io import read,write
-#print(ase.io.__file__)
-#sys.exit()
 
 import myutils as my
 
