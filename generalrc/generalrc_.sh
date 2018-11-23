@@ -61,6 +61,7 @@ tab-color $mypromptpath
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
 [ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy 
+[ "$onhost" = "cosmopc" ] && source $HOME/aiida/bin/activate 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 

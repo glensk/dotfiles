@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os,sys
+import click
 import numpy as np
 from subprocess import check_output,call
-import datetime
+from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
 from socket import gethostname
 
@@ -21,7 +22,7 @@ def create_READMEtxt(directory,add=False):
     os.chdir(hier)
 
     # get time
-    time_now = datetime.datetime.now()
+    time_now = datetime.now()
 
     # name of RADME
     filepath = directory+'/README_'+time_now.strftime("%Y-%m-%d_%H:%M")+'.txt'
@@ -29,18 +30,16 @@ def create_READMEtxt(directory,add=False):
     # write README.txt
     strout=os.path.basename(sys.argv[0])+" "+" ".join(sys.argv[1:])
     with open(filepath, "w") as text_file:
-        text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts")
-        text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts")
-        text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts")
-        text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts")
-        text_file.write("# used sha: "+sha)
-        text_file.write(strout)
+        text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts\n")
+        text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts\n")
+        text_file.write("# used sha: "+sha+"\n")
+        text_file.write(strout+"\n")
         if add:
             if type(add) == str:
-                text_file.write(add)
+                text_file.write(add+"\n")
             elif type(add) == list:
                 for i in add:
-                    text_file.write(i)
+                    text_file.write(i+"\n")
 
 
     print()
@@ -299,20 +298,31 @@ def file_len_linecount(fname):
 def scripts():
     ''' return environment variable scripts '''
     scripts = os.environ['scripts']
-    if not os.path.isdir('scripts'):
+    if not os.path.isdir(scripts):
+        print('scripts:',scripts)
         sys.exit('$scripts variable is not defined or is not an existing folder')
     return scripts
 
-def runner_exec():
+def runner_exec(test=False):
     ''' return environment variable runner_exec (RuNNer executable)'''
     runner_exec = os.environ['runner_exec']
-    if not os.path.isfile('runner_exec'):
+    if test == False and not os.path.isfile(runner_exec):
         sys.exit('$runner_exec variable is not defined or is not an existing file')
     return runner_exec
 
 def hostname():
-    hostname = getgethostname()
+    hostname = gethostname()
     return hostname
+
+def get_click_defaults():
+    # show default values in click
+    orig_init = click.core.Option.__init__
+    def new_init(self, *args, **kwargs):
+        orig_init(self, *args, **kwargs)
+        self.show_default = True
+    click.core.Option.__init__ = new_init
+    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+    return CONTEXT_SETTINGS
 
 if __name__ == "__main__":
     pass
