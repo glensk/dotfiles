@@ -32,7 +32,7 @@ echo "now source"
 source $HOME/miniconda$condaversion/etc/profile.d/conda.sh && conda
 #source ~/.zshrc
 echo "now conda config"
-conda config --add channels intel    # this makes probs;
+conda config --add channels intel    # actually, my mac/cosmopc and all the clusters are intel based (clusters are all Xeon, cosmopc is i5)
 echo "now conda activate"
 conda activate
 
