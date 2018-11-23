@@ -5,7 +5,7 @@ au! BufRead,BufNewFile *.math       setfiletype mma
 au! BufRead,BufNewFile *.MATH       setfiletype mma
 au! BufRead,BufNewFile .bash_alias call SetFileTypeSH("bash")
 au! BufRead,BufNewFile bash_set call SetFileTypeSH("bash")
-au! BufRead,BufNewFile *alias* call SetFileTypeSH("bash")
+"au! BufRead,BufNewFile *alias* call SetFileTypeSH("bash")
 au! BufRead,BufNewFile generalrc call SetFileTypeSH("bash")
 au! BufRead,BufNewFile *tcshrc call SetFileTypeSH("bash")
 au! BufRead,BufNewFile .tcshrc call SetFileTypeSH("bash")

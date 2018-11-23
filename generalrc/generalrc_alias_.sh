@@ -230,7 +230,7 @@ $1 sshimmer 'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=120
 
 $1 pc        'sshimmer -t glensk@cosmopc15.epfl.ch   "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 cosmopc   'sshimmer -t glensk@cosmopc15.epfl.ch   "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-$1 cosmopc_tunnel   'sshimmer -N -L 8080:localhost:8080 -t glensk@cosmopc15.epfl.ch   "[ -e `th.sh` ] && cd `th.sh`; zsh"'  # open this first
+#$1 cosmopc_tunnel   'sshimmer -N -L 8080:localhost:8080 -t glensk@cosmopc15.epfl.ch   "[ -e `th.sh` ] && cd `th.sh`; zsh"'  # open this first
 
 $1 cluster   'sshimmer -t glensk@cmmc002.mpie.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 $1 cmpc      'sshimmer -t glensk@cmpc34.mpie.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"' 
