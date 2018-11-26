@@ -35,7 +35,7 @@ source $dotfiles/scripts/source_to_add_to_path.sh;
 source $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
-# PATH, PYTHONPATH
+# PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH
 # PYTHONPATH should not be set
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $onhost` 
