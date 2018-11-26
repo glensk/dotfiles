@@ -2,20 +2,10 @@
 import click
 import os,sys
 from subprocess import call
-
-# from scripts folder
-import myutils
-
-# show default values in click
-orig_init = click.core.Option.__init__
-def new_init(self, *args, **kwargs):
-    orig_init(self, *args, **kwargs)
-    self.show_default = True
-click.core.Option.__init__ = new_init
-
+import myutils as my
 
 # get help also with -h
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 
 @click.argument('folder')
@@ -31,7 +21,7 @@ def gather_xyz(folder,filename_find,filename_out):
     print('folder:',folder)
     print()
     print('files:')
-    files = myutils.findfiles(folder,extension_or_filename=filename_find)
+    files = my.findfiles(folder,extension_or_filename=filename_find)
 
     if os.path.isfile(filename_out):
         sys.exit('The file '+filename_out+' does already exist! Exit.')
@@ -41,7 +31,7 @@ def gather_xyz(folder,filename_find,filename_out):
         print(i)
         call(["xyz2runner.sh",i],stdout=f)
 
-    myutils.create_READMEtxt(os.getcwd())
+    my.create_READMEtxt(os.getcwd(),add="# created input.data")
     return filename_out
 
 

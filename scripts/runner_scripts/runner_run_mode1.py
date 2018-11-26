@@ -65,9 +65,10 @@ def runner_run_mode_1(filename_in,mode,test_fraction,test):
         call(["mv","tmp",symfun_file])
         print("written",symfun_file)
 
-    ######################################
+    ###############################################################
     # if more than 300 structures: select structures
-    ######################################
+    # however: for 2509 structures it fook less than a day.
+    ###############################################################
 
     ############################################
     # get and adapt input.nn for runner_mode 1

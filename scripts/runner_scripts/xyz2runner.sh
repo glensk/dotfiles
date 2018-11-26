@@ -1,7 +1,12 @@
 #!/bin/sh
 # runner wants all the positions in bohrradius (as are the lattice vectors)
 # runner wants all the energies in hartree
-awk '{if (NF ==4){
+awk '
+function basename(file) {
+    sub(".*/", "", file)
+    return file
+}
+{if (NF ==4){
 printf "%s\t%f\t%f\t%f\t%s\t%f\t%f\t%f\t%f\t%f\n","atom",$2/0.529117,$3/0.529117,$4/0.529117,$1,0,0,$2,$3,$4
 } 
 else if (NF>6)
@@ -12,7 +17,7 @@ printf("energy\t\t0.000000\n")
 printf("charge\t\t0.000000\n")
 printf("end\n")
 printf("begin\n")
-printf("c MD data from the monster under the bed \n")
+print("from ",FILENAME)
 printf("%s%f\t%f\t%f\n", "lattice\t\t",h00,0,0);
 printf("%s%f\t%f\t%f\n", "lattice\t\t",h01,h11,0);
 printf("%s%f\t%f\t%f\n", "lattice\t\t",h02,h12,h22);
