@@ -1,10 +1,20 @@
 #!/bin/sh
 
-# from https://compphysvienna.github.io/n2p2/a01203.html
-
+#####################################################################
+# get n2p2 
+#####################################################################
 cd $HOME/Dropbox/Albert/git
-#git clone https://github.com/CompPhysVienna/n2p2.git
+[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
 cd n2p2/src
+#make libnnpif-static
+#make libnnptrain-static
+make static
+
+#####################################################################
+# now the part to make lammps work with n2p2
+#####################################################################
+
+# from https://compphysvienna.github.io/n2p2/a01203.html
 pwd
 make libnnpif-shared
 cd $HOME/sources/lammps_source_cosmo
