@@ -1,8 +1,11 @@
 #!/bin/sh
+#############################################################
+# lammps versions: serial | on fidis==parallel 
+
 
 folder_lammps_sources=$HOME/sources
 folder_lammps_save=$scripts/lammps_executables
-makeversion="serial"
+makeversion="serial"  # for n2p2 with serial the -DNOMPI needs to be enabled
 makefile=""
 [ "`hostname`" = "fidis" ] && makeversion="fidis" && makefile=$scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
 
@@ -37,6 +40,8 @@ sed -i 's|^#define MAXNEIGH.*|#define MAXNEIGH 500|' pair_runner.h
 rm -f lmp_$makeversion
 [ "`hostname`" = "fidis" ] && cp -r $makefile MAKE && source $MODULESHOME/init/bash && module load intel intel-mpi intel-mkl fftw python/2.7.14
 pwd
+echo "now make"
+exit
 make $makeversion | tee -a make_$makeversion\_out_`date +"%Y_%m_%d"`
 pwd
 [ ! -e "lmp_$makeversion" ] && echo "lmp_$makeversion was NOT CREATED! THE COMPILATION FAILED!"
