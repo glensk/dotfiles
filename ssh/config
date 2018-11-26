@@ -94,7 +94,7 @@ Host fidis
  User glensk
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
-Host cosmopc
+Host cosmopc pc
  HostName cosmopc15.epfl.ch
  User glensk
 
