@@ -1,10 +1,30 @@
 #!/bin/sh
 
-# from https://compphysvienna.github.io/n2p2/a01203.html
+# on fidis do: intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
+module load intel
+module load intel-mpi
+module load intel-mkl
+module load gsl
+module load eigen
+# gives intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
 
+#####################################################################
+# get n2p2 
+#####################################################################
 cd $HOME/Dropbox/Albert/git
-#git clone https://github.com/CompPhysVienna/n2p2.git
+[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
 cd n2p2/src
+#make libnnpif-static
+#make libnnptrain-static
+make static  
+# in my case /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h has in line 56 a preprocessor command #if defined EIGEN_USE_MKL
+# the EIGEN_USE_MKL is actually not acitvaed in the makefiel but is somehow, during the compilation set (which makes the compilation crash)
+
+#####################################################################
+# now the part to make lammps work with n2p2
+#####################################################################
+
+# from https://compphysvienna.github.io/n2p2/a01203.html
 pwd
 make libnnpif-shared
 cd $HOME/sources/lammps_source_cosmo
