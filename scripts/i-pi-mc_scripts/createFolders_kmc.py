@@ -9,16 +9,7 @@ import click
 import convert_fileformats
 import myutils as mu
 
-# show default values in click
-orig_init = click.core.Option.__init__
-def new_init(self, *args, **kwargs):
-    orig_init(self, *args, **kwargs)
-    self.show_default = True
-click.core.Option.__init__ = new_init
-
-
-# get help also with -h
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 
 

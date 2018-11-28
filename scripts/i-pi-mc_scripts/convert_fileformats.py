@@ -1,14 +1,15 @@
 #!/usr/bin/env python
+from __future__ import print_function
+import inspect
 import sys,os,copy
 import argparse
 import numpy as np
 from numpy.linalg import norm
 import ase
 from ase.io import read,write
-
 import myutils as my
 
-my.exit_if_not_python3()
+#my.exit_if_not_python3()  # for what??
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""
@@ -112,9 +113,7 @@ def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=Fals
     '''
 
     # get all known formats from ase; all known formats can be read.
-    known_formats = []
-    for i in ase.io.formats.all_formats:
-        known_formats.append(i)
+    known_formats = ase_get_known_formats()
 
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
@@ -152,26 +151,42 @@ def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=Fals
         #print('d2',data[2])
     else:
         sys.exit('formatin '+formatin+' not in the list of known formats! Exit.')
-    return frame_or_frames
+    if len(frame_or_frames) == 1:
+        return [frame_or_frames]
+    else:
+        return frame_or_frames
 
 def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=False):
+
     ###########################################################################
     # read the inputfile
     ###########################################################################
-    frame = read_in_file_or_files_and_make_ase_object(infile=infile,formatin=formatin,verbose=args.verbose)
+    frame_or_frames = read_in_file_or_files_and_make_ase_object(infile=infile,formatin=formatin,verbose=args.verbose)
 
     ###########################################################################
     # write the outputfile
     ###########################################################################
     print('formatout        :',formatout)
 
+    #print('nowframes (1): ',len(frame_or_frames))
+    if args.write_particular_frame != -1: # -1 is the default
+        #frame_or_frames = frame_or_frames[args.write_particular_frame]
+        frame_or_frames = [frame_or_frames[args.write_particular_frame]]
+
+    #print('nowframes (2): ',len(frame_or_frames))
+    print('frames writing   :',len([frame_or_frames]),"(-wf argument)")
+    #print('nowframes: ',len(frame_or_frames))
 
     otherlist = ['lmp', 'lmp.runner','ipi']
 
+    known_formats = ase_get_known_formats()
 
-    for idx,frameone in enumerate(frame):
+    if len(frame_or_frames) > 1:
+        my.get_from_prompt_Yy_orexit("Do you want to write "+str(len(frame_or_frames))+" structures to drive? [Yy]")
 
-        if len(frame) == 1:
+    for idx,frameone in enumerate(frame_or_frames):
+
+        if len(frame_or_frames) == 1:
             idx = ""
         #print('idx:',idx,type(idx))
         outfilename = get_outfilename(args,idx)
@@ -290,7 +305,67 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     print('written (4)      : '+outfilename)
     return
 
+def check_if_ase_knows_runner():
+    pass
 
+def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=False):
+    known_formats = []
+    x = ase.io.formats.all_formats
+    for i in x:
+        known_formats.append(i)
+
+    if show:
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(x)
+
+    if addrunner_if_missing:
+        if verbose:
+            print('cc',ase.io.__file__)
+        formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
+        if verbose:
+            print('formatspy',formatspy)
+
+        scripts = my.scripts()
+        runnerfile = scripts+"/runner_scripts/ase_fileformat_for_runner.py"
+        if not os.path.isfile(runnerfile):
+            print('runnerfile',runnerfile)
+            sys.exit('the runnerfile does not exist;Exit.')
+        from shutil import copyfile
+        if verbose:
+            print('copying runnerfile to',os.path.dirname(ase.io.__file__))
+        copyfile(runnerfile,os.path.dirname(ase.io.__file__)+"/runner.py")
+
+        if 'runner' in x:
+            print('runner format is already added in formats.py (of ase).')
+        else:
+            print('adapting ase formats.py .... ')
+            if not os.path.isfile(formatspy):
+                print('formatspy',formatspy)
+                sys.exit('did not find '+str(formatspy))
+
+            print('now changing formatspy')
+
+            f = open(formatspy, "r")
+            contents = f.readlines()
+            f.close()
+            insert=0
+            for idx,i in enumerate(contents):
+                #print('i',idx,i)
+                #print("|"+i[:20]+"|")
+                if i[:20] == "    'abinit': ('ABIN":
+                    insert = idx
+
+            contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+            print('insert',insert)
+
+            f = open(formatspy, "w")
+            contents = "".join(contents)
+            f.write(contents)
+            f.close()
+
+
+    return known_formats
 
 if __name__ == "__main__":
     #p = argparse.ArgumentParser(description=pp.pprint(x),
@@ -307,18 +382,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=string)
     parser.add_argument("infile", type = str, help = "The name of the file")
     parser.add_argument("--showformats",'-sf', action='store_true', default=False, help = "show the possible in/outputformats (not showing lammps) and exit")
+    parser.add_argument("--make_ase_runner",'-ar', action='store_true', default=False, help = "adapt ase so that it can read/write runner format.")
     parser.add_argument("--formatin",'-fi', type=str,default="lmp", help="Format of the input file, this can be all of the listed using --showformats, e.g. espresso-out,xyz,vasp, ...; default:lmp")
     parser.add_argument("--formatout",'-fo', type=str,default="lmp", help="Format of the output file, this can be most of the listed using --showformats and additionally lmp for LAMMPS, e.g. lmp,xyz,vasp, ...; default:lmp")
     parser.add_argument("--outfilename", type=str,default=False, help="if nothing is provided --> default=infile+.lmp or when split option: infile+NUMBER+.lmp")
+    parser.add_argument("--write_particular_frame",'-wf', type=int,default=-1, help="when writing of files, specify here if a particular frame should be written; (mind: 0 is frame one, 1 is frame 2, ...); default: all frames are written")
     parser.add_argument('-v','--verbose', help='verbose', action='count', default=False)
 
 
     args = parser.parse_args()
-    if args.showformats:
-        x = ase.io.formats.all_formats
-        import pprint
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(x)
+    if args.showformats or args.make_ase_runner:
+        known_formats = ase_get_known_formats(show=True,addrunner_if_missing=args.make_ase_runner)
         sys.exit()
 
     def get_outfilename(args,frame=""):
