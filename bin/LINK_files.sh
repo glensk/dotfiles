@@ -304,3 +304,9 @@ if [ ! -e "$dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ];
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
 fi
 
+echo
+echo "# make git not upload *.pyc files #########################################################"
+cd $dotfiles
+git rm --cached *.pyc
+find . -name '*.pyc' | xargs -n 1 git rm --cached
+
