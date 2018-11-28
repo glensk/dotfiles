@@ -11,16 +11,23 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 @click.argument('foldername')
 @click.option('--calc_type','-t', type=click.Choice(['static','geopt','ti']),default='static')
+@click.option('--pos','-pos', type=str, default="positions.lmp")
+
 @click.option('--pot','-p', type=click.Choice(['eam','runner','n2p2']),default='eam')
 @click.option('--pot_id','-pid', type=str, default="Al-LEA.eam.alloy",help="this is the file or the corresponding folder of the potential")
+@click.option('--test_static', default=False)
 
-def createFolder_lammps(foldername,calc_type,pot,pot_id):
+def createFolder_lammps(foldername,pos,calc_type,pot,pot_id,test_static):
     ''' calc_type any of [static|geopt|ti] '''
     if os.path.isdir(foldername):
         sys.exit(foldername+' does already exist; Exit.')
     my.mkdir(foldername)
+    print('foldername:',foldername)
+    print('positions :',pos)
+    print('positions :',os.path.abspath(pos))
+
+
     scripts = my.scripts()
-    file_inlmp = scripts + "/i-pi-mc_scripts/in.lmp"
 
     potpath = get_pot(pot,pot_id,verbose=False)
 
@@ -28,7 +35,11 @@ def createFolder_lammps(foldername,calc_type,pot,pot_id):
     print('potlines',potlines)
 
     # make in.lmp
-    get_inlmp(foldername,"../input.data.lmp.runner",potlines)
+    if test_static:
+        copyfile(scripts+'/lammps_scripts/positions_dummyfiles/2x2x2sc_fcc_cubic_vac',foldername+'/positions.lmp')
+    get_inlmp(foldername,os.path.abspath(pos),potlines)
+
+    my.create_READMEtxt(os.getcwd())
     return
 
 
@@ -38,6 +49,12 @@ def potpath_to_lammps_lines(pot,potpath,verbose=False):
         print('potpath:',potpath)
     if pot == 'eam':
         return ["pair_style eam/alloy\n","pair_coeff * * "+potpath+" "+"Al"]
+    if pot == 'runner':
+        a = 'variable runnerDir string "'+potpath+'"'
+        b = "pair_style runner dir ${runnerDir} showewsum 1 showew yes resetew no maxew 1000000"
+        c = "variable runnerCutoff equal 10.0"
+        d = "pair_coeff * * ${runnerCutoff}"
+        return [a+"\n",b+"\n",c+"\n",d+"\n"]
     else:
         return False
 
