@@ -31,7 +31,7 @@ def gather_xyz(folder,filename_find,filename_out):
         print(i)
         call(["xyz2runner.sh",i],stdout=f)
 
-    my.create_READMEtxt(os.getcwd(),add="# created input.data")
+    my.create_READMEtxt(os.getcwd(),add="# created input.data for n2p2/runner")
     return filename_out
 
 

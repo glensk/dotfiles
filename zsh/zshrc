@@ -29,7 +29,7 @@ autoload -U colors && colors                    # necessary for prompt colors (0
 autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
 autoload -U +X bashcompinit && bashcompinit     # make bash completion function work (complete) (0.00s)
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "compinit    : $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` #&& echo "compinit    : $gett"
 
 #################################################################
 # oh-my-zsh: DONT USE IT!!! do this first in zsh; IT IS WAY TOO SLOW!!!!!! DONT USE IT !!!!!
@@ -49,9 +49,9 @@ autoload -U +X bashcompinit && bashcompinit     # make bash completion function 
 #################################################################
 # read in general variables on{mac,cmmc,cmmd},printloadstat
 #################################################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "PHYTHONPATH : $gett https://carlosbecker.com/posts/speeding-up-zsh/"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "PHYTHONPATH : $gett https://carlosbecker.com/posts/speeding-up-zsh/"
 source ~/.generalrc
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.generalrc: $gett https://carlosbecker.com/posts/speeding-up-zsh/"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.generalrc: $gett generalrc" # (https://carlosbecker.com/posts/speeding-up-zsh/)"
 
 # time zsh
 # 0) completely empty             : 0.01s
