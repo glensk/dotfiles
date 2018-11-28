@@ -16,7 +16,8 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('-tf','--test_fraction',required=False,default=0,type=float,help="runner test fraction")
 @click.option('-t','--test/--no-test', default=False)
 
-def runner_run_mode_1(filename_in,mode,test_fraction,test):
+
+def runner_run_mode_1_1(filename_in,mode,test_fraction,test):
     '''
     This scipt gets some symmetry functions from scratch for making fps:
     runner_run_mode1.py -m 1 -tf 0  (first attempt to get symmetry functions if none are available, uses (runner) mode = 1 and (runner) test_fraction = 0)
@@ -30,7 +31,9 @@ def runner_run_mode_1(filename_in,mode,test_fraction,test):
     -
 
     steps:
-    1.1 get symmetry functions (which are derived by CurSel.py)
+    1.0 obtain input.data (== structures in runner format)
+    1.1 runner
+    1.2 choose most important symmetry functions (CurSel.py)
     1.2 get the correct representation/function.date
         (with CurSel.py derived symmetry functions)
     2.  get the potential
@@ -48,6 +51,8 @@ def runner_run_mode_1(filename_in,mode,test_fraction,test):
     # make symfun.output for step 1.1
     ######################################
     if mode == 1 and test_fraction == 0:
+        if os.path.isfile("cursel.def"):
+            sys.exit("cursel.def (which contains symmetry functions) exists but you are trying to use symfun_gen.py ...")
         symfun_file = 'symfun.output'
         if os.path.isfile(symfun_file):
             sys.exit(symfun_file+' file does already exist! Exit')
@@ -73,7 +78,9 @@ def runner_run_mode_1(filename_in,mode,test_fraction,test):
     ############################################
     # get and adapt input.nn for runner_mode 1
     ############################################
-    my.get_inputfile_runner(file_input_runner,"input.nn",symfun_old_delete=True,symfun_file=symfun_file,\
+    my.get_inputfile_runner(file_input_runner,"input.nn",
+            symfun_old_delete=True,
+            symfun_file=symfun_file,
             test_fraction= 0,
             runner_mode= mode,
             number_of_elements= 3,
@@ -97,4 +104,4 @@ def runner_run_mode_1(filename_in,mode,test_fraction,test):
 
 
 if __name__ == "__main__":
-    runner_run_mode_1()
+    runner_run_mode_1_1()

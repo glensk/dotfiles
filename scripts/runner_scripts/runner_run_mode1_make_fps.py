@@ -35,7 +35,7 @@ def make_fps():
     ######################################
     structures = check_output(["grep -c begin input.data"],shell=True).decode(sys.stdout.encoding).strip()
     print('len',structures)
-    print("CurSel.py runs always about 500 seconds, irrespective of lenght 20-2500 landmarks")
+    print("CurSel.py runs always about 500 seconds, irrespective of lenght 20-2500 landmarks, therefore, do it for all the files")
     call(["CurSel.py","-t","1e-3","--landmarks",str(structures),"function.data","logfile_mode1.1"]) # this is interactive, CurSel.py output is written to screen!
 
 
