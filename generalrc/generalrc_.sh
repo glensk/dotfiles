@@ -14,7 +14,7 @@
 ###################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ###################################################################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 case "$0" in bash) export currentshell="bash";;
              tcsh) setenv currentshell "tcsh";;
              *)    export currentshell="zsh";esac
@@ -35,8 +35,8 @@ source $dotfiles/scripts/source_to_add_to_path.sh;
 source $generalrc/generalrc_hostdependent.sh
 
 ###################################################################################
-# PATH, PYTHONPATH
-# PYTHONPATH should not be set (according to anaconda/miniconda)
+# PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH
+# PYTHONPATH should not be set
 ###################################################################################
 eval `$generalrc/generalrc_path.sh $onhost` 
 
@@ -56,13 +56,19 @@ source $generalrc/generalrc_alias_$onhost
 
 tab-color $mypromptpath
 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda"
 ##############################################
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
-[ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
 
+# on mac currently base, aiida, intelpy, python2 (12GB) (anaconda 2GB)
+# the conda activate step takes all the time (not the source)
+case $onhost in
+mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+cosmopc) source $HOME/aiida/bin/activate; ;;
+fidis) source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate; ;;
+esac
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################
 # set Thermodynamics stuff
@@ -119,4 +125,4 @@ source $dotfiles/$currentshell/$currentshell\_set
 [ "$printloadstat" = "true" ] && \
     echo " onhost $onhost"
 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett after conda"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc AFTER CONDA"

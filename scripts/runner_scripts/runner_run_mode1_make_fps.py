@@ -10,31 +10,22 @@ from subprocess import check_output,run
 
 #from subprocess import call,Popen,check_output,PIPE,run
 from subprocess import call,run,check_output
+import myutils as my
 
 
-# from scripts folder
-import kmc_createjob
-
-# show default values in click
-orig_init = click.core.Option.__init__
-def new_init(self, *args, **kwargs):
-    orig_init(self, *args, **kwargs)
-    self.show_default = True
-click.core.Option.__init__ = new_init
-
-
-# get help also with -h
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 
 def make_fps():
     '''
-    This scipt ....
+    - This scipt uses CurSel.py
+    - CurSel.py will choose the most important symmetry functions
+
     '''
     ######################################
     # check weather input.data exists
     ######################################
-    kmc_createjob.check_isfile(\
+    my.check_isfile_or_isfiles(\
             ["function.data","logfile_mode1.1","input.data"],
             ["function.data","logfile_mode1.1","input.data"])
 
@@ -42,16 +33,16 @@ def make_fps():
     ######################################
     # run CurSel.py
     ######################################
-    length = check_output(["grep -c begin input.data"],shell=True).decode(sys.stdout.encoding).strip()
-    print('len',length)
-    print("CurSel.py runs always about 500 seconds, irrespective of lenght 20-2500 landmarks")
-    call(["CurSel.py","-t","1e-3","--landmarks",str(length),"function.data","logfile_mode1.1"]) # this is interactive, CurSel.py output is written to screen!
+    structures = check_output(["grep -c begin input.data"],shell=True).decode(sys.stdout.encoding).strip()
+    print('len',structures)
+    print("CurSel.py runs always about 500 seconds, irrespective of lenght 20-2500 landmarks, therefore, do it for all the files")
+    call(["CurSel.py","-t","1e-3","--landmarks",str(structures),"function.data","logfile_mode1.1"]) # this is interactive, CurSel.py output is written to screen!
 
 
     ######################################
     # write README
     ######################################
-    kmc_createjob.create_READMEtxt(os.getcwd())
+    my.create_READMEtxt(os.getcwd())
     return
 
 

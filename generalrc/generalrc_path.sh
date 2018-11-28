@@ -50,8 +50,6 @@ if [ "$onhost" = "mac" ];then
     # (on mac)
     pygraceplot="$HOME/scripts/python/graceplot"
     pylammps1="/usr/local/Cellar/lammps/2014.02.12/lib/python2.7/site-packages"
-    pylammps2="/usr/local/lib/python2.7/site-packages"  # this is too general an might import libs from non anaconda python 
-    pylammps2=""                                        # this is too general an might import libs from non anaconda python 
     #pyphonopy1="$phonopy/lib/python"     # may be lib64 instead
     #pyphonopy2="$phonopy/lib64/python"   # may be lib64 instead
     pyphonopy1="$HOME/.local/lib/python2.7"     # may be lib64 instead

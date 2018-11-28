@@ -42,6 +42,7 @@ Host gatefromcmmc
     Hostname gate.rzg.mpg.de
     IdentityFile /cmmc/u/aglen/.ssh/gatefromcmmc
 
+#ssh-copy-id -i ~/.ssh/id_rsa.pub aglen@gate.rzg.mpg.de
 Host gate
  HostName gate.rzg.mpg.de
  User aglen
@@ -52,12 +53,22 @@ Host gate
 # User aglen
 # ProxyCommand ssh -q -Y aglen@gate.rzg.mpg.de -W %h:%p
 
-Host cmmc002
-HostName cmmc002.bc.rzg.mpg.de
-User aglen
-ProxyCommand ssh -W %h:%p gatezero.rzg.mpg.de 2>/dev/null
-GSSAPIAuthentication yes
-GSSAPIDelegateCredentials yes
+#Host cmmc002
+#HostName cmmc002.bc.rzg.mpg.de
+#User aglen
+#ProxyCommand ssh -W %h:%p gatezero.rzg.mpg.de 2>/dev/null
+#GSSAPIAuthentication yes
+#GSSAPIDelegateCredentials yes
+
+
+#Host daint*
+# HostName daint.cscs.ch
+Host cmmc002*
+ HostName cmmc002.bc.rzg.mpg.de
+ User aglen
+ ProxyCommand ssh aglen@gatezero.rzg.mpg.de /usr/bin/netcat %h %p 2> /dev/null
+ GSSAPIAuthentication yes
+ GSSAPIDelegateCredentials yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub aglen@gatezero.rzg.mpg.de (after running ssh-keygen)
 Host gar
@@ -83,7 +94,7 @@ Host fidis
  User glensk
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
-Host cosmopc
+Host cosmopc pc
  HostName cosmopc15.epfl.ch
  User glensk
 
