@@ -7,6 +7,7 @@ from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
 from socket import gethostname
+from shutil import copyfile
 
 
 # from scripts folder
@@ -61,6 +62,9 @@ def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
 def sed(file,str_find,str_replace):
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
     return
+
+def cp(src,dest):
+    copyfile(src,dest)
 
 def mkdir(directory):
     if not os.path.exists(directory):
