@@ -16,43 +16,62 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 def createFolder_lammps(foldername,calc_type,pot,pot_id):
     ''' calc_type any of [static|geopt|ti] '''
-    if os.path.isdir('foldername'):
-        sys.exit(foldername+' does already exist;Exit.')
+    if os.path.isdir(foldername):
+        sys.exit(foldername+' does already exist; Exit.')
     my.mkdir(foldername)
     scripts = my.scripts()
     file_inlmp = scripts + "/i-pi-mc_scripts/in.lmp"
 
-    potline = get_pot(pot,pot_id,show=True)
-    print('potline',potline)
-    get_pot('runner',pot_id,show=True)
-    #get_pot('runner')
-    #sys.exit()
-    # make in.lmp
-    get_inlmp(foldername,"../input.data.lmp.runner",pot)
+    potpath = get_pot(pot,pot_id,verbose=False)
 
+    potlines = potpath_to_lammps_lines(pot,potpath,verbose=True)
+    print('potlines',potlines)
+
+    # make in.lmp
+    get_inlmp(foldername,"../input.data.lmp.runner",potlines)
     return
 
-def get_pot(type='eam',id="",show=False):
+
+def potpath_to_lammps_lines(pot,potpath,verbose=False):
+    if verbose:
+        print('pot    :',pot)
+        print('potpath:',potpath)
+    if pot == 'eam':
+        return ["pair_style eam/alloy\n","pair_coeff * * "+potpath+" "+"Al"]
+    else:
+        return False
+
+
+def get_pot(type='eam',id="",verbose=False):
+    potout = False
     listout_basename = []
     listout_fullpath = []
     scripts = my.scripts()
-    eam_folder = scripts + '/potentials/lammps_'+type+'/'
-    #print('eam',eam_folder)
-    files = glob.glob(eam_folder+'/*')
+    pot_folder = scripts + '/potentials/lammps_'+type+'/'
+    files = glob.glob(pot_folder+'/*')
     for i in files:
-        if show:
+        if verbose:
             print(os.path.basename(i))
         listout_basename.append(os.path.basename(i))
         listout_fullpath.append(i)
 
     for i in files:
         if os.path.basename(i) == id:
-            return i
+            potout = i
 
-    return False
+    if verbose:
+        print('potout',potout)
+    if potout == False:
+        print('type',type)
+        print('id',id)
+        print('pot_folder',pot_folder)
+        print("potout",potout)
+        sys.exit('potential not found')
+
+    return potout
 
 
-def get_inlmp(folder,positions_file,pot,static=True):
+def get_inlmp(folder,positions_file,potlines,static=True):
     with open(folder+'/in.lmp', "w") as f:
         # stuff which is always added
         f.write("\n")
@@ -68,9 +87,8 @@ def get_inlmp(folder,positions_file,pot,static=True):
 
         # potential
         f.write("## potential\n")
-        if pot == 'eam':
-            f.write("pair_style eam/alloy\n")
-            f.write("pair_coeff * * Al-LEA.eam.alloy Al\n")
+        for i in potlines:
+            f.write(i)
         f.write("\n")
 
         # fixes define how atoms move
