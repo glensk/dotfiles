@@ -25,6 +25,7 @@ mac)
     setenv myprompthostuser magenta;
     setenv mypromptpath magenta;
     setenv lmp_exec $scripts/executables/lmp_mac_serial_runner_2018_10_30;
+    # conda it seems can not be loaded here
   ;;
 cosmopc)
     setenv myprompttime green ;
@@ -41,6 +42,12 @@ fidis)
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
     setenv lmp_exec $scripts/executables/lmp_fidis_fidis_runner_2018_10_31;
+    module load intel;
+    module load intel-mpi;
+    module load intel-mkl;
+    module load gsl;
+    module load eigen;
+    module load python;
   ;;
 daint)
     setenv myprompttime blue;

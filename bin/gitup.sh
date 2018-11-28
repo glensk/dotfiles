@@ -44,7 +44,7 @@ echo;git commit -a -m "`date`";echo;
 
 
 echo "#######################################"
-echo "#### git pull #########################"
+echo "#### git pull (here it often wants a message)"
 echo "#######################################"
 echo;git pull;echo;
 
