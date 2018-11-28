@@ -14,7 +14,7 @@
 ###################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ###################################################################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 case "$0" in bash) export currentshell="bash";;
              tcsh) setenv currentshell "tcsh";;
              *)    export currentshell="zsh";esac
@@ -60,13 +60,14 @@ tab-color $mypromptpath
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
+
+# on mac currently base, aiida, intelpy, python2 (12GB) (anaconda 2GB)
+# the conda activate step takes all the time (not the source)
 case $onhost in
-mac) source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy;
-;;
-cosmopc) source $HOME/aiida/bin/activate ;
-;;
+mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+cosmopc) source $HOME/aiida/bin/activate; ;;
+fidis) source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate; ;;
 esac
-#[ "$onhost" = "cosmopc" ] && source $HOME/aiida/bin/activate 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################
@@ -124,4 +125,4 @@ source $dotfiles/$currentshell/$currentshell\_set
 [ "$printloadstat" = "true" ] && \
     echo " onhost $onhost"
 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett after conda"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc AFTER CONDA"
