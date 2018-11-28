@@ -16,9 +16,8 @@ else
     exit
 fi
 RED='\033[0;31m'
-RED="\033[31m"
+#RED="\033[31m"
 NC="\033[0m" # No Color
-echo -e "\033[32mOK\033[0m"
 
 echo -e "${RED}###############################################################${NC}"
 echo -e "${RED}## try go get everything running currently with python2 #######${NC}"
@@ -26,7 +25,6 @@ echo -e "${RED}###############################################################${
 echo -e "${RED}Linux_or_MacOSX: $Linux_or_MacOSX"
 echo -e "condaversion   : $condaversion${NC}"
 
-exit
 if [ "$condaversion" == "3" ];then
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-$Linux_or_MacOSX-x86_64.sh
 bash Miniconda3-latest-$Linux_or_MacOSX-x86_64.sh -b -f 
