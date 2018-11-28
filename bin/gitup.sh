@@ -46,6 +46,7 @@ echo;git commit -a -m "`date`";echo;
 echo "#######################################"
 echo "#### git pull (here it often wants a message)"
 echo "#######################################"
+# git pull is basically two actions at once: git fetch followed by a git merge
 echo;git pull;echo;
 
 echo "#######################################"
