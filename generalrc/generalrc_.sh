@@ -60,10 +60,14 @@ tab-color $mypromptpath
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
-[ "$onhost" = "mac" ] && source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy #python2
-[ "$onhost" = "cosmopc" ] && source $HOME/aiida/bin/activate 
+case $onhost in
+mac) source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate intelpy;
+;;
+cosmopc) source $HOME/aiida/bin/activate ;
+;;
+esac
+#[ "$onhost" = "cosmopc" ] && source $HOME/aiida/bin/activate 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
-
 
 ##############################################
 # set Thermodynamics stuff
