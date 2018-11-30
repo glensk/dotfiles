@@ -109,6 +109,14 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
 
 
 def show_ase_frame_or_frames_content(frame_or_frames):
+    #print('frame5',frame_or_frames.cell)
+    #print('frame5',frame_or_frames[:].cell)
+    #print('tt',type(frame_or_frames))
+    #print('t?',type(frame_or_frames) == list)
+    #for idx,i  in enumerate(frame_or_frames):
+    #    print('idx,i',idx,i)
+    if type(frame_or_frames) != list:
+        frame_or_frames = [frame_or_frames]
     show_first = 3
 
     for idx,i  in enumerate(frame_or_frames):
@@ -259,17 +267,26 @@ def save_ase_object_as_lmp_runner(frame,outfilename,comment=""):
 
 
 def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
+    if type(frame) != list:
+        frame = [frame]
     # important not to change frame (aseobject), i dont know why but when this is called
     # externally it changes external frame (aseobject)
+    #print('frame2',frame.cell)
     framework = copy.deepcopy(frame)
+    #print('frame3',frame.cell)
+    #print('frame4',framework.cell)
     #framework = frame
-    print('----------------------------------------xxxxxxxxxxxxx')
-    show_ase_frame_or_frames_content(frame)
-    print('----------------------------------------xxxxxxxxxxxxx')
-    show_ase_frame_or_frames_content(framework)
+    #print('----------------------------------------xxxxxxxxxxxxx')
+    #show_ase_frame_or_frames_content(frame)
+    #print('----------------------------------------xxxxxxxxxxxxx')
+    #show_ase_frame_or_frames_content(framework)
+    #sys.exit()
     #print('fw',framework.positions)
     framework = framework[0]
     #sys.exit()
+
+    # this converts from ase to lammps; newcell,newpos give same energies?
+    # I would actually need something which reverts this
     newcell, newpos = convert_cell(framework.cell, framework.positions)
     framework.set_cell(newcell)
     framework.set_positions(newpos)

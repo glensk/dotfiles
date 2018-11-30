@@ -159,7 +159,8 @@ def createjob(
         # get data.lmp
         #convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
         convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.ipi','ipi')
-        convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.lammps-data','lammps-data')  # lamms data format can only be read? (seems)
+        #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.lammps-data','lammps-data')  # lamms-data data format is only R (can only be read!)
+
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
         if test == True:
             convert_fileformats.save_ase_object_as_lmp(atomsc,jobdir+'/data.lmp')
