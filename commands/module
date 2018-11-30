@@ -1,5 +1,0 @@
-prog() {
-echo "hallo"
-}
-
-prog  ## echos hallo
