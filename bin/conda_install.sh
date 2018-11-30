@@ -69,6 +69,8 @@ echo "${RED}jupyter_contrib_nbextension${NC}"
 conda install -y -c conda-forge jupyter_contrib_nbextensions   # get the notebook extensions for jupyter notebooks
 echo "${RED}jupyter contrib nbextension install --user${NC}"
 jupyter contrib nbextension install --user # also necessary to get the notebook extensions working
+echo "${RED}nglview${NC}"  # to look at structures
+conda install -c omnia nglview
 
 #conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 
 #conda install argcomplete           # to get argcompletion of python scripts in bash/zsh
