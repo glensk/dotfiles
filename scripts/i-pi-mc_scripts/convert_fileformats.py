@@ -107,6 +107,28 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
     if isinstance(filename, str):
         fh.close()
 
+
+def show_ase_frame_or_frames_content(frame_or_frames):
+    show_first = 3
+
+    for idx,i  in enumerate(frame_or_frames):
+        print("frame:",idx)
+        print("------------")
+        print("cell:")
+        print(frame_or_frames[0].cell)
+        #print(frame_or_frames[0].get_cell())
+        print()
+        print("positions:")
+        print(frame_or_frames[idx].positions[:show_first])
+        print()
+        print("...")
+        print(frame_or_frames[0].positions[-show_first:])
+        print()
+        print("elements:",frame_or_frames[0].get_chemical_symbols()[:show_first],"...",frame_or_frames[0].get_chemical_symbols()[-show_first:])
+        print()
+        print('kk',frame_or_frames[idx].get_cell())
+    return
+
 def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=False):
     ''' reads in a file (or several files) and creates out of it one
     ase object containing one (or several) frames
@@ -117,40 +139,35 @@ def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=Fals
 
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
-        # case of once structure only
-        #frame_or_frames = read(infile,format=formatin)  # only first structure (or last?)
-        #print('frame_or_frames',frame_or_frames)
-        #print("cell:",frame_or_frames.cell)
-
-        # maybe more general
         frame_or_frames = read(infile,':',format=formatin) # all structures
         print('infile (read in) :',infile,"(successfully)")
         print('frames           :',len(frame_or_frames))
-        #frame_or_frames = read(infile,'0',format=formatin)  # only first structure
-        if args.verbose == True:
-            if len(frame_or_frames) == 1:
-                print('frame_or_frames',frame_or_frames)
-                print("cell:",frame_or_frames[0].cell)
-                print("positions:",frame_or_frames[0].positions)
 
-                # POTCAR does not have energy...
-                print("potential energy (eV):",frame_or_frames[0].get_potential_energy())
-            elif len(frame_or_frames) >= 1:
-                print("cell[-1]     :",frame_or_frames[-1].cell)
-                print("positions[-1]:",frame_or_frames[-1].positions)
-                print("potential energy (eV) [-1]:",frame_or_frames[-1].get_potential_energy())
-    elif formatin == 'ipi':
-        frame_or_frames = read(infile,format='extxyz')
-        print('fc',frame_or_frames.cell)
-        print('fp',frame_or_frames.positions)
-        #with open(outfilename, 'r') as file:
-        #    # read a list of lines into data
-        #    data = file.readlines()
-        #print('d0',data[0])
-        #print('d1',data[1])
-        #print('d2',data[2])
+
+
+    #elif formatin == 'ipi':
+    #    print('fi ipi')
+    #    #frame_or_frames = read(infile,':',format='extxyz')
+    #    frame_or_frames = read(infile,':',format='xyz')
+    #    print('f',frame_or_frames)
+    #    print('f',type(frame_or_frames))
+    #    #sys.exit('jo')
+    #    #print('fc',frame_or_frames.cell)
+    #    #print('fp',frame_or_frames.positions)
+    #    #with open(outfilename, 'r') as file:
+    #    #    # read a list of lines into data
+    #    #    data = file.readlines()
+    #    #print('d0',data[0])
+    #    #print('d1',data[1])
+    #    #print('d2',data[2])
     else:
         sys.exit('formatin '+formatin+' not in the list of known formats! Exit.')
+
+
+    if args.verbose == True:
+        show_ase_frame_or_frames_content(frame_or_frames)
+
+    #sys.exit('jojoa')
     if len(frame_or_frames) == 1:
         return [frame_or_frames]
     else:
@@ -162,7 +179,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
     # read the inputfile
     ###########################################################################
     frame_or_frames = read_in_file_or_files_and_make_ase_object(infile=infile,formatin=formatin,verbose=args.verbose)
-
+    #sys.exit('nach readin')
     ###########################################################################
     # write the outputfile
     ###########################################################################
@@ -178,6 +195,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
     #print('nowframes: ',len(frame_or_frames))
 
     otherlist = ['lmp', 'lmp.runner','ipi']
+    otherlist = ['lmp', 'lmp.runner']
 
     known_formats = ase_get_known_formats()
 
@@ -196,8 +214,8 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
                 save_ase_object_as_lmp(frameone,outfilename,comment=infile,runner=False)
             if formatout == 'lmp.runner':
                 save_ase_object_as_lmp_runner(frameone,outfilename,comment=infile)
-            if formatout == 'ipi':
-                save_ase_object_as_ipi_format(frameone,outfilename)
+            #if formatout == 'ipi':
+            #    save_ase_object_as_ipi_format(frameone,outfilename)
 
         elif formatout in known_formats:
             save_ase_object_in_ase_format(frameone,outfilename,formatout)
@@ -226,7 +244,7 @@ def save_ase_object_as_ipi_format(frame,outfilename):
         # read a list of lines into data
         data = file.readlines()
 
-    data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step:           4  Bead:       0 positions{angstrom}  cell{angstrom}"+'\n'
+    data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step: 4  Bead: 0 positions{angstrom}  cell{angstrom}"+'\n'
 
     # and write everything back
     with open(outfilename, 'w') as file:
@@ -245,6 +263,13 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     # externally it changes external frame (aseobject)
     framework = copy.deepcopy(frame)
     #framework = frame
+    print('----------------------------------------xxxxxxxxxxxxx')
+    show_ase_frame_or_frames_content(frame)
+    print('----------------------------------------xxxxxxxxxxxxx')
+    show_ase_frame_or_frames_content(framework)
+    #print('fw',framework.positions)
+    framework = framework[0]
+    #sys.exit()
     newcell, newpos = convert_cell(framework.cell, framework.positions)
     framework.set_cell(newcell)
     framework.set_positions(newpos)
@@ -308,7 +333,7 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
 def check_if_ase_knows_runner():
     pass
 
-def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=False):
+def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=True):
     known_formats = []
     x = ase.io.formats.all_formats
     for i in x:
