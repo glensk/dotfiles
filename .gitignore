@@ -1,3 +1,4 @@
+*.pyc
 bin_unused/
 .DS_Store
 Icon^M^M
