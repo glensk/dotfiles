@@ -19,7 +19,6 @@ addeverywhere="$ipi:$runner:$aiida_s:$aiida_a:$aiida_b:$lammps1:$lammps2:$ase_la
 
 export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src"
-#export LAMMPS_COMMAND="$SCR/executables/lmp_fidis_par_2018_11_28"
 export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
 #export lmp_exec="$SCR/executables/lmp_fidis_par_2018_11_28"
 
