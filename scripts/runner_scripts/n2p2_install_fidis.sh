@@ -14,7 +14,7 @@ module load eigen
 # get n2p2 
 #####################################################################
 cd $HOME #$installfolder
-#[ "$USER" = [ "glensk" ] && cd $HOME/Dropbox/Albert/git
+[ "$USER" = [ "glensk" ] && cd $HOME/Dropbox/Albert/git
 [ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
 cd n2p2/src
 

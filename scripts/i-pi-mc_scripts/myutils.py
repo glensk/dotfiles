@@ -400,10 +400,12 @@ def string_to_index_an_array(array,string):
     if string == ":":                  # ":"
         return array
     elif string[0] == ':':             # begins with : e.g. :7
-        print('t1',string[1:])
+        #print('t1',string[1:])
         try:
-            iff  type(int(string[1:])) == int:
-            return array[:int(string[1:])]
+            if type(int(string[1:])) == int:
+                return array[:int(string[1:])]
+        except ValueError:
+            pass
     else:
         try:                           # 7
             a = int(string)
@@ -411,18 +413,6 @@ def string_to_index_an_array(array,string):
         except ValueError:
             pass
         return False
-        #splitted = string.split(":")
-        #print('spl',splitted)
-        #for i in splitted:
-        #    print('i',i,type(i),i=="")
-    #elif try:
-    #    type(int(string)) == int:     # "7"  or "int"
-    #    return [array[int(string)]]
-    #    except ValueError:
-    #elif string[0]== ":" and type(int(string[1:])) == int: # :7
-    #    return array[:int(string[1:])]
-    #else:
-    #    return False
 
 
 def pot_to_ase_lmp_cmd(pot):
