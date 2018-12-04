@@ -3,11 +3,14 @@ from __future__ import print_function
 import os,sys
 import click
 import numpy as np
+import glob
+from socket import gethostname
+from shutil import copyfile
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
-from socket import gethostname
-from shutil import copyfile
+from ase.calculators.lammpslib import LAMMPSlib
+
 
 
 # from scripts folder
@@ -82,7 +85,7 @@ def check_isdir_or_isdirs(path):
     return
 
 
-def check_isfile_or_isfiles(path,pathnames,envvar=False):
+def check_isfile_or_isfiles(path,pathnames=False,envvar=False,verbose=False):
     add=""
     if envvar == True: add = "(set as environment variable)"
     if type(path) is str:
@@ -90,8 +93,9 @@ def check_isfile_or_isfiles(path,pathnames,envvar=False):
             sys.exit('missing file '+path+add)
     elif type(path) is list:
         for idx,i in enumerate(path):
-            #print('ii',i,idx,pathnames[idx])
-            if i is None:
+            if verbose:
+                print('idx',idx,path[idx],'path',i)
+            if i is None and type(pathnames) != bool:
                 sys.exit(pathnames[idx]+" "+add+' is not defined!')
             if not os.path.isfile(i):
                 sys.exit('missing file '+i)
@@ -188,6 +192,9 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
     kmesh = [np.ceil(kmesh_l * np.linalg.norm(reci_cell[i]))
              for i in range(len(reci_cell))]
     return kmesh
+
+def ase_enepot_mev_pa(atoms):
+    return atoms.get_potential_energy()/atoms.get_number_of_atoms()*1000.
 
 def qe_parse_numelectrons_upfpath(upfpath):
     ''' parses the number of electrons from a quantum espresso potential '''
@@ -327,6 +334,130 @@ def get_click_defaults():
     click.core.Option.__init__ = new_init
     CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
     return CONTEXT_SETTINGS
+
+def mypot(getbasename=False):
+    ''' return a list of available potentials '''
+    scripts = os.environ['scripts']
+    allpot_fullpath = glob.glob(scripts+'/potentials/*')
+    allpot_basenames = []
+    onepot_fullpath = False
+    onepot_basename = False
+    for i in allpot_fullpath:
+        #print(i)
+        allpot_basenames.append(os.path.basename(i))
+        if type(getbasename) != bool:
+            if getbasename == os.path.basename(i):
+                onepot_fullpath = i
+                onepot_basename = getbasename
+
+    #print(allpot_basenames)
+    #sys.exit()
+    if getbasename == False:
+        return allpot_basenames
+    else:
+        return onepot_basename,onepot_fullpath
+
+def ase_calculate_ene_from_pot(atoms,pot,verbose=False):
+    ''' atoms is an ase object '''
+    atoms.wrap()
+
+    if verbose:
+        print('XXpot',pot)
+        showfirst = 10
+        print('XXatomsXX',atoms)
+        print('XX atoms')
+        #print(atoms.positions)
+        print(atoms.get_positions()[:showfirst])
+        print('XX elements get_chemical_symbols()')
+        print(atoms.get_chemical_symbols()) #[:showfirst])
+        print('XX atoms.cell')
+        print(atoms.cell)
+        print('XX aa.get_cell_lengths_and_angles()')
+        print(atoms.get_cell_lengths_and_angles())
+        print('atom.numbers',atoms.numbers)
+
+    lmpcmd, atom_types = pot_to_ase_lmp_cmd(pot)
+    if verbose:
+        print('YY--lmpcmd:',lmpcmd)
+        print('YY--atom_types',atom_types)
+    #calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
+    calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
+    if verbose:
+        print('done1')
+    atoms.set_calculator(calcLAMMPS)
+    if verbose:
+        print('done2')
+    ene = atoms.get_total_energy()
+    if verbose:
+        print('ene',ene)
+    return ene,ene/atoms.get_number_of_atoms()*1000.
+
+def string_to_index_an_array(array,string):
+    ''' array will be indexed according to string e.g.
+        array["string"] where "string" = ":7"
+        array[":7"] = [ 0,1,2,3,4,5,6,7]
+    '''
+    if string == ":":                  # ":"
+        return array
+    elif string[0] == ':':             # begins with : e.g. :7
+        print('t1',string[1:])
+        try:
+            iff  type(int(string[1:])) == int:
+            return array[:int(string[1:])]
+    else:
+        try:                           # 7
+            a = int(string)
+            return [array[int(string)]]
+        except ValueError:
+            pass
+        return False
+        #splitted = string.split(":")
+        #print('spl',splitted)
+        #for i in splitted:
+        #    print('i',i,type(i),i=="")
+    #elif try:
+    #    type(int(string)) == int:     # "7"  or "int"
+    #    return [array[int(string)]]
+    #    except ValueError:
+    #elif string[0]== ":" and type(int(string[1:])) == int: # :7
+    #    return array[:int(string[1:])]
+    #else:
+    #    return False
+
+
+def pot_to_ase_lmp_cmd(pot):
+    basename,fullpath = mypot(getbasename=pot)
+    #print('ZZ--basename',basename)
+    #print('ZZ--fullpath',fullpath)
+    if pot == "n2p2_v1ag":
+        lmpcmd = [
+            "mass 1 24.305",
+            "mass 2 26.9815385",
+            "mass 3 28.0855",
+            "variable nnpDir string "+fullpath,
+            "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
+            "pair_coeff * * 17.0",
+            "neighbor 0.4 bin",
+        ]
+        att = {'Mg':1,'Al':2,"Si":3}
+
+    elif pot == 'runner_v1dg':
+        lmpcmd = [
+            "mass 1 24.305",
+            "mass 2 26.9815385",
+            "mass 3 28.0855",
+            "variable runnerDir       string "+fullpath,
+            "variable runnerCutoff    equal  10.0",
+            "pair_style runner dir ${runnerDir} showew no resetew yes maxew 1000000",
+            "pair_coeff * * ${runnerCutoff}",
+        ]
+        att = {'Mg':1,'Al':2,"Si":3}
+
+    else:
+        sys.exit('pot '+str(pot)+' not found!')
+    return lmpcmd, att
+
+
 
 if __name__ == "__main__":
     pass

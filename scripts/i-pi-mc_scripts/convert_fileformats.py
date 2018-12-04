@@ -218,6 +218,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
         outfilename = get_outfilename(args,idx)
         #print('aaa',outfilename)
         if formatout in otherlist:
+            print('formatout        :',formatout,"(not default fileformat, but known - lmp or lmp.runner -)")
             if formatout == 'lmp':
                 save_ase_object_as_lmp(frameone,outfilename,comment=infile,runner=False)
             if formatout == 'lmp.runner':
@@ -226,6 +227,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
             #    save_ase_object_as_ipi_format(frameone,outfilename)
 
         elif formatout in known_formats:
+            print('formatout        :',formatout,"known by default")
             save_ase_object_in_ase_format(frameone,outfilename,formatout)
         else:
             sys.exit('unknown output format '+formatout)
