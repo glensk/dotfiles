@@ -357,7 +357,7 @@ def mypot(getbasename=False):
     else:
         return onepot_basename,onepot_fullpath
 
-def ase_calculate_ene_from_pot(atoms,pot,verbose=False):
+def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,verbose=False):
     ''' atoms is an ase object '''
     atoms.wrap()
 
@@ -374,10 +374,8 @@ def ase_calculate_ene_from_pot(atoms,pot,verbose=False):
         print(atoms.cell)
         print('XX aa.get_cell_lengths_and_angles()')
         print(atoms.get_cell_lengths_and_angles())
-        print('atom.numbers',atoms.numbers)
-
-    lmpcmd, atom_types = pot_to_ase_lmp_cmd(pot)
-    if verbose:
+        print('XXatom.numbers',atoms.numbers)
+        print('XX-------------------------------------------YY')
         print('YY--lmpcmd:',lmpcmd)
         print('YY--atom_types',atom_types)
     #calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
