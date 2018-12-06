@@ -3,6 +3,9 @@
 ###############################################################################
 number_of_elements              3              # Number of elements.
 elements                        Al Mg Si           # Specification of elements.
+atom_energy  Al    -2.4092354
+atom_energy  Mg   -62.6068620
+atom_energy  Si    -5.5597835
 #atom_energy                     S  0.0         # Free atom reference energy (S).
 #atom_energy                     Cu 0.0         # Free atom reference energy (Cu).
 cutoff_type                     2          # Cutoff type (optional argument: shift parameter alpha).
@@ -35,7 +38,7 @@ short_energy_error_threshold    0.00           # RMSE threshold for energy updat
 short_force_error_threshold     1.00           # RMSE threshold for force update candidates.
 rmse_threshold_trials           3              # Maximum number of RMSE threshold trials.
 #repeated_energy_update                         # After force update perform energy update for corresponding structure.
-#use_old_weights_short                          # Restart fitting with old weight parameters.
+use_old_weights_short                          # Restart fitting with old weight parameters.
 weights_min                     -1.0           # Minimum value for initial random weights.
 weights_max                     1.0            # Maximum value for initial random weights.
 #precondition_weights                           # Precondition weights with initial energies.

@@ -193,8 +193,27 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
              for i in range(len(reci_cell))]
     return kmesh
 
-def ase_enepot_mev_pa(atoms):
-    return atoms.get_potential_energy()/atoms.get_number_of_atoms()*1000.
+
+def ase_enepot(atoms,units='eV'):
+    ''' units: eV, eV_pa, hartree, hartree_pa '''
+    ene = atoms.get_potential_energy()
+
+    units_split = units.split("_")
+    #print('us',units_split,units_split[1])
+    if units_split[0].lower() == 'ev':
+        pass
+    elif units_split[0].lower() == 'mev':
+        ene = ene*1000.
+    elif units_split[0] == "hartree" or units_split[0] == "Hartree":
+        ene = ene*0.036749325
+
+    if len(units_split) == 2:
+        if units_split[1] == 'pa':
+            ene = ene/atoms.get_number_of_atoms()
+        else:
+            sys.exit("energy can not have this units (ending must be pa, eV_pa or hartree_pa)")
+
+    return ene
 
 def qe_parse_numelectrons_upfpath(upfpath):
     ''' parses the number of electrons from a quantum espresso potential '''
@@ -332,7 +351,7 @@ def get_click_defaults():
         orig_init(self, *args, **kwargs)
         self.show_default = True
     click.core.Option.__init__ = new_init
-    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
     return CONTEXT_SETTINGS
 
 def mypot(getbasename=False):
@@ -357,7 +376,7 @@ def mypot(getbasename=False):
     else:
         return onepot_basename,onepot_fullpath
 
-def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,verbose=False):
+def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,units='eV',verbose=False):
     ''' atoms is an ase object '''
     atoms.wrap()
 
@@ -378,17 +397,36 @@ def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,verbose=False
         print('XX-------------------------------------------YY')
         print('YY--lmpcmd:',lmpcmd)
         print('YY--atom_types',atom_types)
-    #calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
-    calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
+    calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
+    #calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
     if verbose:
         print('done1')
+    #from ase.io.trajectory import Trajectory
+    #traj = Trajectory('ka', mode='w',atoms=atoms)
     atoms.set_calculator(calcLAMMPS)
+    from ase.optimize import BFGS
+    from ase.optimize import LBFGS
+    from ase.optimize import FIRE
+    #opt = BFGS(atoms,trajectory="ni.traj")
+    #opt.run(steps=20)
+    opt1 = LBFGS(atoms,trajectory="ni.traj")
+    opt1.run(steps=20)
+    #opt2 = FIRE(atoms,trajectory="ni.traj")
+    #opt2.run(steps=20)
+    #calcLAMMPS.attach(traj)
+    #calcLAMMPS.run()
     if verbose:
         print('done2')
-    ene = atoms.get_total_energy()
+        print('units',units)
+    ene = ase_enepot(atoms,units=units)
     if verbose:
         print('ene',ene)
-    return ene,ene/atoms.get_number_of_atoms()*1000.
+    #sys.exit()
+    #ene = atoms.get_total_energy()
+    #if verbose:
+    #    print('ene',ene)
+    #return ene,ene/atoms.get_number_of_atoms()*1000.
+    return ene
 
 def string_to_index_an_array(array,string):
     ''' array will be indexed according to string e.g.
@@ -413,10 +451,11 @@ def string_to_index_an_array(array,string):
         return False
 
 
-def pot_to_ase_lmp_cmd(pot):
+def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     basename,fullpath = mypot(getbasename=pot)
-    #print('ZZ--basename',basename)
-    #print('ZZ--fullpath',fullpath)
+    if verbose:
+        print('get_potential--basename:',basename)
+        print('get_potential--fullpath:',fullpath)
     if pot == "n2p2_v1ag":
         lmpcmd = [
             "mass 1 24.305",
@@ -426,23 +465,30 @@ def pot_to_ase_lmp_cmd(pot):
             "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
             "pair_coeff * * 17.0",
             "neighbor 0.4 bin",
+            "thermo 1",
         ]
         att = {'Mg':1,'Al':2,"Si":3}
 
-    elif pot == 'runner_v1dg':
-        lmpcmd = [
-            "mass 1 24.305",
-            "mass 2 26.9815385",
-            "mass 3 28.0855",
-            "variable runnerDir       string "+fullpath,
-            "variable runnerCutoff    equal  10.0",
-            "pair_style runner dir ${runnerDir} showew no resetew yes maxew 1000000",
-            "pair_coeff * * ${runnerCutoff}",
-        ]
-        att = {'Mg':1,'Al':2,"Si":3}
+    elif pot == 'runner_v1dg' or pot == 'runner_v2dg':
+        pass
+        #lmpcmd = [
+        #    "mass 1 24.305",
+        #    "mass 2 26.9815385",
+        #    "mass 3 28.0855",
+        #    "variable runnerDir       string "+fullpath,
+        #    "variable runnerCutoff    equal  10.0",
+        #    "thermo 1",
+        #    "pair_style runner dir ${runnerDir} showew no resetew yes maxew 1000000",
+        #    "pair_coeff * * ${runnerCutoff}",
+        #]
+        #att = {'Mg':1,'Al':2,"Si":3}
 
     else:
         sys.exit('pot '+str(pot)+' not found!')
+
+    if geopt:
+        lmpcmd.append("min_style cg")
+        lmpcmd.append("minimize 1.0e-9 1.0e-10 1000 1000")
     return lmpcmd, att
 
 

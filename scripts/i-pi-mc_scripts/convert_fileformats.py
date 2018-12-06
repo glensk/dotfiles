@@ -294,7 +294,9 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     framework.set_positions(newpos)
 
     species = framework.get_atomic_numbers()
+    print('species',species)
     unique_species, i_unique_species = np.unique(species, return_index=True)
+    print('unique_species',unique_species)
     masses = framework.get_masses()
     positions = framework.get_positions()
 
@@ -334,13 +336,21 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     elif runner is True:
         # in principle this can be automatically obtained from the nn potential,
         # for now however I am lazy
-        fout.write("1 24.305\n")
-        fout.write("2 26.9815385\n")
-        fout.write("3 28.085\n")
+        fout.write("1 24.305\n")        # Mg
+        fout.write("2 26.9815385\n")    # Al
+        fout.write("3 28.085\n")        # Si
+        species_runner = species.copy()
+        species_runner[species_runner == 12] = 1
+        species_runner[species_runner == 13] = 2
+        species_runner[species_runner == 14] = 3
+        lammps_indices = species_runner
+        #print('sp',species_runner)
+
     fout.write("\n")
     fout.write("Atoms\n")
     fout.write("\n")
-    for ii in range(len(species)):
+    # take care here for runner / n2p2 if only 2 species (say Mg,Si) for Mg,Al,Si potential
+    for ii in range(len(species)):  # if only Mg and Si get is, there will be only type 1 and 2 and not 1 and 3!
         fout.write(("%5d %5d %s" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
         #fout.write(("%5d %5d %.10f %.10f %.10f" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
     fout.write("\n")
