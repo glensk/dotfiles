@@ -60,13 +60,22 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt):
     ##############################################
     # get the potential
     ##############################################
+    if verbose:
+        print('... get lmpcmd')
     lmpcmd, atom_types = my.pot_to_ase_lmp_cmd(pot,verbose=verbose)
-    lmpcmdgeopt, atom_types = my.pot_to_ase_lmp_cmd(pot,geopt=True,verbose=verbose)
+    if geopt:
+        lmpcmdgeopt, atom_types = my.pot_to_ase_lmp_cmd(pot,geopt=True,verbose=verbose)
+        if verbose:
+            print()
+            print('... get lmpcmdgeopt')
 
+    ##############################################
+    # loop over structures
+    ##############################################
     for idx,i in enumerate(structures_to_calc):
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=units)
         ene_pot[idx] = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmd,atom_types=atom_types,units=units, verbose=False)
-        print('ENE',ene_pot[idx])
+        #print('ENE',ene_pot[idx])
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
 

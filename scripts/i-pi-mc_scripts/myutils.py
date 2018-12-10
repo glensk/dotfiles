@@ -376,7 +376,7 @@ def mypot(getbasename=False):
     else:
         return onepot_basename,onepot_fullpath
 
-def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,units='eV',verbose=False):
+def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,geopt=False,units='eV',verbose=False):
     ''' atoms is an ase object '''
     atoms.wrap()
 
@@ -397,24 +397,25 @@ def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,units='eV',ve
         print('XX-------------------------------------------YY')
         print('YY--lmpcmd:',lmpcmd)
         print('YY--atom_types',atom_types)
-    calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
-    #calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
-    if verbose:
-        print('done1')
-    #from ase.io.trajectory import Trajectory
-    #traj = Trajectory('ka', mode='w',atoms=atoms)
-    atoms.set_calculator(calcLAMMPS)
-    from ase.optimize import BFGS
-    from ase.optimize import LBFGS
-    from ase.optimize import FIRE
-    #opt = BFGS(atoms,trajectory="ni.traj")
-    #opt.run(steps=20)
-    opt1 = LBFGS(atoms,trajectory="ni.traj")
-    opt1.run(steps=20)
-    #opt2 = FIRE(atoms,trajectory="ni.traj")
-    #opt2.run(steps=20)
-    #calcLAMMPS.attach(traj)
-    #calcLAMMPS.run()
+    if geopt == False:
+        calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
+        atoms.set_calculator(calcLAMMPS)
+    else:
+        calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
+        atoms.set_calculator(calcLAMMPS)
+        #from ase.io.trajectory import Trajectory
+        #traj = Trajectory('ka', mode='w',atoms=atoms)
+        from ase.optimize import BFGS
+        from ase.optimize import LBFGS
+        from ase.optimize import FIRE
+        #opt = BFGS(atoms,trajectory="ni.traj")
+        #opt.run(steps=20)
+        opt1 = LBFGS(atoms,trajectory="ni.traj")
+        opt1.run(steps=20)
+        #opt2 = FIRE(atoms,trajectory="ni.traj")
+        #opt2.run(steps=20)
+        #calcLAMMPS.attach(traj)
+        #calcLAMMPS.run()
     if verbose:
         print('done2')
         print('units',units)
@@ -454,9 +455,10 @@ def string_to_index_an_array(array,string):
 def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     basename,fullpath = mypot(getbasename=pot)
     if verbose:
-        print('get_potential--basename:',basename)
-        print('get_potential--fullpath:',fullpath)
-    if pot == "n2p2_v1ag":
+        print('...get_potential--basename:',basename)
+        print('...get_potential--fullpath:',fullpath)
+        print('...pot',pot.split("_"))
+    if pot.split("_")[0] == "n2p2":
         lmpcmd = [
             "mass 1 24.305",
             "mass 2 26.9815385",
@@ -465,23 +467,22 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
             "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
             "pair_coeff * * 17.0",
             "neighbor 0.4 bin",
-            "thermo 1",
+            "#thermo 1 # only for geopt",
         ]
         att = {'Mg':1,'Al':2,"Si":3}
 
-    elif pot == 'runner_v1dg' or pot == 'runner_v2dg':
-        pass
-        #lmpcmd = [
-        #    "mass 1 24.305",
-        #    "mass 2 26.9815385",
-        #    "mass 3 28.0855",
-        #    "variable runnerDir       string "+fullpath,
-        #    "variable runnerCutoff    equal  10.0",
-        #    "thermo 1",
-        #    "pair_style runner dir ${runnerDir} showew no resetew yes maxew 1000000",
-        #    "pair_coeff * * ${runnerCutoff}",
-        #]
-        #att = {'Mg':1,'Al':2,"Si":3}
+    elif pot.split("_")[0] == "runner":
+        lmpcmd = [
+            "mass 1 24.305",
+            "mass 2 26.9815385",
+            "mass 3 28.0855",
+            "variable runnerDir       string "+fullpath,
+            "variable runnerCutoff    equal  10.0",
+            "# thermo 1 # for geopt",
+            "pair_style runner dir ${runnerDir} showew no resetew yes maxew 1000000",
+            "pair_coeff * * ${runnerCutoff}",
+        ]
+        att = {'Mg':1,'Al':2,"Si":3}
 
     else:
         sys.exit('pot '+str(pot)+' not found!')
@@ -489,6 +490,8 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     if geopt:
         lmpcmd.append("min_style cg")
         lmpcmd.append("minimize 1.0e-9 1.0e-10 1000 1000")
+    if verbose:
+        print('...lmpcmd',lmpcmd)
     return lmpcmd, att
 
 
