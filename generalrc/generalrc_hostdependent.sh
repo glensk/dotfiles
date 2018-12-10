@@ -47,6 +47,7 @@ fidis)
     module load intel-mkl;
     module load gsl;
     module load eigen;
+    module load quantum-espresso;
     #module load python;  # conflicts with miniconda
   ;;
 daint)
