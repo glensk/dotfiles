@@ -150,6 +150,8 @@ def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=Fals
         frame_or_frames = read(infile,':',format=formatin) # all structures
         print('infile (read in) :',infile,"(successfully)")
         print('frames           :',len(frame_or_frames))
+        if len(frame_or_frames) == 0:
+            sys.exit("NO FRAMES FOUND!")
 
 
 

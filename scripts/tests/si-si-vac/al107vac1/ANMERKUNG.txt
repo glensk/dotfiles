@@ -1,0 +1,1 @@
+from /Users/glensk/Dropbox/Albert/kmc/raw_data/20181024_test_si-si-vac-stability_qe_vs_nn/quantum_espresso/second_test/calculations/wkdir_vac_7x7x7/aiida.out.finalstruct.runner

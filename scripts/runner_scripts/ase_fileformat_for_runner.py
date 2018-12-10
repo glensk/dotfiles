@@ -82,7 +82,7 @@ def read_runner(fileobj, index=-1):
         fileobj.seek(frame_pos)
 
         # comment line
-        line = fileobj.readline() 
+        line = fileobj.readline()
         # Is there any valuable info to strip from the comment line?
         # info = key_val_str_to_dict(line)
 
@@ -148,6 +148,7 @@ def write_runner(fileobj,images,comment=None,append=False):
     """
     Write output in runner format. Written quickly with no regard to the form
     """
+
     if isinstance(fileobj, basestring):
         mode = 'w'
         if append:
@@ -158,9 +159,10 @@ def write_runner(fileobj,images,comment=None,append=False):
         images = [images]
 
     for atoms in images:
+        nat = atoms.get_number_of_atoms()
 
         try: forces = atoms.get_forces()/units.Hartree * units.Bohr
-        except: 
+        except:
             sys.stderr.write("No forces found, setting them to 0\n")
             forces = np.zeros((nat,3))
 
