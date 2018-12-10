@@ -104,6 +104,9 @@ then: xmgrace -hardcopy file.agr
 
 
 
-xmgrace -block file -bxy 1:4   # plot 4th column vs 1st column
 
 xmgracenxy.sh PhononDispersion_4.13
+
+xmgrace -block file -bxy 1:4   # plot 4th column vs 1st column
+xmgrace -block file -bxy 1:2 -bxy 1:3  # plot 2 curves
+
