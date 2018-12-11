@@ -215,6 +215,9 @@ def ase_enepot(atoms,units='eV'):
 
     return ene
 
+
+
+
 def qe_parse_numelectrons_upfpath(upfpath):
     ''' parses the number of electrons from a quantum espresso potential '''
     for line in open(upfpath):
@@ -376,12 +379,92 @@ def mypot(getbasename=False):
     else:
         return onepot_basename,onepot_fullpath
 
+class ase_calculate_ene( object ):
+    def __init__(self,pot,units,geopt,verbose):
+        self.pot = pot
+        self.units = units
+        self.geopt = geopt
+        self.verbose = verbose
+        self.lmpcmd, self.atom_types = pot_to_ase_lmp_cmd(self.pot,geopt=self.geopt,verbose=self.verbose)
+
+        self.atoms = False
+
+        if self.verbose:
+            print('self.verbose :',self.verbose)
+            print('pot          :',self.pot)
+            print('units        :',self.units)
+            print('lmpcmd       :',self.lmpcmd)
+            print('atom_types   :',self.atom_types)
+            print('atoms        :',self.atoms)
+        return
+
+    def ene(self,atoms=False):
+        ''' atoms is an ase object '''
+        if atoms == False:
+            atoms = self.atoms
+        else:
+            atoms = atoms
+
+        atoms.wrap()
+
+        if self.verbose:
+            showfirst = 10
+            print('XXatomsXX',atoms)
+            print('XX atoms')
+            #print(atoms.positions)
+            print(atoms.get_positions()[:showfirst])
+            print('XX elements get_chemical_symbols()')
+            print(atoms.get_chemical_symbols()) #[:showfirst])
+            print('XX atoms.cell')
+            print(atoms.cell)
+            print('XX aa.get_cell_lengths_and_angles()')
+            print(atoms.get_cell_lengths_and_angles())
+            print('XXatom.numbers',atoms.numbers)
+            print('XX-------------------------------------------YY')
+            print('YY--lmpcmd:',self.lmpcmd)
+            print('YY--atom_types',self.atom_types)
+            print('YY--geopt',self.geopt)
+        if self.geopt == False:
+            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
+            atoms.set_calculator(calcLAMMPS)
+        else:
+            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
+            atoms.set_calculator(calcLAMMPS)
+            #from ase.io.trajectory import Trajectory
+            #traj = Trajectory('ka', mode='w',atoms=atoms)
+            from ase.optimize import BFGS
+            from ase.optimize import LBFGS
+            from ase.optimize import FIRE
+            #opt = BFGS(atoms,trajectory="ni.traj")
+            #opt.run(steps=20)
+            opt1 = LBFGS(atoms,trajectory="ni.traj")
+            opt1.run(steps=20)
+            #opt2 = FIRE(atoms,trajectory="ni.traj")
+            #opt2.run(steps=20)
+            #calcLAMMPS.attach(traj)
+            #calcLAMMPS.run()
+        if self.verbose:
+            print('done2')
+            print('units',self.units)
+        ene = ase_enepot(atoms,units=self.units)
+        if self.verbose:
+            print('ene',ene)
+        #sys.exit()
+        #ene = atoms.get_total_energy()
+        #if self.verbose:
+        #    print('ene',ene)
+        #return ene,ene/atoms.get_number_of_atoms()*1000.
+        return ene
+
+
+
+
+
 def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,geopt=False,units='eV',verbose=False):
     ''' atoms is an ase object '''
     atoms.wrap()
 
     if verbose:
-        print('XXpot',pot)
         showfirst = 10
         print('XXatomsXX',atoms)
         print('XX atoms')
@@ -397,6 +480,7 @@ def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,geopt=False,u
         print('XX-------------------------------------------YY')
         print('YY--lmpcmd:',lmpcmd)
         print('YY--atom_types',atom_types)
+        print('YY--geopt',geopt)
     if geopt == False:
         calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
         atoms.set_calculator(calcLAMMPS)

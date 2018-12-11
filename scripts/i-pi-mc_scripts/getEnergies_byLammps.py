@@ -5,6 +5,7 @@ import sys,os
 import click
 import numpy as np
 import myutils as my
+from myutils import ase_calculate_ene #as ace
 from ase.io import read
 from ast import literal_eval
 
@@ -26,22 +27,34 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     for a given potential.
     '''
     scripts = my.scripts()
-    if test == False:
-        my.check_isfile_or_isfiles([infile],verbose=False)
-    else:
-        bulk_str = scripts+'/tests/si-si-vac/al108/aiida.in.runner'
-        vac_str  = scripts+'/tests/si-si-vac/al107vac1/aiida.in.runner'
-        bulk = read(bulk_str,format='runner')
-        vac  = read(vac_str,format='runner')
-        units = 'mev_pa'
-        ene_bulk = my.ase_enepot(bulk,units=units)
 
-        print('vacancy_formation',)
-        sys.exit()
+    #### get the potential
+    ace = ase_calculate_ene(pot,units,geopt,verbose)
 
+
+    if test:
+        sisivac = scripts+'/tests/si-si-vac/'
+        e_al108 = ace.ene(read(sisivac'/al108/aiida.in.runner'))
+        e_al107vac1 = ace.ene(read(sisivac+'/al107vac1/aiida.in.runner'))
+        e_al107si1 = ace.ene(read(sisivac+'/al107vac1/aiida.in.runner'))
+        e_al107si1 = 1
+        if verbose:
+            print('e_al108',e_al108,ace.units)
+            print('e_al107vac1',e_al107vac1,ace.units)
+
+        e_ss_va = e_al107vac1 - e_al108/108. * 107.
+        e_al105si2va1 = 1
+        e_ss_one_si = 1
+        e_ss_al = 1
+        e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
+
+        print('vacancy_formation',e_ss_va,ace.units)
+        sys.exit('test done!')
+    sys.exit('no')
     ##############################################
     # read in the structures
     ##############################################
+    my.check_isfile_or_isfiles([infile],verbose=verbose)
     atoms = read(infile,index=":",format=format_in)
 
     print('number of structures in total:',len(atoms))
@@ -70,23 +83,11 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     # make this parallel at some point
 
     ##############################################
-    # get the potential
-    ##############################################
-    if verbose:
-        print('... get lmpcmd')
-    lmpcmd, atom_types = my.pot_to_ase_lmp_cmd(pot,verbose=verbose)
-    if geopt:
-        lmpcmdgeopt, atom_types = my.pot_to_ase_lmp_cmd(pot,geopt=True,verbose=verbose)
-        if verbose:
-            print()
-            print('... get lmpcmdgeopt')
-
-    ##############################################
     # loop over structures
     ##############################################
     for idx,i in enumerate(structures_to_calc):
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=units)
-        ene_pot[idx] = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmd,atom_types=atom_types,units=units, verbose=False)
+        ene_pot[idx] = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmd,atom_types=atom_types,units=units, verbose=verbose)
         #print('ENE',ene_pot[idx])
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
@@ -113,7 +114,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
             print('goeop',lmpcmdgeopt)
             print(atoms[i].get_positions())
             print('-----------------------------------')
-            ene_pot_geopt = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmdgeopt,atom_types=atom_types,units=units, verbose=False)
+            ene_pot_geopt = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmdgeopt,atom_types=atom_types,units=units, verbose=verbose)
             print('A------------------AAAAA-----------')
             print(idx,'e diff ',ene_pot[idx],ene_pot_geopt,units)
             print(atoms[i].get_positions())
