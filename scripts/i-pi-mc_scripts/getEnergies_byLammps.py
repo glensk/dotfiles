@@ -6,8 +6,8 @@ import click
 import numpy as np
 import myutils as my
 from myutils import ase_calculate_ene #as ace
-from ase.io import read
-from ast import literal_eval
+from ase.io import read as ase_read
+from ase.io import write as ase_write
 
 CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
@@ -26,37 +26,20 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     '''
-    scripts = my.scripts()
 
     #### get the potential
     ace = ase_calculate_ene(pot,units,geopt,verbose)
 
-
+    ### when want to assess some formation energies
     if test:
-        sisivac = scripts+'/tests/si-si-vac/'
-        e_al108 = ace.ene(read(sisivac'/al108/aiida.in.runner'))
-        e_al107vac1 = ace.ene(read(sisivac+'/al107vac1/aiida.in.runner'))
-        e_al107si1 = ace.ene(read(sisivac+'/al107vac1/aiida.in.runner'))
-        e_al107si1 = 1
-        if verbose:
-            print('e_al108',e_al108,ace.units)
-            print('e_al107vac1',e_al107vac1,ace.units)
+        test_sisivac(ace)
+        sys.exit('test done! Exit')
 
-        e_ss_va = e_al107vac1 - e_al108/108. * 107.
-        e_al105si2va1 = 1
-        e_ss_one_si = 1
-        e_ss_al = 1
-        e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
-
-        print('vacancy_formation',e_ss_va,ace.units)
-        sys.exit('test done!')
-    sys.exit('no')
-    ##############################################
-    # read in the structures
-    ##############################################
+    ### read in the structures
     my.check_isfile_or_isfiles([infile],verbose=verbose)
-    atoms = read(infile,index=":",format=format_in)
+    atoms = ase_read(infile,index=":",format=format_in)
 
+    ### print stuff to screen
     print('number of structures in total:',len(atoms))
     print('structures_idx               :',structures_idx)
     structures_to_calc = my.string_to_index_an_array(range(len(atoms)),structures_idx)
@@ -86,9 +69,14 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     # loop over structures
     ##############################################
     for idx,i in enumerate(structures_to_calc):
-        ene_DFT[idx] = my.ase_enepot(atoms[i],units=units)
-        ene_pot[idx] = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmd,atom_types=atom_types,units=units, verbose=verbose)
-        #print('ENE',ene_pot[idx])
+        print()
+        print()
+        print('idx',idx)
+        ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
+        print('idx',idx,'--------------')
+        ene_pot[idx] = ace.ene(atoms[i])
+        ase_write("out.runner",atoms[i],format='runner',append=True)
+        print('ene_dft,enepot',idx,ene_DFT[idx],ene_pot[idx],ene_DFT[idx]-ene_pot[idx])
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
 
@@ -104,21 +92,21 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
         printed = False
 
         if idx in range(0,len(structures_to_calc),50):
-            print("%5.0f %5.0f / %6.0f %16.7f %s" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],units))
+            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
             printed = True
 
         if verbose > 1 and printed == False:
-            print("%5.0f %5.0f / %6.0f %16.7f %s" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],units))
+            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
 
-        if geopt:
-            print('goeop',lmpcmdgeopt)
-            print(atoms[i].get_positions())
-            print('-----------------------------------')
-            ene_pot_geopt = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmdgeopt,atom_types=atom_types,units=units, verbose=verbose)
-            print('A------------------AAAAA-----------')
-            print(idx,'e diff ',ene_pot[idx],ene_pot_geopt,units)
-            print(atoms[i].get_positions())
-            print('-----------------------------------')
+        #if geopt:
+        #    print('goeop',lmpcmdgeopt)
+        #    print(atoms[i].get_positions())
+        #    print('-----------------------------------')
+        #    ene_pot_geopt = my.ase_calculate_ene_from_pot(atoms[i],lmpcmd=lmpcmdgeopt,atom_types=atom_types,units=units, verbose=verbose)
+        #    print('A------------------AAAAA-----------')
+        #    print(idx,'e diff ',ene_pot[idx],ene_pot_geopt,units)
+        #    print(atoms[i].get_positions())
+        #    print('-----------------------------------')
 
 
     my.create_READMEtxt(os.getcwd())
@@ -131,6 +119,29 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     print('en',len(ene_all))
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*6))
     return
+
+
+def test_sisivac(ace):
+    scripts = my.scripts()
+    sisivac = scripts+'/tests/si-si-vac/'
+    ff = '/aiida.in.final.runner'
+    e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
+    e_al107vac1 =   ace.ene(ase_read(sisivac+'/al107vac1'+ff))
+    e_al107si1 =    ace.ene(ase_read(sisivac+'/al107si1'+ff))
+    e_al106si2 =    ace.ene(ase_read(sisivac+'/al106si2'+ff))
+    e_al105si2va1 = ace.ene(ase_read(sisivac+'/al105si2va1'+ff))
+    if ace.verbose:
+        print('e_al108',e_al108,ace.units)
+        print('e_al107vac1',e_al107vac1,ace.units)
+    e_ss_al = e_al108/108.
+    e_ss_va = e_al107vac1 - e_al108/108. * 107.
+    e_ss_one_si = e_al107si1 - e_al108/108. * 107.
+    e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
+
+    print('vacancy_formation (unrelaxed)',round(e_ss_va,4),"",ace.units,"DFT 0.69 eV")
+    print('si-si-vac-complex (unrelaxed)',round(e_si_si_vac_complex,4),ace.units,"DFT -0.074eV")
+
+
 
 if __name__ == "__main__":
     get_energies()

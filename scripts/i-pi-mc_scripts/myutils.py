@@ -407,7 +407,7 @@ class ase_calculate_ene( object ):
 
         atoms.wrap()
 
-        if self.verbose:
+        if self.verbose > 1:
             showfirst = 10
             print('XXatomsXX',atoms)
             print('XX atoms')
@@ -428,7 +428,8 @@ class ase_calculate_ene( object ):
             calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
             atoms.set_calculator(calcLAMMPS)
         else:
-            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
+            #calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
+            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=True)
             atoms.set_calculator(calcLAMMPS)
             #from ase.io.trajectory import Trajectory
             #traj = Trajectory('ka', mode='w',atoms=atoms)
@@ -437,18 +438,28 @@ class ase_calculate_ene( object ):
             from ase.optimize import FIRE
             #opt = BFGS(atoms,trajectory="ni.traj")
             #opt.run(steps=20)
-            opt1 = LBFGS(atoms,trajectory="ni.traj")
-            opt1.run(steps=20)
+            minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE' ]
+            minimizer = 'FIRE'
+            print('startminimize....')
+            if minimizer == 'BFGS':
+                opt1 = BFGS(atoms,trajectory="ni.traj")
+            elif minimizer == 'LGBFGS':
+                opt1 = LBFGS(atoms,trajectory="ni.traj")
+            elif minimizer == 'FIRE':
+                opt1 = FIRE(atoms) #,trajectory="ni.traj")
+            print('startrun....')
+            opt1.run(steps=80)
+            print('done....')
             #opt2 = FIRE(atoms,trajectory="ni.traj")
             #opt2.run(steps=20)
             #calcLAMMPS.attach(traj)
             #calcLAMMPS.run()
-        if self.verbose:
-            print('done2')
-            print('units',self.units)
+        if self.verbose > 1:
+            print('ZZ done2')
+            print('ZZ self.units',self.units)
         ene = ase_enepot(atoms,units=self.units)
-        if self.verbose:
-            print('ene',ene)
+        if self.verbose > 1:
+            print('ZZ ene',ene,self.units)
         #sys.exit()
         #ene = atoms.get_total_energy()
         #if self.verbose:
@@ -459,59 +470,6 @@ class ase_calculate_ene( object ):
 
 
 
-
-def ase_calculate_ene_from_pot(atoms,lmpcmd=False,atom_types=False,geopt=False,units='eV',verbose=False):
-    ''' atoms is an ase object '''
-    atoms.wrap()
-
-    if verbose:
-        showfirst = 10
-        print('XXatomsXX',atoms)
-        print('XX atoms')
-        #print(atoms.positions)
-        print(atoms.get_positions()[:showfirst])
-        print('XX elements get_chemical_symbols()')
-        print(atoms.get_chemical_symbols()) #[:showfirst])
-        print('XX atoms.cell')
-        print(atoms.cell)
-        print('XX aa.get_cell_lengths_and_angles()')
-        print(atoms.get_cell_lengths_and_angles())
-        print('XXatom.numbers',atoms.numbers)
-        print('XX-------------------------------------------YY')
-        print('YY--lmpcmd:',lmpcmd)
-        print('YY--atom_types',atom_types)
-        print('YY--geopt',geopt)
-    if geopt == False:
-        calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types)
-        atoms.set_calculator(calcLAMMPS)
-    else:
-        calcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=atom_types)
-        atoms.set_calculator(calcLAMMPS)
-        #from ase.io.trajectory import Trajectory
-        #traj = Trajectory('ka', mode='w',atoms=atoms)
-        from ase.optimize import BFGS
-        from ase.optimize import LBFGS
-        from ase.optimize import FIRE
-        #opt = BFGS(atoms,trajectory="ni.traj")
-        #opt.run(steps=20)
-        opt1 = LBFGS(atoms,trajectory="ni.traj")
-        opt1.run(steps=20)
-        #opt2 = FIRE(atoms,trajectory="ni.traj")
-        #opt2.run(steps=20)
-        #calcLAMMPS.attach(traj)
-        #calcLAMMPS.run()
-    if verbose:
-        print('done2')
-        print('units',units)
-    ene = ase_enepot(atoms,units=units)
-    if verbose:
-        print('ene',ene)
-    #sys.exit()
-    #ene = atoms.get_total_energy()
-    #if verbose:
-    #    print('ene',ene)
-    #return ene,ene/atoms.get_number_of_atoms()*1000.
-    return ene
 
 def string_to_index_an_array(array,string):
     ''' array will be indexed according to string e.g.
@@ -538,32 +496,31 @@ def string_to_index_an_array(array,string):
 
 def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     basename,fullpath = mypot(getbasename=pot)
-    if verbose:
+    if verbose > 1:
         print('...get_potential--basename:',basename)
         print('...get_potential--fullpath:',fullpath)
         print('...pot',pot.split("_"))
-    if pot.split("_")[0] == "n2p2":
-        lmpcmd = [
+
+    lmpcmd = [
             "mass 1 24.305",
             "mass 2 26.9815385",
             "mass 3 28.0855",
-            "variable nnpDir string "+fullpath,
+            "variable nnpDir string "+fullpath
+            ]
+
+    if pot.split("_")[0] == "n2p2":
+        lmpcmd = lmpcmd + [
             "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
             "pair_coeff * * 17.0",
             "neighbor 0.4 bin",
-            "#thermo 1 # only for geopt",
         ]
         att = {'Mg':1,'Al':2,"Si":3}
 
     elif pot.split("_")[0] == "runner":
-        lmpcmd = [
-            "mass 1 24.305",
-            "mass 2 26.9815385",
-            "mass 3 28.0855",
-            "variable runnerDir       string "+fullpath,
+        lmpcmd = lmpcmd + [
             "variable runnerCutoff    equal  10.0",
             "# thermo 1 # for geopt",
-            "pair_style runner dir ${runnerDir} showew no resetew yes maxew 1000000",
+            "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
             "pair_coeff * * ${runnerCutoff}",
         ]
         att = {'Mg':1,'Al':2,"Si":3}
@@ -571,10 +528,14 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     else:
         sys.exit('pot '+str(pot)+' not found!')
 
-    if geopt:
-        lmpcmd.append("min_style cg")
-        lmpcmd.append("minimize 1.0e-9 1.0e-10 1000 1000")
-    if verbose:
+    #if geopt:  # only if geopt is done by lammps! not if geopt is done by ase!
+    #    lmpcmd = lmpcmd + [
+    #        "min_style cg",
+    #        "minimize 1.0e-9 1.0e-10 1000 1000"
+    #        ]
+        #lmpcmd.append("min_style cg")
+        #lmpcmd.append("minimize 1.0e-9 1.0e-10 1000 1000")
+    if verbose > 1:
         print('...lmpcmd',lmpcmd)
     return lmpcmd, att
 
