@@ -17,15 +17,27 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
 @click.option('--units','-u',type=click.Choice(['eV','meV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
 @click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
+@click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
 @click.option('--verbose','-v',count=True)
 
 
-def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt):
+def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     '''
     scripts = my.scripts()
-    my.check_isfile_or_isfiles([infile],verbose=False)
+    if test == False:
+        my.check_isfile_or_isfiles([infile],verbose=False)
+    else:
+        bulk_str = scripts+'/tests/si-si-vac/al108/aiida.in.runner'
+        vac_str  = scripts+'/tests/si-si-vac/al107vac1/aiida.in.runner'
+        bulk = read(bulk_str,format='runner')
+        vac  = read(vac_str,format='runner')
+        units = 'mev_pa'
+        ene_bulk = my.ase_enepot(bulk,units=units)
+
+        print('vacancy_formation',)
+        sys.exit()
 
     ##############################################
     # read in the structures
