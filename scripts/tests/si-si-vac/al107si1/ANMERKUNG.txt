@@ -1,0 +1,1 @@
+from /Users/glensk/Dropbox/Albert/kmc/raw_data/20181024_test_si-si-vac-stability_qe_vs_nn/quantum_espresso/second_test/calculations/wkdir_singlesolute_from_crash
