@@ -69,14 +69,14 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     # loop over structures
     ##############################################
     for idx,i in enumerate(structures_to_calc):
-        print()
-        print()
-        print('idx',idx)
+        #print()
+        #print()
+        #print('idx',idx)
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
-        print('idx',idx,'--------------')
+        #print('idx',idx,'--------------')
         ene_pot[idx] = ace.ene(atoms[i])
         ase_write("out.runner",atoms[i],format='runner',append=True)
-        print('ene_dft,enepot',idx,ene_DFT[idx],ene_pot[idx],ene_DFT[idx]-ene_pot[idx])
+        #print('ene_dft,enepot',idx,ene_DFT[idx],ene_pot[idx],ene_DFT[idx]-ene_pot[idx])
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
 
@@ -112,11 +112,12 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test):
     my.create_READMEtxt(os.getcwd())
     np.savetxt("ene_DFT.npy",ene_DFT,header=units)
     np.savetxt("ene_pot.npy",ene_pot)
+    np.savetxt("ene_diff_abs.npy",ene_diff_abs)
     np.savetxt("ene_std.npy",ene_std)
     np.savetxt("ene_ste.npy",ene_ste)
     np.savetxt("ene_mean.npy",ene_mean)
     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_mean,ene_std,ene_ste])
-    print('en',len(ene_all))
+    #print('en',len(ene_all))
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*6))
     return
 

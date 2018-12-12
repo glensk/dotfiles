@@ -539,7 +539,27 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
         print('...lmpcmd',lmpcmd)
     return lmpcmd, att
 
+def q():
+    from subprocess import check_output
+    out=check_output(['q'])
+    out2=out.split('\n')
+    id=[]
+    stat=[]
+    cores=[]
+    runtime=[]
+    path=[]
+    for idx,i in enumerate(out2):
+        #print(i.split(" "))
+        str_list = filter(None, i.split(" "))
+        if idx > 0 and len(str_list) > 2:
+            #print(str_list)
+            id.append(int(str_list[0]))
+            stat.append(str_list[1])
+            cores.append(int(str_list[2]))
+            runtime.append(str_list[3])
+            path.append(str_list[4])
 
+    return id,stat,path
 
 if __name__ == "__main__":
     pass
