@@ -10,7 +10,9 @@ from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
 from ase.calculators.lammpslib import LAMMPSlib
-
+from ase.io import read as ase_read
+from ase.io import write as ase_write
+import shutil
 
 
 # from scripts folder
@@ -36,15 +38,15 @@ def create_READMEtxt(directory,add=False):
     with open(filepath, "w") as text_file:
         text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts\n")
         text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts\n")
-        text_file.write("# used sha: "+sha+"\n")
-        text_file.write(strout+"\n")
+        text_file.write("# used sha: "+sha) #+"\n")
         if add:
             if type(add) == str:
                 text_file.write(add+"\n")
             elif type(add) == list:
                 for i in add:
                     text_file.write(i+"\n")
-
+        text_file.write("\n")
+        text_file.write(strout+"\n")
 
     print()
     print('written ',filepath)
@@ -72,6 +74,19 @@ def cp(src,dest):
 def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+class cd:
+    """Context manager for changing the current working directory"""
+    def __init__(self, newPath):
+        self.newPath = os.path.expanduser(newPath)
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)
+
 
 def check_isdir_or_isdirs(path):
     if type(path) is str:
@@ -380,6 +395,9 @@ def mypot(getbasename=False):
         return onepot_basename,onepot_fullpath
 
 class ase_calculate_ene( object ):
+    '''
+    ase_calculate_ene (ace) class which holds lammps commands to be executed
+    '''
     def __init__(self,pot,units,geopt,verbose):
         self.pot = pot
         self.units = units
@@ -540,7 +558,6 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     return lmpcmd, att
 
 def q():
-    from subprocess import check_output
     out=check_output(['q'])
     out2=out.split('\n')
     id=[]
@@ -560,6 +577,68 @@ def q():
             path.append(str_list[4])
 
     return id,stat,path
+
+def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
+    ''' ace is the ace object holding the lammps commands '''
+    mkdir(folder)
+    f = open(folder+'/'+filename,'w')
+
+    f.write("clear\n")
+    f.write("units metal\n")
+    f.write("boundary p p p\n")
+    f.write("atom_style atomic\n")
+    f.write("read_data \"" +str(positions)+"\"\n")
+
+    for i in ace.lmpcmd:
+        f.write(i+"\n")
+
+    f.write("\n")
+
+    if ace.geopt:
+        f.write("min_style cg\n")
+        f.write("minimize 1.0e-9 1.0e-10 1000 1000\n")
+
+    f.write("run 0\n")
+    return
+
+def lammps_ext_calc(atoms,ace):
+    ''' atoms is an ase atoms object which can hold several frames, or just one'''
+    ### mkdir tmpdir
+    tmpdir = os.environ['HOME']+"/_tmp_lammps/"
+    mkdir(tmpdir)
+
+    ### write input structure
+    atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
+
+    ### write inputfile
+    lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
+
+    ### calculate with lammps (trigger externally)
+    ene = False
+    if os.path.isfile(tmpdir+'log.lammps'):
+        os.remove(tmpdir+"log.lammps")
+    LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+    with cd(tmpdir):
+        # without SHELL no LD LIBRARY PATH
+        call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
+
+        ### extract energy and forces
+        ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
+        ene=float(ene)
+        #print('ene',ene,'lammps in eV')
+        #print('ace units',ace.units)
+        if ace.units.lower() == 'ev':
+            pass
+        elif ace.units.lower() == 'hartree':
+            ene = ene*0.036749325
+        elif ace.units.lower() == 'hartree_pa':
+            ene = ene*0.036749325/atoms.get_number_of_atoms()
+        elif ace.units.lower() == 'mev_pa':
+            ene = ene/atoms.get_number_of_atoms()
+        else:
+            sys.exit('units '+ace.units+' unknown! Exit!')
+        #print('ene out',ene,ace.units)
+    return ene
 
 if __name__ == "__main__":
     pass

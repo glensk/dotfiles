@@ -364,7 +364,8 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
 def check_if_ase_knows_runner():
     pass
 
-def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=True):
+def ase_get_known_formats(show=False,add_missing_formats=False,verbose=True):
+    ''' adds formats runner and lammps-runner to ase '''
     known_formats = []
     x = ase.io.formats.all_formats
     for i in x:
@@ -375,7 +376,7 @@ def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=True):
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(x)
 
-    if addrunner_if_missing:
+    if add_missing_formats:
         if verbose:
             print('cc',ase.io.__file__)
         formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
@@ -383,17 +384,18 @@ def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=True):
             print('formatspy',formatspy)
 
         scripts = my.scripts()
-        runnerfile = scripts+"/runner_scripts/ase_fileformat_for_runner.py"
-        if not os.path.isfile(runnerfile):
-            print('runnerfile',runnerfile)
-            sys.exit('the runnerfile does not exist;Exit.')
+        missing1 = scripts+"/runner_scripts/ase_fileformat_for_runner.py"
+        missing2 = scripts+"/runner_scripts/ase_fileformat_for_lammpsrunner.py"
+        missing3 = scripts+"/runner_scripts/ase_fileformat_for_lammpsdata.py"
         from shutil import copyfile
         if verbose:
-            print('copying runnerfile to',os.path.dirname(ase.io.__file__))
-        copyfile(runnerfile,os.path.dirname(ase.io.__file__)+"/runner.py")
+            print('copying files to',os.path.dirname(ase.io.__file__))
+        copyfile(missing1,os.path.dirname(ase.io.__file__)+"/runner.py")
+        copyfile(missing2,os.path.dirname(ase.io.__file__)+"/lammpsrunner.py")
+        copyfile(missing3,os.path.dirname(ase.io.__file__)+"/lammpsdata.py")
 
         if 'runner' in x:
-            print('runner format is already added in formats.py (of ase).')
+            print('missing format are already added in formats.py (of ase).')
         else:
             print('adapting ase formats.py .... ')
             if not os.path.isfile(formatspy):
@@ -406,13 +408,18 @@ def ase_get_known_formats(show=False,addrunner_if_missing=False,verbose=True):
             contents = f.readlines()
             f.close()
             insert=0
+            insert2=0
             for idx,i in enumerate(contents):
                 #print('i',idx,i)
                 #print("|"+i[:20]+"|")
                 if i[:20] == "    'abinit': ('ABIN":
                     insert = idx
+                if i[:30] == "    'lammps-data': 'lammpsdata":
+                    insert2 = idx
 
             contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+            contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
+            contents.insert(insert2, "    'lammps-runner': 'lammpsrunner',\n")
             print('insert',insert)
 
             f = open(formatspy, "w")
