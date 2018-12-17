@@ -123,7 +123,8 @@ $1 grep 'grep --color=auto -d skip'    # skips directories
 $1 bc 'bc -l'
 #alias cp='cp -a'  # this one did not copy symliks as files but as symlinks -> remove -a
 $1 xmgrace 'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
-$1 x 'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+$1 x   'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+$1 xll "DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par"
 $1 g gnuplotfile
 $1 untargz 'tar -xvf'
 $1 untar 'tar xfv'
@@ -254,11 +255,11 @@ $1 moduel 'module'
 #$1 q 'squeue -u "$USER" --format "%A %t %N %C %M %Z" | awk '{printf "%8s %3s %20s %4s %6s %10s\n",$1,$2,$3,$4,$5,$6}''
 #$1 mount_fidis 'sshfs -o idmap=user glensk@fidis@epfl.ch:/scratch/glensk ~/fidis'
 $1 mount_fidis_scratch 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o reconnect -C; echo mounted /scratch/glensk' 
-$1 umount_fidis_scratch 'umount -f /scratch/glensk; umounted /scratch/glensk'
+$1 umount_fidis_scratch 'umount -f /scratch/glensk; echo umounted /scratch/glensk'
 
 
 $1 mount_fidis_home 'sshfs glensk@fidis.epfl.ch:/home/glensk/ /home/glensk -o reconnect -C; echo mounted /home/glensk' 
-$1 umount_fidis_home 'umount -f /home/glensk; umounted /home/glensk'
+$1 umount_fidis_home 'umount -f /home/glensk; echo umounted /home/glensk'
 
 
 
