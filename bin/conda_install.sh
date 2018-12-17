@@ -16,14 +16,14 @@ else
     exit
 fi
 RED='\033[0;31m'
-NC='\033[0m' # No Color
+#RED="\033[31m"
+NC="\033[0m" # No Color
 
-echo "${RED}###############################################################${NC}"
-echo "${RED}## try go get everything running currently with python2 #######${NC}"
-echo "${RED}###############################################################${NC}"
-echo "${RED}Linux_or_MacOSX: $Linux_or_MacOSX"
-echo "condaversion   : $condaversion${NC}"
-
+echo -e "${RED}###############################################################${NC}"
+echo -e "${RED}## try go get everything running currently with python2 #######${NC}"
+echo -e "${RED}###############################################################${NC}"
+echo -e "${RED}Linux_or_MacOSX: $Linux_or_MacOSX"
+echo -e "condaversion   : $condaversion${NC}"
 
 if [ "$condaversion" == "3" ];then
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-$Linux_or_MacOSX-x86_64.sh
@@ -69,6 +69,8 @@ echo "${RED}jupyter_contrib_nbextension${NC}"
 conda install -y -c conda-forge jupyter_contrib_nbextensions   # get the notebook extensions for jupyter notebooks
 echo "${RED}jupyter contrib nbextension install --user${NC}"
 jupyter contrib nbextension install --user # also necessary to get the notebook extensions working
+echo "${RED}nglview${NC}"  # to look at structures
+conda install -c omnia nglview
 
 #conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 
 #conda install argcomplete           # to get argcompletion of python scripts in bash/zsh

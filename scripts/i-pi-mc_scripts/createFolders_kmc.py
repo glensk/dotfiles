@@ -9,16 +9,7 @@ import click
 import convert_fileformats
 import myutils as mu
 
-# show default values in click
-orig_init = click.core.Option.__init__
-def new_init(self, *args, **kwargs):
-    orig_init(self, *args, **kwargs)
-    self.show_default = True
-click.core.Option.__init__ = new_init
-
-
-# get help also with -h
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 
 
@@ -82,7 +73,7 @@ def createjob(
             print('you are NOT on fidis')
             sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
-    nn_pot_dir              = scripts + "/potentials/runner_lammps_nn/" + nn_pot
+    nn_pot_dir              = scripts + "/potentials/lammps_runner/" + nn_pot
     file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
     file_submit             = scripts + "/i-pi-mc_scripts/submit-ipi-kmc.sh"
     file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
@@ -166,7 +157,10 @@ def createjob(
 
 
         # get data.lmp
-        convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
+        #convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
+        convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.ipi','ipi')
+        #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.lammps-data','lammps-data')  # lamms-data data format is only R (can only be read!)
+
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')
         if test == True:
             convert_fileformats.save_ase_object_as_lmp(atomsc,jobdir+'/data.lmp')

@@ -3,10 +3,16 @@ from __future__ import print_function
 import os,sys
 import click
 import numpy as np
+import glob
+from socket import gethostname
+from shutil import copyfile
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
-from socket import gethostname
+from ase.calculators.lammpslib import LAMMPSlib
+from ase.io import read as ase_read
+from ase.io import write as ase_write
+import shutil
 
 
 # from scripts folder
@@ -32,15 +38,15 @@ def create_READMEtxt(directory,add=False):
     with open(filepath, "w") as text_file:
         text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts\n")
         text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts\n")
-        text_file.write("# used sha: "+sha+"\n")
-        text_file.write(strout+"\n")
+        text_file.write("# used sha: "+sha) #+"\n")
         if add:
             if type(add) == str:
                 text_file.write(add+"\n")
             elif type(add) == list:
                 for i in add:
                     text_file.write(i+"\n")
-
+        text_file.write("\n")
+        text_file.write(strout+"\n")
 
     print()
     print('written ',filepath)
@@ -62,9 +68,25 @@ def sed(file,str_find,str_replace):
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
     return
 
+def cp(src,dest):
+    copyfile(src,dest)
+
 def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+class cd:
+    """Context manager for changing the current working directory"""
+    def __init__(self, newPath):
+        self.newPath = os.path.expanduser(newPath)
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)
+
 
 def check_isdir_or_isdirs(path):
     if type(path) is str:
@@ -78,7 +100,7 @@ def check_isdir_or_isdirs(path):
     return
 
 
-def check_isfile_or_isfiles(path,pathnames,envvar=False):
+def check_isfile_or_isfiles(path,pathnames=False,envvar=False,verbose=False):
     add=""
     if envvar == True: add = "(set as environment variable)"
     if type(path) is str:
@@ -86,8 +108,9 @@ def check_isfile_or_isfiles(path,pathnames,envvar=False):
             sys.exit('missing file '+path+add)
     elif type(path) is list:
         for idx,i in enumerate(path):
-            #print('ii',i,idx,pathnames[idx])
-            if i is None:
+            if verbose:
+                print('idx',idx,path[idx],'path',i)
+            if i is None and type(pathnames) != bool:
                 sys.exit(pathnames[idx]+" "+add+' is not defined!')
             if not os.path.isfile(i):
                 sys.exit('missing file '+i)
@@ -184,6 +207,31 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
     kmesh = [np.ceil(kmesh_l * np.linalg.norm(reci_cell[i]))
              for i in range(len(reci_cell))]
     return kmesh
+
+
+def ase_enepot(atoms,units='eV'):
+    ''' units: eV, eV_pa, hartree, hartree_pa '''
+    ene = atoms.get_potential_energy()
+
+    units_split = units.split("_")
+    #print('us',units_split,units_split[1])
+    if units_split[0].lower() == 'ev':
+        pass
+    elif units_split[0].lower() == 'mev':
+        ene = ene*1000.
+    elif units_split[0] == "hartree" or units_split[0] == "Hartree":
+        ene = ene*0.036749325
+
+    if len(units_split) == 2:
+        if units_split[1] == 'pa':
+            ene = ene/atoms.get_number_of_atoms()
+        else:
+            sys.exit("energy can not have this units (ending must be pa, eV_pa or hartree_pa)")
+
+    return ene
+
+
+
 
 def qe_parse_numelectrons_upfpath(upfpath):
     ''' parses the number of electrons from a quantum espresso potential '''
@@ -321,8 +369,276 @@ def get_click_defaults():
         orig_init(self, *args, **kwargs)
         self.show_default = True
     click.core.Option.__init__ = new_init
-    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
     return CONTEXT_SETTINGS
+
+def mypot(getbasename=False):
+    ''' return a list of available potentials '''
+    scripts = os.environ['scripts']
+    allpot_fullpath = glob.glob(scripts+'/potentials/*')
+    allpot_basenames = []
+    onepot_fullpath = False
+    onepot_basename = False
+    for i in allpot_fullpath:
+        #print(i)
+        allpot_basenames.append(os.path.basename(i))
+        if type(getbasename) != bool:
+            if getbasename == os.path.basename(i):
+                onepot_fullpath = i
+                onepot_basename = getbasename
+
+    #print(allpot_basenames)
+    #sys.exit()
+    if getbasename == False:
+        return allpot_basenames
+    else:
+        return onepot_basename,onepot_fullpath
+
+class ase_calculate_ene( object ):
+    '''
+    ase_calculate_ene (ace) class which holds lammps commands to be executed
+    '''
+    def __init__(self,pot,units,geopt,verbose):
+        self.pot = pot
+        self.units = units
+        self.geopt = geopt
+        self.verbose = verbose
+        self.lmpcmd, self.atom_types = pot_to_ase_lmp_cmd(self.pot,geopt=self.geopt,verbose=self.verbose)
+
+        self.atoms = False
+
+        if self.verbose:
+            print('self.verbose :',self.verbose)
+            print('pot          :',self.pot)
+            print('units        :',self.units)
+            print('lmpcmd       :',self.lmpcmd)
+            print('atom_types   :',self.atom_types)
+            print('atoms        :',self.atoms)
+        return
+
+    def ene(self,atoms=False):
+        ''' atoms is an ase object '''
+        if atoms == False:
+            atoms = self.atoms
+        else:
+            atoms = atoms
+
+        atoms.wrap()
+
+        if self.verbose > 1:
+            showfirst = 10
+            print('XXatomsXX',atoms)
+            print('XX atoms')
+            #print(atoms.positions)
+            print(atoms.get_positions()[:showfirst])
+            print('XX elements get_chemical_symbols()')
+            print(atoms.get_chemical_symbols()) #[:showfirst])
+            print('XX atoms.cell')
+            print(atoms.cell)
+            print('XX aa.get_cell_lengths_and_angles()')
+            print(atoms.get_cell_lengths_and_angles())
+            print('XXatom.numbers',atoms.numbers)
+            print('XX-------------------------------------------YY')
+            print('YY--lmpcmd:',self.lmpcmd)
+            print('YY--atom_types',self.atom_types)
+            print('YY--geopt',self.geopt)
+        if self.geopt == False:
+            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
+            atoms.set_calculator(calcLAMMPS)
+        else:
+            #calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
+            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=True)
+            atoms.set_calculator(calcLAMMPS)
+            #from ase.io.trajectory import Trajectory
+            #traj = Trajectory('ka', mode='w',atoms=atoms)
+            from ase.optimize import BFGS
+            from ase.optimize import LBFGS
+            from ase.optimize import FIRE
+            #opt = BFGS(atoms,trajectory="ni.traj")
+            #opt.run(steps=20)
+            minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE' ]
+            minimizer = 'FIRE'
+            print('startminimize....')
+            if minimizer == 'BFGS':
+                opt1 = BFGS(atoms,trajectory="ni.traj")
+            elif minimizer == 'LGBFGS':
+                opt1 = LBFGS(atoms,trajectory="ni.traj")
+            elif minimizer == 'FIRE':
+                opt1 = FIRE(atoms) #,trajectory="ni.traj")
+            print('startrun....')
+            opt1.run(steps=80)
+            print('done....')
+            #opt2 = FIRE(atoms,trajectory="ni.traj")
+            #opt2.run(steps=20)
+            #calcLAMMPS.attach(traj)
+            #calcLAMMPS.run()
+        if self.verbose > 1:
+            print('ZZ done2')
+            print('ZZ self.units',self.units)
+        ene = ase_enepot(atoms,units=self.units)
+        if self.verbose > 1:
+            print('ZZ ene',ene,self.units)
+        #sys.exit()
+        #ene = atoms.get_total_energy()
+        #if self.verbose:
+        #    print('ene',ene)
+        #return ene,ene/atoms.get_number_of_atoms()*1000.
+        return ene
+
+
+
+
+
+def string_to_index_an_array(array,string):
+    ''' array will be indexed according to string e.g.
+        array["string"] where "string" = ":7"
+        array[":7"] = [ 0,1,2,3,4,5,6,7]
+    '''
+    if string == ":":                  # ":"
+        return array
+    elif string[0] == ':':             # begins with : e.g. :7
+        #print('t1',string[1:])
+        try:
+            if type(int(string[1:])) == int:
+                return array[:int(string[1:])]
+        except ValueError:
+            pass
+    else:
+        try:                           # 7
+            a = int(string)
+            return [array[int(string)]]
+        except ValueError:
+            pass
+        return False
+
+
+def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
+    basename,fullpath = mypot(getbasename=pot)
+    if verbose > 1:
+        print('...get_potential--basename:',basename)
+        print('...get_potential--fullpath:',fullpath)
+        print('...pot',pot.split("_"))
+
+    lmpcmd = [
+            "mass 1 24.305",
+            "mass 2 26.9815385",
+            "mass 3 28.0855",
+            "variable nnpDir string "+fullpath
+            ]
+
+    if pot.split("_")[0] == "n2p2":
+        lmpcmd = lmpcmd + [
+            "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
+            "pair_coeff * * 17.0",
+            "neighbor 0.4 bin",
+        ]
+        att = {'Mg':1,'Al':2,"Si":3}
+
+    elif pot.split("_")[0] == "runner":
+        lmpcmd = lmpcmd + [
+            "variable runnerCutoff    equal  10.0",
+            "# thermo 1 # for geopt",
+            "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
+            "pair_coeff * * ${runnerCutoff}",
+        ]
+        att = {'Mg':1,'Al':2,"Si":3}
+
+    else:
+        sys.exit('pot '+str(pot)+' not found!')
+
+    #if geopt:  # only if geopt is done by lammps! not if geopt is done by ase!
+    #    lmpcmd = lmpcmd + [
+    #        "min_style cg",
+    #        "minimize 1.0e-9 1.0e-10 1000 1000"
+    #        ]
+        #lmpcmd.append("min_style cg")
+        #lmpcmd.append("minimize 1.0e-9 1.0e-10 1000 1000")
+    if verbose > 1:
+        print('...lmpcmd',lmpcmd)
+    return lmpcmd, att
+
+def q():
+    out=check_output(['q'])
+    out2=out.split('\n')
+    id=[]
+    stat=[]
+    cores=[]
+    runtime=[]
+    path=[]
+    for idx,i in enumerate(out2):
+        #print(i.split(" "))
+        str_list = filter(None, i.split(" "))
+        if idx > 0 and len(str_list) > 2:
+            #print(str_list)
+            id.append(int(str_list[0]))
+            stat.append(str_list[1])
+            cores.append(int(str_list[2]))
+            runtime.append(str_list[3])
+            path.append(str_list[4])
+
+    return id,stat,path
+
+def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
+    ''' ace is the ace object holding the lammps commands '''
+    mkdir(folder)
+    f = open(folder+'/'+filename,'w')
+
+    f.write("clear\n")
+    f.write("units metal\n")
+    f.write("boundary p p p\n")
+    f.write("atom_style atomic\n")
+    f.write("read_data \"" +str(positions)+"\"\n")
+
+    for i in ace.lmpcmd:
+        f.write(i+"\n")
+
+    f.write("\n")
+
+    if ace.geopt:
+        f.write("min_style cg\n")
+        f.write("minimize 1.0e-9 1.0e-10 1000 1000\n")
+
+    f.write("run 0\n")
+    return
+
+def lammps_ext_calc(atoms,ace):
+    ''' atoms is an ase atoms object which can hold several frames, or just one'''
+    ### mkdir tmpdir
+    tmpdir = os.environ['HOME']+"/_tmp_lammps/"
+    mkdir(tmpdir)
+
+    ### write input structure
+    atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
+
+    ### write inputfile
+    lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
+
+    ### calculate with lammps (trigger externally)
+    ene = False
+    if os.path.isfile(tmpdir+'log.lammps'):
+        os.remove(tmpdir+"log.lammps")
+    LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+    with cd(tmpdir):
+        # without SHELL no LD LIBRARY PATH
+        call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
+
+        ### extract energy and forces
+        ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
+        ene=float(ene)
+        #print('ene',ene,'lammps in eV')
+        #print('ace units',ace.units)
+        if ace.units.lower() == 'ev':
+            pass
+        elif ace.units.lower() == 'hartree':
+            ene = ene*0.036749325
+        elif ace.units.lower() == 'hartree_pa':
+            ene = ene*0.036749325/atoms.get_number_of_atoms()
+        elif ace.units.lower() == 'mev_pa':
+            ene = ene/atoms.get_number_of_atoms()
+        else:
+            sys.exit('units '+ace.units+' unknown! Exit!')
+        #print('ene out',ene,ace.units)
+    return ene
 
 if __name__ == "__main__":
     pass

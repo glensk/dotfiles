@@ -1,20 +1,20 @@
-#!/bin/zsh
-
+echo shell $shell
+module list
+exit
 #installfolder=$HOME  # folder where n2p2 will be installed
 # on fidis do: intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
-eval module load intel
+module load intel
 exit
 module load intel-mpi
 module load intel-mkl
 module load gsl
 module load eigen
 # gives intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
-exit
 #####################################################################
 # get n2p2 
 #####################################################################
 cd $HOME #$installfolder
-#[ "$USER" = [ "glensk" ] && cd $HOME/Dropbox/Albert/git
+[ "$USER" = [ "glensk" ] && cd $HOME/Dropbox/Albert/git
 [ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
 cd n2p2/src
 
@@ -46,8 +46,9 @@ make
 #####################################################################
 exit
 # from https://compphysvienna.github.io/n2p2/a01203.html
-pwd
-make libnnpif-shared
+#pwd
+#make libnnpif-shared
+
 cd $HOME/sources/lammps_source_cosmo
 ln -s $HOME/Dropbox/Albert/git/n2p2 lib/nnp
 cd $HOME/Dropbox/Albert/git/n2p2
@@ -55,5 +56,6 @@ cp -r src/interface/LAMMPS/src/USER-NNP $HOME/sources/lammps_source_cosmo/src
 
 cd $HOME/sources/lammps_source_cosmo/src
 make yes-user-nnp
-make mpi
+#make mpi
+make fidis #(on fidis)
 

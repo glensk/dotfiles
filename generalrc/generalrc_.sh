@@ -27,7 +27,7 @@ setenv onhost $onhost;
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 
 # ipi_mc, scripts, ESPRESSO_PSEUDO, PATH, PYTHONPATH
-source $dotfiles/scripts/source_to_add_to_path.sh;
+source $dotfiles/scripts/source_to_add_to_path.sh
 
 ###################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
@@ -66,7 +66,7 @@ tab-color $mypromptpath
 case $onhost in
 mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 cosmopc) source $HOME/aiida/bin/activate; ;;
-fidis) source $HOME/miniconda3/etc/profile.d/conda.sh && conda activate; ;;
+fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 esac
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 

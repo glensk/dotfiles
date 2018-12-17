@@ -45,6 +45,7 @@ rm -f lmp_$makeversion
 pwd
 echo "now make"
 make $makeversion | tee -a make_$makeversion\_out_`date +"%Y_%m_%d"`
+make mode=shlib $makeversion
 pwd
 [ ! -e "lmp_$makeversion" ] && echo "lmp_$makeversion was NOT CREATED! THE COMPILATION FAILED!"
 if [ -e "lmp_$makeversion" ];then

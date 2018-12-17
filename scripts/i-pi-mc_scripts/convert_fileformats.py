@@ -1,14 +1,15 @@
 #!/usr/bin/env python
+from __future__ import print_function
+import inspect
 import sys,os,copy
 import argparse
 import numpy as np
 from numpy.linalg import norm
 import ase
 from ase.io import read,write
-
 import myutils as my
 
-my.exit_if_not_python3()
+#my.exit_if_not_python3()  # for what??
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""
@@ -106,85 +107,129 @@ def write_lammps_data(infile, atoms, atom_types, comment=None, cutoff=None,
     if isinstance(filename, str):
         fh.close()
 
+
+def show_ase_frame_or_frames_content(frame_or_frames):
+    #print('frame5',frame_or_frames.cell)
+    #print('frame5',frame_or_frames[:].cell)
+    #print('tt',type(frame_or_frames))
+    #print('t?',type(frame_or_frames) == list)
+    #for idx,i  in enumerate(frame_or_frames):
+    #    print('idx,i',idx,i)
+    if type(frame_or_frames) != list:
+        frame_or_frames = [frame_or_frames]
+    show_first = 3
+
+    for idx,i  in enumerate(frame_or_frames):
+        print("frame:",idx)
+        print("------------")
+        print("cell:")
+        print(frame_or_frames[0].cell)
+        #print(frame_or_frames[0].get_cell())
+        print()
+        print("positions:")
+        print(frame_or_frames[idx].positions[:show_first])
+        print()
+        print("...")
+        print(frame_or_frames[0].positions[-show_first:])
+        print()
+        print("elements:",frame_or_frames[0].get_chemical_symbols()[:show_first],"...",frame_or_frames[0].get_chemical_symbols()[-show_first:])
+        print()
+        print('kk',frame_or_frames[idx].get_cell())
+    return
+
 def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=False):
     ''' reads in a file (or several files) and creates out of it one
     ase object containing one (or several) frames
     '''
 
     # get all known formats from ase; all known formats can be read.
-    known_formats = []
-    for i in ase.io.formats.all_formats:
-        known_formats.append(i)
+    known_formats = ase_get_known_formats()
 
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
-        # case of once structure only
-        #frame_or_frames = read(infile,format=formatin)  # only first structure (or last?)
-        #print('frame_or_frames',frame_or_frames)
-        #print("cell:",frame_or_frames.cell)
-
-        # maybe more general
         frame_or_frames = read(infile,':',format=formatin) # all structures
         print('infile (read in) :',infile,"(successfully)")
         print('frames           :',len(frame_or_frames))
-        #frame_or_frames = read(infile,'0',format=formatin)  # only first structure
-        if args.verbose == True:
-            if len(frame_or_frames) == 1:
-                print('frame_or_frames',frame_or_frames)
-                print("cell:",frame_or_frames[0].cell)
-                print("positions:",frame_or_frames[0].positions)
+        if len(frame_or_frames) == 0:
+            sys.exit("NO FRAMES FOUND!")
 
-                # POTCAR does not have energy...
-                print("potential energy (eV):",frame_or_frames[0].get_potential_energy())
-            elif len(frame_or_frames) >= 1:
-                print("cell[-1]     :",frame_or_frames[-1].cell)
-                print("positions[-1]:",frame_or_frames[-1].positions)
-                print("potential energy (eV) [-1]:",frame_or_frames[-1].get_potential_energy())
-    elif formatin == 'ipi':
-        frame_or_frames = read(infile,format='extxyz')
-        print('fc',frame_or_frames.cell)
-        print('fp',frame_or_frames.positions)
-        #with open(outfilename, 'r') as file:
-        #    # read a list of lines into data
-        #    data = file.readlines()
-        #print('d0',data[0])
-        #print('d1',data[1])
-        #print('d2',data[2])
+
+
+    #elif formatin == 'ipi':
+    #    print('fi ipi')
+    #    #frame_or_frames = read(infile,':',format='extxyz')
+    #    frame_or_frames = read(infile,':',format='xyz')
+    #    print('f',frame_or_frames)
+    #    print('f',type(frame_or_frames))
+    #    #sys.exit('jo')
+    #    #print('fc',frame_or_frames.cell)
+    #    #print('fp',frame_or_frames.positions)
+    #    #with open(outfilename, 'r') as file:
+    #    #    # read a list of lines into data
+    #    #    data = file.readlines()
+    #    #print('d0',data[0])
+    #    #print('d1',data[1])
+    #    #print('d2',data[2])
     else:
         sys.exit('formatin '+formatin+' not in the list of known formats! Exit.')
-    return frame_or_frames
+
+
+    if args.verbose == True:
+        show_ase_frame_or_frames_content(frame_or_frames)
+
+    #sys.exit('jojoa')
+    if len(frame_or_frames) == 1:
+        return [frame_or_frames]
+    else:
+        return frame_or_frames
 
 def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=False):
+
     ###########################################################################
     # read the inputfile
     ###########################################################################
-    frame = read_in_file_or_files_and_make_ase_object(infile=infile,formatin=formatin,verbose=args.verbose)
-
+    frame_or_frames = read_in_file_or_files_and_make_ase_object(infile=infile,formatin=formatin,verbose=args.verbose)
+    #sys.exit('nach readin')
     ###########################################################################
     # write the outputfile
     ###########################################################################
     print('formatout        :',formatout)
 
+    #print('nowframes (1): ',len(frame_or_frames))
+    if args.write_particular_frame != -1: # -1 is the default
+        #frame_or_frames = frame_or_frames[args.write_particular_frame]
+        frame_or_frames = [frame_or_frames[args.write_particular_frame]]
+
+    #print('nowframes (2): ',len(frame_or_frames))
+    print('frames writing   :',len([frame_or_frames]),"(-wf argument)")
+    #print('nowframes: ',len(frame_or_frames))
 
     otherlist = ['lmp', 'lmp.runner','ipi']
+    otherlist = ['lmp', 'lmp.runner']
 
+    known_formats = ase_get_known_formats()
 
-    for idx,frameone in enumerate(frame):
+    if len(frame_or_frames) > 1:
+        my.get_from_prompt_Yy_orexit("Do you want to write "+str(len(frame_or_frames))+" structures to drive? [Yy]")
 
-        if len(frame) == 1:
+    for idx,frameone in enumerate(frame_or_frames):
+
+        if len(frame_or_frames) == 1:
             idx = ""
         #print('idx:',idx,type(idx))
         outfilename = get_outfilename(args,idx)
         #print('aaa',outfilename)
         if formatout in otherlist:
+            print('formatout        :',formatout,"(not default fileformat, but known - lmp or lmp.runner -)")
             if formatout == 'lmp':
                 save_ase_object_as_lmp(frameone,outfilename,comment=infile,runner=False)
             if formatout == 'lmp.runner':
                 save_ase_object_as_lmp_runner(frameone,outfilename,comment=infile)
-            if formatout == 'ipi':
-                save_ase_object_as_ipi_format(frameone,outfilename)
+            #if formatout == 'ipi':
+            #    save_ase_object_as_ipi_format(frameone,outfilename)
 
         elif formatout in known_formats:
+            print('formatout        :',formatout,"known by default")
             save_ase_object_in_ase_format(frameone,outfilename,formatout)
         else:
             sys.exit('unknown output format '+formatout)
@@ -211,7 +256,7 @@ def save_ase_object_as_ipi_format(frame,outfilename):
         # read a list of lines into data
         data = file.readlines()
 
-    data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step:           4  Bead:       0 positions{angstrom}  cell{angstrom}"+'\n'
+    data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step: 4  Bead: 0 positions{angstrom}  cell{angstrom}"+'\n'
 
     # and write everything back
     with open(outfilename, 'w') as file:
@@ -226,16 +271,34 @@ def save_ase_object_as_lmp_runner(frame,outfilename,comment=""):
 
 
 def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
+    if type(frame) != list:
+        frame = [frame]
     # important not to change frame (aseobject), i dont know why but when this is called
     # externally it changes external frame (aseobject)
+    #print('frame2',frame.cell)
     framework = copy.deepcopy(frame)
+    #print('frame3',frame.cell)
+    #print('frame4',framework.cell)
     #framework = frame
+    #print('----------------------------------------xxxxxxxxxxxxx')
+    #show_ase_frame_or_frames_content(frame)
+    #print('----------------------------------------xxxxxxxxxxxxx')
+    #show_ase_frame_or_frames_content(framework)
+    #sys.exit()
+    #print('fw',framework.positions)
+    framework = framework[0]
+    #sys.exit()
+
+    # this converts from ase to lammps; newcell,newpos give same energies?
+    # I would actually need something which reverts this
     newcell, newpos = convert_cell(framework.cell, framework.positions)
     framework.set_cell(newcell)
     framework.set_positions(newpos)
 
     species = framework.get_atomic_numbers()
+    print('species',species)
     unique_species, i_unique_species = np.unique(species, return_index=True)
+    print('unique_species',unique_species)
     masses = framework.get_masses()
     positions = framework.get_positions()
 
@@ -275,13 +338,21 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     elif runner is True:
         # in principle this can be automatically obtained from the nn potential,
         # for now however I am lazy
-        fout.write("1 24.305\n")
-        fout.write("2 26.9815385\n")
-        fout.write("3 28.085\n")
+        fout.write("1 24.305\n")        # Mg
+        fout.write("2 26.9815385\n")    # Al
+        fout.write("3 28.085\n")        # Si
+        species_runner = species.copy()
+        species_runner[species_runner == 12] = 1
+        species_runner[species_runner == 13] = 2
+        species_runner[species_runner == 14] = 3
+        lammps_indices = species_runner
+        #print('sp',species_runner)
+
     fout.write("\n")
     fout.write("Atoms\n")
     fout.write("\n")
-    for ii in range(len(species)):
+    # take care here for runner / n2p2 if only 2 species (say Mg,Si) for Mg,Al,Si potential
+    for ii in range(len(species)):  # if only Mg and Si get is, there will be only type 1 and 2 and not 1 and 3!
         fout.write(("%5d %5d %s" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
         #fout.write(("%5d %5d %.10f %.10f %.10f" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
     fout.write("\n")
@@ -290,7 +361,74 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     print('written (4)      : '+outfilename)
     return
 
+def check_if_ase_knows_runner():
+    pass
 
+def ase_get_known_formats(show=False,add_missing_formats=False,verbose=True):
+    ''' adds formats runner and lammps-runner to ase '''
+    known_formats = []
+    x = ase.io.formats.all_formats
+    for i in x:
+        known_formats.append(i)
+
+    if show:
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(x)
+
+    if add_missing_formats:
+        if verbose:
+            print('cc',ase.io.__file__)
+        formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
+        if verbose:
+            print('formatspy',formatspy)
+
+        scripts = my.scripts()
+        missing1 = scripts+"/runner_scripts/ase_fileformat_for_runner.py"
+        missing2 = scripts+"/runner_scripts/ase_fileformat_for_lammpsrunner.py"
+        missing3 = scripts+"/runner_scripts/ase_fileformat_for_lammpsdata.py"
+        from shutil import copyfile
+        if verbose:
+            print('copying files to',os.path.dirname(ase.io.__file__))
+        copyfile(missing1,os.path.dirname(ase.io.__file__)+"/runner.py")
+        copyfile(missing2,os.path.dirname(ase.io.__file__)+"/lammpsrunner.py")
+        copyfile(missing3,os.path.dirname(ase.io.__file__)+"/lammpsdata.py")
+
+        if 'runner' in x:
+            print('missing format are already added in formats.py (of ase).')
+        else:
+            print('adapting ase formats.py .... ')
+            if not os.path.isfile(formatspy):
+                print('formatspy',formatspy)
+                sys.exit('did not find '+str(formatspy))
+
+            print('now changing formatspy')
+
+            f = open(formatspy, "r")
+            contents = f.readlines()
+            f.close()
+            insert=0
+            insert2=0
+            for idx,i in enumerate(contents):
+                #print('i',idx,i)
+                #print("|"+i[:20]+"|")
+                if i[:20] == "    'abinit': ('ABIN":
+                    insert = idx
+                if i[:30] == "    'lammps-data': 'lammpsdata":
+                    insert2 = idx
+
+            contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+            contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
+            contents.insert(insert2, "    'lammps-runner': 'lammpsrunner',\n")
+            print('insert',insert)
+
+            f = open(formatspy, "w")
+            contents = "".join(contents)
+            f.write(contents)
+            f.close()
+
+
+    return known_formats
 
 if __name__ == "__main__":
     #p = argparse.ArgumentParser(description=pp.pprint(x),
@@ -307,18 +445,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=string)
     parser.add_argument("infile", type = str, help = "The name of the file")
     parser.add_argument("--showformats",'-sf', action='store_true', default=False, help = "show the possible in/outputformats (not showing lammps) and exit")
+    parser.add_argument("--make_ase_runner",'-ar', action='store_true', default=False, help = "adapt ase so that it can read/write runner format.")
     parser.add_argument("--formatin",'-fi', type=str,default="lmp", help="Format of the input file, this can be all of the listed using --showformats, e.g. espresso-out,xyz,vasp, ...; default:lmp")
     parser.add_argument("--formatout",'-fo', type=str,default="lmp", help="Format of the output file, this can be most of the listed using --showformats and additionally lmp for LAMMPS, e.g. lmp,xyz,vasp, ...; default:lmp")
     parser.add_argument("--outfilename", type=str,default=False, help="if nothing is provided --> default=infile+.lmp or when split option: infile+NUMBER+.lmp")
+    parser.add_argument("--write_particular_frame",'-wf', type=int,default=-1, help="when writing of files, specify here if a particular frame should be written; (mind: 0 is frame one, 1 is frame 2, ...); default: all frames are written")
     parser.add_argument('-v','--verbose', help='verbose', action='count', default=False)
 
 
     args = parser.parse_args()
-    if args.showformats:
-        x = ase.io.formats.all_formats
-        import pprint
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(x)
+    if args.showformats or args.make_ase_runner:
+        known_formats = ase_get_known_formats(show=True,addrunner_if_missing=args.make_ase_runner)
         sys.exit()
 
     def get_outfilename(args,frame=""):
