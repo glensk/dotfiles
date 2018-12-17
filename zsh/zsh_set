@@ -146,7 +146,8 @@ bindkey '^[[Z' reverse-menu-complete   # using shift-Tab to go bakc in menues
 # this is for linux systems and ideally should not interfere with iterm2 for mac
 # iterm2 gives all this first few keystrokes so it works on all shells and nodes from 
 # iterm; however, being on cosmopc, this is necessary since no iterm2
-bindkey "^[n" backward-word
+
+bindkey "^[n" backward-word    
 bindkey "^[m" forward-word
 bindkey "^[l" forward-char 
 bindkey "^[h" backward-char 
