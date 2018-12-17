@@ -1,28 +1,32 @@
-echo shell $shell
-module list
-exit
-#installfolder=$HOME  # folder where n2p2 will be installed
-# on fidis do: intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
-module load intel
-exit
-module load intel-mpi
-module load intel-mkl
-module load gsl
-module load eigen
+#!/bin/sh
+
+##installfolder=$HOME  # folder where n2p2 will be installed
+## on fidis do: intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
+#module load intel
+#exit
+#module load intel-mpi
+#module load intel-mkl
+#module load gsl
+#module load eigen
 # gives intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
 #####################################################################
 # get n2p2 
 #####################################################################
 cd $HOME #$installfolder
-[ "$USER" = [ "glensk" ] && cd $HOME/Dropbox/Albert/git
+[ "$USER" ==  "glensk" ] && cd $HOME/Dropbox/Albert/git
+echo "#########################"
+pwd
+echo "#########################"
 [ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
-cd n2p2/src
+cd n2p2
+git checkout develop
+git branch
+cd src
 
 # adapt makefile
 sed -i 's|^COMP=.*|COMP=intel|' makefile
 sed -i 's|^PROJECT_DIR.*|PROJECT_DIR=./|' makefile
-sed -i 's|^LIB=.*|libnnp.so libnnpif.so libnnptrain.so|' makefile # remove pynnp.so
-
+sed -i 's|^LIB=libnnp.so libnnpif.so libnnptrain.so pynnp.so|LIB=libnnp.so libnnpif.so libnnptrain.so|' makefile  # remove pynnp.so
 
 # adapt makefile.intel
 sed -i 's|^PROJECT_GSL=.*|PROJECT_GSL=${GSL_ROOT}/include|' makefile.intel
