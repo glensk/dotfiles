@@ -1,0 +1,23 @@
+clear
+variable nameStartCfg string "Al6xxxDB_structures_calc.input.data.0.lmp.runner"
+variable runnerDir string "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v1ag"
+###############################################################################
+# SETUP
+###############################################################################
+units metal                                         # define unit system (metal = Angstrom, eV, ps, g/mol)
+boundary p p p                                      # set periodic boundary conditions
+atom_style atomic           
+#box tilt large                                      # set atomic style for particles
+read_data ${nameStartCfg}                           # read start configuration
+mass 1 24.305
+mass 2 26.9815385 
+mass 3 28.0855
+pair_style nnp dir ${runnerDir} showewsum 1 showew yes resetew no maxew 1000000 cflength 1.8897261328 cfenergy 0.0367493254
+pair_coeff * * 17.0
+neighbor 0.4 bin
+#dump coords all xyz 1 ./jobcoords.xyz
+#dump_modify coords element Al Mg Si
+#min_style cg
+#minimize 1.0e-9 1.0e-10 1000 1000
+
+run 0

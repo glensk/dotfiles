@@ -85,8 +85,11 @@ def read_runner(fileobj, index=-1):
         line = fileobj.readline()
         # Is there any valuable info to strip from the comment line?
         # info = key_val_str_to_dict(line)
+        #print('9999999 88888',line)
+        #sys.exit('876999')
 
-        info = {}
+        #info = {}
+        info = {'comment': line.strip()}
         arrays = {}
 
         cell = [] # Now we have to read 3 lines to extract information about the lattice
@@ -130,7 +133,7 @@ def read_runner(fileobj, index=-1):
         arrays['forces'] = forces
         info['nrg'] = energy
 
-        structure = Atoms(symbols=symbols, positions=positions, cell=cell, pbc=True)
+        structure = Atoms(symbols=symbols, positions=positions, cell=cell, pbc=True,info=info)
 
         calc = SinglePointCalculator(structure, energy=energy, forces=forces)
         structure.set_calculator(calc)
@@ -174,7 +177,18 @@ def write_runner(fileobj,images,comment=None,append=False):
         #atoms.wrap()
         fileobj.write('begin\n')
         if comment is None:
-            fileobj.write('comment ' + str(atoms.get_number_of_atoms())  + ' atoms, species ' + str(atoms.get_chemical_formula()) + "\n")
+            #print('!-===1',atoms.info)
+            #print('!-===2',atoms.info.get('comment'))
+            #print('!-===2',atoms.info.get('comment').split())
+            #sys.exit()
+            if 'comment' in atoms.info:
+                listcheck = atoms.info.get('comment').split()
+                if len(listcheck) > 1 and listcheck[0] == 'comment':
+                    fileobj.write(atoms.info.get('comment') + "\n")
+                else:
+                    fileobj.write('comment '+atoms.info.get('comment') + "\n")
+            else:
+                fileobj.write('comment ' + str(atoms.get_number_of_atoms())  + ' atoms, species ' + str(atoms.get_chemical_formula()) + "\n")
         else:
             fileobj.write('comment ' + comment)
 

@@ -1,0 +1,14 @@
+clear
+variable runnerDir string "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v1ag"
+units metal
+boundary p p p
+atom_style atomic
+read_data "Al6xxxDB_structures_calc.input.data.0.lmp.runner"
+mass 1 24.305
+mass 2 26.9815385 
+mass 3 28.0855
+pair_style nnp dir ${runnerDir} showewsum 1 showew yes resetew no maxew 1000000 cflength 1.8897261328 cfenergy 0.0367493254
+pair_coeff * * 17.0
+neighbor 0.4 bin
+
+run 0
