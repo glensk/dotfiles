@@ -20,3 +20,5 @@ lists existing tmux sessions
 `tmux detach (prefix + d)`
 detach the currently attached session
 
+tmux a (to attach to session)
+ctrl+a d (to deattach from a session)
