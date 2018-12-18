@@ -20,18 +20,19 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
 @click.option('--ase/--no-ase','-a',default=True,help='Do the calculations by the ase interface to lammps.')
 @click.option('--lmp/--no-lmp','-l',default=False,help='Do the calculations externally by lammps and not through ase interface.')
+@click.option('--ipi/--no-ipi','-ipi',default=False,help='Do the calculations externally by ipi-lammps and not through ase interface.')
 @click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
 @click.option('--verbose','-v',count=True)
 
 
-def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,write_runner):
+def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     '''
 
     #### get the potential
-    ace = ase_calculate_ene(pot,units,geopt,verbose)
+    ace = ase_calculate_ene(pot,units=units,geopt=geopt,verbose=verbose)
     units = ace.units
 
     ### when want to assess some formation energies
@@ -56,6 +57,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     print()
     print('verbose                      :',verbose)
     print('lmp                          :',lmp)
+    print('ipi                          :',ipi)
     if write_runner:
         write_runner = 'runner.out'
     print('write_runner                 :',write_runner)
@@ -81,42 +83,47 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ##############################################
     # loop over structures
     ##############################################
-
+    printevery = 50
+    if len(structures_to_calc) < 50:
+        printevery = 1
+    be_very_verbose = 999
+    print('i',structures_to_calc)
     for idx,i in enumerate(structures_to_calc):
-        if verbose > 1:
-            print('idx',idx)
-            my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "STAT1")
-
+        #print('idx',idx,'i',i)
+        if ipi == True:
+            atoms_tmp = copy.deepcopy(atoms[i])
+            ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
+        sys.exit('ipi laueft')
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
-        if verbose > 1:
+        if verbose > be_very_verbose:
             my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "STAT2")
             print('ene_DFT[idx]',ene_DFT[idx])
 
         if ase == True:
-            atoms = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
-            my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "VOF ACE")
-            ene_pot_ase[idx] = ace.ene(atoms[i])
+            atoms_tmp = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
+            ene_pot_ase[idx] = ace.ene(atoms_tmp)
 
         if lmp == True:
-            my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "VOR LMP")
             #print("STAART LAMMPS EXT CALC")
-            atoms = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
-            ene_pot_lmp[idx] = my.lammps_ext_calc(atoms,ace)
-            print("STAART ASE INTERNAL CALC")
-            print("ENE DFT   :",ene_DFT[idx],ace.units)
-            print("ENE ase   :",ene_pot_ase[idx],ace.units)
-            print("ENE lammps:",ene_pot_lmp[idx],ace.units)
-            print("--------------------------------------")
+            atoms_tmp = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
+            ene_pot_lmp[idx] = my.lammps_ext_calc(atoms_tmp,ace)
+            if verbose:
+                print("ENE DFT   :",i,ene_DFT[idx],ace.units)
+                print("ENE ase   :",i,ene_pot_ase[idx],ace.units)
+                print("ENE lammps:",i,ene_pot_lmp[idx],ace.units)
+                print("--------------------------------------")
             ene_diff_lam_ase[idx] = ene_pot_ase[idx] - ene_pot_lmp[idx]
-            print("DIFF      :",ene_diff_lam_ase[idx],ace.units)
-            print("--------------------------------------")
-            print("--------------------------------------")
-            print("MAKE SURE THAT YOU HAVE the correct species in the lammps run!")
+            if verbose:
+                print("DIFF      :",i,ene_diff_lam_ase[idx],ace.units)
+                print("--------------------------------------")
+                print("--------------------------------------")
+                print("MAKE SURE THAT YOU HAVE the correct species in the lammps run!")
             ene_pot[idx] = ene_pot_lmp[idx]
             #print('idx',idx,'getEnergies_byLammps--------------done')
 
         if write_runner:
             ase_write("out.runner",atoms[i],format='runner',append=True)
+
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
 
@@ -131,25 +138,25 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
         printed = False
 
-        if idx in range(0,len(structures_to_calc),50):
+        if idx in range(0,len(structures_to_calc),printevery):
             print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
             printed = True
 
         if verbose > 0 and printed == False:
-            save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time)
+            save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot)
             print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
 
-    np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase)
+    np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
     if write_runner:
         print('our.runner written')
 
-    save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time)
+    save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,ace.units,pot)
     my.create_READMEtxt(os.getcwd())
     return
 
 
-def save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time):
+def save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot):
     np.savetxt("ene_DFT.npy",ene_DFT,header=units)
     np.savetxt("ene_pot.npy",ene_pot,header=units)
     np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
