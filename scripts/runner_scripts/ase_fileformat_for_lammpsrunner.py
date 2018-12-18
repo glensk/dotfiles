@@ -405,10 +405,16 @@ def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True):
     #print('out',fout)
     #sys.exit()
 
-    if type(frame) != list:
-        frame = [frame]
+    #print('this seems ok -1')
+    #print('frame')
+    #print(frame.positions)
+    #sys.exit()
     framework = copy.deepcopy(frame)
+    #print('this seems ok 0')
+    if type(framework) != list:
+        framework = [framework]
     framework = framework[0]
+    #print('this seems ok 1')
     newcell, newpos = convert_cell(framework.cell, framework.positions)
     framework.set_cell(newcell)
     framework.set_positions(newpos)

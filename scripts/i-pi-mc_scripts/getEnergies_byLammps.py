@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import sys,os
+import sys,os,copy
 import click
 import numpy as np
 import myutils as my
@@ -88,9 +88,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
         if ext == False:  # calculate by ase
             ene_pot[idx] = ace.ene(atoms[i])
         else:
+            atoms_for_ext_todelete = copy.deepcopy(atoms[i])
             ene_pot_todelete = ace.ene(atoms[i])
             print("STAART LAMMPS EXT CALC")
-            ene_pot[idx] = my.lammps_ext_calc(atoms[i],ace)
+            ene_pot[idx] = my.lammps_ext_calc(atoms_for_ext_todelete,ace)
             print("STAART ASE INTERNAL CALC")
             print("ENE DFT   :",ene_DFT[idx],ace.units)
             print("ENE ase   :",ene_pot_todelete,ace.units)

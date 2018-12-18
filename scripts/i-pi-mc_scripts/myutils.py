@@ -15,12 +15,15 @@ from ase.io import write as ase_write
 from ase.optimize import BFGS
 from ase.optimize import LBFGS
 from ase.optimize import FIRE
+from ase.optimize.basin import BasinHopping
+from ase.optimize.minimahopping import MinimaHopping
 import shutil
-
+import time
 
 # from scripts folder
 import massedit
 
+start_time = time.time()
 
 def create_READMEtxt(directory,add=False):
     ''' wiretes a README.txt file '''
@@ -42,6 +45,8 @@ def create_READMEtxt(directory,add=False):
         text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts\n")
         text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts\n")
         text_file.write("# used sha: "+sha) #+"\n")
+        text_file.write("# execution time: "+str(time.time() - start_time)+" seconds.")
+        text_file.write("\n")
         if add:
             if type(add) == str:
                 text_file.write(add+"\n")
@@ -398,6 +403,28 @@ def mypot(getbasename=False):
     else:
         return onepot_basename,onepot_fullpath
 
+def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
+    print("#####################################################")
+    print("# "+comment+" #######")
+    print("#####################################################")
+    print('## atoms')
+    print(atoms)
+    print('## atoms.get_number_of_atoms()',atoms.get_number_of_atoms())
+    #print(atoms.positions)
+    print(atoms.get_positions()[:showfirst])
+    print('## elements get_chemical_symbols()')
+    print(atoms.get_chemical_symbols()) #[:showfirst])
+    print('## atoms.cell')
+    print(atoms.cell)
+    print('## aa.get_cell_lengths_and_angles()')
+    print(atoms.get_cell_lengths_and_angles())
+    print('##atom.numbers',atoms.numbers)
+    print("#####################################################")
+    print("#####################################################")
+    print("#####################################################")
+    return
+
+
 class ase_calculate_ene( object ):
     '''
     ase_calculate_ene (ace) class which holds lammps commands to be executed
@@ -430,23 +457,14 @@ class ase_calculate_ene( object ):
         atoms.wrap()
 
         if self.verbose > 1:
-            showfirst = 10
-            print('XX atoms')
-            print('XXatomsXX',atoms)
-            print('XX atoms.get_number_of_atoms()',atoms.get_number_of_atoms())
-            #print(atoms.positions)
-            print(atoms.get_positions()[:showfirst])
-            print('XX elements get_chemical_symbols()')
-            print(atoms.get_chemical_symbols()) #[:showfirst])
-            print('XX atoms.cell')
-            print(atoms.cell)
-            print('XX aa.get_cell_lengths_and_angles()')
-            print(atoms.get_cell_lengths_and_angles())
-            print('XXatom.numbers',atoms.numbers)
-            print('XX-------------------------------------------YY')
-            print('YY--lmpcmd:',self.lmpcmd)
-            print('YY--atom_types',self.atom_types)
-            print('YY--geopt',self.geopt)
+            show_ase_atoms_content(atoms,showfirst=10,comment = "START ASE INTERNAL CALUCLATION !!!")
+            print()
+            print("#####################################################")
+            print('##--lmpcmd:',self.lmpcmd)
+            print('##--atom_types',self.atom_types)
+            print('##--geopt',self.geopt)
+            print("#####################################################")
+            print()
 
 
         if self.geopt == False:
@@ -463,10 +481,12 @@ class ase_calculate_ene( object ):
             #traj = Trajectory('ka', mode='w',atoms=atoms)
             #opt = BFGS(atoms,trajectory="ni.traj")
             #opt.run(steps=20)
-            minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE' ]
-            minimizer = 'FIRE'
+            minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE', 'bh' ]
+            #minimizer = 'FIRE'
             #minimizer = 'BFGS'
             #minimizer = 'LGBFGS'
+            #minimizer = 'bh'
+            minimizer = 'mh'
             print('startminimize....')
             if minimizer == 'BFGS':
                 opt1 = BFGS(atoms) #,trajectory="ni.traj")
@@ -474,20 +494,35 @@ class ase_calculate_ene( object ):
                 opt1 = LBFGS(atoms) #,trajectory="ni.traj")
             elif minimizer == 'FIRE':
                 opt1 = FIRE(atoms) #,trajectory="ni.traj")
+            elif minimizer == 'bh':
+                kB = 1.38064852e-23
+                kB = 1.6021765e-19
+                opt1 = BasinHopping(atoms=atoms,         # the system to optimize
+                  temperature=1*kB, # 'temperature' to overcome barriers
+                  dr=0.5,               # maximal stepwidth
+                  optimizer=LBFGS,      # optimizer to find local minima
+                  fmax=0.1,             # maximal force for the optimizer
+                  )
+            elif minimizer == 'mh':
+                opt1 = MinimaHopping(atoms=atoms)
+                opt1(totalsteps=10)
             print('startrun....')
             maxsteps = 200
-            opt1.run(steps=maxsteps)
-            print('maxsteps                ',maxsteps,type(maxsteps))
-            print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
+            if minimizer == 'bh':
+                maxsteps = 3
+            if minimizer != 'mh': # in all cases but
+                opt1.run(steps=maxsteps)
+                print('maxsteps                ',maxsteps,type(maxsteps))
+                print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
+                if maxsteps == opt1.get_number_of_steps():
+                    print('DID NOT CONVErGE IN '+str(maxsteps)+' number of minimizer steps!')
+                    return np.nan
             print('ene struct 42: without geoopt: -6852.254 eV lmp and ace')
             print('ene struct 42: without geoopt: -456816.99 meV_pa lmp and ace')
             print()
             print('ene struct 42: ENE lammps: -6853.9673 eV 44 steps')
             print('ene struct 42: ENE    ace: -6852.44299271 eV on 15 steps BFGS')
 
-            if maxsteps == opt1.get_number_of_steps():
-                print('DID NOT CONVErGE IN '+str(maxsteps)+' number of minimizer steps!')
-                return np.nan
             #opt1.replay_trajectory('history.traj')
             #print('done....')
             #opt2 = FIRE(atoms,trajectory="ni.traj")
@@ -505,6 +540,10 @@ class ase_calculate_ene( object ):
         #if self.verbose:
         #    print('ene',ene)
         #return ene,ene/atoms.get_number_of_atoms()*1000.
+        if self.verbose:
+            show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
+            print()
+            print()
         return ene
 
 
@@ -629,7 +668,7 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
         # works but has the types wrong, can be read in by ase,
         # atomtypes (however) need to be changed manually
         ###############################################################
-        #f.write("dump dump_all all custom 1 %s id type x y z vx vy vz fx fy fz\n")
+        f.write("dump dump_all all custom 1 %s id type x y z vx vy vz fx fy fz\n")
 
         ###############################################################
         # works and writes instaed of he types the actual element
@@ -643,10 +682,10 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
         ###############################################################
         # try with edoardos comment
         ###############################################################
-        stride = 1  # print all
-        stride = 1000  # print first and last
-        f.write("dump dump_all all xyz "+str(stride)+" traj.out\n")  # dumps with edoardos pach
-        f.write("dump_modify dump_all element Mg Al Si\n")
+        #stride = 1  # print all
+        #stride = 1000  # print first and last
+        #f.write("dump dump_all all xyz "+str(stride)+" traj.out\n")  # dumps with edoardos pach
+        #f.write("dump_modify dump_all element Mg Al Si\n")
 
 
         f.write("min_style cg\n")
@@ -662,7 +701,10 @@ def lammps_ext_calc(atoms,ace):
     mkdir(tmpdir)
 
     ### write input structure
+    if ace.verbose:
+        show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
+    #sys.exit('pos now written or not')
 
     ### write inputfile  # geopt is here added or not
     lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
@@ -692,6 +734,8 @@ def lammps_ext_calc(atoms,ace):
         else:
             sys.exit('units '+ace.units+' unknown! Exit!')
         #print('ene out',ene,ace.units)
+    if ace.verbose:
+        show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
 
 if __name__ == "__main__":

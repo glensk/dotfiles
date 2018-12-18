@@ -455,7 +455,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.showformats or args.make_ase_runner:
-        known_formats = ase_get_known_formats(show=True,addrunner_if_missing=args.make_ase_runner)
+        known_formats = ase_get_known_formats(show=True,add_missing_formats=args.make_ase_runner)
         sys.exit()
 
     def get_outfilename(args,frame=""):
