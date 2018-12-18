@@ -8,8 +8,6 @@ import myutils as my
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
 from ase.io import write as ase_write
-import time
-start_time = time.time()
 
 CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
@@ -134,7 +132,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
     np.savetxt("ene_mean.npy",ene_mean,header=units)
     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_mean,ene_std,ene_ste])
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*6))
-    my.create_READMEtxt(os.getcwd(),add="# execution time: "+str(time.time() - start_time)+" seconds.")
+    my.create_READMEtxt(os.getcwd())
     return
 
 

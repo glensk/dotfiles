@@ -10,6 +10,8 @@ module load intel-mkl
 module load gsl
 module load eigen
 # gives intel/18.0.2   2) intel-mpi/2018.2.199   3) gsl/2.4   4) eigen/3.3.4
+#
+lammpsfolder="lammps_source_cosmo"
 #####################################################################
 # get n2p2 
 #####################################################################
@@ -49,12 +51,11 @@ exit
 #pwd
 #make libnnpif-shared
 
-cd $HOME/sources/lammps_source_cosmo
+cd $HOME/sources/$lammpsfolder
 ln -s $HOME/Dropbox/Albert/git/n2p2 lib/nnp
-cd $HOME/Dropbox/Albert/git/n2p2
-cp -r src/interface/LAMMPS/src/USER-NNP $HOME/sources/lammps_source_cosmo/src
+cp -r $HOME/Dropbox/Albert/git/n2p2/src/interface/LAMMPS/src/USER-NNP $HOME/sources/$lammpsfolder/src
 
-cd $HOME/sources/lammps_source_cosmo/src
+cd $HOME/sources/$lammpsfolder/src
 make yes-user-nnp
 #make mpi
 make fidis #(on fidis)
