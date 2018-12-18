@@ -26,11 +26,10 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.option('-seednumber',default=False,multiple=True, type=int,help="define seed number manually (can be defined multiple times)")
 @click.option('-nsteps',type=int, default=200000, help="number of KMC steps to make")
 @click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
+@click.option('--pot','-p',type=click.Choice(my.mypot()),required=True,default='n2p2_v1ag')
 
 
 # environment variables
-@click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
-@click.option('-nn_pot',type=str, default="v2dg", help="foldername in $scripts containing the neural network potential (can be separately set here for different path)")
 @click.option('-ipi_mc', envvar='ipi_mc',help='path to i-pi-mc (or environment variable $ipi_mc)')
 @click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
@@ -44,12 +43,12 @@ def createjob(
         nvac,
         a0,
         temp,
-        scripts,
         nn_pot,
         nseeds,
         seednumber,
         nsteps,
         runnercutoff,
+        pot,
         ipi_mc,
         lmp_exec,
         submit,
@@ -63,6 +62,7 @@ def createjob(
     createFolder_kmc.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
     """
     verbose = True
+    scripts = my.scripts()
     ####################################
     # a few checks
     ####################################
