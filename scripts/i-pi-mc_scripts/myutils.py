@@ -431,11 +431,13 @@ class ase_calculate_ene( object ):
     '''
     ase_calculate_ene (ace) class which holds lammps commands to be executed
     '''
-    def __init__(self,pot,units,geopt,verbose):
+    def __init__(self,pot,units=False,geopt=False,verbose=False):
         self.pot = pot
         self.units = units
         self.geopt = geopt
         self.verbose = verbose
+
+        # this actually has only to be done when it is calculated by lammps
         self.lmpcmd, self.atom_types = pot_to_ase_lmp_cmd(self.pot,geopt=self.geopt,verbose=self.verbose)
 
         self.atoms = False
@@ -513,17 +515,17 @@ class ase_calculate_ene( object ):
             if minimizer == 'bh':
                 maxsteps = 3
             if minimizer != 'mh': # in all cases but
-                opt1.run(steps=maxsteps)
-                print('maxsteps                ',maxsteps,type(maxsteps))
-                print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
+                opt1.run(steps=maxsteps,fmax=0.005)
+                #print('maxsteps                ',maxsteps,type(maxsteps))
+                #print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
                 if maxsteps == opt1.get_number_of_steps():
                     print('DID NOT CONVErGE IN '+str(maxsteps)+' number of minimizer steps!')
                     return np.nan
-            print('ene struct 42: without geoopt: -6852.254 eV lmp and ace')
-            print('ene struct 42: without geoopt: -456816.99 meV_pa lmp and ace')
-            print()
-            print('ene struct 42: ENE lammps: -6853.9673 eV 44 steps')
-            print('ene struct 42: ENE    ace: -6852.44299271 eV on 15 steps BFGS')
+            #print('ene struct 42: without geoopt: -6852.254 eV lmp and ace')
+            #print('ene struct 42: without geoopt: -456816.99 meV_pa lmp and ace')
+            #print()
+            #print('ene struct 42: ENE lammps: -6853.9673 eV 44 steps')
+            #print('ene struct 42: ENE    ace: -6852.44299271 eV on 15 steps BFGS')
 
             #opt1.replay_trajectory('history.traj')
             #print('done....')
@@ -542,7 +544,7 @@ class ase_calculate_ene( object ):
         #if self.verbose:
         #    print('ene',ene)
         #return ene,ene/atoms.get_number_of_atoms()*1000.
-        if self.verbose:
+        if self.verbose > 1:
             show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
             print()
             print()
@@ -613,13 +615,6 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     else:
         sys.exit('pot '+str(pot)+' not found!')
 
-    #if geopt:  # only if geopt is done by lammps! not if geopt is done by ase!
-    #    lmpcmd = lmpcmd + [
-    #        "min_style cg",
-    #        "minimize 1.0e-9 1.0e-10 1000 1000"
-    #        ]
-        #lmpcmd.append("min_style cg")
-        #lmpcmd.append("minimize 1.0e-9 1.0e-10 1000 1000")
     if verbose > 1:
         print('...lmpcmd',lmpcmd)
     return lmpcmd, att
@@ -697,6 +692,55 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
     f.write("run 0\n")
     return
 
+def ipi_write_inputfile(folder=False,filename='input.xml',positions='init.xyz',ace=False):
+    basename,fullpath = mypot(getbasename=ace.pot)
+    ipi_cmd =[
+    "<simulation mode='static' verbosity='high'>",
+    "  <output prefix='simulation'>",
+    "    <properties stride='1' filename='out'>  [ step, potential ] </properties>",
+    "    <trajectory filename='pos' stride='1'> positions </trajectory>",
+    "  </output>",
+    "  <total_steps> 1000 </total_steps>",
+    "  <prng>",
+    "    <seed> 32342 </seed>",
+    "  </prng>",
+    "  <ffsocket name='lammps' mode='unix' pbc='true'>",
+    "    <address> geop </address>",
+    "  </ffsocket>",
+    "  <system>",
+    "    <initialize nbeads='1'>",
+    "      <file mode='xyz'> init.xyz </file>",
+    "    </initialize>",
+    "    <forces>",
+    "      <force forcefield='lammps'> </force>",
+    "    </forces>",
+    "    <motion mode='minimize'>",
+    "      <optimizer mode='lbfgs'>",
+    "        <tolerances>",
+    "          <energy> 1e-6 </energy>",
+    "          <force> 1e-6 </force>",
+    "          <position> 1e-6 </position>",
+    "        </tolerances>",
+    "      </optimizer>",
+    "    </motion>",
+    "  </system>",
+    "</simulation>",
+    ]
+    mkdir(folder)
+    f = open(folder+'/'+filename,'w')
+    for i in ipi_cmd:
+        f.write(i+"\n")
+    return
+
+def ipi_ext_calc(atoms,ace):
+    ''' atoms is an ase atoms object which can hold several frames, or just one'''
+    ### mkdir tmpdir
+    tmpdir = os.environ['HOME']+"/._tmp_ipi/"
+    mkdir(tmpdir)
+    ipi_write_inputfile(folder=tmpdir,filename='input.xml',positions='init.xyz',ace=ace)
+    ase_write(folder+'/init.xyz',atoms,format='ipi')
+    return
+
 def lammps_ext_calc(atoms,ace):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
     ### mkdir tmpdir
@@ -704,7 +748,7 @@ def lammps_ext_calc(atoms,ace):
     mkdir(tmpdir)
 
     ### write input structure
-    if ace.verbose:
+    if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
     #sys.exit('pos now written or not')
@@ -716,8 +760,10 @@ def lammps_ext_calc(atoms,ace):
     ene = False
     if os.path.isfile(tmpdir+'log.lammps'):
         os.remove(tmpdir+"log.lammps")
+
     LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
-    with cd(tmpdir):
+
+    with cd(tmpdir):  # this cd's savely into folder
         # without SHELL no LD LIBRARY PATH
         call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
 
@@ -737,7 +783,7 @@ def lammps_ext_calc(atoms,ace):
         else:
             sys.exit('units '+ace.units+' unknown! Exit!')
         #print('ene out',ene,ace.units)
-    if ace.verbose:
+    if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
 
