@@ -12,6 +12,9 @@ from ase.build import bulk as ase_build_bulk
 from ase.calculators.lammpslib import LAMMPSlib
 from ase.io import read as ase_read
 from ase.io import write as ase_write
+from ase.optimize import BFGS
+from ase.optimize import LBFGS
+from ase.optimize import FIRE
 import shutil
 
 
@@ -209,10 +212,11 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
     return kmesh
 
 
-def ase_enepot(atoms,units='eV'):
+def ase_enepot(atoms,units='eV',verbose=False):
     ''' units: eV, eV_pa, hartree, hartree_pa '''
     ene = atoms.get_potential_energy()
-
+    if verbose:
+        print('ene eV',ene,"(not per atom)")
     units_split = units.split("_")
     #print('us',units_split,units_split[1])
     if units_split[0].lower() == 'ev':
@@ -427,8 +431,9 @@ class ase_calculate_ene( object ):
 
         if self.verbose > 1:
             showfirst = 10
-            print('XXatomsXX',atoms)
             print('XX atoms')
+            print('XXatomsXX',atoms)
+            print('XX atoms.get_number_of_atoms()',atoms.get_number_of_atoms())
             #print(atoms.positions)
             print(atoms.get_positions()[:showfirst])
             print('XX elements get_chemical_symbols()')
@@ -442,32 +447,49 @@ class ase_calculate_ene( object ):
             print('YY--lmpcmd:',self.lmpcmd)
             print('YY--atom_types',self.atom_types)
             print('YY--geopt',self.geopt)
+
+
         if self.geopt == False:
             calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
             atoms.set_calculator(calcLAMMPS)
         else:
+            # in case of a verbose run:
             #calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
+
+            # in case  of a non verbose run
             calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=True)
             atoms.set_calculator(calcLAMMPS)
             #from ase.io.trajectory import Trajectory
             #traj = Trajectory('ka', mode='w',atoms=atoms)
-            from ase.optimize import BFGS
-            from ase.optimize import LBFGS
-            from ase.optimize import FIRE
             #opt = BFGS(atoms,trajectory="ni.traj")
             #opt.run(steps=20)
             minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE' ]
             minimizer = 'FIRE'
+            #minimizer = 'BFGS'
+            #minimizer = 'LGBFGS'
             print('startminimize....')
             if minimizer == 'BFGS':
-                opt1 = BFGS(atoms,trajectory="ni.traj")
+                opt1 = BFGS(atoms) #,trajectory="ni.traj")
             elif minimizer == 'LGBFGS':
-                opt1 = LBFGS(atoms,trajectory="ni.traj")
+                opt1 = LBFGS(atoms) #,trajectory="ni.traj")
             elif minimizer == 'FIRE':
                 opt1 = FIRE(atoms) #,trajectory="ni.traj")
             print('startrun....')
-            opt1.run(steps=80)
-            print('done....')
+            maxsteps = 200
+            opt1.run(steps=maxsteps)
+            print('maxsteps                ',maxsteps,type(maxsteps))
+            print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
+            print('ene struct 42: without geoopt: -6852.254 eV lmp and ace')
+            print('ene struct 42: without geoopt: -456816.99 meV_pa lmp and ace')
+            print()
+            print('ene struct 42: ENE lammps: -6853.9673 eV 44 steps')
+            print('ene struct 42: ENE    ace: -6852.44299271 eV on 15 steps BFGS')
+
+            if maxsteps == opt1.get_number_of_steps():
+                print('DID NOT CONVErGE IN '+str(maxsteps)+' number of minimizer steps!')
+                return np.nan
+            #opt1.replay_trajectory('history.traj')
+            #print('done....')
             #opt2 = FIRE(atoms,trajectory="ni.traj")
             #opt2.run(steps=20)
             #calcLAMMPS.attach(traj)
@@ -475,7 +497,7 @@ class ase_calculate_ene( object ):
         if self.verbose > 1:
             print('ZZ done2')
             print('ZZ self.units',self.units)
-        ene = ase_enepot(atoms,units=self.units)
+        ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
         if self.verbose > 1:
             print('ZZ ene',ene,self.units)
         #sys.exit()
@@ -513,6 +535,9 @@ def string_to_index_an_array(array,string):
 
 
 def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
+    ''' geoopt (geometry optimization) is added / or not in
+        lammps_write_inputfile(); here only the potential is set.
+    '''
     basename,fullpath = mypot(getbasename=pot)
     if verbose > 1:
         print('...get_potential--basename:',basename)
@@ -529,10 +554,11 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
     if pot.split("_")[0] == "n2p2":
         lmpcmd = lmpcmd + [
             "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
-            "pair_coeff * * 17.0",
+            "pair_coeff * * 17.4",
             "neighbor 0.4 bin",
+            "#write_data ./pos.data # would this be the final struct?",
         ]
-        att = {'Mg':1,'Al':2,"Si":3}
+        att = {'Mg':1,'Al':2,'Si':3}
 
     elif pot.split("_")[0] == "runner":
         lmpcmd = lmpcmd + [
@@ -541,7 +567,7 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
             "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
             "pair_coeff * * ${runnerCutoff}",
         ]
-        att = {'Mg':1,'Al':2,"Si":3}
+        att = {'Mg':1,'Al':2,'Si':3}
 
     else:
         sys.exit('pot '+str(pot)+' not found!')
@@ -587,6 +613,10 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
     f.write("units metal\n")
     f.write("boundary p p p\n")
     f.write("atom_style atomic\n")
+
+    # necessary for structure 344, (343 shourd be 476846.3656628 probably eV)
+    # if this structure would be wired, it would make sense to check the box tilt large for all other structures.
+    f.write("box tilt large\n")
     f.write("read_data \"" +str(positions)+"\"\n")
 
     for i in ace.lmpcmd:
@@ -595,6 +625,30 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
     f.write("\n")
 
     if ace.geopt:
+        ###############################################################
+        # works but has the types wrong, can be read in by ase,
+        # atomtypes (however) need to be changed manually
+        ###############################################################
+        #f.write("dump dump_all all custom 1 %s id type x y z vx vy vz fx fy fz\n")
+
+        ###############################################################
+        # works and writes instaed of he types the actual element
+        # e.g. Mg which can not be read in by ase
+        ###############################################################
+        # works and writes instaed of he types the actual element
+        #f.write("dump dump_all all custom 1 %s id element x y z vx vy vz fx fy fz\n")
+        #f.write("dump_modify dump_all element Mg Al Si\n")
+
+
+        ###############################################################
+        # try with edoardos comment
+        ###############################################################
+        stride = 1  # print all
+        stride = 1000  # print first and last
+        f.write("dump dump_all all xyz "+str(stride)+" traj.out\n")  # dumps with edoardos pach
+        f.write("dump_modify dump_all element Mg Al Si\n")
+
+
         f.write("min_style cg\n")
         f.write("minimize 1.0e-9 1.0e-10 1000 1000\n")
 
@@ -604,13 +658,13 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
 def lammps_ext_calc(atoms,ace):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
     ### mkdir tmpdir
-    tmpdir = os.environ['HOME']+"/_tmp_lammps/"
+    tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
 
     ### write input structure
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
 
-    ### write inputfile
+    ### write inputfile  # geopt is here added or not
     lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
 
     ### calculate with lammps (trigger externally)
@@ -634,7 +688,7 @@ def lammps_ext_calc(atoms,ace):
         elif ace.units.lower() == 'hartree_pa':
             ene = ene*0.036749325/atoms.get_number_of_atoms()
         elif ace.units.lower() == 'mev_pa':
-            ene = ene/atoms.get_number_of_atoms()
+            ene = ene*1000./atoms.get_number_of_atoms()
         else:
             sys.exit('units '+ace.units+' unknown! Exit!')
         #print('ene out',ene,ace.units)

@@ -31,6 +31,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
 
     #### get the potential
     ace = ase_calculate_ene(pot,units,geopt,verbose)
+    units = ace.units
 
     ### when want to assess some formation energies
     if test:
@@ -59,6 +60,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
     print('write_runner                 :',write_runner)
     print()
 
+
     ene_DFT  = np.empty(len(structures_to_calc));ene_DFT[:]  = np.nan
     ene_pot  = np.empty(len(structures_to_calc));ene_pot[:]  = np.nan
     ene_diff = np.empty(len(structures_to_calc));ene_diff[:]  = np.nan
@@ -66,6 +68,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
     ene_std  = np.empty(len(structures_to_calc));ene_std[:]  = np.nan
     ene_ste  = np.empty(len(structures_to_calc));ene_ste[:]  = np.nan
     ene_mean = np.empty(len(structures_to_calc));ene_mean[:] = np.nan
+    ene_diff_lam_ase  = np.empty(len(structures_to_calc));ene_DFT[:]  = np.nan
 
     #sys.exit('get uuid of structure and save structure energy somewhere (cache)')
     #sys.exit('find out weather particular structure in test or trainset')
@@ -74,18 +77,33 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
     ##############################################
     # loop over structures
     ##############################################
+
     for idx,i in enumerate(structures_to_calc):
         #print('idx',idx)
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
+        #if verbose:
         #print('idx',idx,'getEnergies_byLammps--------------')
         if ext == False:  # calculate by ase
             ene_pot[idx] = ace.ene(atoms[i])
         else:
+            ene_pot_todelete = ace.ene(atoms[i])
+            print("STAART LAMMPS EXT CALC")
             ene_pot[idx] = my.lammps_ext_calc(atoms[i],ace)
+            print("STAART ASE INTERNAL CALC")
+            print("ENE DFT   :",ene_DFT[idx],ace.units)
+            print("ENE ase   :",ene_pot_todelete,ace.units)
+            print("ENE lammps:",ene_pot[idx],ace.units)
+            print("--------------------------------------")
+            ene_diff_lam_ase[idx] = ene_pot[idx] - ene_pot_todelete
+            print("DIFF      :",ene_pot[idx] - ene_pot_todelete,ace.units)
+            print("--------------------------------------")
+            print("--------------------------------------")
+            print("MAKE SURE THAT YOU HAVE the correct species in the lammps run!")
             #print('idx',idx,'getEnergies_byLammps--------------done')
 
         #sys.exit()
         #print(atoms[i].info)
+        np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase)
         if write_runner:
             ase_write("out.runner",atoms[i],format='runner',append=True)
         #print('ene_dft,enepot',idx,ene_DFT[idx],ene_pot[idx],ene_DFT[idx]-ene_pot[idx])
@@ -107,7 +125,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
             print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
             printed = True
 
-        if verbose > 1 and printed == False:
+        if verbose > 0 and printed == False:
+            save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time)
             print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
 
         #if geopt:
@@ -124,17 +143,33 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ex
     if write_runner:
         print('our.runner written')
 
+    save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time)
+    return
+
+
+def save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time):
     np.savetxt("ene_DFT.npy",ene_DFT,header=units)
     np.savetxt("ene_pot.npy",ene_pot,header=units)
     np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
     np.savetxt("ene_std.npy",ene_std,header=units)
+<<<<<<< HEAD
     np.savetxt("ene_ste.npy",ene_ste,header=units)
     np.savetxt("ene_mean.npy",ene_mean,header=units)
     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_mean,ene_std,ene_ste])
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*6))
     my.create_READMEtxt(os.getcwd())
-    return
+=======
+    #np.savetxt("ene_mean.npy",ene_mean,header=units)
 
+    #ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_mean,ene_std,ene_ste])
+    #np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*6))
+
+    ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
+    print('ee',ene_all.shape[1])
+    np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+    my.create_READMEtxt(os.getcwd(),add="# execution time: "+str(time.time() - start_time)+" seconds.")
+>>>>>>> b9082e9731859e0cce08869e06b894df981b9d62
+    return
 
 def test_sisivac(ace):
     scripts = my.scripts()

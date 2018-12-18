@@ -2,15 +2,23 @@
 #############################################################
 # Start editing here ########################################
 #############################################################
+#gitfrom="https://github.com/cosmo-epfl/lammps.git"
+gitfrom="https://github.com/lammps/lammps.git"
 folder_lammps_sources=$HOME/sources
 folder_lammps_save=$scripts/lammps_executables
+#folder_lammps_change=$scripts/lammps_scripts/change_src/
+
 makeversion="serial"  # for n2p2 with serial the -DNOMPI needs to be enabled
 makefile=""
-[ "`hostname`" = "fidis" ] && makeversion="fidis" && makefile=$scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
+[ "`hostname`" = "fidis" ] && makeversion="fidis" && makefile=$dotfiles/scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
 #############################################################
 # Stop editing here #########################################
 #############################################################
 
+
+#[ ! -e "$folder_lammps_change" ] && echo "$folder_lammps_change does not exist" && exit
+#[ ! -e "$folder_lammps_change/dump_xyz.cpp" ] && echo "$folder_lammps_change/dump_xyz.cpp does not exist" && exit
+#[ ! -e "$folder_lammps_change/dump_xyz.h" ] && echo "$folder_lammps_change/dump_xyz.h does not exist" && exit
 
 [ "$makeversion" != "serial" ] && [ ! -e "$makefile" ] && echo makefile $makefile not found && exit
 echo "-----------------------------------------------------------------------------------"
@@ -31,13 +39,15 @@ fi
 
 cd $folder_lammps_sources
 pwd
-[ ! -e "lammps_source_cosmo" ] && git clone https://github.com/cosmo-epfl/lammps.git lammps_source_cosmo && echo `date +"%Y_%m_%d"` > ANMERKUNG.txt
+[ ! -e "lammps_source_cosmo" ] && git clone $gitfrom lammps_source_cosmo && echo `date +"%Y_%m_%d"` > ANMERKUNG.txt
 cd lammps_source_cosmo
 git checkout runner-lammps
 cd src
+#cp $folder_lammps_change/dump_xyz.cpp .
+#cp $folder_lammps_change/dump_xyz.h .
 pwd
 make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RIGID yes-USER-MISC
-make yes-USER-RUNNER
+#make yes-USER-RUNNER
 make yes-user-nnp   # this will not work if n2pc has not been installed 
 sed -i 's|^#define MAXNEIGH.*|#define MAXNEIGH 500|' pair_runner.h
 rm -f lmp_$makeversion
