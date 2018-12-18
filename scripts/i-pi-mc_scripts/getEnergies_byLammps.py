@@ -8,8 +8,6 @@ import myutils as my
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
 from ase.io import write as ase_write
-import time
-start_time = time.time()
 
 CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
@@ -155,6 +153,13 @@ def save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time):
     np.savetxt("ene_pot.npy",ene_pot,header=units)
     np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
     np.savetxt("ene_std.npy",ene_std,header=units)
+<<<<<<< HEAD
+    np.savetxt("ene_ste.npy",ene_ste,header=units)
+    np.savetxt("ene_mean.npy",ene_mean,header=units)
+    ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_mean,ene_std,ene_ste])
+    np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*6))
+    my.create_READMEtxt(os.getcwd())
+=======
     #np.savetxt("ene_mean.npy",ene_mean,header=units)
 
     #ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_mean,ene_std,ene_ste])
@@ -164,6 +169,7 @@ def save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot,start_time):
     print('ee',ene_all.shape[1])
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
     my.create_READMEtxt(os.getcwd(),add="# execution time: "+str(time.time() - start_time)+" seconds.")
+>>>>>>> b9082e9731859e0cce08869e06b894df981b9d62
     return
 
 def test_sisivac(ace):
