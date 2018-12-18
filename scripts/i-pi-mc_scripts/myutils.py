@@ -404,8 +404,9 @@ def mypot(getbasename=False):
         return onepot_basename,onepot_fullpath
 
 def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
+    print()
     print("#####################################################")
-    print("# "+comment+" #######")
+    print("# "+comment+" BEGIN #######")
     print("#####################################################")
     print('## atoms')
     print(atoms)
@@ -420,8 +421,9 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print(atoms.get_cell_lengths_and_angles())
     print('##atom.numbers',atoms.numbers)
     print("#####################################################")
+    print("# "+comment+" END #######")
     print("#####################################################")
-    print("#####################################################")
+    print()
     return
 
 
@@ -482,11 +484,11 @@ class ase_calculate_ene( object ):
             #opt = BFGS(atoms,trajectory="ni.traj")
             #opt.run(steps=20)
             minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE', 'bh' ]
-            #minimizer = 'FIRE'
+            minimizer = 'FIRE'
             #minimizer = 'BFGS'
             #minimizer = 'LGBFGS'
             #minimizer = 'bh'
-            minimizer = 'mh'
+            #minimizer = 'mh'
             print('startminimize....')
             if minimizer == 'BFGS':
                 opt1 = BFGS(atoms) #,trajectory="ni.traj")
@@ -688,7 +690,8 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
         #f.write("dump_modify dump_all element Mg Al Si\n")
 
 
-        f.write("min_style cg\n")
+        #f.write("min_style cg\n")
+        f.write("min_style fire\n")
         f.write("minimize 1.0e-9 1.0e-10 1000 1000\n")
 
     f.write("run 0\n")
