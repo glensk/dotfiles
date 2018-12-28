@@ -26,15 +26,10 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.option('-seednumber',default=False,multiple=True, type=int,help="define seed number manually (can be defined multiple times)")
 @click.option('-nsteps',type=int, default=200000, help="number of KMC steps to make")
 @click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
-@click.option('--pot','-p',type=click.Choice(my.mypot()),required=True,default='n2p2_v1ag')
-
 
 # environment variables
-<<<<<<< HEAD
-@click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
 @click.option('--pot','-p',type=click.Choice(mu.mypot()),required=True,default='n2p2_v1ag',help="potential from $scripts/potentials folder.")
-=======
->>>>>>> b0be16b96b705790c9d92a7c4b644158ab17db23
+
 @click.option('-ipi_mc', envvar='ipi_mc',help='path to i-pi-mc (or environment variable $ipi_mc)')
 @click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
@@ -48,12 +43,6 @@ def createjob(
         nvac,
         a0,
         temp,
-<<<<<<< HEAD
-        scripts,
-        pot,
-=======
-        nn_pot,
->>>>>>> b0be16b96b705790c9d92a7c4b644158ab17db23
         nseeds,
         seednumber,
         nsteps,
@@ -72,7 +61,7 @@ def createjob(
     createFolder_kmc.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
     """
     verbose = True
-    scripts = my.scripts()
+    scripts = mu.scripts()
     ####################################
     # a few checks
     ####################################
@@ -143,7 +132,7 @@ def createjob(
     print('directory    ',directory)
     print('submit       ',submit)
     print('submitdebug  ',submitdebug)
-    print('pytohon      ',sys.version_info[0])
+    print('python ver   ',sys.version_info[0])
     print('--------------------------- check the input --------------------------------')
     mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
 
@@ -167,8 +156,8 @@ def createjob(
 
 
         # get data.lmp
-        #convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
-        convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.ipi','ipi')
+        convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
+        #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.ipi','ipi')
         #convert_fileformats.save_ase_object_in_ase_format(atomsc,jobdir+'/data.lammps-data','lammps-data')  # lamms-data data format is only R (can only be read!)
 
         convert_fileformats.save_ase_object_as_lmp_runner(atomsc,jobdir+'/data.lmp.runner')

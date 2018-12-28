@@ -360,16 +360,12 @@ def scripts():
         sys.exit('$scripts variable is not defined or is not an existing folder')
     return scripts
 
-def test_and_return_environment_var_path(var,test=False):
+def test_and_return_environment_var_path(var):
     variable = os.environ[var]
     if not os.path.isfile(variable):
-        sys.exit('variable '+str(var)+" is not defined or is not an existing file')
+        sys.exit('variable '+str(var)+' is not defined or is not an existing file')
     return variable
 
-
-def ipi_exec():
-    HOME = os.environ['HOME']
-    HOME+'/Dropbox/Albert/git
 
 def runner_exec(test=False):
     ''' return environment variable runner_exec (RuNNer executable)'''

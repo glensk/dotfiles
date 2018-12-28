@@ -205,7 +205,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
     #print('nowframes: ',len(frame_or_frames))
 
     otherlist = ['lmp', 'lmp.runner','ipi']
-    otherlist = ['lmp', 'lmp.runner']
+    #otherlist = ['lmp', 'lmp.runner']
 
     known_formats = ase_get_known_formats()
 
@@ -220,13 +220,13 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
         outfilename = get_outfilename(args,idx)
         #print('aaa',outfilename)
         if formatout in otherlist:
-            print('formatout        :',formatout,"(not default fileformat, but known - lmp or lmp.runner -)")
+            print('convert_fileformats.py: formatout        :',formatout,"(not default fileformat, but known - lmp or lmp.runner -)")
             if formatout == 'lmp':
                 save_ase_object_as_lmp(frameone,outfilename,comment=infile,runner=False)
             if formatout == 'lmp.runner':
                 save_ase_object_as_lmp_runner(frameone,outfilename,comment=infile)
-            #if formatout == 'ipi':
-            #    save_ase_object_as_ipi_format(frameone,outfilename)
+            if formatout == 'ipi':
+                save_ase_object_as_ipi_format(frameone,outfilename)
 
         elif formatout in known_formats:
             print('formatout        :',formatout,"known by default")
@@ -296,9 +296,9 @@ def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
     framework.set_positions(newpos)
 
     species = framework.get_atomic_numbers()
-    print('species',species)
+    #print('species',species)
     unique_species, i_unique_species = np.unique(species, return_index=True)
-    print('unique_species',unique_species)
+    #print('unique_species',unique_species)
     masses = framework.get_masses()
     positions = framework.get_positions()
 

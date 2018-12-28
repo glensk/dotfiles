@@ -19,8 +19,9 @@ addeverywhere="$ipi:$runner:$aiida_s:$aiida_a:$aiida_b:$lammps1:$lammps2:$ase_la
 
 export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src"
+
 export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
-export lmp_exec="$SCR/executables/lmp_fidis_par_2018_11_28"
+#export lmp_exec="$SCR/executables/lmp_fidis_par_2018_11_28"
 
 if [ "$PYTHONPATH" = "" ];then
     export PYTHONPATH="$addeverywhere"              # need "export" for python
@@ -28,5 +29,6 @@ else
     export PYTHONPATH="$PYTHONPATH:$addeverywhere"  # need "export" for python
 fi
 export scripts=$SCR
-export ipi_mc=$HOME/Dropbox/Albert/scripts/i-pi-new/i-pi
+#export ipi_mc=$HOME/Dropbox/Albert/scripts/i-pi-new/i-pi
+export ipi_mc=$HOME/Dropbox/Albert/git/i-pi-mc/bin/i-pi
 export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
