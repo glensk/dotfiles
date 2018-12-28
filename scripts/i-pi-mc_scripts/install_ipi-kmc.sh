@@ -2,6 +2,7 @@
 
 [ -z "$scripts" ] && echo source source_to_add_to_path.sh first && exit
 [ ! -z "$scripts" ] && target_folder=$scripts
+[ "$USER" = "glensk" ] && target_folder="$HOME/Dropbox/Albert/git"
 ipi_folder_name="i-pi-mc"
 echo "-----------------------------------------------------------------------------------"
 echo "target_folder: $target_folder"

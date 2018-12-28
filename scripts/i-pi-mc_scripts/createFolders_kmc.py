@@ -30,6 +30,11 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 
 
 # environment variables
+<<<<<<< HEAD
+@click.option('-scripts', envvar='scripts',help='environment variable $scripts (can alse be set here)')
+@click.option('--pot','-p',type=click.Choice(mu.mypot()),required=True,default='n2p2_v1ag',help="potential from $scripts/potentials folder.")
+=======
+>>>>>>> b0be16b96b705790c9d92a7c4b644158ab17db23
 @click.option('-ipi_mc', envvar='ipi_mc',help='path to i-pi-mc (or environment variable $ipi_mc)')
 @click.option('-lmp_exec', envvar='lmp_exec',help='path to lammps executable (or environment variable $lmp_exec)')
 @click.option('-submit/-no-submit', default=False)
@@ -43,7 +48,12 @@ def createjob(
         nvac,
         a0,
         temp,
+<<<<<<< HEAD
+        scripts,
+        pot,
+=======
         nn_pot,
+>>>>>>> b0be16b96b705790c9d92a7c4b644158ab17db23
         nseeds,
         seednumber,
         nsteps,
@@ -73,11 +83,11 @@ def createjob(
             print('you are NOT on fidis')
             sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
 
-    nn_pot_dir              = scripts + "/potentials/lammps_runner/" + nn_pot
+    pot_dir                 = scripts + "/potentials/" + pot
     file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
     file_submit             = scripts + "/i-pi-mc_scripts/submit-ipi-kmc.sh"
     file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
-    mu.check_isdir_or_isdirs([nn_pot_dir,scripts])
+    mu.check_isdir_or_isdirs([pot_dir,scripts])
     mu.check_isfile_or_isfiles([file_inlmp,file_submit],["file_inlmp","file_submit"])
     if not test:
         mu.check_isfile_or_isfiles([ipi_mc,lmp_exec],["ipi_mc","lmp_exec"],envvar=True)
@@ -92,7 +102,7 @@ def createjob(
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
     directory = "ipi_kmc_"+\
-                str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+nn_pot+"_"+\
+                str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+pot+"_"+\
                 str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
                 str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi_"+\
@@ -124,8 +134,8 @@ def createjob(
     print('a0           ',a0)
     print('temp         ',temp)
     print()
-    print('nn_pot       ',nn_pot)
-    print('nn_pot_dir   ',nn_pot_dir)
+    print('pot          ',pot)
+    print('pot_dir      ',pot_dir)
     print()
     print('nseeds       ',nseeds,'seeds',seeds)
     print('nsteps       ',nsteps)
@@ -173,7 +183,7 @@ def createjob(
 
         # get and adapt in.lmp
         copyfile(file_inlmp, jobdir+"/in.lmp")
-        mu.sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+nn_pot_dir+'"')
+        mu.sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+pot_dir+'"')
         mu.sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
         mu.sed(jobdir+"/in.lmp",'variable nameStartCfg .*','variable nameStartCfg string "data.lmp.runner"')
         mu.sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
