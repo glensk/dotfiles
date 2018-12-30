@@ -13,8 +13,8 @@ set +e
 source $MODULESHOME/init/bash    # necessary in the case of zsh or other init shells
 module load intel intel-mpi intel-mkl fftw python/2.7.14
 export OMP_NUM_THREADS=1
-touch time.out
-date +"%y.%m.%d %H:%M:%S" >> time.out
+#touch time.out
+#date +"%y.%m.%d %H:%M:%S" >> time.out
 
 # sets up the internet socket for connections both for i-PI and on the lammps side
 sed -i 's/<ffsocket.*/<ffsocket name="lmpserial" mode="inet">/' input-runner.xml
@@ -31,5 +31,5 @@ do
 done
 
 wait 
-date +"%y.%m.%d %H:%M:%S" >> time.out
+#date +"%y.%m.%d %H:%M:%S" >> time.out
 exit 0

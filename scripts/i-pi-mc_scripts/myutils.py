@@ -438,11 +438,16 @@ class ase_calculate_ene( object ):
     '''
     ase_calculate_ene (ace) class which holds lammps commands to be executed
     '''
-    def __init__(self,pot,units=False,geopt=False,verbose=False):
+    def __init__(self,pot,units=False,geopt=False,kmc=False,verbose=False,temp=False,velSeed=False):
         self.pot = pot
         self.units = units
         self.geopt = geopt
         self.verbose = verbose
+
+        # case of MD or KMC
+        self.kmc = kmc
+        self.temp = temp
+        self.velseed = velseed
 
         # this actually has only to be done when it is calculated by lammps
         self.lmpcmd, self.atom_types = pot_to_ase_lmp_cmd(self.pot,geopt=self.geopt,verbose=self.verbose)
@@ -584,7 +589,11 @@ def string_to_index_an_array(array,string):
         return False
 
 
-def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
+def pot_to_ase_lmp_cmd(
+        pot,
+        geopt=False,
+        kmc=False,
+        verbose=False):
     ''' geoopt (geometry optimization) is added / or not in
         lammps_write_inputfile(); here only the potential is set.
     '''
@@ -621,6 +630,17 @@ def pot_to_ase_lmp_cmd(pot,geopt=False,verbose=False):
 
     else:
         sys.exit('pot '+str(pot)+' not found!')
+
+    if self.kmc:
+        lmpcmd = lmpcmd + [
+            "",
+            "timestep 0.001   # timestep (ps)",
+            "velocity all create ${initTemp} ${velSeed}  # create initial velocities",
+            "thermo 1   # # screen output interval (timesteps)",
+            "fix 1 all ipi f104 12345",
+            "set up integrator",
+            "run ${numSteps}",
+            ]
 
     if verbose > 1:
         print('...lmpcmd',lmpcmd)
@@ -661,7 +681,13 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
     # if this structure would be wired, it would make sense to check the box tilt large for all other structures.
     f.write("box tilt large\n")
     f.write("read_data \"" +str(positions)+"\"\n")
+    f.write("\n")
 
+    # masses
+    # variable nnpDir string
+    # pair_style nnp dir
+    # pair_coeff
+    # neighbor
     for i in ace.lmpcmd:
         f.write(i+"\n")
 

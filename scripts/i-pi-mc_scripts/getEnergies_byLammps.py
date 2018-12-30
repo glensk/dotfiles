@@ -87,21 +87,26 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if len(structures_to_calc) < 50:
         printevery = 1
     be_very_verbose = 999
-    print('i',structures_to_calc)
+    #print(',structures_to_calc:',structures_to_calc)
     for idx,i in enumerate(structures_to_calc):
         #print('idx',idx,'i',i)
         if ipi == True:
             atoms_tmp = copy.deepcopy(atoms[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
-        sys.exit('ipi laueft')
+        #sys.exit('ipi laueft')
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
         if verbose > be_very_verbose:
             my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "STAT2")
-            print('ene_DFT[idx]',ene_DFT[idx])
+        if verbose > 0:
+            print('ene_DFT[idx]     :',ene_DFT[idx],units)
 
         if ase == True:
             atoms_tmp = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
             ene_pot_ase[idx] = ace.ene(atoms_tmp)
+            if verbose > 0:
+                print('ene_pot_ase[idx] :',ene_pot_ase[idx],units)
+            if lmp == False:
+                ene_pot[idx] = copy.deepcopy(ene_pot_ase[idx])
 
         if lmp == True:
             #print("STAART LAMMPS EXT CALC")
@@ -139,7 +144,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         printed = False
 
         if idx in range(0,len(structures_to_calc),printevery):
-            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
+            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s) %4.0f" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units,atoms[i].get_number_of_atoms()))
             printed = True
 
         if verbose > 0 and printed == False:
