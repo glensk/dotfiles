@@ -1,5 +1,7 @@
 import re,copy,sys
 import numpy as np
+from numpy.linalg import norm
+
 
 from ase.atoms import Atoms
 from ase.parallel import paropen

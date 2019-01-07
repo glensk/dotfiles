@@ -58,6 +58,7 @@ def create_READMEtxt(directory,add=False):
 
     print()
     print('written ',filepath)
+    print()
     return
 
 def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
@@ -239,8 +240,30 @@ def ase_enepot(atoms,units='eV',verbose=False):
 
     return ene
 
+def ase_get_chemical_symbols_to_conz(atoms):
+    symbols = atoms.get_chemical_symbols()
+    num = atoms.get_number_of_atoms()
+    #print('symbols',symbols)
+    #print('num',num)
 
+    uniquesym = set(atoms.get_chemical_symbols())
+    d = {}
+    for i in uniquesym:
+        #print(i,symbols.count(i),num)
+        d[i] = float(symbols.count(i))/float(num)
 
+    def dcheck(element):
+        if element in d.keys():
+            #print(element+" exists")
+            pass
+        else:
+            #print(element+" does not exist")
+            d[element] = 0.0
+
+    dcheck("Mg")
+    dcheck("Si")
+    dcheck("Al")
+    return d
 
 def qe_parse_numelectrons_upfpath(upfpath):
     ''' parses the number of electrons from a quantum espresso potential '''
@@ -260,6 +283,7 @@ def qe_full_get_path_to_potential(element,path_to_pseudos):
         print('found potential',potential)
         sys.exit('found more than one or none potential; Exit.')
     return potential
+
 
 
 def qe_get_numelectrons(structure_ase, path_to_pseudos):
@@ -388,7 +412,7 @@ def get_click_defaults():
     CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
     return CONTEXT_SETTINGS
 
-def mypot(getbasename=False):
+def mypotold(getbasename=False):
     ''' return a list of available potentials '''
     scripts = os.environ['scripts']
     allpot_fullpath = glob.glob(scripts+'/potentials/*')
@@ -409,6 +433,37 @@ def mypot(getbasename=False):
         return allpot_basenames
     else:
         return onepot_basename,onepot_fullpath
+
+class mypot( object ):
+    ''' return a list of available potentials '''
+    def __init__(self,pot=False):
+        scripts = os.environ['scripts']
+        allpot_fullpath = glob.glob(scripts+'/potentials/*')
+        pot_all = []
+        onepot_fullpath = False
+        onepot_basename = False
+        for i in allpot_fullpath:
+            #print(i)
+            pot_all.append(os.path.basename(i))
+            if type(pot) != bool:
+                if pot == os.path.basename(i):
+                    onepot_fullpath = i
+                    onepot_basename = pot
+
+        #print(pot_all)
+        #sys.exit()
+        self.pot = onepot_basename
+        self.all = pot_all
+        self.fullpath = onepot_fullpath
+        #if pot == False:
+        #    return pot_all
+        #else:
+        #    return onepot_basename,onepot_fullpath
+        return
+
+def pot_all():
+    all = mypot()
+    return all.all
 
 def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
@@ -437,31 +492,95 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
 class ase_calculate_ene( object ):
     '''
     ase_calculate_ene (ace) class which holds lammps commands to be executed
+    if only pot is defined, static calculation.
     '''
-    def __init__(self,pot,units=False,geopt=False,kmc=False,verbose=False,temp=False,velSeed=False):
+    def __init__(self,
+            pot,
+            units=False,
+            geopt=False,
+            kmc=False,
+            verbose=False,
+            temp=False,
+            ):
+
         self.pot = pot
         self.units = units
-        self.geopt = geopt
+        self.geopt = geopt   # so far only for ene object.
+        self.nsteps = 0
         self.verbose = verbose
+        self.atoms = False # ase atoms object (frame)
+
+        self.lmpcmd = False # in case we run through lammps or ase+lammps
+        self.atom_types = False    # for nn pot
 
         # case of MD or KMC
         self.kmc = kmc
         self.temp = temp
-        self.velseed = velseed
 
-        # this actually has only to be done when it is calculated by lammps
-        self.lmpcmd, self.atom_types = pot_to_ase_lmp_cmd(self.pot,geopt=self.geopt,verbose=self.verbose)
-
-        self.atoms = False
-
-        if self.verbose:
-            print('self.verbose :',self.verbose)
-            print('pot          :',self.pot)
-            print('units        :',self.units)
-            print('lmpcmd       :',self.lmpcmd)
-            print('atom_types   :',self.atom_types)
-            print('atoms        :',self.atoms)
+        self.mypot = mypot(self.pot)
         return
+
+    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False):
+        ''' geoopt (geometry optimization) is added / or not in
+            lammps_write_inputfile(); here only the potential is set.
+        '''
+        self.kmc = kmc
+        self.temp = temp
+        self.nsteps = nsteps
+
+
+        pot = mypot(self.pot)
+
+        basename = pot.pot
+        fullpath = pot.fullpath
+
+        if self.verbose > 1:
+            print('...get_potential--basename:',basename)
+            print('...get_potential--fullpath:',fullpath)
+            print('...pot',self.pot.split("_"))
+
+        self.lmpcmd = [
+                "mass 1 24.305",
+                "mass 2 26.9815385",
+                "mass 3 28.0855",
+                "variable nnpDir string "+fullpath
+                ]
+
+        if self.pot.split("_")[0] == "n2p2":
+            self.lmpcmd = self.lmpcmd + [
+                "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
+                "pair_coeff * * 17.4",
+                "neighbor 0.4 bin",
+                "#write_data ./pos.data # would this be the final struct?",
+            ]
+            self.atom_types = {'Mg':1,'Al':2,'Si':3}
+
+        elif self.pot.split("_")[0] == "runner":
+            self.lmpcmd = self.lmpcmd + [
+                "# thermo 1 # for geopt",
+                "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
+                "pair_coeff * * 10.0",
+            ]
+            self.atom_types = {'Mg':1,'Al':2,'Si':3}
+
+        else:
+            sys.exit('pot '+str(self.pot)+' not found!')
+
+        if self.kmc:
+            self.lmpcmd = self.lmpcmd + [
+                "",
+                "timestep 0.001   # timestep (ps)",
+                "velocity all create "+str(self.temp)+" 4928459",  # create initial velocities 4928459 is random seed for velocity initialization"
+                "thermo 1   # screen output interval (timesteps)",
+                "fix 1 all ipi f104 12345",
+                ]
+                # "fix 1 all ipi fidis 12345",     # for fidis job
+                # "fix 1 all ipi mac 77776 unix",  # for mac job
+
+        if self.verbose > 1:
+            print('...lmpcmd',self.lmpcmd)
+        return
+
 
     def ene(self,atoms=False):
         ''' atoms is an ase object '''
@@ -566,6 +685,7 @@ class ase_calculate_ene( object ):
 
 
 
+
 def string_to_index_an_array(array,string):
     ''' array will be indexed according to string e.g.
         array["string"] where "string" = ":7"
@@ -588,63 +708,6 @@ def string_to_index_an_array(array,string):
             pass
         return False
 
-
-def pot_to_ase_lmp_cmd(
-        pot,
-        geopt=False,
-        kmc=False,
-        verbose=False):
-    ''' geoopt (geometry optimization) is added / or not in
-        lammps_write_inputfile(); here only the potential is set.
-    '''
-    basename,fullpath = mypot(getbasename=pot)
-    if verbose > 1:
-        print('...get_potential--basename:',basename)
-        print('...get_potential--fullpath:',fullpath)
-        print('...pot',pot.split("_"))
-
-    lmpcmd = [
-            "mass 1 24.305",
-            "mass 2 26.9815385",
-            "mass 3 28.0855",
-            "variable nnpDir string "+fullpath
-            ]
-
-    if pot.split("_")[0] == "n2p2":
-        lmpcmd = lmpcmd + [
-            "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
-            "pair_coeff * * 17.4",
-            "neighbor 0.4 bin",
-            "#write_data ./pos.data # would this be the final struct?",
-        ]
-        att = {'Mg':1,'Al':2,'Si':3}
-
-    elif pot.split("_")[0] == "runner":
-        lmpcmd = lmpcmd + [
-            "variable runnerCutoff    equal  10.0",
-            "# thermo 1 # for geopt",
-            "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
-            "pair_coeff * * ${runnerCutoff}",
-        ]
-        att = {'Mg':1,'Al':2,'Si':3}
-
-    else:
-        sys.exit('pot '+str(pot)+' not found!')
-
-    if self.kmc:
-        lmpcmd = lmpcmd + [
-            "",
-            "timestep 0.001   # timestep (ps)",
-            "velocity all create ${initTemp} ${velSeed}  # create initial velocities",
-            "thermo 1   # # screen output interval (timesteps)",
-            "fix 1 all ipi f104 12345",
-            "set up integrator",
-            "run ${numSteps}",
-            ]
-
-    if verbose > 1:
-        print('...lmpcmd',lmpcmd)
-    return lmpcmd, att
 
 def q():
     out=check_output(['q'])
@@ -722,7 +785,9 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
         f.write("min_style fire\n")
         f.write("minimize 1.0e-9 1.0e-10 1000 1000\n")
 
-    f.write("run 0\n")
+    if ace.kmc:
+        ace.nsteps = 66000000   # this needs to by any very high number
+    f.write("run "+str(ace.nsteps)+"\n")
     return
 
 def ipi_write_inputfile(folder=False,filename='input.xml',positions='init.xyz',ace=False):

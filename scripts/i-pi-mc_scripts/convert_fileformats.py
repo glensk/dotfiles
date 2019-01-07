@@ -204,7 +204,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
     print('frames writing   :',len([frame_or_frames]),"(-wf argument)")
     #print('nowframes: ',len(frame_or_frames))
 
-    otherlist = ['lmp', 'lmp.runner','ipi']
+    otherlist = ['ipi']
     #otherlist = ['lmp', 'lmp.runner']
 
     known_formats = ase_get_known_formats()
@@ -220,11 +220,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
         outfilename = get_outfilename(args,idx)
         #print('aaa',outfilename)
         if formatout in otherlist:
-            print('convert_fileformats.py: formatout        :',formatout,"(not default fileformat, but known - lmp or lmp.runner -)")
-            if formatout == 'lmp':
-                save_ase_object_as_lmp(frameone,outfilename,comment=infile,runner=False)
-            if formatout == 'lmp.runner':
-                save_ase_object_as_lmp_runner(frameone,outfilename,comment=infile)
+            print('convert_fileformats.py: formatout        :',formatout,"(not default fileformat, but known - lmp or ipi -)")
             if formatout == 'ipi':
                 save_ase_object_as_ipi_format(frameone,outfilename)
 
@@ -265,101 +261,7 @@ def save_ase_object_as_ipi_format(frame,outfilename):
     return
 
 
-def save_ase_object_as_lmp_runner(frame,outfilename,comment=""):
-    save_ase_object_as_lmp(frame,outfilename,comment=comment,runner=True)
-    return
 
-
-def save_ase_object_as_lmp(frame,outfilename,comment="",runner=False):
-    if type(frame) != list:
-        frame = [frame]
-    # important not to change frame (aseobject), i dont know why but when this is called
-    # externally it changes external frame (aseobject)
-    #print('frame2',frame.cell)
-    framework = copy.deepcopy(frame)
-    #print('frame3',frame.cell)
-    #print('frame4',framework.cell)
-    #framework = frame
-    #print('----------------------------------------xxxxxxxxxxxxx')
-    #show_ase_frame_or_frames_content(frame)
-    #print('----------------------------------------xxxxxxxxxxxxx')
-    #show_ase_frame_or_frames_content(framework)
-    #sys.exit()
-    #print('fw',framework.positions)
-    framework = framework[0]
-    #sys.exit()
-
-    # this converts from ase to lammps; newcell,newpos give same energies?
-    # I would actually need something which reverts this
-    newcell, newpos = convert_cell(framework.cell, framework.positions)
-    framework.set_cell(newcell)
-    framework.set_positions(newpos)
-
-    species = framework.get_atomic_numbers()
-    #print('species',species)
-    unique_species, i_unique_species = np.unique(species, return_index=True)
-    #print('unique_species',unique_species)
-    masses = framework.get_masses()
-    positions = framework.get_positions()
-
-    lammps_indices = species.copy()
-    for ii in range(len(unique_species)):
-        lammps_indices[species == unique_species[ii]] = ii + 1
-
-    ((hxx, hxy, hxz), (hyx, hyy, hyz) , (hzx, hzy, hzz)) = framework.get_cell()
-
-
-    fout = open(outfilename,'w')
-
-    fout.write("LAMMPS positionsfile from: "+str(comment)+"\n")
-    fout.write("\n")
-    fout.write(str(len(species))+" atoms\n")
-
-    if runner is False:  # "normal"  lammps format
-        fout.write(str(len(unique_species))+" atom types\n")
-    elif runner is True:
-        # in principle this can be automatically obtained from the nn potential,
-        # for now however I am lazy
-        fout.write("3 atom types\n")
-    else:
-        sys.exit('variable runner is neigher True nor False; Exit.')
-    fout.write("\n")
-    fout.write("0.0 "+str(hxx)+" xlo xhi\n")
-    fout.write("0.0 "+str(hyy)+" ylo yhi\n")
-    fout.write("0.0 "+str(hzz)+" zlo zhi\n")
-    fout.write(str(hxy)+" "+str(hxz)+" "+str(hyz)+" xy xz yz\n")
-    fout.write("\n")
-    fout.write("Masses\n")
-    fout.write("\n")
-    if runner is False:
-        for ii in range(len(unique_species)):
-            #print(lammps_indices[i_unique_species[ii]], masses[i_unique_species[ii]])
-            fout.write(str(lammps_indices[i_unique_species[ii]])+" "+str(masses[i_unique_species[ii]])+"\n")
-    elif runner is True:
-        # in principle this can be automatically obtained from the nn potential,
-        # for now however I am lazy
-        fout.write("1 24.305\n")        # Mg
-        fout.write("2 26.9815385\n")    # Al
-        fout.write("3 28.085\n")        # Si
-        species_runner = species.copy()
-        species_runner[species_runner == 12] = 1
-        species_runner[species_runner == 13] = 2
-        species_runner[species_runner == 14] = 3
-        lammps_indices = species_runner
-        #print('sp',species_runner)
-
-    fout.write("\n")
-    fout.write("Atoms\n")
-    fout.write("\n")
-    # take care here for runner / n2p2 if only 2 species (say Mg,Si) for Mg,Al,Si potential
-    for ii in range(len(species)):  # if only Mg and Si get is, there will be only type 1 and 2 and not 1 and 3!
-        fout.write(("%5d %5d %s" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
-        #fout.write(("%5d %5d %.10f %.10f %.10f" % (ii + 1, lammps_indices[ii], "  ".join(map(str, positions[ii]))) )+"\n")
-    fout.write("\n")
-
-    fout.close()
-    print('written (4)      : '+outfilename)
-    return
 
 def check_if_ase_knows_runner():
     pass
