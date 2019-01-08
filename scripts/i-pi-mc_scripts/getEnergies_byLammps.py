@@ -101,6 +101,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         #print(d)
         #print(d["Mg"])
         #print(d["Si"])
+        ana_mg_conz[idx] = d["Mg"]
+        ana_si_conz[idx] = d["Si"]
+        ana_al_conz[idx] = d["Al"]
+        ana_atoms[idx]   = atoms[i].get_number_of_atoms()
 
         ### ene from ipi
         if ipi == True:
@@ -165,7 +169,6 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             printed = True
 
         if verbose > 0 and printed == False:
-            save_enes(ene_DFT,ene_pot,ene_diff_abs,ene_std,units,pot)
             print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
 
     np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
@@ -184,8 +187,15 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
 
-    analyze = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
-    np.savetxt("analyze.npy",analyze,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(analyze.shape[1]-1)))
+    print()
+    print(ene_diff_abs)
+    print(ana_mg_conz)
+    analyze = np.transpose([range(len(ene_DFT)),ene_diff_abs,ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms])
+    print('-analyze')
+    print(analyze)
+    #np.savetxt("analyze.npy",analyze,header=units,fmt=' '.join(['%i'] + ['%.2e']*(analyze.shape[1]-1)))
+    #np.savetxt("analyze.npy",analyze,header=units,fmt='%f')
+    np.savetxt("analyze.npy",analyze,header=" i diff Mg   Si   Al  atoms",fmt=' '.join(['%4.0f'] +['%5.2f']*(analyze.shape[1]-2)+['%4.0f']))
 
 
     my.create_READMEtxt(os.getcwd())

@@ -2,8 +2,8 @@
 #############################################################
 # Start editing here ########################################
 #############################################################
-#gitfrom="https://github.com/cosmo-epfl/lammps.git"
-gitfrom="https://github.com/lammps/lammps.git"
+gitfrom="https://github.com/cosmo-epfl/lammps.git"
+#gitfrom="https://github.com/lammps/lammps.git"
 folder_lammps_sources=$HOME/sources
 folder_lammps_save=$scripts/lammps_executables
 #folder_lammps_change=$scripts/lammps_scripts/change_src/
@@ -42,12 +42,13 @@ pwd
 [ ! -e "lammps_source_cosmo" ] && git clone $gitfrom lammps_source_cosmo && echo `date +"%Y_%m_%d"` > ANMERKUNG.txt
 cd lammps_source_cosmo
 git checkout runner-lammps
+ln -s $HOME/Dropbox/Albert/git/n2p2 lib/nnp
+cp -r $HOME/Dropbox/Albert/git/n2p2/src/interface/LAMMPS/src/USER-NNP src
 cd src
 #cp $folder_lammps_change/dump_xyz.cpp .
 #cp $folder_lammps_change/dump_xyz.h .
-pwd
 make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RIGID yes-USER-MISC
-#make yes-USER-RUNNER
+#make yes-USER-RUNNER   # in case it is the cosmo branch.
 make yes-user-nnp   # this will not work if n2pc has not been installed 
 sed -i 's|^#define MAXNEIGH.*|#define MAXNEIGH 500|' pair_runner.h
 rm -f lmp_$makeversion
@@ -55,7 +56,7 @@ rm -f lmp_$makeversion
 pwd
 echo "now make"
 make $makeversion | tee -a make_$makeversion\_out_`date +"%Y_%m_%d"`
-make mode=shlib $makeversion
+#make mode=shlib $makeversion
 pwd
 [ ! -e "lmp_$makeversion" ] && echo "lmp_$makeversion was NOT CREATED! THE COMPILATION FAILED!"
 if [ -e "lmp_$makeversion" ];then

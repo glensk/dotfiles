@@ -32,6 +32,7 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
+@click.option('--ffsocket',type=click.Choice(["unix","inet"]),default='unix',help='ipi fftsocket "unix" or "inet"')
 @click.option('-t','--test/--no-test', default=False)
 @click.option('--verbose','-v',count=True)
 
@@ -50,6 +51,7 @@ def createjob(
         submit,
         submitdebug,
         test,
+        ffsocket,
         verbose):
     """
     This is an script to create KMC jobs quickly (and submit).
@@ -79,9 +81,10 @@ def createjob(
 
 
 
-    ##### here only chck if the potential can be set up.
+    ##### here only chck if the potential can be set up. (in.lmp)
+    ##### the same command is then executed for every kmc folder
     ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
-    mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps)
+    mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
     if test == True:
@@ -173,26 +176,10 @@ def createjob(
             atomsc.write(jobdir+'/data.extxyz',format='extxyz')
             atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
 
-        # get and adapt in.lmp
-        #copyfile(file_inlmp, jobdir+"/in.lmp")
-        #mu.sed(jobdir+"/in.lmp",'variable runnerDir.*','variable runnerDir string "'+pot_dir+'"')
-        #mu.sed(jobdir+"/in.lmp",'variable runnerCutoff.*','variable runnerCutoff equal '+str(runnercutoff))
-        #mu.sed(jobdir+"/in.lmp",'variable nameStartCfg .*','variable nameStartCfg string "data.lmp.runner"')
-        #mu.sed(jobdir+"/in.lmp",'variable initTemp.*','variable initTemp equal '+str(temp))
-        #mu.sed(jobdir+"/in.lmp",'variable startTemp.*','variable startTemp equal '+str(temp))
-        #mu.sed(jobdir+"/in.lmp",'variable stopTemp.*','variable stopTemp equal '+str(temp))
-        #mu.sed(jobdir+"/in.lmp",'variable numSteps.*','variable numSteps equal '+str(nsteps))
-        #mu.sed(jobdir+"/in.lmp",'^fix 1 all.*','fix 1 all ipi mac 77776 unix')   # unix on mac, buth when 'inet' (on fidis) without 'unix'
-        #mu.sed(jobdir+"/in.lmp",'^fix 1 all.*','fix 1 all ipi fidis 12345')   # unix on mac, buth when 'inet' (on fidis) without 'unix'
 
-
-
-
-
-        # get and adapt in.lmp
-        #### get the potential
+        # create in.lmp
         ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
-        mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps)
+        mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
         mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.lmp.runner',ace=ace)
 
 
@@ -216,22 +203,28 @@ def createjob(
         mu.sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
         mu.sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
         mu.sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
-        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> '+str("data")+'.ipi </file>')
-        #mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="unix">')  # for mac (for fidis is changed in submit.sh)
-        mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="inet">')  # for mac (for fidis is changed in submit.sh)
-        #mu.sed(jobdir+"/input-runner.xml",'<address.*','<address> mac </address>')  # for mac (for fidis is changed in submit.sh)
-        mu.sed(jobdir+"/input-runner.xml",'<address.*','<address> mac </address> <port> 12345 </port>')  # for mac (for fidis is changed in submit.sh)
+        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
+
+        mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
+        addressline = '<address> '+socket.gethostname()+' </address>'
+        if ffsocket == "unix":
+            mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline)
+        if ffsocket == "inet":
+            mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline+' <port> 12345 </port>')
 
 
 
         # get submit-ipi-kmc.sh (should be made without copying)
-        copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
-        mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
-        mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-        mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-        mu.sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(LAMMPS_COMMAND)+' < in.lmp')
-        mu.sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
-        mu.sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(IPI_COMMAND)+' input-runner')
+        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,IPI_COMMAND,LAMMPS_COMMAND,lmp_par,ipi_inst,ffsocket)
+
+        #copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','-n '+str(lmp_par)+' --mem')
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(LAMMPS_COMMAND)+' < in.lmp')
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
+        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(IPI_COMMAND)+' input-runner')
 
         mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
 
@@ -241,7 +234,7 @@ def createjob(
 
 if __name__ == "__main__":
     # submitoptions
-    if True:
+    if False:
         nodes=2
         ipi_inst = 4
         lmp_par = 14
@@ -250,6 +243,12 @@ if __name__ == "__main__":
         nodes=3
         ipi_inst = 7
         lmp_par = 12
+
+    # currently on fidis with parallel n2p2 only one node works using unix
+    if True:
+        nodes=1
+        ipi_inst = 2
+        lmp_par = 14
 
     ntasks = cores = nodes * 28
     neval  = ipi_inst*2

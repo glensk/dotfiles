@@ -488,6 +488,69 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
     return
 
+def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False):
+
+    def check(variable,command_name_str,typehere):
+        if type(variable) != typehere:
+            print("ERROR In create_submitskript_ipi_kmc")
+            print("PROBLEM",command_name_str,variable)
+            sys.exit(command_name_str+" is not a "+str(typehere))
+
+    check(IPI_COMMAND,"IPI_COMMAND",str)
+    check(LAMMPS_COMMAND,"LAMMPS_COMMAND",str)
+    check(nodes,"nodes",int)
+    check(ntasks,"ntasks",int)
+    check(lmp_par,"lmp_par",int)
+    check(ipi_inst,"ipi_inst",int)
+    check(ffsocket,"ffsocket",str)
+
+    text = [
+    "#!/bin/bash",
+    "",
+    "#SBATCH --job-name=NNP-mpi",
+    "#SBATCH --get-user-env",
+    "#SBATCH --output=_scheduler-stdout.txt",
+    "#SBATCH --error=_scheduler-stderr.txt",
+    "#SBATCH --nodes="+str(nodes),
+    "#SBATCH --ntasks "+str(ntasks),
+    "#SBATCH --time=00-71:50:00",
+    "#SBATCH --constraint=E5v4",
+    "",
+    "set +e",
+    "source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
+    "module load intel intel-mpi intel-mkl fftw python/2.7.14",
+    "export OMP_NUM_THREADS=1",
+    "#touch time.out",
+    '#date +"%y.%m.%d %H:%M:%S" >> time.out',
+    "",
+    "# sets up the internet/unix socket for connections both for i-PI and on the lammps side",
+    'sed -i \'s/<ffsocket.*/<ffsocket name="lmpserial" mode="'+ffsocket+'">/\' input-runner.xml',
+    'sed -i \'s/address>.*<.addr/address>\'$(hostname)\'<\/addr/\' input-runner.xml',
+    'sed -i \'s/all ipi [^ ]*/all ipi \'$(hostname)\'/\' in.lmp',
+    '',
+    'rm -f /tmp/ipi_'+gethostname(),
+    '',
+    'python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &',
+    '',
+    'sleep 10',
+    '',
+    'for i in `seq '+str(ipi_inst)+'`',
+    'do',
+    #'      srun --hint=nomultithread --exclusive -n 14 --mem=4G /home/glensk/scripts/lammps/src/lmp_fidis < in.lmp > log.lmp$i  &',
+    '      srun -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    'done',
+    '',
+    'wait',
+    '#date +"%y.%m.%d %H:%M:%S" >> time.out',
+    'exit 0',
+    ]
+
+    f = open(filepath,'w')
+    for i in text:
+        f.write(i+"\n")
+
+    return
+
 
 class ase_calculate_ene( object ):
     '''
@@ -520,14 +583,18 @@ class ase_calculate_ene( object ):
         self.mypot = mypot(self.pot)
         return
 
-    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False):
+    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False,ffsocket=False):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
+            ffsocket: ipi ffsocket [ "unix" or "inet" ]
         '''
         self.kmc = kmc
         self.temp = temp
         self.nsteps = nsteps
-
+        self.ffsocket = ffsocket
+        if self.ffsocket not in [ "unix", "inet" ]:
+            print('ffsocket:',fflocket)
+            sys.exit('ffsocket has to be "unix" or "inet"; Exit!')
 
         pot = mypot(self.pot)
 
@@ -549,8 +616,7 @@ class ase_calculate_ene( object ):
         if self.pot.split("_")[0] == "n2p2":
             self.lmpcmd = self.lmpcmd + [
                 "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
-                "pair_coeff * * 17.4",
-                "neighbor 0.4 bin",
+                "pair_coeff * * 11.0",
                 "#write_data ./pos.data # would this be the final struct?",
             ]
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
@@ -567,13 +633,16 @@ class ase_calculate_ene( object ):
             sys.exit('pot '+str(self.pot)+' not found!')
 
         if self.kmc:
+            if self.ffsocket == "unix": add = "unix"
+            if self.ffsocket == "inet": add = ""
             self.lmpcmd = self.lmpcmd + [
                 "",
                 "timestep 0.001   # timestep (ps)",
                 "velocity all create "+str(self.temp)+" 4928459",  # create initial velocities 4928459 is random seed for velocity initialization"
                 "thermo 1   # screen output interval (timesteps)",
-                "fix 1 all ipi f104 12345",
+                "fix 1 all ipi "+str(gethostname())+" 12345 "+str(add),
                 ]
+                # with n2p2 in the parallel version, inet is not working
                 # "fix 1 all ipi fidis 12345",     # for fidis job
                 # "fix 1 all ipi mac 77776 unix",  # for mac job
 
@@ -698,6 +767,14 @@ def string_to_index_an_array(array,string):
         try:
             if type(int(string[1:])) == int:
                 return array[:int(string[1:])]
+        except ValueError:
+            pass
+    elif string[-1] == ':':             # ends with : e.g. 7:
+        #print('t2',string)
+        #print('t3',string[:-1])
+        try:
+            if type(int(string[:-1])) == int:
+                return array[int(string[:-1]):]
         except ValueError:
             pass
     else:
