@@ -614,8 +614,9 @@ class ase_calculate_ene( object ):
                 ]
 
         if self.pot.split("_")[0] == "n2p2":
+            # showewsum 1 showew yes resetew no maxew 1000000
             self.lmpcmd = self.lmpcmd + [
-                "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 1000000  cflength 1.8897261328 cfenergy 0.0367493254",
+                "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261328 cfenergy 0.0367493254",
                 "pair_coeff * * 11.0",
                 "#write_data ./pos.data # would this be the final struct?",
             ]

@@ -32,7 +32,7 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
-@click.option('--ffsocket',type=click.Choice(["unix","inet"]),default='unix',help='ipi fftsocket "unix" or "inet"')
+@click.option('--ffsocket',type=click.Choice(["unix","inet"]),default='inet',help='ipi fftsocket "unix" or "inet"')
 @click.option('-t','--test/--no-test', default=False)
 @click.option('--verbose','-v',count=True)
 
@@ -217,15 +217,7 @@ def createjob(
         # get submit-ipi-kmc.sh (should be made without copying)
         mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,IPI_COMMAND,LAMMPS_COMMAND,lmp_par,ipi_inst,ffsocket)
 
-        #copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','-n '+str(lmp_par)+' --mem')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(LAMMPS_COMMAND)+' < in.lmp')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(IPI_COMMAND)+' input-runner')
-
+        # submit the job
         mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
 
     print('done')
@@ -247,8 +239,8 @@ if __name__ == "__main__":
     # currently on fidis with parallel n2p2 only one node works using unix
     if True:
         nodes=1
-        ipi_inst = 2
-        lmp_par = 14
+        ipi_inst = 1
+        lmp_par = 28
 
     ntasks = cores = nodes * 28
     neval  = ipi_inst*2
