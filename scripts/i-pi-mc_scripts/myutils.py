@@ -488,7 +488,8 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
     return
 
-def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False):
+def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71):
+    ''' time is in min '''
 
     def check(variable,command_name_str,typehere):
         if type(variable) != typehere:
@@ -513,15 +514,15 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     "#SBATCH --error=_scheduler-stderr.txt",
     "#SBATCH --nodes="+str(nodes),
     "#SBATCH --ntasks "+str(ntasks),
-    "#SBATCH --time=00-71:50:00",
+    "#SBATCH --time=00-"+str(submittime_hours)+":00:00",
     "#SBATCH --constraint=E5v4",
     "",
     "set +e",
     "source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
     "export OMP_NUM_THREADS=1",
-    "#touch time.out",
-    '#date +"%y.%m.%d %H:%M:%S" >> time.out',
+    "touch time.out",
+    'date +%s >> time.out',
     "",
     "# sets up the internet/unix socket for connections both for i-PI and on the lammps side",
     'sed -i \'s/<ffsocket.*/<ffsocket name="lmpserial" mode="'+ffsocket+'">/\' input-runner.xml',
@@ -536,12 +537,12 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     '',
     'for i in `seq '+str(ipi_inst)+'`',
     'do',
-    #'      srun --hint=nomultithread --exclusive -n 14 --mem=4G /home/glensk/scripts/lammps/src/lmp_fidis < in.lmp > log.lmp$i  &',
-    '      srun -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    '      srun --hint=nomultithread --exclusive -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    #'      srun -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
     'done',
     '',
     'wait',
-    '#date +"%y.%m.%d %H:%M:%S" >> time.out',
+    'date +%s >> time.out',
     'exit 0',
     ]
 
