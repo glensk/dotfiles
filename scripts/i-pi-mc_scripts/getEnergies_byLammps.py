@@ -100,11 +100,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     print(',structures_to_calc[:3]:',structures_to_calc[:3])
     for idx,i in enumerate(structures_to_calc):
-<<<<<<< HEAD
-        if idx == 2:
-            sys.exit()
         #print('idx',idx,'i',i)
-=======
         d = my.ase_get_chemical_symbols_to_conz(atoms[i])
         #print(d)
         #print(d["Mg"])
@@ -115,7 +111,6 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         ana_atoms[idx]   = atoms[i].get_number_of_atoms()
 
         ### ene from ipi
->>>>>>> d138ac695c77611b433e2f0c0ad677d41e386505
         if ipi == True:
             atoms_tmp = copy.deepcopy(atoms[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
