@@ -29,6 +29,8 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
+    getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
+    getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
     '''
 
     #### get the potential
@@ -48,6 +50,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     print('number of structures in total:',len(atoms))
     print('structures_idx               :',structures_idx)
     structures_to_calc = my.string_to_index_an_array(range(len(atoms)),structures_idx)
+
     print('structures_to_calc           :',len(structures_to_calc))
     print()
     print('pot                          :',pot)
@@ -97,6 +100,11 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     print(',structures_to_calc[:3]:',structures_to_calc[:3])
     for idx,i in enumerate(structures_to_calc):
+<<<<<<< HEAD
+        if idx == 2:
+            sys.exit()
+        #print('idx',idx,'i',i)
+=======
         d = my.ase_get_chemical_symbols_to_conz(atoms[i])
         #print(d)
         #print(d["Mg"])
@@ -107,6 +115,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         ana_atoms[idx]   = atoms[i].get_number_of_atoms()
 
         ### ene from ipi
+>>>>>>> d138ac695c77611b433e2f0c0ad677d41e386505
         if ipi == True:
             atoms_tmp = copy.deepcopy(atoms[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)

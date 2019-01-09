@@ -55,6 +55,8 @@ conda info --envs
 echo "now install stuff CURRENTLY NEED TO ACCEPT EVERYTHIN WHITH IS NOT GOOD"
 echo "${RED}Snow install stuff CURRENTLY NEED TO ACCEPT EVERYTHIN WHITH IS NOT GOOD${NC}"
 echo
+echo "${RED}scikit-learn${NC}"
+conda install -y scikit-learn # for analyzing lifangs ipynb of correlationis
 echo "${RED}colorame${NC}"
 conda install -y colorama
 echo "${RED}click${NC}"
