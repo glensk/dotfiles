@@ -1,3 +1,4 @@
+# check if BASH or ZSH
 if [ "$ZSH_VERSION" != "" ];then
     #echo zsh
     SCR="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -6,6 +7,7 @@ else
     SCR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 fi
 
+# define the folders which are given in this git repo 
 ipi="$SCR/i-pi-mc_scripts"
 runner="$SCR/runner_scripts"
 aiida_s="$SCR/qe-aiida/aiida_solutejobs_scripts"
@@ -21,6 +23,7 @@ export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src"
 
 export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+export IPI_COMMAND="$HOME/Dropbox/Albert/git/i-pi-mc/bin/i-pi"
 #export lmp_exec="$SCR/executables/lmp_fidis_par_2018_11_28"
 
 if [ "$PYTHONPATH" = "" ];then
@@ -30,5 +33,5 @@ else
 fi
 export scripts=$SCR
 #export ipi_mc=$HOME/Dropbox/Albert/scripts/i-pi-new/i-pi
-export ipi_mc=$HOME/Dropbox/Albert/git/i-pi-mc/bin/i-pi
+#export ipi_mc=$HOME/Dropbox/Albert/git/i-pi-mc/bin/i-pi
 export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
