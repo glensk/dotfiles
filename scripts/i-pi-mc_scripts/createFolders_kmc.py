@@ -239,10 +239,15 @@ if __name__ == "__main__":
         lmp_par = 12
 
     # currently on fidis with parallel n2p2 only one node works using unix
-    if True:
+    if False:
         nodes=1
         ipi_inst = 1
         lmp_par = 28
+
+    if True:
+        nodes=2
+        ipi_inst = 4
+        lmp_par = 14
 
     ntasks = cores = nodes * 28
     neval  = ipi_inst*2

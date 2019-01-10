@@ -520,7 +520,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     "set +e",
     "source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
-    "export OMP_NUM_THREADS=1",
+    "#export OMP_NUM_THREADS=1",  # THIS LETS THE JOBS BE KILLED!
     "touch time.out",
     'date +%s >> time.out',
     "",
@@ -611,7 +611,7 @@ class ase_calculate_ene( object ):
                 "mass 1 24.305",
                 "mass 2 26.9815385",
                 "mass 3 28.0855",
-                "variable nnpDir string "+fullpath
+                "variable nnpDir string \""+fullpath+"\""
                 ]
 
         if self.pot.split("_")[0] == "n2p2":
