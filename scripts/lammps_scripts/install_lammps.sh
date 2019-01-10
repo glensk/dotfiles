@@ -13,15 +13,16 @@ move_exec_to=$scripts/lammps_executables  # if exec should be moved
 
 
 makefile=""         # "" means no special/own makefile
-makeversion="mpi"   # "serial" or "mpi" or "fidis"; 
+makeversion="fidis"   # "serial" or "mpi" or "fidis"; 
                     # for serial and n2p2 enable -DNOMPI
 
 lammpsfolder=lammps_$lammps\_$makeversion
-#[ "`hostname`" = "fidis" ] && makeversion="fidis" && makefile=$dotfiles/scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
 #############################################################
 # Stop editing here #########################################
 #############################################################
+[ "`hostname`" = "fidis" ] && [ "$makeversion" == "fidis" ] && makefile=$dotfiles/scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
 
+[ "`hostname`" = "fidis" ] && [ "$makeversion" == "fidis" ] && [ ! -e "$makefile" ] && echo "makefile $makefile does not exist" && exit 
 
 src=$installfolder/$lammpsfolder/src
 src_=$installfolder/$lammpsfolder
@@ -64,6 +65,7 @@ make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RI
 
 if [ "$n2p2_folder" != "" ];then
     cd $src_
+    echo ""
     echo "get n2p2 lib/nnp and USER-NNP to src"
     ln -s $n2p2_folder lib/nnp
     cp -r $n2p2_folder/src/interface/LAMMPS/src/USER-NNP src
@@ -73,6 +75,7 @@ fi
 
 if [ "$lammps" = "cosmo" ];then 
     cd $src
+    echo""
     echo "make yes-USER-RUNNER"
     make yes-USER-RUNNER  
     sed -i 's|^#define MAXNEIGH.*|#define MAXNEIGH 500|' pair_runner.h
@@ -80,8 +83,8 @@ fi
 
 
 #### load modules on fidis
-cd $src
 if [ "`hostname`" = "fidis" ];then
+    cd $src
     #conda deactivate
     [ "$makeversion" == "fidis" ] && cp -r $makefile MAKE # !!! copy the makefile
     source $MODULESHOME/init/bash
@@ -95,6 +98,7 @@ fi
 
 
 #### mow make
+cd $src
 echo "now make"
 pwd
 rm -f lmp_$makeversion
