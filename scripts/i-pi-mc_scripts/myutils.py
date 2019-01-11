@@ -584,7 +584,7 @@ class ase_calculate_ene( object ):
         self.mypot = mypot(self.pot)
         return
 
-    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False,ffsocket=False):
+    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False,ffsocket='inet'):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
@@ -594,7 +594,7 @@ class ase_calculate_ene( object ):
         self.nsteps = nsteps
         self.ffsocket = ffsocket
         if self.ffsocket not in [ "unix", "inet" ]:
-            print('ffsocket:',fflocket)
+            print('ffsocket:',ffsocket)
             sys.exit('ffsocket has to be "unix" or "inet"; Exit!')
 
         pot = mypot(self.pot)

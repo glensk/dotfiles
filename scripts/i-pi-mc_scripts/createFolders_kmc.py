@@ -87,6 +87,7 @@ def createjob(
     ##### the same command is then executed for every kmc folder
     ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
     mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
+    mu.ase_calculate_ene.ipi_kmc(ace,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
     if test == True:
