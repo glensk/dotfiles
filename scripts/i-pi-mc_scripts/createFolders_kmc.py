@@ -32,7 +32,8 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
-@click.option('--ffsocket',type=click.Choice(["unix","inet"]),default='unix',help='ipi fftsocket "unix" or "inet"')
+@click.option('-st','--submittime_hours', type=int,default=71,help="slurm time for the job")
+@click.option('--ffsocket',type=click.Choice(["unix","inet"]),default='inet',help='ipi fftsocket "unix" or "inet"')
 @click.option('-t','--test/--no-test', default=False)
 @click.option('--verbose','-v',count=True)
 
@@ -50,6 +51,7 @@ def createjob(
         pot,
         submit,
         submitdebug,
+        submittime_hours,
         test,
         ffsocket,
         verbose):
@@ -88,7 +90,7 @@ def createjob(
 
     ##### if test
     if test == True:
-        nsteps = 5
+        nsteps = 50
 
 
     file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
@@ -140,10 +142,10 @@ def createjob(
     print('directory     ',directory)
     print('submit        ',submit)
     print('submitdebug   ',submitdebug)
-    print('python ver    ',sys.version_info[0])
-    print()
-    print('LAMMPS_COMMAND',LAMMPS_COMMAND)
-    print('IPI_COMMAND   ',IPI_COMMAND)
+    #print('python ver    ',sys.version_info[0])
+    #print()
+    #print('LAMMPS_COMMAND',LAMMPS_COMMAND)
+    #print('IPI_COMMAND   ',IPI_COMMAND)
     print('--------------------------- check the input --------------------------------')
     mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
 
@@ -169,12 +171,12 @@ def createjob(
 
         atomsc.write(jobdir+'/data.lmp.runner',format='lammps-runner')
 
-        if test == True:
-            atomsc.write(jobdir+'/data.lmp',format='lammps-data')
-            atomsc.write(jobdir+'/data.POSCAR',format='vasp')
-            atomsc.write(jobdir+'/data.xyz',format='xyz')
-            atomsc.write(jobdir+'/data.extxyz',format='extxyz')
-            atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
+        #if test == True:
+        #    atomsc.write(jobdir+'/data.lmp',format='lammps-data')
+        #    atomsc.write(jobdir+'/data.POSCAR',format='vasp')
+        #    atomsc.write(jobdir+'/data.xyz',format='xyz')
+        #    atomsc.write(jobdir+'/data.extxyz',format='extxyz')
+        #    atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
 
 
         # create in.lmp
@@ -215,17 +217,9 @@ def createjob(
 
 
         # get submit-ipi-kmc.sh (should be made without copying)
-        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,IPI_COMMAND,LAMMPS_COMMAND,lmp_par,ipi_inst,ffsocket)
+        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,IPI_COMMAND,LAMMPS_COMMAND,lmp_par,ipi_inst,ffsocket,submittime_hours=submittime_hours)
 
-        #copyfile(file_submit, jobdir+"/submit-ipi-kmc.sh")
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --nodes=.*','#SBATCH --nodes='+str(nodes))
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'#SBATCH --ntasks.*','#SBATCH --ntasks '+str(ntasks))
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','--exclusive -n '+str(lmp_par)+' --mem')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--exclusive -n .* --mem','-n '+str(lmp_par)+' --mem')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'--mem=4G .* < in.lmp','--mem=4G '+str(LAMMPS_COMMAND)+' < in.lmp')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'for i in `seq.*','for i in `seq '+str(ipi_inst)+'`')
-        #mu.sed(jobdir+"/submit-ipi-kmc.sh",'^python .* input-runner','python '+str(IPI_COMMAND)+' input-runner')
-
+        # submit the job
         mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
 
     print('done')
@@ -245,9 +239,14 @@ if __name__ == "__main__":
         lmp_par = 12
 
     # currently on fidis with parallel n2p2 only one node works using unix
-    if True:
+    if False:
         nodes=1
-        ipi_inst = 2
+        ipi_inst = 1
+        lmp_par = 28
+
+    if True:
+        nodes=2
+        ipi_inst = 4
         lmp_par = 14
 
     ntasks = cores = nodes * 28

@@ -1,5 +1,5 @@
 #!/bin/sh
-squeue -u "$USER" --format "%A %t %C %M %Z %N" | awk '{printf "%8s %3s %4s %10s %10s (%-s)\n",$1,$2,$3,$4,$5,$6}' | sed 's|()||'
+squeue -u "$USER" --format "%A %t %C %M %Z %N" | awk '{printf "%8s %3s %4s %10s %10s (%-s)\n",$1,$2,$3,$4,$5,$6}' | sed 's|()||' | sort
 
 
 #echo
