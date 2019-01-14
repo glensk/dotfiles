@@ -528,7 +528,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     "set +e",
     "source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
-    "#export OMP_NUM_THREADS=1",  # THIS LETS THE JOBS BE KILLED!
+    "export OMP_NUM_THREADS="+str(lmp_par),  # THIS LETS THE JOBS BE KILLED!
     "touch time.out",
     'date +%s >> time.out',
     "",
@@ -545,7 +545,8 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     '',
     'for i in `seq '+str(ipi_inst)+'`',
     'do',
-    '      srun --hint=nomultithread --exclusive -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    #'      srun --hint=nomultithread --exclusive -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    '      srun --hint=nomultithread --exclusive --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
     #'      srun -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
     'done',
     '',
