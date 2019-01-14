@@ -204,7 +204,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
     print('frames writing   :',len([frame_or_frames]),"(-wf argument)")
     #print('nowframes: ',len(frame_or_frames))
 
-    otherlist = ['ipi']
+    #otherlist = ['ipi']
     #otherlist = ['lmp', 'lmp.runner']
 
     known_formats = ase_get_known_formats()
@@ -218,13 +218,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
             idx = ""
         #print('idx:',idx,type(idx))
         outfilename = get_outfilename(args,idx)
-        #print('aaa',outfilename)
-        if formatout in otherlist:
-            print('convert_fileformats.py: formatout        :',formatout,"(not default fileformat, but known - lmp or ipi -)")
-            if formatout == 'ipi':
-                save_ase_object_as_ipi_format(frameone,outfilename)
-
-        elif formatout in known_formats:
+        if formatout in known_formats:
             print('formatout        :',formatout,"known by default")
             save_ase_object_in_ase_format(frameone,outfilename,formatout)
         else:
@@ -245,20 +239,20 @@ def save_ase_object_in_ase_format(ase_object,outfilename,formatout):
     print('written (2)      : '+outfilename)
 
 
-def save_ase_object_as_ipi_format(frame,outfilename):
-    ase.io.write(outfilename,frame,format='xyz')
-    laa = frame.get_cell_lengths_and_angles()
-    with open(outfilename, 'r') as file:
-        # read a list of lines into data
-        data = file.readlines()
-
-    data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step: 4  Bead: 0 positions{angstrom}  cell{angstrom}"+'\n'
-
-    # and write everything back
-    with open(outfilename, 'w') as file:
-        file.writelines( data )
-    print('written (3)      : '+outfilename)
-    return
+#def save_ase_object_as_ipi_format(frame,outfilename):
+#    ase.io.write(outfilename,frame,format='xyz')
+#    laa = frame.get_cell_lengths_and_angles()
+#    with open(outfilename, 'r') as file:
+#        # read a list of lines into data
+#        data = file.readlines()
+#
+#    data[1] = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step: 4  Bead: 0 positions{angstrom}  cell{angstrom}"+'\n'
+#
+#    # and write everything back
+#    with open(outfilename, 'w') as file:
+#        file.writelines( data )
+#    print('written (3)      : '+outfilename)
+#    return
 
 
 
@@ -289,12 +283,15 @@ def ase_get_known_formats(show=False,add_missing_formats=False,verbose=True):
         missing1 = scripts+"/runner_scripts/ase_fileformat_for_runner.py"
         missing2 = scripts+"/runner_scripts/ase_fileformat_for_lammpsrunner.py"
         missing3 = scripts+"/runner_scripts/ase_fileformat_for_lammpsdata.py"
+        missing4 = scripts+"/runner_scripts/ase_fileformat_for_ipi.py"
+
         from shutil import copyfile
         if verbose:
             print('copying files to',os.path.dirname(ase.io.__file__))
         copyfile(missing1,os.path.dirname(ase.io.__file__)+"/runner.py")
         copyfile(missing2,os.path.dirname(ase.io.__file__)+"/lammpsrunner.py")
         copyfile(missing3,os.path.dirname(ase.io.__file__)+"/lammpsdata.py")
+        copyfile(missing4,os.path.dirname(ase.io.__file__)+"/ipi.py")
 
         if 'runner' in x:
             print('missing format are already added in formats.py (of ase).')
@@ -320,6 +317,7 @@ def ase_get_known_formats(show=False,add_missing_formats=False,verbose=True):
                     insert2 = idx
 
             contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+            contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
             contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
             contents.insert(insert2, "    'lammps-runner': 'lammpsrunner',\n")
             print('insert',insert)

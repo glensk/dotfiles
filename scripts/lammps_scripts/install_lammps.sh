@@ -14,12 +14,15 @@ move_exec_to=$scripts/lammps_executables  # if exec should be moved
 
 makefile=""         # "" means no special/own makefile
 makeversion="fidis"   # "serial" or "mpi" or "fidis"; 
-                    # for serial and n2p2 enable -DNOMPI
+                      # for serial and n2p2 enable -DNOMPI
+[ "$1" != "" ] && makeversion=$1
 
 lammpsfolder=lammps_$lammps\_$makeversion
 #############################################################
 # Stop editing here #########################################
 #############################################################
+[ "$makeversion" == "fidis" ] && [ "$makeversion" == "mpi" ] && echo "makeversion has to be fidis or mpi" && exit
+
 [ "`hostname`" = "fidis" ] && [ "$makeversion" == "fidis" ] && makefile=$dotfiles/scripts/lammps_makefiles/fidis_deneb_2018-10-31/MINE
 
 [ "`hostname`" = "fidis" ] && [ "$makeversion" == "fidis" ] && [ ! -e "$makefile" ] && echo "makefile $makefile does not exist" && exit 
@@ -61,6 +64,7 @@ echo `date +"%Y_%m_%d"` > ANMERKUNG.txt
 [ "$lammps" = "cosmo" ] && git checkout runner-lammps
 
 cd $src
+make clean-all
 make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RIGID yes-USER-MISC
 
 if [ "$n2p2_folder" != "" ];then
@@ -87,6 +91,7 @@ if [ "`hostname`" = "fidis" ];then
     cd $src
     #conda deactivate
     [ "$makeversion" == "fidis" ] && cp -r $makefile MAKE # !!! copy the makefile
+    echo "now loading the modules ..."
     source $MODULESHOME/init/bash
     module purge
     module load intel
@@ -94,6 +99,8 @@ if [ "`hostname`" = "fidis" ];then
     module load intel-mkl
     module load fftw
     module load python/2.7.14
+    module load gsl   # necessary to have it similarly to n2p2
+    module load eigen # necessary to have it similarly to n2p2
 fi
 
 

@@ -31,6 +31,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
+    getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
+
     '''
 
     #### get the potential
@@ -98,7 +100,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     be_very_verbose = 999
 
 
-    print(',structures_to_calc[:3]:',structures_to_calc[:3])
+    print('structures_to_calc[:3]:',structures_to_calc[:3],'...',structures_to_calc[-3:])
+    print()
+    print('    i   idx /    from       diff      =DFT-ref ('+ace.units+') [atms]      ene_DFT          ene_pot')
+    print('--------------------------------------------------------------------------------------------------')
     for idx,i in enumerate(structures_to_calc):
         #print('idx',idx,'i',i)
         d = my.ase_get_chemical_symbols_to_conz(atoms[i])
@@ -117,6 +122,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
         ### ene from DFT
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
+        #ene_DFT[idx] = 1
         if verbose > be_very_verbose:
             my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "STAT2")
         if verbose > 0:
@@ -125,10 +131,13 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         ### ene from ase (without writing lammps files)
         if ase == True:
             atoms_tmp = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
+            #print('ka')
             ace.pot_to_ase_lmp_cmd()
+            #print('kb')
             ene_pot_ase[idx] = ace.ene(atoms_tmp)
+            #print('kc')
             if verbose > 0:
-                print('ene_pot_ase[idx] :',ene_pot_ase[idx],units)
+                print('xx ene_pot_ase[idx] :',ene_pot_ase[idx],units)
             if lmp == False:
                 ene_pot[idx] = copy.deepcopy(ene_pot_ase[idx])
 
@@ -168,12 +177,15 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
         printed = False
 
+        def printhere():
+            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s) [%4.0f] %16.7f %16.7f" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units,atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx]))
+
         if idx in range(0,len(structures_to_calc),printevery):
-            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s) %4.0f" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units,atoms[i].get_number_of_atoms()))
+            printhere()
             printed = True
 
         if verbose > 0 and printed == False:
-            print("%5.0f %5.0f / %6.0f %16.7f =DFT-ref (%s)" % (i,idx,len(structures_to_calc),ene_diff_abs[idx],ace.units))
+            printhere()
 
     np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
@@ -191,12 +203,12 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
     np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
 
-    print()
-    print(ene_diff_abs)
-    print(ana_mg_conz)
+    #print()
+    #print(ene_diff_abs)
+    #print(ana_mg_conz)
     analyze = np.transpose([range(len(ene_DFT)),ene_diff_abs,ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms])
-    print('-analyze')
-    print(analyze)
+    #print('-analyze')
+    #print(analyze)
     #np.savetxt("analyze.npy",analyze,header=units,fmt=' '.join(['%i'] + ['%.2e']*(analyze.shape[1]-1)))
     #np.savetxt("analyze.npy",analyze,header=units,fmt='%f')
     np.savetxt("analyze.npy",analyze,header=" i diff Mg   Si   Al  atoms",fmt=' '.join(['%4.0f'] +['%5.2f']*(analyze.shape[1]-2)+['%4.0f']))

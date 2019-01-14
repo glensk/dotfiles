@@ -26,7 +26,7 @@ echo "#########################"
 [ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
 
 cd n2p2
-git checkout develop
+#git checkout develop
 git branch
 cd src
 

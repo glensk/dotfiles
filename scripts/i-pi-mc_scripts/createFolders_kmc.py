@@ -33,7 +33,7 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
 @click.option('-st','--submittime_hours', type=int,default=71,help="slurm time for the job")
-@click.option('--ffsocket',type=click.Choice(["unix","inet"]),default='inet',help='ipi fftsocket "unix" or "inet"')
+@click.option('-n','--nodes', type=int,default=1,help="how many nodes to use?")
 @click.option('-t','--test/--no-test', default=False)
 @click.option('--verbose','-v',count=True)
 
@@ -53,7 +53,7 @@ def createjob(
         submitdebug,
         submittime_hours,
         test,
-        ffsocket,
+        nodes,
         verbose):
     """
     This is an script to create KMC jobs quickly (and submit).
@@ -62,6 +62,18 @@ def createjob(
 
     createFolder_kmc.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
     """
+    # definex ffsocket inet/unix
+    if nodes == 1:
+        ffsocket = "unix"
+    elif nodes > 1:
+        ffsocket = "inet"
+    else:
+        sys.exit("Number of nodes has to be positive!")
+
+    # define ntasks, neval
+    ntasks = cores = nodes * 28
+    neval  = ipi_inst*2  # was alwasy better, for ompi and impi
+
     ##### get the seed(s).
     seeds = random.sample(range(1, 999999), nseeds)
     if test == True:
@@ -87,17 +99,12 @@ def createjob(
     ##### the same command is then executed for every kmc folder
     ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
     mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
-    mu.ase_calculate_ene.ipi_kmc(ace,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
     if test == True:
         nsteps = 50
 
-
-    file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
-    file_submit             = scripts + "/i-pi-mc_scripts/submit-ipi-kmc.sh"
     file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
-    mu.check_isfile_or_isfiles([file_inlmp,file_submit],["file_inlmp","file_submit"])
     LAMMPS_COMMAND = mu.test_and_return_environment_var_path('LAMMPS_COMMAND')
     IPI_COMMAND    = mu.test_and_return_environment_var_path('IPI_COMMAND')
 
@@ -143,6 +150,9 @@ def createjob(
     print('directory     ',directory)
     print('submit        ',submit)
     print('submitdebug   ',submitdebug)
+    print()
+    print('nodes         ',nodes)
+    print('ffsocket      ',ffsocket)
     #print('python ver    ',sys.version_info[0])
     #print()
     #print('LAMMPS_COMMAND',LAMMPS_COMMAND)
@@ -167,17 +177,16 @@ def createjob(
             sys.exit("jobdirectory "+str(jobdir)+" already exists!")
         mu.mkdir(jobdir)
 
-        # get data.lmp
-        convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
-
+        # get data.lmp and data.ipi
         atomsc.write(jobdir+'/data.lmp.runner',format='lammps-runner')
+        atomsc.write(jobdir+'/data.ipi',format='ipi')
 
-        #if test == True:
-        #    atomsc.write(jobdir+'/data.lmp',format='lammps-data')
-        #    atomsc.write(jobdir+'/data.POSCAR',format='vasp')
-        #    atomsc.write(jobdir+'/data.xyz',format='xyz')
-        #    atomsc.write(jobdir+'/data.extxyz',format='extxyz')
-        #    atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
+        if test == True:
+            atomsc.write(jobdir+'/data.lmp',format='lammps-data')
+            atomsc.write(jobdir+'/data.POSCAR',format='vasp')
+            atomsc.write(jobdir+'/data.xyz',format='xyz')
+            atomsc.write(jobdir+'/data.extxyz',format='extxyz')
+            atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
 
 
         # create in.lmp
@@ -211,7 +220,7 @@ def createjob(
         mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
         addressline = '<address> '+socket.gethostname()+' </address>'
         if ffsocket == "unix":
-            mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline)
+            mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline+' <latency> 1e-3 </latency>')
         if ffsocket == "inet":
             mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline+' <port> 12345 </port>')
 
@@ -228,30 +237,10 @@ def createjob(
 
 
 if __name__ == "__main__":
-    # submitoptions
-    if False:
-        nodes=2
-        ipi_inst = 4
-        lmp_par = 14
-
-    if False:
-        nodes=3
-        ipi_inst = 7
-        lmp_par = 12
-
-    # currently on fidis with parallel n2p2 only one node works using unix
-    if False:
-        nodes=1
-        ipi_inst = 1
-        lmp_par = 28
-
     if True:
-        nodes=2
         ipi_inst = 4
-        lmp_par = 14
+        lmp_par = 2    # when openmp this is used to define OMP_NUM_THREADS=
 
-    ntasks = cores = nodes * 28
-    neval  = ipi_inst*2
 
 
     createjob()

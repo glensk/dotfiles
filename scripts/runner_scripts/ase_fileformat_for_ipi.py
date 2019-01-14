@@ -19,7 +19,9 @@ def read_ipi(fileobj, index):
     lst = cell_str.split()[2:8]
     cell_out = [float(i) for i in lst]
     #print('out',out)
-
+    #print('cell_out:')
+    #print(cell_out)
+    pbc = (True, True, True)
     #print('xxx',cell_str[2])
 
     #sys.exit()
@@ -33,7 +35,8 @@ def read_ipi(fileobj, index):
             symbol = symbol.lower().capitalize()
             symbols.append(symbol)
             positions.append([float(x), float(y), float(z)])
-        yield Atoms(symbols=symbols, positions=positions, cell=cell_out)
+        #atoms[0].set_cell(atoms[0].get_cell_lengths_and_angles()))
+        yield Atoms(symbols=symbols, positions=positions, cell=cell_out, pbc=pbc)
 
 
 #def simple_write_xyz(fileobj, images, comment=''):
@@ -46,4 +49,4 @@ def write_ipi(fileobj, images, comment=''):
     for atoms in images:
         fileobj.write('%d\n%s\n' % (natoms, comment))
         for s, (x, y, z) in zip(symbols, atoms.positions):
-            fileobj.write('%-2s %22.15f %22.15f %22.15f\n' % (s, x, y, z))
+            fileobj.write('%-2s %16.8f %16.8f %16.8f\n' % (s, x, y, z))

@@ -220,7 +220,15 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
 
 def ase_enepot(atoms,units='eV',verbose=False):
     ''' units: eV, eV_pa, hartree, hartree_pa '''
-    ene = atoms.get_potential_energy()
+    #print('now in ene')
+    #print('ac',atoms.cell)
+    try:
+        ene = atoms.get_potential_energy()
+        #print('ene:',ene)
+    except RuntimeError:
+        #print("had runtime error")
+        ene = 0.
+    #print('--ene eV',ene,"(not per atom)")
     if verbose:
         print('ene eV',ene,"(not per atom)")
     units_split = units.split("_")
@@ -520,7 +528,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     "set +e",
     "source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
-    "#export OMP_NUM_THREADS=1",  # THIS LETS THE JOBS BE KILLED!
+    "export OMP_NUM_THREADS="+str(lmp_par),  # THIS LETS THE JOBS BE KILLED!
     "touch time.out",
     'date +%s >> time.out',
     "",
@@ -537,7 +545,8 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     '',
     'for i in `seq '+str(ipi_inst)+'`',
     'do',
-    '      srun --hint=nomultithread --exclusive -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    #'      srun --hint=nomultithread --exclusive -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
+    '      srun --hint=nomultithread --exclusive --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
     #'      srun -n '+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
     'done',
     '',
@@ -584,7 +593,7 @@ class ase_calculate_ene( object ):
         self.mypot = mypot(self.pot)
         return
 
-    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False,ffsocket='inet'):
+    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet'):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
@@ -611,7 +620,7 @@ class ase_calculate_ene( object ):
                 "mass 1 24.305",
                 "mass 2 26.9815385",
                 "mass 3 28.0855",
-                "variable nnpDir string \""+fullpath+"\""
+                'variable nnpDir string \"'+fullpath+'\"'
                 ]
 
         if self.pot.split("_")[0] == "n2p2":
@@ -740,7 +749,7 @@ class ase_calculate_ene( object ):
             print('ZZ self.units',self.units)
         ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
         if self.verbose > 1:
-            print('ZZ ene',ene,self.units)
+            print('ZZ ene:',ene,self.units)
         #sys.exit()
         #ene = atoms.get_total_energy()
         #if self.verbose:
@@ -932,6 +941,8 @@ def lammps_ext_calc(atoms,ace):
 
     ### write inputfile  # geopt is here added or not
     lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
+    if ace.verbose > 1:
+        print("written lammsp inputfile to ",tmpdir)
 
     ### calculate with lammps (trigger externally)
     ene = False
