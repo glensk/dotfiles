@@ -620,7 +620,7 @@ class ase_calculate_ene( object ):
                 "mass 1 24.305",
                 "mass 2 26.9815385",
                 "mass 3 28.0855",
-                "variable nnpDir string \""+fullpath+"\""
+                'variable nnpDir string \"'+fullpath+'\"'
                 ]
 
         if self.pot.split("_")[0] == "n2p2":

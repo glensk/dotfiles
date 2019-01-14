@@ -70,6 +70,10 @@ def createjob(
     else:
         sys.exit("Number of nodes has to be positive!")
 
+    # define ntasks, neval
+    ntasks = cores = nodes * 28
+    neval  = ipi_inst*2  # was alwasy better, for ompi and impi
+
     ##### get the seed(s).
     seeds = random.sample(range(1, 999999), nseeds)
     if test == True:
@@ -237,8 +241,6 @@ if __name__ == "__main__":
         ipi_inst = 4
         lmp_par = 2    # when openmp this is used to define OMP_NUM_THREADS=
 
-    ntasks = cores = nodes * 28
-    neval  = ipi_inst*2
 
 
     createjob()
