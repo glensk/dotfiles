@@ -220,7 +220,15 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
 
 def ase_enepot(atoms,units='eV',verbose=False):
     ''' units: eV, eV_pa, hartree, hartree_pa '''
-    ene = atoms.get_potential_energy()
+    #print('now in ene')
+    #print('ac',atoms.cell)
+    try:
+        ene = atoms.get_potential_energy()
+        #print('ene:',ene)
+    except RuntimeError:
+        #print("had runtime error")
+        ene = 0.
+    #print('--ene eV',ene,"(not per atom)")
     if verbose:
         print('ene eV',ene,"(not per atom)")
     units_split = units.split("_")
@@ -584,7 +592,7 @@ class ase_calculate_ene( object ):
         self.mypot = mypot(self.pot)
         return
 
-    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=False,ffsocket='inet'):
+    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet'):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
@@ -740,7 +748,7 @@ class ase_calculate_ene( object ):
             print('ZZ self.units',self.units)
         ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
         if self.verbose > 1:
-            print('ZZ ene',ene,self.units)
+            print('ZZ ene:',ene,self.units)
         #sys.exit()
         #ene = atoms.get_total_energy()
         #if self.verbose:
@@ -932,6 +940,8 @@ def lammps_ext_calc(atoms,ace):
 
     ### write inputfile  # geopt is here added or not
     lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
+    if ace.verbose > 1:
+        print("written lammsp inputfile to ",tmpdir)
 
     ### calculate with lammps (trigger externally)
     ene = False

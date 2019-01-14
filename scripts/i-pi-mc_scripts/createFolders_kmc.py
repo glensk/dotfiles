@@ -87,17 +87,12 @@ def createjob(
     ##### the same command is then executed for every kmc folder
     ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
     mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
-    mu.ase_calculate_ene.ipi_kmc(ace,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
     if test == True:
         nsteps = 50
 
-
-    file_inlmp              = scripts + "/i-pi-mc_scripts/in.lmp"
-    file_submit             = scripts + "/i-pi-mc_scripts/submit-ipi-kmc.sh"
     file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
-    mu.check_isfile_or_isfiles([file_inlmp,file_submit],["file_inlmp","file_submit"])
     LAMMPS_COMMAND = mu.test_and_return_environment_var_path('LAMMPS_COMMAND')
     IPI_COMMAND    = mu.test_and_return_environment_var_path('IPI_COMMAND')
 
@@ -167,17 +162,16 @@ def createjob(
             sys.exit("jobdirectory "+str(jobdir)+" already exists!")
         mu.mkdir(jobdir)
 
-        # get data.lmp
-        convert_fileformats.save_ase_object_as_ipi_format(atomsc,jobdir+'/data.ipi')
-
+        # get data.lmp and data.ipi
         atomsc.write(jobdir+'/data.lmp.runner',format='lammps-runner')
+        atomsc.write(jobdir+'/data.ipi',format='ipi')
 
-        #if test == True:
-        #    atomsc.write(jobdir+'/data.lmp',format='lammps-data')
-        #    atomsc.write(jobdir+'/data.POSCAR',format='vasp')
-        #    atomsc.write(jobdir+'/data.xyz',format='xyz')
-        #    atomsc.write(jobdir+'/data.extxyz',format='extxyz')
-        #    atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
+        if test == True:
+            atomsc.write(jobdir+'/data.lmp',format='lammps-data')
+            atomsc.write(jobdir+'/data.POSCAR',format='vasp')
+            atomsc.write(jobdir+'/data.xyz',format='xyz')
+            atomsc.write(jobdir+'/data.extxyz',format='extxyz')
+            atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
 
 
         # create in.lmp
