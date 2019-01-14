@@ -104,6 +104,7 @@ pwd
 rm -f lmp_$makeversion
 make $makeversion | tee -a make_$makeversion\_out_`date +"%Y_%m_%d"`
 #make mode=shlib $makeversion
+#make mode=shlib fidis
 pwd
 exit
 
