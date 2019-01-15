@@ -1,5 +1,7 @@
 if [[ $- == *i* ]];then  # only in interactive shell
-if [ "`hostname | grep -o daint`" = "daint" ];then
+   daint=`hostname | grep -o daint` 
+   fidis=`hostname | grep -o fidis` 
+if [[ "$daint" = "daint" || "$fidis" = "fidis" ]];then
     ka="kb" # dont do anyting
 else
 #################################################################
