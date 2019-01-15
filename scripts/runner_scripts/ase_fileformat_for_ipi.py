@@ -43,7 +43,7 @@ def read_ipi(fileobj, index):
 def write_ipi(fileobj, images, comment=''):
     symbols = images[0].get_chemical_symbols()
     laa = images[0].get_cell_lengths_and_angles()
-    comment = '# CELL(abcABCxxx):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+"  Step:           4  Bead:       0 positions{angstrom}               cell{angstrom}"
+    comment = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+" Step: 4  Bead: 0 positions{angstrom} cell{angstrom}"
 
     natoms = len(symbols)
     for atoms in images:
