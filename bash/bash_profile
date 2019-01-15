@@ -20,7 +20,6 @@ case "$-" in
   # only for interactive shell login on fidis or daint --> load zsh
   # for interactive shell login on fidis or daint --> load zsh
   # when login to f210 (worknode fidis cluster) or actually any host besides daint / fidis -> do not load zsh
-  *i*) [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l
-  *i*) [ "`hostname | grep -o fidis`" = "fidis" ] && exec /bin/zsh -l
-  ;;
+  *i*) [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l;;
+  *i*) [ "`hostname | grep -o fidis`" = "fidis" ] && exec /bin/zsh -l;;
 esac
