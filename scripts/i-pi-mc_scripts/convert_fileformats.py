@@ -280,53 +280,65 @@ def ase_get_known_formats(show=False,add_missing_formats=False,verbose=True):
             print('formatspy',formatspy)
 
         scripts = my.scripts()
-        missing1 = scripts+"/runner_scripts/ase_fileformat_for_runner.py"
-        missing2 = scripts+"/runner_scripts/ase_fileformat_for_lammpsrunner.py"
-        missing3 = scripts+"/runner_scripts/ase_fileformat_for_lammpsdata.py"
-        missing4 = scripts+"/runner_scripts/ase_fileformat_for_ipi.py"
+        missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]
 
         from shutil import copyfile
-        if verbose:
-            print('copying files to',os.path.dirname(ase.io.__file__))
-        copyfile(missing1,os.path.dirname(ase.io.__file__)+"/runner.py")
-        copyfile(missing2,os.path.dirname(ase.io.__file__)+"/lammpsrunner.py")
-        copyfile(missing3,os.path.dirname(ase.io.__file__)+"/lammpsdata.py")
-        copyfile(missing4,os.path.dirname(ase.io.__file__)+"/ipi.py")
+        from_ = scripts+"/runner_scripts/ase_fileformat_for_"
+        to = os.path.dirname(ase.io.__file__)+"/"
+        for ff in missing:
+            #print('copying ',from_+ff,'to',to+ff)
+            print('copying ',ff,'to',to+ff)
+            copyfile(from_+ff,to+ff)
 
+        print('adapting ase formats.py .... ')
+        if not os.path.isfile(formatspy):
+            print('formatspy',formatspy)
+            sys.exit('did not find '+str(formatspy))
+
+
+        f = open(formatspy, "r")
+        contents = f.readlines()
+        f.close()
+        insert=0
+        insert2=0
+        for idx,i in enumerate(contents):
+            #print('i',idx,i)
+            #print("|"+i[:20]+"|")
+            if i[:20] == "    'abinit': ('ABIN":
+                insert = idx
+            if i[:30] == "    'lammps-data': 'lammpsdata":
+                insert2 = idx
+
+        writeformatspy = False
         if 'runner' in x:
-            print('missing format are already added in formats.py (of ase).')
+            print('runner        format are already added in formats.py (of ase).')
         else:
-            print('adapting ase formats.py .... ')
-            if not os.path.isfile(formatspy):
-                print('formatspy',formatspy)
-                sys.exit('did not find '+str(formatspy))
-
-            print('now changing formatspy')
-
-            f = open(formatspy, "r")
-            contents = f.readlines()
-            f.close()
-            insert=0
-            insert2=0
-            for idx,i in enumerate(contents):
-                #print('i',idx,i)
-                #print("|"+i[:20]+"|")
-                if i[:20] == "    'abinit': ('ABIN":
-                    insert = idx
-                if i[:30] == "    'lammps-data': 'lammpsdata":
-                    insert2 = idx
-
             contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+            writeformatspy = True
+
+        if 'ipi' in x:
+            print('ipi           format are already added in formats.py (of ase).')
+        else:
             contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
+            writeformatspy = True
+
+        if 'lammps-runner' in x:
+            print('lammps-runner format are already added in formats.py (of ase).')
+        else:
             contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
-            contents.insert(insert2, "    'lammps-runner': 'lammpsrunner',\n")
+            contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
+            writeformatspy = True
+
+        if writeformatspy == True:
+            print('now changing formatspy')
             print('insert',insert)
 
             f = open(formatspy, "w")
             contents = "".join(contents)
             f.write(contents)
             f.close()
-
+        else:
+            print('everything was already in formats.py')
 
     return known_formats
 
