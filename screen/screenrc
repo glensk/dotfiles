@@ -11,7 +11,8 @@ defbce "on"
 
 
 #shell tcsh
-shell bash
+#shell bash
+shell zsh
 # Don't display the copyright page
 startup_message off
 
@@ -56,7 +57,8 @@ bind - command -c selectHighs   #bind the hyphen to
 #screen -t interactive.fiction  8
 #screen -t hellahella   8	paster serve --daemon  /home/gyaresu/downloads/hellahella/hella.ini	
 
-shelltitle "$ |bash"
+#shelltitle "$ |bash"
+shelltitle "$ |zsh"
 
 # THIS IS THE PRETTY BIT
 #change the hardstatus settings to give an window list at the bottom of the                                                                        
@@ -82,6 +84,7 @@ hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u
 #  Shift <KeyPress> Prior: string(0x1b) string("[25S") \n\
 #  Shift <KeyPress> Next: string(0x1b) string("[25T") \n
 
+bind '"\C-p": beginning-of-line'
 
 # Scroll up
 bindkey -d "^[[5S" eval copy "stuff 5\025"

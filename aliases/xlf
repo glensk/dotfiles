@@ -1,0 +1,3 @@
+#!/bin/zsh
+echo opening :$1:
+DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par  -block $1 -bxy 1:4 -bxy 1:5

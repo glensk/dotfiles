@@ -41,13 +41,14 @@ fidis)
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
-    setenv lmp_exec $scripts/executables/lmp_fidis_fidis_runner_2018_10_31;
+    setenv lmp_exec $scripts/executables/lmp_fidis_par_runner_2018_10_31;
     module load intel;
     module load intel-mpi;
     module load intel-mkl;
     module load gsl;
     module load eigen;
-    module load python;
+    module load quantum-espresso;
+    #module load python;  # conflicts with miniconda
   ;;
 daint)
     setenv myprompttime blue;

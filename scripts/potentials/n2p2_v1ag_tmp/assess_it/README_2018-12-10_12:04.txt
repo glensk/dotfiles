@@ -1,0 +1,5 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 14f292f7ca30cf6117d1c95440a3735acdff44e3
+
+getEnergies_byLammps.py -i ../input.data -p n2p2_v2ag -u meV_pa

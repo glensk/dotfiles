@@ -1,6 +1,6 @@
 if [[ $- == *i* ]];then  # only in interactive shell
 
-gettime="true"
+gettime="false"
 loadzsh="true"          # shuts all zst settings on/off
 
 if [ "$loadzsh" = "true" ];then
