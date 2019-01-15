@@ -2,7 +2,13 @@
 import os,sys
 from subprocess import call
 
-dotfiles = os.environ['dotfiles']
+try:
+    dotfiles = os.environ['dotfiles']
+except KeyError:
+    HOME = os.environ['HOME']
+    dotfiles = HOME+"/Dropbox/Albert/scripts/dotfiles/"
+#print('dotfiles:',dotfiles)
+#sys.exit()
 
 def gitclone(what):
     call(["git","clone","--depth","1",what])
