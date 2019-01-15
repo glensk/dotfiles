@@ -117,8 +117,7 @@ def createjob(
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
-    directory = "ipi_kmc_"+\
-                str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+pot+"_"+\
+    directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+pot+"_"+\
                 str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
                 str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi_"+\
@@ -239,7 +238,7 @@ def createjob(
 if __name__ == "__main__":
     if True:
         ipi_inst = 4
-        lmp_par = 2    # when openmp this is used to define OMP_NUM_THREADS=
+        lmp_par = 7    # when openmp this is used to define OMP_NUM_THREADS=
 
 
 
