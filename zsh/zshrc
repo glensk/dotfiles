@@ -53,6 +53,9 @@ autoload -U +X bashcompinit && bashcompinit     # make bash completion function 
 source ~/.generalrc
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.generalrc: $gett generalrc" # (https://carlosbecker.com/posts/speeding-up-zsh/)"
 
+#source $MODULESHOME/init/bash    # necessary for zsh or other init shells
+#source $MODULESHOME/init/bash    # necessary for zsh or other init shells
+#source $MODULESHOME/init/bash    # necessary for zsh or other init shells
 # time zsh
 # 0) completely empty             : 0.01s
 # 1) 0+ autoload colors/bashinit  : 0.01s 

@@ -15,9 +15,8 @@
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ###################################################################################
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
-case "$0" in bash) export currentshell="bash";;
-             tcsh) setenv currentshell "tcsh";;
-             *)    export currentshell="zsh";esac
+[ "$BASH_VERSION" != "" ] && currentshell="bash"
+[ "$ZSH_VERSION" != "" ] && currentshell="zsh"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh
 host=`hostname`   # 0.001s

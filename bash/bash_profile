@@ -11,15 +11,16 @@ PATH=$PATH:$HOME/.local/bin:$HOME/bin
 
 export PATH
 
-#echo "in .bash_profile"
-case "$-" in
-  #[ "`hostname | grep -o daint`" = "daint" ];then
-  #*i*) export SHELL=/bin/zsh;export currentshell="zsh";unset FPATH; exec /bin/zsh -l
-  #*i*) unset FPATH; exec /bin/zsh -l
+#echo "in .bash_profile, `hostname | grep -o fidis`"
 
+case "$-" in
   # only for interactive shell login on fidis or daint --> load zsh
   # for interactive shell login on fidis or daint --> load zsh
   # when login to f210 (worknode fidis cluster) or actually any host besides daint / fidis -> do not load zsh
-  *i*) [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l;;
-  *i*) [ "`hostname | grep -o fidis`" = "fidis" ] && exec /bin/zsh -l;;
+  *i*)
+  # THIS LOOP IS ONLY ENTERED FOR INTERACTIVE LOGINS AND NOT OTHERWISE (ssh -C "command")
+  # echo hostname `hostname`
+  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l
+  [ "`hostname | grep -o fidis`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+   ;;
 esac
