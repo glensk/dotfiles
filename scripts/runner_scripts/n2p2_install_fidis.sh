@@ -23,10 +23,12 @@ cd $installfolder
 echo "#########################"
 echo installfolder: `pwd`
 echo "#########################"
-[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
+#[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git np2p_dev
+git clone https://github.com/CompPhysVienna/n2p2.git n2p2_dev
 
-cd n2p2
-#git checkout develop
+#cd n2p2
+cd n2p2_dev
+git checkout develop   # this is necessary 
 git branch
 cd src
 

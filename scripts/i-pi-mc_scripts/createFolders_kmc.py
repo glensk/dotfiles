@@ -70,8 +70,11 @@ def createjob(
     else:
         sys.exit("Number of nodes has to be positive!")
 
+
     # define ntasks, neval
+    lmp_par = 2          # = OMP_NUM_THREADS
     ntasks = cores = nodes * 28
+    ipi_inst = 4         # for sure best on fidis
     neval  = ipi_inst*2  # was alwasy better, for ompi and impi
 
     ##### get the seed(s).
@@ -226,7 +229,23 @@ def createjob(
 
 
         # get submit-ipi-kmc.sh (should be made without copying)
-        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,IPI_COMMAND,LAMMPS_COMMAND,lmp_par,ipi_inst,ffsocket,submittime_hours=submittime_hours)
+        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,
+                IPI_COMMAND=IPI_COMMAND,
+                LAMMPS_COMMAND=LAMMPS_COMMAND,
+                lmp_par=lmp_par,
+                ipi_inst=ipi_inst,
+                ffsocket=ffsocket,
+                submittime_hours=submittime_hours,
+                SBATCH=True)
+
+        mu.create_submitskript_ipi_kmc(jobdir+"/osubmit-ipi-kmc.sh",nodes,ntasks,
+                IPI_COMMAND=IPI_COMMAND,
+                LAMMPS_COMMAND=LAMMPS_COMMAND,
+                lmp_par=lmp_par,
+                ipi_inst=ipi_inst,
+                ffsocket=ffsocket,
+                submittime_hours=submittime_hours,
+                SBATCH=False)
 
         # submit the job
         mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
@@ -236,10 +255,4 @@ def createjob(
 
 
 if __name__ == "__main__":
-    if True:
-        ipi_inst = 4
-        lmp_par = 7    # when openmp this is used to define OMP_NUM_THREADS=
-
-
-
     createjob()
