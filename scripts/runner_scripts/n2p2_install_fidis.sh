@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo ""
 echo "n2p2 should be compiled before compiling lammps!"
 echo ""
@@ -8,7 +8,7 @@ installfolder=$HOME  # folder where n2p2 will be installed
 
 #### load modules
 #conda deactivate
-source $MODULESHOME/init/bash
+#source $MODULESHOME/init/bash
 module purge
 module load intel
 module load intel-mpi
@@ -23,10 +23,12 @@ cd $installfolder
 echo "#########################"
 echo installfolder: `pwd`
 echo "#########################"
-[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git
+#[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git np2p_dev
+git clone https://github.com/CompPhysVienna/n2p2.git n2p2_dev2
 
-cd n2p2
-#git checkout develop
+#cd n2p2
+cd n2p2_dev2
+git checkout develop   # this is necessary 
 git branch
 cd src
 
@@ -48,7 +50,7 @@ sed -i 's|^PROJECT_LDFLAGS_BLAS=.*|PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_
 cp libnnptrain/makefile libnnptrain/makefile.back 
 sed -i 's|^INCLUDES=.*|INCLUDES=-I./ -I${PROJECT_INCLUDE}/ -I${PROJECT_GSL} -I${PROJECT_EIGEN} -I${MKL_INCLUDE}|' libnnptrain/makefile
 
-# was added recently
+# was added recently  ... seems to be necessary for lammps
 make libnnpif-shared
 
 # make

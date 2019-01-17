@@ -496,14 +496,17 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
     return
 
-def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71):
-    ''' time is in min '''
+def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True,LOOPFOLDER=False):
+    ''' time is in min
+        this should be a class so that it is not necessary to shuffle
+        variables back and forth.
+    '''
 
     def check(variable,command_name_str,typehere):
         if type(variable) != typehere:
             print("ERROR In create_submitskript_ipi_kmc")
-            print("PROBLEM",command_name_str,variable)
-            sys.exit(command_name_str+" is not a "+str(typehere))
+            print("PROBLEM variable name:",command_name_str,"=",variable,"type(variable)",type(variable),"but should be",str(typehere))
+            sys.exit()
 
     check(IPI_COMMAND,"IPI_COMMAND",str)
     check(LAMMPS_COMMAND,"LAMMPS_COMMAND",str)
@@ -513,9 +516,11 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     check(ipi_inst,"ipi_inst",int)
     check(ffsocket,"ffsocket",str)
 
-    text = [
+    text1 = [
     "#!/bin/bash",
-    "",
+    ""]
+
+    text2 = [
     "#SBATCH --job-name=NNP-mpi",
     "#SBATCH --get-user-env",
     "#SBATCH --output=_scheduler-stdout.txt",
@@ -524,26 +529,35 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     "#SBATCH --ntasks "+str(ntasks),
     "#SBATCH --time=00-"+str(submittime_hours)+":00:00",
     "#SBATCH --constraint=E5v4",
-    "",
+    ""]
+
+    text3 = [
     "set +e",
-    "source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
+    "#source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
     "export OMP_NUM_THREADS="+str(lmp_par),  # THIS LETS THE JOBS BE KILLED!
+    ""]
+
+    text4 = [
     "touch time.out",
     'date +%s >> time.out',
     "",
     "# sets up the internet/unix socket for connections both for i-PI and on the lammps side",
+    'seed=`grep seed input-runner.xml | awk \'{print $3}\'`',
+    'hostname=`hostname`',
+    'seed_hostname=$hostname\_$seed',
     'sed -i \'s/<ffsocket.*/<ffsocket name="lmpserial" mode="'+ffsocket+'">/\' input-runner.xml',
-    'sed -i \'s/address>.*<.addr/address>\'$(hostname)\'<\/addr/\' input-runner.xml',
-    'sed -i \'s/all ipi [^ ]*/all ipi \'$(hostname)\'/\' in.lmp',
+    #'sed -i \'s/address>.*<.addr/address>\'$(hostname)\'<\/addr/\' input-runner.xml',
+    #'sed -i \'s/all ipi [^ ]*/all ipi \'$(hostname)\'/\' in.lmp',
+    'sed -i \'s/address>.*<.addr/address> \'\"$seed_hostname\"\' <\/addr/\' input-runner.xml',
+    'sed -i \'s/all ipi [^ ]*/all ipi \'\"$seed_hostname\"\'/\' in.lmp',
     '',
     'rm -f /tmp/ipi_*',
     '',
-    '# runs i-PI on the calculating node, so you can use UNIX sockets',
-    'ssh $SLURM_JOB_NODELIST -C \" cd $SLURM_SUBMIT_DIR; nohup python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &\"',
+    #'# runs i-PI on the calculating node, so you can use UNIX sockets',
+    #'ssh $SLURM_JOB_NODELIST -C \" cd $SLURM_SUBMIT_DIR; nohup python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &\"',
     '',
-    #'# runs i-PI on the submit node -> not a good idea in general',
-    #'#python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &',
+    'python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &',
     #'',
     'sleep 10',
     '',
@@ -557,12 +571,37 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     '',
     'wait',
     'date +%s >> time.out',
+    'cat time.out | xargs | awk \'{print $2-$1-10}\' > tmptime',
+    'mv tmptime time.out',
     'exit 0',
     ]
+
+    text4o = [
+    'folder_=`ls -1d seed*`',
+    'hier=`pwd`',
+    'for folder in $folder_;do',
+    '    echo folder $folder',
+    '    cd $hier',
+    '    cd $folder',
+    '    ./osubmit-ipi-kmc.sh &',
+    'done',
+    'wait'
+    ]
+
+    if LOOPFOLDER == True:
+        text4 = text4o
+
+    if SBATCH == True:
+        text = text1 + text2 + text3 + text4
+    else:
+        text = text1 + text3 + text4
+
 
     f = open(filepath,'w')
     for i in text:
         f.write(i+"\n")
+
+    call(['chmod', '0755', filepath])
 
     return
 

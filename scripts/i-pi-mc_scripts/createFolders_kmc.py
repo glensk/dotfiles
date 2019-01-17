@@ -70,8 +70,11 @@ def createjob(
     else:
         sys.exit("Number of nodes has to be positive!")
 
+
     # define ntasks, neval
+    lmp_par = 2          # = OMP_NUM_THREADS
     ntasks = cores = nodes * 28
+    ipi_inst = 4         # for sure best on fidis
     neval  = ipi_inst*2  # was alwasy better, for ompi and impi
 
     ##### get the seed(s).
@@ -110,10 +113,10 @@ def createjob(
 
 
     ####################################
-    # get directoryname
+    # get directory
     ####################################
     if verbose:
-        print("get directoryname")
+        print("get directory")
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
@@ -131,20 +134,19 @@ def createjob(
     # show the input variables
     print('--------------------------- check the input --------------------------------')
     #print('seednumber   ',seednumber,type(seednumber))
-    print('JOBS:         ',nseeds,'!! defined by -nseeds / or -seednumber')
+    print('JOBS (nseeds) ',nseeds,'(defined by -nseeds / or -seednumber)')
+    print('seeds         ',seeds)
+    print('nsteps        ',nsteps)
     print()
     print('ncell         ',ncell,"(",atomsc.get_number_of_atoms(),"atoms )")
-    print('nsi           ',nsi,  "(",pcsi,"%)")
-    print('nmg           ',nmg,"(",pcmg,"%)")
-    print('nvac          ',nvac,"(",pcvac,"%)")
-    print('a0            ',a0)
-    print('temp          ',temp)
+    print('nsi           ',nsi,  "(",pcsi,"at%)")
+    print('nmg           ',nmg,"(",pcmg,"at%)")
+    print('nvac          ',nvac,"(",pcvac,"at%)")
+    print('a0            ',a0,"angstrom")
+    print('temp          ',temp,"K")
     print()
     print('mypot.pot     ',mypot.pot)
     print('mypot.fullpath',mypot.fullpath)
-    print()
-    print('nseeds        ',nseeds,'seeds',seeds)
-    print('nsteps        ',nsteps)
     print()
     print('directory     ',directory)
     print('submit        ',submit)
@@ -226,20 +228,47 @@ def createjob(
 
 
         # get submit-ipi-kmc.sh (should be made without copying)
-        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,IPI_COMMAND,LAMMPS_COMMAND,lmp_par,ipi_inst,ffsocket,submittime_hours=submittime_hours)
+        mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,
+                IPI_COMMAND=IPI_COMMAND,
+                LAMMPS_COMMAND=LAMMPS_COMMAND,
+                lmp_par=lmp_par,
+                ipi_inst=ipi_inst,
+                ffsocket=ffsocket,
+                submittime_hours=submittime_hours,
+                SBATCH=True)
 
-        # submit the job
-        mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
+        # get osubmit-ipi-kmc.sh (should be made without copying)
+        mu.create_submitskript_ipi_kmc(jobdir+"/osubmit-ipi-kmc.sh",nodes,ntasks,
+                IPI_COMMAND=IPI_COMMAND,
+                LAMMPS_COMMAND=LAMMPS_COMMAND,
+                lmp_par=lmp_par,
+                ipi_inst=ipi_inst,
+                ffsocket=ffsocket,
+                submittime_hours=submittime_hours,
+                SBATCH=False)
+
+        # submit the job (execute either this or submit-ipi-kmc.sh_all3, not both)
+        #mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
+
+    # get submit-ipi-kmc.sh_all3 (should be made without copying)
+    if nseeds == 3:
+        mu.create_submitskript_ipi_kmc(directory+"/submit-ipi-kmc.sh_all3",nodes,ntasks,
+                IPI_COMMAND=IPI_COMMAND,
+                LAMMPS_COMMAND=LAMMPS_COMMAND,
+                lmp_par=lmp_par,
+                ipi_inst=ipi_inst,
+                ffsocket=ffsocket,
+                submittime_hours=submittime_hours,
+                SBATCH=True,
+                LOOPFOLDER=True)
+
+        # submit the job (execute either this or submit-ipi-kmc.sh_all3, not both)
+        mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=directory,submitskript="submit-ipi-kmc.sh_all3")
+
 
     print('done')
     return
 
 
 if __name__ == "__main__":
-    if True:
-        ipi_inst = 4
-        lmp_par = 7    # when openmp this is used to define OMP_NUM_THREADS=
-
-
-
     createjob()
