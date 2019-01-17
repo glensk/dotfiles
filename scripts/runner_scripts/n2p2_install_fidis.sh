@@ -2,13 +2,13 @@
 echo ""
 echo "n2p2 should be compiled before compiling lammps!"
 echo ""
-
+foldername="n2p2"
 installfolder=$HOME  # folder where n2p2 will be installed
 [ "$USER" ==  "glensk" ] && installfolder=$HOME/Dropbox/Albert/git
 
 #### load modules
 #conda deactivate
-#source $MODULESHOME/init/bash
+#source $MODULESHOME/init/bash   # since I have a bash shell now, this is not necessary anymore
 module purge
 module load intel
 module load intel-mpi
@@ -23,12 +23,13 @@ cd $installfolder
 echo "#########################"
 echo installfolder: `pwd`
 echo "#########################"
-#[ ! -e "n2p2" ] && git clone https://github.com/CompPhysVienna/n2p2.git np2p_dev
-git clone https://github.com/CompPhysVienna/n2p2.git n2p2_dev2
+
+[ ! -e "$foldername" ] && git clone https://github.com/CompPhysVienna/n2p2.git $foldername
+git clone https://github.com/CompPhysVienna/n2p2.git $foldername
 
 #cd n2p2
-cd n2p2_dev2
-git checkout develop   # this is necessary 
+cd $foldername
+git checkout develop   # this is necessary in order to write function.data out
 git branch
 cd src
 
