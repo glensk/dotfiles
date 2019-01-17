@@ -496,8 +496,11 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
     return
 
-def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True):
-    ''' time is in min '''
+def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True,LOOPFOLDER=False):
+    ''' time is in min
+        this should be a class so that it is not necessary to shuffle
+        variables back and forth.
+    '''
 
     def check(variable,command_name_str,typehere):
         if type(variable) != typehere:
@@ -516,6 +519,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     text1 = [
     "#!/bin/bash",
     ""]
+
     text2 = [
     "#SBATCH --job-name=NNP-mpi",
     "#SBATCH --get-user-env",
@@ -526,12 +530,14 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     "#SBATCH --time=00-"+str(submittime_hours)+":00:00",
     "#SBATCH --constraint=E5v4",
     ""]
+
     text3 = [
     "set +e",
     "#source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
     "export OMP_NUM_THREADS="+str(lmp_par),  # THIS LETS THE JOBS BE KILLED!
     ""]
+
     text4 = [
     "touch time.out",
     'date +%s >> time.out',
@@ -570,10 +576,26 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
     'exit 0',
     ]
 
+    text4o = [
+    'folder_=`ls -1d seed*`',
+    'hier=`pwd`',
+    'for folder in $folder_;do',
+    '    echo folder $folder',
+    '    cd $hier',
+    '    cd $folder',
+    '    ./osubmit-ipi-kmc.sh &',
+    'done',
+    'wait'
+    ]
+
+    if LOOPFOLDER == True:
+        text4 = text4o
+
     if SBATCH == True:
         text = text1 + text2 + text3 + text4
     else:
         text = text1 + text3 + text4
+
 
     f = open(filepath,'w')
     for i in text:
