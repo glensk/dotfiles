@@ -263,7 +263,7 @@ def createjob(
                 LOOPFOLDER=True)
 
         # submit the job (execute either this or submit-ipi-kmc.sh_all3, not both)
-        mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=jobdir,submitskript="submit-ipi-kmc.sh")
+        mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=directory,submitskript="submit-ipi-kmc.sh_all3")
 
 
     print('done')
