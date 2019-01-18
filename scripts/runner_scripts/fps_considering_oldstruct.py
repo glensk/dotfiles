@@ -25,7 +25,14 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 
 def make_fps(db1,db2,nsym,structures):
-    ''' makes the fps considering previous structures '''
+    ''' makes the fps considering previous structures
+
+        to get nsyms (and not needing to provide it):
+         - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | uniq | grep -v "<.*" # -> gets the elements
+         -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Al" | wc -l # -> gets 64
+         -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Mg" | wc -l # -> gets 64
+         -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Si" | wc -l # -> gets 64
+    '''
     DB1_path = os.path.abspath(db1)
     DB2_path = os.path.abspath(db2)
     if not os.path.isdir("fps"):
@@ -38,9 +45,10 @@ def make_fps(db1,db2,nsym,structures):
     #sys.exit()
     # to create DB1
     if not os.path.isfile(DB1_path+'/function_average.data'):
-        print('createing DB1')
+        print('reading:',DB1_path+'/input.data')
         nat_per_frame_5000 = getnat_per_frame(DB1_path+'/input.data')
-        print(nat_per_frame_5000)
+        print("nat_per_frame",nat_per_frame_5000)
+        print('createing DB1:',DB1_path+'/function.data')
         DB1 = create_average_SF(DB1_path+'/function.data', nsyms, nat_per_frame_5000,outfile=DB1_path+'/function_average.data')
     else:
         print('loading ... DB1 from ',DB1_path+'/function_average.data')
@@ -48,9 +56,10 @@ def make_fps(db1,db2,nsym,structures):
 
     print()
     if not os.path.isfile(DB2_path+'/function_average.data'):
-        print('createing DB2')
+        print('reading:',DB2_path+'/input.data')
         nat_per_frame_2509 = getnat_per_frame(DB2_path+'/input.data')
         print(nat_per_frame_2509)
+        print('createing DB2:',DB2_path+'/function.data')
         DB2 = create_average_SF(DB2_path+'/function.data', nsyms, nat_per_frame_2509,outfile=DB2_path+'/function_average.data')
     else:
         print('loading ... DB2 from ',DB2_path+'/function_average.data')
@@ -229,6 +238,5 @@ if __name__ == "__main__":
     #DB1_path    = base + "5000_struct"
     #DB2_path    = base + "2509_struct"
     #DB2_path    = base + "5020_struct"
-
-    nsyms = {"Mg":64, "Al":64, "Si":64}
+    #nsym = {"Mg":64, "Al":64, "Si":64}
     make_fps()
