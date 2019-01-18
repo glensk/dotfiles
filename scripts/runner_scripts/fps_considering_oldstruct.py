@@ -20,11 +20,11 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('-d1','--db1',required=True,help="path to DB1 which are preexisting structures")
 @click.option('-d2','--db2',required=True,help="path to DB2 which are current structures")
-@click.option('-nsym','--nsym',required=False,default={"Mg":64, "Al":64, "Si":64},help="dictionary containing amount of symmetry functions per element")
-@click.option('-s','--structures',required=False,default=False,type=int,help="upper limit of structures to fps/input.fps.data")
+@click.option('-nsyms','--nsyms',required=False,default={"Mg":64, "Al":64, "Si":64},help="dictionary containing amount of symmetry functions per element")
+@click.option('-s','--structures_upperlim',required=False,default=False,type=int,help="upper limit of structures to fps/input.fps.data")
 
 
-def make_fps(db1,db2,nsym,structures):
+def make_fps(db1,db2,nsyms,structures_upperlim):
     ''' makes the fps considering previous structures
 
         to get nsyms (and not needing to provide it):
@@ -40,14 +40,14 @@ def make_fps(db1,db2,nsym,structures):
 
     print('DB1_path         ',DB1_path)
     print('DB2_path         ',DB2_path)
-    print('structures       ',structures)
+    print('structures_upperlim       ',structures_upperlim)
     print()
     #sys.exit()
     # to create DB1
     if not os.path.isfile(DB1_path+'/function_average.data'):
         print('reading:',DB1_path+'/input.data')
         nat_per_frame_5000 = getnat_per_frame(DB1_path+'/input.data')
-        print("nat_per_frame",nat_per_frame_5000)
+        print('read in:',DB1_path+'/input.data',"nat_per_frame:",nat_per_frame_5000)
         print('createing DB1:',DB1_path+'/function.data')
         DB1 = create_average_SF(DB1_path+'/function.data', nsyms, nat_per_frame_5000,outfile=DB1_path+'/function_average.data')
     else:
@@ -138,13 +138,13 @@ def make_fps(db1,db2,nsym,structures):
     frames = ase_read(DB2_path+'/input.data',':',format='runner')
     fo = 'fps/input.fps'+str(DB2len)+'.data'
     print('saving DB2 ',fo)
-    if structures > 0:
-        fo = 'fps/input.fps'+str(structures)+'.data'
+    if structures_upperlim > 0:
+        fo = 'fps/input.fps'+str(structures_upperlim)+'.data'
     for idx,i in enumerate(dist_vec_new[:,2].astype(int)):
         #print('i',i)
         #print(frames[int(i)].get_chemical_formula())
         ase_write(fo,frames[i],format='runner',append=True)
-        if structures > 0 and idx == structures:
+        if structures_upperlim > 0 and idx == structures_upperlim:
             break
 
     my.create_READMEtxt(os.getcwd()+'/fps')
