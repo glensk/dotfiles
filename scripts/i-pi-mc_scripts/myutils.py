@@ -4,6 +4,7 @@ import os,sys
 import click
 import numpy as np
 import glob
+from copy import deepcopy
 from socket import gethostname
 from shutil import copyfile
 from subprocess import check_output,call
@@ -216,6 +217,19 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
     kmesh = [np.ceil(kmesh_l * np.linalg.norm(reci_cell[i]))
              for i in range(len(reci_cell))]
     return kmesh
+
+def ase_get_unique_frames(frames):
+    ''' this function only takes care of exactly same frames;
+        for structures which are close by another function will be necessary;
+    '''
+    framesout = deepcopy(frames)
+    for idx,midx in enumerate(range(len(frames))[::-1]):
+        isin=False
+        if frames[midx] in frames[:midx]:
+            isin=True
+            del framesout[midx]
+        #print(idx,midx,frames[midx].positions[0,0],isin)
+    return framesout
 
 
 def ase_enepot(atoms,units='eV',verbose=False):

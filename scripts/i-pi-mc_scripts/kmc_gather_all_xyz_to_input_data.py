@@ -1,8 +1,12 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import click
+import numpy as np
 import os,sys
+from copy import deepcopy
 from subprocess import call
 import myutils as my
+from ase.io import read,write
 
 # get help also with -h
 CONTEXT_SETTINGS = my.get_click_defaults()
@@ -31,7 +35,11 @@ def gather_xyz(folder,filename_find,filename_out):
         print(i)
         call(["xyz2runner.sh",i],stdout=f)
 
-    my.create_READMEtxt(os.getcwd(),add="# created input.data for n2p2/runner")
+    print('reading input.data and removing duplicates')
+    frames = read("input.data",":",format="runner")
+    write("input.data",my.ase_get_unique_frames(frames),format="runner")
+
+    my.create_READMEtxt(os.getcwd(),add="# created input.data for n2p2/runner which contains only the unique structures")
     return filename_out
 
 
