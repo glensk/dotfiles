@@ -35,6 +35,7 @@ generalrc/generalrc_alias_oncmpc
 generalrc/generalrc_alias_onmac
 generalrc/generalrc_alias_
 test.sh
+function.data
 sources/atomsk_*/
 sources_bin
 licence_version_1.55
