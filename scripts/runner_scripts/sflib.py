@@ -9,7 +9,6 @@ import scipy.sparse.linalg as spalg
 import sys
 import scipy.integrate as spint
 
-
 ###########################################################
 ## I WILL TEMPORARILY DEFINE HERE THE SYMMETRY FUNCTIONS ##
 ## IN THE FUTURE THIS SHOULD BE DONE BETTER              ##

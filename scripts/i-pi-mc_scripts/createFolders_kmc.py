@@ -56,11 +56,14 @@ def createjob(
         nodes,
         verbose):
     """
-    This is an script to create KMC jobs quickly (and submit).
+    This is an script to create KMC jobs quickly (and submits them if -submit/-submitdebug).
 
     e.g.
 
     createFolder_kmc.py -temp 1000 -ncell 5 -nsi 3 -nmg 3 -nvac 1 -submit
+
+    to evaluate energies vs. realtime use:\n
+            %kmc_show_time_xmgrace.sh seed*/KMC_AL6XXX
     """
     # definex ffsocket inet/unix
     if nodes == 1:
