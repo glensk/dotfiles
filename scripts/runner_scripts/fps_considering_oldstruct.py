@@ -35,6 +35,14 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     '''
     DB1_path = os.path.abspath(db1)
     DB2_path = os.path.abspath(db2)
+    for i in [ DB1_path,DB2_path]:
+        if not os.path.isdir(i): sys.exit(i+" does not exist!")
+        else: print(i+" exists")
+        if not os.path.isfile(i+'/input.data'): sys.exit(i+"/input.data does not exist!")
+        else: print(i+"/input.data exists")
+        if not os.path.isfile(i+'/function.data'): sys.exit(i+"/function.data does not exist!")
+        else: print(i+"/function.data exists")
+    sys.exit()
     if not os.path.isdir("fps"):
         os.mkdir('fps')
 
