@@ -17,7 +17,7 @@ printf("energy\t\t0.000000\n")
 printf("charge\t\t0.000000\n")
 printf("end\n")
 printf("begin\n")
-print("from ",FILENAME)
+print("comment",FILENAME)
 printf("%s%f\t%f\t%f\n", "lattice\t\t",h00,0,0);
 printf("%s%f\t%f\t%f\n", "lattice\t\t",h01,h11,0);
 printf("%s%f\t%f\t%f\n", "lattice\t\t",h02,h12,h22);
