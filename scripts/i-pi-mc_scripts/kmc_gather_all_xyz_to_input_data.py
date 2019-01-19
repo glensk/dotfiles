@@ -21,6 +21,8 @@ def gather_xyz(folder,filename_find,filename_out):
     This scipt looks for all files ($filename_find; default: simulation.pos_0.xyz) in
     $folder and converts content to RuNNer readable fileformat $filename_out
     (default: input.data).
+    e.g. \n
+    kmc_gather_all_xyz_to_input_data.py `pwd`
     '''
     print('folder:',folder)
     print()
@@ -39,7 +41,17 @@ def gather_xyz(folder,filename_find,filename_out):
     frames = read("input.data",":",format="runner")
     write("input.data",my.ase_get_unique_frames(frames),format="runner")
 
-    my.create_READMEtxt(os.getcwd(),add="# created input.data for n2p2/runner which contains only the unique structures")
+    remark0="# created input.data for n2p2/runner which contains only the unique structures;"
+    remark1="# Now you need to do an nnp-scaling to get function.data on this input.data run for fps! (fps_considering_oldstruct.py);"
+    remark2="# e.g. fps_considering_oldstruct.py -d1 /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v1ag/ -d2 kmc_gaterh_all_xyz"
+    my.mkdir("kmc_gaterh_all_xyz")
+    my.create_READMEtxt(os.getcwd()+"/kmc_gaterh_all_xyz",add=[remark0,remark1,remark2])
+    my.create_READMEtxt(os.getcwd(),add=[remark0,remark1,remark2])
+    os.rename("input.data","kmc_gaterh_all_xyz/input.data")
+    print()
+    print(remark0)
+    print(remark1)
+    print(remark2)
     return filename_out
 
 

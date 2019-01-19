@@ -49,6 +49,8 @@ def create_READMEtxt(directory,add=False):
         text_file.write("# execution time: "+str(time.time() - start_time)+" seconds.")
         text_file.write("\n")
         if add:
+            print('add')
+            print(type(add))
             if type(add) == str:
                 text_file.write(add+"\n")
             elif type(add) == list:
