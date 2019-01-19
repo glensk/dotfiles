@@ -21,11 +21,12 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('-d1','--db1',required=True,type=str,help="path to DB1 which are preexisting structures")
 @click.option('-d2','--db2',required=True,type=str,help="path to DB2 which are current structures")
 @click.option('-nsyms','--nsyms',required=False,default={"Mg":64, "Al":64, "Si":64},help="dictionary containing amount of symmetry functions per element")
-@click.option('-s','--structures_upperlim',required=False,default=False,type=int,help="upper limit of structures to fps/input.fps.data")
+@click.option('-s','--structures_upperlim',required=False,default=False,type=int,help="upper limit of structures to fps_considering_oldstruct/input.fps.data")
 
 
 def make_fps(db1,db2,nsyms,structures_upperlim):
     ''' makes the fps considering previous structures
+        saves everything in fps_considering_oldstruct
 
         to get nsyms (and not needing to provide it):
          - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | uniq | grep -v "<.*" # -> gets the elements
@@ -123,18 +124,19 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     if DB2len < 100:
         every = 10
 
-
-    if not os.path.isdir("fps"):
-        os.mkdir('fps')
+    foldername = "fps_considering_oldstruct"
+    if not os.path.isdir(foldername):
+        os.mkdir(foldername)
 
     print()
     print()
     # one could in principle check if any of the structures in DB2 are repetitions.
-    if not os.path.isfile('fps/dist_vec_from_DB1.dat'):
+    if not os.path.isfile(foldername+'/dist_vec_from_DB1.dat'):
         print('-------------------------------------------------------------------------------')
-        print('making fps/dist_vec.dat to find the structure in DB2 which is furthest from DB1')
+        print('making '+foldername+'/dist_vec.dat to find the structure in DB2 which is furthest from DB1')
         print('-------------------------------------------------------------------------------')
-
+        print()
+        print("Writing output every",every)
         dist_vec = np.full((DB2len), np.inf)  # 2509
         # this could be easily parallelized ...
         for i in range(DB2len):  # 0 ... 2508
@@ -146,13 +148,13 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
                 print('i',i,'/',DB2.shape[0],dist_vec[i])
         #print('i',i,dist,dist_vec[0])
         #print(dist_vec)
-        np.savetxt('fps/dist_vec_from_DB1.dat',dist_vec)  # this is the distance of every structure in DB2 to all structures in DB1
+        np.savetxt(foldername+'/dist_vec_from_DB1.dat',dist_vec)  # this is the distance of every structure in DB2 to all structures in DB1
     else:
-        print('reading fps/dist_vec_from_DB1.dat')
-        dist_vec = np.loadtxt('fps/dist_vec_from_DB1.dat')
+        print('reading '+foldername+'/dist_vec_from_DB1.dat')
+        dist_vec = np.loadtxt(foldername+'/dist_vec_from_DB1.dat')
 
     print()
-    if not os.path.isfile('fps/dist_vec_fin.dat'):
+    if not os.path.isfile(foldername+'/dist_vec_fin.dat'):
         print('----------------------------------------------------------')
         print('creating dist_vec_fin.dat which holds the distances of DB2')
         print('----------------------------------------------------------')
@@ -167,7 +169,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         dist_vec_new[0,0] = 0
         dist_vec_new[0,1] = distmax
         dist_vec_new[0,2] = argmax
-
+        print()
+        print("Writing output every",every)
         for j in np.arange(1,DB2len): # geht ueber alle eingraege von DB2, 2509 eintraege, diese sind von interesse.
             for i in range(DB2len): # geht ueber alle eingraege von DB2, 2509 eintraege, diese sind von interesse.
                 new_dist = salg.norm(DB2[i]-DB2[argmax])
@@ -184,20 +187,20 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
             dist_vec_new[j,1] = distmax
             dist_vec_new[j,2] = argmax
             #np.savetxt('dist_vec_'+str(j),dist_vec)
-        np.savetxt('fps/dist_vec_fin.dat',dist_vec_new)
+        np.savetxt(foldername+'/dist_vec_fin.dat',dist_vec_new)
     else:
-        print('reading fps/dist_vec_fin.dat')
-        dist_vec_new = np.loadtxt('fps/dist_vec_fin.dat')
+        print('reading '+foldername+'/dist_vec_fin.dat')
+        dist_vec_new = np.loadtxt(foldername'/dist_vec_fin.dat')
 
 
     print()
     frames = ase_read(DB2_path+'/input.data',':',format='runner')
-    fo = 'fps/input.fps'+str(DB2len)+'.data'
+    fo = foldername+'/input.fps'+str(DB2len)+'.data'
     print("----------------------------------------------------")
     print('saving DB2 ',fo)
     print("----------------------------------------------------")
     if structures_upperlim > 0:
-        fo = 'fps/input.fps'+str(structures_upperlim)+'.data'
+        fo = foldername+'/input.fps'+str(structures_upperlim)+'.data'
     for idx,i in enumerate(dist_vec_new[:,2].astype(int)):
         #print('i',i)
         #print(frames[int(i)].get_chemical_formula())
@@ -205,7 +208,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         if structures_upperlim > 0 and idx == structures_upperlim:
             break
 
-    my.create_READMEtxt(os.getcwd(),add="Do: xmgrace fps/dist_vec_fin.dat in a log/log plot; Then grep the first structures of interest from fps/input.fps256.data ")
+    my.create_READMEtxt(os.getcwd(),add=[ "#","Do: xmgrace "+foldername+"/dist_vec_fin.dat in a log/log plot; Then grep the first structures of interest from "+foldername+"/input.fps256.data "])
     return
 
 
@@ -292,7 +295,7 @@ def getnat_per_frame(infile):
 
 
 if __name__ == "__main__":
-    base = "/scratch/glensk/n2p2_get_function_data_and_make_fps/"
+    #base = "/scratch/glensk/n2p2_get_function_data_and_make_fps/"
     #DB1_path    = base + "5000_struct"
     #DB2_path    = base + "2509_struct"
     #DB2_path    = base + "5020_struct"
