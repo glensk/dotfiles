@@ -61,8 +61,6 @@ Host gate
 #GSSAPIDelegateCredentials yes
 
 
-#Host daint*
-# HostName daint.cscs.ch
 Host cmmc002*
  HostName cmmc002.bc.rzg.mpg.de
  User aglen
