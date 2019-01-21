@@ -26,6 +26,7 @@ setenv onhost $onhost;
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 
 # ipi_mc, scripts, ESPRESSO_PSEUDO, PATH, PYTHONPATH
+# PATH, PYTHONPATH, LD_LIBRARY_PATH
 source $dotfiles/scripts/source_to_add_to_path.sh
 
 ###################################################################################

@@ -257,7 +257,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
         ene = atoms.get_potential_energy()
         #print('ene:',ene)
     except RuntimeError:
-        #print("had runtime error")
+        print("had runtime error")
         ene = 0.
     #print('--ene eV',ene,"(not per atom)")
     if verbose:
