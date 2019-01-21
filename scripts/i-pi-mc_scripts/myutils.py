@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from tqdm import tqdm
 import os,sys
 import click
 import numpy as np
@@ -220,12 +221,27 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
              for i in range(len(reci_cell))]
     return kmesh
 
+def progress(count, total, status=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
+
+
+
 def ase_get_unique_frames(frames):
     ''' this function only takes care of exactly same frames;
         for structures which are close by another function will be necessary;
     '''
     framesout = deepcopy(frames)
+    length = len(frames)
+    #for idx,midx in enumerate(tdqm(range(len(frames))[::-1])):
     for idx,midx in enumerate(range(len(frames))[::-1]):
+        progress(idx, length , status='')
         isin=False
         if frames[midx] in frames[:midx]:
             isin=True
@@ -643,13 +659,12 @@ class ase_calculate_ene( object ):
         self.verbose = verbose
         self.atoms = False # ase atoms object (frame)
 
-        self.lmpcmd = False # in case we run through lammps or ase+lammps
+        self.lmpcmd = False # in case we run through ase (also needs lmpcmd) or external lammps
         self.atom_types = False    # for nn pot
 
         # case of MD or KMC
         self.kmc = kmc
         self.temp = temp
-
         self.mypot = mypot(self.pot)
         return
 
@@ -676,6 +691,8 @@ class ase_calculate_ene( object ):
             print('...get_potential--fullpath:',fullpath)
             print('...pot',self.pot.split("_"))
 
+        # this depends only on the potential which is already defined
+        # so should be easy to make this general.
         self.lmpcmd = [
                 "mass 1 24.305",
                 "mass 2 26.9815385",

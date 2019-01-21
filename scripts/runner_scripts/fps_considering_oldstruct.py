@@ -140,6 +140,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         dist_vec = np.full((DB2len), np.inf)  # 2509
         # this could be easily parallelized ...
         for i in range(DB2len):  # 0 ... 2508
+            my.progress(i,DB2len)
             for j in range(DB1len):  # 0 ... 2508
                 dist = salg.norm(DB2[i]-DB1[j])
                 if dist < dist_vec[i]:
@@ -172,6 +173,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         print()
         print("Writing output every",every)
         for j in np.arange(1,DB2len): # geht ueber alle eingraege von DB2, 2509 eintraege, diese sind von interesse.
+            my.progress(j,DB2len)
             for i in range(DB2len): # geht ueber alle eingraege von DB2, 2509 eintraege, diese sind von interesse.
                 new_dist = salg.norm(DB2[i]-DB2[argmax])
                 if new_dist < dist_vec[i]:
@@ -190,7 +192,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         np.savetxt(foldername+'/dist_vec_fin.dat',dist_vec_new)
     else:
         print('reading '+foldername+'/dist_vec_fin.dat')
-        dist_vec_new = np.loadtxt(foldername'/dist_vec_fin.dat')
+        dist_vec_new = np.loadtxt(foldername+'/dist_vec_fin.dat')
 
 
     print()

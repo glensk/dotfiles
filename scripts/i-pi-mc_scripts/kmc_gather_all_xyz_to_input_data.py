@@ -37,8 +37,10 @@ def gather_xyz(folder,filename_find,filename_out):
         print(i)
         call(["xyz2runner.sh",i],stdout=f)
 
-    print('reading input.data and removing duplicates')
+    print('reading input.data ...')
     frames = read("input.data",":",format="runner")
+    print('input.data has',len(frames),"frames.")
+    print('removing duplicates ...')
     write("input.data",my.ase_get_unique_frames(frames),format="runner")
 
     remark0="# created input.data for n2p2/runner which contains only the unique structures;"
