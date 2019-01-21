@@ -37,6 +37,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     #### get the potential
     ace = ase_calculate_ene(pot,units=units,geopt=geopt,verbose=verbose)
+    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
     units = ace.units
 
     ### when want to assess some formation energies
