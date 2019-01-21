@@ -280,17 +280,42 @@ def ase_enepot(atoms,units='eV',verbose=False):
 
     return ene
 
-def ase_get_chemical_symbols_to_conz(atoms):
+def ase_get_chemical_symbols_to_number_of_species(atoms):
     symbols = atoms.get_chemical_symbols()
-    num = atoms.get_number_of_atoms()
+    #numat = atoms.get_number_of_atoms()
     #print('symbols',symbols)
-    #print('num',num)
+    #print('numat',numat)
 
     uniquesym = set(atoms.get_chemical_symbols())
     d = {}
     for i in uniquesym:
-        #print(i,symbols.count(i),num)
-        d[i] = float(symbols.count(i))/float(num)
+        #print(i,symbols.count(i),numat)
+        d[i] = symbols.count(i)
+
+    def dcheck(element):
+        if element in d.keys():
+            #print(element+" exists")
+            pass
+        else:
+            #print(element+" does not exist")
+            d[element] = 0.0
+
+    dcheck("Mg")
+    dcheck("Si")
+    dcheck("Al")
+    return d
+
+def ase_get_chemical_symbols_to_conz(atoms):
+    symbols = atoms.get_chemical_symbols()
+    numat = atoms.get_number_of_atoms()
+    #print('symbols',symbols)
+    #print('numat',numat)
+
+    uniquesym = set(atoms.get_chemical_symbols())
+    d = {}
+    for i in uniquesym:
+        #print(i,symbols.count(i),numat)
+        d[i] = float(symbols.count(i))/float(numat)
 
     def dcheck(element):
         if element in d.keys():
