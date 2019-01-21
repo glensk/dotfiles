@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from tqdm import tqdm
 import os,sys
 import click
 import numpy as np
