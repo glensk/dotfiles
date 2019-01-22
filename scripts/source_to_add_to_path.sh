@@ -16,11 +16,12 @@ aiida_b="$SCR/qe-aiida/aiida_submitskripts"
 lammps1="$SCR/lammps_executables"
 lammps2="$SCR/lammps_scripts"
 ase_lammps="$HOME/sources/lammps_source_cosmo"
+n2p2="$HOME/Dropbox/Albert/git/n2p2/lib"
 
 addeverywhere="$ipi:$runner:$aiida_s:$aiida_a:$aiida_b:$lammps1:$lammps2:$ase_lammps/python"
 
 export PATH="$PATH:$addeverywhere"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$n2p2"
 
 export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
 export IPI_COMMAND="$HOME/Dropbox/Albert/git/i-pi-mc/bin/i-pi"

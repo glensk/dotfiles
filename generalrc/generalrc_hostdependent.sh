@@ -10,7 +10,6 @@
 ##############################################################################
 # defaults / fall back options
 ##############################################################################
-export LD_LIBRARY_PATH=$HOME/Dropbox/Albert/git/n2p2/lib:${LD_LIBRARY_PATH}
 setenv mylaptop mac;
 setenv GZIP -9;   # an empty string ("") is not possible, better use dummy
 setenv myshell zsh; # set this specifically for other cases

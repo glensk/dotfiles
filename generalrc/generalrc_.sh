@@ -1,19 +1,19 @@
 #!/bin/sh
-###################################################################################
+##################################################################################
 # this script defines environment variables independent of the used shell
 # (tcsh;bash;zsh). Although it uses "setenv" which is usually used in the tcsh 
 # shell, all set variables will be loaded by either shell (bash or tcsh or zsh) 
 # since the setenv function is defined for the bash shell in the first loaded 
 # $generalrc/generalrc_necessary_bash.sh script.
-###################################################################################
+##################################################################################
 
-###################################################################################
+##################################################################################
 # this has to be the first line  (loads senenv for zsh/bash); defines: tab-color; module; mkalias
-###################################################################################
+##################################################################################
 
-###################################################################################
+##################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
-###################################################################################
+##################################################################################
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 [ "$BASH_VERSION" != "" ] && currentshell="bash"
 [ "$ZSH_VERSION" != "" ] && currentshell="zsh"
@@ -25,20 +25,20 @@ setenv host $host;
 setenv onhost $onhost;
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 
-# ipi_mc, scripts, ESPRESSO_PSEUDO, PATH, PYTHONPATH
-# PATH, PYTHONPATH, LD_LIBRARY_PATH
+##################################################################################
+# COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
+##################################################################################
 source $dotfiles/scripts/source_to_add_to_path.sh
 
-###################################################################################
+##################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
-###################################################################################
+##################################################################################
 source $generalrc/generalrc_hostdependent.sh
 
-###################################################################################
-# PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH
-# PYTHONPATH should not be set
-###################################################################################
-eval `$generalrc/generalrc_path.sh $onhost` 
+##################################################################################
+# PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH (PYTHONPATH should not be set)
+##################################################################################
+source $generalrc/generalrc_path.sh $onhost
 
 ##############################################
 # ALIASES & PROMPT & tabcolor
@@ -59,16 +59,21 @@ tab-color $mypromptpath
 ##############################################
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
 
 # on mac currently base, aiida, intelpy, python2 (12GB) (anaconda 2GB)
 # the conda activate step takes all the time (not the source)
+##############################################
+# lets see weather we can survive without conda
+# on mac: install stuff with easy_install / pip / brew
+# on fidis: might be necessary to install click somehow but for now lets try without;
+##############################################
 case $onhost in
-mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+#mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 cosmopc) source $HOME/aiida/bin/activate; ;;
-fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+#fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 esac
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################
 # set Thermodynamics stuff
@@ -90,6 +95,9 @@ tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
 complete -W "n/*/`echo $tocomplete `/" goo
 
 
+##############################################
+# general variables
+##############################################
 setenv EDITOR vim   
 setenv SVN_EDITOR vim        # for svn (Thermodynamics folder)
 setenv LESS "-R"
@@ -125,4 +133,4 @@ source $dotfiles/$currentshell/$currentshell\_set
 [ "$printloadstat" = "true" ] && \
     echo " onhost $onhost"
 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc AFTER CONDA"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc AFTER CONDA"

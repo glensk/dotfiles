@@ -21,9 +21,9 @@ dropboxbin="$dotfiles/bin"       # Dropbox binaries
 bin2="$dotfiles/sources_bin"
 bin3="$dotfiles/bin/stefan"
 bin5="$dotfiles/bin/phonon_lifetimes"
-aliases="$dotfiles/aliases"
+bin6="$dotfiles/aliases"  
 
-PATH="$PATH:$aliases:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+export PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
@@ -63,9 +63,7 @@ if [ "$onhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
-    PATH="$sed:$brew:$phonopy:$PATH" 
-    LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
+    export PATH="$sed:$brew:$phonopy:$PATH"   # brew necessary to load coreutils
+    export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
+    export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"
 fi
-
-# whithout this brew coreutis will not load...
-echo 'export PATH="'"$PATH"'"; export LD_LIBRARY_PATH="'"$LD_LIBRARY_PATH"'"; export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include"'
