@@ -14,7 +14,7 @@
 ##################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ##################################################################################
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 [ "$BASH_VERSION" != "" ] && currentshell="bash"
 [ "$ZSH_VERSION" != "" ] && currentshell="zsh"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
@@ -28,13 +28,16 @@ setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
 ##################################################################################
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
 source $dotfiles/scripts/source_to_add_to_path.sh
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time s1"
 
 ##################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
 # PATH due to module load
 ##################################################################################
 source $generalrc/generalrc_hostdependent.sh
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time s3"
 
 ##################################################################################
 # PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH (PYTHONPATH should not be set)
@@ -60,7 +63,7 @@ tab-color $mypromptpath
 ##############################################
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
 
 # on mac currently base, aiida, intelpy, python2 (12GB) (anaconda 2GB)
 # the conda activate step takes all the time (not the source)
@@ -68,13 +71,17 @@ tab-color $mypromptpath
 # lets see weather we can survive without conda
 # on mac: install stuff with easy_install / pip / brew
 # on fidis: might be necessary to install click somehow but for now lets try without;
+# fidis: pip install --install-option="--prefix=$HOME/.local" click
 ##############################################
+# s3 goo zsh_set
+# s1 CONDA autojump AFTER_CONDA
+# s1 thermodynamics autojump generalrc
 case $onhost in
-#mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
-cosmopc) source $HOME/aiida/bin/activate; ;;
-#fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    #mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    cosmopc) source $HOME/aiida/bin/activate; ;;
+    #fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 esac
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################
 # set Thermodynamics stuff
@@ -87,33 +94,36 @@ if [ -e "$thermodynamics/utilities/" ];then
 #[ "$currentshell" != "tcsh" ] && source $thermodynamics/utilities/bashrc_add
 source $thermodynamics/utilities/bashrc_add
 fi
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett thermodynamics"
 
 ##############################################
 # completion goo for commands
 ##############################################
-export PATH="$dotfiles/commands/:$PATH"  # if this is loaded before: complete -W ... $tocomplete the commands are executed which is not intended
-tocomplete=`ls -1d $dotfiles/commands/* | sed 's|.*commands/||g'`
-complete -W "n/*/`echo $tocomplete `/" goo
+fpath=($dotfiles/completions_fpath $fpath)
+function goo() { $dotfiles/aliases/goo $1 }
+autoload _goo # do not forget BEFORE the next cmd! 
+compdef _goo goo # binds the completion function to a command
+
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett goo"
 
 
 ##############################################
 # general variables
 ##############################################
+#setenv PAGER most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
 setenv EDITOR vim   
 setenv SVN_EDITOR vim        # for svn (Thermodynamics folder)
 setenv LESS "-R"
 setenv LC_ALL C   # necessary for perl git svn
 setenv LANG C     # necessary for perl
-    
 setenv GIT_EDITOR vim
-#setenv PAGER most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
 setenv PAGER less 
 setenv BROWSER chrome
 setenv BROWSER open # is necessary for opening jupyter notebook files
 setenv LC_ALL en_US.UTF-8
 setenv GREP_COLOR 31    # red; some greps have colorized ouput. enable...
 setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green
-
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett setenv"
 
 ##############################################
 # autojump 
@@ -122,11 +132,13 @@ case "$currentshell" in
     zsh) source ~/.autojump/share/autojump/autojump.zsh;;
     bash) [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh;;
 esac
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett autojump"
 
 ##############################################
 # shell dependent settings; defines colors for ls; bindkeys for history-search-bakcward ...
 ##############################################
 source $dotfiles/$currentshell/$currentshell\_set
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett zsh_set"
 
 ##############################################
 # set host variables  
@@ -134,4 +146,4 @@ source $dotfiles/$currentshell/$currentshell\_set
 [ "$printloadstat" = "true" ] && \
     echo " onhost $onhost"
 
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc AFTER CONDA"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"

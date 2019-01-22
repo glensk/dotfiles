@@ -1,14 +1,16 @@
 if [[ $- == *i* ]];then  # only in interactive shell
 
 gettime="false"
+#gettime="true"
 loadzsh="true"          # shuts all zst settings on/off
 
 if [ "$loadzsh" = "true" ];then
     if [ "$gettime" = "true" ];then
         date=`which date`
         [ "`hostname | grep -o mac`" = "mac" ] && date=/usr/local/opt/coreutils/libexec/gnubin/date
+        
         getms() {
-            #/usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+            # for mac: /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
             $date +%s%N
         }
     
