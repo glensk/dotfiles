@@ -40,7 +40,6 @@ fidis)
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
     #module load intel;
-
     # all of those take too long and are not necessary in interactive work
     #module load intel-mpi;
     #module load intel-mkl;
@@ -48,6 +47,13 @@ fidis)
     #module load eigen;
     #module load quantum-espresso;
     #module load python/2.7.14;  # conflicts with miniconda
+    
+    ################################# 
+    # those might be the most important ones
+    # but maybe can be loaded from manually if python necessary
+    ################################# 
+    module load intel;
+    module load python/2.7.14;  # conflicts with miniconda
   ;;
 daint)
     setenv myprompttime blue;
