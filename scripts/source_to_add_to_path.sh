@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # check if BASH or ZSH
 if [ "$ZSH_VERSION" != "" ];then
     #echo zsh

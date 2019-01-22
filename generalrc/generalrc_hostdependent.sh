@@ -1,3 +1,4 @@
+#!/bin/sh
 #################################################################
 # this script returns host dependent environment variables 
 # it does know all prior defined environment variables           
@@ -38,12 +39,12 @@ fidis)
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
-    module load intel;
-    module load intel-mpi;
-    module load intel-mkl;
-    module load gsl;
-    module load eigen;
-    module load quantum-espresso;
+#    module load intel;
+#    module load intel-mpi;
+#    module load intel-mkl;
+#    module load gsl;
+#    module load eigen;
+#    module load quantum-espresso;
     #module load python;  # conflicts with miniconda
   ;;
 daint)

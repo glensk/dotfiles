@@ -32,6 +32,7 @@ source $dotfiles/scripts/source_to_add_to_path.sh
 
 ##################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
+# PATH due to module load
 ##################################################################################
 source $generalrc/generalrc_hostdependent.sh
 

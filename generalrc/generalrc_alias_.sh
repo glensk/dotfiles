@@ -4,7 +4,7 @@
 # ALIASES
 ##############################################
 # how to create a new alias (which works on every host)
-# 1. shell: virca  --> add the alias you need to this file here
+# 1. shell: virca (change this file) --> add the alias you need to this file here
 # 2. to renew aliasfile: ra   (this only creates a new alias file)
 # 3. START A NEW SHELL (also you typed ra!) 
 
@@ -114,7 +114,7 @@ $1 extract '$dotfiles/bin/extract.sh'
 $1 monthly_update 'cd $dotfiles/cron;./monthlyupdate.sh'
 
 
-$1 du 'echo ______better ncdu______;echo; du'
+#$1 du 'echo ______better ncdu______;echo; du'
 $1 lstarfile 'tar -ztvf'
 #$1 diff 'colordiff'
 $1 ep 'epstopdf'

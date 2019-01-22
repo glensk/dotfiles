@@ -13,17 +13,17 @@
 #anaconda="$HOME/anaconda/bin"  # don't load anaconda on cmmc since the module is available
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"
-bin="/usr/bin"              # on mac it is there anyhow.
-bin6="$HOME/.local/bin"
+b1="/usr/bin"                  # on mac it is there anyhow.
 
+# stuff which should always be added
+bin0="$dotfiles/bin"       # Dropbox binaries
+bin1="$dotfiles/sources_bin"
+bin2="$dotfiles/bin/stefan"
+bin3="$dotfiles/bin/phonon_lifetimes"
+bin4="$dotfiles/aliases"  
+bin5="$HOME/.local/bin"      # needs to be there for lbzip2
 
-dropboxbin="$dotfiles/bin"       # Dropbox binaries
-bin2="$dotfiles/sources_bin"
-bin3="$dotfiles/bin/stefan"
-bin5="$dotfiles/bin/phonon_lifetimes"
-bin6="$dotfiles/aliases"  
-
-export PATH="$PATH:$dropboxbin:$svnctags:$homebrew:$bin:$bin2:$bin3:$bin4:$bin5:$bin6"
+export PATH="$PATH:$svnctags:$homebrew:$b1:$bin0:$bin1:$bin2:$bin3:$bin4:$bin5:$bin6"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 

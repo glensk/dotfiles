@@ -6,10 +6,11 @@
 #fi
 
 # User specific environment and startup programs
-
-PATH=$PATH:$HOME/.local/bin:$HOME/bin
-
-export PATH
+#echo PATH-
+#echo PATH- $PATH
+#echo PATH-
+#PATH=$PATH:$HOME/.local/bin:$HOME/bin
+#export PATH
 
 #echo "in .bash_profile, `hostname | grep -o fidis`"
 
