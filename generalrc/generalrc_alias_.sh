@@ -188,7 +188,7 @@ $1 qstatn 'qstatn -d'
     $1 trash "rmtrash" && \
     $1 del "rmtrash" && \
     #$1 rm 'echo Use del command, or the full path i.e. /bin/rm' && \
-    $1 rm 'del' && \
+    #$1 rm 'del' && \
     $1 ctagsnew '/usr/local/Cellar/ctags/5.8/bin/ctags -R .' && \
     $1 mvim     'open /Applications/MacVim.app' 
     #$1 edit "open -a MacVim.app $1"
