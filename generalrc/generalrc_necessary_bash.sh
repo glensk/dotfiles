@@ -11,6 +11,11 @@
 #    fi
 #}
 
+#getms() {
+#    # for mac: /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+#    $date +%s%N
+#}
+
 setenv () {
       export $1=$2
 }
