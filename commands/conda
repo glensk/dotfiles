@@ -1,3 +1,7 @@
+# to activate conda on mac: 
+source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate
+
+
 conda update conda
 conda info --envs           # Conda show available virtual environments
 conda env list              # Conda show available virtual environments
