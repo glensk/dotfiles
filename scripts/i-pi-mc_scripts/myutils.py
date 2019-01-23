@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import os,sys
+import os,sys,re
 import click
 import numpy as np
 import glob
@@ -21,10 +21,21 @@ from ase.optimize.minimahopping import MinimaHopping
 import shutil
 import time
 
-# from scripts folder
-import massedit
 
 start_time = time.time()
+
+def grep(filepath,string):
+    out = []
+    file = open(filepath, "r")
+
+    for line in file:
+         if re.search(string, line):
+            line_ = line.rstrip()
+            #print('found:'+line_+":",type(line_))
+            out.append(line_)
+            #print("foundo",out)
+    #print("out",out)
+    return out
 
 def create_READMEtxt(directory,add=False):
     ''' wiretes a README.txt file '''
@@ -77,6 +88,8 @@ def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
         return
 
 def sed(file,str_find,str_replace):
+    # from scripts folder
+    import massedit
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
     return
 
@@ -476,27 +489,6 @@ def get_click_defaults():
     CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
     return CONTEXT_SETTINGS
 
-def mypotold(getbasename=False):
-    ''' return a list of available potentials '''
-    scripts = os.environ['scripts']
-    allpot_fullpath = glob.glob(scripts+'/potentials/*')
-    allpot_basenames = []
-    onepot_fullpath = False
-    onepot_basename = False
-    for i in allpot_fullpath:
-        #print(i)
-        allpot_basenames.append(os.path.basename(i))
-        if type(getbasename) != bool:
-            if getbasename == os.path.basename(i):
-                onepot_fullpath = i
-                onepot_basename = getbasename
-
-    #print(allpot_basenames)
-    #sys.exit()
-    if getbasename == False:
-        return allpot_basenames
-    else:
-        return onepot_basename,onepot_fullpath
 
 class mypot( object ):
     ''' return a list of available potentials '''
@@ -519,6 +511,20 @@ class mypot( object ):
         self.pot = onepot_basename
         self.all = pot_all
         self.fullpath = onepot_fullpath
+
+
+        # get from input.nn the atomic energies
+        if type(self.pot) != bool:
+            self.pottype = self.pot.split("_")[0]
+            if self.pottype == "runner" or self.pottype == "n2p2":
+                inputnn = self.fullpath+"/input.nn"
+                if os.path.isfile(inputnn):
+                    lines = grep(inputnn,"^elements")
+                    if len(lines) == 1:
+                        line = lines[0]
+                        print(line.split()[1:])
+
+
         #if pot == False:
         #    return pot_all
         #else:
@@ -666,6 +672,8 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
 
 class ase_calculate_ene( object ):
     '''
+    - should be evaluated just once to initialize and NOT FORE EVERY CALCULATION
+      (due to the fact that mypot would be called unnecessarily)
     ase_calculate_ene (ace) class which holds lammps commands to be executed
     if only pot is defined, static calculation.
     '''
@@ -687,11 +695,12 @@ class ase_calculate_ene( object ):
 
         self.lmpcmd = False # in case we run through ase (also needs lmpcmd) or external lammps
         self.atom_types = False    # for nn pot
-
+        #print('init')
         # case of MD or KMC
         self.kmc = kmc
         self.temp = temp
         self.mypot = mypot(self.pot)
+
         return
 
     def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet'):

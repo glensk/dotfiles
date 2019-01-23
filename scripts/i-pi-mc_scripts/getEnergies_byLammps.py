@@ -36,7 +36,13 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     '''
 
     #### get the potential
+    print('hier 0')
     ace = ase_calculate_ene(pot,units=units,geopt=geopt,verbose=verbose)
+
+    print("hmmm1",ace.mypot.pot)
+    print("hmmm1",ace.mypot.pottype)
+    print("hmmm2",ace.mypot.fullpath)
+    sys.exit()
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
     units = ace.units
 
@@ -104,7 +110,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     print('structures_to_calc[:3]:',structures_to_calc[:3],'...',structures_to_calc[-3:])
     print()
-    print('    i   idx /    from       diff      =DFT-ref ('+ace.units+') [atms]      ene_DFT          ene_pot')
+    print('    i   idx /    from       diff      =DFT-ref ('+ace.units+') [atms]  ene_DFT('+ace.units+') ene_pot('+ace.units+')')
     print('--------------------------------------------------------------------------------------------------')
     for idx,i in enumerate(structures_to_calc):
         #print('idx',idx,'i',i)
@@ -222,12 +228,12 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     #print()
     #print(ene_diff_abs)
     #print(ana_mg_conz)
-    analyze = np.transpose([range(len(ene_DFT)),ene_diff_abs,ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms])
+    analyze = np.transpose([range(len(ene_DFT)),ene_diff_abs,ene_DFT,for_DFTmax,ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms])
     #print('-analyze')
     #print(analyze)
     #np.savetxt("analyze.npy",analyze,header=units,fmt=' '.join(['%i'] + ['%.2e']*(analyze.shape[1]-1)))
     #np.savetxt("analyze.npy",analyze,header=units,fmt='%f')
-    np.savetxt("analyze.npy",analyze,header=" i diff Mg   Si   Al  atoms",fmt=' '.join(['%4.0f'] +['%5.2f']*(analyze.shape[1]-2)+['%4.0f']))
+    np.savetxt("analyze.npy",analyze,header=" i   diff  E_tot for_max Mg     Si     Al   atoms",fmt=' '.join(['%4.0f'] +['%6.2f']*(analyze.shape[1]-2)+['%4.0f']))
 
 
     my.create_READMEtxt(os.getcwd())
