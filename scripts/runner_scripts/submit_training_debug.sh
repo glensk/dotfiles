@@ -18,7 +18,7 @@ export LD_LIBRARY_PATH=$HOME/Dropbox/Albert/git/n2p2/lib:${LD_LIBRARY_PATH}
 touch time.out
 date +%s >> time.out
 
-srun -n 28 $HOME/Dropbox/Albert/git/n2p2/bin/nnp-scaling 1
+srun -n 21 /home/glensk/Dropbox/Albert/git/n2p2/bin/nnp-train
 date +%s >> time.out
 cat time.out | xargs | awk '{print $2-$1-10}' > time.sec
 $dotfiles/scripts/n2p2/n2p2_scale_train_tarfolder.sh
