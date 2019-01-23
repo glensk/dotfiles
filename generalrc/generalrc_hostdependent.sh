@@ -52,7 +52,7 @@ fidis)
     # those might be the most important ones
     # but maybe can be loaded from manually if python necessary
     ################################# 
-    module load intel;
+    module load intel;          # intel is necessary to load python
     module load python/2.7.14;  # conflicts with miniconda
   ;;
 daint)
