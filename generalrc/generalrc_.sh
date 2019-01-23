@@ -33,8 +33,7 @@ source $dotfiles/scripts/source_to_add_to_path.sh
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time s1"
 
 ##################################################################################
-# HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...)
-# PATH due to module load
+# HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...);  PATH due to module load
 ##################################################################################
 source $generalrc/generalrc_hostdependent.sh
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time s3"
