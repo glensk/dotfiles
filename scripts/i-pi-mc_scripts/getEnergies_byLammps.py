@@ -47,7 +47,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     ### read in the structures
     my.check_isfile_or_isfiles([infile],verbose=verbose)
-    atoms = ase_read(infile,index=":",format=format_in)
+    atoms = ase_read(infile,index=structures_idx,format=format_in)
 
     ### print stuff to screen
     print('number of structures in total:',len(atoms))
@@ -88,6 +88,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ene_diff_lam_ase  = np.empty(len(structures_to_calc));ene_DFT[:]  = np.nan
 
 
+    for_DFTmax    = np.empty(len(structures_to_calc));for_DFTmax[:]  = np.nan
     #sys.exit('get uuid of structure and save structure energy somewhere (cache)')
     #sys.exit('find out weather particular structure in test or trainset')
     # make this parallel at some point
@@ -120,6 +121,20 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         if ipi == True:
             atoms_tmp = copy.deepcopy(atoms[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
+
+        #print(atoms[i].positions)
+        #print()
+        #print(atoms[i].get_positions())
+        #print()
+        #print(atoms[i].get_forces())
+        #print()
+        #print(np.abs(atoms[i].get_forces()))
+        #print()
+        #print(np.abs(atoms[i].get_forces()).max())
+        #sys.exit()
+
+        ### analysis
+        for_DFTmax[idx] = np.abs(atoms[i].get_forces()).max()
 
         ### ene from DFT
         ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
