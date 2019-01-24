@@ -96,6 +96,9 @@ def sed(file,str_find,str_replace):
 def cp(src,dest):
     copyfile(src,dest)
 
+def rm(src):
+    os.remove(src)
+
 def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -272,8 +275,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
     except RuntimeError:
         print("had runtime error")
         ene = 0.
-    #print('--ene eV',ene,"(not per atom)")
-    if verbose:
+    if verbose > 1:
         print('ene eV',ene,"(not per atom)")
     units_split = units.split("_")
     #print('us',units_split,units_split[1])
@@ -310,7 +312,7 @@ def ase_get_chemical_symbols_to_number_of_species(atoms):
             pass
         else:
             #print(element+" does not exist")
-            d[element] = 0.0
+            d[element] = 0
 
     dcheck("Mg")
     dcheck("Si")
@@ -324,11 +326,13 @@ def ase_get_chemical_symbols_to_conz(atoms):
     #print('numat',numat)
 
     uniquesym = set(atoms.get_chemical_symbols())
+    # print("uniquesym",uniquesym) # --> set(['Mg', 'Al'])
     d = {}
     for i in uniquesym:
         #print(i,symbols.count(i),numat)
+        #print('ii',i,'---',float(symbols.count(i))/float(numat))
         d[i] = float(symbols.count(i))/float(numat)
-
+    #print('kk',d)
     def dcheck(element):
         if element in d.keys():
             #print(element+" exists")
@@ -336,7 +340,7 @@ def ase_get_chemical_symbols_to_conz(atoms):
         else:
             #print(element+" does not exist")
             d[element] = 0.0
-
+    #print('dd',d)
     dcheck("Mg")
     dcheck("Si")
     dcheck("Al")
@@ -493,47 +497,88 @@ def get_click_defaults():
 class mypot( object ):
     ''' return a list of available potentials '''
     def __init__(self,pot=False):
+        self.elements = False  # list e.g. ['Al', 'Mg', 'Si']
+        self.pot = pot         # n2p2_v1ag
+        self.pot_all = False   # n2p2_v1ag
+        self.fullpath = False  #
+        return
+
+
+    def get_pothpath_and_pot_all(self):
+        # get the self.pot && self.pot_all
         scripts = os.environ['scripts']
         allpot_fullpath = glob.glob(scripts+'/potentials/*')
-        pot_all = []
+        self.pot_all = []
         onepot_fullpath = False
         onepot_basename = False
         for i in allpot_fullpath:
             #print(i)
-            pot_all.append(os.path.basename(i))
-            if type(pot) != bool:
-                if pot == os.path.basename(i):
-                    onepot_fullpath = i
-                    onepot_basename = pot
+            self.pot_all.append(os.path.basename(i))
+            if type(self.pot) != bool:
+                if self.pot == os.path.basename(i):
+                    self.fullpath = i
+        return
 
         #print(pot_all)
         #sys.exit()
-        self.pot = onepot_basename
-        self.all = pot_all
-        self.fullpath = onepot_fullpath
 
-
+    def get_elements_and_atomic_energies(self):
         # get from input.nn the atomic energies
         if type(self.pot) != bool:
             self.pottype = self.pot.split("_")[0]
             if self.pottype == "runner" or self.pottype == "n2p2":
                 inputnn = self.fullpath+"/input.nn"
                 if os.path.isfile(inputnn):
+                    ##### get elements
                     lines = grep(inputnn,"^elements")
                     if len(lines) == 1:
                         line = lines[0]
-                        print(line.split()[1:])
+                        line_elements_ = line.split()[1:]
+                        self.elements = []
+                        import my_atom
+                        for i in line_elements_:
+                            #print(i)
+                            if i in my_atom.atomic_symbols:
+                                #print("yo",i)
+                                self.elements.append(i)
+                            else:
+                                break
+                        #print('elements ++',self.elements)
 
+                    ##### get atomic energies
+                    lines = grep(inputnn,"^atom_energy")
+                    ele_list = []
+                    ene_list = []
+                    d = {}
+                    for i in lines:
+                        if i.split()[1] in self.elements:
+                            ele = i.split()[1]
+                            ene = float(i.split()[2])
+                            #print('lines',i.split(),"--------->>",ele,ene,type(ene))
+                            ele_list.append(ele)
+                            ene_list.append(ene)
+                            #print("ele_list",ele_list)
+                    #print
+                    self.elements = ele_list
+                    #print('ele_final:',ele_list)
+                    #print('ene_final',ene_list)
+                    if len(ele_list) == len(ene_list):
+                        d = {}
+                        for idx,i in enumerate(ele_list):
+                            d[i] = ene_list[idx]
+                        self.elements = ele_list
+                        self.atom_energy = d
+        return
 
-        #if pot == False:
-        #    return pot_all
-        #else:
-        #    return onepot_basename,onepot_fullpath
+    def get(self):
+        self.get_pothpath_and_pot_all()
+        self.get_elements_and_atomic_energies()
         return
 
 def pot_all():
     all = mypot()
-    return all.all
+    all.get()
+    return all.pot_all
 
 def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
@@ -687,7 +732,7 @@ class ase_calculate_ene( object ):
             ):
 
         self.pot = pot
-        self.units = units
+        self.units = units.lower()
         self.geopt = geopt   # so far only for ene object.
         self.nsteps = 0
         self.verbose = verbose
@@ -700,6 +745,7 @@ class ase_calculate_ene( object ):
         self.kmc = kmc
         self.temp = temp
         self.mypot = mypot(self.pot)
+        self.mypot.get()
 
         return
 
@@ -717,6 +763,7 @@ class ase_calculate_ene( object ):
             sys.exit('ffsocket has to be "unix" or "inet"; Exit!')
 
         pot = mypot(self.pot)
+        pot.get()
 
         basename = pot.pot
         fullpath = pot.fullpath
@@ -783,6 +830,9 @@ class ase_calculate_ene( object ):
 
         atoms.wrap()
 
+        #self.atomsin = deepcopy(atoms)
+        self.atoms = atoms
+
         if self.verbose > 1:
             show_ase_atoms_content(atoms,showfirst=10,comment = "START ASE INTERNAL CALUCLATION !!!")
             print()
@@ -795,9 +845,15 @@ class ase_calculate_ene( object ):
 
 
         if self.geopt == False:
+            ################################################
+            ### statis calculation
+            ################################################
             calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
             atoms.set_calculator(calcLAMMPS)
         else:
+            ################################################
+            ### with geometry optimization
+            ################################################
             # in case of a verbose run:
             #calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
 
@@ -811,16 +867,18 @@ class ase_calculate_ene( object ):
             minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE', 'bh' ]
             minimizer = 'FIRE'
             #minimizer = 'BFGS'
-            #minimizer = 'LGBFGS'
+            minimizer = 'LGBFGS'
             #minimizer = 'bh'
             #minimizer = 'mh'
-            print('startminimize....')
+            #print('startminimize....')
+            logfile="-" # output to screen
+            logfile="tmp" # output to file and not to screen
             if minimizer == 'BFGS':
-                opt1 = BFGS(atoms) #,trajectory="ni.traj")
+                opt1 = BFGS(atoms,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'LGBFGS':
-                opt1 = LBFGS(atoms) #,trajectory="ni.traj")
+                opt1 = LBFGS(atoms,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'FIRE':
-                opt1 = FIRE(atoms) #,trajectory="ni.traj")
+                opt1 = FIRE(atoms,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'bh':
                 kB = 1.38064852e-23
                 kB = 1.6021765e-19
@@ -829,11 +887,11 @@ class ase_calculate_ene( object ):
                   dr=0.5,               # maximal stepwidth
                   optimizer=LBFGS,      # optimizer to find local minima
                   fmax=0.1,             # maximal force for the optimizer
-                  )
+                  logfile=logfile)
             elif minimizer == 'mh':
-                opt1 = MinimaHopping(atoms=atoms)
+                opt1 = MinimaHopping(atoms=atoms,logfile=logfile)
                 opt1(totalsteps=10)
-            print('startrun....')
+            #print('startrun....')
             maxsteps = 200
             if minimizer == 'bh':
                 maxsteps = 3
@@ -843,6 +901,10 @@ class ase_calculate_ene( object ):
                 #print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
                 if maxsteps == opt1.get_number_of_steps():
                     print('DID NOT CONVErGE IN '+str(maxsteps)+' number of minimizer steps!')
+                    #print('---- cell -----')
+                    #print(atoms.get_cell())
+                    #print('---- positions -----')
+                    #print(atoms.get_positions())
                     return np.nan
             #print('ene struct 42: without geoopt: -6852.254 eV lmp and ace')
             #print('ene struct 42: without geoopt: -456816.99 meV_pa lmp and ace')

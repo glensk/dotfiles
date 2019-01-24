@@ -78,7 +78,7 @@ tab-color $mypromptpath
 case $onhost in
     #mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     cosmopc) source $HOME/aiida/bin/activate; ;;
-    #fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 esac
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 

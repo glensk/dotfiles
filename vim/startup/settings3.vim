@@ -9,10 +9,10 @@ set viewoptions=cursor,folds,slash,unix
 set foldmethod=indent   " foldmethod=marker   
 "set foldmethod=syntax    " now trying for c code
 set foldmarker={,}
-set foldnestmax=2
+set foldnestmax=5
 set foldlevel=99
 " only fold if more than 3 ines are indented (2 are not enoug)
-set foldminlines=3
+set foldminlines=1
 " open folds when search or jump to specific line (:22)
 "set foldopen=all
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
