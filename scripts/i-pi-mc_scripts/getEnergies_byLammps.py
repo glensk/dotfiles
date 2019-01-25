@@ -140,7 +140,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         ### when check for particular concentration
         d = my.ase_get_chemical_symbols_to_conz(atoms[i])
         if consider_concentration_al >= 0:
-            if d["Al"] != consider_concentration_al:
+            if d["Mg"] != consider_concentration_al:
                 continue
 
 
@@ -286,20 +286,21 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             np.savetxt(name,what,header=units)
         return what
 
-    mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
-    mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
-    mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
-    mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
-    mysavetxt(ene_std,"ene_std.npy",units,save=True)
+    ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
+    ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
+    ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
+    ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
+    ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
+
     ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"",units,save=False)
-    for_DFTmax = mysavetxt(for_DFTmax,"",units,save=False)
-    ana_mg_conz = mysavetxt(ana_mg_conz,"",units,save=False)
-    ana_si_conz = mysavetxt(ana_si_conz,"",units,save=False)
-    ana_al_conz = mysavetxt(ana_al_conz,"",units,save=False)
-    ana_atoms = mysavetxt(ana_atoms,"",units,save=False)
-    ana_vol = mysavetxt(ana_vol ,"",units,save=False)
-    ana_vol_pa = mysavetxt(ana_vol_pa ,"",units,save=False)
-    ana_dist_min = mysavetxt(ana_dist_min,"",units,save=False)
+    for_DFTmax      = mysavetxt(for_DFTmax,"",units,save=False)
+    ana_mg_conz     = mysavetxt(ana_mg_conz,"",units,save=False)
+    ana_si_conz     = mysavetxt(ana_si_conz,"",units,save=False)
+    ana_al_conz     = mysavetxt(ana_al_conz,"",units,save=False)
+    ana_atoms       = mysavetxt(ana_atoms,"",units,save=False)
+    ana_vol         = mysavetxt(ana_vol ,"",units,save=False)
+    ana_vol_pa      = mysavetxt(ana_vol_pa ,"",units,save=False)
+    ana_dist_min    = mysavetxt(ana_dist_min,"",units,save=False)
 
     np.savetxt("ene_DFT.npy",ene_DFT,header=units)
     np.savetxt("ene_pot.npy",ene_pot,header=units)
@@ -317,7 +318,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         ene_DFT_wo_atomic,     # E_wo
         for_DFTmax,            # for
         ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms,ana_vol,ana_vol_pa,ana_dist_min])
-    analyze_len = analyze.shape[1] - 1
+    print('a',analyze.shape)
+    print('a',analyze.shape[0])
+    #analyze_len = analyze.shape[1] - 1
+    analyze_len = analyze.shape[0] - 1
     np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
@@ -328,7 +332,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('    i   idx /    from       diff      =DFT-ref ('+ace_units+') [atms]  ene_DFT('+ace_units+')  ene_pot('+ace_units+')   ene_wo_atomic       for_DFT_max            E-E_geopt')
+    print('    i   idx /    from       diff      =DFT-ref ('+ace_units+') [atms]  ene_DFT('+ace_units+')  ene_pot('+ace_units+')   ene_wo_atomic       for_DFTmax            E-E_geopt')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
