@@ -292,7 +292,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
     mysavetxt(ene_std,"ene_std.npy",units,save=True)
     ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"",units,save=False)
-    ene_DFTmax = mysavetxt(ene_DFTmax,"",units,save=False)
+    for_DFTmax = mysavetxt(for_DFTmax,"",units,save=False)
     ana_mg_conz = mysavetxt(ana_mg_conz,"",units,save=False)
     ana_si_conz = mysavetxt(ana_si_conz,"",units,save=False)
     ana_al_conz = mysavetxt(ana_al_conz,"",units,save=False)
