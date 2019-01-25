@@ -76,7 +76,7 @@ tab-color $mypromptpath
 # s1 CONDA autojump AFTER_CONDA
 # s1 thermodynamics autojump generalrc
 case $onhost in
-    #mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     cosmopc) source $HOME/aiida/bin/activate; ;;
     fidis) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 esac
