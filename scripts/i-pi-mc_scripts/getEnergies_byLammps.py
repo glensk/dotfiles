@@ -22,11 +22,12 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--lmp/--no-lmp','-l',default=False,help='Do the calculations externally by lammps and not through ase interface.')
 @click.option('--ipi/--no-ipi','-ipi',default=False,help='Do the calculations externally by ipi-lammps and not through ase interface.')
 @click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
+@click.option('--consider_concentration_al','-cal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -cc Al 1.0')
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
 @click.option('--verbose','-v',count=True)
 
 
-def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner):
+def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner,consider_concentration_al):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
@@ -136,6 +137,13 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if type(atoms) != list:
         atoms = [atoms]
     for idx,i in enumerate(range(structures_to_calc)):
+        ### when check for particular concentration
+        d = my.ase_get_chemical_symbols_to_conz(atoms[i])
+        if consider_concentration_al >= 0:
+            if d["Al"] != consider_concentration_al:
+                continue
+
+
         added=""
         #print(atoms[idx].get_positions())
         if calc_DFT: ### ene from DFT
@@ -150,7 +158,6 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             ana_vol[idx] = atoms[i].get_volume()
             ana_vol_pa[idx] = atoms[i].get_volume()/atoms[i].get_number_of_atoms()
             ana_dist_min[idx] = np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min()
-            d = my.ase_get_chemical_symbols_to_conz(atoms[i])
             n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
             ana_mg_conz[idx] = d["Mg"]
             ana_si_conz[idx] = d["Si"]
@@ -235,9 +242,11 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             ene_ste[idx] = 0.
             ene_mean[idx] = ene_diff[idx]
         else:
-            ene_std[idx] = np.std(ene_DFT[:idx+1]-ene_pot[:idx+1])
+            x = ene_DFT[:idx+1]-ene_pot[:idx+1]
+            x = x[~np.isnan(x)]
+            ene_std[idx] = np.std(x)
             ene_ste[idx] = ene_std[idx]/np.sqrt(idx)
-            ene_mean[idx] = np.mean(np.abs(ene_DFT[:idx+1]-ene_pot[:idx+1]))
+            ene_mean[idx] = np.mean(np.abs(x))
 
         printed = False
 
@@ -271,7 +280,26 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if write_runner:
         print('our.runner written')
 
+    def mysavetxt(what,name,units,save=True):
+        what = what[~np.isnan(what)]
+        if save:
+            np.savetxt(name,what,header=units)
+        return what
 
+    mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
+    mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
+    mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
+    mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
+    mysavetxt(ene_std,"ene_std.npy",units,save=True)
+    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"",units,save=False)
+    ene_DFTmax = mysavetxt(ene_DFTmax,"",units,save=False)
+    ana_mg_conz = mysavetxt(ana_mg_conz,"",units,save=False)
+    ana_si_conz = mysavetxt(ana_si_conz,"",units,save=False)
+    ana_al_conz = mysavetxt(ana_al_conz,"",units,save=False)
+    ana_atoms = mysavetxt(ana_atoms,"",units,save=False)
+    ana_vol = mysavetxt(ana_vol ,"",units,save=False)
+    ana_vol_pa = mysavetxt(ana_vol_pa ,"",units,save=False)
+    ana_dist_min = mysavetxt(ana_dist_min,"",units,save=False)
 
     np.savetxt("ene_DFT.npy",ene_DFT,header=units)
     np.savetxt("ene_pot.npy",ene_pot,header=units)
