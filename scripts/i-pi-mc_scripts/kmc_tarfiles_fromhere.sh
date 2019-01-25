@@ -10,7 +10,19 @@ for i in $files;do
     cd $folder
     pwd
     #du -sh $tar 
-    tar.gz_file_or_folder_remove_origfiles.sh $tar 
+    tar.bzip2_file_or_folder.sh $tar
+    cd $hier
+done
+tar="KMC_ECACHE"
+files=`find . -name $tar`
+for i in $files;do
+    cd $hier
+    folder=`echo $i | sed 's|/'"$tar"'$||g'`
+    cd $hier
+    cd $folder
+    pwd
+    #du -sh $tar 
+    tar.bzip2_file_or_folder.sh $tar
     cd $hier
 done
 
@@ -22,7 +34,7 @@ for i in $files;do
     cd $hier
     cd $folder
     pwd
-    tar.gz_file_or_folder_remove_origfiles.sh log*
+    tar.bzip2_file_or_folder.sh log*
     cd $hier
 done
 
