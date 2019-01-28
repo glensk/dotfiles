@@ -99,6 +99,10 @@ def cp(src,dest):
 def rm(src):
     os.remove(src)
 
+def rm_if_exists(src):
+    if os.path.isfile(src):
+        os.remove(src)
+
 def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
