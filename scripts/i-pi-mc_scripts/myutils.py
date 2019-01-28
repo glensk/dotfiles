@@ -99,12 +99,22 @@ def cp(src,dest):
 def rm(src):
     os.remove(src)
 
+def rm_if_exists(src):
+    if os.path.isfile(src):
+        os.remove(src)
+
 def mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
 class cd:
-    """Context manager for changing the current working directory"""
+    """
+    Context manager for changing the current working directory
+    use:
+    with cd("~/Library"):
+        subprocess.call("ls")
+
+    """
     def __init__(self, newPath):
         self.newPath = os.path.expanduser(newPath)
 
@@ -270,8 +280,14 @@ def ase_enepot(atoms,units='eV',verbose=False):
     #print('now in ene')
     #print('ac',atoms.cell)
     try:
+        # in the case of "DFT"                 , it just retrieves the energy  -> get_stress() can NOT be obtained.
+        # in the case of of an ace calculations, it calculates the energy      -> get_stress() CAN     be obtained.
         ene = atoms.get_potential_energy()
-        #print('ene:',ene)
+        #print('ene:',ene,atoms.info)
+        #uuid = atoms.info["comment"]
+        #print('uuid',uuid)
+        #stress = atoms.get_stress()
+        #print('stress:',stress)
     except RuntimeError:
         print("had runtime error")
         ene = 0.

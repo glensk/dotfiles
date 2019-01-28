@@ -75,6 +75,7 @@ tab-color $mypromptpath
 # s3 goo zsh_set
 # s1 CONDA autojump AFTER_CONDA
 # s1 thermodynamics autojump generalrc
+# conda is necessary for python lammps, for jupyter (mac) ... better load it.
 case $onhost in
     mac) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     cosmopc) source $HOME/aiida/bin/activate; ;;

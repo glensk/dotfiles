@@ -22,12 +22,19 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--lmp/--no-lmp','-l',default=False,help='Do the calculations externally by lammps and not through ase interface.')
 @click.option('--ipi/--no-ipi','-ipi',default=False,help='Do the calculations externally by ipi-lammps and not through ase interface.')
 @click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
-@click.option('--consider_concentration_al','-cal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -cc Al 1.0')
+
+@click.option('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
+@click.option('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
+@click.option('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
+@click.option('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
+@click.option('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
+
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
 @click.option('--verbose','-v',count=True)
 
 
-def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner,consider_concentration_al):
+def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner,
+        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
@@ -137,11 +144,49 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if type(atoms) != list:
         atoms = [atoms]
     for idx,i in enumerate(range(structures_to_calc)):
-        ### when check for particular concentration
+        ana_atoms_ = atoms[i].get_number_of_atoms()
+        for_DFTmax_ = np.abs(atoms[i].get_forces()).max()
         d = my.ase_get_chemical_symbols_to_conz(atoms[i])
-        if consider_concentration_al >= 0:
-            if d["Al"] != consider_concentration_al:
-                continue
+        n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
+        cell = atoms[i].get_cell()
+        pos = atoms[i].get_positions()
+        cellshape = "?"
+        if cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
+            cellshape="R"
+            if cell[0,0] == cell[1,1] == cell[2,2]:
+                cellshape="Q"
+                #if ana_atoms_ == 4
+                #if pos[0,0] == pos[0,1] == pos[
+
+        ### when check for particular picks
+        if pick_number_of_atoms >= 0 and ana_atoms_ != pick_number_of_atoms:
+            continue
+        if pick_concentration_al >= 0 and d["Al"] != pick_concentration_al:
+            continue
+        if pick_atoms_al >= 0 and n["Al"] != pick_atoms_al:
+            continue
+        if pick_forcesmax ==0 and for_DFTmax_ > 0.001:
+            continue
+        #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
+        if pick_cellshape >= 0 and cellshape not in ["Q"]:
+            continue
+        #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
+
+        if calc_analysis: ### analysis stuff
+            ana_atoms[idx] = ana_atoms_
+            for_DFTmax[idx] = for_DFTmax_
+            ana_vol[idx] = atoms[i].get_volume()
+            ana_vol_pa[idx] = atoms[i].get_volume()/atoms[i].get_number_of_atoms()
+            ana_dist_min[idx] = np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min()
+            ana_mg_conz[idx] = d["Mg"]
+            ana_si_conz[idx] = d["Si"]
+            ana_al_conz[idx] = d["Al"]
+            at_mg = n["Mg"]
+            at_si = n["Si"]
+            at_al = n["Al"]
+
+
+
 
 
         added=""
@@ -154,29 +199,15 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             if verbose > 1:
                 print('ene_DFT[idx]     :',ene_DFT[idx],units)
 
-        if calc_analysis: ### analysis stuff
-            ana_vol[idx] = atoms[i].get_volume()
-            ana_vol_pa[idx] = atoms[i].get_volume()/atoms[i].get_number_of_atoms()
-            ana_dist_min[idx] = np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min()
-            n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
-            ana_mg_conz[idx] = d["Mg"]
-            ana_si_conz[idx] = d["Si"]
-            ana_al_conz[idx] = d["Al"]
-            at_mg = n["Mg"]
-            at_si = n["Si"]
-            at_al = n["Al"]
-            ana_atoms[idx]   = atoms[i].get_number_of_atoms()
 
-            #### analysisstuff when for whole structure (if per atom then it is necessary to use concentration (d) instead of n["Al"]
-            if len(ace.units.split("_")) == 1: # per structure
-                ene_DFT_wo_atomic[idx] = ene_DFT[idx] - n["Mg"]*atom_energy_Mg - n["Si"]*atom_energy_Si - n["Al"]*atom_energy_Al
-            elif len(ace.units.split("_")) == 2: # per atom
-                ene_DFT_wo_atomic[idx] = ene_DFT[idx] - d["Mg"]*atom_energy_Mg - d["Si"]*atom_energy_Si - d["Al"]*atom_energy_Al
-            else:
-                sys.exit("either per atom or per structure")
+        if len(ace.units.split("_")) == 1: # per structure
+            ene_DFT_wo_atomic[idx] = ene_DFT[idx] - n["Mg"]*atom_energy_Mg - n["Si"]*atom_energy_Si - n["Al"]*atom_energy_Al
+        elif len(ace.units.split("_")) == 2: # per atom
+            ene_DFT_wo_atomic[idx] = ene_DFT[idx] - d["Mg"]*atom_energy_Mg - d["Si"]*atom_energy_Si - d["Al"]*atom_energy_Al
+            #print('a',ene_DFT[idx])
+        else:
+            sys.exit("either per atom or per structure")
 
-            ### analysis forces
-            for_DFTmax[idx] = np.abs(atoms[i].get_forces()).max()
 
         if ipi == True:  ### ene from ipi
             atoms_tmp = copy.deepcopy(atoms[i])
@@ -257,14 +288,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                 show = 3
 
             fmt_one = '%16.'+str(show)+'f'
-            fmt=' '.join(['%16.'+str(show)+'f']*4)
-            fmt=' '.join([fmt_one]*4)
-            fmt=' '.join([fmt_one]*5)
-            ka1="%5.0f %5.0f / %6.0f %16.2f =DFT-ref (%s) [%4.0f] %16.2f %16.2f %16.2f %16.2f"
-            ka2="%5.0f %5.0f / %6.0f %16.2f =DFT-ref (%s) [%4.0f] "+fmt
-            ka3="%5.0f %5.0f / %6.0f "+fmt_one+" =DFT-ref (%s) [%4.0f] "+fmt+" "+added
-            #print("%5.0f %5.0f / %6.0f %16.2f =DFT-ref (%s) [%4.0f] %16.2f %16.2f %16.2f %16.2f" % (i,idx,structures_to_calc,ene_diff_abs[idx],ace.units,atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx]))
-            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],ace.units,atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx]))
+            fmt_one = '%10.'+str(show)+'f'
+            fmt=' '.join([fmt_one]*6)   # add here if a new entry
+            ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f] "+fmt+" "+added
+            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx]))
             return
 
 
@@ -280,45 +307,62 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if write_runner:
         print('our.runner written')
 
-    def mysavetxt(what,name,units,save=True):
-        what = what[~np.isnan(what)]
+    def mysavetxt(what,name,units,save=False):
+        whatout = what[~np.isnan(what)]
         if save:
-            np.savetxt(name,what,header=units)
-        return what
+            np.savetxt(name,whatout,header=units)
 
-    mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
-    mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
-    mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
-    mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
-    mysavetxt(ene_std,"ene_std.npy",units,save=True)
-    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"",units,save=False)
-    for_DFTmax = mysavetxt(for_DFTmax,"",units,save=False)
-    ana_mg_conz = mysavetxt(ana_mg_conz,"",units,save=False)
-    ana_si_conz = mysavetxt(ana_si_conz,"",units,save=False)
-    ana_al_conz = mysavetxt(ana_al_conz,"",units,save=False)
-    ana_atoms = mysavetxt(ana_atoms,"",units,save=False)
-    ana_vol = mysavetxt(ana_vol ,"",units,save=False)
-    ana_vol_pa = mysavetxt(ana_vol_pa ,"",units,save=False)
-    ana_dist_min = mysavetxt(ana_dist_min,"",units,save=False)
+        #print("in",what.shape,"out",whatout.shape,name)
+        return whatout
 
-    np.savetxt("ene_DFT.npy",ene_DFT,header=units)
-    np.savetxt("ene_pot.npy",ene_pot,header=units)
-    np.savetxt("ene_diff.npy",ene_diff,header=units)
-    np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
-    np.savetxt("ene_std.npy",ene_std,header=units)
+    ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
+    ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
+    ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
+    ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
+    ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
-    ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
-    np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units)
+    for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
+    ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
+    ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
+    ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
+    ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
+    ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
+    ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
+    ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
+    if len(ene_pot) != 0:
+        np.savetxt("ene_DFT.npy",ene_DFT,header=units)
+        np.savetxt("ene_pot.npy",ene_pot,header=units)
+        np.savetxt("ene_diff.npy",ene_diff,header=units)
+        np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
+        np.savetxt("ene_std.npy",ene_std,header=units)
 
-    ### write analyze.csv
-    analyze = np.transpose([
-        np.arange(len(ene_DFT)),   # i
-        ene_diff_abs,          # diff
-        ene_DFT_wo_atomic,     # E_wo
-        for_DFTmax,            # for
-        ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms,ana_vol,ana_vol_pa,ana_dist_min])
-    analyze_len = analyze.shape[1] - 1
-    np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+        ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
+        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+        #print('len',len(ene_DFT))
+        #print(ene_DFT.shape)
+        #print(ene_diff_abs.shape)
+        #print(ene_DFT_wo_atomic.shape)
+        #print(for_DFTmax.shape)
+        #print(ana_mg_conz.shape)
+        #print(ana_si_conz.shape)
+        #print(ana_al_conz.shape)
+        #print(ana_atoms.shape)
+        #print(ana_vol.shape)
+        #print(ana_vol_pa.shape)
+        #print(ana_dist_min.shape)
+        ### write analyze.csv
+        analyze = np.transpose([
+            np.arange(len(ene_DFT)),   # i
+            ene_diff_abs,          # diff
+            ene_DFT_wo_atomic,     # E_wo
+            for_DFTmax,            # for
+            ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms,ana_vol,ana_vol_pa,ana_dist_min])
+        #print('a',analyze.shape)
+        #print('a',analyze.shape[0])
+        #analyze_len = analyze.shape[1] - 1
+        analyze_len = analyze.shape[0] - 1
+        np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
     my.create_READMEtxt(os.getcwd())
@@ -328,7 +372,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('    i   idx /    from       diff      =DFT-ref ('+ace_units+') [atms]  ene_DFT('+ace_units+')  ene_pot('+ace_units+')   ene_wo_atomic       for_DFT_max            E-E_geopt')
+    print('#                         ('+ace_units+')        ('+ace_units+')     ('+ace_units+')    ')
+    print('#                         (DFT-ref)                            ene_wo_atomic    forces    (if geopt)  Vol per')
+    print('#   i   idx /    from       diff  [atms]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 

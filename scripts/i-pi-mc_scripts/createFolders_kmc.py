@@ -26,6 +26,7 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.option('-seednumber',default=False,multiple=True, type=int,help="define seed number manually (otherwise a random number generator; can be used to define multiple seeds)")
 @click.option('-nsteps',type=int, default=50000, help="number of KMC steps to make")
 @click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
+@click.option('-fa','--foldername_append',type=str, default="", help="append to foldername")
 
 # environment variables
 @click.option('--pot','-p',type=click.Choice(mu.pot_all()),required=True,default='n2p2_v1ag',help="potential from $scripts/potentials folder.")
@@ -48,6 +49,7 @@ def createjob(
         seednumber,
         nsteps,
         runnercutoff,
+        foldername_append,
         pot,
         submit,
         submitdebug,
@@ -128,6 +130,8 @@ def createjob(
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
                 str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi_"+\
                 str(runnercutoff)+"rcut"
+    if foldername_append != "":
+        directory = directory+"_"+foldername_append
 
 
     # make the atomic structure
