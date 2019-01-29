@@ -1,21 +1,30 @@
 #!/bin/sh
 
-#echo $@
+echo :$@:
+[ "$1" = "" ] && echo "please provide a folder/file! (or path is not mounted)" && exit
 rm -f $HOME/.tmp_xmg_command
 rm -f $HOME/.tmp_xmg_to_delete*
 touch tta
 nr=0
+echo "---------------------"
+for folderin in $@;do
+    echo folder: $folderin
+    [ ! -e "$folderin" ] && echo $folderin does not exist && exit
+done
+echo "---------------------"
+echo
 for folderin in $@;do
     #echo f1: $folder
     folder=`echo $folderin | sed 's|KMC_AL6XXX$||'`
     folder=`echo $folderin | sed 's|simlation.out$||'`
     folder=`echo $folderin | sed 's|simulation.out$||'`
+    echo folder1 $folder  # has to be the seedxxx folder
     # now remove seedxxx (just in case there were some)
-    folder=`echo $folder | sed 's|/seed*|/|g'`
+    folder=`echo $folder | sed 's|/seed.*|/|g'`
+    echo folder2 $folder  # has to be the seedxxx folder
     # now re introduce folder
     seedfolder=`ls -1d $folder/seed*`
     for folder in $seedfolder;do
-        echo $folder  # has to be the seedxxx folder
         #if [ ! -e "$folder" 
         #echo f2: $folder
         file=$folder/KMC_AL6XXX

@@ -247,6 +247,10 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
     return kmesh
 
 def progress(count, total, status=''):
+    ''' use:
+    for i in range(DB2len):
+        my.progress(i,DB2len)
+    '''
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
 
