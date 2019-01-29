@@ -44,10 +44,13 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     # check if necessary files exist
     print()
     for i in [ DB1_path,DB2_path]:
+        # does folder exist?
         if not os.path.isdir(i): sys.exit(i+" does not exist!")
         else: print(i+" exists")
+        # does input.data exist?
         if not os.path.isfile(i+'/input.data'): sys.exit(i+"/input.data does not exist!")
         else: print(i+"/input.data exists")
+        # does funcion.data exist?
         if not os.path.isfile(i+'/function.data'):
             if os.path.isfile(i+'/function.data.tar.bzip2'):
                 print('extracting', i+'/function.data')
@@ -60,15 +63,20 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     #  - get input.nn from DB1
     #  - get input.data from the current input data
     #  - take the submitskirt and run it. this is fast (< 1min);
+
+    # if DB2/function.data does not exist
     if not os.path.isfile(DB2_path+'/function.data'):
         gfdf = get_function_data_folder = DB2_path+"/get_function_data"
         if os.path.isfile(gfdf+"/function.data"):
             my.cp(gfdf+"/function.data",DB2_path+'/function.data')
+            my.rm(gfdf+"/function.data")
         else:
-            # setup the job to create function data for the new structures
+            # setup the job to create DB2/function.data for the new structures
+            # get input.nn from DB1
             if not os.path.isfile(DB1_path+'/input.nn'):
                 sys.exit("Need "+DB1_path+'/input.nn')
             scripts = my.scripts()
+            # get runner_scripts/submit_scaling_debug.sh
             submitscript = scripts+"/runner_scripts/submit_scaling_debug.sh"
             if not os.path.isfile(submitscript):
                 sys.exit("Need submitscript "+submitscript)
@@ -135,8 +143,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         print('-------------------------------------------------------------------------------')
         print('making '+foldername+'/dist_vec.dat to find the structure in DB2 which is furthest from DB1')
         print('-------------------------------------------------------------------------------')
-        print()
-        print("Writing output every",every)
+        #print()
+        #print("Writing output every",every)
         dist_vec = np.full((DB2len), np.inf)  # 2509
         # this could be easily parallelized ...
         for i in range(DB2len):  # 0 ... 2508
@@ -145,8 +153,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
                 dist = salg.norm(DB2[i]-DB1[j])
                 if dist < dist_vec[i]:
                     dist_vec[i] = dist
-            if i in np.arange(0,DB2len,every):
-                print('i',i,'/',DB2.shape[0],dist_vec[i])
+            #if i in np.arange(0,DB2len,every):
+            #    print('i',i,'/',DB2.shape[0],dist_vec[i])
         #print('i',i,dist,dist_vec[0])
         #print(dist_vec)
         np.savetxt(foldername+'/dist_vec_from_DB1.dat',dist_vec)  # this is the distance of every structure in DB2 to all structures in DB1
@@ -170,8 +178,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         dist_vec_new[0,0] = 0
         dist_vec_new[0,1] = distmax
         dist_vec_new[0,2] = argmax
-        print()
-        print("Writing output every",every)
+        #print()
+        #print("Writing output every",every)
         for j in np.arange(1,DB2len): # geht ueber alle eingraege von DB2, 2509 eintraege, diese sind von interesse.
             my.progress(j,DB2len)
             for i in range(DB2len): # geht ueber alle eingraege von DB2, 2509 eintraege, diese sind von interesse.
@@ -210,7 +218,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         if structures_upperlim > 0 and idx == structures_upperlim:
             break
 
-    my.create_READMEtxt(os.getcwd(),add=[ "#","Do: xmgrace "+foldername+"/dist_vec_fin.dat in a log/log plot; Then grep the first structures of interest from "+foldername+"/input.fps256.data "])
+    my.create_READMEtxt(os.getcwd(),add=[ "#","Do: xll "+foldername+"/dist_vec_fin.dat for a log/log plot; Then grep the first structures of interest from "+foldername+"/input.fps256.data "])
     return
 
 
