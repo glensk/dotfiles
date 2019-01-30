@@ -170,8 +170,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         argmax = np.argmax(dist_vec) # this has the largest distance to the previous 5000 struct.
         distmax = dist_vec[argmax]
         # from here on we dont really need dis_vec anymore! Only DB2 distanes will be checked.
-        print('sarting loop....')
-        print(0,'distmax,argmax :',distmax,argmax) #,np.where(dist_vec == 0)[0])
+        #print('sarting loop....')
+        #print(0,'distmax,argmax :',distmax,argmax) #,np.where(dist_vec == 0)[0])
         #dist_vec[0] = distmax
         length = DB2.shape[0]
         dist_vec_new      = np.zeros((length,3))  # 2509
@@ -191,8 +191,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
             argmax = np.argmax(dist_vec)
             distmax = dist_vec[argmax]
             #dist_vec[argmax] = 0
-            if j in np.arange(0,DB2len,every):
-                print(j,'/',DB2len,'distmax,argmax :',distmax,argmax) #,np.where(dist_vec == 0)[0])
+            #if j in np.arange(0,DB2len,every):
+            #    print(j,'/',DB2len,'distmax,argmax :',distmax,argmax) #,np.where(dist_vec == 0)[0])
             dist_vec_new[j,0] = int(j)
             dist_vec_new[j,1] = distmax
             dist_vec_new[j,2] = argmax
@@ -211,7 +211,9 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     print("----------------------------------------------------")
     if structures_upperlim > 0:
         fo = foldername+'/input.fps'+str(structures_upperlim)+'.data'
+    progresslength = len(dist_vec_new[:,2].astype(int))
     for idx,i in enumerate(dist_vec_new[:,2].astype(int)):
+        my.progress(idx,DB2len)
         #print('i',i)
         #print(frames[int(i)].get_chemical_formula())
         ase_write(fo,frames[i],format='runner',append=True)

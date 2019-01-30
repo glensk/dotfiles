@@ -37,8 +37,10 @@ def grep(filepath,string):
     #print("out",out)
     return out
 
-def create_READMEtxt(directory,add=False):
+def create_READMEtxt(directory=False,add=False):
     ''' wiretes a README.txt file '''
+    if directory == False:
+        directory = os.getcwd()
     # get sha
     hier = os.getcwd()
     os.chdir(os.environ['scripts'])
@@ -75,7 +77,34 @@ def create_READMEtxt(directory,add=False):
     print()
     return
 
+def n2p2_get_scaling_and_function_data():
+    if not os.path.isfile("input.data"):
+        sys.exit("Need input.data file")
+    if not os.path.isfile("input.nn"):
+        sys.exit("Need input.nn file")
+    submitfile = scripts()+"/n2p2/submit_scaling_debug.sh"
+    if not os.path.isfile(submitfile):
+        sys.exit("Need "+submitfile+" file!")
+
+    folder="get_scaling"
+    if os.path.isdir(folder):
+        sys.exit(folder+" already exists!")
+
+    mkdir(folder)
+    os.chdir(folder)
+    cp("../input.data")
+    cp("../input.nn")
+    cp(submitfile)
+
+    submitjob(submitdebug=True,jobdir=os.getcwd(),submitskript="submit_scaling_debug.sh")
+    create_READMEtxt()
+    return
+
+
+
 def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
+    if jobdir == False:
+        jobdir = os.getcwd()
     if submit is True or submitdebug is True:
         check_isdir_or_isdirs(jobdir)
         cwd = os.getcwd()
@@ -93,8 +122,37 @@ def sed(file,str_find,str_replace):
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
     return
 
-def cp(src,dest):
-    copyfile(src,dest)
+def cp(src=False,dest=False):
+    if dest==False:
+        dest = os.getcwd()
+    if dest==".":
+        dest = os.getcwd()
+    src_is = False
+    dest_is = False
+    #print('src',src)
+    #print('dest',dest)
+    if os.path.isfile(src):
+        #print("src is file")
+        src_is = "file"
+    if os.path.isdir(src):
+        #print("src is dir")
+        src_is = "dir"
+    if os.path.isfile(dest):
+        #print("dest is file")
+        dest_is = "file"
+    if os.path.isdir(dest):
+        #print("dest is dir")
+        dest_is = "dir"
+    if src_is == "file" and dest_is == "file":
+        copyfile(src,dest)
+    elif src_is == "file" and dest_is == "dir":
+        basename = os.path.basename(src)
+        #print("basename:",os.path.basename(src))
+        copyfile(src,dest+"/"+basename)
+    else:
+        print("source is:",src_is,":",src)
+        print("dest   is:",dest_is,":",dest)
+        sys.exit()
 
 def rm(src):
     os.remove(src)
