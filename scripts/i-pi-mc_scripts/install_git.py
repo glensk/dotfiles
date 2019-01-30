@@ -107,7 +107,10 @@ def install_n2p2(install):
 
     # module load on fidis
     print("cc",os.getcwd())
+    # @fidis
     bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
+    # @daint
+    #bash_command("module load daint-mc intel craype cray-mpich intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
 
     #subprocess.call(["module","load","intel"],shell=True)
     #subprocess.call(["module","load","intel-mpi"],shell=True)
