@@ -215,7 +215,7 @@ def check_isfile_or_isfiles(path,pathnames=False,envvar=False,verbose=False):
     return
 
 
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False):
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,create_fake_vacancy=False):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -249,8 +249,17 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False):
         atomsc[i].symbol = 'Mg'
     for i in np.arange(nmg,nmg+nsi):
         atomsc[i].symbol = 'Si'
-    for i in np.arange(nvac):
-        del atomsc[-1]
+    if create_fake_vacancy == False:
+        for i in np.arange(nvac):
+            del atomsc[-1]
+    elif create_fake_vacancy == True:
+        startsubst = -1
+        for i in np.arange(nvac):
+            #print('startsubst',startsubst)
+            atomsc[startsubst].symbol = 'V'
+            startsubst -= 1
+    else:
+        sys.exit("create_fake_vacancy has to be True or False")
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
     #ase.io.write('kalmp',atomsc,format='lammps-dump')

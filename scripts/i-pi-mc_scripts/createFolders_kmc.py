@@ -135,6 +135,7 @@ def createjob(
 
 
     # make the atomic structure
+    atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,create_fake_vacancy = True)
     atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
 
@@ -188,6 +189,7 @@ def createjob(
         # get data.lmp and data.ipi
         atomsc.write(jobdir+'/data.lmp.runner',format='lammps-runner')
         atomsc.write(jobdir+'/data.ipi',format='ipi')
+        atomsc_fakevac.write(jobdir+'/data_fakevac.ipi',format='ipi')
 
         if test == True:
             atomsc.write(jobdir+'/data.lmp',format='lammps-data')

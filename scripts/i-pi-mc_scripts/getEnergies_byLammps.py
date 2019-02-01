@@ -177,7 +177,17 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             for_DFTmax[idx] = for_DFTmax_
             ana_vol[idx] = atoms[i].get_volume()
             ana_vol_pa[idx] = atoms[i].get_volume()/atoms[i].get_number_of_atoms()
-            ana_dist_min[idx] = np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min()
+            #print('ana',ana_atoms_)
+            #print('ka',atoms[i].get_all_distances(mic=True))
+            #print('kb',np.sort(atoms[i].get_all_distances(mic=True))[:,1:])
+            #print('kc',np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min())
+            #print('kd')
+            if ana_atoms[idx] > 1:
+                ana_dist_min[idx] = np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min()
+            else:
+                #print('atoms[i].cell',atoms[i].cell)
+                #sys.exit()
+                ana_dist_min[idx] = 0
             ana_mg_conz[idx] = d["Mg"]
             ana_si_conz[idx] = d["Si"]
             ana_al_conz[idx] = d["Al"]
@@ -338,20 +348,24 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         np.savetxt("ene_std.npy",ene_std,header=units)
 
         ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
-        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
-        #print('len',len(ene_DFT))
-        #print(ene_DFT.shape)
-        #print(ene_diff_abs.shape)
-        #print(ene_DFT_wo_atomic.shape)
-        #print(for_DFTmax.shape)
-        #print(ana_mg_conz.shape)
-        #print(ana_si_conz.shape)
-        #print(ana_al_conz.shape)
-        #print(ana_atoms.shape)
-        #print(ana_vol.shape)
-        #print(ana_vol_pa.shape)
-        #print(ana_dist_min.shape)
         ### write analyze.csv
+        try:
+            np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+        except IndexError:
+            print('len',len(ene_DFT))
+            print(ene_DFT.shape)
+            print(ene_diff_abs.shape)
+            print(ene_DFT_wo_atomic.shape)
+            print(for_DFTmax.shape)
+            print(ana_mg_conz.shape)
+            print(ana_si_conz.shape)
+            print(ana_al_conz.shape)
+            print(ana_atoms.shape)
+            print(ana_vol.shape)
+            print(ana_vol_pa.shape)
+            print(ana_dist_min.shape)
+            print('cant save ene_all.npy')
+
         analyze = np.transpose([
             np.arange(len(ene_DFT)),   # i
             ene_diff_abs,          # diff

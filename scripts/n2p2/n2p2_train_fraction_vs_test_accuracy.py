@@ -5,41 +5,53 @@ import numpy as np
 import glob,sys,os
 from myutils import q
 
-id,stat,path = q()
+#id,stat,path = q()
+path=""
 checkpath_run = []
 checkpath_que = []
-for idx,i in enumerate(path):
-    #print(i.split("/scratch/glensk/n2p2_jobs"))
-    if type(i.split("/scratch/glensk/n2p2_jobs/")) == list:
-        #print("-->",i.split("/scratch/glensk/n2p2_jobs/")[1])
-        if i[:3] != "/sc":
-            continue
-        if stat[idx] == 'R':
-            print(i[:3])
-            checkpath_run.append(i.split("/scratch/glensk/n2p2_jobs/")[1])
-        else:
-            checkpath_que.append(i.split("/scratch/glensk/n2p2_jobs/")[1])
-
+subfolderbase = "/scratch/glensk/"
+subfolder = "n2p2_24_24/"
+subfolder_len = len(subfolderbase+subfolder)
+#for idx,i in enumerate(path):
+#    #print('i',i)
+#    #print(i.split("/scratch/glensk/n2p2_jobs"))
+#    if i[:subfolder_len] != subfolderbase+subfolder:
+#        continue
+#    if type(i.split(subfolderbase+subfolder)) == list:
+#        print('i >>>',i)
+#        print("i -->",i.split(subfolderbase+subfolder))
+#        #print('i >>>',i[:3])
+#        if i[:3] != "/sc":
+#            continue
+#        if stat[idx] == 'R':
+#            print(i[:3])
+#            checkpath_run.append(i.split(subfolderbase+subfolder)[1])
+#        else:
+#            checkpath_que.append(i.split(subfolderbase+subfolder)[1])
+#
 
 def pp():
     a="-----------"
     print(12*a)
 
 
-for c in ["28","21_","21maa_fr/", "21maa_fr_ff0"]:
+for c in ["*"]:
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
-    fo=sorted(glob.glob("tf_*_"+c+"*/learning-curve.out"))
-    if len(fo) == 0:
-        fo=glob.glob("tf_*_"+c+"*learning-curve.out")
+    fo=sorted(glob.glob(c+"/learning-curve.out"))
+    print('fo::',fo)
+    #if len(fo) == 0:
+    #    fo=glob.glob("tf_*_"+c+"*learning-curve.out")
     out=[]
     out2=[]
     for i in fo:
         #print('fo',i)
-        testf=float(i.split("_")[1])
+        #testf=float(i.split("_")[1])
+        testf=0.2
         train_fraction=1.-testf
         lc = np.loadtxt(i) #+'/learning-curve.out')
         len_ = len(lc[:,1])
-        #print(len(len_))
+        #print(lc[:,1])
+        #print(len(lc[:,1]))
         #sys.exit()
 
         trainmin                = lc[:,1].min()
