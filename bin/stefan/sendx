@@ -1,39 +1,39 @@
 #!/bin/sh
+[ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
 
 datum=`date +"%Y_%m_%d__%H:%M:%S"`
 filename=".sendx_$datum"
-echo $filename
+#echo $filename
 touch $filename
 echo `pwd` > $filename
 echo $* >> $filename
-[ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
 
-garching="false"
-epfl="true"
 
 ##### TAR the file ######################################
 #tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 $filename $*
 #tar -cvf archive.tar.bzip2 $filename $*
-[ -e "name-of-archive.tar.gz" ] && rm name-of-archive.tar.gz
-tar -czvf name-of-archive.tar.gz $filename $*
-
+#[ -e "name-of-archive.tar.gz" ] && rm name-of-archive.tar.gz
+#tar -czvf name-of-archive.tar.gz $filename $*
+tosend="sendx.tar.bzip2"
+rm -f $tosend
+tar.bzip2_file_or_folder_for_sendx.sh $*
+[ ! -e "$tosend" ] && echo tar did not work out since no $tosend created && exit
 
 
 ####### move to ~/.exchange ############################
-if [ "$garching" = "true" ];then
-    #scp archive.tar.bzip2 aglen@gate.rzg.mpg.de:~/.exchange/
-    echo 'scp name-of-archive.tar.gz aglen@gate.rzg.mpg.de:~/.exchange/'
-    scp name-of-archive.tar.gz aglen@gate.rzg.mpg.de:~/.exchange/
+address="aglen@gate.rzg.mpg.de"  # garching
+address="aglensk@ela.cscs.ch"    # ela, part of daint
+
+
+echo "scp sendx.tar.bzip2 $address:~/.exchange/"
+if [ "`hostname | grep -o daint`" == "daint" ];then
+    mv $tosend ~/.exchange/
+else
+    scp $tosend $address:~/.exchange/
 fi
 
-if [ "$epfl" = "true" ];then
-    echo 'mv name-of-archive.tar.gz ~/.exchange/'
-    mv name-of-archive.tar.gz ~/.exchange/
 
-fi
-
-###### remove the rm archive.tar.bzip2 ######################
-[ -e "name-of-archive.tar.gz" ] && echo 'rm name-of-archive.tar.gz' && rm name-of-archive.tar.gz
-[ -e "$filename" ] && echo "rm $filename" && rm $filename 
+###### remove the rm $tosend archive  ######################
+[ -e "$tosend" ] && rm $tosend 
 
 
