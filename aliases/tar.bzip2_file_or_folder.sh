@@ -1,6 +1,14 @@
 #!/bin/sh
-lbzip2=`command -v lbzip2`
+check_remove=`echo $0 | sed 's|.*aliases/||' | grep "and_remove_originals"`
+check_sendx=`echo $0 | sed 's|.*aliases/||' | grep "for_sendx"`
+verbose="true"
+[ "$check_sendx" != "" ] && verbose="false"
+#echo "check_remove:$check_remove:"
+#echo "check_sendx:$check_sendx:"
 #exit
+tar=`command -v gtar`
+[ "$tar" == "" ] && tar=`command -v tar`
+lbzip2=`command -v lbzip2`
 if ([ "$lbzip2" = "" ] && [ ! -e "$HOME/.local/bin/lbzip2" ]);then
     echo lbzip2 $lbzip2
     echo "insalling lbzip2"
@@ -31,12 +39,18 @@ fi
 # --> to make both work
 #############################################################
 
-################# all files/folders
+
+#############################################################
+# DEFINE WHAT TO SEND (allpaths, can be files and or folder)
+#############################################################
 allpaths=$@
 allpaths=`echo $@ | sed 's|/ | |g'`
 [ "$allpaths" = "" ] && echo 'need $1 to the the foldername' && exit
-echo "allpath to tar: $allpaths"
-################# name of the archive
+[ "$verbose" == "true" ] && echo "allpath to tar: $allpaths"
+
+#############################################################
+# DEFINE how to name the tarred archive  
+#############################################################
 saveas=""
 [ "`echo $* | wc -w`" = "1" ] && saveas=$1
 if [ "`echo $* | wc -w`" != "1" ];then
@@ -44,20 +58,25 @@ if [ "`echo $* | wc -w`" != "1" ];then
     [ "$saveas" = "" ] && saveas="$1_and_other_files"
     [ "`echo $saveas | wc -c`" = "0" ] && saveas="$1_and_other_files"
 fi
-echo "saveas        : $saveas.tar.bzip2"
+[ "$check_sendx" != "" ] && saveas="sendx"
+[ "$verbose" == "true" ] && echo "saveas        : $saveas.tar.bzip2"
 [ -e "$saveas.tar.bzip2" ] && echo $saveas does already exist && exit
-#exit
 ################# make the tar
-tar --remove-files --use-compress-program=lbzip2 -cvf "$saveas.tar.bzip2" $allpaths
+addcommand="";[ "$check_remove" != "" ] && addcommand=" --remove-files "
+
+
+[ "$verbose" == "true" ] && echo "addcommand    : $addcommand (empty means original files are not deleted)"
+$tar $addcommand --use-compress-program=lbzip2 -cvf "$saveas.tar.bzip2" $allpaths
+
 #############################################################
 # in case lbzip2 is not available or can not be compiled
 #############################################################
 #tar --remove-files -zcvf $saveas.tar.gz $*
 
 if [ -e "$saveas.tar.bzip2" ];then
-    echo "success       : $saveas.tar.bzip2 has been created."
+    [ "$verbose" == "true" ] && echo "success       : $saveas.tar.bzip2 has been created."
 else
-    echo "ERROR  !!!!!  : $saveas.tar.bzip2 has NOT been created."
+    [ "$verbose" == "true" ] && echo "ERROR  !!!!!  : $saveas.tar.bzip2 has NOT been created."
 fi
 
 ###########################################################

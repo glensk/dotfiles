@@ -96,6 +96,11 @@ Host cosmopc pc
  HostName cosmopc15.epfl.ch
  User glensk
 
+# ssh-copy-id -i ~/.ssh/id_rsa.pub aglensk@ela.cscs.ch
+# can go to ela from mac (without pw)
+# can go to ela from fidis (without pw)
+# can go to ela from cosmopc (without pw)
+# pw:  (normal zwei ohne sterne 1234)
 Host ela
  HostName ela.cscs.ch
  User aglensk
