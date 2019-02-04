@@ -23,7 +23,6 @@ tar=`command -v gtar`
 [ "$tar" == "" ] && tar=`command -v tar`
 echo "tar       : $tar"
 echo 
-echo
-#$tar -xzvf $filename 
+echo "---------------------- getting following files -----------------"
 $tar -xvf $filename 
 rm $filename 
