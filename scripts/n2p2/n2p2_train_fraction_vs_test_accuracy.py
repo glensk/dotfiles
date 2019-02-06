@@ -5,31 +5,27 @@ import numpy as np
 import glob,sys,os
 from myutils import q
 
-#id,stat,path = q()
-path=""
+fo=sorted(glob.glob("*/learning-curve.out"))
+id,stat,path = q()
 checkpath_run = []
 checkpath_que = []
 subfolderbase = "/scratch/glensk/"
 subfolder = "n2p2_24_24/"
 subfolder_len = len(subfolderbase+subfolder)
-#for idx,i in enumerate(path):
-#    #print('i',i)
-#    #print(i.split("/scratch/glensk/n2p2_jobs"))
-#    if i[:subfolder_len] != subfolderbase+subfolder:
-#        continue
-#    if type(i.split(subfolderbase+subfolder)) == list:
-#        print('i >>>',i)
-#        print("i -->",i.split(subfolderbase+subfolder))
-#        #print('i >>>',i[:3])
-#        if i[:3] != "/sc":
-#            continue
-#        if stat[idx] == 'R':
-#            print(i[:3])
-#            checkpath_run.append(i.split(subfolderbase+subfolder)[1])
-#        else:
-#            checkpath_que.append(i.split(subfolderbase+subfolder)[1])
-#
-
+for idx,i in enumerate(path):
+    #print('i',i)
+    #print(i.split("/scratch/glensk/n2p2_jobs"))
+    #print('j',i.split("/"))
+    for g in fo:
+        gc = g.split("/learning-curve.out")[0]
+        #print('gc',gc)
+        if gc in i.split("/") and stat[idx] == 'R':
+            checkpath_run.append(gc)
+        if gc in i.split("/") and stat[idx] == 'Q':
+            checkpath_que.append(gc)
+#print()
+#print('run:',checkpath_run)
+#sys.exit()
 def pp():
     a="-----------"
     print(12*a)
@@ -38,13 +34,13 @@ def pp():
 for c in ["*"]:
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
     fo=sorted(glob.glob(c+"/learning-curve.out"))
-    print('fo::',fo)
+    #print('fo::',fo)
     #if len(fo) == 0:
     #    fo=glob.glob("tf_*_"+c+"*learning-curve.out")
     out=[]
     out2=[]
     for i in fo:
-        #print('fo',i)
+        #print('test_que:',i)
         #testf=float(i.split("_")[1])
         testf=0.2
         train_fraction=1.-testf
@@ -117,8 +113,8 @@ for c in ["*"]:
     #print('My list:', *out2, sep='\n- ')
     #for idj,j in enumerate(out): # for every line
     #    print("%0.2f  %6.1f  (%4.0f) %5.1f  (%4.0f) [%4.0f]   %s"%(j[0],j[1],j[4],j[2],j[5],j[6],j[3]))
-    print()
-    print()
+    #print()
+    #print()
     pp()
     pp()
     print("#             || rmse  /  rmse        || rmse / rmse         || [stes]")
@@ -133,9 +129,11 @@ for c in ["*"]:
         epochs_=len(j) - 2
         #print('a',path_,j,'--->',j[11])
         #sys.exit()
-        if j[path_].split("/learning-curve.out")[0] in checkpath_run:
+        #print('kk',j[path_].split("/learning-curve.out"))
+        path_before_learningcurve = j[path_].split("/learning-curve.out")[0]  # random_seed_2234125
+        if path_before_learningcurve in checkpath_run:
             run = "(R) "
-        if j[path_].split("/learning-curve.out")[0] in checkpath_que:
+        if path_before_learningcurve in checkpath_que:
             run = "(Q) "
         if j[epochs_] - 250 < j[3]:
             NJC = "NJC "

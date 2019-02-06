@@ -104,10 +104,16 @@ def ReadLOG(logfile):
             sf.readline() # parse comment
             rsym = []
             line = sf.readline()
+            #print 'linexx',line,'line[2]:',line[0]
             while line[2] != "-":
+                #print rehm.group(1),"||",line.split()[1:]
+                #sys.exit()
                 rsym.append(line.split()[1:])
                 line = sf.readline()
             fundef[rehm.group(1)] = rsym
             print "READ "
     sf.close()
+    #print '-------------------'
+    #print fundef
+    #print '-------------------'
     return fundef

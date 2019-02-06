@@ -86,6 +86,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ana_al_conz      = np.empty(structures_to_calc);ana_al_conz[:]  = np.nan
     ana_atoms        = np.empty(structures_to_calc);ana_atoms[:]  = np.nan
     ana_vol          = np.empty(structures_to_calc);ana_vol[:]  = np.nan
+    ana_VOL_diff_norm= np.empty(structures_to_calc);ana_VOL_diff_norm[:]  = np.nan
     ana_vol_pa       = np.empty(structures_to_calc);ana_vol_pa[:]  = np.nan
     ana_dist_min     = np.empty(structures_to_calc);ana_dist_min[:]  = np.nan
     ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
@@ -177,6 +178,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             for_DFTmax[idx] = for_DFTmax_
             ana_vol[idx] = atoms[i].get_volume()
             ana_vol_pa[idx] = atoms[i].get_volume()/atoms[i].get_number_of_atoms()
+            VOL_norm = n["Al"]*16.5+n["Mg"]*22.85+n["Si"]*20.5
+            VOL_diff = ana_vol[idx] - VOL_norm
+            ana_VOL_diff_norm[idx] = VOL_diff/VOL_norm
             #print('ana',ana_atoms_)
             #print('ka',atoms[i].get_all_distances(mic=True))
             #print('kb',np.sort(atoms[i].get_all_distances(mic=True))[:,1:])
@@ -187,7 +191,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             else:
                 #print('atoms[i].cell',atoms[i].cell)
                 #sys.exit()
-                ana_dist_min[idx] = 0
+                ana_dist_min[idx] = -1
             ana_mg_conz[idx] = d["Mg"]
             ana_si_conz[idx] = d["Si"]
             ana_al_conz[idx] = d["Al"]
@@ -228,6 +232,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             if ace.geopt == False:
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
+                stress = atoms_tmp.get_stress()
+                print('stress',stress)
 
             if ace.geopt == True:
                 ace.geopt = False
@@ -299,9 +305,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
             fmt_one = '%16.'+str(show)+'f'
             fmt_one = '%10.'+str(show)+'f'
-            fmt=' '.join([fmt_one]*6)   # add here if a new entry
+            fmt=' '.join([fmt_one]*8)   # add here if a new entry
             ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f] "+fmt+" "+added
-            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx]))
+            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
             return
 
 
@@ -339,6 +345,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
     ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
     ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
+    ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
     ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
     if len(ene_pot) != 0:
         np.savetxt("ene_DFT.npy",ene_DFT,header=units)
@@ -371,12 +378,20 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             ene_diff_abs,          # diff
             ene_DFT_wo_atomic,     # E_wo
             for_DFTmax,            # for
-            ana_mg_conz,ana_si_conz,ana_al_conz,ana_atoms,ana_vol,ana_vol_pa,ana_dist_min])
+            ana_mg_conz,
+            ana_si_conz,
+            ana_al_conz,
+            ana_atoms,
+            ana_vol,
+            ana_vol_pa,
+            ana_dist_min,
+            ana_VOL_diff_norm])
         #print('a',analyze.shape)
         #print('a',analyze.shape[0])
         #analyze_len = analyze.shape[1] - 1
         analyze_len = analyze.shape[0] - 1
-        np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+        #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+        np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
     my.create_READMEtxt(os.getcwd())
