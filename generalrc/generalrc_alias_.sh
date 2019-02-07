@@ -252,8 +252,9 @@ $1 moduel 'module'
 ################################
 # Slurm que jobsceduler
 # #############################
-#$1 q 'squeue -u "$USER" --format "%A %t %N %C %M %Z" | awk '{printf "%8s %3s %20s %4s %6s %10s\n",$1,$2,$3,$4,$5,$6}''
 #$1 mount_fidis 'sshfs -o idmap=user glensk@fidis@epfl.ch:/scratch/glensk ~/fidis'
+# removed: -o reconnect
+
 $1 mount_fidis_scratch 'sshfs glensk@fidis.epfl.ch:/scratch/glensk/ /scratch/glensk -o reconnect -C; echo mounted /scratch/glensk' 
 $1 umount_fidis_scratch 'umount -f /scratch/glensk; echo umounted /scratch/glensk'
 
