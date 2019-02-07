@@ -39,9 +39,11 @@ def SF_integrate(sym, rho={},prefix=False,element=False):
     SF_int = np.zeros(nsym)
     print('prefix',prefix,'element',element)
     if prefix != False and element != False:
-        if os.path.isfile(prefix+"_"+element+".sfintegral"):
-            print 'exists:',prefix+"_"+element+".sfintegral"
-            SF_int = np.loadtxt(prefix+"_"+element+".sfintegral")
+        add=""
+        add="_tmp"
+        if os.path.isfile(prefix+"_"+element+".sfintegral"+add):
+            print 'exists:',prefix+"_"+element+".sfintegral"+add
+            SF_int = np.loadtxt(prefix+"_"+element+".sfintegral"+add)
     #sys.exit()
     for idx in xrange(nsym):
         #print ":",SF_int[idx],":"
@@ -82,7 +84,7 @@ def SF_integrate(sym, rho={},prefix=False,element=False):
         #print 'pref',prefix, 'ele',element
         if prefix != False and element != False:
             #print('folder',prefix+"_"+element+".sfintegral_tmp")
-            np.savetxt(prefix+"_"+element+".sfintegral", SF_int)
+            np.savetxt(prefix+"_"+element+".sfintegral"+add, SF_int)
 
     return SF_int
 
