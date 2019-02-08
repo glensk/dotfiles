@@ -73,6 +73,7 @@ echo "${RED}jupyter contrib nbextension install --user${NC}"
 jupyter contrib nbextension install --user # also necessary to get the notebook extensions working
 echo "${RED}nglview${NC}"  # to look at structures
 conda install -c omnia nglview
+conda install -y -c conda-forge atomsk  # checking for unwrapping atomic structures
 
 conda install -y -c numba # tried for faster SF_integrate with CurSel
 #conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 

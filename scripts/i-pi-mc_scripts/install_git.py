@@ -5,71 +5,62 @@ import argparse
 import sys,os
 import myutils as my
 import subprocess
+import myutils
 
-known = ["ipi","n2p2","lbzip"]
+known = ["ipi","n2p2","lbzip","atomsk", "vmd" ]
 
 def help(p = None ,known=known):
-    string='''This is the Help'''
+    string='''e.g. install_git.py -i atomsk'''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i','--install', choices=known, required=True,
             help='choose what to install')
-    p.add_argument('-if','--install_folder', action='store_true', default=os.environ.get('HOME')+"/sources/",
+    p.add_argument('-if','--sources_folder', action='store_true', default=os.environ.get('HOME')+"/sources/",
             help='The target folder for installation.')
     return p
 
 p = help()
 args = p.parse_args()
 
-#import click
-#CONTEXT_SETTINGS = my.get_click_defaults()
-#@click.command(context_settings=CONTEXT_SETTINGS)
-#@click.option('--install','-i',type=click.Choice(known),required=True,help="choose what to install")
-#@click.option('--install_folder','-if',type=str,default=os.environ.get('HOME')+"/sources/",required=False,help="the target folder for installation.")
-
-
 def install_(args,known):
-    install_folder = args.install_folder
-    install = args.install
-    if not os.path.isdir(install_folder):
-        my.mkdir(install_folder)
-    if install not in known:
-        sys.exit("Not known how to install "+install+"; Exit!")
-    install_folder_prog = install_folder+"/"+install
-    #if os.path.isdir(install_folder_prog):
-    #    sys.exit(install_folder_prog+" does already exist; Exit!")
+    install        = args.install
 
-    print("cd "+install_folder)
-    with my.cd(install_folder):
+    # check if the program is known
+    if args.install not in known:
+        sys.exit("Not known how to install "+args.install+"; Exit!")
 
-        if install == 'ipi':
-            print("git clone --depth 1 -b kmc-al6xxx https://github.com/ceriottm/i-pi-mc "+install)
-            subprocess.call(["git","clone","--depth","1","-b","kmc-al6xxx","https://github.com/ceriottm/i-pi-mc",install])
-            print(os.getcwd())
-            with my.cd(install):
-                print(os.getcwd())
-                subprocess.call(["git","checkout","kmc-al6xxx"])
-                print("git branch")
-                subprocess.call(["git","branch"])
+    # mkdir the install folder
+    if not os.path.isdir(args.sources_folder):
+        my.mkdir(args.sources_folder)
 
-        if install == 'xmgrace':  # currently not working, see below
-            subprocess.call(["git","clone","--depth","1","https://github.com/fxcoudert/xmgrace",install])
-            with my.cd(install):
-                subprocess.call(["./configure"])  # this once complains about missing: configure: error: M*tif has not been found
+    print("cd "+args.sources_folder)
+    with my.cd(args.sources_folder):
 
-        if install == 'n2p2':
-            install_n2p2(install)
-            #os.chdir(install+"/src")
-            #print("cc",os.getcwd())
-            #bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
+        if args.install == 'ipi'    : install_ipi(args)
+        if args.install == 'n2p2'   : install_n2p2(args)
+        if args.install == 'atomsk' : install_atomsk(args)
+        if args.install == 'vmd'    : install_vmd(args)
+
+        # not working yet
+        if args.install == 'xmgrace': install_xmgrace(args)
 
     print("DONE")
     return
 
+def install_ipi(args):
+    print("git clone --depth 1 -b kmc-al6xxx https://github.com/ceriottm/i-pi-mc "+args.install)
+    subprocess.call(["git","clone","--depth","1","-b","kmc-al6xxx","https://github.com/ceriottm/i-pi-mc",args.install])
+    print(os.getcwd())
+    with my.cd(args.install):
+        print(os.getcwd())
+        subprocess.call(["git","checkout","kmc-al6xxx"])
+        print("git branch")
+        subprocess.call(["git","branch"])
+    return
 
-def install_n2p2(install):
-    subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",install])
-    os.chdir(install)
+def install_n2p2(args):
+    subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install])
+    os.chdir(args.install)
     subprocess.call(["git","branch"])
     os.chdir("src")
     print('pwd aa:',os.getcwd())
@@ -120,6 +111,36 @@ def install_n2p2(install):
     #subprocess.call(["module","load","gsl"],shell=True)
     #subprocess.call(["module","load","eigen"],shell=True)
     return
+
+def install_xmgrace(args):
+    subprocess.call(["git","clone","--depth","1","https://github.com/fxcoudert/xmgrace",args.install])
+    with my.cd(args.install):
+        subprocess.call(["./configure"])  # this once complains about missing: configure: error: M*tif has not been found
+
+def install_atomsk(args):
+    print("atoms was in the end installed with conda!")
+    print("by: conda install -y -c conda-forge atomsk")
+    sys.exit()
+    subprocess.call(["git","clone","--depth","1","https://github.com/pierrehirel/atomsk",args.install])
+    os.chdir(args.install)
+    os.chdir("src")
+    bash_command("make atomsk",os.getcwd())
+    return
+
+def install_vmd(args):
+    home = os.environ["HOME"]
+    vmd = home+"/Dropbox/Albert/scripts/dotfiles/sources/vmd-1.9.3.tar.bzip2"
+    if not os.path.exists(vmd):
+        sys.exit("vmd is not saved @ "+vmd)
+    myutils.cp(vmd,".")
+    import tarfile
+    tar = tarfile.open("vmd-1.9.3.tar.bzip2", "r:bz2")
+    tar.extractall()
+    tar.close()
+    os.chdir("vmd-1.9.3")
+
+    return
+
 
 def bash_command(bashCommand,cwd=False):
     print("HIER:",cwd)
