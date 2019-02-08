@@ -128,24 +128,56 @@ def install_atomsk(args):
     return
 
 def install_vmd(args):
+    vmdfolder="vmd-1.9.3"
+
+    print("### check if already installed")
+    if os.path.exists(vmdfolder):
+        sys.exit(vmdfolder+" does already exist in the source folder ! Exit!")
+
+    print("### make sure VMDINSTALLNAME is defined")
+    VMDINSTALLNAME = os.environ["VMDINSTALLNAME"]
+    print("### make sure VMDINSTALLBINDIR is defined")
+    VMDINSTALLBINDIR = os.environ["VMDINSTALLBINDIR"]
+    print("### make sure VMDINSTALLLIBRARYDIR is defined")
+    VMDINSTALLLIBRARYDIR = os.environ["VMDINSTALLLIBRARYDIR"]
+
+
+    print("### copy to sources")
     home = os.environ["HOME"]
-    vmd = home+"/Dropbox/Albert/scripts/dotfiles/sources/vmd-1.9.3.tar.bzip2"
+    vmd = home+"/Dropbox/Albert/scripts/dotfiles/sources/"+vmdfolder+".tar.bzip2"
     if not os.path.exists(vmd):
         sys.exit("vmd is not saved @ "+vmd)
     myutils.cp(vmd,".")
+
+    print("### untar")
     import tarfile
     tar = tarfile.open("vmd-1.9.3.tar.bzip2", "r:bz2")
     tar.extractall()
     tar.close()
-    os.chdir("vmd-1.9.3")
 
+    print("### configure")
+    os.chdir(vmdfolder)
+    subprocess.call(["./configure"])
+
+    ## This would only be necessary if VMD variables were not set
+    #vmdpath = home+"/sources/"+vmdfolder+"/"
+    #binhome = vmdpath+"/bin"
+    #libhome = vmdpath+"/lib/lib"  # make lib/lib to distinguish
+    #bash_command("export VMDINSTALLNAME=\"vmd\" && export VMDINSTALLBINDIR=\""+binhome+"\" && export VMDINSTALLLIBRARYDIR=\""+libhome+"/$VMDINSTALLNAME\" && ./configure",os.getcwd())
+
+    print("###",os.getcwd())
+    print("### make install")
+    os.chdir("src")
+    print("###",os.getcwd())
+    subprocess.call(["make", "install"])
+    #bash_command("make atomsk",os.getcwd())
     return
 
 
 def bash_command(bashCommand,cwd=False):
-    print("HIER:",cwd)
-    print("HIER:",os.getcwd())
-    print("BASH:",bashCommand)
+    #print("HIER:",cwd)
+    #print("HIER:",os.getcwd())
+    #print("BASH:",bashCommand)
     #subprocess.Popen(['/bin/bash', '-c', cmd])
     #process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE,cwd=cwd)
     #output, error = process.communicate()
