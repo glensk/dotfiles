@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","n2p2","lbzip","atomsk", "vmd" ]
+known = ["ipi","n2p2","lbzip","lbzip2","atomsk", "vmd" ]
 
 def help(p = None ,known=known):
     string='''e.g. install_git.py -i atomsk'''
@@ -36,10 +36,11 @@ def install_(args,known):
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
 
-        if args.install == 'ipi'    : install_ipi(args)
-        if args.install == 'n2p2'   : install_n2p2(args)
-        if args.install == 'atomsk' : install_atomsk(args)
-        if args.install == 'vmd'    : install_vmd(args)
+        if args.install in ['atomsk'] : install_atomsk(args)
+        if args.install in ['lbzip','lbzip2'] : install_lbzip(args)
+        if args.install in ['ipi']    : install_ipi(args)
+        if args.install in ['n2p2']   : install_n2p2(args)
+        if args.install in ['vmd']    : install_vmd(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -57,6 +58,19 @@ def install_ipi(args):
         print("git branch")
         subprocess.call(["git","branch"])
     return
+
+def install_lbzip(args):
+    print("wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz")
+    subprocess.call(["wget","http://archive.lbzip2.org/lbzip2-2.5.tar.gz"])
+    subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
+    with my.cd("lbzip2-2.5/"):
+        subporocess.call(['./configure','--prefix=\"$HOME/.local\"'])
+        subporocess.call(['make'])
+        subporocess.call(['make install'])
+    return
+
+
+
 
 def install_n2p2(args):
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install])
