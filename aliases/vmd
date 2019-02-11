@@ -1,0 +1,3 @@
+#!/bin/sh
+$HOME/sources/vmd-1.9.3/bin/vmd $*
+
