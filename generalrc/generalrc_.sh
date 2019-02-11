@@ -46,12 +46,14 @@ source $generalrc/generalrc_path.sh $onhost
 ##############################################
 # ALIASES & PROMPT & tabcolor
 ##############################################
-[ ! -e "$generalrc/generalrc_alias_$onhost" ] && $generalrc/generalrc_alias_renew.sh
+if [ "$onhost" != "UNKNOWN" ];then
+    [ ! -e "$generalrc/generalrc_alias_$onhost" ] && $generalrc/generalrc_alias_renew.sh
+    # this works only for bash and zsh
+    source $generalrc/generalrc_alias_$onhost
+fi
 source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
-
-# this works only for bash and zsh
-source $generalrc/generalrc_alias_$onhost
+    
 #limit coredumpsize 0    # Disable core dumps # limit command is not know in bash
 
 # this would be for tcsh which will not be enabled since I curretnly dont use tcsh

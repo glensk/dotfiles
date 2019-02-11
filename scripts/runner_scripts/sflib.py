@@ -33,39 +33,58 @@ def g9(rij, rik, theta, rc, eta, zeta, l):
 
 ###########################################################
 
-def SF_integrate(sym, rho={}):
+def SF_integrate(sym, rho={},prefix=False,element=False):
     """Calculate the integral of the SF for an homogeneous gas"""
     nsym = len(sym)
     SF_int = np.zeros(nsym)
+    print('prefix',prefix,'element',element)
+    if prefix != False and element != False:
+        add=""
+        add="_tmp"
+        if os.path.isfile(prefix+"_"+element+".sfintegral"+add):
+            print 'exists:',prefix+"_"+element+".sfintegral"+add
+            SF_int = np.loadtxt(prefix+"_"+element+".sfintegral"+add)
+    #sys.exit()
     for idx in xrange(nsym):
-        if sym[idx][1] == "2":  # Two body
-            rc = float(sym[idx][-1])
-            rs = float(sym[idx][-2])
-            eta = float(sym[idx][-3])
-            rho1 = rho[sym[idx][2]]
-            #print('aa 2')
-            SF_int[idx] = rho1*np.pi*4*spint.quad(lambda x: x**2*g2(x,rc,eta,rs),0,rc)[0]
-        elif sym[idx][1] == "3":  # Three body
-            rc = float(sym[idx][-1])
-            zeta = float(sym[idx][-2])
-            l = float(sym[idx][-3])
-            eta = float(sym[idx][-4])
-            rho1 = rho[sym[idx][2]]
-            rho2 = rho[sym[idx][3]]
-            #print('aa 3')
-            SF_int[idx] = rho1*rho2*np.pi**2*8*spint.tplquad(lambda x, y, th: (x**2*y**2*np.sin(th)*g3(x, y, th,rc, eta, zeta, l)), 0,np.pi,lambda a:0,lambda a:rc,lambda a,b:0,lambda a,b:rc )[0]
-        elif sym[idx][1] == "9":
-            rc = float(sym[idx][-1])
-            zeta = float(sym[idx][-2])
-            l = float(sym[idx][-3])
-            eta = float(sym[idx][-4])
-            g9itheta = lambda rij, rik: (np.exp(-eta*(rij*rij+rik*rik))*fc(rij/rc)*fc(rik/rc)*2**(1.0-zeta)*((1.0+l)**(1+zeta)-(1.0-l)**(1+zeta))/(l*(1.0+zeta)) )
-            rho1 = rho[sym[idx][2]]
-            rho2 = rho[sym[idx][3]]
-            SF_int[idx] = rho1*rho2*np.pi**2*8*spint.dblquad(lambda x, y: (x**2*y**2*g9itheta(x,y)), 0,rc,lambda a:0,lambda a:rc )[0]
-        else:
-            raise ImplementationError('Not yet implemented with the symmetry function choice you selected')
-        print idx,"out of",nsym,"--",sym[idx], SF_int[idx]
+        #print ":",SF_int[idx],":"
+        add="calculated"
+        if SF_int[idx] != 0:
+            add="from file"
+        else: #SF_int[idx] == 0:
+            if sym[idx][1] == "2":  # Two body
+                rc = float(sym[idx][-1])
+                rs = float(sym[idx][-2])
+                eta = float(sym[idx][-3])
+                rho1 = rho[sym[idx][2]]
+                #print('aa 2')
+                SF_int[idx] = rho1*np.pi*4*spint.quad(lambda x: x**2*g2(x,rc,eta,rs),0,rc)[0]
+            elif sym[idx][1] == "3":  # Three body
+                rc = float(sym[idx][-1])
+                zeta = float(sym[idx][-2])
+                l = float(sym[idx][-3])
+                eta = float(sym[idx][-4])
+                rho1 = rho[sym[idx][2]]
+                rho2 = rho[sym[idx][3]]
+                #print('aa 3')
+                SF_int[idx] = rho1*rho2*np.pi**2*8*spint.tplquad(lambda x, y, th: (x**2*y**2*np.sin(th)*g3(x, y, th,rc, eta, zeta, l)), 0,np.pi,lambda a:0,lambda a:rc,lambda a,b:0,lambda a,b:rc )[0]
+            elif sym[idx][1] == "9":
+                rc = float(sym[idx][-1])
+                zeta = float(sym[idx][-2])
+                l = float(sym[idx][-3])
+                eta = float(sym[idx][-4])
+                g9itheta = lambda rij, rik: (np.exp(-eta*(rij*rij+rik*rik))*fc(rij/rc)*fc(rik/rc)*2**(1.0-zeta)*((1.0+l)**(1+zeta)-(1.0-l)**(1+zeta))/(l*(1.0+zeta)) )
+                rho1 = rho[sym[idx][2]]
+                rho2 = rho[sym[idx][3]]
+                SF_int[idx] = rho1*rho2*np.pi**2*8*spint.dblquad(lambda x, y: (x**2*y**2*g9itheta(x,y)), 0,rc,lambda a:0,lambda a:rc )[0]
+            else:
+                raise ImplementationError('Not yet implemented with the symmetry function choice you selected')
+        if add != "from file":
+            print idx,"out of",nsym,"--",sym[idx], SF_int[idx],add
+        #sys.exit()
+        #print 'pref',prefix, 'ele',element
+        if prefix != False and element != False:
+            #print('folder',prefix+"_"+element+".sfintegral_tmp")
+            np.savetxt(prefix+"_"+element+".sfintegral"+add, SF_int)
 
     return SF_int
 

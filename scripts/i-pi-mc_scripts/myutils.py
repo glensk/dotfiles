@@ -362,6 +362,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
     except RuntimeError:
         print("had runtime error")
         ene = 0.
+        #stress = False
     if verbose > 1:
         print('ene eV',ene,"(not per atom)")
     units_split = units.split("_")
@@ -1060,6 +1061,7 @@ def string_to_index_an_array(array,string):
 
 def q():
     out=check_output(['q'])
+    debug=False
     out2=out.split('\n')
     id=[]
     stat=[]
@@ -1067,10 +1069,15 @@ def q():
     runtime=[]
     path=[]
     for idx,i in enumerate(out2):
-        #print(i.split(" "))
+        #if debug:
+        #    print('i.split:',i.split(" "))
         str_list = filter(None, i.split(" "))
-        if idx > 0 and len(str_list) > 2:
-            #print(str_list)
+        if debug:
+            print('str_list:',str_list,'len:',len(str_list))
+        #if idx > 0 and len(str_list) > 2:
+        if len(str_list) > 2 and str_list[0] != "JOBID":
+            if debug:
+                print('xxx str_list:',str_list,'len:',len(str_list))
             id.append(int(str_list[0]))
             stat.append(str_list[1])
             cores.append(int(str_list[2]))
