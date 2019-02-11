@@ -175,6 +175,8 @@ def install_vmd(args):
 
 
 def bash_command(bashCommand,cwd=False):
+    ''' help
+    '''
     #print("HIER:",cwd)
     #print("HIER:",os.getcwd())
     #print("BASH:",bashCommand)
