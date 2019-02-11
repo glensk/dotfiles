@@ -89,5 +89,7 @@ self.ridx[ivac=63] (54) -> gives always the index of where the vacancy is curren
 
 self.idx[63]  = 54 -> original site 63 is currently on site 54 
 self.ridx[54] = 63 -> current site 54 is originally from site 54 
-
+self.ridx[svac]    -> always 63 (for every step)
+self.sites[54]     -> always gives array([24.3950316 ,  7.82471003,  8.85264884])
+				   -> for every step
 

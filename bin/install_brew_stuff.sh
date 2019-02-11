@@ -72,6 +72,7 @@ brew tap 'caskroom/cask'
 brew install 'brew-cask'
 # check at http://caskroom.io/search if your package is available
 brew cask install --appdir="/Applications" iterm2
+brew cask install --appdir="/Applications" thunderbird
 brew cask install --appdir="/Applications" google-chrome
 brew cask install --appdir="/Applications" dropbox
 brew cask install --appdir="/Applications" alfred
