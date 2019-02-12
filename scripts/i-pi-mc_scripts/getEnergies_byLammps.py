@@ -16,7 +16,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--format_in','-fi',type=str,default='runner',help='ase format for reading files')
 @click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default='n2p2_v1ag')
 @click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
-@click.option('--units','-u',type=click.Choice(['eV','meV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
+@click.option('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
 @click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
 @click.option('--ase/--no-ase','-a',default=True,help='Do the calculations by the ase interface to lammps.')
 @click.option('--lmp/--no-lmp','-l',default=False,help='Do the calculations externally by lammps and not through ase interface.')
@@ -232,8 +232,27 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             if ace.geopt == False:
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
+                if pot == "runner_v2dg":
+                    n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
+                    ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
+                    ### -lied by the number of atoms, this can only work if energies are
+                    ### not calculated by _pa
+                    ene_Al = 468.846788393
+                    ene_Mg = -1247.7770629
+                    ene_Si = -0.0170875377214
+
+                    ### correction in eV
+                    correction = ene_Al*n["Al"] + ene_Si*n["Si"] + ene_Mg*n["Mg"]
+                    len_units_split = len(ace.units.split("_"))
+                    #print("units_split",units_split)
+                    if len_units_split == 2:
+                        correction = correction / atoms[i].get_number_of_atoms()
+                        if ace.units.split("_")[0][0] == 'm':  # meV mhartree
+                            correction = correction * 1000.
+
+                    ene_pot_ase[idx] = ene_pot_ase[idx] - correction
                 stress = atoms_tmp.get_stress()
-                print('stress',stress)
+                #print('stress',stress)
 
             if ace.geopt == True:
                 ace.geopt = False

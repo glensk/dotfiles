@@ -1,22 +1,24 @@
 parray env HOME
 package require pbctools
-mol load xyz "/home/glensk/Downloads/tmp2/simulation.pos_0.xyz"
+mol load xyz "/home/glensk/Downloads/tmp2/vacancy_pos.xyz"
 pbc set {11.474929 11.474929 11.474929 60.000000 60.000000 60.000000} -all
 set id [molinfo top get id ]
 #mol waitfor all molid $id;   # when at some point not all points are read in
 set allmyframes [molinfo $id get numframes]
-puts "frames $allmyframes"
+puts "--> frames $allmyframes"
 pbc unwrap
 #animate write xyz unwrapped.xyz
-set sel1 [atomselect top "index 63" frame 0];
+#set sel1 [atomselect top "index 63" frame 0];
+set sel1 [atomselect top "index 0" frame 0];
 set x [$sel1 get x ];
 set y [$sel1 get y ];
 set z [$sel1 get z ];
 set r0 [expr $x*$x+$y*$y+$z*$z];
 
-set fo [open "vacancy_path.dat" a]
+set fo [open "vacancy_radius.dat" a]
 for {set i 0} {$i < $allmyframes} {incr i} {
-    set sel1 [atomselect top "index 63" frame $i];
+    #set sel1 [atomselect top "index 63" frame $i];
+    set sel1 [atomselect top "index 0" frame $i];
     set xyz [$sel1 get {x y z} ];
     set x [$sel1 get x ];
     set y [$sel1 get y ];

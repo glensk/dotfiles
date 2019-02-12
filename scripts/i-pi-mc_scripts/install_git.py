@@ -25,6 +25,9 @@ args = p.parse_args()
 def install_(args,known):
     install        = args.install
 
+    with my.cd(os.environ.get('dotfiles')):
+        subprocess.call(["git","config","credential.helper","store"])
+
     # check if the program is known
     if args.install not in known:
         sys.exit("Not known how to install "+args.install+"; Exit!")
