@@ -8,15 +8,21 @@
 #@ fi
 #@ rm archive.tar.bzip2
 
-    
-
-address=`grep "address=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address="||' | sed 's|".*||'`
-echo "address   : $address"
-
 filename="sendx.tar.bzip2"
-# USE RSYNC SINCE IT CAN DELETE THE FILE AFTERWARDS
-#echo "copy $address:~/.exchange/$filename ."
-rsync --progress --remove-source-files -av -e ssh $address:~/.exchange/$filename . 
+#echo $onhost
+#exit
+if [ "$onhost" == "daint" ];then
+    ### get file when on daint
+    mv ~/.exchange/$filename .
+else
+    ### get file when somewhere else
+    address=`grep "address=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address="||' | sed 's|".*||'`
+    echo "address   : $address"
+    
+    # USE RSYNC SINCE IT CAN DELETE THE FILE AFTERWARDS
+    #echo "copy $address:~/.exchange/$filename ."
+    rsync --progress --remove-source-files -av -e ssh $address:~/.exchange/$filename . 
+fi
 
 #echo ":$1:"
 tar=`command -v gtar`
