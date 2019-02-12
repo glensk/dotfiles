@@ -10,8 +10,9 @@ tar=`command -v gtar`
 [ "$tar" == "" ] && tar=`command -v tar`
 lbzip2=`command -v lbzip2`
 if ([ "$lbzip2" = "" ] && [ ! -e "$HOME/.local/bin/lbzip2" ]);then
-    echo lbzip2 $lbzip2
-    echo "insalling lbzip2"
+    echo "##################### installing lbzip2 #################"
+    echo "lbzip2:$lbzip2: (if empty will be installed)"
+    echo "##################### installing lbzip2 #################"
     hier=`pwd`
     [ ! -e "$HOME/sources" ] && mkdir $HOME/sources
     [ ! -e "$HOME/.local" ] && mkdir $HOME/.local
