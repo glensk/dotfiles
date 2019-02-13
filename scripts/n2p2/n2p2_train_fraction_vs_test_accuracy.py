@@ -5,8 +5,20 @@ import numpy as np
 import glob,sys,os
 from myutils import q
 
-fo=sorted(glob.glob("*/learning-curve.out"))
+verbose = False
+fo=sorted(glob.glob(os.getcwd()+"/*/learning-curve.out"))
+if verbose:
+    print('----- currently considered pathes -----')
+    for i in fo:
+        print(i)
+    print()
 id,stat,path = q()
+if verbose:
+    print('----- currently in the que -----')
+    for idx,i in enumerate(id):
+        print(idx,id[idx],stat[idx],path[idx])
+    print()
+
 checkpath_run = []
 checkpath_que = []
 subfolderbase = "/scratch/glensk/"
@@ -19,12 +31,23 @@ for idx,i in enumerate(path):
     for g in fo:
         gc = g.split("/learning-curve.out")[0]
         #print('gc',gc)
-        if gc in i.split("/") and stat[idx] == 'R':
+        if gc == i and stat[idx] == 'R':
+        #if gc in i and stat[idx] == 'R':
+        #if gc in i.split("/") and stat[idx] == 'R':
+            #print('--> gc',gc)
+            #print('--> i ',i)
             checkpath_run.append(gc)
         if gc in i.split("/") and stat[idx] == 'Q':
             checkpath_que.append(gc)
-#print()
-#print('run:',checkpath_run)
+
+if verbose:
+    print('----- given the status R -----')
+    for i in checkpath_run:
+        print(i)
+    print()
+    print('----- given the status Q -----')
+    for i in checkpath_que:
+        print(i)
 #sys.exit()
 def pp():
     a="-----------"
@@ -130,7 +153,11 @@ for c in ["*"]:
         #print('a',path_,j,'--->',j[11])
         #sys.exit()
         #print('kk',j[path_].split("/learning-curve.out"))
+        #print('0j[path_]',j[path_])
         path_before_learningcurve = j[path_].split("/learning-curve.out")[0]  # random_seed_2234125
+        #print('1j[path_]',j[path_])
+        path_before_learningcurve = os.getcwd()+"/"+path_before_learningcurve
+        #print('2j[path_]',path_before_learningcurve)
         if path_before_learningcurve in checkpath_run:
             run = "(R) "
         if path_before_learningcurve in checkpath_que:
