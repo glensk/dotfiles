@@ -53,7 +53,7 @@ allpaths=`echo $@ | sed 's|/ | |g'`
 # DEFINE how to name the tarred archive  
 #############################################################
 saveas=""
-[ "`echo $* | wc -w`" = "1" ] && saveas=$1
+[ "`echo $* | wc -w`" = "1" ] && saveas=`echo "$1" | sed 's|/$||'`
 if [ "`echo $* | wc -w`" != "1" ];then
     saveas=`echo $* | xargs -n1 | sed -e '1{h;d;}' -e 'G;s,\(.*\).*\n\1.*,\1,;h;$!d' | sed 's/\.$//g'`
     [ "$saveas" = "" ] && saveas="$1_and_other_files"

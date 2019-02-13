@@ -12,7 +12,7 @@ from ase.io import write as ase_write
 CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 
-@click.option('--infile','-i',required=True,type=str,help='input files containing structures that will be imported by ase')
+@click.option('--infile','-i',required=False,type=str,help='input files containing structures that will be imported by ase')
 @click.option('--format_in','-fi',type=str,default='runner',help='ase format for reading files')
 @click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default='n2p2_v1ag')
 @click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
@@ -42,16 +42,24 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
 
     '''
+    ### when want to assess some formation energies
+    if test:
+        ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
+        print('changed units to eV!')
+        ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
+        units = ace.units
+        test_sisivac(ace)
+        sys.exit('test done! Exit')
+
+    ### check infile
+    if not infile:
+        sys.exit("Error: Missing option \"--infile\" / \"-i\".")
 
     #### get the potential
     ace = ase_calculate_ene(pot,units=units,geopt=geopt,verbose=verbose)
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
     units = ace.units
 
-    ### when want to assess some formation energies
-    if test:
-        test_sisivac(ace)
-        sys.exit('test done! Exit')
 
     ### read in the structures
     my.check_isfile_or_isfiles([infile],verbose=verbose)
@@ -232,14 +240,14 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             if ace.geopt == False:
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
-                if pot == "runner_v2dg":
+                if pot == "runner_v2dg" and False: # only in case we load DFT energies from new DFT calcs
                     n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
                     ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
                     ### -lied by the number of atoms, this can only work if energies are
                     ### not calculated by _pa
-                    ene_Al = 468.846788393
-                    ene_Mg = -1247.7770629
-                    ene_Si = -0.0170875377214
+                    ene_Al = 468.846788393       # runner - n2p2: -2.4092354 - -19.6286626 = 17.2194272 hartree == 468.56444 eV
+                    ene_Mg = -1247.7770629       # runner - n2p2: -62.6068620 - -16.7493346 =  -45.8575274  hartree == -1247.8468 eV
+                    ene_Si = -0.0170875377214    # runner_v2dg-n2p2_v1ag atomic energy: -5.5597835 - -5.5274864 = -.0322971 hartree == -0.87884879
 
                     ### correction in eV
                     correction = ene_Al*n["Al"] + ene_Si*n["Si"] + ene_Mg*n["Mg"]
