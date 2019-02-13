@@ -7,6 +7,7 @@ import re,os,sys
 import subprocess,os
 import numpy as np
 import time
+import subprocess
 import scipy.linalg as salg
 import scipy.sparse.linalg as spalg
 import scipy.integrate as spint
@@ -27,6 +28,9 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 def make_fps(db1,db2,nsyms,structures_upperlim):
     ''' makes the fps considering previous structures
         saves everything in fps_considering_oldstruct
+        e.g. fps_considering_oldstruct.py -d1 reference_5000struct/input.data.new_aseformat_5000  -d2 ./input2509_selected.data
+
+        e.g. fps_considering_oldstruct.py -d1 /home/glensk/Dropbox/Albert/scripts/dotfiles//scripts/potentials/n2p2_v1ag/ -d2 .
 
         to get nsyms (and not needing to provide it):
          - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | uniq | grep -v "<.*" # -> gets the elements
@@ -34,13 +38,45 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
          -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Mg" | wc -l # -> gets 64
          -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Si" | wc -l # -> gets 64
     '''
-    DB1_path = str(os.path.abspath(db1))
-    DB2_path = str(os.path.abspath(db2))
+    ### get absolute datafile
+    DB1_datafile = str(os.path.abspath(db1))
+    DB2_datafile = str(os.path.abspath(db2))
+    if not os.path.isfile(DB1_datafile): sys.exit(DB1_datafile+" (datafile) does not exist!")
+    if not os.path.isfile(DB2_datafile): sys.exit(DB2_datafile+" (datafile) does not exist!")
+
+    ### figure out DB1_path DB2_path
+    DB1_path = "/".join(DB1_datafile.split("/")[:-1])+"/"
+    DB2_path = "/".join(DB2_datafile.split("/")[:-1])+"/"
+    if not os.path.isdir(DB1_path): sys.exit(DB1_path+" (directory) does not exist!")
+    if not os.path.isdir(DB2_path): sys.exit(DB2_path+" (directory) does not exist!")
+
+    ### get or link input.data of DB1 and DB2
+    DB1_datafilename = DB1_datafile.split("/")[-1]
+    DB2_datafilename = DB2_datafile.split("/")[-1]
+    if DB1_datafilename == "input.data":
+        pass # everythig is file
+    else:  # other name then input.data
+        if not os.path.exists(DB1_path+"input.data"):
+            os.symlink(DB1_datafile, DB1_path+"input.data")
+        elif os.path.realpath(DB1_path+"input.data") != os.path.realpath(DB1_datafile):
+            sys.exit(DB1_path+"input.data exists already and is linked to a file different then "+DB1_datafile)
+    if DB2_datafilename == "input.data":
+        pass # everythig is file
+    else:  # other name then input.data
+        if not os.path.exists(DB2_path+"input.data"):
+            os.symlink(DB2_datafile, DB2_path+"input.data")
+        elif os.path.realpath(DB2_path+"input.data") != os.path.realpath(DB2_datafile):
+            sys.exit(DB2_path+"input.data exists already and is linked to a file different then "+DB2_datafile)
+
+
+    if DB1_path == DB2_path:
+        sys.exit(DB1_path+" is equal to "+DB2_path)
+
+    # b) create link DB1/2_path input.data
     print('DB1_path         ',DB1_path)
     print('DB2_path         ',DB2_path) #,type(DB2_path))
     print('structures_upperlim       ',structures_upperlim)
     print()
-
     # check if necessary files exist
     print()
     for i in [ DB1_path,DB2_path]:
@@ -50,6 +86,10 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         # does input.data exist?
         if not os.path.isfile(i+'/input.data'): sys.exit(i+"/input.data does not exist!")
         else: print(i+"/input.data exists")
+        # does input.nn exist?
+        if not os.path.isfile(i+'/input.nn'): sys.exit(i+"/input.nn does not exist!")
+        else: print(i+"/input.nn exists")
+
         # does funcion.data exist?
         if not os.path.isfile(i+'/function.data'):
             if os.path.isfile(i+'/function.data.tar.bzip2'):
@@ -59,37 +99,64 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
                 tar.close()
         print()
 
+    # does input.nn have same amount of symmetry functions?
+    s1 = subprocess.check_output(['grep "^symfunction_short" '+DB1_path+'/input.nn | wc -l'],shell=True)
+    s2 = subprocess.check_output(['grep "^symfunction_short" '+DB2_path+'/input.nn | wc -l'],shell=True)
+    if s1 != s2:
+        print(DB1_path)
+        print('s1',s1)#,type(s1))
+        print(DB2_path)
+        print('s2',s2)# ,type(s2))
+        sys.exit("amount of symmetry functions differ!")
+
+    if not os.path.isfile(DB1_path+'/function.data'):
+        if not os.path.isdir(DB1_path+"/get_scaling"):
+            my.cd(DB1_path)
+            my.n2p2_get_scaling_and_function_data()
+            sys.exit()
+        else:
+            sys.exit(DB1_path+"/get_scaling already exists ... submitted already?")
+    if not os.path.isfile(DB2_path+'/function.data'):
+        if not os.path.isdir(DB2_path+"/get_scaling"):
+            my.cd(DB2_path)
+            my.n2p2_get_scaling_and_function_data()
+            sys.exit()
+        else:
+            sys.exit(DB2_path+"/get_scaling already exists ... submitted already?")
+
     # to get function.data for the new file:
     #  - get input.nn from DB1
     #  - get input.data from the current input data
     #  - take the submitskirt and run it. this is fast (< 1min);
 
     # if DB2/function.data does not exist
-    if not os.path.isfile(DB2_path+'/function.data'):
-        gfdf = get_function_data_folder = DB2_path+"/get_function_data"
-        if os.path.isfile(gfdf+"/function.data"):
-            my.cp(gfdf+"/function.data",DB2_path+'/function.data')
-            my.rm(gfdf+"/function.data")
-        else:
-            # setup the job to create DB2/function.data for the new structures
-            # get input.nn from DB1
-            if not os.path.isfile(DB1_path+'/input.nn'):
-                sys.exit("Need "+DB1_path+'/input.nn')
-            scripts = my.scripts()
-            # get runner_scripts/submit_scaling_debug.sh
-            submitscript = scripts+"/runner_scripts/submit_scaling_debug.sh"
-            if not os.path.isfile(submitscript):
-                sys.exit("Need submitscript "+submitscript)
-            print()
-            print("making "+DB2_path+"/get_function_data")
-            my.mkdir(DB2_path+"/get_function_data")
-            my.cp(DB1_path+'/input.nn',DB2_path+"/get_function_data/input.nn")
-            my.cp(DB2_path+'/input.data',DB2_path+"/get_function_data/input.data")
-            my.cp(submitscript,DB2_path+"/get_function_data/submit_scaling_debug.sh")
-            my.submitjob(submitdebug=True,jobdir=DB2_path+"/get_function_data",submitskript="submit_scaling_debug.sh")
-            my.create_READMEtxt(DB2_path+"/get_function_data/",add="# It it necessary to create the function data for the new structures for fps")
-            my.create_READMEtxt(os.getcwd()                   ,add=["#","# Restart this skript once "+DB2_path+"/get_function_data/function.data exists!"])
-            sys.exit("submitted job to get function data to debug que; this typically takes only ~50 sec; once finished, restart this job again")
+    #if not os.path.isfile(DB2_path+'/function.data'):
+    #    sys.exit('dne '+DB2_path+'/function.data')
+
+    #    gfdf = get_function_data_folder = DB2_path+"/get_function_data"
+    #    if os.path.isfile(gfdf+"/function.data"):
+    #        my.cp(gfdf+"/function.data",DB2_path+'/function.data')
+    #        my.rm(gfdf+"/function.data")
+    #    else:
+    #        # setup the job to create DB2/function.data for the new structures
+    #        # get input.nn from DB1
+    #        if not os.path.isfile(DB1_path+'/input.nn'):
+    #            sys.exit("Need "+DB1_path+'/input.nn')
+    #        scripts = my.scripts()
+    #        # get runner_scripts/submit_scaling_debug.sh
+    #        submitscript = scripts+"/n2p2/submit_scaling_debug.sh"
+    #        if not os.path.isfile(submitscript):
+    #            sys.exit("Need submitscript "+submitscript)
+    #        print()
+    #        print("making "+DB2_path+"/get_function_data")
+    #        my.mkdir(DB2_path+"/get_function_data")
+    #        my.cp(DB1_path+'/input.nn',DB2_path+"/get_function_data/input.nn")
+    #        my.cp(DB2_path+'/input.data',DB2_path+"/get_function_data/input.data")
+    #        my.cp(submitscript,DB2_path+"/get_function_data/submit_scaling_debug.sh")
+    #        my.submitjob(submitdebug=True,jobdir=DB2_path+"/get_function_data",submitskript="submit_scaling_debug.sh")
+    #        my.create_READMEtxt(DB2_path+"/get_function_data/",add="# It it necessary to create the function data for the new structures for fps")
+    #        my.create_READMEtxt(os.getcwd()                   ,add=["#","# Restart this skript once "+DB2_path+"/get_function_data/function.data exists!"])
+    #        sys.exit("submitted job to get function data to debug que; this typically takes only ~50 sec; once finished, restart this job again")
 
     for i in [ DB1_path,DB2_path]:
         if not os.path.isfile(i+'/function.data'):
@@ -101,24 +168,24 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     #sys.exit()
     # to create DB1
     if not os.path.isfile(DB1_path+'/function_average.data'):
-        print('reading:',DB1_path+'/input.data')
-        nat_per_frame_5000 = getnat_per_frame(DB1_path+'/input.data')
-        print('read in:',DB1_path+'/input.data',"nat_per_frame:",nat_per_frame_5000)
-        print('createing (DB1)',DB1_path+'/function.data')
-        DB1 = create_average_SF(DB1_path+'/function.data', nsyms, nat_per_frame_5000,outfile=DB1_path+'/function_average.data')
-        print('createing (DB1)',DB1_path+'/function.data DONE!')
+        print('--> reading:',DB1_path+'/input.data')
+        nat_per_frame_DB1 = getnat_per_frame(DB1_path+'/input.data')
+        print("--> nat_per_frame_DB1",nat_per_frame_DB1)
+        print('--> createing (DB1)',DB1_path+'/function_average.data')
+        DB1 = create_average_SF(DB1_path+'/function.data', nsyms, nat_per_frame_DB1,outfile=DB1_path+'/function_average.data')
+        print('created   (DB1)',DB1_path+'/function_average.data DONE!')
     else:
         print('loading ... DB1 from ',DB1_path+'/function_average.data')
         DB1 = np.loadtxt(DB1_path+'/function_average.data')
 
     print()
     if not os.path.isfile(DB2_path+'/function_average.data'):
-        print('reading:',DB2_path+'/input.data')
-        nat_per_frame_2509 = getnat_per_frame(DB2_path+'/input.data')
-        print(nat_per_frame_2509)
-        print('createing (DB2)',DB2_path+'/function.data')
-        DB2 = create_average_SF(DB2_path+'/function.data', nsyms, nat_per_frame_2509,outfile=DB2_path+'/function_average.data')
-        print('createing (DB2)',DB2_path+'/function.data DONE!')
+        print('--> reading:',DB2_path+'/input.data')
+        nat_per_frame_DB2 = getnat_per_frame(DB2_path+'/input.data')
+        print("--> nat_per_frame_DB2",nat_per_frame_DB2)
+        print('--> createing (DB2)',DB2_path+'/function_average.data')
+        DB2 = create_average_SF(DB2_path+'/function.data', nsyms, nat_per_frame_DB2,outfile=DB2_path+'/function_average.data')
+        print('created   (DB2)',DB2_path+'/function_average.data DONE!')
     else:
         print('loading ... DB2 from ',DB2_path+'/function_average.data')
         DB2 = np.loadtxt(DB2_path+'/function_average.data')

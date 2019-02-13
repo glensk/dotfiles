@@ -3,7 +3,7 @@ from __future__ import print_function
 import os,sys,re
 import click
 import numpy as np
-import glob
+import glob,pathlib
 from copy import deepcopy
 from socket import gethostname
 from shutil import copyfile
@@ -122,6 +122,11 @@ def sed(file,str_find,str_replace):
     massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
     return
 
+def get_absdir_from_relative_filepath(filepath):
+    print('fp',filepath)
+    return
+
+
 def cp(src=False,dest=False):
     if dest==False:
         dest = os.getcwd()
@@ -129,8 +134,12 @@ def cp(src=False,dest=False):
         dest = os.getcwd()
     src_is = False
     dest_is = False
-    #print('src',src)
-    #print('dest',dest)
+    s = pathlib.Path(src)
+    d = pathlib.Path(dest)
+    #print('src',src,"file?",s.is_file())
+    #print('src',src,"dir? ",s.is_dir())
+    #print('dest',dest,"file?",d.is_file())
+    #print('dest',dest,"dir ?",d.is_dir())
     if os.path.isfile(src):
         #print("src is file")
         src_is = "file"
@@ -143,7 +152,10 @@ def cp(src=False,dest=False):
     if os.path.isdir(dest):
         #print("dest is dir")
         dest_is = "dir"
-    if src_is == "file" and dest_is == "file":
+    if src_is == "file" and dest_is == False:
+        # possibly because dest does not exist
+        copyfile(src,dest)
+    elif src_is == "file" and dest_is == "file":
         copyfile(src,dest)
     elif src_is == "file" and dest_is == "dir":
         basename = os.path.basename(src)

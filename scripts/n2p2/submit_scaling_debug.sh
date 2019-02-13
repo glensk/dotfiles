@@ -22,4 +22,6 @@ srun -n 28 $HOME/sources/n2p2/bin/nnp-scaling 1
 date +%s >> time.out
 cat time.out | xargs | awk '{print $2-$1-10}' > time.sec
 $dotfiles/scripts/n2p2/n2p2_tarfolder_for_scale_train.sh
+[ "`pwd | grep -o "/get_scaling$"`" == '/get_scaling' ] && echo creating link && ln -s `pwd`/function.data ../function.data
+
 exit 0
