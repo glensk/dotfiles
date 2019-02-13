@@ -61,7 +61,7 @@ if [ "`echo $* | wc -w`" != "1" ];then
 fi
 [ "$check_sendx" != "" ] && saveas="sendx"
 [ "$verbose" == "true" ] && echo "saveas        : $saveas.tar.bzip2"
-[ -e "$saveas.tar.bzip2" ] && echo $saveas does already exist && exit
+[ -e "$saveas.tar.bzip2" ] && echo "$saveas.tar.bzip2 does already exist!" && exit
 ################# make the tar
 addcommand="";[ "$check_remove" != "" ] && addcommand=" --remove-files "
 
