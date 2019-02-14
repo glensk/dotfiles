@@ -3,7 +3,7 @@ from __future__ import print_function
 import os,sys,re
 import click
 import numpy as np
-import glob,pathlib
+import glob #,pathlib
 from copy import deepcopy
 from socket import gethostname
 from shutil import copyfile
@@ -134,8 +134,8 @@ def cp(src=False,dest=False):
         dest = os.getcwd()
     src_is = False
     dest_is = False
-    s = pathlib.Path(src)
-    d = pathlib.Path(dest)
+    #s = pathlib.Path(src)
+    #d = pathlib.Path(dest)
     #print('src',src,"file?",s.is_file())
     #print('src',src,"dir? ",s.is_dir())
     #print('dest',dest,"file?",d.is_file())
@@ -393,6 +393,30 @@ def ase_enepot(atoms,units='eV',verbose=False):
             sys.exit("energy can not have this units (ending must be pa, eV_pa or hartree_pa)")
 
     return ene
+
+def remove_duplicates_in_numpy_xy_array_and_sort(array,roundto=15):
+    disp_vs_force = array
+    data = disp_vs_force.copy()  # shifted to simulate a distance @ lattice constants @Tmelt
+    sorted_idx = np.lexsort(data.T)
+    sorted_data =  data[sorted_idx,:]
+    row_mask = np.append([True],np.any(np.diff(sorted_data,axis=0),1))
+    disp_vs_force = sorted_data[row_mask]
+    disp_vs_force = disp_vs_force[disp_vs_force[:,0].argsort()]
+    zero_wh = np.where(disp_vs_force[:,1] == 0)[0]
+    #print('out')
+    #print(disp_vs_force)
+    #print('zw',zero_wh,'len',len(zero_wh))
+    if len(zero_wh) > 1:
+        #print('lzg',round(disp_vs_force[zero_wh[0]][0],15))
+        #print('lzg',round(disp_vs_force[zero_wh[1]][0],15))
+        if round(disp_vs_force[zero_wh[0]][0],roundto) == round(disp_vs_force[zero_wh[1]][0],roundto):
+            #print("jodel")
+            #del disp_vs_force[zero_wh[0]]
+            disp_vs_force = np.delete(disp_vs_force,zero_wh[1],0)
+    #print('out2')
+    #print(disp_vs_force)
+    #sys.exit()
+    return disp_vs_force
 
 def ase_get_chemical_symbols_to_number_of_species(atoms):
     symbols = atoms.get_chemical_symbols()
