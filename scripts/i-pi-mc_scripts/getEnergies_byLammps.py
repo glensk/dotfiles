@@ -245,9 +245,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                     ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
                     ### -lied by the number of atoms, this can only work if energies are
                     ### not calculated by _pa
-                    ene_Al = 468.846788393       # runner - n2p2: -2.4092354 - -19.6286626 = 17.2194272 hartree == 468.56444 eV
-                    ene_Mg = -1247.7770629       # runner - n2p2: -62.6068620 - -16.7493346 =  -45.8575274  hartree == -1247.8468 eV
-                    ene_Si = -0.0170875377214    # runner_v2dg-n2p2_v1ag atomic energy: -5.5597835 - -5.5274864 = -.0322971 hartree == -0.87884879
+                    ene_Al = 468.845752582        # runner - n2p2: -2.4092354 - -19.6286626 = 17.2194272 hartree == 468.56444 eV
+                    ene_Mg = -1247.77831679       # runner - n2p2: -62.6068620 - -16.7493346 =  -45.8575274  hartree == -1247.8468 eV
+                    ene_Si = -0.0161424965998     # runner_v2dg-n2p2_v1ag atomic energy: -5.5597835 - -5.5274864 = -.0322971 hartree == -0.87884879
 
                     ### correction in eV
                     correction = ene_Al*n["Al"] + ene_Si*n["Si"] + ene_Mg*n["Mg"]
