@@ -102,8 +102,9 @@ fi
 # completion goo for commands
 ##############################################
 fpath=($dotfiles/completions_fpath $fpath)
-function goo() { $dotfiles/aliases/goo $1 }
-autoload _goo # do not forget BEFORE the next cmd! 
+function goo() { $dotfiles/aliases/goo "$1" 
+}  # this nees to be a in second line
+autoload _goo    # do not forget BEFORE the next cmd! 
 compdef _goo goo # binds the completion function to a command
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett goo"
