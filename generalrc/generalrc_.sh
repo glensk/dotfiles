@@ -145,7 +145,6 @@ source $dotfiles/$currentshell/$currentshell\_set
 ##############################################
 # set host variables  
 ##############################################
-[ "$printloadstat" = "true" ] && \
-    echo " onhost $onhost"
+[ "$printloadstat" = "true" ] && echo " onhost $onhost"
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"
