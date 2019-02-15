@@ -25,6 +25,8 @@ if __name__ == '__main__':
         string = '''
         e.g. rename.py -f simulation.pos_* -r .extxyz$ -w .xyz     # shows all changes (.extexy to xyz)
         e.g. rename.py -f simulation.pos_* -r .extxyz$ -w .xyz -d  # ranemes all .extexy to xyz
+        e.g. rename.py -f cosmo* -r .$ -w .md   # justa append .md to every file
+
 
         Nothing will every happen until you specity the option: -d / --doit
         '''
