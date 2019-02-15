@@ -63,11 +63,20 @@ fi
 [ "$verbose" == "true" ] && echo "saveas        : $saveas.tar.bzip2"
 [ -e "$saveas.tar.bzip2" ] && echo "$saveas.tar.bzip2 does already exist!" && exit
 ################# make the tar
-addcommand="";[ "$check_remove" != "" ] && addcommand=" --remove-files "
+addcommand="";
+[ "$check_remove" != "" ] && addcommand=" --remove-files "
+
+
+
+addexclude="--exclude=KMC_QCACHE.tar.bzip2 --exclude=KMC_ECACHE.tar.bzip2 --exclude=KMC_AL6XXX.tar.bzip2 --exclude=log.tar.bzip2 --exclude=log.tar.gz"
+addexclude=""
+#echo add: $addcommand
+#echo addexclude: $addexclude
+#echo allpaths: $allpaths
 
 
 [ "$verbose" == "true" ] && echo "addcommand    : $addcommand (empty means original files are not deleted)"
-$tar $addcommand --use-compress-program=lbzip2 -cvf "$saveas.tar.bzip2" $allpaths
+$tar $addexclude $addcommand --use-compress-program=lbzip2 -cvf "$saveas.tar.bzip2" $allpaths
 
 #############################################################
 # in case lbzip2 is not available or can not be compiled
