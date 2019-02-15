@@ -125,6 +125,7 @@ setenv BROWSER open # is necessary for opening jupyter notebook files
 setenv LC_ALL en_US.UTF-8
 setenv GREP_COLOR 31    # red; some greps have colorized ouput. enable...
 setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green
+setenv NOTES_DIRECTORY $dotfiles/notes
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett setenv"
 
 ##############################################
@@ -137,7 +138,10 @@ esac
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett autojump"
 
 ##############################################
-# shell dependent settings; defines colors for ls; bindkeys for history-search-bakcward ...
+# shell dependent settings; 
+# defines colors for ls; 
+# bindkeys for history-search-bakcward ...
+# bash/zsh completion
 ##############################################
 source $dotfiles/$currentshell/$currentshell\_set
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett zsh_set"
