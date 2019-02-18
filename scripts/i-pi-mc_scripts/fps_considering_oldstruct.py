@@ -24,6 +24,11 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('-nsyms','--nsyms',required=False,default={"Mg":64, "Al":64, "Si":64},help="dictionary containing amount of symmetry functions per element")
 @click.option('-s','--structures_upperlim',required=False,default=False,type=int,help="upper limit of structures to fps_considering_oldstruct/input.fps.data")
 
+def printstatement(text):
+    print("####################################")
+    print("#",text)
+    print("####################################")
+
 
 def make_fps(db1,db2,nsyms,structures_upperlim):
     ''' makes the fps considering previous structures
@@ -90,7 +95,9 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         if not os.path.isfile(i+'/input.nn'): sys.exit(i+"/input.nn does not exist!")
         else: print(i+"/input.nn exists")
 
+
         # does funcion.data exist?
+        #printstatement("does funcion.data exist?")
         if not os.path.isfile(i+'/function.data'):
             if os.path.isfile(i+'/function.data.tar.bzip2'):
                 print('extracting', i+'/function.data')
