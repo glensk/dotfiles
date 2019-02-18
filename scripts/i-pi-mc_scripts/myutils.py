@@ -14,6 +14,7 @@ try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
     pass
+
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase.optimize import BFGS
@@ -341,12 +342,14 @@ def progress(count, total, status=''):
 
     sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
     sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
+    return
 
 
 
 def ase_get_unique_frames(frames):
-    ''' this function only takes care of exactly same frames;
-        for structures which are close by another function will be necessary;
+    '''
+    this function only takes care of exactly same frames;
+    structures which are close by another function will be necessary;
     '''
     framesout = deepcopy(frames)
     length = len(frames)
@@ -358,6 +361,7 @@ def ase_get_unique_frames(frames):
             isin=True
             del framesout[midx]
         #print(idx,midx,frames[midx].positions[0,0],isin)
+    print('returning framesout ... (unique)')
     return framesout
 
 
