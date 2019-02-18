@@ -10,7 +10,10 @@ from shutil import copyfile
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
-from ase.calculators.lammpslib import LAMMPSlib
+try:
+    from ase.calculators.lammpslib import LAMMPSlib
+except ImportError:
+    pass
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase.optimize import BFGS

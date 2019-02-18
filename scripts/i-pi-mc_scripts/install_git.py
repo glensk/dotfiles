@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","n2p2","lbzip","lbzip2","atomsk", "vmd" ]
+known = ["ipi","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd" ]
 
 def help(p = None ,known=known):
     string='''e.g. install_git.py -i atomsk'''
@@ -38,12 +38,12 @@ def install_(args,known):
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-
         if args.install in ['atomsk'] : install_atomsk(args)
         if args.install in ['lbzip','lbzip2'] : install_lbzip(args)
         if args.install in ['ipi']    : install_ipi(args)
         if args.install in ['n2p2']   : install_n2p2(args)
         if args.install in ['vmd']    : install_vmd(args)
+        if args.install in ['lammps'] : install_lammps(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -72,7 +72,15 @@ def install_lbzip(args):
         subporocess.call(['make install'])
     return
 
-
+def install_lammps(args):
+    sys.exit("not yet finished")
+    subprocess.call(["git","clone","--depth","1","https://github.com/lammps/lammps.git",args.install])
+    os.chdir(args.install)
+    os.chdir("src")
+    subprocess.call(["make", "clean-all",])
+    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER_MISC"]
+    for i in list:
+        subprocess.call(["make", i])
 
 
 def install_n2p2(args):

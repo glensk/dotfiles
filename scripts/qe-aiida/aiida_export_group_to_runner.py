@@ -4,6 +4,7 @@ aiida.load_dbenv()
 from aiida.orm.querybuilder import QueryBuilder
 from aiida.orm import Group, WorkCalculation
 import click
+import myutils,os
 
 # show default values in click
 orig_init = click.core.Option.__init__
@@ -51,9 +52,10 @@ def createjob(work_group,filename):
     eV_per_angstrom_to_hartree_per_bohrradius = 0.019446905
 
     if filename == False:
-        fileOut = open(work_group+".input.data", "w")
+        fileOut = open("aiida_export_group_"+work_group+".data", "w")
     else:
         fileOut = open(filename, "w")
+    myutils.create_READMEtxt(os.getcwd())
 
     for idx, workchain in enumerate(all_works):
         ase_structure, energy, forces, uuid, path = get_workcalc_runnerdata(workchain)

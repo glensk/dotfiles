@@ -1,11 +1,11 @@
 #!/bin/sh
 [ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
 sendtarred=""
-if [ "`basename $0`" == "sendxtarred" ];then
+if [ "`basename $0`" = "sendxtarred" ];then
     getname=`tar.bzip2_file_or_folder.sh $* | tail -1`
     getnametest=`echo $getname | grep -o "success"`
     sendtarred=`echo $getname | awk '{print $3}'`
-    if [ "$getnametest" == "success" ];then
+    if [ "$getnametest" = "success" ];then
         #echo "success:$getname | testedfor:$getnametest:"
         echo "sendtarred: $sendtarred"
     else
@@ -29,7 +29,7 @@ echo $* >> $filename
 #tar -czvf name-of-archive.tar.gz $filename $*
 tosend="sendx.tar.bzip2"
 rm -f $tosend
-[ "$sendtarred" == "" ] && tar.bzip2_file_or_folder_for_sendx.sh $*
+[ "$sendtarred" = "" ] && tar.bzip2_file_or_folder_for_sendx.sh $*
 [ "$sendtarred" != "" ] && tar.bzip2_file_or_folder_for_sendx.sh $sendtarred
 [ ! -e "$tosend" ] && echo tar did not work out since no $tosend created && exit
 
@@ -40,7 +40,7 @@ address="aglensk@ela.cscs.ch"    # ela, part of daint
 
 
 echo "scp sendx.tar.bzip2 $address:~/.exchange/"
-if [ "`hostname | grep -o daint`" == "daint" ];then
+if [ "`hostname | grep -o daint`" = "daint" ];then
     mv $tosend ~/.exchange/
 else
     scp $tosend $address:~/.exchange/

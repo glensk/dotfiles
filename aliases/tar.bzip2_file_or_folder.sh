@@ -7,7 +7,7 @@ verbose="true"
 #echo "check_sendx:$check_sendx:"
 #exit
 tar=`command -v gtar`
-[ "$tar" == "" ] && tar=`command -v tar`
+[ "$tar" = "" ] && tar=`command -v tar`
 lbzip2=`command -v lbzip2`
 if ([ "$lbzip2" = "" ] && [ ! -e "$HOME/.local/bin/lbzip2" ]);then
     echo "##################### installing lbzip2 #################"
@@ -47,7 +47,7 @@ fi
 allpaths=$@
 allpaths=`echo $@ | sed 's|/ | |g'`
 [ "$allpaths" = "" ] && echo 'need $1 to the the foldername' && exit
-[ "$verbose" == "true" ] && echo "allpath to tar: $allpaths"
+[ "$verbose" = "true" ] && echo "allpath to tar: $allpaths"
 
 #############################################################
 # DEFINE how to name the tarred archive  
@@ -60,7 +60,7 @@ if [ "`echo $* | wc -w`" != "1" ];then
     [ "`echo $saveas | wc -c`" = "0" ] && saveas="$1_and_other_files"
 fi
 [ "$check_sendx" != "" ] && saveas="sendx"
-[ "$verbose" == "true" ] && echo "saveas        : $saveas.tar.bzip2"
+[ "$verbose" = "true" ] && echo "saveas        : $saveas.tar.bzip2"
 [ -e "$saveas.tar.bzip2" ] && echo "$saveas.tar.bzip2 does already exist!" && exit
 ################# make the tar
 addcommand="";
@@ -75,7 +75,7 @@ addexclude=""
 #echo allpaths: $allpaths
 
 
-[ "$verbose" == "true" ] && echo "addcommand    : $addcommand (empty means original files are not deleted)"
+[ "$verbose" = "true" ] && echo "addcommand    : $addcommand (empty means original files are not deleted)"
 $tar $addexclude $addcommand --use-compress-program=lbzip2 -cvf "$saveas.tar.bzip2" $allpaths
 
 #############################################################
@@ -84,9 +84,9 @@ $tar $addexclude $addcommand --use-compress-program=lbzip2 -cvf "$saveas.tar.bzi
 #tar --remove-files -zcvf $saveas.tar.gz $*
 
 if [ -e "$saveas.tar.bzip2" ];then
-    [ "$verbose" == "true" ] && echo "success       : $saveas.tar.bzip2 has been created."
+    [ "$verbose" = "true" ] && echo "success       : $saveas.tar.bzip2 has been created."
 else
-    [ "$verbose" == "true" ] && echo "ERROR  !!!!!  : $saveas.tar.bzip2 has NOT been created."
+    [ "$verbose" = "true" ] && echo "ERROR  !!!!!  : $saveas.tar.bzip2 has NOT been created."
 fi
 
 ###########################################################
