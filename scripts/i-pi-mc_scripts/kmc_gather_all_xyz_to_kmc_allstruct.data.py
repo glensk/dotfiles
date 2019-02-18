@@ -25,12 +25,13 @@ def gather_xyz(folder,filename_find,filename_out):
     e.g. kmc_gather_all_xyz_to_kmc_allstruct.data.py `pwd`
     e.g. kmc_gather_all_xyz_to_kmc_allstruct.data.py .
     '''
-    frames = read("kmc_allstruct.data",":",format="runner")
-    print('readin')
-    write("kmc_allstruct.data.new",frames,format="runner",setenergy_eV=0,setforces_ase_units="str_is_settozero")
-    #write(filename_out+'tmp',i,format="runner",append=True)
-    print('wrote')
-    sys.exit()
+    #frames = read("kmc_allstruct.data",":",format="runner")
+    #print('readin')
+    #write("kmc_allstruct.data.new",frames,format="runner",setenergy_eV=0,setforces_ase_units="str_is_settozero")
+    ##write(filename_out+'tmp',i,format="runner",append=True)
+    #print('wrote')
+    #sys.exit()
+
     print('folder:',folder)
     print()
     print('files:')
@@ -51,15 +52,14 @@ def gather_xyz(folder,filename_find,filename_out):
     framesuniq = my.ase_get_unique_frames(frames)
     print()
     print('removing duplicates done.')
-    print('len to write',len(framesuniq))
-    print('writing',filename_out)
+    print('writing',len(framesuniq),"frames to",filename_out)
     length = len(framesuniq)
-    for idx,i in enumerate(framesuniq):
-        print(i.get_positions())
-    sys.exit()
+    #for idx,i in enumerate(framesuniq):
+    #    print(i.get_positions())
+    #sys.exit()
     for idx,i in enumerate(framesuniq):
         my.progress(idx, length , status='')
-        write(filename_out+'tmp',i,format="runner",append=True)
+        write(filename_out+'tmp',i,format="runner",append=True,setforces_ase_units="str_is_settozero",setenergy_eV=0,wrap=False)
 
     print('written tmp')
     os.rename(filename_out+'tmp',filename_out)

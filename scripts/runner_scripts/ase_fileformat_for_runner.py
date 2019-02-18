@@ -147,7 +147,7 @@ def read_runner(fileobj, index=-1):
 
         yield structure
 
-def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,setforces_ase_units=False):
+def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,setforces_ase_units=False,wrap=True):
     """
     Write output in runner format. Written quickly with no regard to the form
     """
@@ -161,9 +161,13 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
     if hasattr(images, 'get_positions'):
         images = [images]
 
-    for atoms in images:
+    for idximage,atoms in enumerate(images):
         nat = atoms.get_number_of_atoms()
+        #print('idximage',idximage,nat,setforces_ase_units,setenergy_eV)
 
+        ####################################################
+        # forces
+        ####################################################
         if setforces_ase_units == False:
             try: forces = atoms.get_forces()/units.Hartree * units.Bohr
             except:
@@ -175,6 +179,9 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
             else:
                 forces = setforces_ase_units
 
+        ####################################################
+        # energy
+        ####################################################
         if setenergy_eV == False:
             try: energy = atoms.get_potential_energy()/units.Hartree
             except:
@@ -207,11 +214,8 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
             fileobj.write('lattice  %16.10f %16.10f %16.10f\n' % (cell[idx][0],cell[idx][1],cell[idx][2]))
 
         nat = atoms.get_number_of_atoms()
-
-        positions = atoms.get_positions(wrap=True)/units.Bohr
+        positions = atoms.get_positions(wrap=False)/units.Bohr  # Wrapping takes huge amout of time
         for idx in xrange(nat):
-            #fileobj.write('atom ' + atoms[idx].position + atoms[idx].symbol + '0.000000 0.000000 ' + forces[idx])
-            #fileobj.write("atom " + str(positions[idx,0]) + " " + str(positions[idx,1]) + " " + str(positions[idx,2]) + " " + atoms[idx].symbol + " " + str(0.0000000) + " " + str(0.000000) + " " + str(forces[idx][0]) + " " + str(forces[idx][1]) + " " + str(forces[idx][2]) + "\n")
             fileobj.write('atom  %16.10f %16.10f %16.10f  %3s  %1.1f %1.1f   %16.10f %16.10f %16.10f\n' % (positions[idx,0],positions[idx,1],positions[idx,2],atoms[idx].symbol,0.0,0.0,forces[idx][0],forces[idx][1],forces[idx][2]))
 
 
