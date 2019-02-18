@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: 12e735c5ca88f0bb30e8ab38fb6a6daf1fdf3637
-# execution time: 0.15043091774 seconds.
-
-aiida_export_group_to_runner.py -wg kmc_1000K_4_calc

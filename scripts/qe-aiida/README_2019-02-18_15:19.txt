@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 379f4affe2dfe1a4f9747faa4ed0dd53481c674b
+# execution time: 0.314243078232 seconds.
+
+aiida_export_group_to_runner.py -wg v1ag_fps3134_first20_calc
