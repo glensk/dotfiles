@@ -147,7 +147,7 @@ def read_runner(fileobj, index=-1):
 
         yield structure
 
-def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False):
+def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,setforces_ase_units=False):
     """
     Write output in runner format. Written quickly with no regard to the form
     """
@@ -164,10 +164,16 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False):
     for atoms in images:
         nat = atoms.get_number_of_atoms()
 
-        try: forces = atoms.get_forces()/units.Hartree * units.Bohr
-        except:
-            sys.stderr.write("No forces found, setting them to 0\n")
-            forces = np.zeros((nat,3))
+        if setforces_ase_units == False:
+            try: forces = atoms.get_forces()/units.Hartree * units.Bohr
+            except:
+                sys.stderr.write("No forces found, setting them to 0\n")
+                forces = np.zeros((nat,3))
+        else:
+            if type(setforces_ase_units) == str:
+                forces = np.zeros((nat,3))
+            else:
+                forces = setforces_ase_units
 
         if setenergy_eV == False:
             try: energy = atoms.get_potential_energy()/units.Hartree
