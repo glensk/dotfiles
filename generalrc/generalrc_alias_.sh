@@ -38,8 +38,8 @@ $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide=
 #################################################################
 $1 gar 'sshgar.sh'
 $1 finder-cd-to-current-finder-dir 'cd `finder-list-current-finder-dir`'
-$1 n 'cd `tn.sh`'  # go to corresponding nas folder
-$1 d 'cd `td.sh`'  # go to corresponding data folder
+#$1 n 'cd `tn.sh`'  # go to corresponding nas folder
+#$1 d 'cd `td.sh`'  # go to corresponding data folder
 $1 l 'cd `ti_high_0_create_Folders_vasp.sh -l`'  # go to corresponding high folder
 $1 h 'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high folder
 $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh

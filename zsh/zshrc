@@ -27,10 +27,8 @@ if [ "$loadzsh" = "true" ];then
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)
 autoload -U colors && colors                    # necessary for prompt colors (0.00s)
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:color: $gett"
-autoload -U +X compinit && compinit             # (0.03s)  (seems I cant avoid compinit=Necessary)
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "zsh1:compi: $gett"
-autoload -U +X bashcompinit && bashcompinit     # make bash completion function work (complete) (0.00s)
+autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) 
+autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
 [ "$gettime" = "true" ] && gett=`gt $gett` #&& echo "compinit    : $gett"
 
 #################################################################
@@ -66,5 +64,7 @@ source ~/.generalrc
 # 3) 2+ . generalrc               : 0.05s (generalrc) = 0.011s (from bashrc)
 # 4) 3+ zsh_set                   : 0.06s (zsh_set  ) = 0.01s
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
+autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) repeat here to get completion for notes without restarting shell again
+#autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
 fi
 fi
