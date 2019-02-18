@@ -25,6 +25,12 @@ def gather_xyz(folder,filename_find,filename_out):
     e.g. kmc_gather_all_xyz_to_kmc_allstruct.data.py `pwd`
     e.g. kmc_gather_all_xyz_to_kmc_allstruct.data.py .
     '''
+    frames = read("kmc_allstruct.data",":",format="runner")
+    print('readin')
+    write("kmc_allstruct.data.new",frames,format="runner",setenergy_eV=0,setforces_ase_units="str_is_settozero")
+    #write(filename_out+'tmp',i,format="runner",append=True)
+    print('wrote')
+    sys.exit()
     print('folder:',folder)
     print()
     print('files:')
@@ -43,9 +49,23 @@ def gather_xyz(folder,filename_find,filename_out):
     print(filename_out,'has',len(frames),"frames.")
     print('removing duplicates ...')
     framesuniq = my.ase_get_unique_frames(frames)
-
-    write(filename_out,framesuniq,format="runner") # works
+    print()
+    print('removing duplicates done.')
+    print('len to write',len(framesuniq))
+    print('writing',filename_out)
+    length = len(framesuniq)
+    for idx,i in enumerate(framesuniq):
+        print(i.get_positions())
     sys.exit()
+    for idx,i in enumerate(framesuniq):
+        my.progress(idx, length , status='')
+        write(filename_out+'tmp',i,format="runner",append=True)
+
+    print('written tmp')
+    os.rename(filename_out+'tmp',filename_out)
+    print('written',filename_out)
+
+
     remark0="# created "+filename_out+" for n2p2/runner which contains only the unique structures;"
     remark1="# Now you need to do an nnp-scaling to get function.data on this "+filename_out+" run for fps! (fps_considering_oldstruct.py);"
     remark2="# e.g. fps_considering_oldstruct.py -d1 /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v1ag/ -d2 kmc_gaterh_all_xyz"
@@ -57,7 +77,8 @@ def gather_xyz(folder,filename_find,filename_out):
     print(remark0)
     print(remark1)
     print(remark2)
-    return filename_out
+    #return filename_out  # not good when run from shell??
+    return
 
 
 if __name__ == "__main__":

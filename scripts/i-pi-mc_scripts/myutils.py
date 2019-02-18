@@ -347,8 +347,9 @@ def progress(count, total, status=''):
 
 
 def ase_get_unique_frames(frames):
-    ''' this function only takes care of exactly same frames;
-        for structures which are close by another function will be necessary;
+    '''
+    this function only takes care of exactly same frames;
+    structures which are close by another function will be necessary;
     '''
     framesout = deepcopy(frames)
     length = len(frames)
@@ -360,6 +361,7 @@ def ase_get_unique_frames(frames):
             isin=True
             del framesout[midx]
         #print(idx,midx,frames[midx].positions[0,0],isin)
+    print('returning framesout ... (unique)')
     return framesout
 
 
