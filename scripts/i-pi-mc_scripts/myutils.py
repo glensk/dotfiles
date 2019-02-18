@@ -14,6 +14,7 @@ try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
     pass
+
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase.optimize import BFGS
@@ -341,6 +342,7 @@ def progress(count, total, status=''):
 
     sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
     sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
+    return
 
 
 

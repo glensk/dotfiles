@@ -14,15 +14,16 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 @click.argument('folder')
 @click.option('-ff','--filename_find',required=False,default="simulation.pos_0.xyz",help="Filename or extension of the searched file")
-@click.option('-fo','--filename_out',required=False,default="input.data",help="Filename of the output file")
+@click.option('-fo','--filename_out',required=False,default="kmc_allstruct.data",help="Filename of the output file")
 
 def gather_xyz(folder,filename_find,filename_out):
     '''
     This scipt looks for all files ($filename_find; default: simulation.pos_0.xyz) in
     $folder and converts content to RuNNer readable fileformat $filename_out
-    (default: input.data).
-    e.g. \n
-    kmc_gather_all_xyz_to_input_data.py `pwd`
+    (default: kmc_allstruct.data).
+
+    e.g. kmc_gather_all_xyz_to_kmc_allstruct.data.py `pwd`
+    e.g. kmc_gather_all_xyz_to_kmc_allstruct.data.py .
     '''
     print('folder:',folder)
     print()
@@ -37,19 +38,21 @@ def gather_xyz(folder,filename_find,filename_out):
         print(i)
         call(["xyz2runner.sh",i],stdout=f)
 
-    print('reading input.data ...')
-    frames = read("input.data",":",format="runner")
-    print('input.data has',len(frames),"frames.")
+    print('reading',filename_out,'...')
+    frames = read(filename_out,":",format="runner")
+    print(filename_out,'has',len(frames),"frames.")
     print('removing duplicates ...')
-    write("input.data",my.ase_get_unique_frames(frames),format="runner")
+    framesuniq = my.ase_get_unique_frames(frames)
 
-    remark0="# created input.data for n2p2/runner which contains only the unique structures;"
-    remark1="# Now you need to do an nnp-scaling to get function.data on this input.data run for fps! (fps_considering_oldstruct.py);"
+    write(filename_out,framesuniq,format="runner") # works
+    sys.exit()
+    remark0="# created "+filename_out+" for n2p2/runner which contains only the unique structures;"
+    remark1="# Now you need to do an nnp-scaling to get function.data on this "+filename_out+" run for fps! (fps_considering_oldstruct.py);"
     remark2="# e.g. fps_considering_oldstruct.py -d1 /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v1ag/ -d2 kmc_gaterh_all_xyz"
     my.mkdir("kmc_gaterh_all_xyz")
     my.create_READMEtxt(os.getcwd()+"/kmc_gaterh_all_xyz",add=[remark0,remark1,remark2])
     my.create_READMEtxt(os.getcwd(),add=[remark0,remark1,remark2])
-    os.rename("input.data","kmc_gaterh_all_xyz/input.data")
+    os.rename(filename_out,"kmc_gaterh_all_xyz/"+filename_out)
     print()
     print(remark0)
     print(remark1)
