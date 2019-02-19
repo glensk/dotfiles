@@ -98,8 +98,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ana_vol_pa       = np.empty(structures_to_calc);ana_vol_pa[:]  = np.nan
     ana_dist_min     = np.empty(structures_to_calc);ana_dist_min[:]  = np.nan
     ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
+    ene_DFT_atomic   = np.empty(structures_to_calc);ene_DFT_atomic[:]  = np.nan
     ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
     ene_pot          = np.empty(structures_to_calc);ene_pot[:]  = np.nan
+    ene_pot_wo_atomic= np.empty(structures_to_calc);ene_pot_wo_atomic[:]  = np.nan
     ene_pot_ase      = np.empty(structures_to_calc);ene_pot_ase[:]  = np.nan
     ene_pot_ase_geop = np.empty(structures_to_calc);ene_pot_ase_geop[:]  = np.nan
     ene_pot_lmp      = np.empty(structures_to_calc);ene_pot_lmp[:]  = np.nan
@@ -223,13 +225,13 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
 
         if len(ace.units.split("_")) == 1: # per structure
-            ene_DFT_wo_atomic[idx] = ene_DFT[idx] - n["Mg"]*atom_energy_Mg - n["Si"]*atom_energy_Si - n["Al"]*atom_energy_Al
+            ene_DFT_atomic[idx] = n["Mg"]*atom_energy_Mg + n["Si"]*atom_energy_Si + n["Al"]*atom_energy_Al
         elif len(ace.units.split("_")) == 2: # per atom
-            ene_DFT_wo_atomic[idx] = ene_DFT[idx] - d["Mg"]*atom_energy_Mg - d["Si"]*atom_energy_Si - d["Al"]*atom_energy_Al
-            #print('a',ene_DFT[idx])
+            ene_DFT_atomic[idx] = d["Mg"]*atom_energy_Mg + d["Si"]*atom_energy_Si + d["Al"]*atom_energy_Al
         else:
             sys.exit("either per atom or per structure")
 
+        ene_DFT_wo_atomic[idx] = ene_DFT[idx] - ene_DFT_atomic[idx]
 
         if ipi == True:  ### ene from ipi
             atoms_tmp = copy.deepcopy(atoms[i])
@@ -306,7 +308,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         ### write runner output
         if write_runner:
             ase_write("out.runner",atoms[i],format='runner',append=True)
-
+        ene_pot_wo_atomic[idx] = ene_pot[idx] - ene_DFT_atomic[idx]
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
         ene_mean[idx] = ene_diff[:idx+1].mean()
@@ -332,9 +334,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
             fmt_one = '%16.'+str(show)+'f'
             fmt_one = '%10.'+str(show)+'f'
-            fmt=' '.join([fmt_one]*8)   # add here if a new entry
-            ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f] "+fmt+" "+added
-            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+            fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
+            ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
+            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],atoms[i].get_number_of_atoms(),n["Si"],n["Mg"],n["Al"],ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
             return
 
 
@@ -364,7 +366,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
     ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
-    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units)
+    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
+    ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
     for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
     ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
     ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
@@ -390,6 +393,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             print(ene_DFT.shape)
             print(ene_diff_abs.shape)
             print(ene_DFT_wo_atomic.shape)
+            print(ene_pot_wo_atomic.shape)
             print(for_DFTmax.shape)
             print(ana_mg_conz.shape)
             print(ana_si_conz.shape)
@@ -428,9 +432,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('#                         ('+ace_units+')        ('+ace_units+')     ('+ace_units+')    ')
-    print('#                         (DFT-ref)                            ene_wo_atomic    forces    (if geopt)  Vol per')
-    print('#   i   idx /    from       diff  [atms]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
+    print('#                         ('+ace_units+')                        ('+ace_units+')     ('+ace_units+')    ')
+    print('#                         (DFT-ref)                                            ene_wo_atomic    forces    (if geopt)  Vol per')
+    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
