@@ -596,10 +596,14 @@ def scripts():
         sys.exit('$scripts variable is not defined or is not an existing folder')
     return scripts
 
-def test_and_return_environment_var_path(var):
+def test_and_return_environment_var_path(var,path=False):
     variable = os.environ[var]
-    if not os.path.isfile(variable):
-        sys.exit('variable '+str(var)+' is not defined or is not an existing file')
+    if path == False:
+        if not os.path.isfile(variable):
+            sys.exit('variable '+str(var)+' is not defined or is not an existing file')
+    else:
+        if not os.path.isdir(variable):
+            sys.exit('directory '+str(var)+' is not defined or does not exist')
     return variable
 
 
@@ -734,7 +738,7 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print()
     return
 
-def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_COMMAND=False,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True,LOOPFOLDER=False):
+def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True,LOOPFOLDER=False):
     ''' time is in min
         this should be a class so that it is not necessary to shuffle
         variables back and forth.
@@ -746,8 +750,13 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
             print("PROBLEM variable name:",command_name_str,"=",variable,"type(variable)",type(variable),"but should be",str(typehere))
             sys.exit()
 
+    IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
+    LAMMPS_COMMAND = test_and_return_environment_var_path('LAMMPS_COMMAND')
+    N2P2_PATH = test_and_return_environment_var_path('N2P2_PATH',path=True)
+
     check(IPI_COMMAND,"IPI_COMMAND",str)
     check(LAMMPS_COMMAND,"LAMMPS_COMMAND",str)
+    check(N2P2_PATH,"N2P2_PATH",str)
     check(nodes,"nodes",int)
     check(ntasks,"ntasks",int)
     check(lmp_par,"lmp_par",int)
@@ -771,8 +780,10 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,IPI_COMMAND=False,LAMMPS_C
 
     text3 = [
     "set +e",
+    "export LD_LIBRARY_PATH=",
     "#source $MODULESHOME/init/bash    # necessary for zsh or other init shells",
     "module load intel intel-mpi intel-mkl fftw python/2.7.14",
+    "export LD_LIBRARY_PATH="+N2P2_PATH+"/lib:${LD_LIBRARY_PATH} # necessary for n2p2",
     "export OMP_NUM_THREADS="+str(lmp_par),  # THIS LETS THE JOBS BE KILLED!
     ""]
 

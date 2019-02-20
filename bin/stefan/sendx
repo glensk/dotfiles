@@ -38,7 +38,7 @@ rm -f $tosend
 address="aglen@gate.rzg.mpg.de"  # garching
 address="aglensk@ela.cscs.ch"    # ela, part of daint
 
-
+echo "address: $address"
 echo "scp sendx.tar.bzip2 $address:~/.exchange/"
 if [ "`hostname | grep -o daint`" = "daint" ];then
     mv $tosend ~/.exchange/

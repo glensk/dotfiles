@@ -27,7 +27,8 @@ export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$_n2p2_lib"
 
 export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
-export IPI_COMMAND="$HOME/Dropbox/Albert/git/i-pi-mc/bin/i-pi"
+export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
+export N2P2_PATH="$HOME/sources/n2p2/"
 
 if [ "$PYTHONPATH" = "" ];then
     export PYTHONPATH="$addeverywhere"              # need "export" for python

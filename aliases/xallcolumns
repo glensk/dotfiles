@@ -1,0 +1,13 @@
+#!/bin/zsh
+echo $1
+echo
+columns=`head -1 $1 | wc -w | awk '{print $1-1}'`
+echo columns $columns
+add=""
+[ "$columns" = "5" ] && add='-bxy 1:2 -bxy 1:3 -bxy 1:4 -bxy 1:5 -bxy 1;6'
+[ "$columns" = "4" ] && add='-bxy 1:2 -bxy 1:3 -bxy 1:4 -bxy 1:5'
+[ "$columns" = "3" ] && add='-bxy 1:2 -bxy 1:3 -bxy 1:4'
+[ "$columns" = "2" ] && add='-bxy 1:2 -bxy 1:3'
+[ "$columns" = "1" ] && add='-bxy 1:2'
+echo "add:$add:"
+DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -block $1 `echo $add`

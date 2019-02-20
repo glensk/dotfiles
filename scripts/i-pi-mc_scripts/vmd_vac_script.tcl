@@ -13,9 +13,9 @@ set sel1 [atomselect top "index 0" frame 0];
 set x [$sel1 get x ];
 set y [$sel1 get y ];
 set z [$sel1 get z ];
-set r0 [expr $x*$x+$y*$y+$z*$z];
+set r02 [expr $x*$x+$y*$y+$z*$z];
 
-set fo [open "vacancy_radius.dat" a]
+set fo [open "vacancy_radius_squared.dat" a]
 for {set i 0} {$i < $allmyframes} {incr i} {
     #set sel1 [atomselect top "index 63" frame $i];
     set sel1 [atomselect top "index 0" frame $i];
@@ -26,7 +26,7 @@ for {set i 0} {$i < $allmyframes} {incr i} {
     #set xx [expr $x*$x];
     #set yy [expr $y*$y];
     #set zz [expr $z*$z];
-    set rr [expr $x*$x+$y*$y+$z*$z-$r0];
+    set rr [expr $x*$x+$y*$y+$z*$z-$r02];
 
     #puts $fo "$x\t$y\t$z"
     #puts $fo "$xx\t$y\t$z"
