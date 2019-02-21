@@ -46,9 +46,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if test:
         ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
         print('changed units to eV!')
-        ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
+        ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_formation_energies
         units = ace.units
-        test_sisivac(ace)
+        test_formation_energies(ace)
         sys.exit('test done! Exit')
 
     ### check infile
@@ -57,7 +57,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     #### get the potential
     ace = ase_calculate_ene(pot,units=units,geopt=geopt,verbose=verbose)
-    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
+    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_formation_energies
     units = ace.units
 
 
@@ -438,9 +438,12 @@ def printhead(structures_to_calc,ace_units):
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
-def test_sisivac(ace):
+def test_formation_energies(ace):
     scripts = my.scripts()
-    sisivac = scripts+'/tests/si-si-vac/'
+    tests = scripts+'/tests/'
+
+
+    sisivac = tests+'/si-si-vac/'
     ff = '/aiida.in.final.runner'
     e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
     e_al107vac1 =   ace.ene(ase_read(sisivac+'/al107vac1'+ff))
@@ -458,6 +461,7 @@ def test_sisivac(ace):
     print('vacancy_formation (unrelaxed) NN: ',round(e_ss_va,4),"",ace.units,"DFT: 0.69 eV")
     print('si-si-vac-complex (unrelaxed) NN:',round(e_si_si_vac_complex,4),"",ace.units,"DFT: -0.074eV")
 
+    beta_prime_frames = ase_read(,index=":",format="runner")
 
 
 if __name__ == "__main__":
