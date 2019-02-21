@@ -45,6 +45,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ### when want to assess some formation energies
     if test:
         test_formation_energies(pot,geopt,verbose)
+        my.create_READMEtxt(os.getcwd())
         sys.exit('test done! Exit')
 
     ### check infile
@@ -504,6 +505,7 @@ def test_formation_energies(pot,geopt,verbose):
     ace.murn(frames[3]) # 108 atoms
     print('precip')
     ace.murn(frames[0])
+    return
 
 
 
