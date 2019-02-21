@@ -889,6 +889,17 @@ class ase_calculate_ene( object ):
         self.mypot = mypot(self.pot)
         self.mypot.get()
 
+        if self.verbose:
+            print('ase_calculate_ene, self.pot           :',self.pot)
+            print('ase_calculate_ene, self.units         :',self.units)
+            print('ase_calculate_ene, self.geopt         :',self.geopt)
+            print('ase_calculate_ene, self.nsteps        :',self.nsteps)
+            print('ase_calculate_ene, self.lmpcmd        :',self.lmpcmd)
+            print('ase_calculate_ene, self.kmc           :',self.kmc)
+            print('ase_calculate_ene, self.temp          :',self.temp)
+            print('ase_calculate_ene, self.mypot.pot     :',self.mypot.pot)
+            #print('ase_calculate_ene, self.mypot.pot_all :',self.mypot.pot_all)
+            print('ase_calculate_ene, self.mypot.elements:',self.mypot.elements)
         return
 
     def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet'):
@@ -969,9 +980,7 @@ class ase_calculate_ene( object ):
             atoms = self.atoms
         else:
             atoms = atoms
-
         atoms.wrap()
-
         #self.atomsin = deepcopy(atoms)
         self.atoms = atoms
 
@@ -990,18 +999,18 @@ class ase_calculate_ene( object ):
             ################################################
             ### statis calculation
             ################################################
-            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
-            atoms.set_calculator(calcLAMMPS)
+            asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types)
+            atoms.set_calculator(asecalcLAMMPS)
         else:
             ################################################
             ### with geometry optimization
             ################################################
             # in case of a verbose run:
-            #calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
+            #asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, log_file='./xlolg.lammps.log',tmp_dir="./",keep_alive=True,atom_types=self.atom_types)
 
             # in case  of a non verbose run
-            calcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=True)
-            atoms.set_calculator(calcLAMMPS)
+            asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=True)
+            atoms.set_calculator(asecalcLAMMPS)
             #from ase.io.trajectory import Trajectory
             #traj = Trajectory('ka', mode='w',atoms=atoms)
             #opt = BFGS(atoms,trajectory="ni.traj")
@@ -1058,8 +1067,8 @@ class ase_calculate_ene( object ):
             #print('done....')
             #opt2 = FIRE(atoms,trajectory="ni.traj")
             #opt2.run(steps=20)
-            #calcLAMMPS.attach(traj)
-            #calcLAMMPS.run()
+            #asecalcLAMMPS.attach(traj)
+            #asecalcLAMMPS.run()
         if self.verbose > 1:
             print('ZZ done2')
             print('ZZ self.units',self.units)
@@ -1076,6 +1085,35 @@ class ase_calculate_ene( object ):
             print()
             print()
         return ene
+
+    def murn(self,atoms=False):
+        if atoms == False:
+            atoms = self.atoms
+        else:
+            atoms = atoms
+        atoms.wrap()
+
+
+
+        print('ene',self.ene(atoms))
+        #pos_ref = atoms.get_positions()
+        #print('ene',self.ene(atoms))
+        dvol=[0.97,0.98,0.99,1.0,1.01,1.02,1.03]
+        dvol=[0.97,0.98,0.99,1.0,1.01,1.02,1.03,1.04,1.05,1.06]
+        #print('cell',atoms.get_cell())
+        #print('vol',atoms.get_volume())
+        #print(atoms.get_positions()[:3])
+        #print()
+        cell_ref = atoms.get_cell()
+        nat = atoms.get_number_of_atoms()
+        for i in dvol:
+            atoms.set_cell(cell_ref*i,scale_atoms=True)
+            #print('cell',atoms.get_cell())
+            vol=atoms.get_volume()
+            ene=self.ene(atoms)
+            #print('vol',vol,'ene',ene)
+            print(vol/nat,ene/nat)
+        return
 
 
 
