@@ -525,9 +525,10 @@ def test_formation_energies(pot,geopt,verbose):
         print("########################################################################")
         print("# beta'' (Mg5Si6)")
         print("########################################################################")
-        bprimeprime = tests+'/Al-Mg-Si/beta_prime/BetaPrime_structures_relax.input.data'
+        bprimeprime = tests+'/Al-Mg-Si/Mg5Si6_beta_doubleprime/POSCAR'
         print('bprime input data',bprime)
-        frames = ase_read(bprime,index=":",format="runner")
+        frame = ase_read(bprimeprime,index=":",format="vasp")
+        print('f',frame.get_positions())
 
     return
 
