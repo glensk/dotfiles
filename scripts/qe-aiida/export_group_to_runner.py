@@ -70,7 +70,7 @@ def createjob(work_group):
     for idx, workchain in enumerate(all_works):
         ase_structure, energy, forces, uuid, path = get_workcalc_runnerdata(workchain)
         print(idx, "ene (eV)", energy, uuid, path)
-        forces = forces[0]
+        forces = forces[-1]
 
         work_uuid = workchain.uuid
         fileOut.write("begin\ncomment uuid: {}\n".format(work_uuid))
