@@ -11,7 +11,7 @@
 filename="sendx.tar.bzip2"
 #echo $onhost
 #exit
-if [ "$onhost" == "daint" ];then
+if [ "$onhost" = "daint" ];then
     ### get file when on daint
     mv ~/.exchange/$filename .
 else
@@ -26,7 +26,7 @@ fi
 
 #echo ":$1:"
 tar=`command -v gtar`
-[ "$tar" == "" ] && tar=`command -v tar`
+[ "$tar" = "" ] && tar=`command -v tar`
 echo "tar       : $tar"
 echo 
 echo "---------------------- getting following files -----------------"
