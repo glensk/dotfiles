@@ -1,10 +1,14 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import aiida
 aiida.load_dbenv()
 from aiida.orm.querybuilder import QueryBuilder
 from aiida.orm import Group, WorkCalculation
+from aiida.orm.utils import load_node
 import click
 import myutils,os
+import sys
+from ase.io import read
 
 # show default values in click
 orig_init = click.core.Option.__init__
@@ -57,8 +61,76 @@ def createjob(work_group,filename):
         fileOut = open(filename, "w")
     myutils.create_READMEtxt(os.getcwd())
 
+    if False:
+        # from verdi calculation list -a -p1
+        failed = [102402,102497,102500,102503,102523,102530,102537,102588]
+        worked_part = [102202,102217,102230,102261,102272,102298,102313,102323]
+
+        for idx, workchain in enumerate(all_works):
+            print()
+            #print('idx all:',idx,workchain)
+            uuid = workchain.uuid
+            pk = workchain.pk
+
+            print('uuid:',uuid) #,workchain.pk)
+            if pk in failed:
+                print('pk  :',pk,"FAILED") #,workchain.pk)
+            else:
+                print('pk  :',pk,"WORKED") #,workchain.pk)
+
+
+            calc = load_node(pk)
+            uuidcheck = calc.uuid
+            abspath = calc.get_abs_path()
+            abspath2=""
+            try:
+                abspath2= calc.out.retrieved.get_abs_path()
+            except AttributeError:
+                pass
+            #print('path:',abspath) #,workchain.pk)
+            #print('path2',abspath2) #,workchain.pk)
+            if uuid != uuidcheck:
+                sys.exit('uuid prob')
+
+            #try:
+            #    calc.inp.CALL.inp.options.get_dict()
+            #except AttributeError:
+            #    print("Error here")
+            #    continue
+    if False:
+        for idx in failed:
+            calc = load_node(idx)
+            pathinput= calc.get_abs_path()
+            path = calc.out.retrieved.get_abs_path()
+            out = myutils.grep(pathinput+"/raw_input/_aiidasubmit.sh","#SBATCH --nodes=")
+            atoms= myutils.grep(pathinput+"/raw_input/aiida.in","nat =")
+            print("Failed path input:",pathinput)
+            #print("Failed           :",path)
+            print("out FAILED       :",out,"atoms",atoms)
+            dd=calc.inp.CALL.inp.options.get_dict()
+            print('dd',dd)
+        print()
+        print('----------')
+
+        for idx in worked_part:
+            calc = load_node(idx)
+            pathinput =  calc.get_abs_path()
+            path = calc.out.retrieved.get_abs_path()
+            out = myutils.grep(pathinput+"/raw_input/_aiidasubmit.sh","#SBATCH --nodes=")
+            atoms= myutils.grep(pathinput+"/raw_input/aiida.in","nat =")
+
+            print("worked path input :",pathinput)
+            print("worked path output:",path)
+            print("out WORKED        :",out,"atoms",atoms)
+            dd=calc.inp.CALL.inp.options.get_dict()
+            print('dd',dd)
+
     for idx, workchain in enumerate(all_works):
-        ase_structure, energy, forces, uuid, path = get_workcalc_runnerdata(workchain)
+        try:
+            ase_structure, energy, forces, uuid, path = get_workcalc_runnerdata(workchain)
+        except AttributeError:
+            print('WARNING: idx',idx,"failed for some reason!!! (will be excluded)")
+            continue
         print(idx, "ene (eV)", energy, uuid, path)
         forces = forces[0]
 
