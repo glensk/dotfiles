@@ -113,8 +113,6 @@ def createjob(
         nsteps = 50
 
     file_ipi_input_runner   = scripts + "/i-pi-mc_scripts/input-runner.xml"
-    LAMMPS_COMMAND = mu.test_and_return_environment_var_path('LAMMPS_COMMAND')
-    IPI_COMMAND    = mu.test_and_return_environment_var_path('IPI_COMMAND')
 
 
     ####################################
@@ -164,8 +162,6 @@ def createjob(
     print('ffsocket      ',ffsocket)
     #print('python ver    ',sys.version_info[0])
     #print()
-    #print('LAMMPS_COMMAND',LAMMPS_COMMAND)
-    #print('IPI_COMMAND   ',IPI_COMMAND)
     print('--------------------------- check the input --------------------------------')
     mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
 
@@ -225,7 +221,11 @@ def createjob(
         mu.sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
         mu.sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
         mu.sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
-        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
+
+
+        #mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
+        mu.sed(jobdir+"/input-runner.xml",'<!-- <activelist> .*','<activelist> '+str(range(ncell**3 - nvac))+' </activelist>')
+        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data_fakevac.ipi </file>')
 
         mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
         addressline = '<address> '+socket.gethostname()+' </address>'
@@ -238,8 +238,6 @@ def createjob(
 
         # get submit-ipi-kmc.sh (should be made without copying)
         mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,
-                IPI_COMMAND=IPI_COMMAND,
-                LAMMPS_COMMAND=LAMMPS_COMMAND,
                 lmp_par=lmp_par,
                 ipi_inst=ipi_inst,
                 ffsocket=ffsocket,
@@ -248,8 +246,6 @@ def createjob(
 
         # get osubmit-ipi-kmc.sh (should be made without copying)
         mu.create_submitskript_ipi_kmc(jobdir+"/osubmit-ipi-kmc.sh",nodes,ntasks,
-                IPI_COMMAND=IPI_COMMAND,
-                LAMMPS_COMMAND=LAMMPS_COMMAND,
                 lmp_par=lmp_par,
                 ipi_inst=ipi_inst,
                 ffsocket=ffsocket,
@@ -262,8 +258,6 @@ def createjob(
     # get submit-ipi-kmc.sh_all3 (should be made without copying)
     if nseeds == 3:
         mu.create_submitskript_ipi_kmc(directory+"/submit-ipi-kmc.sh_all3",nodes,ntasks,
-                IPI_COMMAND=IPI_COMMAND,
-                LAMMPS_COMMAND=LAMMPS_COMMAND,
                 lmp_par=lmp_par,
                 ipi_inst=ipi_inst,
                 ffsocket=ffsocket,

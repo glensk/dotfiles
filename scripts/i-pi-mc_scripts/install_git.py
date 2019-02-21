@@ -15,6 +15,8 @@ def help(p = None ,known=known):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i','--install', choices=known, required=True,
             help='choose what to install')
+
+    ### from now on we save everything in the source folder! (not in the dropbox)
     p.add_argument('-if','--sources_folder', action='store_true', default=os.environ.get('HOME')+"/sources/",
             help='The target folder for installation.')
     return p

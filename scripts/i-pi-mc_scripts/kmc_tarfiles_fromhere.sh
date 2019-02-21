@@ -11,7 +11,10 @@ for tar in $tarfiles;do
         cd $hier
         cd $folder
         pwd
+        [ "$tar" == "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX_out" ] && rm KMC_AL6XXX_out   # just if previous KMC_AL6xxx_out existed 
+        [ "$tar" == "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX" ] && kmc_get_vacancy_radius_vs_time.sh 
         [ "$tar" == "KMC_AL6XXX" ] && awk '{print $1*2.4e-17,$3}' KMC_AL6XXX > KMC_AL6XXX_out
+        rm -f .sendx_*
 
         #du -sh $tar 
         tar.bzip2_file_or_folder_and_remove_originals.sh $tar

@@ -44,11 +44,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     '''
     ### when want to assess some formation energies
     if test:
-        ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
-        print('changed units to eV!')
-        ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
-        units = ace.units
-        test_sisivac(ace)
+        test_formation_energies(pot,geopt,verbose)
+        my.create_READMEtxt(os.getcwd())
         sys.exit('test done! Exit')
 
     ### check infile
@@ -57,20 +54,20 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
     #### get the potential
     ace = ase_calculate_ene(pot,units=units,geopt=geopt,verbose=verbose)
-    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_sisivac
+    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_formation_energies
     units = ace.units
 
 
     ### read in the structures
     my.check_isfile_or_isfiles([infile],verbose=verbose)
-    atoms = ase_read(infile,index=structures_idx,format=format_in)
+    frames = ase_read(infile,index=structures_idx,format=format_in)
 
     ### print stuff to screen
     print('structures_idx               :',structures_idx)
 
-    #structures_to_calc = my.string_to_index_an_array(range(len(atoms)),structures_idx)
-    if type(atoms) == list:
-        structures_to_calc = len(atoms)
+    #structures_to_calc = my.string_to_index_an_array(range(len(frames)),structures_idx)
+    if type(frames) == list:
+        structures_to_calc = len(frames)
     else:
         structures_to_calc = 1
 
@@ -98,8 +95,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ana_vol_pa       = np.empty(structures_to_calc);ana_vol_pa[:]  = np.nan
     ana_dist_min     = np.empty(structures_to_calc);ana_dist_min[:]  = np.nan
     ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
+    ene_DFT_atomic   = np.empty(structures_to_calc);ene_DFT_atomic[:]  = np.nan
     ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
     ene_pot          = np.empty(structures_to_calc);ene_pot[:]  = np.nan
+    ene_pot_wo_atomic= np.empty(structures_to_calc);ene_pot_wo_atomic[:]  = np.nan
     ene_pot_ase      = np.empty(structures_to_calc);ene_pot_ase[:]  = np.nan
     ene_pot_ase_geop = np.empty(structures_to_calc);ene_pot_ase_geop[:]  = np.nan
     ene_pot_lmp      = np.empty(structures_to_calc);ene_pot_lmp[:]  = np.nan
@@ -150,15 +149,15 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     printhead(structures_to_calc,ace.units)
     goover = [1]
     if ace.geopt == True : goover = [1,2]
-    if type(atoms) != list:
-        atoms = [atoms]
+    if type(frames) != list:
+        frames = [frames]
     for idx,i in enumerate(range(structures_to_calc)):
-        ana_atoms_ = atoms[i].get_number_of_atoms()
-        for_DFTmax_ = np.abs(atoms[i].get_forces()).max()
-        d = my.ase_get_chemical_symbols_to_conz(atoms[i])
-        n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
-        cell = atoms[i].get_cell()
-        pos = atoms[i].get_positions()
+        ana_atoms_ = frames[i].get_number_of_atoms()
+        for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        d = my.ase_get_chemical_symbols_to_conz(frames[i])
+        n = my.ase_get_chemical_symbols_to_number_of_species(frames[i])
+        cell = frames[i].get_cell()
+        pos = frames[i].get_positions()
         cellshape = "?"
         if cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
             cellshape="R"
@@ -184,20 +183,20 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
         if calc_analysis: ### analysis stuff
             ana_atoms[idx] = ana_atoms_
             for_DFTmax[idx] = for_DFTmax_
-            ana_vol[idx] = atoms[i].get_volume()
-            ana_vol_pa[idx] = atoms[i].get_volume()/atoms[i].get_number_of_atoms()
+            ana_vol[idx] = frames[i].get_volume()
+            ana_vol_pa[idx] = frames[i].get_volume()/frames[i].get_number_of_atoms()
             VOL_norm = n["Al"]*16.5+n["Mg"]*22.85+n["Si"]*20.5
             VOL_diff = ana_vol[idx] - VOL_norm
             ana_VOL_diff_norm[idx] = VOL_diff/VOL_norm
             #print('ana',ana_atoms_)
-            #print('ka',atoms[i].get_all_distances(mic=True))
-            #print('kb',np.sort(atoms[i].get_all_distances(mic=True))[:,1:])
-            #print('kc',np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min())
+            #print('ka',frames[i].get_all_distances(mic=True))
+            #print('kb',np.sort(frames[i].get_all_distances(mic=True))[:,1:])
+            #print('kc',np.sort(frames[i].get_all_distances(mic=True))[:,1:].min())
             #print('kd')
             if ana_atoms[idx] > 1:
-                ana_dist_min[idx] = np.sort(atoms[i].get_all_distances(mic=True))[:,1:].min()
+                ana_dist_min[idx] = np.sort(frames[i].get_all_distances(mic=True))[:,1:].min()
             else:
-                #print('atoms[i].cell',atoms[i].cell)
+                #print('frames[i].cell',frames[i].cell)
                 #sys.exit()
                 ana_dist_min[idx] = -1
             ana_mg_conz[idx] = d["Mg"]
@@ -212,31 +211,31 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
 
         added=""
-        #print(atoms[idx].get_positions())
+        #print(frames[idx].get_positions())
         if calc_DFT: ### ene from DFT
-            ene_DFT[idx] = my.ase_enepot(atoms[i],units=ace.units)
+            ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
 
             if verbose > be_very_verbose:
-                my.show_ase_atoms_content(atoms[i],showfirst=3,comment = "STAT2")
+                my.show_ase_atoms_content(frames[i],showfirst=3,comment = "STAT2")
             if verbose > 1:
                 print('ene_DFT[idx]     :',ene_DFT[idx],units)
 
 
         if len(ace.units.split("_")) == 1: # per structure
-            ene_DFT_wo_atomic[idx] = ene_DFT[idx] - n["Mg"]*atom_energy_Mg - n["Si"]*atom_energy_Si - n["Al"]*atom_energy_Al
+            ene_DFT_atomic[idx] = n["Mg"]*atom_energy_Mg + n["Si"]*atom_energy_Si + n["Al"]*atom_energy_Al
         elif len(ace.units.split("_")) == 2: # per atom
-            ene_DFT_wo_atomic[idx] = ene_DFT[idx] - d["Mg"]*atom_energy_Mg - d["Si"]*atom_energy_Si - d["Al"]*atom_energy_Al
-            #print('a',ene_DFT[idx])
+            ene_DFT_atomic[idx] = d["Mg"]*atom_energy_Mg + d["Si"]*atom_energy_Si + d["Al"]*atom_energy_Al
         else:
             sys.exit("either per atom or per structure")
 
+        ene_DFT_wo_atomic[idx] = ene_DFT[idx] - ene_DFT_atomic[idx]
 
         if ipi == True:  ### ene from ipi
-            atoms_tmp = copy.deepcopy(atoms[i])
+            atoms_tmp = copy.deepcopy(frames[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
 
         if ase == True:  ### ene from ase (without writing lammps files)
-            atoms_tmp = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
+            atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since frames change when geoopt
             if ace.geopt == False:
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
@@ -254,7 +253,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                     len_units_split = len(ace.units.split("_"))
                     #print("units_split",units_split)
                     if len_units_split == 2:
-                        correction = correction / atoms[i].get_number_of_atoms()
+                        correction = correction / frames[i].get_number_of_atoms()
                         if ace.units.split("_")[0][0] == 'm':  # meV mhartree
                             correction = correction * 1000.
 
@@ -266,13 +265,13 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                 ace.geopt = False
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
-                #print(atoms[i].get_positions())
+                #print(frames[i].get_positions())
 
                 ace.geopt = True
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase_geop[idx] = ace.ene(atoms_tmp)
                 #print(ace.atomsin.get_positions())
-                #print(ace.atoms.get_positions())
+                #print(ace.frames.get_positions())
                 if idx == 0 and os.path.isfile("out_relaxed.runner"):
                     my.rm("out_relaxed.runner")
                 if abs(ene_pot_ase[idx]-ene_pot_ase_geop[idx]) > 0.01: # meV_pa
@@ -288,7 +287,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                 ene_pot[idx] = copy.deepcopy(ene_pot_ase[idx])
 
         if lmp == True:  ### ene from lammps (by writing lammps files)
-            atoms_tmp = copy.deepcopy(atoms[i])  # for other instances, since atoms change when geoopt
+            atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since atoms change when geoopt
             ene_pot_lmp[idx] = my.lammps_ext_calc(atoms_tmp,ace)
             if verbose:
                 print("ENE DFT   :",i,ene_DFT[idx],ace.units)
@@ -305,8 +304,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
         ### write runner output
         if write_runner:
-            ase_write("out.runner",atoms[i],format='runner',append=True)
-
+            ase_write("out.runner",frames[i],format='runner',append=True)
+        ene_pot_wo_atomic[idx] = ene_pot[idx] - ene_DFT_atomic[idx]
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
         ene_mean[idx] = ene_diff[:idx+1].mean()
@@ -332,9 +331,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 
             fmt_one = '%16.'+str(show)+'f'
             fmt_one = '%10.'+str(show)+'f'
-            fmt=' '.join([fmt_one]*8)   # add here if a new entry
-            ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f] "+fmt+" "+added
-            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],atoms[i].get_number_of_atoms(),ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+            fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
+            ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
+            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],frames[i].get_number_of_atoms(),n["Si"],n["Mg"],n["Al"],ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
             return
 
 
@@ -364,7 +363,8 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
     ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
-    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units)
+    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
+    ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
     for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
     ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
     ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
@@ -390,6 +390,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
             print(ene_DFT.shape)
             print(ene_diff_abs.shape)
             print(ene_DFT_wo_atomic.shape)
+            print(ene_pot_wo_atomic.shape)
             print(for_DFTmax.shape)
             print(ana_mg_conz.shape)
             print(ana_si_conz.shape)
@@ -428,15 +429,23 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('#                         ('+ace_units+')        ('+ace_units+')     ('+ace_units+')    ')
-    print('#                         (DFT-ref)                            ene_wo_atomic    forces    (if geopt)  Vol per')
-    print('#   i   idx /    from       diff  [atms]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
+    print('#                         ('+ace_units+')                        ('+ace_units+')     ('+ace_units+')    ')
+    print('#                         (DFT-ref)                                            ene_wo_atomic    forces    (if geopt)  Vol per')
+    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
-def test_sisivac(ace):
+def test_formation_energies(pot,geopt,verbose):
+    ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
+    print('changed units to eV!')
+    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_formation_energies
+    units = ace.units
+
     scripts = my.scripts()
-    sisivac = scripts+'/tests/si-si-vac/'
+    tests = scripts+'/tests/'
+
+
+    sisivac = tests+'/si-si-vac/'
     ff = '/aiida.in.final.runner'
     e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
     e_al107vac1 =   ace.ene(ase_read(sisivac+'/al107vac1'+ff))
@@ -450,9 +459,53 @@ def test_sisivac(ace):
     e_ss_va = e_al107vac1 - e_al108/108. * 107.
     e_ss_one_si = e_al107si1 - e_al108/108. * 107.
     e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
-
+    print()
     print('vacancy_formation (unrelaxed) NN: ',round(e_ss_va,4),"",ace.units,"DFT: 0.69 eV")
     print('si-si-vac-complex (unrelaxed) NN:',round(e_si_si_vac_complex,4),"",ace.units,"DFT: -0.074eV")
+    print()
+
+
+    bprime = tests+'/beta_prime/BetaPrime_structures_relax.input.data'
+    frames = ase_read(bprime,index=":",format="runner")
+    print('len',len(frames))
+    print()
+    for idx,i in enumerate(frames):
+        ana_atoms_ = frames[idx].get_number_of_atoms()
+        d = my.ase_get_chemical_symbols_to_conz(frames[idx])
+        n = my.ase_get_chemical_symbols_to_number_of_species(frames[idx])
+        print(idx,'nat',ana_atoms_,"nAl:",n["Al"],"nSi:",n["Si"],'nMg:',n["Mg"])
+
+    eDFT_pure_al   = my.ase_enepot(frames[3],units=ace.units) # 108 atoms
+    eDFT_dilute_mg = my.ase_enepot(frames[1],units=ace.units) # 108 atoms
+    eDFT_dilute_si = my.ase_enepot(frames[2],units=ace.units) # 108 atoms
+    eDFT_precip    = my.ase_enepot(frames[0],units=ace.units) # 28 atoms, 10Si, 18Mg
+    print('eDFT_precip  :',eDFT_precip,"(eV)",eDFT_precip*0.036749325,"(hartree)")
+
+    e_pure_al   = ace.ene(frames[3]) # 108 atoms
+    e_dilute_mg = ace.ene(frames[1]) # 108 atoms
+    e_dilute_si = ace.ene(frames[2]) # 108 atoms
+    e_precip    = ace.ene(frames[0]) # 28 atoms, 10Si, 18Mg
+    print('e_precip     :',e_precip,"(eV)",e_precip*0.036749325,"(hartree)")
+
+
+    dilute_si_f =  e_dilute_si - 107*e_pure_al/108
+    dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108
+    heat_precip = (e_precip - 18*dilute_mg_f - 10*dilute_si_f)/28
+
+    dilute_si_f_DFT =  eDFT_dilute_si - 107*eDFT_pure_al/108
+    dilute_mg_f_DFT =  eDFT_dilute_mg - 107*eDFT_pure_al/108
+    heat_precip_DFT = (eDFT_precip - 18*dilute_mg_f_DFT - 10*dilute_si_f_DFT)/28
+
+    print("dilute_si_f pot:",round(dilute_si_f,3)," DFT:",round(dilute_si_f_DFT,3))
+    print("dilute_mg_f pot:",round(dilute_mg_f,3)," DFT:",round(dilute_mg_f_DFT,3))
+    print("heat_precip pot:",round(heat_precip,3)," DFT:",round(heat_precip_DFT,3))
+    print()
+
+    print('bulk')
+    ace.murn(frames[3]) # 108 atoms
+    print('precip')
+    ace.murn(frames[0])
+    return
 
 
 

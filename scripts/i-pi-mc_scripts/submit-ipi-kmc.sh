@@ -21,7 +21,8 @@ sed -i 's/<ffsocket.*/<ffsocket name="lmpserial" mode="inet">/' input-runner.xml
 sed -i 's/address>.*<.addr/address>'$(hostname)'<\/addr/' input-runner.xml
 sed -i 's/all ipi [^ ]*/all ipi '$(hostname)'/' in.lmp
 
-python /home/glensk/scripts/i-pi-mc/bin/i-pi input-runner.xml &> log.i-pi &
+#python /home/glensk/scripts/i-pi-mc/bin/i-pi input-runner.xml &> log.i-pi &
+python /home/glensk/sources/ipi/bin/i-pi input-runner.xml &> log.i-pi &
 
 sleep 10
 
