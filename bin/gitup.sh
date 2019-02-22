@@ -25,11 +25,14 @@ cd $dot
 echo `pwd`
 one=`pwd | sed 's|^/cmmc/||'`
 one=`echo $one/`
+
+if [ "$1" != "-aa" ];then 
 if [ "$one" != "$dot" ];then
     echo "pwd              : `pwd`"
     echo "but you are in   : $one" 
     echo "you have to be in: $dot"
     exit
+fi
 fi
 
 if [ "$1" != "-oo" ];then
