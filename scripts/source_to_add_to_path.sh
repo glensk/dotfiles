@@ -13,6 +13,7 @@ fi
 _ipi="$SCR/i-pi-mc_scripts"
 _runner="$SCR/runner_scripts"
 _n2p2="$SCR/n2p2"
+_aiida="$HOME/sources/aiida-alloy/"
 _aiida_o="$SCR/qe-aiida/"
 _aiida_s="$SCR/qe-aiida/aiida_solutejobs_scripts/"
 _aiida_a="$SCR/qe-aiida/aiida_analyze/"
@@ -22,7 +23,7 @@ _lammps2="$SCR/lammps_scripts"
 _ase_lammps="$HOME/sources/lammps_source_cosmo"
 _n2p2_lib="$HOME/sources/n2p2/lib"
 
-addeverywhere="$_ipi:$_n2p2:$_runner:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps1:$_lammps2:$_ase_lammps/python"
+addeverywhere="$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps1:$_lammps2:$_ase_lammps/python"
 
 export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$_n2p2_lib"
