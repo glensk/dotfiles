@@ -107,3 +107,9 @@ git co https://glensk@bitbucket.org/glensk/scriptsnew.git
 #
 # git get remote url: 
 git config --get remote.origin.url
+
+###################################################################################
+aiida-alloy
+###################################################################################
+https://gitlab.com/daniel.marchand/aiida-alloy
+pw: mit zwei doppel s nix weiter
