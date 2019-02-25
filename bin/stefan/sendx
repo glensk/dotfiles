@@ -35,7 +35,7 @@ rm -f $tosend
 
 
 ####### move to ~/.exchange ############################
-address="aglen@gate.rzg.mpg.de"  # garching
+#address="aglen@gate.rzg.mpg.de"  # garching
 address="aglensk@ela.cscs.ch"    # ela, part of daint
 
 echo "address: $address"
