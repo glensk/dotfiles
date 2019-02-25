@@ -31,6 +31,7 @@ You have: k                 -> joule/(mol K N_A)    --> * 8.314472
 you have: k                 -> meV/K		        --> * 0.086173422
 you have: joule/(mol K N_A) -> meV/K			    -->	* 0.010364269
 you have: kjoule/(mol N_A)  -> meV			        -->	* 10.364269
+you have: kjoule/(mol N_A)  -> eV			        -->	* 0.010364269 
 you have: joule/(mol N_A)   -> meV			        -->	* 0.010364269
 you have: k                 -> eV/K				    --> * 8.6173422e-05
 You have: eV/K	            -> k                    --> * 11604.506

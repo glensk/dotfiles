@@ -46,10 +46,10 @@ def create_READMEtxt(directory=False,add=False):
     if directory == False:
         directory = os.getcwd()
     # get sha
-    hier = os.getcwd()
+    pwd = os.getcwd()
     os.chdir(os.environ['scripts'])
     sha = check_output(["git","rev-parse","master"]).decode('utf-8')
-    os.chdir(hier)
+    os.chdir(pwd)
 
     # get time
     time_now = datetime.now()

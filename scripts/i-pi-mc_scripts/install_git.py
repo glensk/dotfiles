@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd" ]
+known = ["ipi","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 
 def help(p = None ,known=known):
     string='''e.g. install_git.py -i atomsk'''
@@ -43,6 +43,7 @@ def install_(args,known):
         if args.install in ['atomsk'] : install_atomsk(args)
         if args.install in ['lbzip','lbzip2'] : install_lbzip(args)
         if args.install in ['ipi']    : install_ipi(args)
+        if args.install in ['aiida-alloy']: install_aiida_alloy(args)
         if args.install in ['n2p2']   : install_n2p2(args)
         if args.install in ['vmd']    : install_vmd(args)
         if args.install in ['lammps'] : install_lammps(args)
@@ -62,6 +63,12 @@ def install_ipi(args):
         subprocess.call(["git","checkout","kmc-al6xxx"])
         print("git branch")
         subprocess.call(["git","branch"])
+    return
+
+def install_aiida_alloy(args):
+    print("git clone --depth 1 https://gitlab.com/daniel.marchand/aiida-alloy"+args.install)
+    subprocess.call(["git","clone","--depth","1","https://gitlab.com/daniel.marchand/aiida-alloy",args.install])
+    print(os.getcwd())
     return
 
 def install_lbzip(args):
