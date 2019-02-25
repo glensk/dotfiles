@@ -19,16 +19,20 @@ fi
 dot=$dotfiles
 
 cd $dot
+[ "$1" = "-aa" ] && cd $HOME/sources/aiida-alloy
 
 
 echo `pwd`
 one=`pwd | sed 's|^/cmmc/||'`
 one=`echo $one/`
+
+if [ "$1" != "-aa" ];then 
 if [ "$one" != "$dot" ];then
     echo "pwd              : `pwd`"
     echo "but you are in   : $one" 
     echo "you have to be in: $dot"
     exit
+fi
 fi
 
 if [ "$1" != "-oo" ];then
@@ -75,36 +79,36 @@ fi
 
 #echo myhost:$myhost:
 #echo mylaptop:$mylaptop:
-if [ "`hostname`" = "$mylaptop" ];then
-    echo
-    echo
-    echo
-    echo
-    echo
-    echo "#######################################"
-    echo "#### update other hosts ###############"
-    echo "#######################################"
-
-
-    #@ echo "#######################################"
-    #@ echo "#### update cmpc (and cmmd) ###########"
-    #@ echo "#######################################"
-    #@ #ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
-    #@ ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/Albert/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
-    
-    #@ echo "#######################################"
-    #@ echo "#### update cmpc (and cmmd) DONE ######"
-    #@ echo "#######################################"
-    #@ echo
-    #@ echo
-    #@ echo
-    #@ echo
-    #@ echo
-    #echo "#######################################"
-    #echo "#### update cmmc ######################"
-    #echo "#######################################"
-    #ssh.sh -t glensk@$myhost.mpie.de "/home/glensk/Dropbox/Albert/scripts/dotfiles/bin/ssh.sh -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd /cmmc/u/aglen/Dropbox/Albert/scripts/dotfiles;module load git;./bin/gitdown.sh\""
-    #echo
-    #echo
-    #echo
-fi
+#if [ "`hostname`" = "$mylaptop" ];then
+#    echo
+#    echo
+#    echo
+#    echo
+#    echo
+#    echo "#######################################"
+#    echo "#### update other hosts ###############"
+#    echo "#######################################"
+#
+#
+#    #@ echo "#######################################"
+#    #@ echo "#### update cmpc (and cmmd) ###########"
+#    #@ echo "#######################################"
+#    #@ #ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
+#    #@ ssh.sh -t glensk@$myhost.mpie.de "cd /home/glensk/Dropbox/Albert/scripts/dotfiles;./bin/gitdown.sh;./generalrc/generalrc_alias_renew.sh;./ssh/change_rights_of_config_to_600.sh"
+#    
+#    #@ echo "#######################################"
+#    #@ echo "#### update cmpc (and cmmd) DONE ######"
+#    #@ echo "#######################################"
+#    #@ echo
+#    #@ echo
+#    #@ echo
+#    #@ echo
+#    #@ echo
+#    #echo "#######################################"
+#    #echo "#### update cmmc ######################"
+#    #echo "#######################################"
+#    #ssh.sh -t glensk@$myhost.mpie.de "/home/glensk/Dropbox/Albert/scripts/dotfiles/bin/ssh.sh -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd /cmmc/u/aglen/Dropbox/Albert/scripts/dotfiles;module load git;./bin/gitdown.sh\""
+#    #echo
+#    #echo
+#    #echo
+#fi
