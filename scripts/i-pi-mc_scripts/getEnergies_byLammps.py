@@ -444,7 +444,10 @@ def test_formation_energies(pot,geopt,verbose):
     scripts = my.scripts()
     tests = scripts+'/tests/'
 
-    if True: # si-si-vac
+    if False: # si-si-vac
+        print("########################################################################")
+        print("# si-si-vac")
+        print("########################################################################")
         sisivac = tests+'/Al-Mg-Si/si-si-vac/'
         ff = '/aiida.in.final.runner'
         e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
@@ -469,66 +472,103 @@ def test_formation_energies(pot,geopt,verbose):
         print("# beta' (Mg9Si5)")
         print("########################################################################")
         bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_structures_relax.input.data'
-        print('bprime input data',bprime)
-        frames = ase_read(bprime,index=":",format="runner")
-        #print('len',len(frames))
-        for idx,i in enumerate(frames):
-            ana_atoms_ = frames[idx].get_number_of_atoms()
-            d = my.ase_get_chemical_symbols_to_conz(frames[idx])
-            n = my.ase_get_chemical_symbols_to_number_of_species(frames[idx])
-            print(idx,'nat',ana_atoms_,"nAl:",n["Al"],"nSi:",n["Si"],'nMg:',n["Mg"])
+        bprime2 = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/aiida_exported_group_BetaPrime_structures_relax.input.data'
+        relax_unrelax = [ bprime, bprime+'.v1',bprime+'.v3']
+        relax_unrelax = [ bprime+'.v3',bprime2]
+        for bprime in relax_unrelax:
+            print('bprime input data',bprime)
+            frames = ase_read(bprime,index=":",format="runner")
+            #print('len',len(frames))
+            for idx,i in enumerate(frames):
+                ana_atoms_ = frames[idx].get_number_of_atoms()
+                d = my.ase_get_chemical_symbols_to_conz(frames[idx])
+                n = my.ase_get_chemical_symbols_to_number_of_species(frames[idx])
+                print(idx,'nat',ana_atoms_,"nAl:",n["Al"],"nSi:",n["Si"],'nMg:',n["Mg"])
 
-        eDFT_pure_al   = my.ase_enepot(frames[3],units=ace.units) # 108 atoms
-        eDFT_dilute_mg = my.ase_enepot(frames[1],units=ace.units) # 108 atoms
-        eDFT_dilute_si = my.ase_enepot(frames[2],units=ace.units) # 108 atoms
-        eDFT_precip    = my.ase_enepot(frames[0],units=ace.units) # 28 atoms, 10Si, 18Mg
-        print('eDFT_pure_al  :',eDFT_pure_al  ,"(eV)",eDFT_pure_al  *0.036749325,"(hartree)")
-        print('eDFT_dilute_mg:',eDFT_dilute_mg,"(eV)",eDFT_dilute_mg*0.036749325,"(hartree)")
-        print('eDFT_dilute_si:',eDFT_dilute_si,"(eV)",eDFT_dilute_si*0.036749325,"(hartree)")
-        print('eDFT_precip   :',eDFT_precip   ,"(eV)",eDFT_precip   *0.036749325,"(hartree)")
-        print()
-        print('vol  pure  /at:',frames[3].get_volume()/frames[3].get_number_of_atoms())
-        print('vol  dilMg /at:',frames[1].get_volume()/frames[1].get_number_of_atoms())
-        print('vol  dilSi /at:',frames[2].get_volume()/frames[2].get_number_of_atoms())
-        print('vol  precip/at:',frames[0].get_volume()/frames[0].get_number_of_atoms())
+            eDFT_pure_al   = my.ase_enepot(frames[3],units=ace.units) # 108 atoms
+            eDFT_dilute_mg = my.ase_enepot(frames[1],units=ace.units) # 108 atoms
+            eDFT_dilute_si = my.ase_enepot(frames[2],units=ace.units) # 108 atoms
+            eDFT_precip    = my.ase_enepot(frames[0],units=ace.units) # 28 atoms, 10Si, 18Mg
+            #ase_write("POSCAR.ase.dat",frames[0],format="vasp")
+            #sys.exit()
+            print('eDFT_pure_al  :',eDFT_pure_al  ,"(eV)",eDFT_pure_al  *0.036749325,"(hartree)")
+            print('eDFT_dilute_mg:',eDFT_dilute_mg,"(eV)",eDFT_dilute_mg*0.036749325,"(hartree)")
+            print('eDFT_dilute_si:',eDFT_dilute_si,"(eV)",eDFT_dilute_si*0.036749325,"(hartree)")
+            print('eDFT_precip   :',eDFT_precip   ,"(eV)",eDFT_precip   *0.036749325,"(hartree)")
+            #print()
+            #print('vol  pure  /at:',frames[3].get_volume()/frames[3].get_number_of_atoms())
+            #print('vol  dilMg /at:',frames[1].get_volume()/frames[1].get_number_of_atoms())
+            #print('vol  dilSi /at:',frames[2].get_volume()/frames[2].get_number_of_atoms())
+            #print('vol  precip/at:',frames[0].get_volume()/frames[0].get_number_of_atoms())
 
-        e_pure_al   = ace.ene(frames[3]) # 108 atoms
-        e_dilute_mg = ace.ene(frames[1]) # 108 atoms
-        e_dilute_si = ace.ene(frames[2]) # 108 atoms
-        e_precip    = ace.ene(frames[0]) # 28 atoms, 10Si, 18Mg
+            e_pure_al   = ace.ene(frames[3]) # 108 atoms
+            e_dilute_mg = ace.ene(frames[1]) # 108 atoms
+            e_dilute_si = ace.ene(frames[2]) # 108 atoms
+            e_precip    = ace.ene(frames[0]) # 28 atoms, 10Si, 18Mg
 
-        print('e_pure_al  :',e_pure_al  ,"(eV)",e_pure_al  *0.036749325,"(hartree)")
-        print('e_dilute_mg:',e_dilute_mg,"(eV)",e_dilute_mg*0.036749325,"(hartree)")
-        print('e_dilute_si:',e_dilute_si,"(eV)",e_dilute_si*0.036749325,"(hartree)")
-        print('e_precip   :',e_precip   ,"(eV)",e_precip   *0.036749325,"(hartree)")
+            e_pure_al   = ace.ene(frames[3]) # 108 atoms
+            e_dilute_mg_r = ace.ene(frames[1],relax=True) # 108 atoms
+            e_dilute_si_r = ace.ene(frames[2],relax=True) # 108 atoms
+            e_precip_relaxed = ace.ene(frames[0],relax=True) # 28 atoms, 10Si, 18Mg
 
+            print('e_pure_al  :',e_pure_al  ,"(eV)",e_pure_al  *0.036749325,"(hartree)")
+            print('e_dilute_mg:',e_dilute_mg,"(eV)",e_dilute_mg*0.036749325,"(hartree)")
+            print('e_dilute_si:',e_dilute_si,"(eV)",e_dilute_si*0.036749325,"(hartree)")
+            print('e_precip   :',e_precip   ,"(eV)",e_precip   *0.036749325,"(hartree)")
+            print('e_precip_r :',e_precip_relaxed,"(eV)",e_precip_relaxed*0.036749325,"(hartree)")
+            #print(frames[0].get_forces())
+            #sys.exit()
 
-        dilute_si_f =  e_dilute_si - 107*e_pure_al/108
-        dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108
-        heat_precip = (e_precip - 18*dilute_mg_f - 10*dilute_si_f)/28
+            dilute_si_f =  e_dilute_si - 107*e_pure_al/108
+            dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108
+            heat_precip = (e_precip - 18*dilute_mg_f - 10*dilute_si_f)/28
+            heat_precip_relaxed = (e_precip_relaxed - 18*dilute_mg_f - 10*dilute_si_f)/28
 
-        dilute_si_f_DFT =  eDFT_dilute_si - 107*eDFT_pure_al/108
-        dilute_mg_f_DFT =  eDFT_dilute_mg - 107*eDFT_pure_al/108
-        heat_precip_DFT = (eDFT_precip - 18*dilute_mg_f_DFT - 10*dilute_si_f_DFT)/28
+            dilute_si_f_DFT =  eDFT_dilute_si - 107*eDFT_pure_al/108
+            dilute_mg_f_DFT =  eDFT_dilute_mg - 107*eDFT_pure_al/108
+            heat_precip_DFT = (eDFT_precip - 18*dilute_mg_f_DFT - 10*dilute_si_f_DFT)/28
 
-        print("dilute_si_f pot:",round(dilute_si_f,3)," DFT:",round(dilute_si_f_DFT,3))
-        print("dilute_mg_f pot:",round(dilute_mg_f,3)," DFT:",round(dilute_mg_f_DFT,3))
-        print("heat_precip pot:",round(heat_precip,3)," DFT:",round(heat_precip_DFT,3))
-        print()
+            dilute_si_f_r =  e_dilute_si_r - 107*e_pure_al/108
+            dilute_mg_f_r =  e_dilute_mg_r - 107*e_pure_al/108
+            heat_precip_rall = (e_precip_relaxed - 18*dilute_mg_f_r - 10*dilute_si_f_r)/28
 
-        print('bulk')
-        ace.murn(frames[3]) # 108 atoms
-        print('precip')
-        ace.murn(frames[0])
+            print("dilute_si_f pot        :",round(dilute_si_f,3)," DFT:",round(dilute_si_f_DFT,3))
+            print("dilute_mg_f pot        :",round(dilute_mg_f,3)," DFT:",round(dilute_mg_f_DFT,3))
+            print("heat_precip pot        :",round(heat_precip,3)," DFT:",round(heat_precip_DFT,3))
+            print("heat_precip_relaxed pot:",round(heat_precip_relaxed,3))
+            print("heat_precip_rall    pot:",round(heat_precip_rall,3))
+            print()
 
-    if True: # beta''
+            if False:   # get the murnaghan curve
+                print('bulk')
+                ace.murn(frames[3]) # 108 atoms
+                print('precip')
+                ace.murn(frames[0])
+
+    if False: # beta''
         print("########################################################################")
         print("# beta'' (Mg5Si6)")
         print("########################################################################")
         bprimeprime = tests+'/Al-Mg-Si/Mg5Si6_beta_doubleprime/POSCAR'
-        print('bprime input data',bprime)
-        frame = ase_read(bprimeprime,index=":",format="vasp")
-        print('f',frame.get_positions())
+        print('bprime input data',bprimeprime)
+        frame = ase_read(bprimeprime,format="vasp")
+        ase_write("POSCAR.aseMg5Si6.dat",frame,format="vasp")
+        print('lf',len(frame))
+        print('lf',frame)
+        print('fc',frame.cell)
+        #print('fp',frame.positions)
+        print('sym',frame.symbols)
+        e_mg5si6 = ace.ene(frame) # 108 atoms
+        print('e_mg5si6',e_mg5si6)
+        e_mg5si6_relaxed = ace.ene(frame,relax=True) # 28 atoms, 10Si, 18Mg
+        print('e_mg5si6_r',e_mg5si6_relaxed)
+        heat_precip         = (e_mg5si6 -         10*dilute_mg_f - 12*dilute_si_f)/22
+        heat_precip_relaxed = (e_mg5si6_relaxed - 10*dilute_mg_f - 12*dilute_si_f)/22
+        print("heat_precip pot:",round(heat_precip,3)) #," DFT:",round(heat_precip_DFT,3))
+        print("heat_preciprpot:",round(heat_precip_relaxed,3)) #," DFT:",round(heat_precip_DFT,3))
+        if True:   # get the murnaghan curve
+            print("beta'' volume ")
+            ace.murn(frame)
 
     return
 

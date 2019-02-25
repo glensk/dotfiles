@@ -1,6 +1,6 @@
 parray env HOME
 package require pbctools
-mol load xyz "/home/glensk/Downloads/tmp2/vacancy_pos.xyz"
+mol load xyz "/home/glensk/Downloads/tmp2/vacancy_pos_angstrom.xyz"
 pbc set {11.474929 11.474929 11.474929 60.000000 60.000000 60.000000} -all
 set id [molinfo top get id ]
 #mol waitfor all molid $id;   # when at some point not all points are read in

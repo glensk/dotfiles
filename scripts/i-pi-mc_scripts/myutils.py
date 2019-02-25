@@ -974,7 +974,7 @@ class ase_calculate_ene( object ):
         return
 
 
-    def ene(self,atoms=False):
+    def ene(self,atoms=False,relax=False):
         ''' atoms is an ase object '''
         if atoms == False:
             atoms = self.atoms
@@ -984,6 +984,15 @@ class ase_calculate_ene( object ):
         #self.atomsin = deepcopy(atoms)
         self.atoms = atoms
 
+        if relax == False and self.geopt == False:
+            pass
+        if relax == True and self.geopt == True:
+            pass
+        if relax == True and self.geopt == False:
+            pass  # realx wins, since locally set explicitely
+        if relax == False and self.geopt == True:
+            relax = True
+
         if self.verbose > 1:
             show_ase_atoms_content(atoms,showfirst=10,comment = "START ASE INTERNAL CALUCLATION !!!")
             print()
@@ -991,11 +1000,12 @@ class ase_calculate_ene( object ):
             print('##--lmpcmd:',self.lmpcmd)
             print('##--atom_types',self.atom_types)
             print('##--geopt',self.geopt)
+            print('##--relax',relax)
             print("#####################################################")
             print()
 
 
-        if self.geopt == False:
+        if relax == False:
             ################################################
             ### statis calculation
             ################################################

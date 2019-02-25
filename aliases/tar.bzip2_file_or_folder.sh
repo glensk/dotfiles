@@ -75,7 +75,9 @@ addexclude=""
 #echo allpaths: $allpaths
 
 
-[ "$verbose" = "true" ] && echo "addcommand    : $addcommand (empty means original files are not deleted)"
+[ "$verbose" = "true" ] && [ "$addcommand" = "" ] && echo "addcommand    : (empty: original files are NOT being deleted)"
+[ "$verbose" = "true" ] && [ "$addcommand" != "" ] && echo "addcommand    : $addcommand"
+
 $tar $addexclude $addcommand --use-compress-program=lbzip2 -cvf "$saveas.tar.bzip2" $allpaths
 
 #############################################################

@@ -1,9 +1,12 @@
 #!/bin/sh
 hier=`pwd`
 tarfiles="KMC_QCACHE KMC_ECACHE KMC_AL6XXX"
+outof=`echo "$tarfiles" | wc -l`
+now=1
 for tar in $tarfiles;do
     echo
-    echo tar $tar
+    echo "tar $tar | $now / outof $outof"
+    now=`echo $now | awk '{print $1+1}'`
     files=`find . -name $tar`
     for i in $files;do
         cd $hier
