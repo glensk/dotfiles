@@ -1,5 +1,11 @@
+self.nsites = 64  # for a 4^3 supercell
+self.natoms = self.nsites - self.nvac
+
+self.dbeads[0].q[0,:]): --> actual positions
+self.sites[self.unique_idx(self.state)].copy()*bohr_to_ang
+
 self.sites:  
-(actual undisturbed lattice sites)
+(undisturbed lattice sites) ---> those NEVER change during simulation
 [[ 0.          0.          0.        ]
  [ 2.71055907  1.56494201  4.42632442]
 ...
@@ -11,6 +17,15 @@ self.state:
 
 ostr:
 ostr = "".join(self.state)  = e.g. AAAAAAAMAAASAAAAMAAAAAAAAAAASASAAMAAAAVA...
+
+# how to make a new state && new sites:
+nstate = self.state.copy()
+nstate[svac], nstate[sneigh] = self.state[sneigh], self.state[svac]
+self.sites[self.unique_idx(nstate)]
+self.sites[self.unique_idx(self.state)]
+print(self.sites[self.unique_idx(self.state)])
+
+
 
 ivac (constant): if 64 atoms sits & 1vac -> ivac = [63]
 ivac (constant): if 64 atoms sits & 2vac -> ivac = [63 ,62]
