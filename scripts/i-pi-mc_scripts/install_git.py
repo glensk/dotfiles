@@ -66,8 +66,9 @@ def install_ipi(args):
     return
 
 def install_aiida_alloy(args):
-    print("git clone --depth 1 https://gitlab.com/daniel.marchand/aiida-alloy"+args.install)
-    subprocess.call(["git","clone","--depth","1","https://gitlab.com/daniel.marchand/aiida-alloy",args.install])
+    address="https://gitlab.com/daniel.marchand/aiida-alloy.git"
+    print("git clone --depth 1",address,args.install)
+    subprocess.call(["git","clone","--depth","1",address,args.install])
     print(os.getcwd())
     return
 
