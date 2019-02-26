@@ -82,11 +82,11 @@ def install_lbzip(args):
     home = os.environ["HOME"]
     print('HOME:',home)
     with my.cd("lbzip2-2.5/"):
-        print('configure ....')`
+        print('configure ....')
         subprocess.call(['./configure','--prefix='+home+'/.local'])
-        print('make ....')`
+        print('make ....')
         subprocess.call(['make'])
-        print('make install ....')`
+        print('make install ....')
         subprocess.call(['make','install'])
     return
 
@@ -201,6 +201,7 @@ def install_vmd(args):
     print("### configure")
     os.chdir(vmdfolder)
     subprocess.call(["./configure"])
+    #subprocess.call(['./configure','--prefix='+home+'/.local'])
 
     ## This would only be necessary if VMD variables were not set
     #vmdpath = home+"/sources/"+vmdfolder+"/"
@@ -213,7 +214,6 @@ def install_vmd(args):
     os.chdir("src")
     print("###",os.getcwd())
     subprocess.call(["make", "install"])
-    #bash_command("make atomsk",os.getcwd())
     return
 
 

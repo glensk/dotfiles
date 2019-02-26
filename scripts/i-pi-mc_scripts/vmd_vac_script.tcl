@@ -3,6 +3,8 @@ package require pbctools
 mol load xyz "/home/glensk/Downloads/tmp2/vacancy_pos_angstrom.xyz"
 pbc set {11.474929 11.474929 11.474929 60.000000 60.000000 60.000000} -all
 set id [molinfo top get id ]
+# pbc box # to show box 
+# pbc get # to show box coordinates which are set with pbc set ...
 #mol waitfor all molid $id;   # when at some point not all points are read in
 set allmyframes [molinfo $id get numframes]
 puts "--> frames $allmyframes"
