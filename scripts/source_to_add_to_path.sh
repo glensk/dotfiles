@@ -20,10 +20,11 @@ _aiida_a="$SCR/qe-aiida/aiida_analyze/"
 _aiida_b="$SCR/qe-aiida/aiida_submitskripts/"
 _lammps1="$SCR/lammps_executables"
 _lammps2="$SCR/lammps_scripts"
+_python_thermodynamics="$SCR/python_thermodynamics/"
 _ase_lammps="$HOME/sources/lammps_source_cosmo"
 _n2p2_lib="$HOME/sources/n2p2/lib"
 
-addeverywhere="$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps1:$_lammps2:$_ase_lammps/python"
+addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps1:$_lammps2:$_ase_lammps/python"
 
 export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$_n2p2_lib"
