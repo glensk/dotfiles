@@ -70,9 +70,11 @@ addcommand="";
 
 addexclude="--exclude=KMC_QCACHE.tar.bzip2 --exclude=KMC_ECACHE.tar.bzip2 --exclude=KMC_AL6XXX.tar.bzip2 --exclude=log.tar.bzip2 --exclude=log.tar.gz"
 addexclude=""
-#echo add: $addcommand
-#echo addexclude: $addexclude
-#echo allpaths: $allpaths
+echo ---------------------------
+echo add: $addcommand
+echo addexclude: $addexclude
+echo allpaths: $allpaths
+echo ---------------------------
 
 
 [ "$verbose" = "true" ] && [ "$addcommand" = "" ] && echo "addcommand    : (empty: original files are NOT being deleted)"

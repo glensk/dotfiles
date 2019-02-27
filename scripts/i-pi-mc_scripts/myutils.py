@@ -594,14 +594,14 @@ def scripts():
     scripts = os.environ['scripts']
     if not os.path.isdir(scripts):
         print('scripts:',scripts)
-        sys.exit('$scripts variable is not defined or is not an existing folder')
+        sys.exit('scripts variable is not defined or is not an existing folder')
     return scripts
 
 def test_and_return_environment_var_path(var,path=False):
     variable = os.environ[var]
     if path == False:
         if not os.path.isfile(variable):
-            sys.exit('variable '+str(var)+' is not defined or is not an existing file')
+            sys.exit('The variable '+str(var)+' is not defined or is not an existing file')
     else:
         if not os.path.isdir(variable):
             sys.exit('directory '+str(var)+' is not defined or does not exist')
@@ -612,7 +612,7 @@ def runner_exec(test=False):
     ''' return environment variable runner_exec (RuNNer executable)'''
     runner_exec = os.environ['runner_exec']
     if test == False and not os.path.isfile(runner_exec):
-        sys.exit('$runner_exec variable is not defined or is not an existing file')
+        sys.exit('runner_exec variable is not defined or is not an existing file')
     return runner_exec
 
 def hostname():

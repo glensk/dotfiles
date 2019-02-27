@@ -73,13 +73,21 @@ def install_aiida_alloy(args):
     return
 
 def install_lbzip(args):
+    ''' works on fidis
+        works on mac (also not necessary, since alredy installed)
+    '''
     print("wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz")
     subprocess.call(["wget","http://archive.lbzip2.org/lbzip2-2.5.tar.gz"])
     subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
+    home = os.environ["HOME"]
+    print('HOME:',home)
     with my.cd("lbzip2-2.5/"):
-        subporocess.call(['./configure','--prefix=\"$HOME/.local\"'])
-        subporocess.call(['make'])
-        subporocess.call(['make install'])
+        print('configure ....')
+        subprocess.call(['./configure','--prefix='+home+'/.local'])
+        print('make ....')
+        subprocess.call(['make'])
+        print('make install ....')
+        subprocess.call(['make','install'])
     return
 
 def install_lammps(args):
@@ -193,6 +201,7 @@ def install_vmd(args):
     print("### configure")
     os.chdir(vmdfolder)
     subprocess.call(["./configure"])
+    #subprocess.call(['./configure','--prefix='+home+'/.local'])
 
     ## This would only be necessary if VMD variables were not set
     #vmdpath = home+"/sources/"+vmdfolder+"/"
@@ -205,7 +214,6 @@ def install_vmd(args):
     os.chdir("src")
     print("###",os.getcwd())
     subprocess.call(["make", "install"])
-    #bash_command("make atomsk",os.getcwd())
     return
 
 
