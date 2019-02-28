@@ -1471,5 +1471,4 @@ if __name__ == '__main__':
 	#print("I am " + unicodedata.lookup("GREEK SMALL LETTER PI"))
 	#print("I am " + unicodedata.lookup("GREEK SMALL LETTER DELTA"))
 	#DELTA=unicodedata.lookup("GREEK CAPITAL LETTER DELTA")
-
-        print(("==> ("+args.element+") ene_std: {ene_std:5.1f} for_std: {for_std:6.4f}  dudl/2: {free_ene_err:5.1f}  ||| alat {alat:4.3f} ||| alat_mor {alat_mor:4.3f} a_mor {a_mor:7.5f}  D_mor {D_mor:7.5f} ||"+PRL_L).format(ene_std=args.ene_std_lam1, for_std=args.for_std_lam1, free_ene_err=free_ene_err,alat_mor=args.alat_mor,alat=args.alat,delta=1. - args.alat_mor/args.alat,a_mor=args.a_mor,D_mor=args.D_mor))
+        print(("==> ("+args.element+") ene_std: {ene_std:5.1f} for_std: {for_std:6.5f}  dudl/2: {free_ene_err:5.1f}  ||| alat {alat:4.3f} ||| alat_mor {alat_mor:4.3f} a_mor {a_mor:7.5f}  D_mor {D_mor:7.5f} ||"+PRL_L).format(ene_std=args.ene_std_lam1, for_std=args.for_std_lam1, free_ene_err=free_ene_err,alat_mor=args.alat_mor,alat=args.alat,delta=1. - args.alat_mor/args.alat,a_mor=args.a_mor,D_mor=args.D_mor))
