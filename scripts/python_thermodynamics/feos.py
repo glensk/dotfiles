@@ -170,7 +170,7 @@ class eos(object):
         self.e0 = None
         self.b0 = None
         self.b0der = None
-        self.parameters = None
+        self.parameters = None # [e0, v0, b0, b0der]
         self.fitvolumes = None
         self.fitenergies = None
         self.fitdeltas = None
@@ -444,9 +444,11 @@ class eos(object):
             datax = self.data[:,0]
         if type(datay) == bool:
             datay = self.data[:,1]
-
-        print "datax:",datax
-        print "datay:",datay
+        self.datax = datax
+        self.datay = datay
+        if self._verbose:
+            print "datax:",datax
+            print "datay:",datay
 
         if len(datax) is not len(datay):
             sys.exit("volumes_per_atom have different lenght than energies_per_atom")
@@ -461,7 +463,8 @@ class eos(object):
         if self.equation == "lennardjones":
             #guess = [ eps, rm ]
             guess = [ 16. , volume_enemin ]
-        print "guess:",guess
+        if self._verbose:
+            print "guess:",guess
 
         # fit to data
         from scipy import optimize
@@ -492,8 +495,9 @@ class eos(object):
             self.b0 = parameters[2] #* meVByAngstromToGPa * 1000
             self.b0der = parameters[3]
             self.parameters = [self.e0, self.v0, self.b0, self.b0der]
-        _printgreen(">>> "+str(self.equation)+" <<< ",)
-        print("pars: "+str(self.parameters))
+        if self._verbose:
+            _printgreen(">>> "+str(self.equation)+" <<< ",)
+            print("pars: "+str(self.parameters))
 
         # fit (it would be more nice to solve maximum energy and plot to corr. volume)
         dx = max([abs(datax.min() - self.v0), abs(datax.max() - self.v0)])*1.03
@@ -504,7 +508,8 @@ class eos(object):
             print "datax.max",datax.max()
             print "dx",dx
         self.fitvolumes = np.linspace(self.v0 - dx, self.v0 + dx, num=points)
-        print "fm:",self.fitvolumes,"aaa",parameters
+        if self._verbose:
+            print("fm:",self.fitvolumes,"aaa",parameters)
         self.fitenergies = eos(self.fitvolumes, *parameters)
 
 
@@ -527,9 +532,10 @@ class eos(object):
 
         # delta to fit
         self.fitdeltas = eos(datax, *parameters) - datay
-        print "datay:",datay
-        print "datan:", eos(datax, *parameters)
-        print "fitde:",self.fitdeltas
+        if self._verbose:
+            print "datay:",datay
+            print "datan:", eos(datax, *parameters)
+            print "fitde:",self.fitdeltas
 
         # check if delta to fit has no hop (e.g. due to change in NGX(F))
         #d = np.diff(self.fitdeltas)/np.diff(self.datax)

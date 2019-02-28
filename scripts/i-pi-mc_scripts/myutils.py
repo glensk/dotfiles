@@ -1181,9 +1181,10 @@ class ase_calculate_ene( object ):
         print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
         #pos_ref = atoms_murn.get_positions()
         #print('ene',self.ene(atoms_murn))
-        dvol_rel=[0.97,0.98,0.99,1.0,1.01,1.02,1.03]
+        dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,1.0,1.05,1.01,1.015,1.02,1.025,1.03]
         vol_pa = np.zeros(len(dvol_rel))
         ene_pa = np.zeros(len(dvol_rel))
+
 
         #dvol_rel=[0.97,0.98,0.99,1.0,1.01,1.02,1.03,1.04,1.05,1.06]
         #print('cell',atoms_murn.get_cell())
@@ -1200,11 +1201,17 @@ class ase_calculate_ene( object ):
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
             #print('vol',vol,'ene',ene)
-            print(vol/nat,ene/nat)
+            #print(vol/nat,ene/nat)
+
+        np.savetxt("energy.dat",np.transpose([vol_pa,ene_pa]))
         from feos import eos
         vinet = eos()
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
-        print('e0',vient.e0)
+        print('e0',vinet.e0)
+        print('v0',vinet.v0)
+        print('b0',vinet.b0)
+        print('b0der',vinet.b0der)
+        print('pars',vinet.parameters)
 
         return
 
