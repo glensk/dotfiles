@@ -174,7 +174,7 @@ class eos(object):
         self.fitvolumes = None
         self.fitenergies = None
         self.fitdeltas = None
-        self.data = None
+        self.data = False
 
         #specifit for importing
         self._verbose = False
@@ -277,23 +277,28 @@ class eos(object):
                 help='verbose', action='store_true', default=self._verbose)
         return p
 
-    def import_energy_vs_volume_data(self):
+    def import_energy_vs_volume_data(self,data=False):
         """ Imports the first tow columns from a file containing:
         1st column: Volumes per atom [Angstrom^3]
         2nd column: Energies per atom [eV] """
-        if os.path.isfile(self.inputfile) is not True:
-            sys.exit("Necessary inputfile \"" + str(self.inputfile) + "\" not found.")
+        if type(data) == bool:
+            if os.path.isfile(self.inputfile) is not True:
+                sys.exit("Necessary inputfile \"" + str(self.inputfile) + "\" not found.")
+            else:
+                self.inputfile = os.path.abspath(self.inputfile)
+
+            #_printgreen("importing "+str(os.path.abspath(self.inputfile))+" ...")
+            _printgreen("importing "+str(os.path.relpath(self.inputfile))+" ...")
+
+            self.folder = os.path.split(os.path.realpath(self.inputfile))[0]
+
+            data = pylab.loadtxt(self.inputfile)
         else:
-            self.inputfile = os.path.abspath(self.inputfile)
-
-        #_printgreen("importing "+str(os.path.abspath(self.inputfile))+" ...")
-        _printgreen("importing "+str(os.path.relpath(self.inputfile))+" ...")
-
-        self.folder = os.path.split(os.path.realpath(self.inputfile))[0]
-
-        data = pylab.loadtxt(self.inputfile)
+            data = data
         self.data = data[data[:, 0].argsort()]
         self.data_in = self.data
+        #print('skkkkkkk',self.data)
+        #sys.exit()
 
         # if we have a third column in energy.dat file
         if self.data.shape[1] == 3:
@@ -331,6 +336,7 @@ class eos(object):
             pass
         elif self._units_volume == "Bohr^3":
             dataxall = dataxall * 6.7483346
+
 
         datayall = self.data[:, 1]*1000/self._input_energy_divide  # *1000 since murn and so on need energy in meV
         if self._units_energy == 'eV':
@@ -440,10 +446,20 @@ class eos(object):
         v0smallerwarnin = 8
         v0biggerwarnin = 35
 
-        if type(datax) == bool:
-            datax = self.data[:,0]
-        if type(datay) == bool:
-            datay = self.data[:,1]
+
+
+        if type(datax) == bool and type(datay) == bool:
+            if type(self.data) == bool:
+                sys.exit('no data given!!!')
+            else:
+                datax = self.data[:,0]
+                datay = self.data[:,1]
+        if type(datax) != bool and type(datay) != bool:
+            data = np.transpose([datax,datay])
+            self.import_energy_vs_volume_data(data=data)
+            datax = self.datax
+            datay = self.datay
+
         self.datax = datax
         self.datay = datay
         if self._verbose:
@@ -663,6 +679,8 @@ class eos(object):
                     fmt='%.18f',
                     delimiter='  ')   # X is an array
 
+        #print('sd',self.data)
+        #print('fd',self.fitdeltas)
         plotdiff = np.transpose([self.data[:,0],self.fitdeltas])
         np.savetxt("delta_evinet_fit-data.dat",plotdiff)
         return
