@@ -435,28 +435,30 @@ def printhead(structures_to_calc,ace_units):
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
-def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,frame=[False,False]):
-    vol = ""
-    vol0 = ""
-    ace = frame[0]
-    frame=frame[1]
-    if type(frame) != bool:
-        vol = frame.get_volume()/frame.get_number_of_atoms()
-        vol = round(vol,3)
-        #print('stress 1',ace.stress(frame))
-        # print('ene1',ace.ene(frame))
-        ace.ene(frame,atomrelax=True, cellrelax=True) #,print_minimization_to_screen=True)
-        #print('ene2',ace.ene(frame))
-        vol0 = frame.get_volume()/frame.get_number_of_atoms()
-        vol0 = round(vol0,3)
-        #print('stress 2',ace.stress(frame))
+def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,eos=""):
+    if eos != "":
+        eos = np.round(eos,1)[1:][:2]
+    #vol = ""
+    #vol0 = ""
+    #ace = frame[0]
+    #frame=frame[1]
+    #if type(frame) != bool:
+    #    vol = frame.get_volume()/frame.get_number_of_atoms()
+    #    vol = round(vol,3)
+    #    #print('stress 1',ace.stress(frame))
+    #    # print('ene1',ace.ene(frame))
+    #    ace.ene(frame,atomrelax=True, cellrelax=True) #,print_minimization_to_screen=True)
+    #    #print('ene2',ace.ene(frame))
+    #    vol0 = frame.get_volume()/frame.get_number_of_atoms()
+    #    vol0 = round(vol0,3)
+    #    #print('stress 2',ace.stress(frame))
 
 
     try:
         diff = round(np.abs(np.abs(pot_ene/DFT_ene)-1),2)
     except ZeroDivisionError:
         diff = "-"
-    print(text.ljust(35)+":",str(round(pot_ene,3)).ljust(8),"(eV) DFT:",str(round(DFT_ene,3)).ljust(9),str(diff).ljust(5),"volcurr/vol0",vol,vol0)
+    print(text.ljust(35)+":",str(round(pot_ene,3)).ljust(8),"(eV) DFT:",str(round(DFT_ene,3)).ljust(9),str(diff).ljust(5),eos)
     return
 
 def test_si_si_vac(ace):
@@ -495,26 +497,13 @@ def test_betaprime_mg9si5(ace):
     for bprime in relax_unrelax:
         #print('bprime input data',bprime)
         frames = ase_read(bprime,index=":",format="runner")
-        #print('len',len(frames))
-        #for idx,i in enumerate(frames):
-        #    ana_atoms_ = frames[idx].get_number_of_atoms()
-        #    d = my.ase_get_chemical_symbols_to_conz(frames[idx])
-        #    n = my.ase_get_chemical_symbols_to_number_of_species(frames[idx])
-        #    #print(idx,'nat',ana_atoms_,"nAl:",n["Al"],"nSi:",n["Si"],'nMg:',n["Mg"])
 
         struct_pure_al = frames[3]
         struct_dilute_mg = frames[1]
         struct_dilute_si = frames[2]
         struct_mg9si5    = frames[0]
 
-        e_1 = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
-        print('e_01',e_1)
-        ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
-        e_2 = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
         #e_2 = ace.ene(struct_mg9si5,cellrelax=True,atomrelax=True) # 28 atoms, 10Si, 18Mg
-        print('e_02',e_2)
-        print()
-        sys.exit()
 
 
 
@@ -522,72 +511,16 @@ def test_betaprime_mg9si5(ace):
         eDFT_dilute_mg = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
         eDFT_dilute_si = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
         eDFT_precip    = my.ase_enepot(struct_mg9si5   ,units=ace.units) # 28 atoms, 10Si, 18Mg
-        #print('---forces DFT---',abs(frames[0].get_forces()).max())
-        #print(frames[0].get_forces()[:3])
-        #print('pos')
-        #print(frames[0].get_positions()[:3])
-        #print('stress',ace.stress(frames[0]))
-        #print('volume',frames[0].get_volume()/frames[0].get_number_of_atoms())
-        #print()
-        #ase_write("POSCAR.ase.dat",frames[0],format="vasp")
-        #sys.exit()
-        #print('eDFT_pure_al  :',eDFT_pure_al  ,"(eV)",eDFT_pure_al  *0.036749325,"(hartree)")
-        #print('eDFT_dilute_mg:',eDFT_dilute_mg,"(eV)",eDFT_dilute_mg*0.036749325,"(hartree)")
-        #print('eDFT_dilute_si:',eDFT_dilute_si,"(eV)",eDFT_dilute_si*0.036749325,"(hartree)")
-        #print('eDFT_precip   :',eDFT_precip   ,"(eV)",eDFT_precip   *0.036749325,"(hartree)")
-        #print()
-        #print('vol  pure  /at:',frames[3].get_volume()/frames[3].get_number_of_atoms())
-        #print('vol  dilMg /at:',frames[1].get_volume()/frames[1].get_number_of_atoms())
-        #print('vol  dilSi /at:',frames[2].get_volume()/frames[2].get_number_of_atoms())
-        #print('vol  precip/at:',frames[0].get_volume()/frames[0].get_number_of_atoms())
-
         e_pure_al   = ace.ene(struct_pure_al) # 108 atoms
         e_dilute_mg = ace.ene(struct_dilute_mg) # 108 atoms
         e_dilute_si = ace.ene(struct_dilute_si) # 108 atoms
         e_precip    = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
 
-        #cpos = frames[0].get_positions()
-        #print('cpos')
-        #print(cpos[:10])
-        #cpos[0][0]=1.87  # was 1.845412
-        #frames[0].set_positions(cpos)
-        #print('---forces pot---',abs(frames[0].get_forces()).max())
-        #print(frames[0].get_forces()[:3])
-        #print('pos')
-        #print(frames[0].get_positions()[:3])
-        #print('stress',ace.stress(frames[0]))
-        #print('volume',frames[0].get_volume()/frames[0].get_number_of_atoms())
-        #print()
-
         e_pure_al        = ace.ene(struct_pure_al) # 108 atoms
         e_dilute_mg_r    = ace.ene(struct_dilute_mg,atomrelax=True) # 108 atoms
         e_dilute_si_r    = ace.ene(struct_dilute_si,atomrelax=True) # 108 atoms
         e_precip_relaxed = ace.ene(struct_mg9si5   ,atomrelax=True) # 28 atoms, 10Si, 18Mg
-        #print('---forces pot relaxed---',abs(frames[0].get_forces()).max())
-        #print(frames[0].get_forces()[:3])
-        #print(frames[0].get_positions()[:3])
-        #print('stress',ace.stress(frames[0]))
-        #print('volume',frames[0].get_volume()/frames[0].get_number_of_atoms())
-        #print()
 
-
-        #print('---XXXforces pot relaxed---',abs(frames[0].get_forces()).max())
-        #print('volume',frames[0].get_volume()/frames[0].get_number_of_atoms())
-        #def get_volcurrent_volequilibrium(frame):
-
-        #ace.ene(frames[0],atomrelax=True, cellrelax=True) #,print_minimization_to_screen=True)
-        #print(frames[0].get_forces()[:3])
-        #print(frames[0].get_positions()[:3])
-        #print('stress',ace.stress(frames[0]))
-        #print('volume',frames[0].get_volume()/frames[0].get_number_of_atoms())
-
-        #print('e_pure_al  :',e_pure_al  ,"(eV)",e_pure_al  *0.036749325,"(hartree)")
-        #print('e_dilute_mg:',e_dilute_mg,"(eV)",e_dilute_mg*0.036749325,"(hartree)")
-        #print('e_dilute_si:',e_dilute_si,"(eV)",e_dilute_si*0.036749325,"(hartree)")
-        #print('e_precip   :',e_precip   ,"(eV)",e_precip   *0.036749325,"(hartree)")
-        #print('e_precip_r :',e_precip_relaxed,"(eV)",e_precip_relaxed*0.036749325,"(hartree)")
-        #print(frames[0].get_forces())
-        #sys.exit()
 
         dilute_si_f =  e_dilute_si - 107*e_pure_al/108
         dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108
@@ -605,38 +538,16 @@ def test_betaprime_mg9si5(ace):
 
 
 
+        vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
 
         print_compare_ene_vs_DFT("one Si in Al",dilute_si_f,dilute_si_f_DFT)
-        print_compare_ene_vs_DFT("one Si in Al r",dilute_si_f_r,dilute_si_f_DFT)
+        #print_compare_ene_vs_DFT("one Si in Al r",dilute_si_f_r,dilute_si_f_DFT)
         print_compare_ene_vs_DFT("one Mg in Al",dilute_mg_f,dilute_mg_f_DFT)
-        print_compare_ene_vs_DFT("one Mg in Al r",dilute_mg_f_r,dilute_mg_f_DFT)
-        print_compare_ene_vs_DFT("beta prime Mg9Si5",heat_precip,heat_precip_DFT)
-        print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT)
-        print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT,[ace,struct_mg9si5])
-        print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT,[ace,struct_mg9si5])
-
-
-
-        e_1 = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
-        print('e_1',e_1)
-        ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
-        e_2 = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
-        print('e_2',e_2)
-
-
-        sys.exit('8888888')
-        #print("one Si in Al           :",round(dilute_si_f,3)," DFT:",round(dilute_si_f_DFT,3))
-        #print("one Mg in Al           :",round(dilute_mg_f,3)," DFT:",round(dilute_mg_f_DFT,3))
-        #print("beta prime Mg9Si5      :",round(heat_precip,3)," DFT:",round(heat_precip_DFT,3))
-        #print("beta prime _relaxed pot:",round(heat_precip_relaxed,3))
-        #print("beta prime _rall    pot:",round(heat_precip_rall,3))
-        #print()
-
-        if False:   # get the murnaghan curve
-            print('bulk volume/atom',frames[3].get_volume()/frames[3].get_number_of_atoms())
-            ace.get_murn(frames[3]) # 108 atoms
-            print('precip',frames[0].get_volume()/frames[0].get_number_of_atoms())
-            ace.get_murn(frames[0])
+        #print_compare_ene_vs_DFT("one Mg in Al r",dilute_mg_f_r,dilute_mg_f_DFT)
+        print_compare_ene_vs_DFT("beta prime Mg9Si5",heat_precip,heat_precip_DFT,vinet_mg9si5)
+        #print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT)
+        #print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT,[ace,struct_mg9si5])
+        #print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT,[ace,struct_mg9si5])
         return dilute_mg_f, dilute_si_f
 
 def test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f):
@@ -646,25 +557,16 @@ def test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f):
     #print('bprime input data',bprimeprime)
     frame = ase_read(bprimeprime,format="vasp")
     ase_write("POSCAR.aseMg5Si6.dat",frame,format="vasp")
-    #print('lf',len(frame))
-    #print('lf',frame)
-    #print('fc',frame.cell)
-    #print('fp',frame.positions)
-    #print('sym',frame.symbols)
     e_mg5si6 = ace.ene(frame) # 108 atoms
     #print('e_mg5si6',e_mg5si6)
     e_mg5si6_relaxed = ace.ene(frame,atomrelax=True) # 28 atoms, 10Si, 18Mg
     #print('e_mg5si6_r',e_mg5si6_relaxed)
 
+    vinet_mg5si6 = ace.get_murn(frame) # 28 atoms, 10Si, 18Mg
     heat_precip         = (e_mg5si6 -         10*dilute_mg_f - 12*dilute_si_f)/22
     heat_precip_relaxed = (e_mg5si6_relaxed - 10*dilute_mg_f - 12*dilute_si_f)/22
-    print_compare_ene_vs_DFT("beta double prime Mg5Si6",heat_precip,0.0)
-    print_compare_ene_vs_DFT("beta double prime Mg5Si6 (relaxed)",heat_precip_relaxed,0.0)
-    #print("heat_precip pot:",round(heat_precip,3)) #," DFT:",round(heat_precip_DFT,3))
-    #print("heat_preciprpot:",round(heat_precip_relaxed,3)) #," DFT:",round(heat_precip_DFT,3))
-    if False:   # get the murnaghan curve
-        print("beta'' volume ")
-        ace.get_murn(frame)
+    print_compare_ene_vs_DFT("beta double prime Mg5Si6",heat_precip,0.0,vinet_mg5si6)
+    #print_compare_ene_vs_DFT("beta double prime Mg5Si6 (relaxed)",heat_precip_relaxed,0.0)
     return
 
 def test_formation_energies(pot,geopt,verbose):

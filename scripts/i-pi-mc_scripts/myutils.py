@@ -16,6 +16,7 @@ try:
 except ImportError:
     pass
 
+from feos import eos
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase.optimize import BFGS
@@ -889,6 +890,7 @@ class ase_calculate_ene( object ):
         self.temp = temp
         self.mypot = mypot(self.pot)
         self.mypot.get()
+        #self.eos = [ False, False, False, False] # e0_meV/pa, v0_ang^3/pa, B0, B0der]
 
         if self.verbose:
             print('ase_calculate_ene, self.pot           :',self.pot)
@@ -1157,6 +1159,28 @@ class ase_calculate_ene( object ):
         #print('stress',stress)
         return stress
 
+    def get_v0(self,atomsin=False):
+        ''' the function will never change the atomsobject '''
+        if atomsin == False:
+            sys.exit('need to define atoms in this case XX')
+        atoms_murn = atomsin.copy()
+        atoms_murn.wrap()
+
+        keep_alive = False
+        atomrelax = False
+        if atomrelax == False: keep_alive = False
+        if atomrelax == True:  keep_alive = True
+        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
+        atoms_murn.set_calculator(asecalcLAMMPS)
+
+        ### relax the atoms_murn first to the equilibrium
+        self.ene(atoms_murn,cellrelax=True,atomrelax=True)
+        return atoms_murn.get_volume()
+
+    def get_v0_pa(self,atomsin=False):
+        ''' the function will never change the atomsobject '''
+        return self.get_v0(atomsin=atomsin)/atomsin.get_number_of_atoms()
+
     def get_murn(self,atomsin=False):
         ''' the murn will never change the atomsobject '''
         if atomsin == False:
@@ -1177,11 +1201,11 @@ class ase_calculate_ene( object ):
 
 
 
-        print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
-        print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
+        #print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
+        #print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
         #pos_ref = atoms_murn.get_positions()
         #print('ene',self.ene(atoms_murn))
-        dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,1.0,1.05,1.01,1.015,1.02,1.025,1.03]
+        dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,1.0,1.005,1.01,1.015,1.02,1.025,1.03]
         vol_pa = np.zeros(len(dvol_rel))
         ene_pa = np.zeros(len(dvol_rel))
 
@@ -1193,6 +1217,7 @@ class ase_calculate_ene( object ):
         #print()
         cell_ref = atoms_murn.get_cell()
         nat = atoms_murn.get_number_of_atoms()
+
         for idx,i in enumerate(dvol_rel):
             atoms_murn.set_cell(cell_ref*i,scale_atoms=True)
             #print('cell',atoms_murn.get_cell())
@@ -1200,20 +1225,17 @@ class ase_calculate_ene( object ):
             ene=self.ene(atoms_murn)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
-            #print('vol',vol,'ene',ene)
+            #print(idx,i,'vol',vol,'ene',ene)
             #print(vol/nat,ene/nat)
 
-        np.savetxt("energy.dat",np.transpose([vol_pa,ene_pa]))
-        from feos import eos
-        vinet = eos()
-        vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
-        print('e0',vinet.e0)
-        print('v0',vinet.v0)
-        print('b0',vinet.b0)
-        print('b0der',vinet.b0der)
-        print('pars',vinet.parameters)
+        #np.savetxt("energy.dat",np.transpose([vol_pa,ene_pa]))
 
-        return
+        vinet = eos()
+        data=np.transpose([vol_pa,ene_pa])
+        vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
+        #self.eos = vinet.parameters
+        #print('pars',vinet.parameters)
+        return vinet.parameters
 
 
 def ase_vpa(atoms):
