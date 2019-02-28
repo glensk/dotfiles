@@ -480,8 +480,8 @@ def test_si_si_vac(ace):
     e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
 
     #print_compare_ene_vs_DFT('vacancy_formation (unrelaxed) NN: ',e_ss_va,
-    print_compare_ene_vs_DFT("vacancy_formation (unrelaxed)",e_ss_va,0.69)
-    print_compare_ene_vs_DFT("si-si-vac-complex (unrelaxed)",e_si_si_vac_complex,0.074)
+    print_compare_ene_vs_DFT("vacancy_formation (unrelaxed, oDFT)",e_ss_va,0.69)
+    print_compare_ene_vs_DFT("si-si-vac-complex (unrelaxed, oDFT)",e_si_si_vac_complex,0.074)
     return
 
 def test_betaprime_mg9si5(ace):
