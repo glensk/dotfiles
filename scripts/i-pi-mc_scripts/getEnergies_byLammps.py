@@ -435,9 +435,11 @@ def printhead(structures_to_calc,ace_units):
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
-def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,eos=""):
+def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,eos="",f300=""):
     if eos != "":
         eos = np.round(eos,1)[1:][:2]
+    if f300 != "":
+        f300 = np.round(f300,1)
     #vol = ""
     #vol0 = ""
     #ace = frame[0]
@@ -458,7 +460,7 @@ def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,eos=""):
         diff = round(np.abs(np.abs(pot_ene/DFT_ene)-1),2)
     except ZeroDivisionError:
         diff = "-"
-    print(text.ljust(35)+":",str(round(pot_ene,3)).ljust(8),"(eV) DFT:",str(round(DFT_ene,3)).ljust(9),str(diff).ljust(5),eos)
+    print(text.ljust(35)+":",str(round(pot_ene,3)).ljust(8),"(eV) DFT:",str(round(DFT_ene,3)).ljust(9),str(diff).ljust(5),eos,f300)
     return
 
 def test_si_si_vac(ace):
@@ -485,9 +487,6 @@ def test_si_si_vac(ace):
     return
 
 def test_betaprime_mg9si5(ace):
-    #print("########################################################################")
-    #print("# beta' (Mg9Si5)")
-    #print("########################################################################")
     scripts = my.scripts()
     tests = scripts+'/tests/'
     bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_structures_relax.input.data'
@@ -503,7 +502,6 @@ def test_betaprime_mg9si5(ace):
         struct_dilute_si = frames[2]
         struct_mg9si5    = frames[0]
 
-        #e_2 = ace.ene(struct_mg9si5,cellrelax=True,atomrelax=True) # 28 atoms, 10Si, 18Mg
 
 
 
@@ -515,6 +513,14 @@ def test_betaprime_mg9si5(ace):
         e_dilute_mg = ace.ene(struct_dilute_mg) # 108 atoms
         e_dilute_si = ace.ene(struct_dilute_si) # 108 atoms
         e_precip    = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+
+        vinet_al = ace.get_murn(struct_pure_al) # 28 atoms, 10Si, 18Mg
+        f300 = ace.get_fh(struct_pure_al)
+        print_compare_ene_vs_DFT("Al",e_pure_al,eDFT_pure_al,vinet_al,f300)
+        sys.exit("777777777777")
+
+
+
 
         e_pure_al        = ace.ene(struct_pure_al) # 108 atoms
         e_dilute_mg_r    = ace.ene(struct_dilute_mg,atomrelax=True) # 108 atoms
@@ -539,6 +545,7 @@ def test_betaprime_mg9si5(ace):
 
 
         vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+        ace.get_fh(struct_mg9si5)
 
         print_compare_ene_vs_DFT("one Si in Al",dilute_si_f,dilute_si_f_DFT)
         #print_compare_ene_vs_DFT("one Si in Al r",dilute_si_f_r,dilute_si_f_DFT)
@@ -563,6 +570,7 @@ def test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f):
     #print('e_mg5si6_r',e_mg5si6_relaxed)
 
     vinet_mg5si6 = ace.get_murn(frame) # 28 atoms, 10Si, 18Mg
+
     heat_precip         = (e_mg5si6 -         10*dilute_mg_f - 12*dilute_si_f)/22
     heat_precip_relaxed = (e_mg5si6_relaxed - 10*dilute_mg_f - 12*dilute_si_f)/22
     print_compare_ene_vs_DFT("beta double prime Mg5Si6",heat_precip,0.0,vinet_mg5si6)
@@ -574,9 +582,9 @@ def test_formation_energies(pot,geopt,verbose):
     #print('changed units to eV!')
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_formation_energies
 
-    test_si_si_vac(ace)
+    #test_si_si_vac(ace)
     dilute_mg_f, dilute_si_f = test_betaprime_mg9si5(ace)
-    test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f)
+    #test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f)
     return
 
 

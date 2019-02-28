@@ -1198,9 +1198,6 @@ class ase_calculate_ene( object ):
         ### relax the atoms_murn first to the equilibrium
         self.ene(atoms_murn,cellrelax=True,atomrelax=True)
 
-
-
-
         #print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
         #print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
         #pos_ref = atoms_murn.get_positions()
@@ -1236,6 +1233,55 @@ class ase_calculate_ene( object ):
         #self.eos = vinet.parameters
         #print('pars',vinet.parameters)
         return vinet.parameters
+
+    def get_fh(self,atomsin=False,disp=0.01):
+        ''' the function will never change the atomsobject '''
+        if atomsin == False:
+            sys.exit('need to define atoms in this case XX')
+        atoms_h = atomsin.copy()
+        atoms_h.wrap()
+
+        keep_alive = False
+        atomrelax = False
+        if atomrelax == False: keep_alive = False
+        if atomrelax == True:  keep_alive = True
+        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
+        atoms_h.set_calculator(asecalcLAMMPS)
+
+        ### relax the atoms_h first to the equilibrium
+        self.ene(atoms_h,cellrelax=True,atomrelax=True)
+        pos0 = atoms_h.get_positions()
+        hessematrix=np.zeros((pos0.shape[0]*3,pos0.shape[0]*3))
+
+        ### schleife ueber alle atome, 1..32
+
+        for iidx,i in enumerate(pos0): # loop over all atoms
+            #print(iidx,"/",pos0.shape[0]) # loop over xyz 1..3
+            for jidx,j in enumerate(i):
+                pos1 = np.copy(pos0)
+                pos1[iidx,jidx] = pos1[iidx,jidx]+disp
+
+                atoms_h.set_positions(pos1)
+                fah = atoms_h.get_forces()
+
+                #eahmev,eah,fah = get_energy_forces(
+                #    pot=pot,
+                #    potparam=potparam,                                      394                 coord_cart = pos1,
+                #    coord0_cart = pos0,
+                #    cell=crystal0.cellvec,
+                #    printresult=False)
+                hessematrix[iidx*3+jidx] = fah.reshape((1,pos0.shape[0]*        3))/(-disp)
+        np.savetxt("HesseMatrix.dat",hessematrix/97.173617,fmt="%.13f")
+        import hesse as h
+        hes = h.hesseclass(listin=['al'],H=hessematrix)
+        f300 = (hes.ene_atom[300]-hes.ene_atom[0])[1] # free energy diff to 300K
+        return f300
+
+    def submit_aiida(self,atomsin=False):
+        ## o) move this from the ase calass to something separate
+        ## a) create inputxxx.data
+        ## b) follow kmc_submit_inputdata_to_aiida.sh
+        return
 
 
 def ase_vpa(atoms):
