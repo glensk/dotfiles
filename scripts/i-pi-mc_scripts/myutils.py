@@ -22,6 +22,7 @@ from ase.io import write as ase_write
 from ase.optimize import BFGS
 from ase.optimize import LBFGS
 from ase.optimize import FIRE
+from ase.optimize import GPMin
 from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
 import shutil
@@ -986,16 +987,13 @@ class ase_calculate_ene( object ):
         self.atoms = atoms
         return self.atoms
 
-    def ene(self,atoms=False,atomrelax=False,cellrelax=False,print_minimization_to_screen=False):
+    def ene(self,atoms=False,atomrelax=False,cellrelax=False,print_minimization_to_screen=False,minimizer="LGBFGS"):
         ''' atoms is an ase object
             if don_change_atomsobject is chosen,
         '''
         ## now the atoms object is not changed
         #atoms = atomsin.copy()
         atoms = self.define_wrapped_self_atoms(atoms)
-
-        if print_minimization_to_screen:
-            print('ka',atomrelax)
 
         if atomrelax == False and self.geopt == False:
             pass
@@ -1005,9 +1003,6 @@ class ase_calculate_ene( object ):
             pass  # realx wins, since locally set explicitely
         if atomrelax == False and self.geopt == True:
             atomrelax = True
-        if print_minimization_to_screen:
-            print('kb',atomrelax)
-            print(atoms.get_positions()[:3])
 
         if self.verbose > 1:
             show_ase_atoms_content(atoms,showfirst=10,comment = "START ASE INTERNAL CALUCLATION !!!")
@@ -1017,6 +1012,7 @@ class ase_calculate_ene( object ):
             print('##--atom_types',self.atom_types)
             print('##--geopt',self.geopt)
             print('##--atomrelax',atomrelax)
+            print('##--minimizer',minimizer)
             print("#####################################################")
             print()
 
@@ -1032,23 +1028,20 @@ class ase_calculate_ene( object ):
         atoms.set_calculator(asecalcLAMMPS)
 
         ### attach to atoms to relax the cell
+        constraint = False
         if cellrelax == True and atomrelax == False:
-            atoms = StrainFilter(atoms)
+            constraint = StrainFilter(atoms)
             ## in this case it does not work out
-            sys.exit('currently I get a coredump for cellrelax == True and atomrelax == True ... in this case do only one, then the other one')
-        if cellrelax == True and atomrelax == True:
-            #atoms = ExpCellFilter(atoms)
-            atoms = StrainFilter(atoms)  # seems better for betaprime Mg9Si5 then ExpCellFilter
-            pass
-        #print('atomrelax',atomrelax,'cellrelax',cellrelax)
-
+            sys.exit('This gives a segmentation fault (coredump) when cellrelax == True and atomrelax == True ... in this case do only one, then the other one')
+        elif cellrelax == True and atomrelax == True:
+            ## when doint both this is recommended
+            constraint = ExpCellFilter(atoms)
 
         ## atomrelax = False and cellrelax = False works
         ## atomrelax = True  and cellrelax = False works
         ## atomrelax = True  and cellrelax = True  works
         ## atomrelax = False and cellrelax = True  NOPE
         if atomrelax == True or cellrelax == True:
-            #print('in',atomrelax,cellrelax)
             if atomrelax == False and cellrelax == True:
                 print('NOOOOOOOOOOOOOOOWWWWWWWWWWWWWWWWW'*3)
             ################################################
@@ -1064,37 +1057,59 @@ class ase_calculate_ene( object ):
             #traj = Trajectory('ka', mode='w',atoms=atoms)
             #opt = BFGS(atoms,trajectory="ni.traj")
             #opt.run(steps=20)
-            minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE', 'bh' ]
-            minimizer = 'FIRE'
-            minimizer = 'BFGS'
-            minimizer = 'LGBFGS'
-            #minimizer = 'bh'
-            #minimizer = 'mh'
-            #print('startminimize....')
-            #print_to_screen = True
+            minimizer_choices = [ 'BFGS', 'LGBFGS', 'FIRE', 'GPMin', 'bh', 'mh' ]
+            if minimizer not in minimizer_choices:
+                print("your minimizer",minimizer)
+                print("available:",minimizer_choices)
+                sys.exit("choose one of the proper minimizer choices")
+            if minimizer == 'mh' and atomrelax == True and cellrelax == True:
+                sys.exit("use minimahopping (mh) with either with atomrelax or with cellrelax; or use both but with other minimizer;  but not with both at a time, rather run those sequentially o")
+
+            if print_minimization_to_screen:
+                print("AAA nat:",atoms.get_number_of_atoms())
+                print("AAA pos:",atoms.get_positions()[:4])
+                print("AAA for:",atoms.get_forces()[:4])
+                print("AAA fmx:",abs(atoms.get_forces()).max())
+                print("AAA vol:",atoms.get_volume())
+                print("AAA vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
+
+            ## the syntax apparently vareis a bit depending
+            ## if constraint or not
+            use = atoms
+            if type(constraint) != bool:
+                use = constraint
+
             if print_minimization_to_screen:
                 print("minimizer:",minimizer)
                 logfile="-" # output to screen
             else:
                 logfile="tmp" # output to file and not to screen
 
+
+            #if print_minimization_to_screen:
+            #print('BBB logfile',logfile)
+
             if minimizer == 'BFGS':
-                opt1 = BFGS(atoms,logfile=logfile) #,trajectory="ni.traj")
+                opt1 = BFGS(use,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'LGBFGS':
-                opt1 = LBFGS(atoms,logfile=logfile) #,trajectory="test.traj")
+                opt1 = LBFGS(use,logfile=logfile) #,trajectory="test.traj")
+            elif minimizer == 'GPMin':
+                opt1 = GPMin(use,logfile=logfile) #,trajectory="test.traj")
             elif minimizer == 'FIRE':
-                opt1 = FIRE(atoms,logfile=logfile) #,trajectory="ni.traj")
+                opt1 = FIRE(use,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'bh':
                 kB = 1.38064852e-23
                 kB = 1.6021765e-19
-                opt1 = BasinHopping(atoms=atoms,         # the system to optimize
+                opt1 = BasinHopping(atoms=use, # the system to optimize
                   temperature=1*kB, # 'temperature' to overcome barriers
-                  dr=0.5,               # maximal stepwidth
-                  optimizer=LBFGS,      # optimizer to find local minima
-                  fmax=0.1,             # maximal force for the optimizer
+                  dr=0.5,      # maximal stepwidth
+                  optimizer=LBFGS, # optimizer to find local minima
+                  fmax=0.1,      # maximal force for the optimizer
                   logfile=logfile)
             elif minimizer == 'mh':
-                opt1 = MinimaHopping(atoms=atoms,logfile=logfile)
+                if os.path.isfile("tmp"):
+                    os.remove("tmp")
+                opt1 = MinimaHopping(atoms=use,logfile=logfile)
                 opt1(totalsteps=10)
             #print('startrun....')
             maxsteps = 200
@@ -1104,13 +1119,14 @@ class ase_calculate_ene( object ):
             ######################################################
             ## MINIMIZE
             ######################################################
-            if minimizer != 'mh': # in all cases but
+            if minimizer not in ['mh','bh']: # in all cases but
                 #opt1.run(steps=maxsteps,fmax=0.005)
                 #opt1.run(steps=maxsteps,fmax=0.0001)
                 #print('start')
                 opt1.run(fmax=0.0001)
                 #print('maxsteps                ',maxsteps,type(maxsteps))
                 #print('opt1.get_number_of_steps',opt1.get_number_of_steps(),type(opt1.get_number_of_steps()))
+
                 if maxsteps == opt1.get_number_of_steps():
                     print('DID NOT CONVErGE IN '+str(maxsteps)+' number of minimizer steps!')
                     #print('---- cell -----')
@@ -1118,18 +1134,17 @@ class ase_calculate_ene( object ):
                     #print('---- positions -----')
                     #print(atoms.get_positions())
                     return np.nan
-            #print('ene struct 42: without geoopt: -6852.254 eV lmp and ace')
-            #print('ene struct 42: without geoopt: -456816.99 meV_pa lmp and ace')
-            #print()
-            #print('ene struct 42: ENE lammps: -6853.9673 eV 44 steps')
-            #print('ene struct 42: ENE    ace: -6852.44299271 eV on 15 steps BFGS')
 
-            #opt1.replay_trajectory('history.traj')
-            #print('done....')
-            #opt2 = FIRE(atoms,trajectory="ni.traj")
-            #opt2.run(steps=20)
-            #asecalcLAMMPS.attach(traj)
-            #asecalcLAMMPS.run()
+        if print_minimization_to_screen:
+            print('UUU atomrelax:',atomrelax)
+            print('UUU cellrelax:',cellrelax)
+            print("UUU nat:",atoms.get_number_of_atoms())
+            print("UUU pos:",atoms.get_positions()[:4])
+            print("UUU for:",atoms.get_forces()[:4])
+            print("UUU fmx:",abs(atoms.get_forces()).max())
+            print("UUU vol:",atoms.get_volume())
+            print("UUU vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
+
         if self.verbose > 1:
             print('ZZ done2')
             print('ZZ self.units',self.units)
@@ -1148,6 +1163,9 @@ class ase_calculate_ene( object ):
             show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
             print()
             print()
+
+        #print('forces out',atomrelax,cellrelax)
+        #print(atoms.get_forces()[:3])
         return ene
 
     def stress(self,atoms=False):
@@ -1234,8 +1252,9 @@ class ase_calculate_ene( object ):
         #print('pars',vinet.parameters)
         return vinet.parameters
 
-    def get_fh(self,atomsin=False,disp=0.01):
+    def get_fh(self,atomsin=False,disp=0.03,debug=False):
         ''' the function will never change the atomsobject '''
+
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         atoms_h = atomsin.copy()
@@ -1248,14 +1267,38 @@ class ase_calculate_ene( object ):
         asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
         atoms_h.set_calculator(asecalcLAMMPS)
 
+        if debug:
+            print("###########################################")
+            print("forces harmonic 3:",atoms_h.get_forces()[:3])
+            print("###########################################")
         ### relax the atoms_h first to the equilibrium
-        self.ene(atoms_h,cellrelax=True,atomrelax=True)
+        ene = self.ene(atoms_h,cellrelax=True,atomrelax=True,print_minimization_to_screen=debug)
+        if debug:
+            print("###########################################")
+            print("forces harmonic 4:",atoms_h.get_forces()[:3])
+            print("###########################################")
+        maxforce = np.abs(atoms_h.get_forces()).max()
+        if maxforce > 0.001:
+            print("forces harmonic 4:",atoms_h.get_forces()[:3])
+            print('maxforce',maxforce)
+            sys.exit('maxforce is too large')
+
+        nat = atoms_h.get_number_of_atoms()
+        if nat < 20:
+            atoms_h *= (2,2,2)
+        if debug:
+            nat = atoms_h.get_number_of_atoms()
+            print("###########################################")
+            print('!!!!!!!nat',nat)
+            print("forces harmonic 2:",atoms_h.get_forces()[:3])
+            print("###########################################")
         pos0 = atoms_h.get_positions()
         hessematrix=np.zeros((pos0.shape[0]*3,pos0.shape[0]*3))
 
         ### schleife ueber alle atome, 1..32
 
         for iidx,i in enumerate(pos0): # loop over all atoms
+            progress(iidx,len(pos0))
             #print(iidx,"/",pos0.shape[0]) # loop over xyz 1..3
             for jidx,j in enumerate(i):
                 pos1 = np.copy(pos0)
@@ -1263,18 +1306,22 @@ class ase_calculate_ene( object ):
 
                 atoms_h.set_positions(pos1)
                 fah = atoms_h.get_forces()
-
-                #eahmev,eah,fah = get_energy_forces(
-                #    pot=pot,
-                #    potparam=potparam,                                      394                 coord_cart = pos1,
-                #    coord0_cart = pos0,
-                #    cell=crystal0.cellvec,
-                #    printresult=False)
                 hessematrix[iidx*3+jidx] = fah.reshape((1,pos0.shape[0]*        3))/(-disp)
-        np.savetxt("HesseMatrix.dat",hessematrix/97.173617,fmt="%.13f")
+        #np.savetxt("HesseMatrix.dat",hessematrix/97.173617,fmt="%.13f")
         import hesse as h
-        hes = h.hesseclass(listin=['al'],H=hessematrix)
-        f300 = (hes.ene_atom[300]-hes.ene_atom[0])[1] # free energy diff to 300K
+        if debug:
+            print("!!!!!!!!!!!!!!!!! get free energy")
+        #hes = h.hesseclass(listin=['al'],H=hessematrix)
+        if debug:
+            print('get_chemical_symbols()')
+            print(atoms_h.get_chemical_symbols())
+        hes = h.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False)
+        try:
+            f300 = (hes.ene_atom[300]-hes.ene_atom[0])[1]
+        except IndexError:
+            f300 = "UNSTABLE"
+        if debug and type(f300) != str:
+            hes.write_ene_atom()
         return f300
 
     def submit_aiida(self,atomsin=False):
@@ -1288,7 +1335,10 @@ def ase_vpa(atoms):
     return atoms.get_volume()/atoms.get_number_of_atoms()
 def ase_epa(atoms):
     return atoms.get_potential_energy()/atoms.get_number_of_atoms()
-
+def ase_mepa(atoms):
+    return atoms.get_potential_energy()/atoms.get_number_of_atoms()*1000.
+def ase_fmax(atoms):
+    return abs(atoms.get_forces()).max()
 
 
 def string_to_index_an_array(array,string):

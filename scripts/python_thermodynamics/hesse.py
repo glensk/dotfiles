@@ -523,7 +523,7 @@ class hesseclass( object ):
     defines everything related to the harmonic approximation.
     defines eigenfrequencies and Free Energy from HesseMatrix
     '''
-    def __init__( self, args = False , listin = False, H = False):
+    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True):
         '''
         units of h (hessematrix): [eV/Angstrom^2]
         if HesseMatrix is imported units are expected in [hartree/bohrradius^2]
@@ -542,6 +542,7 @@ class hesseclass( object ):
 
         self._verbose = None
         self.__verbose = None
+        self.show_negative_eigenvalues = show_negative_eigenvalues
         self.listin = listin      # listin   --> 'Al', 'Si1Al31'
         self.inputfile = "Hessematrix_sphinx"
         self._inputfile_default = "Hessematrix_sphinx"
@@ -574,11 +575,11 @@ class hesseclass( object ):
         m3="or  hesse=h.hesseclass(['al', 'si', 31, 1], h=np.array([...]))"
         if self.listin == False:
             sys.exit(m1+"\n"+m2+"\n"+m3)
-        print('listin',self.listin)
+        #print('listin',self.listin)
         self.atomdata = atom.atom(self.listin)
-        print('ad',self.atomdata)
+        #print('ad',self.atomdata)
         self.mass = self.atomdata.mass
-        print('mass',self.mass)
+        #print('mass',self.mass)
         self._temp = int((self.atomdata.melting+1.0).max())  # +1 since int rounds down
         if self._l:
             self._temp = int((self.atomdata.melting+1.0).min())  # +1 since int rounds down
@@ -600,6 +601,7 @@ class hesseclass( object ):
         # self.m -- Mass Matrix
         ############################################################
         self.get_mass_matrix()
+        #print('self.M',self.M)
 
 
         ############################################################
@@ -931,12 +933,14 @@ class hesseclass( object ):
 
         ### check if we have negative parts
         if ev[0] < 0:
-            _printred("NEGATIVE EIGENVALUES!")
-            print("ev[0]:",ev[0])
-            print("ev:",ev)
+            if self.show_negative_eigenvalues:
+                _printred("NEGATIVE EIGENVALUES!")
+                print("ev[0]:",ev[0])
+                print("ev:",ev)
             self.freqsNEGATIVE = ev*dynMatToFreq
-            np.savetxt("ExactFreqs_NEGATIVE",self.freqsNEGATIVE)
-            print("np.sqrt(ev)*dynMatToFreq:",np.sqrt(ev)*dynMatToFreq)
+            if self.show_negative_eigenvalues:
+                np.savetxt("ExactFreqs_NEGATIVE",self.freqsNEGATIVE)
+                print("np.sqrt(ev)*dynMatToFreq:",np.sqrt(ev)*dynMatToFreq)
             sys.exit("ERROR: Negative Eigenvalues : "+str(ev[0]))
 
         a = np.sqrt(ev)*dynMatToFreq
