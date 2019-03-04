@@ -523,7 +523,7 @@ class hesseclass( object ):
     defines everything related to the harmonic approximation.
     defines eigenfrequencies and Free Energy from HesseMatrix
     '''
-    def __init__( self, args = None , listin = None, H = None):
+    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True):
         '''
         units of h (hessematrix): [eV/Angstrom^2]
         if HesseMatrix is imported units are expected in [hartree/bohrradius^2]
@@ -533,7 +533,7 @@ class hesseclass( object ):
         # im __init__ darf ein systemabbruch erfolgen wenn infiputvars in gesetz werde koennen
         # help really should be external
 
-        self.H = None
+        self.H = H
         self.M = None
         self.freqs = False
         self.freqsunsorted = False
@@ -542,22 +542,27 @@ class hesseclass( object ):
 
         self._verbose = None
         self.__verbose = None
-        self.listin = None      # listin   --> 'Al', 'Si1Al31'
+        self.show_negative_eigenvalues = show_negative_eigenvalues
+        self.listin = listin      # listin   --> 'Al', 'Si1Al31'
         self.inputfile = "Hessematrix_sphinx"
         self._inputfile_default = "Hessematrix_sphinx"
         self.inputfile_all = None
         self._filename_addstring = ""
         self._l = False
         self._fm = False
-        self.inputfile = None
+        self.inputfile = False
+        self._H_filename_units_possible = ["hartree/bohrradius^2","eV/angstrom^2"]
+        self._H_filename_units = "hartree/bohrradius^2"
+        self.writeoutput = False
 
         if args:
             self._verbose = args.verbose
             self.inputfile = args.inputfile
-            self.inputfile = args.inputfile
             self.listin = args.elements
             self._l = args.l
             self._fm = args.fm
+            self.writeoutput = True  # when called from shell
+
         if self._verbose:
             print("args:",args)
 
@@ -568,11 +573,13 @@ class hesseclass( object ):
         m1="Call hesse class with"
         m2="    hesse=h.hesseclass(['al'],              h=\"filename\")"
         m3="or  hesse=h.hesseclass(['al', 'si', 31, 1], h=np.array([...]))"
-        if self.listin == None:
+        if self.listin == False:
             sys.exit(m1+"\n"+m2+"\n"+m3)
-
+        #print('listin',self.listin)
         self.atomdata = atom.atom(self.listin)
+        #print('ad',self.atomdata)
         self.mass = self.atomdata.mass
+        #print('mass',self.mass)
         self._temp = int((self.atomdata.melting+1.0).max())  # +1 since int rounds down
         if self._l:
             self._temp = int((self.atomdata.melting+1.0).min())  # +1 since int rounds down
@@ -585,6 +592,53 @@ class hesseclass( object ):
         ####################################################################
         ### check if inputfile is ok, if only one Hesse... exists, take it
         ####################################################################
+        if type(self.H) == bool:
+            self.import_H()
+
+        self.atoms = self.H.shape[0]/3
+
+        ############################################################
+        # self.m -- Mass Matrix
+        ############################################################
+        self.get_mass_matrix()
+        #print('self.M',self.M)
+
+
+        ############################################################
+        # self.freqs -- array
+        ############################################################
+        try:
+            self.freqs = self.get_freqs()
+        except: # catch *all* exceptions
+            self.freqs = sys.exc_info()
+        if self.__verbose:
+            print("self.freqs:",self.freqs)
+        if self._fm:
+            print(self.freqsmean)
+
+
+        ############################################################
+        # self.freene -- array
+        ############################################################
+        try:
+            self.ene_atom = self.get_ene_atom()
+        except: # catch *all* exceptions
+            self.ene_atom = sys.exc_info()
+
+        try:
+            self.ene_cell = self.get_ene_cell()
+        except: # catch *all* exceptions
+            self.ene_cell = sys.exc_info()
+
+        if self._verbose:
+            print('self.write() now ....')
+
+        if self.writeoutput:
+            self.write()
+        return
+
+
+    def import_H(self):
         print("self.inputfile:",self.inputfile)
         searchhessefile = False
         if type(self.inputfile) == bool:
@@ -625,11 +679,6 @@ class hesseclass( object ):
         if self.inputfile == False:
             sys.exit("no inputfile found")
 
-        #############################################################
-        ## self.H -- hessematrix (take h if given, else, try to import)
-        #############################################################
-        self._H_filename_units_possible = ["hartree/bohrradius^2","eV/angstrom^2"]
-        self._H_filename_units = "hartree/bohrradius^2"
 
         #############################################################
         ## self._filename_addstring
@@ -721,11 +770,10 @@ class hesseclass( object ):
             sys.exit("Your Hessematirxi is not a 2D array")
         if self.H.shape[0] != self.H.shape[1]:
             sys.exit("Your Hessematirxi is not a square matrix (same number of rows and columns)")
-        self.atoms = self.H.shape[0]/3
+        return
 
-        ############################################################
-        # self.m -- Mass Matrix
-        ############################################################
+
+    def get_mass_matrix(self):
         if len(self.mass) == 1:
             #print('sm',self.mass)
             #print('sm',self.mass*self.mass)
@@ -735,19 +783,19 @@ class hesseclass( object ):
             if self._verbose:
                 print("self.M.shape:",self.M.shape)
 
-        if len(self.mass) != 1:
+        elif len(self.mass) == self.atoms:
+            self.M = np.zeros((self.atoms*3,self.atoms*3))
+            for zeile,mass1 in enumerate(self.mass):
+                for spalte,mass2 in enumerate(self.mass):
+                    self.M[zeile*3,spalte*3:spalte*3+3] = mass1*mass2
+                    self.M[zeile*3+1,spalte*3:spalte*3+3] = mass1*mass2
+                    self.M[zeile*3+2,spalte*3:spalte*3+3] = mass1*mass2
+        else: # len(self.mass) != 1:
             if len(self.mass) != self.atoms:
                 m1="Your Hessematrix and amount of atoms have different dimensions. \n"
                 m2="Hessematrix: "+str(self.H.shape)+" (="+str(self.atoms)+" atoms)\n"
                 m3="atoms in: "+str(self.atomdata.symbol)+" (having mass:"+str(self.mass)+")"
                 sys.exit(m1+m2+m3)
-            if len(self.mass) == self.atoms:
-                self.M = np.zeros((self.atoms*3,self.atoms*3))
-                for zeile,mass1 in enumerate(self.mass):
-                    for spalte,mass2 in enumerate(self.mass):
-                        self.M[zeile*3,spalte*3:spalte*3+3] = mass1*mass2
-                        self.M[zeile*3+1,spalte*3:spalte*3+3] = mass1*mass2
-                        self.M[zeile*3+2,spalte*3:spalte*3+3] = mass1*mass2
 
         if self._verbose:
             print("self.atoms:",self.atoms)
@@ -755,40 +803,7 @@ class hesseclass( object ):
             print("len(self.mass):",len(self.mass))
         if self.__verbose:
             print("M:",self.M)
-
-
-        ############################################################
-        # self.freqs -- array
-        ############################################################
-        try:
-            self.freqs = self.get_freqs()
-        except: # catch *all* exceptions
-            self.freqs = sys.exc_info()
-        if self.__verbose:
-            print("self.freqs:",self.freqs)
-        if self._fm:
-            print(self.freqsmean)
-
-        ############################################################
-        # self.freene -- array
-        ############################################################
-        try:
-            self.ene_atom = self.get_ene_atom()
-        except: # catch *all* exceptions
-            self.ene_atom = sys.exc_info()
-
-        try:
-            self.ene_cell = self.get_ene_cell()
-        except: # catch *all* exceptions
-            self.ene_cell = sys.exc_info()
-
-        if self._verbose:
-            print('self.write() now ....')
-        self.write()
         return
-
-
-
 
     def write(self):
         ############################################################
@@ -918,12 +933,14 @@ class hesseclass( object ):
 
         ### check if we have negative parts
         if ev[0] < 0:
-            _printred("NEGATIVE EIGENVALUES!")
-            print("ev[0]:",ev[0])
-            print("ev:",ev)
+            if self.show_negative_eigenvalues:
+                _printred("NEGATIVE EIGENVALUES!")
+                print("ev[0]:",ev[0])
+                print("ev:",ev)
             self.freqsNEGATIVE = ev*dynMatToFreq
-            np.savetxt("ExactFreqs_NEGATIVE",self.freqsNEGATIVE)
-            print("np.sqrt(ev)*dynMatToFreq:",np.sqrt(ev)*dynMatToFreq)
+            if self.show_negative_eigenvalues:
+                np.savetxt("ExactFreqs_NEGATIVE",self.freqsNEGATIVE)
+                print("np.sqrt(ev)*dynMatToFreq:",np.sqrt(ev)*dynMatToFreq)
             sys.exit("ERROR: Negative Eigenvalues : "+str(ev[0]))
 
         a = np.sqrt(ev)*dynMatToFreq
