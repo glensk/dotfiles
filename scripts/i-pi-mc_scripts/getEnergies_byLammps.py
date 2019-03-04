@@ -14,7 +14,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 @click.option('--infile','-i',required=False,type=str,help='input files containing structures that will be imported by ase')
 @click.option('--format_in','-fi',type=str,default='runner',help='ase format for reading files')
-@click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default='n2p2_v1ag')
+@click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default='n2p2_v2ag')
 @click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
 @click.option('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
 @click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
@@ -94,6 +94,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ana_VOL_diff_norm= np.empty(structures_to_calc);ana_VOL_diff_norm[:]  = np.nan
     ana_vol_pa       = np.empty(structures_to_calc);ana_vol_pa[:]  = np.nan
     ana_dist_min     = np.empty(structures_to_calc);ana_dist_min[:]  = np.nan
+
     ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
     ene_DFT_atomic   = np.empty(structures_to_calc);ene_DFT_atomic[:]  = np.nan
     ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
@@ -261,16 +262,18 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                 stress = atoms_tmp.get_stress()
                 #print('stress',stress)
 
-            if ace.geopt == True:
+            elif ace.geopt == True:
                 ace.geopt = False
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
-                #print(frames[i].get_positions())
+                #print('b',atoms_tmp.get_positions()[:3])
+                #print('ene',ene_pot_ase[idx])
 
                 ace.geopt = True
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase_geop[idx] = ace.ene(atoms_tmp)
-                #print(ace.atomsin.get_positions())
+                #print('a',atoms_tmp.get_positions()[:3])
+                #print('ene',ene_pot_ase_geop[idx])
                 #print(ace.frames.get_positions())
                 if idx == 0 and os.path.isfile("out_relaxed.runner"):
                     my.rm("out_relaxed.runner")
@@ -429,9 +432,9 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('#                         ('+ace_units+')                        ('+ace_units+')     ('+ace_units+')    ')
-    print('#                         (DFT-ref)                                            ene_wo_atomic    forces    (if geopt)  Vol per')
-    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
+    print('#                         ('+ace_units+')                        ('+ace_units+')    ('+ace_units+')                                  ('+ace_units+')')
+    print('#                         (DFT-ref)                                            ene_wo_atomic  forces   (if geopt)  Vol per')
+    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                 DFTmax    E-E_geopt   atom')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
