@@ -41,7 +41,7 @@ fi
 export scripts=$SCR
 export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
 
-# for vmd
+# for vmd (seems ok to define this on mac with downloaded/installed vmd)
 export VMDINSTALLNAME="vmd"
 export VMDINSTALLBINDIR="$HOME/sources/vmd-1.9.3/bin"
 export VMDINSTALLLIBRARYDIR="$HOME/sources/vmd-1.9.3/lib/lib" # lib/lib to distinguish from /lib

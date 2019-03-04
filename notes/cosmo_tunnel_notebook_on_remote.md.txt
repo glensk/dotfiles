@@ -4,4 +4,18 @@ cd `th.sh`; zsh"'  # open this first on mac (maybe it is possible to put this in
 the background
 
 2) on cosmopc, open the notebook:
+deactivate
 jupyter-notebook SOAPS.ipynb
+
+
+on cosmopc:
+jupyter-notebook --no-browser --port=8889
+
+
+ssh cosmopc
+deactivate
+cd /local/scratch/glensk/Dropbox/Albert/kmc/results/20190220_andrea_soap
+# python runs python 2.7
+jupyter notebook --no-browser --port=8889
+on mac: ssh -N -f -L localhost:8888:localhost:8889 glensk@cosmopc15.epfl.ch
+browser: http://localhost:8888
