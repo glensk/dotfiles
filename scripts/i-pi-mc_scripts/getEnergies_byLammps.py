@@ -446,7 +446,7 @@ def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,eos=False,f300=False):
     else: f300 = ""
 
     diff = "-"
-    if np.abs(DFT_ene) > 0
+    if np.abs(DFT_ene) > 0:
         try:
             diff = round(np.abs(np.abs(pot_ene/DFT_ene)-1),2)
         except ZeroDivisionError, RuntimeWarning:
@@ -771,10 +771,10 @@ def test_formation_energies(pot,geopt,verbose):
     ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
                               # ... in case we do test_formation_energies
-    #@ test_si_si_vac(ace)
-    #@ dilute_mg_f, dilute_si_f = test_betaprime_mg9si5(ace)
+    test_si_si_vac(ace)
+    dilute_mg_f, dilute_si_f = test_betaprime_mg9si5(ace)
     #@ #test_betaprime_mg9si5_find_global_min(ace)
-    #@ test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f)
+    test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f)
     test_Mg2Si(ace)
     return
 
