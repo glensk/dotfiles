@@ -1,0 +1,38 @@
+#####################################################################################
+There are four main pot scripts with different tasks:
+#####################################################################################
+- pot.py
+- pot_energy_forces.py
+- pot_info startjob.py
+- pot_parametrize.py
+- hesse.py    (calculates energy and forces for snapshots given by caresian_coords)
+
+#####################################################################################
+Basic description:
+#####################################################################################
+- pot.py                : can be run with arguments; Creates jobs for thermodynamic integration (to check parameterisation). 
+
+- pot_energy_forces.py  : can be run with arguments; Calculate energies and forces from (and can show them on screen) for static structures; contains additional analysis scripts from OUTCAR MD's: longvecs (distributions), Fig.2a) PRL
+- hesse.py              : can be run with arguments; Calculate energies and forces from (and can show them on screen) for static structures; 
+
+- pot_info startjob.py  : runs with parameters; loads in all data for parameterization.  
+
+- pot_parametrize.py    : This script can load and/or create the corresponding forces from the displacements folders
+
+
+#####################################################################################
+Detailed information for the single scripts:
+#####################################################################################
+
+## - pot_parametrize.py 
+This script can load and/or create the corresponding forces from the displacements folders
+This script is called from pot_info_startjob.py and can not be run by itself.
+The main function which loads all data is "load_all_pkl_npz(self)", this function is called from the pot_info_startjob.py script. "load_all_pkl_npz" first
+          1) loads (or creates) the file nnforces.npz
+
+1. load nnforces.npz for every displacement
+
+2. load parametrization_long == xxx_data_xxx.pkl
+3. load FML.npz == forces (for corresponding direction) - longforce in quer direction
+4. TOTI.npz
+

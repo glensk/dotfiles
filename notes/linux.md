@@ -1,1 +1,0 @@
-uname -r    # which kernel?

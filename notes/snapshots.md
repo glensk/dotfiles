@@ -1,1 +1,0 @@
-ls /home/$user/.snapshot/

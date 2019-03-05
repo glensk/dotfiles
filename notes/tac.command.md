@@ -1,1 +1,0 @@
-tac file 		## cat backwords

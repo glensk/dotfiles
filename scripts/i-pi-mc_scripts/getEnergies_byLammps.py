@@ -14,7 +14,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 @click.option('--infile','-i',required=False,type=str,help='input files containing structures that will be imported by ase')
 @click.option('--format_in','-fi',type=str,default='runner',help='ase format for reading files')
-@click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default='n2p2_v1ag')
+@click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default='n2p2_v2ag')
 @click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
 @click.option('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
 @click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
@@ -94,6 +94,7 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     ana_VOL_diff_norm= np.empty(structures_to_calc);ana_VOL_diff_norm[:]  = np.nan
     ana_vol_pa       = np.empty(structures_to_calc);ana_vol_pa[:]  = np.nan
     ana_dist_min     = np.empty(structures_to_calc);ana_dist_min[:]  = np.nan
+
     ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
     ene_DFT_atomic   = np.empty(structures_to_calc);ene_DFT_atomic[:]  = np.nan
     ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
@@ -261,16 +262,18 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
                 stress = atoms_tmp.get_stress()
                 #print('stress',stress)
 
-            if ace.geopt == True:
+            elif ace.geopt == True:
                 ace.geopt = False
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
-                #print(frames[i].get_positions())
+                #print('b',atoms_tmp.get_positions()[:3])
+                #print('ene',ene_pot_ase[idx])
 
                 ace.geopt = True
                 ace.pot_to_ase_lmp_cmd()
                 ene_pot_ase_geop[idx] = ace.ene(atoms_tmp)
-                #print(ace.atomsin.get_positions())
+                #print('a',atoms_tmp.get_positions()[:3])
+                #print('ene',ene_pot_ase_geop[idx])
                 #print(ace.frames.get_positions())
                 if idx == 0 and os.path.isfile("out_relaxed.runner"):
                     my.rm("out_relaxed.runner")
@@ -429,107 +432,353 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('#                         ('+ace_units+')                        ('+ace_units+')     ('+ace_units+')    ')
-    print('#                         (DFT-ref)                                            ene_wo_atomic    forces    (if geopt)  Vol per')
-    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                  DFTmax     E-E_geopt   atom')
+    print('#                         ('+ace_units+')                        ('+ace_units+')    ('+ace_units+')                                  ('+ace_units+')')
+    print('#                         (DFT-ref)                                            ene_wo_atomic  forces   (if geopt)  Vol per')
+    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                 DFTmax    E-E_geopt   atom')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
-def test_formation_energies(pot,geopt,verbose):
-    ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
-    print('changed units to eV!')
-    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case we do test_formation_energies
-    units = ace.units
+def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene,eos=False,f300=False):
+    if type(eos) != bool:
+        eos = np.round(eos,1)[1:][:2]
+    else: eos = ""
 
+    if type(f300) != bool:
+        if type(f300) != str:
+            f300 = np.round(f300,1)
+    else: f300 = ""
+
+    diff = "-"
+    if np.abs(DFT_ene) > 0:
+        try:
+            diff = round(np.abs(np.abs(pot_ene/DFT_ene)-1),2)
+        except ZeroDivisionError, RuntimeWarning:
+            diff = "-"
+    print(text.ljust(35)+":",
+            str(round(pot_ene,3)).ljust(10),
+            "(eV) DFT:",
+            str(round(DFT_ene,4)).ljust(12),
+            str(diff).ljust(6),eos,f300)
+    return
+
+def test_si_si_vac(ace):
+    scripts = my.scripts()
+    tests = scripts+'/tests/'
+    sisivac = tests+'/Al-Mg-Si/si-si-vac/'
+    ff = '/aiida.in.final.runner'
+    e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
+    e_al107vac1 =   ace.ene(ase_read(sisivac+'/al107vac1'+ff))
+    e_al107si1 =    ace.ene(ase_read(sisivac+'/al107si1'+ff))
+    e_al106si2 =    ace.ene(ase_read(sisivac+'/al106si2'+ff))
+    e_al105si2va1 = ace.ene(ase_read(sisivac+'/al105si2va1'+ff))
+    e_ss_al = e_al108/108.
+    e_ss_va = e_al107vac1 - e_al108/108. * 107.
+    e_ss_one_si = e_al107si1 - e_al108/108. * 107.
+    e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
+
+    #print_compare_ene_vs_DFT('vacancy_formation (unrelaxed) NN: ',e_ss_va,
+    print_compare_ene_vs_DFT("vacancy_formation (unrelaxed, oDFT)",e_ss_va,0.69)
+    print_compare_ene_vs_DFT("si-si-vac-complex (unrelaxed, oDFT)",e_si_si_vac_complex,0.074)
+    return
+
+def get_dilute_si_mg_f(ace):
+    scripts = my.scripts()
+    tests = scripts+'/tests/'
+    bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_structures_relax.input.data'
+
+    frames = ase_read(bprime,index=":",format="runner")
+
+    struct_pure_al = frames[3]
+    struct_dilute_mg = frames[1]
+    struct_dilute_si = frames[2]
+
+    # @ 0K (eV/cell)
+    e_pure_al   = ace.ene(struct_pure_al)   # 108 atoms
+    e_dilute_mg = ace.ene(struct_dilute_mg) # 108 atoms
+    e_dilute_si = ace.ene(struct_dilute_si) # 108 atoms
+
+    # (eV/defect)
+    dilute_si_f =  e_dilute_si - 107*e_pure_al/108    # eV per defect
+    dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108    # eV per defect
+
+    # @ 300K ( for 1 atom, therefore *108 (to get per cell), in meV, therefore /1000)
+    f300_pure_al   = ace.get_fh(struct_pure_al)*108/1000.    # for 1 atom, therefore *108
+    f300_dilute_mg = ace.get_fh(struct_dilute_mg)*108/1000.  # for 1 atom, therefore *108
+    f300_dilute_si = ace.get_fh(struct_dilute_si)*108/1000.  # for 1 atom, therefore *108
+
+    dilute_si_f_300 =  f300_dilute_si - 107*f300_pure_al/108
+    dilute_mg_f_300 =  f300_dilute_mg - 107*f300_pure_al/108
+
+    return dilute_si_f, dilute_mg_f, dilute_si_f_300, dilute_mg_f_300
+
+def test_betaprime_mg9si5(ace):
     scripts = my.scripts()
     tests = scripts+'/tests/'
 
-    if True: # si-si-vac
-        sisivac = tests+'/Al-Mg-Si/si-si-vac/'
-        ff = '/aiida.in.final.runner'
-        e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
-        e_al107vac1 =   ace.ene(ase_read(sisivac+'/al107vac1'+ff))
-        e_al107si1 =    ace.ene(ase_read(sisivac+'/al107si1'+ff))
-        e_al106si2 =    ace.ene(ase_read(sisivac+'/al106si2'+ff))
-        e_al105si2va1 = ace.ene(ase_read(sisivac+'/al105si2va1'+ff))
-        if ace.verbose:
-            print('e_al108',e_al108,ace.units)
-            print('e_al107vac1',e_al107vac1,ace.units)
-        e_ss_al = e_al108/108.
-        e_ss_va = e_al107vac1 - e_al108/108. * 107.
-        e_ss_one_si = e_al107si1 - e_al108/108. * 107.
-        e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
-        print()
-        print('vacancy_formation (unrelaxed) NN: ',round(e_ss_va,4),"",ace.units,"DFT: 0.69 eV")
-        print('si-si-vac-complex (unrelaxed) NN:',round(e_si_si_vac_complex,4),"",ace.units,"DFT: -0.074eV")
-        print()
+    bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_structures_relax.input.data'
+    bprime2 = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/aiida_exported_group_BetaPrime_structures_relax.input.data'
+    relax_unrelax = [ bprime, bprime+'.v1',bprime+'.v3']
+    relax_unrelax = [ bprime+'.v3']
 
-    if True: # bprime (beta')
-        print("########################################################################")
-        print("# beta' (Mg9Si5)")
-        print("########################################################################")
-        bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_structures_relax.input.data'
-        print('bprime input data',bprime)
+    bprime_stable = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/mg9si5_stable_phonons.runner'
+    struct_mg9si5_stable = ase_read(bprime_stable,format="runner")
+
+    for bprime in relax_unrelax:
+        #print('bprime input data',bprime)
         frames = ase_read(bprime,index=":",format="runner")
-        #print('len',len(frames))
-        for idx,i in enumerate(frames):
-            ana_atoms_ = frames[idx].get_number_of_atoms()
-            d = my.ase_get_chemical_symbols_to_conz(frames[idx])
-            n = my.ase_get_chemical_symbols_to_number_of_species(frames[idx])
-            print(idx,'nat',ana_atoms_,"nAl:",n["Al"],"nSi:",n["Si"],'nMg:',n["Mg"])
 
-        eDFT_pure_al   = my.ase_enepot(frames[3],units=ace.units) # 108 atoms
-        eDFT_dilute_mg = my.ase_enepot(frames[1],units=ace.units) # 108 atoms
-        eDFT_dilute_si = my.ase_enepot(frames[2],units=ace.units) # 108 atoms
-        eDFT_precip    = my.ase_enepot(frames[0],units=ace.units) # 28 atoms, 10Si, 18Mg
-        print('eDFT_pure_al  :',eDFT_pure_al  ,"(eV)",eDFT_pure_al  *0.036749325,"(hartree)")
-        print('eDFT_dilute_mg:',eDFT_dilute_mg,"(eV)",eDFT_dilute_mg*0.036749325,"(hartree)")
-        print('eDFT_dilute_si:',eDFT_dilute_si,"(eV)",eDFT_dilute_si*0.036749325,"(hartree)")
-        print('eDFT_precip   :',eDFT_precip   ,"(eV)",eDFT_precip   *0.036749325,"(hartree)")
-        print()
-        print('vol  pure  /at:',frames[3].get_volume()/frames[3].get_number_of_atoms())
-        print('vol  dilMg /at:',frames[1].get_volume()/frames[1].get_number_of_atoms())
-        print('vol  dilSi /at:',frames[2].get_volume()/frames[2].get_number_of_atoms())
-        print('vol  precip/at:',frames[0].get_volume()/frames[0].get_number_of_atoms())
+        struct_pure_al = frames[3]
+        struct_dilute_mg = frames[1]
+        struct_dilute_si = frames[2]
+        struct_mg9si5    = frames[0]
 
-        e_pure_al   = ace.ene(frames[3]) # 108 atoms
-        e_dilute_mg = ace.ene(frames[1]) # 108 atoms
-        e_dilute_si = ace.ene(frames[2]) # 108 atoms
-        e_precip    = ace.ene(frames[0]) # 28 atoms, 10Si, 18Mg
+        eDFT_pure_al   = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
+        eDFT_dilute_mg = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
+        eDFT_dilute_si = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
+        eDFT_precip    = my.ase_enepot(struct_mg9si5   ,units=ace.units) # 28 atoms, 10Si, 18Mg
 
-        print('e_pure_al  :',e_pure_al  ,"(eV)",e_pure_al  *0.036749325,"(hartree)")
-        print('e_dilute_mg:',e_dilute_mg,"(eV)",e_dilute_mg*0.036749325,"(hartree)")
-        print('e_dilute_si:',e_dilute_si,"(eV)",e_dilute_si*0.036749325,"(hartree)")
-        print('e_precip   :',e_precip   ,"(eV)",e_precip   *0.036749325,"(hartree)")
-
+        e_pure_al   = ace.ene(struct_pure_al) # 108 atoms
+        e_dilute_mg = ace.ene(struct_dilute_mg) # 108 atoms
+        e_dilute_si = ace.ene(struct_dilute_si) # 108 atoms
+        e_precip    = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+        e_precip_stable = ace.ene(struct_mg9si5_stable) # 28 atoms, 10Si, 18Mg
 
         dilute_si_f =  e_dilute_si - 107*e_pure_al/108
         dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108
         heat_precip = (e_precip - 18*dilute_mg_f - 10*dilute_si_f)/28
+        heat_precip_stable = (e_precip_stable - 18*dilute_mg_f - 10*dilute_si_f)/28
 
         dilute_si_f_DFT =  eDFT_dilute_si - 107*eDFT_pure_al/108
         dilute_mg_f_DFT =  eDFT_dilute_mg - 107*eDFT_pure_al/108
         heat_precip_DFT = (eDFT_precip - 18*dilute_mg_f_DFT - 10*dilute_si_f_DFT)/28
 
-        print("dilute_si_f pot:",round(dilute_si_f,3)," DFT:",round(dilute_si_f_DFT,3))
-        print("dilute_mg_f pot:",round(dilute_mg_f,3)," DFT:",round(dilute_mg_f_DFT,3))
-        print("heat_precip pot:",round(heat_precip,3)," DFT:",round(heat_precip_DFT,3))
+        ###### pure al
+        vinet_al = ace.get_murn(struct_pure_al) # 28 atoms, 10Si, 18Mg
+        f300 = ace.get_fh(struct_pure_al)
+        print_compare_ene_vs_DFT("Al",e_pure_al,eDFT_pure_al,vinet_al,f300)
+
+        ###### dilute solution
+        print_compare_ene_vs_DFT("one Si in Al",dilute_si_f,dilute_si_f_DFT)
+        print_compare_ene_vs_DFT("one Mg in Al",dilute_mg_f,dilute_mg_f_DFT)
+
+        ##### beta prime ... seems is not stable
+        vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+        f300 = ace.get_fh(struct_mg9si5,debug=False)
+        print_compare_ene_vs_DFT("beta prime Mg9Si5",heat_precip,heat_precip_DFT,vinet_mg9si5,f300)
+
+        ###### beta prime after global minimization with minima hopping
+        vinet_mg9si5_stable = ace.get_murn(struct_mg9si5_stable) # 28 atoms, 10Si, 18Mg
+        f300 = ace.get_fh(struct_mg9si5_stable,debug=False)
+        print_compare_ene_vs_DFT("beta prime Mg9Si5 stable",heat_precip_stable,0,vinet_mg9si5_stable,f300)
+
+
+        ###### beta prime after global minimization relax everything
+        e_dilute_mg_r    = ace.ene(struct_dilute_mg,atomrelax=True) # 108 atoms
+        e_dilute_si_r    = ace.ene(struct_dilute_si,atomrelax=True) # 108 atoms
+
+        dilute_si_f_r =  e_dilute_si_r - 107*e_pure_al/108
+        dilute_mg_f_r =  e_dilute_mg_r - 107*e_pure_al/108
+        heat_precip_stable_allrelax = (e_precip_stable - 18*dilute_mg_f_r - 10*dilute_si_f_r)/28
+        print_compare_ene_vs_DFT("beta prime Mg9Si5 stable allrelax",heat_precip_stable_allrelax,0,vinet_mg9si5_stable,f300)
+        return dilute_mg_f, dilute_si_f
+
+def test_betaprime_mg9si5_find_global_min(ace,find_global_minimum=True):
+    scripts = my.scripts()
+    tests = scripts+'/tests/'
+    bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_structures_relax.input.data'
+    bprime2 = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/aiida_exported_group_BetaPrime_structures_relax.input.data'
+    relax_unrelax = [ bprime, bprime+'.v1',bprime+'.v3']
+    relax_unrelax = [ bprime+'.v3']
+
+    bprime_stable = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/mg9si5_stable_phonons.runner'
+
+    for bprime in relax_unrelax:
+        #print('bprime input data',bprime)
+        frames = ase_read(bprime,index=":",format="runner")
+
+        struct_pure_al = frames[3]
+        struct_dilute_mg = frames[1]
+        struct_dilute_si = frames[2]
+        struct_mg9si5    = frames[0]
+
+
+
+
+        eDFT_pure_al   = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
+        eDFT_dilute_mg = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
+        eDFT_dilute_si = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
+        eDFT_precip    = my.ase_enepot(struct_mg9si5   ,units=ace.units) # 28 atoms, 10Si, 18Mg
+
+        e_pure_al   = ace.ene(struct_pure_al) # 108 atoms
+        e_dilute_mg = ace.ene(struct_dilute_mg) # 108 atoms
+        e_dilute_si = ace.ene(struct_dilute_si) # 108 atoms
+        e_precip    = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+
+        dilute_si_f =  e_dilute_si - 107*e_pure_al/108
+        dilute_mg_f =  e_dilute_mg - 107*e_pure_al/108
+        heat_precip = (e_precip - 18*dilute_mg_f - 10*dilute_si_f)/28
+        heat_precip_stable = (e_precip_stable - 18*dilute_mg_f - 10*dilute_si_f)/28
+
+        dilute_si_f_DFT =  eDFT_dilute_si - 107*eDFT_pure_al/108
+        dilute_mg_f_DFT =  eDFT_dilute_mg - 107*eDFT_pure_al/108
+        heat_precip_DFT = (eDFT_precip - 18*dilute_mg_f_DFT - 10*dilute_si_f_DFT)/28
+
+
+        vinet_al = ace.get_murn(struct_pure_al) # 28 atoms, 10Si, 18Mg
+        f300 = ace.get_fh(struct_pure_al)
+        print_compare_ene_vs_DFT("Al",e_pure_al,eDFT_pure_al,vinet_al,f300)
+
+
+        print_compare_ene_vs_DFT("one Si in Al",dilute_si_f,dilute_si_f_DFT)
+        print_compare_ene_vs_DFT("one Mg in Al",dilute_mg_f,dilute_mg_f_DFT)
+        vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+        f300 = ace.get_fh(struct_mg9si5,debug=False)
+        print_compare_ene_vs_DFT("beta prime Mg9Si5",heat_precip,heat_precip_DFT,vinet_mg9si5,f300)
+        if find_global_minimum:
+            print("#############################")
+            print("FIND GLOBAL MINIMUM")
+            print("#############################")
+
+
+
+            vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+            f300 = ace.get_fh(struct_mg9si5,debug=False)
+            print_compare_ene_vs_DFT("beta prime Mg9Si5",e_precip,0,vinet_mg9si5,f300)
+
+
+            e_pure_al        = ace.ene(struct_pure_al) # 108 atoms
+            e_dilute_mg_r    = ace.ene(struct_dilute_mg,atomrelax=True) # 108 atoms
+            e_dilute_si_r    = ace.ene(struct_dilute_si,atomrelax=True) # 108 atoms
+
+            e_precip_relaxed = ace.ene(struct_mg9si5   ,atomrelax=True)
+            print('v2',my.ase_vpa(struct_mg9si5),struct_mg9si5.get_potential_energy(),my.ase_mepa(struct_mg9si5))
+            print('stress',struct_mg9si5.get_stress())
+            print()
+
+            ### try to find global minimum
+            print('------- 3')
+            e = ace.ene(struct_mg9si5   ,atomrelax=True,cellrelax = True)
+            print('v3',my.ase_vpa(struct_mg9si5),struct_mg9si5.get_potential_energy(),my.ase_mepa(struct_mg9si5))
+            vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+            f300 = ace.get_fh(struct_mg9si5,debug=False)
+            print_compare_ene_vs_DFT("beta prime Mg9Si5 3",e,0,vinet_mg9si5,f300)
+            print('stress',struct_mg9si5.get_stress())
+            print()
+
+            print('------- 4')
+            e = ace.ene(struct_mg9si5   ,atomrelax=True,minimizer='mh')
+            print('v4',my.ase_vpa(struct_mg9si5),struct_mg9si5.get_potential_energy(),my.ase_mepa(struct_mg9si5))
+            vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+            f300 = ace.get_fh(struct_mg9si5,debug=False)
+            print_compare_ene_vs_DFT("beta prime Mg9Si5 4",e,0,vinet_mg9si5,f300)
+            print('stress',struct_mg9si5.get_stress())
+            print()
+
+
+            print('------- 5')
+            e = ace.ene(struct_mg9si5   ,atomrelax=True,cellrelax=True)
+            print('v5',my.ase_vpa(struct_mg9si5),struct_mg9si5.get_potential_energy(),my.ase_mepa(struct_mg9si5))
+            vinet_mg9si5 = ace.get_murn(struct_mg9si5) # 28 atoms, 10Si, 18Mg
+            f300 = ace.get_fh(struct_mg9si5,debug=False)
+            print_compare_ene_vs_DFT("beta prime Mg9Si5 5",e,0,vinet_mg9si5,f300)
+            print('stress',struct_mg9si5.get_stress())
+            print()
+            ase_write("mg9si5_stable_phonons.runner",struct_mg9si5,format='runner')
+
+
+
+
+
+
+        heat_precip_relaxed = (e_precip_relaxed - 18*dilute_mg_f - 10*dilute_si_f)/28
+        dilute_si_f_r =  e_dilute_si_r - 107*e_pure_al/108
+        dilute_mg_f_r =  e_dilute_mg_r - 107*e_pure_al/108
+        heat_precip_rall = (e_precip_relaxed - 18*dilute_mg_f_r - 10*dilute_si_f_r)/28
+
+
+
+
+
+        print('v3',my.ase_vpa(struct_mg9si5))
+        print('fm',my.ase_fmax(struct_mg9si5))
+        print('st',struct_mg9si5.get_stress())
         print()
+        print()
+        print()
+        print()
+        e_precip_relaxed = ace.ene(struct_mg9si5   ,atomrelax=True,cellrelax=True)
+        f300 = ace.get_fh(struct_mg9si5,debug=False)
+        print_compare_ene_vs_DFT("beta prime Mg9Si5 ??",heat_precip,heat_precip_DFT,vinet_mg9si5,f300)
+        print('v4',my.ase_vpa(struct_mg9si5))
+        print('fm',my.ase_fmax(struct_mg9si5))
+        print('st',struct_mg9si5.get_stress())
+        print()
+        print()
+        print()
+        print()
+        e_precip_relaxed = ace.ene(struct_mg9si5   ,atomrelax=True,cellrelax=True)
+        f300 = ace.get_fh(struct_mg9si5,debug=False)
+        print_compare_ene_vs_DFT("beta prime Mg9Si5 aa",heat_precip,heat_precip_DFT,vinet_mg9si5,f300)
+        print('v5',my.ase_vpa(struct_mg9si5))
+        print('fm',my.ase_fmax(struct_mg9si5))
+        print('st',struct_mg9si5.get_stress())
+        print()
+        #print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT)
+        #print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT,[ace,struct_mg9si5])
+        #print_compare_ene_vs_DFT("beta prime Mg9Si5 r",heat_precip_rall,heat_precip_DFT,[ace,struct_mg9si5])
+        return dilute_mg_f, dilute_si_f
 
-        print('bulk')
-        ace.murn(frames[3]) # 108 atoms
-        print('precip')
-        ace.murn(frames[0])
 
-    if True: # beta''
-        print("########################################################################")
-        print("# beta'' (Mg5Si6)")
-        print("########################################################################")
-        bprimeprime = tests+'/Al-Mg-Si/Mg5Si6_beta_doubleprime/POSCAR'
-        print('bprime input data',bprime)
-        frame = ase_read(bprimeprime,index=":",format="vasp")
-        print('f',frame.get_positions())
+def test_Mg2Si(ace):
+    dilute_si_f, dilute_mg_f, dilute_si_f_300, dilute_mg_f_300 = get_dilute_si_mg_f(ace)
+    print("dilute_si_f:",dilute_si_f)
+    print("dilute_mg_f:",dilute_mg_f)
+    print("dilute_si_f_300:",dilute_si_f_300)
+    print("dilute_mg_f_300:",dilute_mg_f_300)
 
+    # @ T=0K
+    scripts = my.scripts()
+    tests = scripts+'/tests/'
+    path = tests+'/Al-Mg-Si/Mg2Si/POSCAR'
+    frame = ase_read(path,format="vasp")
+    e_mg2si = ace.ene(frame,atomrelax=True,cellrelax=True)
+    heat_precip_T0K         = (e_mg2si -         8*dilute_mg_f - 4*dilute_si_f)/12
+    vinet_mg2si = ace.get_murn(frame)
+    f300_mg2si = ace.get_fh(frame)
+    print_compare_ene_vs_DFT("Mg2Si @0K",heat_precip_T0K,0.0,vinet_mg2si,f300_mg2si)
+
+
+    # @ T300K
+    f300_mg2si_cell = f300_mg2si*frame.get_number_of_atoms()/1000.
+    heat_precip_300_corr = (f300_mg2si_cell -         8*dilute_mg_f_300 - 4*dilute_si_f_300)/12
+    print_compare_ene_vs_DFT("Mg2Si @300K",heat_precip_T0K+heat_precip_300_corr,0.0,vinet_mg2si,f300_mg2si)
+    return
+
+def test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f):
+    scripts = my.scripts()
+    tests = scripts+'/tests/'
+    bprimeprime = tests+'/Al-Mg-Si/Mg5Si6_beta_doubleprime/POSCAR'
+    frame = ase_read(bprimeprime,format="vasp")
+    e_mg5si6 = ace.ene(frame) # 108 atoms
+    e_mg5si6_relaxed = ace.ene(frame,atomrelax=True) # 28 atoms, 10Si, 18Mg
+
+    vinet_mg5si6 = ace.get_murn(frame) # 28 atoms, 10Si, 18Mg
+    f300 = ace.get_fh(frame)
+
+    heat_precip         = (e_mg5si6 -         10*dilute_mg_f - 12*dilute_si_f)/22
+    heat_precip_relaxed = (e_mg5si6_relaxed - 10*dilute_mg_f - 12*dilute_si_f)/22
+    print_compare_ene_vs_DFT("beta double prime Mg5Si6",heat_precip,0.0,vinet_mg5si6,f300)
+    return
+
+def test_formation_energies(pot,geopt,verbose):
+    ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
+    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
+                              # ... in case we do test_formation_energies
+    test_si_si_vac(ace)
+    dilute_mg_f, dilute_si_f = test_betaprime_mg9si5(ace)
+    #@ #test_betaprime_mg9si5_find_global_min(ace)
+    test_betadoubleprime_mg5si6(ace,dilute_mg_f, dilute_si_f)
+    test_Mg2Si(ace)
     return
 
 
