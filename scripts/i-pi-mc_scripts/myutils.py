@@ -31,6 +31,7 @@ import time
 
 start_time = time.time()
 
+
 def grep(filepath,string):
     out = []
     file = open(filepath, "r")
@@ -498,8 +499,6 @@ def qe_full_get_path_to_potential(element,path_to_pseudos):
         print('found potential',potential)
         sys.exit('found more than one or none potential; Exit.')
     return potential
-
-
 
 def qe_get_numelectrons(structure_ase, path_to_pseudos):
     element_nume_dict = {}
@@ -1199,7 +1198,7 @@ class ase_calculate_ene( object ):
         ''' the function will never change the atomsobject '''
         return self.get_v0(atomsin=atomsin)/atomsin.get_number_of_atoms()
 
-    def get_murn(self,atomsin=False):
+    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False):
         ''' the murn will never change the atomsobject '''
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
@@ -1240,8 +1239,9 @@ class ase_calculate_ene( object ):
             ene=self.ene(atoms_murn)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
-            #print(idx,i,'vol',vol,'ene',ene)
-            #print(vol/nat,ene/nat)
+            if verbose:
+                print(idx,i,'vol',vol,'ene',ene)
+                print(vol/nat,ene/nat)
 
         #np.savetxt("energy.dat",np.transpose([vol_pa,ene_pa]))
 
@@ -1249,7 +1249,18 @@ class ase_calculate_ene( object ):
         data=np.transpose([vol_pa,ene_pa])
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
         #self.eos = vinet.parameters
-        #print('pars',vinet.parameters)
+        if verbose:
+            print('pars',vinet.parameters)
+        if return_minimum_volume_frame == True:
+            volume_in  = ase_vpa(atomsin)
+            volume_out = vinet.parameters[1]
+            volume_scale = (volume_out/volume_in)**(1./3.)
+            #print('volume_in',volume_in)
+            #print('volume_out',volume_out)
+            #print('scale',volume_scale)
+            atomsin.set_cell(atomsin.get_cell()*volume_scale)
+
+            #atomsin =
         return vinet.parameters
 
     def get_fh(self,atomsin=False,disp=0.03,debug=False):
@@ -1555,6 +1566,24 @@ def lammps_ext_calc(atoms,ace):
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
+
+def get_latest_n2p2_pot():
+    checkfor = scripts()+"/potentials/n2p2_v*ag/"
+    found = glob.glob(checkfor)
+    ver = []
+    for i in found:
+        try:
+            name2 = i.split("/potentials/n2p2_v")[-1]
+            name3 = name2.split("ag")[0]
+            name4 = int(name3)
+            ver.append(name4)
+            #print(i,name2,name3,name4,"ver",ver)
+        except:
+            pass
+    ver = np.sort(np.array(ver))
+    potout = "n2p2_v"+str(ver[-1])+"ag"
+    #print('ver',ver,"->",potout)
+    return potout
 
 if __name__ == "__main__":
     pass
