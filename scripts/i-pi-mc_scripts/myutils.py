@@ -1029,12 +1029,12 @@ class ase_calculate_ene( object ):
         ### attach to atoms to relax the cell
         constraint = False
         if cellrelax == True and atomrelax == False:
-            constraint = StrainFilter(atoms)
+            constraint = StrainFilter(atoms)  # this relaxes the cell shape & the volume while keeping atomic positions fixed
             ## in this case it does not work out
             sys.exit('This gives a segmentation fault (coredump) when cellrelax == True and atomrelax == True ... in this case do only one, then the other one')
         elif cellrelax == True and atomrelax == True:
             ## when doint both this is recommended
-            constraint = ExpCellFilter(atoms)
+            constraint = ExpCellFilter(atoms)  # Modify the supercell and the atom positions.
 
         ## atomrelax = False and cellrelax = False works
         ## atomrelax = True  and cellrelax = False works
@@ -1198,7 +1198,7 @@ class ase_calculate_ene( object ):
         ''' the function will never change the atomsobject '''
         return self.get_v0(atomsin=atomsin)/atomsin.get_number_of_atoms()
 
-    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False):
+    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False,atomrelax=False):
         ''' the murn will never change the atomsobject '''
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
@@ -1206,14 +1206,14 @@ class ase_calculate_ene( object ):
         atoms_murn.wrap()
 
         keep_alive = False
-        atomrelax = False
         if atomrelax == False: keep_alive = False
         if atomrelax == True:  keep_alive = True
         asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
         atoms_murn.set_calculator(asecalcLAMMPS)
 
         ### relax the atoms_murn first to the equilibrium
-        self.ene(atoms_murn,cellrelax=True,atomrelax=True)
+        if atomrelax == True:
+            self.ene(atoms_murn,cellrelax=True,atomrelax=True)
 
         #print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
         #print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
@@ -1283,6 +1283,8 @@ class ase_calculate_ene( object ):
             print("forces harmonic 3:",atoms_h.get_forces()[:3])
             print("###########################################")
         ### relax the atoms_h first to the equilibrium
+        #if atomrelax == True:
+        # need to do this otherwise not in equilibrium
         ene = self.ene(atoms_h,cellrelax=True,atomrelax=True,print_minimization_to_screen=debug)
         if debug:
             print("###########################################")
@@ -1326,14 +1328,15 @@ class ase_calculate_ene( object ):
         if debug:
             print('get_chemical_symbols()')
             print(atoms_h.get_chemical_symbols())
-        hes = h.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False)
+        hes = h.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000)
         try:
-            f300 = (hes.ene_atom[300]-hes.ene_atom[0])[1]
+            #free_ene = (hes.ene_atom[300]-hes.ene_atom[0])[1]
+            free_ene = hes.ene_atom
         except IndexError:
-            f300 = "UNSTABLE"
-        if debug and type(f300) != str:
+            free_ene = "UNSTABLE"
+        if debug and type(free_ene) != str:
             hes.write_ene_atom()
-        return f300
+        return free_ene
 
     def submit_aiida(self,atomsin=False):
         ## o) move this from the ase calass to something separate
