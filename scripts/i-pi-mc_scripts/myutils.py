@@ -31,6 +31,7 @@ import time
 
 start_time = time.time()
 
+
 def grep(filepath,string):
     out = []
     file = open(filepath, "r")
@@ -498,8 +499,6 @@ def qe_full_get_path_to_potential(element,path_to_pseudos):
         print('found potential',potential)
         sys.exit('found more than one or none potential; Exit.')
     return potential
-
-
 
 def qe_get_numelectrons(structure_ase, path_to_pseudos):
     element_nume_dict = {}
@@ -1030,12 +1029,12 @@ class ase_calculate_ene( object ):
         ### attach to atoms to relax the cell
         constraint = False
         if cellrelax == True and atomrelax == False:
-            constraint = StrainFilter(atoms)
+            constraint = StrainFilter(atoms)  # this relaxes the cell shape & the volume while keeping atomic positions fixed
             ## in this case it does not work out
             sys.exit('This gives a segmentation fault (coredump) when cellrelax == True and atomrelax == True ... in this case do only one, then the other one')
         elif cellrelax == True and atomrelax == True:
             ## when doint both this is recommended
-            constraint = ExpCellFilter(atoms)
+            constraint = ExpCellFilter(atoms)  # Modify the supercell and the atom positions.
 
         ## atomrelax = False and cellrelax = False works
         ## atomrelax = True  and cellrelax = False works
@@ -1199,7 +1198,7 @@ class ase_calculate_ene( object ):
         ''' the function will never change the atomsobject '''
         return self.get_v0(atomsin=atomsin)/atomsin.get_number_of_atoms()
 
-    def get_murn(self,atomsin=False):
+    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False,atomrelax=False):
         ''' the murn will never change the atomsobject '''
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
@@ -1207,14 +1206,14 @@ class ase_calculate_ene( object ):
         atoms_murn.wrap()
 
         keep_alive = False
-        atomrelax = False
         if atomrelax == False: keep_alive = False
         if atomrelax == True:  keep_alive = True
         asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
         atoms_murn.set_calculator(asecalcLAMMPS)
 
         ### relax the atoms_murn first to the equilibrium
-        self.ene(atoms_murn,cellrelax=True,atomrelax=True)
+        if atomrelax == True:
+            self.ene(atoms_murn,cellrelax=True,atomrelax=True)
 
         #print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
         #print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
@@ -1240,8 +1239,9 @@ class ase_calculate_ene( object ):
             ene=self.ene(atoms_murn)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
-            #print(idx,i,'vol',vol,'ene',ene)
-            #print(vol/nat,ene/nat)
+            if verbose:
+                print(idx,i,'vol',vol,'ene',ene)
+                print(vol/nat,ene/nat)
 
         #np.savetxt("energy.dat",np.transpose([vol_pa,ene_pa]))
 
@@ -1249,7 +1249,18 @@ class ase_calculate_ene( object ):
         data=np.transpose([vol_pa,ene_pa])
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
         #self.eos = vinet.parameters
-        #print('pars',vinet.parameters)
+        if verbose:
+            print('pars',vinet.parameters)
+        if return_minimum_volume_frame == True:
+            volume_in  = ase_vpa(atomsin)
+            volume_out = vinet.parameters[1]
+            volume_scale = (volume_out/volume_in)**(1./3.)
+            #print('volume_in',volume_in)
+            #print('volume_out',volume_out)
+            #print('scale',volume_scale)
+            atomsin.set_cell(atomsin.get_cell()*volume_scale)
+
+            #atomsin =
         return vinet.parameters
 
     def get_fh(self,atomsin=False,disp=0.03,debug=False):
@@ -1272,6 +1283,8 @@ class ase_calculate_ene( object ):
             print("forces harmonic 3:",atoms_h.get_forces()[:3])
             print("###########################################")
         ### relax the atoms_h first to the equilibrium
+        #if atomrelax == True:
+        # need to do this otherwise not in equilibrium
         ene = self.ene(atoms_h,cellrelax=True,atomrelax=True,print_minimization_to_screen=debug)
         if debug:
             print("###########################################")
@@ -1315,14 +1328,15 @@ class ase_calculate_ene( object ):
         if debug:
             print('get_chemical_symbols()')
             print(atoms_h.get_chemical_symbols())
-        hes = h.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False)
+        hes = h.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000)
         try:
-            f300 = (hes.ene_atom[300]-hes.ene_atom[0])[1]
+            #free_ene = (hes.ene_atom[300]-hes.ene_atom[0])[1]
+            free_ene = hes.ene_atom
         except IndexError:
-            f300 = "UNSTABLE"
-        if debug and type(f300) != str:
+            free_ene = "UNSTABLE"
+        if debug and type(free_ene) != str:
             hes.write_ene_atom()
-        return f300
+        return free_ene
 
     def submit_aiida(self,atomsin=False):
         ## o) move this from the ase calass to something separate
@@ -1555,6 +1569,24 @@ def lammps_ext_calc(atoms,ace):
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
+
+def get_latest_n2p2_pot():
+    checkfor = scripts()+"/potentials/n2p2_v*ag/"
+    found = glob.glob(checkfor)
+    ver = []
+    for i in found:
+        try:
+            name2 = i.split("/potentials/n2p2_v")[-1]
+            name3 = name2.split("ag")[0]
+            name4 = int(name3)
+            ver.append(name4)
+            #print(i,name2,name3,name4,"ver",ver)
+        except:
+            pass
+    ver = np.sort(np.array(ver))
+    potout = "n2p2_v"+str(ver[-1])+"ag"
+    #print('ver',ver,"->",potout)
+    return potout
 
 if __name__ == "__main__":
     pass

@@ -29,7 +29,7 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.option('-fa','--foldername_append',type=str, default="", help="append to foldername")
 
 # environment variables
-@click.option('--pot','-p',type=click.Choice(mu.pot_all()),required=True,default='n2p2_v1ag',help="potential from $scripts/potentials folder.")
+@click.option('--pot','-p',type=click.Choice(mu.pot_all()),required=True,default=my.get_latest_n2p2_pot(),help="potential from $scripts/potentials folder.")
 
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
