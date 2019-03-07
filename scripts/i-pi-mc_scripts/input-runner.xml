@@ -4,6 +4,7 @@
 <simulation verbosity="low">
     <output prefix="simulation">
         <properties stride="1" filename="out"> [ step, potential] </properties>
+        <properties stride="1" filename="vac"> [ step, time{picosecond}, atom_x{angstrom}(214), atom_x{angstrom}(215) ] </properties>
         <trajectory filename="pos" stride="100" cell_units="angstrom" format="xyz" bead="0"> positions{angstrom} </trajectory>
     </output>
     <total_steps>200000</total_steps>

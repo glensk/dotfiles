@@ -29,13 +29,14 @@ CONTEXT_SETTINGS = mu.get_click_defaults()
 @click.option('-fa','--foldername_append',type=str, default="", help="append to foldername")
 
 # environment variables
-@click.option('--pot','-p',type=click.Choice(mu.pot_all()),required=True,default=my.get_latest_n2p2_pot(),help="potential from $scripts/potentials folder.")
+@click.option('--pot','-p',type=click.Choice(mu.pot_all()),required=True,default=mu.get_latest_n2p2_pot(),help="potential from $scripts/potentials folder.")
 
 @click.option('-submit/-no-submit', default=False)
 @click.option('-submitdebug/-no-submitdebug', default=False)
 @click.option('-st','--submittime_hours', type=int,default=71,help="slurm time for the job")
 @click.option('-n','--nodes', type=int,default=1,help="how many nodes to use?")
 @click.option('-t','--test/--no-test', default=False)
+@click.option('-tf','--testfiles/--no-testfiles', default=False)
 @click.option('--verbose','-v',count=True)
 
 def createjob(
@@ -55,6 +56,7 @@ def createjob(
         submitdebug,
         submittime_hours,
         test,
+        testfiles,
         nodes,
         verbose):
     """
@@ -163,7 +165,8 @@ def createjob(
     #print('python ver    ',sys.version_info[0])
     #print()
     print('--------------------------- check the input --------------------------------')
-    mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
+    if submit == True or submitdebug == True:
+        mu.get_from_prompt_Yy_orexit("Are the ine input variables ok? [y]es: ")
 
     # make the directory
     if os.path.isdir(directory):
@@ -171,7 +174,9 @@ def createjob(
     mu.mkdir(directory)
 
     # create README.md
-    mu.create_READMEtxt(directory)
+    IPI_COMMAND = os.environ["IPI_COMMAND"]
+    LAMMPS_COMMAND = os.environ["LAMMPS_COMMAND"]
+    mu.create_READMEtxt(directory,add=["# to start manually (1): python "+IPI_COMMAND+" input-runner.xml","# to start manually (2):"+LAMMPS_COMMAND+" < in.lmp"])
 
     for seed in seeds:
 
@@ -187,7 +192,7 @@ def createjob(
         atomsc.write(jobdir+'/data.ipi',format='ipi')
         atomsc_fakevac.write(jobdir+'/data_fakevac.ipi',format='ipi')
 
-        if test == True:
+        if testfiles == True:
             atomsc.write(jobdir+'/data.lmp',format='lammps-data')
             atomsc.write(jobdir+'/data.POSCAR',format='vasp')
             atomsc.write(jobdir+'/data.xyz',format='xyz')
@@ -207,7 +212,7 @@ def createjob(
         if test == True:
             nsteps = 5
             stride = 1
-            verbosity = "high"
+            verbosity = "low"   # with high every socket connect is reported ... which is too much info
 
         copyfile(file_ipi_input_runner, jobdir+"/input-runner.xml")
         mu.sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(nsteps)+' </total_steps>')
@@ -224,7 +229,16 @@ def createjob(
 
 
         #mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
-        mu.sed(jobdir+"/input-runner.xml",'<!-- <activelist> .*','<activelist> '+str(range(ncell**3 - nvac))+' </activelist>')
+        activelist = str(range(ncell**3 - nvac))
+        activelist = activelist.replace(" ", "")
+        mu.sed(jobdir+"/input-runner.xml",'<!-- <activelist> .*','<activelist> '+activelist+' </activelist>')
+        atom_x_list = []
+        for nvac_idx in range(ncell**3 - nvac,ncell**3):
+            atom_x_list.append('atom_x{angstrom}('+str(nvac_idx)+')')
+        insert = ", ".join(atom_x_list)
+        mu.sed(jobdir+"/input-runner.xml",'atom_x{.*',insert+" ] </properties>")
+
+
         mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data_fakevac.ipi </file>')
 
         mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
