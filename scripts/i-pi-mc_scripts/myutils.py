@@ -265,10 +265,17 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,crea
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
 
-    for i in np.arange(nmg):
-        atomsc[i].symbol = 'Mg'
-    for i in np.arange(nmg,nmg+nsi):
+    #for i in np.arange(nmg):
+    #    atomsc[i].symbol = 'Mg'
+    #for i in np.arange(nmg,nmg+nsi):
+    #    atomsc[i].symbol = 'Si'
+
+    # This is the order which ipi kmc expects
+    for i in np.arange(nsi):
         atomsc[i].symbol = 'Si'
+    for i in np.arange(nsi,nmg+nsi):
+        atomsc[i].symbol = 'Mg'
+
     if create_fake_vacancy == False:
         for i in np.arange(nvac):
             del atomsc[-1]

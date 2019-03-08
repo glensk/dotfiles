@@ -188,9 +188,9 @@ def createjob(
         mu.mkdir(jobdir)
 
         # get data.lmp and data.ipi
-        atomsc.write(jobdir+'/data.lmp.runner',format='lammps-runner')
-        atomsc.write(jobdir+'/data.ipi',format='ipi')
-        atomsc_fakevac.write(jobdir+'/data_fakevac.ipi',format='ipi')
+        atomsc.write(jobdir+'/data.runnerformat.lmp',format='lammps-runner')
+        atomsc_fakevac.write(jobdir+'/data.ipi',format='ipi')
+        #atomsc_fakevac.write(jobdir+'/data_fakevac.ipi',format='ipi')
 
         if testfiles == True:
             atomsc.write(jobdir+'/data.lmp',format='lammps-data')
@@ -203,7 +203,7 @@ def createjob(
         # create in.lmp
         ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
         mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
-        mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.lmp.runner',ace=ace)
+        mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.runnerformat.lmp',ace=ace)
 
 
         # get input-runner.xml (should be made without copying)
@@ -239,7 +239,7 @@ def createjob(
         mu.sed(jobdir+"/input-runner.xml",'atom_x{.*',insert+" ] </properties>")
 
 
-        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data_fakevac.ipi </file>')
+        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
 
         mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
         addressline = '<address> '+socket.gethostname()+' </address>'
