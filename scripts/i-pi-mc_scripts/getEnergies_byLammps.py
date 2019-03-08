@@ -22,6 +22,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--lmp/--no-lmp','-l',default=False,help='Do the calculations externally by lammps and not through ase interface.')
 @click.option('--ipi/--no-ipi','-ipi',default=False,help='Do the calculations externally by ipi-lammps and not through ase interface.')
 @click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
+@click.option('--test2/--no-test2','-t2',default=False,help='Assess elastic constants.')
 
 @click.option('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
 @click.option('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
@@ -33,7 +34,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--verbose','-v',count=True)
 
 
-def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,ase,lmp,ipi,write_runner,
+def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,test2,ase,lmp,ipi,write_runner,
         pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
@@ -46,6 +47,10 @@ def get_energies(infile,format_in,pot,verbose,structures_idx,units,geopt,test,as
     if test:
         test_formation_energies(pot,geopt,verbose)
         my.create_READMEtxt(os.getcwd())
+        sys.exit('test done! Exit')
+
+    if test2:
+        test2_elastic(pot,geopt,verbose)
         sys.exit('test done! Exit')
 
     ### check infile
@@ -783,6 +788,19 @@ def test_formation_energies(pot,geopt,verbose):
     #test_betaprime_mg9si5_find_global_min(ace,f_dilute_si, f_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
     return
 
+def test2_elastic(pot,geopt,verbose):
+    ace = ase_calculate_ene(pot,units='eV',geopt=geopt,verbose=verbose)
+    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
+
+    # load the stuff
+    scripts = my.scripts()
+    tests = scripts+'/tests/'
+    path = tests+'/Al-Mg-Si/Mg2Si/POSCAR'
+    frame = ase_read(path,format="vasp")
+
+    ace.get_elastic(frame,verbose=False)
+
+    return
 
 
 if __name__ == "__main__":

@@ -265,10 +265,17 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,crea
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
 
-    for i in np.arange(nmg):
-        atomsc[i].symbol = 'Mg'
-    for i in np.arange(nmg,nmg+nsi):
+    #for i in np.arange(nmg):
+    #    atomsc[i].symbol = 'Mg'
+    #for i in np.arange(nmg,nmg+nsi):
+    #    atomsc[i].symbol = 'Si'
+
+    # This is the order which ipi kmc expects
+    for i in np.arange(nsi):
         atomsc[i].symbol = 'Si'
+    for i in np.arange(nsi,nmg+nsi):
+        atomsc[i].symbol = 'Mg'
+
     if create_fake_vacancy == False:
         for i in np.arange(nvac):
             del atomsc[-1]
@@ -598,14 +605,22 @@ def scripts():
         sys.exit('scripts variable is not defined or is not an existing folder')
     return scripts
 
-def test_and_return_environment_var_path(var,path=False):
+def test_and_return_environment_var_path(var,path=False,exit=True):
     variable = os.environ[var]
     if path == False:
         if not os.path.isfile(variable):
-            sys.exit('The variable '+str(var)+' is not defined or is not an existing file')
+            message='The variable '+str(var)+' is not defined or is not an existing file'
+            if exit == True:
+                sys.exit(message)
+            else:
+                print(message)
     else:
         if not os.path.isdir(variable):
-            sys.exit('directory '+str(var)+' is not defined or does not exist')
+            message = 'directory '+str(var)+' is not defined or does not exist'
+            if exit == True:
+                sys.exit(message)
+            else:
+                print(message)
     return variable
 
 
@@ -1197,6 +1212,49 @@ class ase_calculate_ene( object ):
     def get_v0_pa(self,atomsin=False):
         ''' the function will never change the atomsobject '''
         return self.get_v0(atomsin=atomsin)/atomsin.get_number_of_atoms()
+
+    def get_elastic(self,atomsin=False,verbose=False):
+        ''' the function will never change the atomsobject '''
+
+        if atomsin == False:
+            sys.exit('need to define atoms in this case XX')
+
+        atoms_h = atomsin.copy()
+        atoms_h.wrap()
+
+        keep_alive = False
+        atomrelax = False
+        if atomrelax == False: keep_alive = False
+        if atomrelax == True:  keep_alive = True
+        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
+        #atoms_h.set_calculator(asecalcLAMMPS)  # wird in parcalc.py gesetzt
+        #/home/glensk/miniconda2/lib/python2.7/site-packages/parcalc/parcalc.py
+
+
+        #### load the elastic stuff
+        from parcalc import ClusterVasp, ParCalculate
+
+        from elastic import get_pressure, BMEOS, get_strain
+        from elastic import get_elementary_deformations, scan_volumes
+        from elastic import get_BM_EOS, get_elastic_tensor
+
+        # Create elementary deformations (systems are ase frames)
+        #print('sys',elastic.__file__)
+        systems = get_elementary_deformations(atoms_h, n=5, d=0.33)
+        print(systems)
+        print()
+        print(systems[0])
+
+        # Run the stress calculations on deformed cells
+        res = ParCalculate(systems, asecalcLAMMPS)
+
+        ## Elastic tensor by internal routine
+        #Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
+        #print("Cij (GPa):", Cij/units.GPa)
+
+
+
+
 
     def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False,atomrelax=False):
         ''' the murn will never change the atomsobject '''
