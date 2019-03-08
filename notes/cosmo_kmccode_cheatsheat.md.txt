@@ -43,6 +43,7 @@ ridx: # reverse lookup index [i.e. ridx[i] gives the index of the atoms/vacancy 
 
 
 idx: connects the initial positions of the atoms 
+self.idx[atom] will give the index of the atom where atom is the index of the initial atom (as stored in the simulations_pos.out file)
 self.idx[ivac] : is sorted in such a way that last position gives alwasy the index 
 to the vacancy.
 
