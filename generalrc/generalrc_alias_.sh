@@ -279,7 +279,7 @@ $1 make_home_accessible 'chmod -R ga+r $HOME'
 $1 ca 'conda_activate'
 $1 ac 'conda_activate'
 
-$1 aiida 'source aiida/bin/activate'
+$1 aiida "source $HOME/aiida/bin/activate"
 
 $1 s 'cd $SCRATCH'
 $1 aiida_activate "source $HOME/aiida/bin/activate"
