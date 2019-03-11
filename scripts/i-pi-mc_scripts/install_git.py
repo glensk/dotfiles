@@ -12,24 +12,19 @@ known = ["ipi","ipi_cosmo","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "ai
 # create pull request
 # i-pi/tools/py/mux-positions.py
 address = {};branch={}
-<<<<<<< HEAD
 address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
 branch['ipi_old']       = "kmc-al6xxx"
 
-address["ipi"]          = "https://github.com/cosmo-epfl/i-pi.git"
-branch['ipi']           = "feat/kmc-al6xxx"
+address["ipi_cosmo"]    = "https://github.com/cosmo-epfl/i-pi.git";
+branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
+
+address["ipi"]          = "https://github.com/glensk/i-pi.git";
+branch['ipi']           = "feat/kmc"
 
 address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
 
 address["lammps"]       = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
-=======
-address["ipi_old_DONT_USE"] = "https://github.com/ceriottm/i-pi-mc";                branch['ipi_old']       = "kmc-al6xxx"
-address["ipi_cosmo"]        = "https://github.com/cosmo-epfl/i-pi.git";             branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
-address["ipi"]              = "https://github.com/glensk/i-pi.git";                 branch['ipi']           = "feat/kmc"
-address["aiida-alloy"]      = "https://gitlab.com/daniel.marchand/aiida-alloy.git"; branch['aiida-alloy']   = False
-address["lammps"]           = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
->>>>>>> fb06f63d6d80a6914fae7985fea729d08fc59f33
 
 
 def help(p = None ,known=known):
