@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -40,12 +40,13 @@ def install_(args,known):
     install        = args.install
 
     with my.cd(os.environ.get('dotfiles')):
-        print('pwd',os.getcwd())
+        print('pwd (ssh key should was added: https://github.com/settings/keys)',os.getcwd())
+
         # git config --global credential.helper store   ; before git push makes it work without password
-        subprocess.call(["git","config","--global","credential.helper","store"])
-        get_my_address = "https://github.com/glensk/dotfiles.git"  # git config --get remote.origin.url
-        subprocess.call(["git","pull"],shell=True)
-        subprocess.call(["git","push",get_my_address],shell=True)
+        #subprocess.call(["git","config","--global","credential.helper","store"])
+        #get_my_address = "https://github.com/glensk/dotfiles.git"  # git config --get remote.origin.url
+        #subprocess.call(["git","pull"],shell=True)
+        #subprocess.call(["git","push",get_my_address],shell=True)
 
     # check if the program is known
     if args.install not in known:
@@ -65,6 +66,7 @@ def install_(args,known):
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
         if args.install in ['ipi']              : git_clone(args)
+        if args.install in ['ipi_cosmo']        : git_clone(args)
         if args.install in ['aiida-alloy']      : git_clone(args)
         if args.install in ['atomsk']           : install_atomsk(args)
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)

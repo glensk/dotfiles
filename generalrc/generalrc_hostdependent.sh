@@ -39,6 +39,7 @@ fidis)
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
+	module load git;
     #module load intel;
     # all of those take too long and are not necessary in interactive work
     #module load intel-mpi;
