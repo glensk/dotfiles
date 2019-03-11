@@ -39,7 +39,7 @@ fidis)
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
-	module load git;
+    module load git;  # to get git 2.17 (instad of 1.8)
     #module load intel;
     # all of those take too long and are not necessary in interactive work
     #module load intel-mpi;
