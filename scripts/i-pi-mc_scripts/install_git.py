@@ -8,12 +8,15 @@ import subprocess
 import myutils
 
 known = ["ipi","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-
+# git clone https://github.com/glensk/i-pi.git
+# create pull request
+# i-pi/tools/py/mux-positions.py
 address = {};branch={}
-address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc";                branch['ipi_old']       = "kmc-al6xxx"
-address["ipi"]          = "https://github.com/cosmo-epfl/i-pi.git";             branch['ipi']           = "feat/kmc-al6xxx"
-address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"; branch['aiida-alloy']   = False
-address["lammps"]       = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
+address["ipi_old_DONT_USE"] = "https://github.com/ceriottm/i-pi-mc";                branch['ipi_old']       = "kmc-al6xxx"
+address["ipi_cosmo"]        = "https://github.com/cosmo-epfl/i-pi.git";             branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
+address["ipi"]              = "https://github.com/glensk/i-pi.git";                 branch['ipi']           = "feat/kmc"
+address["aiida-alloy"]      = "https://gitlab.com/daniel.marchand/aiida-alloy.git"; branch['aiida-alloy']   = False
+address["lammps"]           = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
 
 
 def help(p = None ,known=known):
@@ -38,8 +41,11 @@ def install_(args,known):
 
     with my.cd(os.environ.get('dotfiles')):
         print('pwd',os.getcwd())
-        subprocess.call(["git","config","credential.helper","store"])
-        subprocess.call(["git push `git config --get remote.origin.url`"],shell=True)
+        # git config --global credential.helper store   ; before git push makes it work without password
+        subprocess.call(["git","config","--global","credential.helper","store"])
+        get_my_address = "https://github.com/glensk/dotfiles.git"  # git config --get remote.origin.url
+        subprocess.call(["git","pull"],shell=True)
+        subprocess.call(["git","push",get_my_address],shell=True)
 
     # check if the program is known
     if args.install not in known:

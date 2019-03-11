@@ -1,3 +1,0 @@
-n2p2_submit_inputdata_to_aiida.sh mg9si5_stable_phonons_v2_atomrelax_cellrelax_minimahopping.runner
-
-retrieve: mg9si5_stable_phonons_v2_atomrelax_cellrelax_minimahopping.runner.group_calc
