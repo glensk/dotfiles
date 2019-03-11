@@ -1,0 +1,4 @@
+print sys.path
+print utils.__file__ # /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/python_thermodynamics/utils.p
+
+print engine.__file__ # /home/glensk/sources/ipi/ipi/engine/__init__.py
