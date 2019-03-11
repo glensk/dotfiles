@@ -29,6 +29,7 @@ if __name__ == '__main__':
         e.g. rename.py -f simulation.pos_* -r .extxyz$ -w .xyz     # shows all changes (.extexy to xyz)
         e.g. rename.py -f simulation.pos_* -r .extxyz$ -w .xyz -d  # ranemes all .extexy to xyz
         e.g. rename.py -f * -a .md # justa append .md to every file
+        e.g. rename.py -f * -r .md.txt -w .txt -v -d  # change .md.txt to .txt
 
 
 

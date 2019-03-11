@@ -113,3 +113,68 @@ aiida-alloy
 ###################################################################################
 https://gitlab.com/daniel.marchand/aiida-alloy
 pw: mit zwei doppel s nix weiter
+
+
+
+###################################################################################
+working with forks
+###################################################################################
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+git remote -v (now shows upstream)
+git remote set-url upstream  https://github.com/cosmo-epfl/i-pi.git   # to change upstream
+git fetch upstream # to get all branches, also from upstream
+git diff feat/kmc:ipi/engine/motion/geop.py remotes/upstream/bugfix/geop_softexit:ipi/engine/motion/geop.py  # show diff of particular file/branch ...
+
+# with michele
+git stash # get get rid of the changes I made.
+git checkout master # Branch 'master' set up to track remote branch 'master' from 'upstream' by rebasing. Switched to a new branch 'master'
+git fetch upstream master
+git merge upstream/master 
+git checkout feat/kmc
+git merge master # did not work
+
+%git merge master --allow-unrelated-histories
+Auto-merging ipi/inputs/motion/motion.py
+CONFLICT (add/add): Merge conflict in ipi/inputs/motion/motion.py
+Auto-merging ipi/inputs/motion/geop.py
+CONFLICT (add/add): Merge conflict in ipi/inputs/motion/geop.py
+Auto-merging ipi/engine/motion/geop.py
+CONFLICT (add/add): Merge conflict in ipi/engine/motion/geop.py
+Auto-merging ipi/engine/motion/__init__.py
+CONFLICT (add/add): Merge conflict in ipi/engine/motion/__init__.py
+Auto-merging ipi/engine/ensembles.py
+CONFLICT (add/add): Merge conflict in ipi/engine/ensembles.py
+Automatic merge failed; fix conflicts and then commit the result.
+
+
+# tried:
+git pull https://github.com/cosmo-epfl/i-pi.git feat/kmc
+
+# tried 2
+install_git.py -i ipi -if ipi_my_checkout1
+
+# tried 3
+install_git.py -i ipi -if ipi_my_checkout2
+git pull https://github.com/cosmo-epfl/i-pi.git feat/kmc # this now has conflicts. HEAD <<<< ...
+git rebase --skip # makes the conflicts go away and applies micheles changes.
+(however: when git pull, those changes disappear again. which I therefore did not do the next time)
+git remote set-url upstream  https://github.com/cosmo-epfl/i-pi.git  # did not work but:
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+
+
+# tried 4
+install_git.py -i ipi -if ipi_my_checkout3
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+git remote -v
+git --version # 2.17
+git fetch upstream feat/kmc
+git branch -a
+    # * feat/kmc
+    remotes/origin/feat/kmc
+    remotes/upstream/feat/kmc
+git checkout remotes/upstream/feat/kmc
+git checkout feat/kmc
+git checkout --patch remotes/upstream/feat/kmc ipi/engine/motion/geop.py
+install_git.py -i ipi -if ipi_my_checkout4
+
+

@@ -13,6 +13,8 @@ bn=`basename $1`
 scp $1 cosmopc:/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/aiida-alloy
 echo
 echo "now ssh: loading structures as aiida group"
+echo "bn:"
+echo $bn
 echo
 
 ssh glensk@cosmopc15.epfl.ch "source /home/glensk/aiida/bin/activate;cd /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/aiida-alloy; ./load_runner_dataset.py -d $bn -gn $bn.group && verdi group list -A"

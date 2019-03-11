@@ -523,7 +523,7 @@ class hesseclass( object ):
     defines everything related to the harmonic approximation.
     defines eigenfrequencies and Free Energy from HesseMatrix
     '''
-    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True):
+    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True, Tmax = False):
         '''
         units of h (hessematrix): [eV/Angstrom^2]
         if HesseMatrix is imported units are expected in [hartree/bohrradius^2]
@@ -548,6 +548,7 @@ class hesseclass( object ):
         self._inputfile_default = "Hessematrix_sphinx"
         self.inputfile_all = None
         self._filename_addstring = ""
+        self._temp = Tmax
         self._l = False
         self._fm = False
         self.inputfile = False
@@ -580,9 +581,10 @@ class hesseclass( object ):
         #print('ad',self.atomdata)
         self.mass = self.atomdata.mass
         #print('mass',self.mass)
-        self._temp = int((self.atomdata.melting+1.0).max())  # +1 since int rounds down
-        if self._l:
-            self._temp = int((self.atomdata.melting+1.0).min())  # +1 since int rounds down
+        if self._temp == False:
+            self._temp = int((self.atomdata.melting+1.0).max())  # +1 since int rounds down
+            if self._l:
+                self._temp = int((self.atomdata.melting+1.0).min())  # +1 since int rounds down
         if self._verbose:
             print("self.mass        :",self.mass)
             print("self._temp       :",self._temp)
