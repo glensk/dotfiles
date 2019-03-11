@@ -10,9 +10,15 @@ import myutils
 known = ["ipi","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 
 address = {};branch={}
-address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc";                branch['ipi_old']       = "kmc-al6xxx"
-address["ipi"]          = "https://github.com/cosmo-epfl/i-pi.git";             branch['ipi']           = "feat/kmc-al6xxx"
-address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"; branch['aiida-alloy']   = False
+address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
+branch['ipi_old']       = "kmc-al6xxx"
+
+address["ipi"]          = "https://github.com/cosmo-epfl/i-pi.git"
+branch['ipi']           = "feat/kmc-al6xxx"
+
+address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
+branch['aiida-alloy']   = False
+
 address["lammps"]       = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
 
 

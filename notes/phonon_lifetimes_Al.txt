@@ -1,0 +1,74 @@
+latex writing:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_63_Michaels_korrekturen_version_paper_09_August_2018/version_27_Feb2019
+
+Fig 2b:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_46_pic_freq_lifetime_convergence
+
+
+cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes/check_0_DFT_RUNS_Al/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_run_1
+
+Parametrization LA:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_62_LA_POSITIONs/ANMERKUNG.txt
+
+Supercell convergence:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_20_python_plotting/check_3_sc_convergence/nve_tutild_pot_cutoff_5
+
+PARAMETRIZATION USED FOR LA paper***:
+----------------------------------
+%argparse_md_code.py -e Al --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5 -a_mor 1.437 -D_mor 0.258 -t1 -0.072
+==> (Al) ene_std:   1.7 for_std: 0.0490  dudl/2:   0.3  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43700  D_mor 0.25800 ||(PRL YES)
+
+
+
+==> this is just the morse parametrization from:
+/Users/glensk/Dropbox/Albert/Understanding_distributions/ti/Al/30__PTS_dosall_from_2x2x2sc__LON_quer_3x3x3kp_all_morse_LONADD__NO_LON2_NONE_LON2ADD__NO_TOX_NONE_TOY_NONE_TOZ_NONE/lambda0.0//HesseMatrix_sphinx
+- argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2   # this is the old parametrization
+==> (Al) ene_std:   8.8 for_std:  0.157  dudl/2:   7.4  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43267  D_mor 0.27930 ||(PRL NO )
+
+==> so only the t1 has been adjusted
+
+==> so the -0.07 is the optimum also from the displacements.
+%argparse_md_code.py -e Al -fandp /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400 -vm2 -a_mor 1.437 -D_mor 0.258 -t1 -0.07
+==> (Al) ene_std:   0.1 for_std: 0.00805  dudl/2:   0.0  ||| alat 4.140 ||| alat_mor 4.140 a_mor 1.43700  D_mor 0.25800 ||(PRL -  )
+
+
+==> OPTIMUM is QUITE CLOSE:
+%argparse_md_code.py -e Al -fandp /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400 -vm2 -a_mor 1.439 -D_mor 0.257 -t1 -0.068
+==> (Al) ene_std:   0.1 for_std: 0.00797  dudl/2:   0.0  ||| alat 4.140 ||| alat_mor 4.140 a_mor 1.43900  D_mor 0.25700 ||(PRL -  )
+
+
+==> check other parametrizations:
+%argparse_md_code.py -e Al -fandp /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/5x5x5sc_quer_2x2x2kp_vasp4 -vm2 -a_mor 1.437 -D_mor 0.258 -t1 -0.07
+==> (Al) ene_std:   0.0 for_std: 0.00448  dudl/2:   0.0  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43700  D_mor 0.25800 ||(PRL -  )
+
+==> much better
+%argparse_md_code.py -e Al -fandp /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/5x5x5sc_quer_2x2x2kp_vasp4 -vm2 -t1 -0.07 -gpf_dispfolder_cf110 999
+==> (Al) ene_std:   0.0 for_std: 0.00341  dudl/2:   0.0  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.48337  D_mor 0.24190 ||(PRL -  )
+
+==> this is however not better for 3x3x3 supercell:
+%argparse_md_code.py -e Al -fandp /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400 -vm2 -a_mor 1.48337 -D_mor 0.2419 -t1 -0.07
+==> (Al) ene_std:   0.1 for_std: 0.00893  dudl/2:   0.0  ||| alat 4.140 ||| alat_mor 4.140 a_mor 1.48337  D_mor 0.24190 ||(PRL -  )
+
+
+
+
+
+same parametrization without tox:
+%argparse_md_code.py -e Al --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5 -a_mor 1.437 -D_mor 0.258 -t1 -0.00
+==> (Al) ene_std:   7.2 for_std: 0.1190  dudl/2:   5.8  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43700  D_mor 0.25800 ||(PRL YES)
+
+
+The parametrization form the 5x5x5 supercell (from displacemetns seems actually even a bit beter when using the same t1:
+%argparse_md_code.py -e Al --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5 -t1 -0.072
+==> (Al) ene_std:   1.8 for_std: 0.0480  dudl/2:   0.3  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.51085  D_mor 0.22675 ||(PRL YES)
+
+also, a different t1 would be even better (at least for the std which is the only thing we will look at): and would have been much more stable ...
+%argparse_md_code.py -e Al --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5 -t1 -0.06
+==> (Al) ene_std:   1.6 for_std: 0.0440  dudl/2:   0.7  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.51085  D_mor 0.22675 ||(PRL YES)
+
+
+
+DFT:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_30_DFT_POSITIONs/low_3x3x3sc_250eV_3x3x3kp_EDIFF1E-2__4.14Ang_900K_GGA/run_1/restart
+
+
