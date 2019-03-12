@@ -11,6 +11,7 @@ from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
 from ase.constraints import StrainFilter,ExpCellFilter
+from numba import njit
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
@@ -31,6 +32,17 @@ import time
 
 start_time = time.time()
 
+@njit
+def multidet(a,b,c):
+    n=a.shape[0]
+    d=np.empty(n)
+    for i in range(n):
+        u,v,w=a[i],b[i],c[i]
+        d[i]=\
+        u[0]*(v[1]*w[2]-v[2]*w[1])+\
+        u[1]*(v[2]*w[0]-v[0]*w[2])+\
+        u[2]*(v[0]*w[1]-v[1]*w[0])  # 14 operations / det
+    return d
 
 def grep(filepath,string):
     out = []
