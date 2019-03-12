@@ -1180,6 +1180,8 @@ class ase_calculate_ene( object ):
             print(atoms.get_positions()[:3])
         if self.verbose > 1:
             print('ZZ ene:',ene,self.units)
+        if not print_minimization_to_screen and os.path.isfile("tmp"):
+            os.remove("tmp")
         #sys.exit()
         #ene = atoms.get_total_energy()
         #if self.verbose:
