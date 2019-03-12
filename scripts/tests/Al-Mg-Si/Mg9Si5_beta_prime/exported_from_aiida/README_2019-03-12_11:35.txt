@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: 09c8afc30d1be7fc4247278924a59733ca36e7ef
+
+aiida_export_group_to_runner.py -gn BetaPrime_vc-relaxed -wor
