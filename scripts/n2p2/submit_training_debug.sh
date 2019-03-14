@@ -12,7 +12,7 @@ set +e
 # it is necessary to have all the modules which are used when compiling
 export LD_LIBRARY_PATH=""
 module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen
-export LD_LIBRARY_PATH=$HOME/Dropbox/Albert/git/n2p2/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=$HOME/sources/n2p2/lib:${LD_LIBRARY_PATH}
 #echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
 
 touch time.out

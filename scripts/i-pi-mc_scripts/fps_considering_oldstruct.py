@@ -24,10 +24,6 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('-nsyms','--nsyms',required=False,default={"Mg":64, "Al":64, "Si":64},help="dictionary containing amount of symmetry functions per element")
 @click.option('-s','--structures_upperlim',required=False,default=False,type=int,help="upper limit of structures to fps_considering_oldstruct/input.fps.data")
 
-def printstatement(text):
-    print("####################################")
-    print("#",text)
-    print("####################################")
 
 
 def make_fps(db1,db2,nsyms,structures_upperlim):
@@ -84,7 +80,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     print()
     # check if necessary files exist
     print()
-    for i in [ DB1_path,DB2_path]:
+    input_nn_ref = False
+    for idx,i in enumerate([ DB1_path,DB2_path]):
         # does folder exist?
         if not os.path.isdir(i): sys.exit(i+" does not exist!")
         else: print(i+" exists")
@@ -92,8 +89,13 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         if not os.path.isfile(i+'/input.data'): sys.exit(i+"/input.data does not exist!")
         else: print(i+"/input.data exists")
         # does input.nn exist?
+        if type(input_nn_ref) != bool and not os.path.isfile(i+'/input.nn'):
+            print("copying",input_nn_ref,"to",i)
+            my.cp(input_nn_ref,i)
         if not os.path.isfile(i+'/input.nn'): sys.exit(i+"/input.nn does not exist!")
         else: print(i+"/input.nn exists")
+        if idx == 0:
+            input_nn_ref = i+'/input.nn'
 
 
         # does funcion.data exist?
@@ -297,6 +299,10 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     my.create_READMEtxt(os.getcwd(),add=[ "#","Do: xll "+foldername+"/dist_vec_fin.dat for a log/log plot; Then grep the first structures of interest from "+foldername+"/input.fps256.data "])
     return
 
+def printstatement(text):
+    print("####################################")
+    print("#",text)
+    print("####################################")
 
 def create_average_SF(datafile, nsyms, nat_per_frame,outfile=False):
     #!TODO nsyms should be discarded, like also nat_per_frame. Both should be read within the function, the only arguments passed
