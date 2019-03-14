@@ -498,7 +498,7 @@ def test_si_si_vac(ace):
 def get_dilute_si_mg_f(ace):
     scripts = my.scripts()
     tests = scripts+'/tests/'
-    bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/BetaPrime_anddilute_structures_relax.input.data'
+    bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/dilute_structures_and_beta_prime.input.data'
 
     savefolder = tests+'/Al-Mg-Si/save_'+ace.pot+"_h"
     if not os.path.isdir(savefolder):
@@ -695,12 +695,12 @@ def test_betaprime_mg9si5_find_global_min(ace,f_dilute_si, f_dilute_mg, f_dilute
             ase_write("mg9si5_stable_phonons_v2.runner",struct_mg9si5,format='runner')
         return
 
-def test_Mg9Si5_fully_relaxed(ace):
-    path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/from_daniel_all_relaxed/aiida_exported_group_BetaPrime_vc-relaxed.input.data'
+def test_Mg9Si5(ace):
+    path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
     frame = ase_read(path,format="runner")
     print('vpa',my.ase_vpa(frame))
-    get_formation_energy(ace,frame,"Mg9Si5 (unrelaxed @DFT)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True)
-    get_formation_energy(ace,frame,"Mg9Si5 (fully relaxed)" ,atomrelax=True ,cellrelax=True ,volumerelax=True)
+    get_formation_energy(ace,frame,"Mg9Si5 (@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True)
+    get_formation_energy(ace,frame,"Mg9Si5 (@NN  fully relaxed)" ,atomrelax=True ,cellrelax=True ,volumerelax=True)
     #print(np.round(frame.get_positions(),2))
     #print()
     #print(np.round(frame.get_cell(),2))
@@ -741,7 +741,7 @@ def test_formation_energies(pot,geopt,verbose):
 
     #test_si_si_vac(ace)
     #test_Mg2Si(ace)
-    test_Mg9Si5_fully_relaxed(ace)
+    test_Mg9Si5(ace)
     #test_Mg9Si5_pos(ace)
     #test_betadoubleprime_mg5si6(ace)
     #test_betaprime_mg9si5_find_global_min(ace,f_dilute_si, f_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
