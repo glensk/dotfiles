@@ -175,6 +175,16 @@ git branch -a
 git checkout remotes/upstream/feat/kmc
 git checkout feat/kmc
 git checkout --patch remotes/upstream/feat/kmc ipi/engine/motion/geop.py
+
 install_git.py -i ipi -if ipi_my_checkout4
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+git fetch upstream  # to see what michele has added.
+git diff feat/kmc:ipi/engine/motion/al6xxx_kmc.py remotes/upstream/feat/kmc:ipi/engine/motion/al6xxx_kmc.py  # shows the 2 comments michele added
+git checkout --patch remotes/upstream/feat/kmc ipi/engine/motion/al6xxx_kmc.py
+git checkout --patch remotes/upstream/feat/kmc ipi/inputs/motion/geop.py
+git commit -m "merged with micheles changes"
+git push # did not work
+git pull 
+git push # now did work
 
 
