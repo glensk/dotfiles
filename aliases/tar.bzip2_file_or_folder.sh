@@ -30,6 +30,10 @@ if ([ "$lbzip2" = "" ] && [ -e "$HOME/.local/bin/lbzip2" ]);then
     echo lbzip2 $lbzip2
     echo lbzip2 exists but $HOME/.local/bin is not in your PATH
     echo make sure that $HOME/.local/bin is in your PaTH
+    echo 'export PATH="$PATH:$HOME/.local/bin"'
+    echo 'to tar: tar --use-compress-program=lbzip2 -cvf "OUTCAR3.tar.bzip2" OUTCAR'
+    echo 'to tar: tar --use-compress-program=lbzip2 -cvf "sendx.tar.bzip2" OUTCAR'
+    echo 'to sendx: scp sendx.tar.bzip2 aglensk@ela.cscs.ch:~/.exchange/'
     exit
 fi
 #echo ll $lbzip2

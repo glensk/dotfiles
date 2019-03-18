@@ -530,6 +530,7 @@ void print_forcesdft_to_screen(int idxmax,char stringin[],double faktor,int step
 ////////////// write to file
 void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int read_pos0,int read_uoutcar,int verbose,int write_analyze,const char *filename_in_positions,const char *filename_in_positions0, const char *filename_in_hesse,int read_hesse,int read_forces,int columns, int columns0, const char *filename_in_uoutcar,int evolve_md_on_hesse,int write_positions_forces,int write_positions) {
 	FILE *anmerkung;
+	int dtorig=dt*1e12;
 	//@@char buff[20];
 	//@@struct tm *sTm;
 	//@@time_t now = time (0);
@@ -1002,10 +1003,12 @@ void check_pos0_for_duplicates(double faktor,const char *filename_in_positions) 
 }
 
 void check_arguments(int i,char *argv[]) {
-	if (i!=10) {
-	    printf("i is %d and not 6!\n",i);
-		printf("  usage: ./a.out T     dt  L   l   r  v  w  h       \n");
-		printf("         ./a.out 1775 .001 120 20  0  0  0  0> tmp\n\n");
+	if (i!=11) {
+	    // 11 is the total number of input variables including filepath
+	    printf("i is %d and not 11!\n",i);
+	    //                   1   2      3  4   5   6  7  8  9  10  11
+		printf("  usage: ./a.out T     dt  L   l   r  v  w  h  f   u     \n");
+		printf("         ./a.out 1775 .001 120 20  0  0  0  0  0   0\n\n");
         printf("    where:\n");
         printf("\n");
         printf("    T:  %-7s temperature (in K) corresponding to total energy per degree of freedom\n",argv[1]);
@@ -1016,6 +1019,8 @@ void check_arguments(int i,char *argv[]) {
         printf("    v:  %-7s verbose; 0==no;1=verbose;2==very_verbose\n",argv[6]);
         printf("    w:  %-7s write files for MD analyis; 1=True;else==False\n",argv[7]);
         printf("    h:  %-7s read hessematrix_sphinx   ; 1=True;else==False\n",argv[8]);
+        printf("    f:  %-7s read forces               ; 1=True;else==False\n",argv[9]);
+        printf("    u:  %-7s read u_OUTCAR             ; 1=True;else==False\n",argv[10]);
         exit(1);
 	}
 }
@@ -2129,29 +2134,50 @@ int main(int argc,char *argv[]){
     int columns0=3;  // columns when reading in pos0 for hessematrix separately
 
     //printf("columns xx    %d\n",columns);
-	if (argc==11) {
-		i+=sscanf(argv[1],"%lf",&T);
-		i+=sscanf(argv[2],"%lf",&dt);
-		i+=sscanf(argv[3],"%d",&zeitschritte);
-		i+=sscanf(argv[4],"%d",&l);
-		i+=sscanf(argv[5],"%d",&read_pos);
-		i+=sscanf(argv[6],"%d",&verbose);
-		i+=sscanf(argv[7],"%d",&write_analyze);
-		i+=sscanf(argv[8],"%d",&read_hesse);
-		i+=sscanf(argv[9],"%d",&read_forces);
-		i+=sscanf(argv[10],"%d",&read_uoutcar);
-	}
-	dt*=1e-12;	                    //in s
-    double faktor_verlet=(d0*dt/r0_eq_morse);
+    printf("argc    %d\n",argc);
+    printf("i (in)  %d\n",i);
+    printf("T (in)  %lf\n",T);
+    //for (i=0;i<(argc);i++) {
+    //    if (i==0) {printf("(a) Step %d   \n",i);}
+    //}
+    if (argc > 1)  {sscanf(argv[1],"%lf",&T);};
+    if (argc > 2)  {sscanf(argv[2],"%lf",&dt);};
+    if (argc > 3)  {sscanf(argv[3],"%d",&zeitschritte);};
+    if (argc > 4)  {sscanf(argv[4],"%d",&l);};
+    if (argc > 5)  {sscanf(argv[5],"%d",&read_pos);};
+    if (argc > 6)  {sscanf(argv[6],"%d",&verbose);};
+    if (argc > 7)  {sscanf(argv[7],"%d",&write_analyze);};
+    if (argc > 8)  {sscanf(argv[8],"%d",&read_hesse);};
+    if (argc > 9)  {sscanf(argv[9],"%d",&read_forces);};
+    if (argc > 10) {sscanf(argv[10],"%d",&read_uoutcar);};
+	//if (argc==11) {
+	//	i+=sscanf(argv[1],"%lf",&T);
+	//	i+=sscanf(argv[2],"%lf",&dt);
+	//	i+=sscanf(argv[3],"%d",&zeitschritte);
+	//	i+=sscanf(argv[4],"%d",&l);
+	//	i+=sscanf(argv[5],"%d",&read_pos);
+	//	i+=sscanf(argv[6],"%d",&verbose);
+	//	i+=sscanf(argv[7],"%d",&write_analyze);
+	//	i+=sscanf(argv[8],"%d",&read_hesse);
+	//	i+=sscanf(argv[9],"%d",&read_forces);
+	//	i+=sscanf(argv[10],"%d",&read_uoutcar);
+	//}
+    printf("i (out) %d\n",i);
+    printf("T (out) %lf\n",T);
+
+
+    check_arguments(argc,argv);
 
     if (verbose>2) {printf("POSxx 0  \n");};
     int columns=0;          // 3 columns in POSITIONs when only positions; 6 when positions and forces;
 	if (read_pos==1) {columns=3;};  // after read in of arguments
 	if (read_forces==1) {columns=6;};  // after read in of arguments
     if ((columns !=0) && (columns!=6) && (columns!=3)) {printf("neither 0 nor 3 nor 6! exit\n");exit(1);}
-    check_arguments(i,argv);
 
+    write_out_info(T,dt,zeitschritte,l,read_pos,read_pos0,read_uoutcar,verbose,write_analyze,filename_in_positions,filename_in_positions0,filename_in_hesse,read_hesse, read_forces,columns,columns0,filename_in_uoutcar,evolve_md_on_hesse,write_positions_forces,write_positions);
 
+	dt*=1e-12;	                    //in s
+    double faktor_verlet=(d0*dt/r0_eq_morse);
     // ok : \rm a.out;gcc md_long_tox.c;./a.out 1787 .001 940000 1 0 0 0 1   (ca. 7.6MB memory)
     // SEG: \rm a.out;gcc md_long_tox.c;./a.out 1787 .001 9940000 1 0 0 0 1
 
@@ -2163,7 +2189,6 @@ int main(int argc,char *argv[]){
     //// arr_u_{dft,la,harm}
     double* arr_u_dft      =malloc(stepsdudlmax*sizeof(double*));
 
-    write_out_info(T,dt,zeitschritte,l,read_pos,read_pos0,read_uoutcar,verbose,write_analyze,filename_in_positions,filename_in_positions0,filename_in_hesse,read_hesse, read_forces,columns,columns0,filename_in_uoutcar,evolve_md_on_hesse,write_positions_forces,write_positions);
 
     if (verbose>2) {printf("POSxx 3  \n");};
     if (read_uoutcar==1) {read_u_OUTCAR(filename_in_uoutcar,arr_u_dft,zeitschritte);};
