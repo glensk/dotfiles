@@ -97,8 +97,8 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         if idx == 0:
             input_nn_ref = i+'/input.nn'
 
-
-        # does funcion.data exist?
+        print()
+        print('... does funcion.data exist?')
         #printstatement("does funcion.data exist?")
         if not os.path.isfile(i+'/function.data'):
             if os.path.isfile(i+'/function.data.tar.bzip2'):
@@ -106,6 +106,10 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
                 tar = tarfile.open(i+'/function.data.tar.bzip2', "r:bz2")
                 tar.extractall(i)
                 tar.close()
+        if not os.path.isfile(i+'/function.data'):
+            sys.exit(i+'/function.data does not exist')
+        else:
+            print(i+'/function.data does exists')
         print()
 
     # does input.nn have same amount of symmetry functions?
@@ -229,6 +233,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
                 dist = salg.norm(DB2[i]-DB1[j])
                 if dist < dist_vec[i]:
                     dist_vec[i] = dist
+            print('i DB2',i,'minimal dist',dist_vec[i],DB2[i].shape)
             #if i in np.arange(0,DB2len,every):
             #    print('i',i,'/',DB2.shape[0],dist_vec[i])
         #print('i',i,dist,dist_vec[0])
