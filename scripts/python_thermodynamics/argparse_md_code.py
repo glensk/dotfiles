@@ -12,7 +12,7 @@ from shutil import copyfile
 from os import fdopen, remove
 import my_atom
 import get_parametrization_for_displacementfolder as get_param_disp
-
+import myutils
 
 def help(p = None):
     string = '''
@@ -515,7 +515,7 @@ def get_alat_mor(args):
         sys.exit('args.supercell NOT found')
 
     ##### try to get alat
-    if type(args.supercell) != bool and os.path.isfile(args.folder+'/cell'):
+    if type(args.supercell) != bool and type(args.folder) != bool and os.path.isfile(args.folder+'/cell'):
         cell = np.loadtxt(args.folder+'/cell')
         #print cell
         args.alat = cell[0,0]/args.supercell
@@ -1129,7 +1129,11 @@ def compare_dudl(args):
 
 def read_in_results(args):
     # the onces which should always be there
-    a = np.loadtxt("out_dudlav.dat")
+    if os.path.isfile("out_dudlav.dat"):
+        a = np.loadtxt("out_dudlav.dat")
+    else:
+        sys.exit('DONE, not out_dudlav.dat ... assuming MD')
+
     if len(a.shape) > 1:
         alast = a[-1]
     elif len(a.shape) == 1:
@@ -1338,6 +1342,9 @@ if __name__ == '__main__':
     if args.element_all == True:
         args.element_all = ["Al","Ag","Au","Cu","Ir","Pb","Pd","Pt","Rh"]
 
+    ### make readme
+    myutils.create_READMEtxt(os.getcwd())
+
     for args.element in args.element_all:
         args.calculate_energy_and_forces_exists = 0
         print_parameters(args,idx="(8)")
@@ -1431,7 +1438,22 @@ if __name__ == '__main__':
             devnull = None   # print to screen
             if args.verbose_m1 or args.verbose_m2:
                 devnull = open(os.devnull, 'w')
-            call(  ["./a.out", ov0(args.temperature,float),timestep,ov1(args.steps),str(args.write_every),ov1(args.read_positions),ov1(args.verbose), ov1(args.write_analyze) , ov1(args.read_hesse),ov1(args.read_forces),ov1(args.read_uoutcar)],stdout=devnull)
+            command =   ["./a.out",
+                ov0(args.temperature,float),
+                timestep,
+                ov1(args.steps),
+                str(args.write_every),
+                ov1(args.read_positions),
+                ov1(args.verbose),
+                ov1(args.write_analyze) ,
+                ov1(args.read_hesse),
+                ov1(args.read_forces),
+                ov1(args.read_uoutcar)]
+            print('command')
+            print(command)
+            print(" ".join(command))
+            call(command,stdout=devnull)
+            print("------- BACK in argparse_my_code.py -------")
             #print('args.stdout 1',args.stdout)
             read_in_results(args)
             #print('args.lambda_',args.lambda_)
