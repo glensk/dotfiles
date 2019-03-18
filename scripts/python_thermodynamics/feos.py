@@ -569,6 +569,7 @@ class eos(object):
             print "abs gradient fitdeltas:",abs(self._fitdeltas_grad)
             print "abs greater:",self._fitdeltas_grad_greater
             _printred(m1+m2+m3+m4+m0)
+            np.savetxt('dataxdatay.dat',np.transpose([datax,datay]))
 
 
         #return [self.e0, self.v0, self.b0, self.b0der]
