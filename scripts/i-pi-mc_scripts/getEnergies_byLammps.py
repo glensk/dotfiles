@@ -530,6 +530,16 @@ def get_dilute_si_mg_f(ace):
     struct_dilute_mg = frames[1]
     struct_dilute_si = frames[2]
 
+    vp = ace.get_murn(struct_pure_al,verbose=False,return_minimum_volume_frame=False)
+    print('bulk vp     :',vp,"current vol:",my.ase_vpa(struct_pure_al))
+    print()
+    vp = ace.get_murn(struct_dilute_mg,verbose=False,return_minimum_volume_frame=False)
+    print('dilute Mg vp:',vp,"current vol:",my.ase_vpa(struct_dilute_mg))
+    print()
+    vp = ace.get_murn(struct_dilute_si,verbose=False,return_minimum_volume_frame=False)
+    print('dilute Si vp:',vp,"current vol:",my.ase_vpa(struct_dilute_si))
+    print()
+
     # @ 0K (eV/cell)
     ace.eDFT_bprim      = my.ase_enepot(struct_bprime   ,units=ace.units)
     ace.eDFT_pure_al    = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
@@ -562,59 +572,88 @@ def get_dilute_si_mg_f(ace):
     print_compare_ene_vs_DFT('formation dilute si (1Si in bulk Al) 3x3x3',ace.f_dilute_si,ace.fDFT_dilute_si, '-',"-")
     print_compare_ene_vs_DFT('formation dilute mg (1Mg in bulk Al) 3x3x3',ace.f_dilute_mg,ace.fDFT_dilute_mg, '-',"-")
 
+    if False: # does not yield energy
+        si_dc_path   = tests+'/Al-Mg-Si/Si_dc/runner.data'
+        frame        = ase_read(si_dc_path,format="runner")
+        print('deos not yield energy', ace.ene(frame))
+
+    if False: # does not yield energy
+        si_dc_path   = tests+'/Al-Mg-Si/Si_dc/out.runner'
+        frame        = ase_read(si_dc_path,format="runner")
+        print('deos not yield energy', ace.ene(frame))
+
+    if True: # works
+        si_dc_path   = tests+'/Al-Mg-Si/Si_dc/out.runner'
+        at = 2  # works
+        at = 8  # works
+        si_dc_path   = tests+'/Al-Mg-Si/Si_dc/POSCAR_dc'+str(at)
+        frame        = e_si_diamond = ase_read(si_dc_path,format="vasp")
+        print
+
+    print('Heat of formation Si in 3x3x3sc (si_dc vol unrelaxed):',ace.f_dilute_si - ace.ene(frame)/frame.get_number_of_atoms())
+    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
+    print('Heat of formation Si in 3x3x3sc (si_dc vol relaxed)  :',ace.f_dilute_si - ace.ene(frame)/frame.get_number_of_atoms())
+
+    if True: # does not yield energy
+        frame_path   = tests+'/Al-Mg-Si/SoluteEnergy/Al255Si/runner.data'
+        framexx        = ase_read(frame_path,format="runner")
+        e_al255si    = ace.ene(framexx)
+        f_dilute_si_4x4x4 = e_al255si   - 255*ace.e_pure_al/108
+        print("ace.f_dilute_si  ",ace.f_dilute_si)
+        print('f_dilute_si_4x4x4',f_dilute_si_4x4x4)
+
+    print('Heat of formation Si in 4x4x4sc (si_dc vol unrelaxed):',f_dilute_si_4x4x4 - ace.ene(frame)/frame.get_number_of_atoms())
+    vp = ace.get_murn(framexx,verbose=False,return_minimum_volume_frame=True)
+    print('Heat of formation Si in 4x4x4sc (si_dc vol relaxed)  :',f_dilute_si_4x4x4 - ace.ene(frame)/frame.get_number_of_atoms())
+
+
+    print('Heat of formation Si (si_dc vol unrelaxed):',ace.f_dilute_si - ace.ene(frame)/frame.get_number_of_atoms())
+    sys.exit()
+
+    print('Heat of formation Si (si_dc vol unrelaxed):',ace.f_dilute_si - ace.ene(frame)/frame.get_number_of_atoms())
+    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
+    print('Heat of formation Si (si_dc vol relaxed)  :',ace.f_dilute_si - ace.ene(frame)/frame.get_number_of_atoms())
+
+    sys.exit()
+    mg_hcp_path   = tests+'/Al-Mg-Si/Mg_hcp/runner.data'
+    frame         = ase_read(mg_hcp_path,format="runner")
+    mg_hcp_ene    = ace.ene(frame)
+    print('Heat of formation Mg:',ace.f_dilute_mg - ace.ene(frame)/frame.get_number_of_atoms())
+
+    print()
+
+
+
+
     # get energy of pure al and 107al1si at equilibrium volume of Al.
     # 1. get equilibrium volume of al, --> done with fqh
     # 2. get energy of al and 107al1si at this volume.
+    # 3. get formation energy
+    # 4. do this for different sized supercells
 
-    tmp_ = tests+'/Al-Mg-Si/si-si-vac/al108/aiida.in.final.runner.stressed'
+    # 1.
+    tmp_ = tests+'/Al-Mg-Si/si-si-vac/al108/aiida.in.final.runner'
     frame = ase_read(tmp_,format="runner")
+    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
+    volpa = vp[1]
+    print('vp',vp)
 
-    print('1 ene',ace.ene(frame),'vol',frame.get_volume()/frame.get_number_of_atoms())
-    print('1 cell',frame.get_cell())
-    print('1 stress',frame.get_stress())
+    # 2.
+    print('bulk',frame.get_volume())
+    tmp_ = tests+'/Al-Mg-Si/si-si-vac/al107vac1/aiida.in.final.runner'
+    frame = ase_read(tmp_,format="runner")
+    ene = ace.ene(frame)
+    print('al10',frame.get_volume(),ene)
     print()
 
-    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=False)
-    print('2 ene',ace.ene(frame),'vol',frame.get_volume()/frame.get_number_of_atoms())
-    print('2 cell',frame.get_cell())
-    print('2 stress',frame.get_stress())
-    sys.exit()
-    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
-    print('3 ene',ace.ene(frame),'vol',frame.get_volume()/frame.get_number_of_atoms())
-    print('3 cell',frame.get_cell())
-    print('3 stress',frame.get_stress())
-
-    ene = ace.ene_new(frame,volumerelax=True)
-    print('4 ene',ace.ene(frame),'vol',frame.get_volume()/frame.get_number_of_atoms())
-    print('4 cell',frame.get_cell())
-    print('4 stress',frame.get_stress())
-
-
-
+    vpnew = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
+    enenew = ace.ene(frame)
+    print('al10',frame.get_volume(),enenew)
+    print()
 
 
     sys.exit()
-    frame = struct_pure_al
-    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=False)
-    print('vp 1',vp,ace.ene(frame),my.ase_vpa(frame))
-    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=False)
-    print('vp 1',vp,ace.ene(frame),my.ase_vpa(frame))
-    print('from now vol can change')
-    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
-    print('vp 2',vp,ace.ene(frame),my.ase_vpa(frame))
 
-    print('from now vol can change but should not')
-    vp = ace.get_murn(frame,verbose=False,return_minimum_volume_frame=True)
-    print('vp 3',vp,ace.ene(frame),my.ase_vpa(frame))
-    print('ovl should change')
-    vp = ace.get_murn(frame,return_frame_with_volume_per_atom=vp[1])
-    print('vp 4',vp,ace.ene(frame),my.ase_vpa(frame))
-    print('al 0 si 0 mg vpa',frame.get_volume()/frame.get_number_of_atoms())
-    print('--------')
-
-
-
-    sys.exit()
     ace.get_ene_at_volume_pa(frame,vpa=16.49887583216148,vinet_parameter=vp)
     print('--------')
     frame = struct_dilute_si

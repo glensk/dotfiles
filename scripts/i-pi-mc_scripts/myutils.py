@@ -11,6 +11,7 @@ from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
 from ase.constraints import StrainFilter,ExpCellFilter
+from numba import njit
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
@@ -30,6 +31,18 @@ import time
 
 
 start_time = time.time()
+
+@njit
+def multidet(a,b,c):
+    n=a.shape[0]
+    d=np.empty(n)
+    for i in range(n):
+        u,v,w=a[i],b[i],c[i]
+        d[i]=\
+        u[0]*(v[1]*w[2]-v[2]*w[1])+\
+        u[1]*(v[2]*w[0]-v[0]*w[2])+\
+        u[2]*(v[0]*w[1]-v[1]*w[0])  # 14 operations / det
+    return d
 
 def grep(filepath,string):
     out = []
@@ -1481,7 +1494,7 @@ class ase_calculate_ene( object ):
         return
 
 
-    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False,return_frame_with_volume_per_atom=False,atomrelax=False):
+    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False,return_frame_with_volume_per_atom=False,atomrelax=False,write_energies=False,get_to_minvol_first=True):
         ''' the murn will never change the atomsobject
         return_frame_with_volume_per_atom : volume can be specified and he frame scaled
         '''
@@ -1497,16 +1510,22 @@ class ase_calculate_ene( object ):
         atoms_murn.set_calculator(asecalcLAMMPS)
 
         ### relax the atoms_murn first to the equilibrium
-        if atomrelax == True:
-            # the pre volume relax should actually always be done.
-            self.ene(atoms_murn,cellrelax=True,atomrelax=True)
+        #if atomrelax == True:
+        #    # the pre volume relax should actually always be done.
+        #    self.ene(atoms_murn,cellrelax=True,atomrelax=True)
+        if verbose:
+            print('before',atoms_murn.get_volume())
+        if get_to_minvol_first == True:
+            vp = self.get_murn(atoms_murn,verbose=False,return_minimum_volume_frame=True,get_to_minvol_first = False)
+        if verbose:
+            print('after ',atoms_murn.get_volume())
 
         #print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
         #print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
         #pos_ref = atoms_murn.get_positions()
         #print('ene',self.ene(atoms_murn))
         dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,1.0,1.005,1.01,1.015,1.02,1.025,1.03]
-        dvol_rel = np.arange(0.97,1.03,0.001)
+        #dvol_rel = np.arange(0.97,1.03,0.001)
         vol_pa = np.zeros(len(dvol_rel))
         ene_pa = np.zeros(len(dvol_rel))
 
@@ -1526,13 +1545,27 @@ class ase_calculate_ene( object ):
             atoms_murn.set_cell(cell_ref*i,scale_atoms=True)
             if verbose:
                 print('111 cell',atoms_murn.get_cell())
-            print('111 cell',atoms_murn.get_cell())
+            #print('111 cell',atoms_murn.get_cell())
+            #print('111 cell',atoms_murn.get_cell()[0,0]/atoms_murn.get_cell()[1,1])
             vol=atoms_murn.get_volume()
             if verbose:
                 print('222 vol',atoms_murn.get_volume())
             #ene = self.ene(atoms_murn)                         # works
             #ene = self.ene_new(atoms_murn)                         # works
             ene = self.ene_allfix(atoms_murn)                       # works
+            if verbose:
+                stress = atoms_murn.get_stress()[:3]
+                cell = atoms_murn.get_cell()
+                pos = atoms_murn.get_positions()[1]/cell[0,0]
+
+                if cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
+                    if cell[0,0] == cell[1,1] == cell[2,2]:
+                        if round(stress[0],6) == round(stress[1],6) == round(stress[2],6):
+                            print('murn cell++  ',round(cell[0,0],6),pos)
+                        else:
+                            print('murn cell--  ',cell[0,0],stress)
+                    else:
+                        print('murn cell---  ',cell[0,0],cell[1,1],cell[2,2])
             #ene = ase_enepot(atoms_murn) #,units=ace.units)    # core dump
             #ene = atoms_murn.get_potential_energy()            # core dump
             #ene = ase_enepot(atoms_murn,units=self.units,verbose=self.verbose)  # core dump
@@ -1543,16 +1576,21 @@ class ase_calculate_ene( object ):
             if verbose:
                 print('idx:',idx,'i:',i,'vol:',vol,'ene:',ene)
                 print('vol/nat',vol/nat,'ene/nat',ene/nat)
-
-        #np.savetxt("energy.dat",np.transpose([vol_pa,ene_pa]))
+        if verbose:
+            stress = atoms_murn.get_stress()[:3]
+            cell = atoms_murn.get_cell()
+            pos = atoms_murn.get_positions()[1]/cell[0,0]
+            print("---1-->>",pos)
+        if type(write_energies) != bool:
+            np.savetxt(write_energies,np.transpose([vol_pa,ene_pa]))
         if verbose:
             print('loop done')
         vinet = eos()
         data=np.transpose([vol_pa,ene_pa])
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
         #self.eos = vinet.parameters
-        #if verbose:
-        print('pars',vinet.parameters)
+        if verbose:
+            print('pars',vinet.parameters)
         if return_minimum_volume_frame == True or type(return_frame_with_volume_per_atom) != bool:
             volume_in  = ase_vpa(atomsin)
             volume_out = vinet.parameters[1]
@@ -1562,9 +1600,14 @@ class ase_calculate_ene( object ):
             #print('volume_in',volume_in)
             #print('volume_out',volume_out)
             #print('scale',volume_scale)
-            atomsin.set_cell(atomsin.get_cell()*volume_scale)
+            atomsin.set_cell(atomsin.get_cell()*volume_scale,scale_atoms=True)
 
             #atomsin =
+        stress = atoms_murn.get_stress()[:3]
+        cell = atoms_murn.get_cell()
+        pos = atoms_murn.get_positions()[1]/cell[0,0]
+        if verbose:
+            print("---2-->>",pos)
         return vinet.parameters
 
     def get_fh(self,atomsin=False,disp=0.03,debug=False):
