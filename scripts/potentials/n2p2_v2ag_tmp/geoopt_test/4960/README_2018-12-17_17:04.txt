@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: b9082e9731859e0cce08869e06b894df981b9d62
-# execution time: 2.20386004448 seconds.
-
-getEnergies_byLammps.py -i ../../input.data -u eV -p n2p2_v1ag -idx 42 -e -vv -g
