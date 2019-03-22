@@ -904,10 +904,12 @@ void analyze_forces(int i,FILE *file_forces,FILE *file_forces_av,FILE *file_forc
 	//exit(1);
 }
 
-void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_check_dist_r) {
+void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_check_dist_r,FILE *file_out_check_dist_nn) {
     int j=0;
     //double dx,dy,dz,rrx,rry,rrz,rr;
     double dx,dy,dz,rr;
+    double x,y,z,r;
+	int k,j1,j2,j3,ind1,ind2;
 		for (j=0;j<atoms;j++) {  // schleife ueber alle atome
 		    dx = (pos[j].x-pos0[j].x)/a0*alat_lattice;  // sollte in angstrom sein
 		    if (dx > N*alat_lattice/2)
@@ -940,6 +942,21 @@ void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_
             }
 		    fprintf(file_out_check_dist_r,"%.10f\n",rr);
         }
+
+    for (k=0;k<atoms*first_neighbors/2;k++) {   // 12 * atoms_supercell / 2
+        ind1=l1nn[k].ind1;
+        ind2=l1nn[k].ind2;
+        j1=l1nn[k].j1;
+        j2=l1nn[k].j2;
+        j3=l1nn[k].j3;
+
+        // abstaende nn
+		x=(signed)(pos[ind1].x-pos[ind2].x)/a0*alat_lattice;
+		y=(signed)(pos[ind1].y-pos[ind2].y)/a0*alat_lattice;
+		z=(signed)(pos[ind1].z-pos[ind2].z)/a0*alat_lattice;
+		r=sqrt(x*x+y*y+z*z);
+		fprintf(file_out_check_dist_nn,"%.10f\n",r);
+    }
 }
 
 void check_pos_vs_pos0_if_same_positions_and_check_if_correct_alat() {
@@ -2109,6 +2126,7 @@ int main(int argc,char *argv[]){
     FILE *file_forces_vs_forces_dft;
     FILE *file_out_check_dist_xyz;
     FILE *file_out_check_dist_r;
+    FILE *file_out_check_dist_nn;
     FILE *file_in_positions;
     FILE *file_in_hesse;
     //FILE *file_out_check_dist_fcheck;
@@ -2225,6 +2243,7 @@ int main(int argc,char *argv[]){
     if (write_analyze==1) {
 	    file_out_check_dist_xyz =(FILE *)fopen("out_analyze_positions_distances_from_equilibrium_xyz.dat","w");
 	    file_out_check_dist_r   =(FILE *)fopen("out_analyze_positions_distances_from_equilibrium_r.dat","w");
+	    file_out_check_dist_nn  =(FILE *)fopen("out_analyze_positions_distances_nn.dat","w");
 	}
 
 
@@ -2285,7 +2304,7 @@ int main(int argc,char *argv[]){
             analyze_forces(i,file_forces,file_forces_av,  file_forces_vs_forces_dft,write_analyze_forces,read_hesse);
 
             if (write_analyze==1) {
-                write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r);};
+                write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn);};
 
             //forces_to_velocities(dt); // only necessary when volocities are necessary
 
@@ -2366,6 +2385,7 @@ int main(int argc,char *argv[]){
             fclose(file_forces_vs_forces_dft);
             fclose(file_out_check_dist_xyz);
             fclose(file_out_check_dist_r);
+            fclose(file_out_check_dist_nn);
         };
 	    //fclose(file_out_check_dist_fcheck);
 	    //fclose(file_out_temp);
@@ -2464,7 +2484,7 @@ int main(int argc,char *argv[]){
                 if (i%l==l-1) {write_positions_tofile(file_out_positions);};}
 
             if (write_analyze==1) {
-                write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r);
+                write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn);
                 };
 
 
@@ -2501,6 +2521,7 @@ int main(int argc,char *argv[]){
 	if (write_analyze==1){
 	    fclose(file_out_check_dist_xyz);
 	    fclose(file_out_check_dist_r);
+	    fclose(file_out_check_dist_nn);
     }
     if (read_pos == 1) {fclose(file_in_positions);}
 

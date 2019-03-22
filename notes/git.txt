@@ -188,3 +188,30 @@ git pull
 git push # now did work
 
 
+git diff --name-only  # to show only changed files of current branch
+
+install_git.py -i ipi -if ipi_my_checkout7
+git fetch # does not shwo feat/wrap_unwrap branch
+
+
+git pull  
+git push # did not work,  'Note about fast-forwards' in 'git push --help' for details.
+
+git pull origin feat/wrap_unwrap
+git pull
+
+install_git.py -i ipi -if ipi_my_checkout9
+git remote add upstream https://github.com/i-pi/i-pi.git
+
+
+try next time: git push origin HEAD
+
+micheles way:
+git clone https://github.com/glensk/i-pi.git
+cd i-pi
+git checkout feat/wrap_unwrap
+git pull
+mv ~/mux-positions.py tools/py/mux-positions.py
+git commit -a "Fixing mux-positions"
+git push
+
