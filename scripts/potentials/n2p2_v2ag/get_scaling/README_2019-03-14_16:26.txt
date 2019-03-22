@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: d1c5492d00a0d45f11dfb54c7c8ef0c732c17407
+# execution time: 0.265013217926 seconds.
+
+n2p2_get_scaling_and_function_data.py 

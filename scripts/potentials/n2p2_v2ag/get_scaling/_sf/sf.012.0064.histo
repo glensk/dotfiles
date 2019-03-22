@@ -1,0 +1,30 @@
+#SFINFO lineNumber  143
+#SFINFO index       64
+#SFINFO type        3
+#SFINFO ec          Mg
+#SFINFO rc          1.20000000E+01
+#SFINFO cutoffType  2
+#SFINFO cutoffAlpha 0.00000000E+00
+#SFINFO e1          Si
+#SFINFO e2          Si
+#SFINFO eta         2.00000000E-02
+#SFINFO lambda      1.00000000E+00
+#SFINFO zeta        4.00000000E+00
+#SFINFO rs          0.00000000E+00
+#SFINFO min          0.00000000E+00
+#SFINFO max          1.55091281E-02
+#SFINFO mean         6.89333940E-04
+#SFINFO sigma        1.24983563E-03
+################################################################################
+# Symmetry function histogram.
+################################################################################
+# Col  Name      Description
+################################################################################
+# 1    symfunc_l Symmetry function value, left bin limit.
+# 2    symfunc_r Symmetry function value, right bin limit.
+# 3    hist      Histogram count.
+################################################################################
+#              1                2                3
+#      symfunc_l        symfunc_r             hist
+##################################################
+            -NAN              INF   1.94490000E+04

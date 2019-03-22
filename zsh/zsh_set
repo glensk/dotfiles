@@ -54,7 +54,8 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"  # disable marking untracked files under VC
 # 95  = light purple
 # 96  = turquoise
 # to add: after:   *.pptx=01;31:
-export LS_COLORS="no=00:fi=00:di=1;34:ln=04;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=30;42:st=37;44:ex=01;32:*.tex=01;31:*.pptx=01;31:*.docx=01;91:*.pkl=01;31:*.tar=01;31:*.bzip2=01;31:*.tgz=01;31:*.npz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.ipynb=01;91:*.agr=01;91:*.nb=01;91:*.pdf=01;33:*.txt=01;95:*.eps=01;33:*.ps=01;33:*.jpg=01;33:*.jpeg=01;33:*.gif=01;33:*.bmp=01;33:*.pbm=01;33:*.pgm=01;33:*.ppm=01;33:*.tga=01;33:*.xbm=01;33:*.xpm=01;33:*.tif=01;33:*.tiff=01;33:*.png=01;33:*.mov=01;33:*.mpg=01;33:*.mpeg=01;33:*.avi=01;33:*.fli=01;33:*.gl=01;33:*.dl=01;33:*.xcf=01;33:*.xwd=01;33:*.flac=01;33:*.mp3=01;33:*.mpc=01;33:*.ogg=01;33:*.wav=01;33:"
+# to add: after:   *.py=01;32:
+export LS_COLORS="no=00:fi=00:di=1;34:ln=04;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=30;42:st=37;44:ex=01;32:*.tex=01;31:*.pptx=01;31:*.docx=01;91:*.pkl=01;31:*.tar=01;31:*.bzip2=01;31:*.tgz=01;31:*.npz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.ipynb=01;91:*.py=01;32:*.agr=01;91:*.nb=01;91:*.pdf=01;33:*.txt=01;95:*.eps=01;33:*.ps=01;33:*.jpg=01;33:*.jpeg=01;33:*.gif=01;33:*.bmp=01;33:*.pbm=01;33:*.pgm=01;33:*.ppm=01;33:*.tga=01;33:*.xbm=01;33:*.xpm=01;33:*.tif=01;33:*.tiff=01;33:*.png=01;33:*.mov=01;33:*.mpg=01;33:*.mpeg=01;33:*.avi=01;33:*.fli=01;33:*.gl=01;33:*.dl=01;33:*.xcf=01;33:*.xwd=01;33:*.flac=01;33:*.mp3=01;33:*.mpc=01;33:*.ogg=01;33:*.wav=01;33:"
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 

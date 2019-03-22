@@ -20,6 +20,7 @@ branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
 
 address["ipi"]          = "https://github.com/glensk/i-pi.git";
 branch['ipi']           = "feat/kmc"
+branch['ipi']           = False # get all the branches and not just feat/kmc
 
 address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
@@ -73,7 +74,7 @@ def install_(args,known):
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-        if args.install in ['ipi']              : git_clone(args)
+        if args.install in ['ipi']              : git_clone(args,specify_depth = False)
         if args.install in ['ipi_cosmo']        : git_clone(args)
         if args.install in ['aiida-alloy']      : git_clone(args)
         if args.install in ['atomsk']           : install_atomsk(args)
@@ -88,14 +89,15 @@ def install_(args,known):
     print("DONE")
     return
 
-def git_clone(args):
-    print('pwd:',os.getcwd())
-    if args.branch == False:
-        print("git clone --depth 1 "+args.git+" "+args.install_folder)
-        subprocess.call(["git","clone","--depth","1",args.git,args.install_folder])
-    else:
-        print("git clone --depth 1 -b "+args.branch+" "+args.git+" "+args.install_folder)
-        subprocess.call(["git","clone","--depth","1","-b",args.branch,args.git,args.install_folder])
+
+def git_clone(args,specify_depth = True):
+    do = ["git","clone"]
+    if specify_depth == True:
+        do = do + ["--depth","1"]
+    if args.branch != False:
+        do = do + ["-b",args.branch]
+    do = do + [args.git,args.install_folder]
+    subprocess.call(do)
     os.chdir(args.install_folder)
     print('pwd:',os.getcwd())
     subprocess.call(["git","branch"])

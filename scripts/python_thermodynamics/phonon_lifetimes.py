@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# PYTHON_ARGCOMPLETE_OK
 from __future__ import print_function
+import myutils
 
 # lammps_pos_to_sum.py bcc 6 3.253 4 4 4 50   # dominiques job; 6sc ; timestep 1fs; jeden 50 schritt ausgegeben; 3.253 alat;
 # nun versucht mit ~/Thermodynamics/python_thermodynamics/phonon_lifetimes.py -s bcc -n 6 -dt 50 -a 3.253 -fftpy
@@ -23,7 +23,6 @@ from __future__ import print_function
 # run argparse first to make it quick
 ##########################################################################################
 import argparse
-import argcomplete, argparse
 import textwrap
 import future
 #from argparse import ArgumentDefaultsHelpFormatter
@@ -2439,7 +2438,6 @@ def help(p = None):
     return p
 p = help()  # this gives the possibility to change some __init__ settings
 args = p.parse_args()
-argcomplete.autocomplete(parser)
 
 ##########################################################################################
 # argparse first done
@@ -5347,7 +5345,9 @@ def get_space_fft_from_positions(filename, qpoints_all = False, mdsteps_per_chun
     #qpoints_all=np.array([[1,0,0],[2,0,0],[3,0,0],[4,0,0]])
     #qpoints_all=np.array([[2,0,0]])
     #qpoints_all=np.array([[2,0,0],[3,0,0]])
-    if os.path.isfile(filename) != True: sys.exit("ERROR:"+str(filenmae)+" does not exist")
+    print('filename (1):',filename)
+    if os.path.isfile(filename) != True:
+        sys.exit("ERROR:"+str(filenmae)+" does not exist")
     #print "filename:",filename
     #print "scale_data:",scale_data,type(scale_data)
     if type(args.atoms) == bool: sys.exit("ERROR: args.atoms needs to be a number!")
@@ -5425,12 +5425,20 @@ def get_space_fft_from_positions(filename, qpoints_all = False, mdsteps_per_chun
         columns = int(subprocess.check_output('head -1 '+'POSITIONs'+' | wc -w', shell=True,\
                 stderr=subprocess.STDOUT))
         print('POSITIONs columns    :',columns,type(columns))
+
+        ####################################################################################
+        # this is not necessary with delim_whitespace=True in pandas.read_csv
+        ####################################################################################
         #if columns == 3:
-        #    print 'POSITIONs columns    : has already 3 columns -> no awk'
-        #else:
-        #    print "os.popen POSITIONs and awk to get only first 3 columns "+printred("(this may take a while)")
+        #    print('POSITIONs columns    : has already 3 columns -> awk is still necessary to be able to read_csv... may take a while')
         #    os.popen("cat POSITIONs| awk '{print $1,$2,$3}' > tmp_xyzz; mv tmp_xyzz POSITIONs").read()
-        #    print "os.popen POSITIONs done"
+        #    print("os.popen POSITIONs done")
+        #elif columns == 6:
+        #    print('POSITIONs columns    : has 6 columns -> awk is still necessary to be able to read_csv... may take a while')
+        #    os.popen("cat POSITIONs| awk '{print $1,$2,$3,$4,$5,$6}' > tmp_xyzz; mv tmp_xyzz POSITIONs").read()
+        #    print("os.popen POSITIONs done")
+        #else:
+        #    sys.exit('can not read POSITONs')
     else:
         sys.exit('no POSITIONs file found')
 
@@ -5440,9 +5448,12 @@ def get_space_fft_from_positions(filename, qpoints_all = False, mdsteps_per_chun
     else:
         print("WARNING: this POSITIONS/pos/trj_lammpsnew.out/trj_lammpsnew.out_noJumps_small file ist greater than 10GB, consider the c skript using -fftc since this might take a while.")
     print("---> read_csv        : from filename",filename,printred("(may take a while)"))
-    reader = read_csv(filename, sep=' ', header=None,engine='c',chunksize=chunksize) #,usecols=[1,2,3]) # 3.7 sec
+    #reader = read_csv(filename, sep=' ', header=None,engine='c',chunksize=chunksize) #,usecols=[1,2,3]) # 3.7 sec
+    reader = read_csv(filename,header=None,delim_whitespace=True)  # works for /Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_62_LA_POSITIONs/generate_positios/4x4x4sc
     print("---> read_csv        : from filename",filename,"finished!")
     print("resuling chunksize(2):",chunksize)
+    #print(reader)
+    #sys.exit('kba')
 
 
 
@@ -5493,6 +5504,7 @@ def get_space_fft_from_positions(filename, qpoints_all = False, mdsteps_per_chun
     # This loop could be easily parellized to make it quicker
     ####################################################################################
     for chunk,pos in enumerate(reader):
+        print('pos')
         ########################################
         # case were we have chunks
         ########################################
@@ -5503,6 +5515,8 @@ def get_space_fft_from_positions(filename, qpoints_all = False, mdsteps_per_chun
                 continue
             # remove nan colums when there was whitespace in the file
             xxx = pos.as_matrix()
+            print('xxx (11)')
+            print(xxx[:3])
 
 
 
@@ -5522,6 +5536,8 @@ def get_space_fft_from_positions(filename, qpoints_all = False, mdsteps_per_chun
         if chunksize == None and chunk == 0:
             xxx = reader.as_matrix()
 
+        print('xxx (12)')
+        print(xxx[:3])
         #print 'xxx3',xxx.shape
         #print xxx
         xxx = xxx[:,:3] # (8000000, 3) is correct; (8000000, 6) includes forces
@@ -10964,6 +10980,9 @@ if __name__ == '__main__':
         print("             :",idx+1,"/",len(folder_all),i)
     print()
 
+    ### make README
+    myutils.create_READMEtxt(os.getcwd())
+
     for idxfolder,folder_in in enumerate(folder_all):
         os.chdir(folder_in)
         print("#"*(len(os.getcwd())+21))
@@ -11062,7 +11081,7 @@ if __name__ == '__main__':
         ##################################################
         # look for filenames POSITIONs to make space fft
         ##################################################
-        filename_scale_by_alat_N = [ 'trj_lammpsnew.out', 'trj_lammpsnew.out_noJumps_small', 'pos', 'POSITIONs', 'out_positions_forces_out.dat', 'out_positions_forces.dat' ] # lammps to direct coords
+        filename_scale_by_alat_N = [ 'trj_lammpsnew.out', 'trj_lammpsnew.out_noJumps_small', 'pos', 'POSITIONs', 'out_positions_forces_out.dat', 'out_positions_forces.dat', 'out_positions.dat' ] # lammps to direct coords
         filename_scale_by_N = [ 'dum', 'posmichael' ] # michaels sim_fcc_morse (to convert to direct)
 
         filename = False
@@ -11140,7 +11159,13 @@ if __name__ == '__main__':
                     print('idxx',idxx,qpoint,'qpt (line 10688)==> qpt ==>',qpt)
                     for tq in qpt:
                         print('qpoint',qpoint,'tq',tq,'len(qpt)',len(qpt),'qpt',qpt)
-
+            if args.verbose:
+                print('filename:',filename)
+                print('qpoints_all', qpoints_all)
+            if type(filename) == bool:
+                sys.exit("No input positins (filename) found")
+            if not os.path.exists('POSITIONs'):
+                os.symlink(filename,'POSITIONs')
             get_space_fft_from_positions(\
                         filename,\
                         qpoints_all=qpoints_all,\
