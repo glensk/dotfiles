@@ -1,0 +1,6 @@
+0.666666666667   -0.359785188969 Mg2Si (fully relaxed)
+0.642857142857   -0.300805421535 Mg9Si5 (@DFT fully relaxed)
+0.642857142857   -0.31781659085 Mg9Si5 (@NN  fully relaxed)
+0.454545454545   -0.237352505803 Mg5Si6 (fully relaxed)
+0.555555555556   -0.25872054737 Mg5Al2Si4 (fully relaxed)
+0.5   -0.220584484189 Mg4Al3Si4 (fully relaxed)

@@ -10,6 +10,7 @@ from shutil import copyfile
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
+from ase.spacegroup import crystal
 from ase.constraints import StrainFilter,ExpCellFilter
 from numba import njit
 try:
@@ -246,8 +247,7 @@ def check_isfile_or_isfiles(path,pathnames=False,envvar=False,verbose=False):
         sys.exit('unknown type file type path '+str(path))
     return
 
-
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,create_fake_vacancy=False):
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,create_fake_vacancy=False,whichcell="fcc"):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -272,7 +272,18 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,crea
         cubic: bool
             Construct cubic unit cell if possible.
     """
-    atom = ase_build_bulk('Al',crystalstructure='fcc',a=a0,cubic=False)
+    if whichcell == "fcc":
+        atom = ase_build_bulk('Al',crystalstructure='fcc',a=a0,cubic=cubic)
+    elif whichcell == "hcp":
+        a = 3.21
+        c = 5.21
+        atom = crystal('Mg', [(1./3., 2./3., 3./4.)], spacegroup=194, cellpar=[a, a, c, 90, 90, 120])
+    elif whichcell == "dc":
+        a = 5.47
+        atom = crystal('Si', [(0,0,0)], spacegroup=227, cellpar=[a, a, a, 90, 90, 90])
+    else:
+        sys.exti("whichcell has to be in fcc or hcp")
+
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
@@ -905,13 +916,19 @@ class ase_calculate_ene( object ):
 
         self.pot = pot
         self.units = units.lower()
-        self.geopt = geopt   # so far only for ene object.
+        self.geopt = geopt          # so far only for ene object.
         self.nsteps = 0
         self.verbose = verbose
-        self.atoms = False # ase atoms object (frame)
+        self.atoms = False          # ase atoms object (frame)
 
-        self.lmpcmd = False # in case we run through ase (also needs lmpcmd) or external lammps
-        self.atom_types = False    # for nn pot
+        #####################
+        # for the calculator
+        #####################
+        self.calculator = "lammps"
+        self.lmpcmd     = False         # in case we run through ase (also needs lmpcmd) or external lammps
+        self.atom_types = False     # for nn pot
+        self.keep_alive = True
+
         #print('init')
         # case of MD or KMC
         self.kmc = kmc
@@ -1075,6 +1092,8 @@ class ase_calculate_ene( object ):
             vinet = self.get_murn(atoms,verbose=False,return_minimum_volume_frame=True)
             print('after murn')
             #constraint = ExpCellFilter(atoms, hydrostatic_strain=True) does not work
+        elif atomrelax == False and cellshaperelax == True:
+            constraint = StrainFilter(atoms)  # this relaxes the cell shape & the volume while keeping atomic positions fixed
         else:
             sys.exit('still to define')
 
@@ -1223,11 +1242,13 @@ class ase_calculate_ene( object ):
         #print(atoms.get_forces()[:3])
         return ene
 
-    def ene(self,atoms=False,atomrelax=False,
+    def ene(self,atoms=False,
+            atomrelax=False,
             cellrelax=False,
             cellshaperelax=False,
             cellvolumerelax=False,
-            print_minimization_to_screen=False,minimizer="LGBFGS"):
+            print_minimization_to_screen=False,
+            minimizer="LGBFGS"):
         ''' atoms is an ase object
             if don_change_atomsobject is chosen,
         '''
@@ -1261,18 +1282,17 @@ class ase_calculate_ene( object ):
         ## (by attaching the calculator to atoms)
         ## this is valid for relaxations and static calcs
         ################################
-        keep_alive = False
         if atomrelax == False: keep_alive = False
         if atomrelax == True:  keep_alive = True
-        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
-        atoms.set_calculator(asecalcLAMMPS)
+        self.keep_alive = keep_alive
+        self.get_calculator(atoms)
 
         ### attach to atoms to relax the cell
         constraint = False
-        if cellrelax == True and atomrelax == False:
+        if cellrelax == True: # and atomrelax == False:
             constraint = StrainFilter(atoms)  # this relaxes the cell shape & the volume while keeping atomic positions fixed
             ## in this case it does not work out
-            sys.exit('This gives a segmentation fault (coredump) when cellrelax == True and atomrelax == True ... in this case do only one, then the other one')
+            #sys.exit('This gives a segmentation fault (coredump) when cellrelax == True and atomrelax == True ... in this case do only one, then the other one')
         elif cellrelax == True and atomrelax == True:
             ## when doint both this is recommended
             constraint = ExpCellFilter(atoms)  # Modify the supercell and the atom positions.
@@ -1315,9 +1335,9 @@ class ase_calculate_ene( object ):
 
             ## the syntax apparently vareis a bit depending
             ## if constraint or not
-            use = atoms
+            atoms_or_constraint = atoms
             if type(constraint) != bool:
-                use = constraint
+                atoms_or_constraint = constraint
 
             if print_minimization_to_screen:
                 print("minimizer:",minimizer)
@@ -1330,17 +1350,17 @@ class ase_calculate_ene( object ):
             #print('BBB logfile',logfile)
 
             if minimizer == 'BFGS':
-                opt1 = BFGS(use,logfile=logfile) #,trajectory="ni.traj")
+                opt1 = BFGS(atoms_or_constraint,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'LGBFGS':
-                opt1 = LBFGS(use,logfile=logfile) #,trajectory="test.traj")
+                opt1 = LBFGS(atoms_or_constraint,logfile=logfile) #,trajectory="test.traj")
             elif minimizer == 'GPMin':
-                opt1 = GPMin(use,logfile=logfile) #,trajectory="test.traj")
+                opt1 = GPMin(atoms_or_constraint,logfile=logfile) #,trajectory="test.traj")
             elif minimizer == 'FIRE':
-                opt1 = FIRE(use,logfile=logfile) #,trajectory="ni.traj")
+                opt1 = FIRE(atoms_or_constraint,logfile=logfile) #,trajectory="ni.traj")
             elif minimizer == 'bh':
                 kB = 1.38064852e-23
                 kB = 1.6021765e-19
-                opt1 = BasinHopping(atoms=use, # the system to optimize
+                opt1 = BasinHopping(atoms=atoms_or_constraint, # the system to optimize
                   temperature=1*kB, # 'temperature' to overcome barriers
                   dr=0.5,      # maximal stepwidth
                   optimizer=LBFGS, # optimizer to find local minima
@@ -1349,7 +1369,7 @@ class ase_calculate_ene( object ):
             elif minimizer == 'mh':
                 if os.path.isfile("tmp"):
                     os.remove("tmp")
-                opt1 = MinimaHopping(atoms=use,logfile=logfile)
+                opt1 = MinimaHopping(atoms=atoms_or_constraint,logfile=logfile)
                 opt1(totalsteps=10)
             #print('startrun....')
             maxsteps = 200
@@ -1384,6 +1404,18 @@ class ase_calculate_ene( object ):
             print("UUU fmx:",abs(atoms.get_forces()).max())
             print("UUU vol:",atoms.get_volume())
             print("UUU vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
+        if print_minimization_to_screen:
+            print('XXX atomrelax:',atomrelax)
+            print('XXX cellrelax:',cellrelax)
+            print("XXX nat:",atoms_or_constraint.get_number_of_atoms())
+            print("XXX pos:",atoms_or_constraint.get_positions()[:4])
+            print("XXX for:",atoms_or_constraint.get_forces()[:4])
+            print("XXX fmx:",abs(atoms_or_constraint.get_forces()).max())
+            print("XXX vol:",atoms_or_constraint.get_volume())
+            print("XXX vpa:",atoms_or_constraint.get_volume()/atoms.get_number_of_atoms())
+
+        if self.verbose > 1:
+            print('ZZ done2')
 
         if self.verbose > 1:
             print('ZZ done2')
@@ -1483,80 +1515,109 @@ class ase_calculate_ene( object ):
         ## Elastic tensor by internal routine
         #Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
         #print("Cij (GPa):", Cij/units.GPa)
-
-
-
-
-    def get_ene_at_volume_pa(self,atomsin=False,vpa=False,vinet_parameter=False):
-        if type(vinet_parameter) == bool:
-            vinet_parameter = self.get_murn(atomsin=atomsin,vinet_parameter=False)
-        print('vinet:::',vinet_parameter)
+    def get_calculator(self,atoms):
+        if self.calculator == "lammps":
+            asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=self.keep_alive)
+            atoms.set_calculator(asecalcLAMMPS)
         return
 
+    def ase_relax_atomic_positions_only(self,atoms,fmax=0.001,verbose=False):
+        ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
+        self.keep_alive = True
+        self.get_calculator(atoms)
 
-    def get_murn(self,atomsin=False,verbose=False,return_minimum_volume_frame=False,return_frame_with_volume_per_atom=False,atomrelax=False,write_energies=False,get_to_minvol_first=True):
+        if verbose:
+            print('relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
+
+        logfile="-" # output to screen
+        logfile="tmp" # output to file and not to screen
+        opt = LBFGS(atoms,logfile=logfile)
+        opt.run(fmax=fmax)
+        if os.path.isfile("tmp"):
+            os.remove("tmp")
+        if verbose:
+            print('relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
+        return
+
+    def ase_relax_cellshape_and_volume_only(self,atoms,verbose=False):
+        ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
+        self.keep_alive = True
+        self.get_calculator(atoms)
+
+        if verbose: self.check_frame('ase_relax_cellshape_and_volume_only in',frame=atoms)
+
+        sf = StrainFilter(atoms)
+        logfile="-" # output to screen
+        logfile="tmp" # output to file and not to screen
+        opt = BFGS(sf,logfile=logfile)
+        opt.run(0.005)
+        if os.path.isfile("tmp"):
+            os.remove("tmp")
+        if verbose: self.check_frame('ase_relax_cellshape_and_volume_only out',frame=atoms)
+        return
+
+    def get_murn(self,atomsin=False,verbose=False,
+            return_minimum_volume_frame=False,
+            return_frame_with_volume_per_atom=False,
+            atomrelax=False,
+            write_energies=False,
+            get_to_minvol_first=True):
         ''' the murn will never change the atomsobject
         return_frame_with_volume_per_atom : volume can be specified and he frame scaled
         '''
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
-        atoms_murn = atomsin.copy()
+        if return_minimum_volume_frame == True or type(return_frame_with_volume_per_atom) != bool:
+            atoms_murn = atomsin
+        else:
+            atoms_murn = atomsin.copy()
+
         atoms_murn.wrap()
 
-        keep_alive = False
-        if atomrelax == False: keep_alive = False
-        if atomrelax == True:  keep_alive = True
-        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
-        atoms_murn.set_calculator(asecalcLAMMPS)
+        # probably not necessary since this is set up when necessary
+        self.keep_alive = True
+        self.get_calculator(atoms_murn)
 
         ### relax the atoms_murn first to the equilibrium
-        #if atomrelax == True:
-        #    # the pre volume relax should actually always be done.
-        #    self.ene(atoms_murn,cellrelax=True,atomrelax=True)
-        if verbose:
-            print('before',atoms_murn.get_volume())
-        if get_to_minvol_first == True:
-            vp = self.get_murn(atoms_murn,verbose=False,return_minimum_volume_frame=True,get_to_minvol_first = False)
-        if verbose:
-            print('after ',atoms_murn.get_volume())
+        if verbose: self.check_frame('get_murn 1 in',frame=atoms_murn)
+        self.ase_relax_cellshape_and_volume_only(atoms_murn,verbose=verbose)
+        if verbose: self.check_frame('get_murn 2 atfer cellshape relax',frame=atoms_murn)
+        if atomrelax:
+            self.ase_relax_atomic_positions_only(atoms_murn,fmax=0.0002,verbose=False)
+            if verbose: self.check_frame('get_murn 2 atfer atomrelax only',frame=atoms_murn)
 
-        #print('murn: ene    ',self.ene(atoms_murn),'vol in',atoms_murn.get_volume())
-        #print('murn: ene/pa',ase_epa(atoms_murn),'vol in/pa',ase_vpa(atoms_murn))
-        #pos_ref = atoms_murn.get_positions()
-        #print('ene',self.ene(atoms_murn))
-        dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,1.0,1.005,1.01,1.015,1.02,1.025,1.03]
+        dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,0.998,1.0,1.002,1.005,1.01,1.015,1.02,1.025,1.03]
         #dvol_rel = np.arange(0.97,1.03,0.001)
+        #dvol_rel = np.arange(0.995,1.005,0.0003)
         vol_pa = np.zeros(len(dvol_rel))
         ene_pa = np.zeros(len(dvol_rel))
 
 
-        #dvol_rel=[0.97,0.98,0.99,1.0,1.01,1.02,1.03,1.04,1.05,1.06]
-        #print('cell',atoms_murn.get_cell())
-        #print('vol',atoms_murn.get_volume())
-        #print(atoms_murn.get_positions()[:3])
-        #print()
         cell_ref = atoms_murn.get_cell()
         nat = atoms_murn.get_number_of_atoms()
 
+        atoms_murn_loop = atoms_murn.copy()
+
         for idx,i in enumerate(dvol_rel):
-            if verbose:
+            if verbose > 2:
                 print()
                 print('000 idx:',idx,'i:',i)
-            atoms_murn.set_cell(cell_ref*i,scale_atoms=True)
-            if verbose:
-                print('111 cell',atoms_murn.get_cell())
-            #print('111 cell',atoms_murn.get_cell())
-            #print('111 cell',atoms_murn.get_cell()[0,0]/atoms_murn.get_cell()[1,1])
-            vol=atoms_murn.get_volume()
-            if verbose:
-                print('222 vol',atoms_murn.get_volume())
-            #ene = self.ene(atoms_murn)                         # works
-            #ene = self.ene_new(atoms_murn)                         # works
-            ene = self.ene_allfix(atoms_murn)                       # works
-            if verbose:
-                stress = atoms_murn.get_stress()[:3]
-                cell = atoms_murn.get_cell()
-                pos = atoms_murn.get_positions()[1]/cell[0,0]
+            atoms_murn_loop.set_cell(cell_ref*i,scale_atoms=True)
+            if verbose > 2:
+                print('111 cell',atoms_murn_loop.get_cell())
+            #print('111 cell',atoms_murn_loop.get_cell())
+            #print('111 cell',atoms_murn_loop.get_cell()[0,0]/atoms_murn_loop.get_cell()[1,1])
+            vol=atoms_murn_loop.get_volume()
+            if verbose > 2:
+                print('222 vol',atoms_murn_loop.get_volume())
+            #ene = self.ene(atoms_murn_loop)                         # works
+            #ene = self.ene_new(atoms_murn_loop)                         # works
+            ene = self.ene_allfix(atoms_murn_loop)                       # works
+            #print('ams3',atoms_murn_loop.get_stress(),ase_vpa(atoms_murn_loop))
+            if verbose > 2:
+                stress = atoms_murn_loop.get_stress()[:3]
+                cell = atoms_murn_loop.get_cell()
+                pos = atoms_murn_loop.get_positions()[1]/cell[0,0]
 
                 if cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
                     if cell[0,0] == cell[1,1] == cell[2,2]:
@@ -1566,78 +1627,104 @@ class ase_calculate_ene( object ):
                             print('murn cell--  ',cell[0,0],stress)
                     else:
                         print('murn cell---  ',cell[0,0],cell[1,1],cell[2,2])
-            #ene = ase_enepot(atoms_murn) #,units=ace.units)    # core dump
-            #ene = atoms_murn.get_potential_energy()            # core dump
-            #ene = ase_enepot(atoms_murn,units=self.units,verbose=self.verbose)  # core dump
-            if verbose:
+            #ene = ase_enepot(atoms_murn_loop) #,units=ace.units)    # core dump
+            #ene = atoms_murn_loop.get_potential_energy()            # core dump
+            #ene = ase_enepot(atoms_murn_loop,units=self.units,verbose=self.verbose)  # core dump
+            if verbose > 2:
                 print('333 ene',ene) #,ene2)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
+            if verbose > 2:
+                print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
             if verbose:
-                print('idx:',idx,'i:',i,'vol:',vol,'ene:',ene)
-                print('vol/nat',vol/nat,'ene/nat',ene/nat)
-        if verbose:
+                stress = atoms_murn_loop.get_stress()[:3]
+                print('i',str(i).ljust(5),'vol/nat',str(round(vol/nat,7)).ljust(10),'ene/nat',str(ene/nat).ljust(19),stress)
+
+        if verbose: self.check_frame('get_murn 3 atfer loop           ',frame=atoms_murn)
+        if verbose > 1:
             stress = atoms_murn.get_stress()[:3]
             cell = atoms_murn.get_cell()
             pos = atoms_murn.get_positions()[1]/cell[0,0]
             print("---1-->>",pos)
-        if type(write_energies) != bool:
+        if write_energies:
+            print('we1')
+            if type(write_energies) == bool:
+                print('we2')
+                write_energies = "energies.dat"
             np.savetxt(write_energies,np.transpose([vol_pa,ene_pa]))
-        if verbose:
+        if verbose > 1:
             print('loop done')
         vinet = eos()
         data=np.transpose([vol_pa,ene_pa])
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
         #self.eos = vinet.parameters
-        if verbose:
+        if verbose > 1:
             print('pars',vinet.parameters)
-        if return_minimum_volume_frame == True or type(return_frame_with_volume_per_atom) != bool:
-            volume_in  = ase_vpa(atomsin)
-            volume_out = vinet.parameters[1]
-            if type(return_frame_with_volume_per_atom) != bool:
-                volume_out = return_frame_with_volume_per_atom
-            volume_scale = (volume_out/volume_in)**(1./3.)
-            #print('volume_in',volume_in)
-            #print('volume_out',volume_out)
-            #print('scale',volume_scale)
-            atomsin.set_cell(atomsin.get_cell()*volume_scale,scale_atoms=True)
+        if verbose: self.check_frame('get_murn 4 before min vol ret   ',frame=atoms_murn)
+        #if return_minimum_volume_frame == True or type(return_frame_with_volume_per_atom) != bool:
+        #    print('adapt atoms in')
+        #    atomsin = atoms_murn.copy()
+        #        # old
+        #        #volume_in  = ase_vpa(atomsin)
+        #        #volume_out = vinet.parameters[1]
+        #        #if type(return_frame_with_volume_per_atom) != bool:
+        #        #    volume_out = return_frame_with_volume_per_atom
+        #        #volume_scale = (volume_out/volume_in)**(1./3.)
+        #        ##print('volume_in',volume_in)
+        #        ##print('volume_out',volume_out)
+        #        ##print('scale',volume_scale)
+        #        #atomsin.set_cell(atomsin.get_cell()*volume_scale,scale_atoms=True)
 
-            #atomsin =
-        stress = atoms_murn.get_stress()[:3]
-        cell = atoms_murn.get_cell()
-        pos = atoms_murn.get_positions()[1]/cell[0,0]
-        if verbose:
+        if verbose: self.check_frame('get_murn 5 after  min vol ret   ',frame=atoms_murn)
+
+
+
+        if verbose > 2:
+            stress = atoms_murn.get_stress()[:3]
+            cell = atoms_murn.get_cell()
+            pos = atoms_murn.get_positions()[1]/cell[0,0]
             print("---2-->>",pos)
         return vinet.parameters
 
-    def get_fh(self,atomsin=False,disp=0.03,debug=False):
+    def get_fh(self,atomsin=False,disp=0.03,debug=False,try_readfile=False,return_units="mev_pa"):
         ''' the function will never change the atomsobject '''
+        if return_units == "mev_pa":
+            return_mult = 1.
+        elif return_units == "ev_cell":
+            return_mult = atomsin.get_number_of_atoms()/1000.
+        else:
+            raise NameError('return_units unknown')
+
+        if try_readfile:
+            if os.path.isfile(try_readfile):
+                return np.loadtxt(try_readfile)*return_mult
 
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         atoms_h = atomsin.copy()
         atoms_h.wrap()
 
-        keep_alive = False
-        atomrelax = False
-        if atomrelax == False: keep_alive = False
-        if atomrelax == True:  keep_alive = True
-        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
-        atoms_h.set_calculator(asecalcLAMMPS)
+        self.keep_alive = False
+        self.get_calculator(atoms_h)
 
         if debug:
             print("###########################################")
-            print("forces harmonic 3:",atoms_h.get_forces()[:3])
-            print("###########################################")
-        ### relax the atoms_h first to the equilibrium
-        #if atomrelax == True:
-        # need to do this otherwise not in equilibrium
-        ene = self.ene(atoms_h,cellrelax=True,atomrelax=True,print_minimization_to_screen=debug)
+            #`print("forces harmonic 3:",atoms_h.get_forces()[:3])
+            #print("###########################################")
+            print('in atoms_h str',atoms_h.get_stress())
+            maxforce = np.abs(atoms_h.get_forces()).max()
+            print('in maxforce in',maxforce)
+
+        #ene = self.ene(atoms_h,cellrelax=True,atomrelax=True,print_minimization_to_screen=debug)
+        self.ase_relax_atomic_positions_only(atoms_h,fmax=0.001,verbose=False)
+        maxforce = np.abs(atoms_h.get_forces()).max()
         if debug:
             print("###########################################")
-            print("forces harmonic 4:",atoms_h.get_forces()[:3])
-            print("###########################################")
-        maxforce = np.abs(atoms_h.get_forces()).max()
+            #print("forces harmonic 4:",atoms_h.get_forces()[:3])
+            #print("###########################################")
+            print('out atoms_h str',atoms_h.get_stress())
+            print('out maxforce out',maxforce)
+
         if maxforce > 0.001:
             print("forces harmonic 4:",atoms_h.get_forces()[:3])
             print('maxforce',maxforce)
@@ -1683,14 +1770,34 @@ class ase_calculate_ene( object ):
             free_ene = "UNSTABLE"
         if debug and type(free_ene) != str:
             hes.write_ene_atom()
-        return free_ene
+        if try_readfile:
+            np.savetxt(try_readfile,free_ene)
+        return free_ene*return_mult
+
+
+    def check_frame(self,text,frame=False,verbose=True,setupcalc=True):
+        if type(text) != str:
+            raise TypeError("need a text!")
+
+        if setupcalc == True:
+            self.keep_alive = True
+            self.get_calculator(frame)
+
+        #print('fgs',frame.get_stress())
+        check_stress_max = round(abs(frame.get_stress()).max(),5)
+        check_vpa = round(ase_vpa(frame),2)  # only 2 digits can be nicely fitted
+        check_force_max = round(abs(frame.get_forces()).max(),5)
+        if verbose:
+            print(text.ljust(42),'fm,sm,curr vol ',[check_force_max,check_stress_max,check_vpa]) # forces max , stress max
+        return ['fm,sm,curr vol ',check_force_max,check_stress_max,check_vpa]
+
+
 
     def submit_aiida(self,atomsin=False):
         ## o) move this from the ase calass to something separate
         ## a) create inputxxx.data
         ## b) follow kmc_submit_inputdata_to_aiida.sh
         return
-
 
 def ase_vpa(atoms):
     return atoms.get_volume()/atoms.get_number_of_atoms()
