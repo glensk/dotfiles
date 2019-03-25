@@ -916,8 +916,12 @@ def test_beta2_bulk(ace):
         #get_formation_energy(ace,frame,"Mg5Si6 (fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True)
 
         print()
-        path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/'
-        frame = ase_read(path+"runner.data",format="runner")
+        #path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/'
+        #frame = ase_read(path+"runner.data",format="runner")
+
+        path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
+        frame = ase_read(path,format="runner")
+
         #get_formation_energy(ace,frame,i+" (unrelaxed    )",atomrelax=False,cellrelax=False,volumerelax=False)
         get_formation_energy(ace,frame,i+" (fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True)
         ase_write(path+"NN_relaxed_"+i+"_"+ace.pot+".runner",frame,format='runner')
