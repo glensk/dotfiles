@@ -279,10 +279,10 @@ def help(p = None):
     p.add_argument('-waf',   '--write_analyze_forces', required=False, action='store_true',
        help='add to out_dudl{,av}.dat the info of the forces std, out_forcesdiff.dat, out_forcesdiffav.dat, out_forces_vs_dft.dat', default=False)
 
-    p.add_argument('-wp',   '--write_positions', required=False, action='store_true',
-       help='write out_positions.dat', default=False)
-    p.add_argument('-wpf',   '--write_positions_forces', required=False, action='store_true',
-       help='write out_positions_forces.dat', default=None)
+    p.add_argument('-wp',   '--write_positions', required=False, action='store_true', help='write out_positions.dat', default=False)
+    p.add_argument('-wpr',  '--write_positions_rel', required=False, action='store_true', default=False,
+       help='write relative position coordinates instaed of absolute ones')
+    p.add_argument('-wpf',   '--write_positions_forces', required=False, action='store_true', help='write out_positions_forces.dat', default=None)
 
 
     # morse parameters for 1NN
@@ -1448,7 +1448,8 @@ if __name__ == '__main__':
                 ov1(args.write_analyze) ,
                 ov1(args.read_hesse),
                 ov1(args.read_forces),
-                ov1(args.read_uoutcar)]
+                ov1(args.read_uoutcar),
+                ov1(args.write_positions_rel)]
             print('command')
             print(command)
             print(" ".join(command))
