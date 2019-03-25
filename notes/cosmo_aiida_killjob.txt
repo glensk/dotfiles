@@ -1,0 +1,8 @@
+verdi process list
+verdi process kill 103272 103292
+
+use the most abstract workchain:
+So the full list would be:
+Elastic -> Relax -> Base -> Calculation
+ElasticWork -> RelaxWork -> BaseWork - > CalculationJob 
+
