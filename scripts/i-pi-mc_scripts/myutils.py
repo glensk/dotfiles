@@ -10,17 +10,13 @@ from shutil import copyfile
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
-<<<<<<< HEAD
 from ase.constraints import StrainFilter
 try:  # not in aiida ase
     from ase.constraints import ExpCellFilter
 except ImportError:
     pass
-=======
 from ase.spacegroup import crystal
-from ase.constraints import StrainFilter,ExpCellFilter
-from numba import njit
->>>>>>> 69fcdc6d6344395083b73a31de2ee727279d8120
+from ase.constraints import ExpCellFilter
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:

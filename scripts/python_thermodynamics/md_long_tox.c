@@ -54,7 +54,7 @@
 #define stepsdudlmax (200000)
 #define faktor_temperature (m_element/k_B/(12.*N*N*N))
 
-//double faktor=1./(a0*N);       // show in relative
+double faktor_rel_pos=1./(a0*N);       // show in relative
 double faktor=alat_lattice/a0;   // show in absolute
 //double faktor=1./a0;           // show in internal coords
 
@@ -528,7 +528,7 @@ void print_forcesdft_to_screen(int idxmax,char stringin[],double faktor,int step
 
 
 ////////////// write to file
-void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int read_pos0,int read_uoutcar,int verbose,int write_analyze,const char *filename_in_positions,const char *filename_in_positions0, const char *filename_in_hesse,int read_hesse,int read_forces,int columns, int columns0, const char *filename_in_uoutcar,int evolve_md_on_hesse,int write_positions_forces,int write_positions) {
+void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int read_pos0,int read_uoutcar,int verbose,int write_analyze,const char *filename_in_positions,const char *filename_in_positions0, const char *filename_in_hesse,int read_hesse,int read_forces,int columns, int columns0, const char *filename_in_uoutcar,int evolve_md_on_hesse,int write_positions_forces,int write_positions, int write_positions_rel) {
 	FILE *anmerkung;
 	int dtorig=dt*1e12;
 	//@@char buff[20];
@@ -586,6 +586,9 @@ void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int 
     if (write_positions_forces!=1){fprintf(anmerkung,"write_positions_forces: %d (False)\n",write_positions_forces);}
 	if (write_positions==1){fprintf(anmerkung,"write_positions: %d (True)\n" ,write_positions);}
     if (write_positions!=1){fprintf(anmerkung,"write_positions: %d (False)\n",write_positions);}
+
+	if (write_positions_rel==1){fprintf(anmerkung,"write_positions_rel: %d (True)\n" ,write_positions_rel);}
+    if (write_positions_rel!=1){fprintf(anmerkung,"write_positions_rel: %d (False)\n",write_positions_rel);}
 	fclose(anmerkung);
 
 
@@ -634,6 +637,8 @@ void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int 
 	if (write_positions_forces!=1) {printf("write_positions_forces: %d (False)\n",write_positions_forces);}
 	if (write_positions==1) {printf("write_positions: %d (True)\n" ,write_positions);}
 	if (write_positions!=1) {printf("write_positions: %d (False)\n",write_positions);}
+	if (write_positions_rel==1) {printf("write_positions_rel: %d (True)\n" ,write_positions_rel);}
+	if (write_positions_rel!=1) {printf("write_positions_rel: %d (False)\n",write_positions_rel);}
 	printsep("");
 	//printf("\n");
 	//printf("\n");
@@ -697,9 +702,12 @@ void write_positions_forces_tofile(FILE *file_out_positions) {
     for (j=0;j<atoms;j++) fprintf(file_out_positions,"%14.10f %14.10f %14.10f %14.10f %14.10f %14.10f\n",pos[j].x*faktor,pos[j].y*faktor,pos[j].z*faktor,force[j].x/1.602176e-9,force[j].y/1.602176e-9,force[j].z/1.602176e-9);
 }
 
-void write_positions_tofile(FILE *file_out_positions) {
+void write_positions_tofile(FILE *file_out_positions, int write_positions_rel) {
     int j=0;
-    for (j=0;j<atoms;j++) fprintf(file_out_positions,"%14.10f %14.10f %14.10f\n",pos[j].x*faktor,pos[j].y*faktor,pos[j].z*faktor);
+	if (write_positions_rel==1){
+        for (j=0;j<atoms;j++) fprintf(file_out_positions,"%14.10f %14.10f %14.10f\n",pos[j].x*faktor_rel_pos,pos[j].y*faktor_rel_pos,pos[j].z*faktor_rel_pos);}
+    else {
+        for (j=0;j<atoms;j++) fprintf(file_out_positions,"%14.10f %14.10f %14.10f\n",pos[j].x*faktor,pos[j].y*faktor,pos[j].z*faktor);}
 }
 
 void write_dudl_head(FILE *file_out_dudl,FILE *file_out_dudl_av) {
@@ -1020,12 +1028,12 @@ void check_pos0_for_duplicates(double faktor,const char *filename_in_positions) 
 }
 
 void check_arguments(int i,char *argv[]) {
-	if (i!=11) {
+	if (i!=12) {
 	    // 11 is the total number of input variables including filepath
-	    printf("i is %d and not 11!\n",i);
-	    //                   1   2      3  4   5   6  7  8  9  10  11
-		printf("  usage: ./a.out T     dt  L   l   r  v  w  h  f   u     \n");
-		printf("         ./a.out 1775 .001 120 20  0  0  0  0  0   0\n\n");
+	    printf("i is %d and not 12!\n",i);
+	    //                   1   2      3  4   5   6  7  8  9  10  11 12
+		printf("  usage: ./a.out T     dt  L   l   r  v  w  h  f   u  wpr   \n");
+		printf("         ./a.out 1775 .001 120 20  0  0  0  0  0   0  0     \n\n");
         printf("    where:\n");
         printf("\n");
         printf("    T:  %-7s temperature (in K) corresponding to total energy per degree of freedom\n",argv[1]);
@@ -1038,6 +1046,8 @@ void check_arguments(int i,char *argv[]) {
         printf("    h:  %-7s read hessematrix_sphinx   ; 1=True;else==False\n",argv[8]);
         printf("    f:  %-7s read forces               ; 1=True;else==False\n",argv[9]);
         printf("    u:  %-7s read u_OUTCAR             ; 1=True;else==False\n",argv[10]);
+        printf("    u:  %-7s read u_OUTCAR             ; 1=True;else==False\n",argv[10]);
+        printf("    wrp:%-7s write positions relative  ; 1=True;else==False\n",argv[11]);
         exit(1);
 	}
 }
@@ -2142,6 +2152,7 @@ int main(int argc,char *argv[]){
     int write_analyze=0;    // 0: dont write analyse ; 1: write the analyse
     int write_analyze_forces=0;    // 0: dont write analyse ; 1: write the analyse
     int write_positions_forces=0;    // 0: dont write analyse ; 1: write the analyse
+    int write_positions_rel=0;
     int write_positions=0;    // 0: dont write analyse ; 1: write the analyse
     int read_hesse=0;       // 0: dont read the hesse
     int evolve_md_on_hesse=0;  // perform MD on hessematrix (lambda=0.0)
@@ -2168,6 +2179,7 @@ int main(int argc,char *argv[]){
     if (argc > 8)  {sscanf(argv[8],"%d",&read_hesse);};
     if (argc > 9)  {sscanf(argv[9],"%d",&read_forces);};
     if (argc > 10) {sscanf(argv[10],"%d",&read_uoutcar);};
+    if (argc > 11) {sscanf(argv[11],"%d",&write_positions_rel);};
 	//if (argc==11) {
 	//	i+=sscanf(argv[1],"%lf",&T);
 	//	i+=sscanf(argv[2],"%lf",&dt);
@@ -2192,7 +2204,7 @@ int main(int argc,char *argv[]){
 	if (read_forces==1) {columns=6;};  // after read in of arguments
     if ((columns !=0) && (columns!=6) && (columns!=3)) {printf("neither 0 nor 3 nor 6! exit\n");exit(1);}
 
-    write_out_info(T,dt,zeitschritte,l,read_pos,read_pos0,read_uoutcar,verbose,write_analyze,filename_in_positions,filename_in_positions0,filename_in_hesse,read_hesse, read_forces,columns,columns0,filename_in_uoutcar,evolve_md_on_hesse,write_positions_forces,write_positions);
+    write_out_info(T,dt,zeitschritte,l,read_pos,read_pos0,read_uoutcar,verbose,write_analyze,filename_in_positions,filename_in_positions0,filename_in_hesse,read_hesse, read_forces,columns,columns0,filename_in_uoutcar,evolve_md_on_hesse,write_positions_forces,write_positions,write_positions_rel);
 
 	dt*=1e-12;	                    //in s
     double faktor_verlet=(d0*dt/r0_eq_morse);
@@ -2348,7 +2360,7 @@ int main(int argc,char *argv[]){
             if (write_positions_forces==1) {
                 if (i%l==l-1) {write_positions_forces_tofile(file_out_positions);};}
             if (write_positions==1) {
-                if (i%l==l-1) {write_positions_tofile(file_out_positions);};}
+                if (i%l==l-1) {write_positions_tofile(file_out_positions,write_positions_rel);};}
 
             ///////////////////////////////////////////////////////////////////////////////
             // TO GET TEMPERATURE AND VELOCITIES IS NOT NECESSARY WHEN RUNNING ON POSITIONS
@@ -2481,7 +2493,7 @@ int main(int argc,char *argv[]){
                 if (i%l==l-1) {write_positions_forces_tofile(file_out_positions);};}
             //printf("----> m:\n");
             if (write_positions==1) {
-                if (i%l==l-1) {write_positions_tofile(file_out_positions);};}
+                if (i%l==l-1) {write_positions_tofile(file_out_positions,write_positions_rel);};}
 
             if (write_analyze==1) {
                 write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn);
