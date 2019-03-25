@@ -905,9 +905,12 @@ def test_Mg9Si5(ace):
 
     print_compare_ene_vs_DFT("Mg9Si5 (@DFT fully relaxed) @0K Vissers GGA",-0.335,DFT_ene="-",eos=False,f300=False)
     try_read = ace.savefolder+"h_Mg9Si5_at_DFT_relaxed"
+    try_read = False
     #print('try read',try_read)
     get_formation_energy(ace,frame,"Mg9Si5 (@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
+
     try_read = ace.savefolder+"h_Mg9Si5_at_NN_relaxed"
+    try_read = False
     #print('try read',try_read)
     get_formation_energy(ace,frame,"Mg9Si5 (@NN  fully relaxed)" ,atomrelax=True ,cellrelax=True ,volumerelax=True,try_harmonic_readfile=try_read)
     #print(np.round(frame.get_positions(),2))
