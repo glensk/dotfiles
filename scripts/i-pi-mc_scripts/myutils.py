@@ -16,6 +16,7 @@ try:  # not in aiida ase
 except ImportError:
     pass
 from ase.spacegroup import crystal
+from ase.constraints import StrainFilter
 from ase.constraints import ExpCellFilter
 try:
     from ase.calculators.lammpslib import LAMMPSlib
