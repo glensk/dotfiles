@@ -68,7 +68,7 @@ def create_READMEtxt(directory=False,add=False):
     time_now = datetime.now()
 
     # name of RADME
-    filepath = directory+'/README_'+time_now.strftime("%Y-%m-%d_%H:%M")+'.txt'
+    filepath = directory+'/README_'+time_now.strftime("%Y-%m-%d_%H:%M:%S")+'.txt'
 
     # write README.txt
     strout=os.path.basename(sys.argv[0])+" "+" ".join(sys.argv[1:])
