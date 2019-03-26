@@ -74,7 +74,7 @@ def install_(args,known):
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-        if args.install in ['ipi']              : git_clone(args,specify_depth = False)
+        if args.install in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
         if args.install in ['ipi_cosmo']        : git_clone(args)
         if args.install in ['aiida-alloy']      : git_clone(args)
         if args.install in ['atomsk']           : install_atomsk(args)
@@ -90,7 +90,7 @@ def install_(args,known):
     return
 
 
-def git_clone(args,specify_depth = True):
+def git_clone(args,specify_depth = True,checkout=False):
     do = ["git","clone"]
     if specify_depth == True:
         do = do + ["--depth","1"]
@@ -101,6 +101,8 @@ def git_clone(args,specify_depth = True):
     os.chdir(args.install_folder)
     print('pwd:',os.getcwd())
     subprocess.call(["git","branch"])
+    if checkout != False:
+        subprocess.call(["git","checkout",checkout])
     return
 
 def install_lbzip(args):

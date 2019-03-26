@@ -1493,10 +1493,19 @@ class ase_calculate_ene( object ):
 
         #### load the elastic stuff
         from parcalc import ClusterVasp, ParCalculate
-
         from elastic import get_pressure, BMEOS, get_strain
         from elastic import get_elementary_deformations, scan_volumes
         from elastic import get_BM_EOS, get_elastic_tensor
+
+        print('ene   ',self.ene(atoms_h))
+        print('stress1',atoms_h.get_stress())
+        self.ase_relax_cellshape_and_volume_only(atoms_h,verbose=False)
+        print('stress2',atoms_h.get_stress())
+        cryst = atoms_h.copy()
+        #print('stress2',cryst.get_isotropic_pressure(cryst.get_stress()))
+
+        sys.exit()
+
 
         # Create elementary deformations (systems are ase frames)
         #print('sys',elastic.__file__)
@@ -1511,6 +1520,8 @@ class ase_calculate_ene( object ):
         ## Elastic tensor by internal routine
         #Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
         #print("Cij (GPa):", Cij/units.GPa)
+        return
+
     def get_calculator(self,atoms):
         if self.calculator == "lammps":
             asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=self.keep_alive)
@@ -1974,13 +1985,16 @@ def ipi_ext_calc(atoms,ace):
 
 def lammps_ext_calc(atoms,ace):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
+
     ### mkdir tmpdir
     tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
+    print('doint the calculation in lammps, externally, in folder',tmpdir)
 
     ### write input structure
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
+    atoms.set_calculator(None)
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
     #sys.exit('pos now written or not')
 
@@ -1997,6 +2011,7 @@ def lammps_ext_calc(atoms,ace):
     LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
 
     with cd(tmpdir):  # this cd's savely into folder
+        # RUN LAMMPS
         # without SHELL no LD LIBRARY PATH
         call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
 
@@ -2016,6 +2031,7 @@ def lammps_ext_calc(atoms,ace):
         else:
             sys.exit('units '+ace.units+' unknown! Exit!')
         #print('ene out',ene,ace.units)
+
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
