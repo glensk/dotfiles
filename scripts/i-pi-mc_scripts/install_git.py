@@ -27,7 +27,7 @@ branch['aiida-alloy']   = False
 
 address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]  = False
 address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
-address["lammps_runner"] = "https://github.com/glensk/lammps.git";           branch["lammps_runner"] = False
+address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
 
 
 def help(p = None ,known=known):
@@ -73,9 +73,13 @@ def install_(args,known):
 
     if args.install_folder == False:
         args.install_folder = args.sources_folder+args.install
+
+    print('args.install       :',args.install)
     print('args.sources_folder:',args.sources_folder)
     print('args.install_folder:',args.install_folder)
     print()
+    if os.path.isdir(args.install_folder):
+        sys.exit('args.install_folder '+args.install_folder+' does already exist; Exit')
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
@@ -86,8 +90,9 @@ def install_(args,known):
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         if args.install in ['n2p2']             : install_n2p2(args)
         if args.install in ['vmd']              : install_vmd(args)
-        if args.install in ['lammps_runner']    : install_lammps_runner(args)
-        if args.install in ['lammps_n2p2']      : install_lammps_n2p2(args)
+        if args.install in ['lammps_runner']    : install_lammps(args)
+        if args.install in ['lammps_n2p2']      : install_lammps(args)
+        #if args.install in ['lammps_n2p2']      : install_lammps_n2p2(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -129,36 +134,65 @@ def install_lbzip(args):
         subprocess.call(['make','install'])
     return
 
-def install_lammps_runner(args):
-    git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB
+def install_lammps(args):
+    ''' lammps_runner works on fidis && mac
+        lammps_n2p2   works on fidis
+    '''
+    if args.install == "lammps_runner":
+        git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
+        extension = "runner"
+    elif args.install == "lammps_n2p2":
+        git_clone(args,specify_depth = True)
+        extension = "n2p2"
+        n2p2_folder=args.sources_folder+"/n2p2"
+        if not os.path.isdir(n2p2_folder): sys.exit("please install n2p2 first")
+
     os.chdir(args.install_folder)
+    if extension == "n2p2":
+        # ln -s $n2p2_folder lib/nnp
+        # cp -r $n2p2_folder/src/interface/LAMMPS/src/USER-NNP src
+        os.symlink(n2p2_folder, "lib/nnp")
+        my.cp(n2p2_folder+'/src/interface/LAMMPS/src/USER-NNP','src/')
+
     print('os.getcwd() (1)',os.getcwd())
     os.chdir("src")
     print('os.getcwd() (2)',os.getcwd())
     subprocess.call(["make", "clean-all",])
-    scripts = my.scripts()+'/lammps_scripts/src_runner/'
-    if not os.path.isdir(scripts+'USER-MISC'):
-        print('***copying USER-MISC')
-        my.cp(scripts+'USER-MISC','.')
-    if not os.path.isdir(scripts+'USER-RUNNER'):
-        print('***copying USER-RUNNER')
-        my.cp(scripts+'USER-RUNNER','.')
-    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC", "yes-USER-RUNNER"]
+
+
+    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC" ]
+    if args.install == "lammps_runner": list = list + [ "yes-USER-RUNNER" ]
+    if args.install == "lammps_n2p2":   list = list + [ "yes-user-nnp" ]
     for i in list:
         subprocess.call(["make", i])
-    my.sed("pair_runner.h","^#define MAXNEIGH.*","#define MAXNEIGH 500")
+
+    if args.install == "lammps_runner":
+        my.sed("pair_runner.h","^#define MAXNEIGH.*","#define MAXNEIGH 500")
+
+    if extension == "runner": checkdir = 'USER-RUNNER'
+    if extension == "n2p2": checkdir = 'USER-NNP'
+    if not os.path.isdir(checkdir):
+        sys.exit(checkdir+" does not exist; Exit")
+
     import socket
     hostname = socket.gethostname()
     print('hostname',hostname)
     if hostname == 'fidis':
         if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
             my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
+
         print("module load ... && make fidis")
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
-        print('copy ',"lmp_fidis to",my.scripts()+"/executables/lmp_fidis_par_runner")
-        my.cp("lmp_fidis",my.scripts()+"/executables/lmp_fidis_par_runner")
+        print()
+
+        if not os.path.isfile('lmp_fidis'):
+            sys.exit("lmp_fidis does not exist, .... was not created; Exit")
+        print('copy ',"lmp_fidis to",my.scripts()+"/executables/lmp_fidis_par_"+extension)
+        my.cp("lmp_fidis",my.scripts()+"/executables/lmp_fidis_par_"+extension)
     elif hostname == 'mac':
         subprocess.call(["make", "serial"])
+        print('copy ',"lmp_serial to",my.scripts()+"/executables/lmp_mac_serial_"+extension)
+        my.cp("lmp_fidis",my.scripts()+"/executables/lmp_mac_serial_"+extension)
 
     else:
         sys.exit("hostname "+hostname+" not set up yet")
