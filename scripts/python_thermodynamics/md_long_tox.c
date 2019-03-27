@@ -2088,24 +2088,29 @@ void verletstep_from_velocities(double dt,FILE *file_out_temp,double faktor_verl
 
 void preequilibration_if_no_readpos(double dt, int read_pos,FILE *file_out_temp,double** hessemat,double faktor_verlet,int read_hesse, int evolve_md_on_hesse) {
     int i;
+    printf("dt      :%2.16f\n",dt);
+    //double dt_preeq = 0.0000000000000010;
+    //if (dt < dt_preeq) {dt_preeq=dt;};  # somehow does not work
+
+    double dt_preeq = dt;
 	clock_t start,end;
-    //printf("dt:%2.16f\n",dt);
+    printf("dt_preeq:%2.16f\n",dt_preeq);
     if (read_pos!=1) {
         int preeq=3000000/atoms;
 	    start = clock();
-        printf("... preequilibration start (depending on cellsize...) using %d steps\n",preeq);
+        printf("... preequilibration start (depending on cellsize...) using %d steps on timestep of 1fs or below: %2.16f\n",preeq,dt_preeq);
         for (i=0;i<preeq;i++) {
 
-            //calculate_forces_energy_la(dt,0);      // 1.5-1.6 sec
-            //forces_to_velocities(dt);
-            calculate_forces_energy_la(dt,0);
+            //calculate_forces_energy_la(dt_preeq,0);      // 1.5-1.6 sec
+            //forces_to_velocities(dt_preeq);
+            calculate_forces_energy_la(dt_preeq,0);
             if (read_hesse==1) {calculate_forces_energy_hesse(hessemat);}
-            if (evolve_md_on_hesse==1) {forcesharm_to_velocities(dt);}
-            else {forces_to_velocities(dt);}
+            if (evolve_md_on_hesse==1) {forcesharm_to_velocities(dt_preeq);}
+            else {forces_to_velocities(dt_preeq);}
 
             //calculate_forces_energy_hesse(hessemat);   // 1.6-1.7 sec
             //if (i%l==l-1) {write_positions_forces(file_out_positions,faktor);}; // 4.3 sec
-            verletstep_from_velocities(dt,file_out_temp,faktor_verlet);
+            verletstep_from_velocities(dt_preeq,file_out_temp,faktor_verlet);
         }
         printf("... preequilibration finished\n");
 	    end = clock();
