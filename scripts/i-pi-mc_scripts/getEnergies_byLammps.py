@@ -692,7 +692,7 @@ def get_basic_NN_energies_ace(ace):
     # Elastic Constant C12all = 61.1070426952492 GPa
     # Elastic Constant C13all = 61.1070416045365 GPa
     # Elastic Constant C23all = 61.107042461058 GPa
-    # Elastic Constant C44all = 40.1762067982596 GPa
+    # Elastic Constant C44all = 40.1762067982596 GPa    ***
     # Elastic Constant C55all = 40.176206764599 GPa
     # Elastic Constant C66all = 40.1762067923422 GPa
     # Elastic Constant C14all = 2.32166198948779e-07 GPa
@@ -725,6 +725,8 @@ def get_basic_NN_energies_ace(ace):
     get_si_dc_equilibrium(ace)
     ene_pot_lmp = my.lammps_ext_calc(ace.al_fcc,ace)
     #ase_write('pos_al.lmp',ace.al_fcc,format='lammps-runner')
+    vinet = ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False,write_energies=False)
+    print('vinet',vinet)
     sys.exit('ace fcc al si dc')
 
     get_dilute_formation_energy(text="NN dilute formation energy Si ",sc=4,nsi=1,nmg=0,e_si_diamond_pa=ace.si_dc_ene_pa,ace=ace,t2="Kobayashi 0.375 eV")
