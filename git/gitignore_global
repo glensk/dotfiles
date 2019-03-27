@@ -72,7 +72,7 @@ iTerm.plist
 *.dll
 *.o
 *.so
-*.mod
+# *.mod nope! this would exclude displace.mod init.mod potential.mod
 *.g
 *.f
 *.L 
