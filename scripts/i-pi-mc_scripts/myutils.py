@@ -37,6 +37,7 @@ from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
 import shutil
 import time
+import myutils as my
 
 
 start_time = time.time()
@@ -181,7 +182,22 @@ def cp(src=False,dest=False):
     else:
         print("source is:",src_is,":",src)
         print("dest   is:",dest_is,":",dest)
-        sys.exit()
+        basename = os.path.basename(src)
+        print("basename:",os.path.basename(src))
+        to = dest+'/'+basename
+        print('to',to)
+        def copyDirectory(src, dest):
+            try:
+                shutil.copytree(src, dest)
+            # Directories are the same
+            except shutil.Error as e:
+                print('Directory not copied. Error: %s' % e)
+            # Any error saying that the directory doesn't exist
+            except OSError as e:
+                print('Directory not copied. Error: %s' % e)
+        print('copy...')
+        copyDirectory(src, to)
+    return
 
 def rm(src):
     os.remove(src)
@@ -979,6 +995,8 @@ class ase_calculate_ene( object ):
                 'variable nnpDir string \"'+fullpath+'\"'
                 ]
 
+        #print('spp',self.pot.split("_")[0])
+        #sys.exit()
         if self.pot.split("_")[0] == "n2p2":
             # showewsum 1 showew yes resetew no maxew 1000000
             self.lmpcmd = self.lmpcmd + [
@@ -991,8 +1009,8 @@ class ase_calculate_ene( object ):
         elif self.pot.split("_")[0] == "runner":
             self.lmpcmd = self.lmpcmd + [
                 "# thermo 1 # for geopt",
-                "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
-                "pair_coeff * * 10.0",
+                "pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000",
+                "pair_coeff * * 7.937658735",
             ]
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
 
@@ -2008,13 +2026,27 @@ def lammps_ext_calc(atoms,ace):
     if os.path.isfile(tmpdir+'log.lammps'):
         os.remove(tmpdir+"log.lammps")
 
-    LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+
+    #ka=ace.pot.split("_")[0]
+    #print('aa:'+ka+":",type(ka))
+    if ace.pot.split("_")[0] == "runner":
+        LAMMPS_COMMAND = my.scripts()+'/executables/lmp_fidis_par_runner'
+        #print("LAMMPS_COMMAND 1",LAMMPS_COMMAND)
+    else:
+        #print("LAMMPS_COMMAND 2",LAMMPS_COMMAND)
+        LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+
+    #print("LAMMPS_COMMAND",LAMMPS_COMMAND)
+    #sys.exit()
 
     with cd(tmpdir):  # this cd's savely into folder
         # RUN LAMMPS
         # without SHELL no LD LIBRARY PATH
+        #print('pwd',os.getcwd())
         call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
 
+        #print('pwd2',os.getcwd())
+        #sys.exit()
         ### extract energy and forces
         ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
         ene=float(ene)

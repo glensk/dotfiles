@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","ipi_cosmo","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -25,7 +25,9 @@ branch['ipi']           = False # get all the branches and not just feat/kmc
 address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
 
-address["lammps"]       = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
+address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]  = False
+address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
+address["lammps_runner"] = "https://github.com/glensk/lammps.git";           branch["lammps_runner"] = False
 
 
 def help(p = None ,known=known):
@@ -70,7 +72,10 @@ def install_(args,known):
         my.mkdir(args.sources_folder)
 
     if args.install_folder == False:
-        args.install_folder = args.install
+        args.install_folder = args.sources_folder+args.install
+    print('args.sources_folder:',args.sources_folder)
+    print('args.install_folder:',args.install_folder)
+    print()
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
@@ -81,7 +86,8 @@ def install_(args,known):
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         if args.install in ['n2p2']             : install_n2p2(args)
         if args.install in ['vmd']              : install_vmd(args)
-        if args.install in ['lammps']           : install_lammps(args)
+        if args.install in ['lammps_runner']    : install_lammps_runner(args)
+        if args.install in ['lammps_n2p2']      : install_lammps_n2p2(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -123,16 +129,39 @@ def install_lbzip(args):
         subprocess.call(['make','install'])
     return
 
-def install_lammps(args):
-    sys.exit("not yet finished")
-    subprocess.call(["git","clone","--depth","1","https://github.com/lammps/lammps.git",args.install_folder])
+def install_lammps_runner(args):
+    git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB
     os.chdir(args.install_folder)
+    print('os.getcwd() (1)',os.getcwd())
     os.chdir("src")
+    print('os.getcwd() (2)',os.getcwd())
     subprocess.call(["make", "clean-all",])
-    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER_MISC"]
+    scripts = my.scripts()+'/lammps_scripts/src_runner/'
+    if not os.path.isdir(scripts+'USER-MISC'):
+        print('***copying USER-MISC')
+        my.cp(scripts+'USER-MISC','.')
+    if not os.path.isdir(scripts+'USER-RUNNER'):
+        print('***copying USER-RUNNER')
+        my.cp(scripts+'USER-RUNNER','.')
+    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC", "yes-USER-RUNNER"]
     for i in list:
         subprocess.call(["make", i])
+    my.sed("pair_runner.h","^#define MAXNEIGH.*","#define MAXNEIGH 500")
+    import socket
+    hostname = socket.gethostname()
+    print('hostname',hostname)
+    if hostname == 'fidis':
+        if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
+            my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
+        print("module load ... && make fidis")
+        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
+        print('copy ',"lmp_fidis to",my.scripts()+"/executables/lmp_fidis_par_runner")
+        my.cp("lmp_fidis",my.scripts()+"/executables/lmp_fidis_par_runner")
+    elif hostname == 'mac':
+        subprocess.call(["make", "serial"])
 
+    else:
+        sys.exit("hostname "+hostname+" not set up yet")
 
 def install_n2p2(args):
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
