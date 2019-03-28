@@ -1607,6 +1607,7 @@ class ase_calculate_ene( object ):
         if verbose: self.check_frame('get_murn 1 in',frame=atoms_murn)
         self.ase_relax_cellshape_and_volume_only(atoms_murn,verbose=verbose)
         if verbose: self.check_frame('get_murn 2 atfer cellshape relax',frame=atoms_murn)
+
         if atomrelax:
             self.ase_relax_atomic_positions_only(atoms_murn,fmax=0.0002,verbose=False)
             if verbose: self.check_frame('get_murn 2 atfer atomrelax only',frame=atoms_murn)
