@@ -65,7 +65,7 @@ echo `date +"%Y_%m_%d"` > ANMERKUNG.txt
 
 cd $src
 make clean-all
-make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RIGID yes-USER-MISC yes-MEAM
+make yes-CLASS2 yes-KSPACE yes-MANYBODY yes-MISC yes-MOLECULE yes-REPLICA yes-RIGID yes-USER-MISC
 
 if [ "$n2p2_folder" != "" ];then
     cd $src_

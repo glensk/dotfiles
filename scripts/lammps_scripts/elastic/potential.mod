@@ -10,7 +10,7 @@
 
 # Runner pot
 variable runnerDir string "rv64_1"
-variable runnerDir string "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v2dg"
+variable runnerDir string "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v2dg"
 pair_style runner dir ${runnerDir} showewsum 1 showew yes resetew no maxew 1000000
 pair_coeff * * 7.937658735
 
