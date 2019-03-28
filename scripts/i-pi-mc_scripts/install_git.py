@@ -145,7 +145,7 @@ def install_lammps(args):
         git_clone(args,specify_depth = True)
         extension = "n2p2"
         n2p2_folder=args.sources_folder+"/n2p2"
-        if not os.path.isdir(n2p2_folder): sys.exit("please install n2p2 first")
+        if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
 
     os.chdir(args.install_folder)
     if extension == "n2p2":
@@ -190,6 +190,16 @@ def install_lammps(args):
         print('copy ',"lmp_fidis to",my.scripts()+"/executables/lmp_fidis_par_"+extension)
         my.cp("lmp_fidis",my.scripts()+"/executables/lmp_fidis_par_"+extension)
     elif hostname == 'mac':
+        print("####################################################################")
+        print("# for mac you want to have the true gcc working: conda install gcc #")
+        print("#")
+        print("# in n2p2: cd src; make libnnp COMP=gnu")
+        print("#")
+        print("# %find ~/sources/n2p2 -name \"InterfaceLammps.h\")
+        print("#      /Users/glensk/sources/n2p2/include/InterfaceLammps.h")
+        print("#      /Users/glensk/sources/n2p2/src/libnnpif/InterfaceLammps.h")
+        print("#")
+        print("####################################################################")
         subprocess.call(["make", "serial"])
         print('copy ',"lmp_serial to",my.scripts()+"/executables/lmp_mac_serial_"+extension)
         my.cp("lmp_fidis",my.scripts()+"/executables/lmp_mac_serial_"+extension)
