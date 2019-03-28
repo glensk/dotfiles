@@ -582,9 +582,9 @@ def get_al_fcc_equilibrium(ace):
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
     ace.ase_relax_cellshape_and_volume_only(frame_al,verbose=False)
     ace.al_fcc = frame_al
-    ace.al_fcc_ene_pa = ace.ene(frame_al)/frame_al.get_number_of_atoms()
+    ace.al_fcc_ene_pa = my.ase_vpa(ace.al_fcc) #ace.ene(frame_al)/frame_al.get_number_of_atoms()
     ace.al_fcc_vol_pa = frame_al.get_volume()/frame_al.get_number_of_atoms()
-    print("NN Al vpa @T=0K",ace.al_fcc_vol_pa)
+    print("NN Al vpa @T=0K",ace.al_fcc_vol_pa,"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     print('e_ and f_ al should all be done consistently from the NN!!!')
     ase_write(ace.savefolder+"al_fcc.runner",frame_al,format='runner')
     return
@@ -725,7 +725,12 @@ def get_basic_NN_energies_ace(ace):
     get_si_dc_equilibrium(ace)
     ene_pot_lmp = my.lammps_ext_calc(ace.al_fcc,ace)
     #ase_write('pos_al.lmp',ace.al_fcc,format='lammps-runner')
+    #get_vpa(
+    print("NN 1 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
+    ace.ase_relax_cellshape_and_volume_only(ace.al_fcc,verbose=False)
+    print("NN 2 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     vinet = ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False,write_energies=False)
+    print("NN 3 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     print('vinet',vinet)
     sys.exit('ace fcc al si dc')
 

@@ -92,7 +92,6 @@ def install_(args,known):
         if args.install in ['vmd']              : install_vmd(args)
         if args.install in ['lammps_runner']    : install_lammps(args)
         if args.install in ['lammps_n2p2']      : install_lammps(args)
-        #if args.install in ['lammps_n2p2']      : install_lammps_n2p2(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -178,6 +177,11 @@ def install_lammps(args):
     hostname = socket.gethostname()
     print('hostname',hostname)
     if hostname == 'fidis':
+        serialfidis = 'fidis'
+    elif hostname == 'mac':
+        serialfidis = 'serial'
+
+    if hostname == 'fidis':
         if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
             my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
 
@@ -185,15 +189,21 @@ def install_lammps(args):
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
         print()
 
-        if not os.path.isfile('lmp_fidis'):
-            sys.exit("lmp_fidis does not exist, .... was not created; Exit")
-        print('copy ',"lmp_fidis to",my.scripts()+"/executables/lmp_fidis_par_"+extension)
-        my.cp("lmp_fidis",my.scripts()+"/executables/lmp_fidis_par_"+extension)
+
+
     elif hostname == 'mac':
         print("####################################################################")
         print("# for mac you want to have the true gcc working: conda install gcc #")
+        print("# libnnp and nnp-predict can be compiled to make n2p2 predict energies from input.data")
+        print("# libnnpif is not working yet.")
         print("#")
-        print("# in n2p2: cd src; make libnnp COMP=gnu")
+        print("# in n2p2: cd src; make libnnp COMP=gnu # did not work in following steps in the end")
+        print("#")
+        print("# %g++ --version  --> needs to point to ---> g++ (GCC) 4.8.5")
+        print("# in n2p2: cd src; cd libnnp; make static COMP=gnu # !!! THIS worked!!!! (with g++)")
+        print("# in n2p2: cd src/application/nnp-predict; make static COMP=gnu # !!! THIS worked!!!! (with g++)")
+        print("#")
+        print("# /Users/glensk/sources/n2p2/src/application/nnp-predict/nnp-predict input.data     # !!! wow, worked on mac!!!")
         print("#")
         print("# %find ~/sources/n2p2 -name \"InterfaceLammps.h\"")
         print("#      /Users/glensk/sources/n2p2/include/InterfaceLammps.h")
@@ -201,11 +211,37 @@ def install_lammps(args):
         print("#")
         print("####################################################################")
         subprocess.call(["make", "serial"])
-        print('copy ',"lmp_serial to",my.scripts()+"/executables/lmp_mac_serial_"+extension)
-        my.cp("lmp_fidis",my.scripts()+"/executables/lmp_mac_serial_"+extension)
-
+        print()
     else:
         sys.exit("hostname "+hostname+" not set up yet")
+
+    print()
+    print("************ make done ************")
+    print()
+    print("************ copy executable ************")
+    #### copy the executable
+    os.chdir(args.install_folder+"/src")
+    executable = 'lmp_'+serialfidis
+    if not os.path.isfile(executable):
+        sys.exit(executable +" does not exist, .... was not created; Exit")
+    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_par_"+extension)
+    my.cp(executable,my.scripts()+"/executables/"+executable+"_par_"+extension)
+    print()
+
+    ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
+    #subprocess.call(["make", 'mpi-stubs'])
+    #subprocess.call(["make", 'g++_serial','mode=shlib'])
+    print()
+    print("************ make mode=shlib xxxx ************")
+    os.chdir(args.install_folder+"/src")
+    subprocess.call(["make", 'mode=shlib',serialfidis])  # serialfidis can be fidis,serial,mpi
+    os.chdir(args.install_folder+"/python")
+    print()
+    print("************ install.py ************")
+    print('pwd:',os.getcwd())
+    subprocess.call(["chmod", 'u+x','install.py'])
+    subprocess.call(['./install.py'])
+    return
 
 def install_n2p2(args):
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
@@ -217,14 +253,31 @@ def install_n2p2(args):
     #my.cp("makefile.intel","makefile.intel.back")
     #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
+    hostname = socket.gethostname()
+
+    if hostname == 'fidis':
+        COMP="intel"
+    if hostname == 'mac':
+        COMP="gnu"
+        #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
+        #EIGEN = /Users/glensk/miniconda2/
+
     # makefile
-    my.sed("makefile","^COMP=.*","COMP=intel")
+    my.sed("makefile","^COMP=.*","COMP="+COMP)
     my.sed("makefile","^PROJECT_DIR.*","PROJECT_DIR=./")
     my.sed("makefile","^LIB=libnnp.so libnnpif.so libnnptrain.so pynnp.so","LIB=libnnp.so libnnpif.so libnnptrain.so") # remove pynnp.so
     # makefile.intel
     my.sed("makefile.intel","^PROJECT_GSL=.*","PROJECT_GSL=${GSL_ROOT}/include")
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
     my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
+    if hostname == 'mac':
+        my.sed("makefile.gnu","^PROJECT_GSL=.*","PROJECT_GSL=./")  # try also with the acutal paths
+        my.sed("makefile.gnu","^PROJECT_EIGEN=.*","PROJECT_EIGEN=./")  # try also with the actual paths
+        # on mac: conda install gcc
+        # on mac: conda install -c conda-forge gsl   # has now the libgsl... in ~/miniconda2/lib
+        # on mac: conda install -c omnia eigen3
+        # or
+        # on mac: conda install -c conda-forge eigen
     f = open("makefile.intel", "r");contents = f.readlines();f.close();insert=0
     for idx,i in enumerate(contents):
         if i[:14] == "PROJECT_EIGEN=": insert = idx
