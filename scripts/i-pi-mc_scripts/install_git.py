@@ -195,7 +195,7 @@ def install_lammps(args):
         print("#")
         print("# in n2p2: cd src; make libnnp COMP=gnu")
         print("#")
-        print("# %find ~/sources/n2p2 -name \"InterfaceLammps.h\")
+        print("# %find ~/sources/n2p2 -name \"InterfaceLammps.h\"")
         print("#      /Users/glensk/sources/n2p2/include/InterfaceLammps.h")
         print("#      /Users/glensk/sources/n2p2/src/libnnpif/InterfaceLammps.h")
         print("#")
