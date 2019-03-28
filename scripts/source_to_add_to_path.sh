@@ -28,6 +28,12 @@ addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$
 
 export PATH="$PATH:$addeverywhere"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$_n2p2_lib"
+_n2p2_mac_predict="$HOME/miniconda2/lib"
+if [ "`hostname`" = "mac" ];then
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$_n2p2_mac_predict"
+    export GSL_ROOT="/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005" # conda install -c conda-forge gsl
+    export EIGEN_ROOT="/Users/glensk/miniconda2/" # conda install -c conda-forge gsl
+fi
 
 export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
 export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
