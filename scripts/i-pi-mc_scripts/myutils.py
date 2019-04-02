@@ -11,6 +11,7 @@ from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
 from ase.constraints import StrainFilter
+import hesse
 try:  # not in aiida ase
     from ase.constraints import ExpCellFilter
 except ImportError:
@@ -38,9 +39,24 @@ from ase.optimize.minimahopping import MinimaHopping
 import shutil
 import time
 import myutils as my
-
+from ase import units as aseunits
 
 start_time = time.time()
+
+def printoutcolor(red,var,ENDC):
+    if len(var) == 1:
+        return red + str(var[0]) + ENDC
+    else:
+        return red + str(var) + ENDC
+
+
+
+def printred(*var):
+    #print "lenred:",len(var)
+    red = '\033[31m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
 
 def grep(filepath,string):
     out = []
@@ -386,7 +402,7 @@ def progress(count, total, status=''):
     percents = round(100.0 * count / float(total), 1)
     bar = '=' * filled_len + '-' * (bar_len - filled_len)
 
-    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.write('[%s] %s%s ... %s\r' % (bar, percents, '%', status))
     sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
     return
 
@@ -438,7 +454,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
     elif units_split[0].lower() == 'mev':
         ene = ene*1000.
     elif units_split[0] == "hartree" or units_split[0] == "Hartree":
-        ene = ene*0.036749325
+        ene = ene/aseunits.Hartree
 
     if len(units_split) == 2:
         if units_split[1] == 'pa':
@@ -924,11 +940,14 @@ class ase_calculate_ene( object ):
             kmc=False,
             verbose=False,
             temp=False,
+            elastic=False,
             ):
 
         self.pot = pot
         self.units = units.lower()
         self.geopt = geopt          # so far only for ene object.
+        self.elastic = elastic
+        self.elastic_relax = True
         self.nsteps = 0
         self.verbose = verbose
         self.atoms = False          # ase atoms object (frame)
@@ -950,17 +969,50 @@ class ase_calculate_ene( object ):
         #self.eos = [ False, False, False, False] # e0_meV/pa, v0_ang^3/pa, B0, B0der]
 
         if self.verbose:
-            print('ase_calculate_ene, self.pot           :',self.pot)
-            print('ase_calculate_ene, self.units         :',self.units)
-            print('ase_calculate_ene, self.geopt         :',self.geopt)
-            print('ase_calculate_ene, self.nsteps        :',self.nsteps)
-            print('ase_calculate_ene, self.lmpcmd        :',self.lmpcmd)
-            print('ase_calculate_ene, self.kmc           :',self.kmc)
-            print('ase_calculate_ene, self.temp          :',self.temp)
-            print('ase_calculate_ene, self.mypot.pot     :',self.mypot.pot)
-            #print('ase_calculate_ene, self.mypot.pot_all :',self.mypot.pot_all)
-            print('ase_calculate_ene, self.mypot.elements:',self.mypot.elements)
+            tt = 'ase_calculate_ene, self.'
+            print(tt+'pot           :',self.pot)        # : n2p2_v2ag
+            print(tt+'units         :',self.units)      # : ev
+            print(tt+'geopt         :',self.geopt)      # : False
+            print(tt+'elastic       :',self.elastic)    # : False
+            print(tt+'nsteps        :',self.nsteps)     # : 0
+            print(tt+'lmpcmd        :',self.lmpcmd)     # : False
+            print(tt+'kmc           :',self.kmc)        # : False
+            print(tt+'temp          :',self.temp)       # : False
+            print(tt+'mypot.pot     :',self.mypot.pot)  # : n2p2_v2ag
+            #print(tt+'mypot.pot_all :',self.mypot.pot_all)
+            print(tt+'mypot.elements:',self.mypot.elements) # : ['Al', 'Mg', 'Si']
         return
+
+
+    def lammps_command_potential_n2p2(self):
+        command = [
+        # showewsum 1 showew yes resetew no maxew 1000000
+        'variable nnpDir string \"'+self.mypot.fullpath+'\"',
+        "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261328 cfenergy 0.0367493254",
+        "pair_coeff * * 11.0",
+        "#write_data ./pos.data # would this be the final struct?"
+        ]
+        return command
+
+    def lammps_command_potential_runner(self):
+        command = [
+        # comment
+        "# thermo 1 # for geopt",
+        'variable nnpDir string \"'+self.mypot.fullpath+'\"',
+        "pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000",
+        "pair_coeff * * 7.937658735"
+        ]
+        return command
+
+
+    def lammps_command_masses(self):
+        command = [
+                "mass 1 24.305",
+                "mass 2 26.9815385",
+                "mass 3 28.0855",
+                ]
+        return command
+
 
     def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet'):
         ''' geoopt (geometry optimization) is added / or not in
@@ -975,43 +1027,36 @@ class ase_calculate_ene( object ):
             print('ffsocket:',ffsocket)
             sys.exit('ffsocket has to be "unix" or "inet"; Exit!')
 
-        pot = mypot(self.pot)
-        pot.get()
+        self.mypot = mypot(self.pot)
+        self.mypot.get()
 
-        basename = pot.pot
-        fullpath = pot.fullpath
+        #basename = self.mypot.pot
+        #fullpath = self.mypot.fullpath
 
-        if self.verbose > 1:
-            print('...get_potential--basename:',basename)
-            print('...get_potential--fullpath:',fullpath)
+        if self.verbose:
+            tt = 'ase_calculate_ene, self.'
+            print(tt+'mypot.pot     :',self.mypot.pot)        # : n2p2_v2ag
+            print(tt+'mypot.fullpath:',self.mypot.fullpath)   # :
             print('...pot',self.pot.split("_"))
-
+        #sys.exit()
         # this depends only on the potential which is already defined
         # so should be easy to make this general.
-        self.lmpcmd = [
-                "mass 1 24.305",
-                "mass 2 26.9815385",
-                "mass 3 28.0855",
-                'variable nnpDir string \"'+fullpath+'\"'
-                ]
+        self.lmpcmd = self.lammps_command_masses()
+        #self.lmpcmd = [
+        #        "mass 1 24.305",
+        #        "mass 2 26.9815385",
+        #        "mass 3 28.0855",
+        #        ]
 
         #print('spp',self.pot.split("_")[0])
         #sys.exit()
         if self.pot.split("_")[0] == "n2p2":
             # showewsum 1 showew yes resetew no maxew 1000000
-            self.lmpcmd = self.lmpcmd + [
-                "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261328 cfenergy 0.0367493254",
-                "pair_coeff * * 11.0",
-                "#write_data ./pos.data # would this be the final struct?",
-            ]
+            self.lmpcmd = self.lmpcmd + self.lammps_command_potential_n2p2()
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
 
         elif self.pot.split("_")[0] == "runner":
-            self.lmpcmd = self.lmpcmd + [
-                "# thermo 1 # for geopt",
-                "pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000",
-                "pair_coeff * * 7.937658735",
-            ]
+            self.lmpcmd = self.lmpcmd + self.lammps_command_potential_runner()
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
 
         else:
@@ -1491,6 +1536,31 @@ class ase_calculate_ene( object ):
         ''' the function will never change the atomsobject '''
         return self.get_v0(atomsin=atomsin)/atomsin.get_number_of_atoms()
 
+    def get_elastic_external(self,atomsin=False,verbose=False,text=False):
+        ''' the function will never change the atomsobject '''
+        if self.elastic != True:
+            return
+        if atomsin == False:
+            sys.exit('need to define atoms in this case XX')
+        frame = atomsin.copy()
+        frame.wrap()
+
+        self.get_calculator(frame)  # to be able to calculate stress
+        print('stress original frame:',frame.get_stress())
+        if self.elastic_relax == True:
+            self.ase_relax_cellshape_and_volume_only(frame)
+        print('stress relaxed frame :',frame.get_stress())
+        #ase_write('pos.runner',frame,format='runner')
+        print('-------------- lammps_ext_calc -----------')
+        ene_pot_lmp = lammps_ext_calc(frame,self,get_elastic_constants=True)
+
+        if type(text) != bool:
+            text = printred(text)
+            ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
+            ene_pot_lmp = ene_pot_lmp.replace('C44all =', printred('C44all ='))
+        print(ene_pot_lmp)
+        return
+
     def get_elastic(self,atomsin=False,verbose=False):
         ''' the function will never change the atomsobject '''
 
@@ -1712,23 +1782,49 @@ class ase_calculate_ene( object ):
             print("---2-->>",pos)
         return vinet.parameters
 
-    def get_fh(self,atomsin=False,disp=0.03,debug=False,try_readfile=False,return_units="mev_pa"):
+    def get_fh(self,atomsin=False,disp=0.03,debug=False,try_readfile=False):
         ''' the function will never change the atomsobject '''
-        if return_units == "mev_pa":
-            return_mult = 1.
-        elif return_units == "ev_cell":
-            return_mult = atomsin.get_number_of_atoms()/1000.
-        else:
-            raise NameError('return_units unknown')
-
-        if try_readfile:
-            if os.path.isfile(try_readfile):
-                return np.loadtxt(try_readfile)*return_mult
-
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         atoms_h = atomsin.copy()
         atoms_h.wrap()
+
+        T0shift_ev_atom = self.ene(atoms_h)/atoms_h.get_number_of_atoms()
+        #print('--> T0shift_ev_atom',T0shift_ev_atom)
+        #sys.exit('T0shift_ev_atom')
+
+        #if return_units == "mev_pa":
+        #    return_mult = 1.
+        #elif return_units == "ev_cell":
+        #    return_mult = atomsin.get_number_of_atoms()/1000.
+        #else:
+        #    raise NameError('return_units conversion not yet set for '+return_units)
+
+        if try_readfile:
+            if os.path.isfile(try_readfile+"_hessematrix"):
+                if debug: print('tryread ...')
+                hessematrix = hesse.read_Hessematrix(try_readfile+"_hessematrix")
+                if debug: print('hesse ...')
+                hes = hesse.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000, T0shift_ev_atom = T0shift_ev_atom)
+                if debug: print('done ...')
+
+                #free_ene      = hes.ene_atom
+                #print('fe pa',free_ene[:3])
+                #print('fe pa',free_ene[-3:])
+                #free_ene_cell = hes.ene_cell
+                #print()
+                #print('fe cell',free_ene_cell[:3])
+                #print('fe cell',free_ene_cell[-3:])
+                #print()
+                #print('fe cell ev',hes.ene_cell_only_ev)
+                #print()
+                #print('ka',hes.ene_cell_only_ev_T0shifted[:3])
+                #print('ka',hes.ene_cell_only_ev_T0shifted[-3:])
+                #sys.exit()
+                #get = np.loadtxt(try_readfile)
+                #return np.transpose([get[:,0],get[:,1]*return_mult])
+                return hes
+
 
         self.keep_alive = False
         self.get_calculator(atoms_h)
@@ -1771,7 +1867,7 @@ class ase_calculate_ene( object ):
         ### schleife ueber alle atome, 1..32
 
         for iidx,i in enumerate(pos0): # loop over all atoms
-            progress(iidx,len(pos0))
+            progress(iidx,len(pos0),status=try_readfile)
             #print(iidx,"/",pos0.shape[0]) # loop over xyz 1..3
             for jidx,j in enumerate(i):
                 pos1 = np.copy(pos0)
@@ -1780,25 +1876,34 @@ class ase_calculate_ene( object ):
                 atoms_h.set_positions(pos1)
                 fah = atoms_h.get_forces()
                 hessematrix[iidx*3+jidx] = fah.reshape((1,pos0.shape[0]*        3))/(-disp)
+
         #np.savetxt("HesseMatrix.dat",hessematrix/97.173617,fmt="%.13f")
-        import hesse as h
         if debug:
             print("!!!!!!!!!!!!!!!!! get free energy")
-        #hes = h.hesseclass(listin=['al'],H=hessematrix)
+        #hes = hesse.hesseclass(listin=['al'],H=hessematrix)
         if debug:
             print('get_chemical_symbols()')
             print(atoms_h.get_chemical_symbols())
-        hes = h.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000)
-        try:
-            #free_ene = (hes.ene_atom[300]-hes.ene_atom[0])[1]
-            free_ene = hes.ene_atom
-        except IndexError:
-            free_ene = "UNSTABLE"
-        if debug and type(free_ene) != str:
-            hes.write_ene_atom()
+        hes = hesse.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000, T0shift_ev_atom = T0shift_ev_atom)
+        #try:
+        #    #free_ene = (hes.ene_atom[300]-hes.ene_atom[0])[1]
+        #    free_ene      = hes.ene_atom
+        #    free_ene_cell = hes.ene_cell
+        #except IndexError:
+        #    free_ene = "UNSTABLE"
+        #if debug and type(free_ene) != str:
+        #    hes.write_ene_atom()
         if try_readfile:
-            np.savetxt(try_readfile,free_ene)
-        return free_ene*return_mult
+            hes.write_hessematrix(try_readfile+"_hessematrix")
+            hes.write_ene_atom(try_readfile+"_per_atom")
+            hes.write_ene_cell(try_readfile+"_per_cell")
+            #np.savetxt(try_readfile,free_ene)
+
+
+        #get = np.loadtxt(try_readfile)
+        #return np.transpose([get[:,0],get[:,1]*return_mult])
+        #return free_ene*return_mult
+        return hes
 
 
     def check_frame(self,text,frame=False,verbose=True,setupcalc=True):
@@ -1892,6 +1997,15 @@ def q():
             path.append(str_list[4])
 
     return id,stat,path
+
+def lammps_write_inputfile_from_command(folder,filename='in.lmp',command=False):
+    ''' command is holding the lammps commands '''
+    mkdir(folder)
+    f = open(folder+'/'+filename,'w')
+    for i in command:
+        f.write(i+"\n")
+    f.close()
+    return
 
 def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
     ''' ace is the ace object holding the lammps commands '''
@@ -2002,23 +2116,138 @@ def ipi_ext_calc(atoms,ace):
     ase_write(folder+'/init.xyz',atoms,format='ipi')
     return
 
-def lammps_ext_calc(atoms,ace):
+
+
+def lammps_ext_elastic_init_mod(ace,positions='pos.lmp'):
+    command = [
+    "# NOTE: This script can be modified for different atomic structures,",
+    "# units, etc. See in.elastic for more info.",
+    "#",
+    "",
+    "# Define the finite deformation size. Try several values of this",
+    "# variable to verify that results do not depend on it.",
+    "variable up equal 1.0e-6",
+    "",
+    "# Define the amount of random jiggle for atoms",
+    "# This prevents atoms from staying on saddle points",
+    "variable atomjiggle equal 1.0e-5",
+    "",
+    "# Uncomment one of these blocks, depending on what units",
+    "# you are using in LAMMPS and for output",
+    "",
+    "# metal units, elastic constants in eV/A^3",
+    "#units    metal",
+    "#variable cfac equal 6.2414e-7",
+    "#variable cunits string eV/A^3",
+    "",
+    "# metal units, elastic constants in GPa",
+    "units    metal",
+    "variable cfac equal 1.0e-4",
+    "variable cunits string GPa",
+    "",
+    "# real units, elastic constants in GPa",
+    "#units    real",
+    "#variable cfac equal 1.01325e-4",
+    "#variable cunits string GPa",
+    "",
+    "# Define minimization parameters",
+    "variable etol equal 0.0",
+    "variable ftol equal 1.0e-10" ]
+    if ace.elastic_relax == True:
+        command = command + [
+    "variable maxiter equal 100 # do the relaxation of atomic positions" ]
+    else:
+        command = command + [
+    "variable maxiter equal 0.0 # dont do relaxation of atomic positions"]
+
+    command = command + [
+    "variable maxeval equal 1000",
+    "variable dmax equal 1.0e-2",
+    "",
+    "boundary  p p p",
+    "box tilt large",
+    "",
+    "# generate the box and atom positions using a diamond lattice",
+    'read_data "'+positions+'"',
+    "",
+    "# Need to set mass to something, just to satisfy LAMMPS",
+    ] + ace.lammps_command_masses()
+    return command
+
+
+def lammps_ext_elastic_potential_mod(ace):
+    command = [
+    "# NOTE: This script can be modified for different pair styles",
+    "# See in.elastic for more info.",
+    "",
+    "# Choose potential"]
+
+    # change the potential
+    #print('kkkkkkk',ace.pot.split("_")[0])
+    if ace.pot.split("_")[0] == "n2p2":
+        command = command + ace.lammps_command_potential_n2p2()
+    elif ace.pot.split("_")[0] == "runner":
+        command = command + ace.lammps_command_potential_runner()
+    else: sys.exit('potential now known yet')
+
+    command = command + [
+    "",
+    "# Setup neighbor style",
+    "neighbor 1.0 nsq",
+    "neigh_modify once no every 1 delay 0 check yes",
+    "",
+    "# Setup minimization style",
+    "min_style       cg",
+    "min_modify       dmax ${dmax} line quadratic",
+    "",
+    "# Setup output",
+    "thermo    1",
+    "thermo_style custom step temp pe press pxx pyy pzz pxy pxz pyz lx ly lz vol",
+    "thermo_modify norm no"
+    ]
+    return command
+
+def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
 
-    ### mkdir tmpdir
+    ###############################################################
+    # find LAMMPS executable
+    ###############################################################
+    if ace.pot.split("_")[0] == "runner":
+        LAMMPS_COMMAND = my.scripts()+'/executables/lmp_fidis_par_runner'
+        #print("LAMMPS_COMMAND 1",LAMMPS_COMMAND)
+    else:
+        #print("LAMMPS_COMMAND 2",LAMMPS_COMMAND)
+        LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+    if ace.verbose:
+        print("LAMMPS_COMMAND",LAMMPS_COMMAND)
+    #sys.exit()
+
+    ###############################################################
+    # make tmpdir (/home/glensk/._tmp_lammps/)
+    ###############################################################
     tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
-    print('doint the calculation in lammps, externally, in folder',tmpdir)
+    print('doing the calculation in lammps, externally, in folder',tmpdir)
 
-    ### write input structure
+    ###############################################################
+    # write input structure (pos.lmp)
+    ###############################################################
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.set_calculator(None)
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
-    #sys.exit('pos now written or not')
+    if ace.verbose:
+        print('written ',tmpdir+'/pos.lmp')
 
-    ### write inputfile  # geopt is here added or not
-    lammps_write_inputfile(folder=tmpdir,filename='in.lmp',positions='pos.lmp',ace=ace)
+    ###############################################################
+    # write in.lmp (for mormal energy calculation)
+    ###############################################################
+    if not get_elastic_constants:
+        execute_file = 'in.lmp'
+        lammps_write_inputfile(folder=tmpdir,filename=execute_file,positions='pos.lmp',ace=ace)
+        if ace.verbose:
+            print('written ',tmpdir+'/'+execute_file)
     if ace.verbose > 1:
         print("written lammsp inputfile to ",tmpdir)
 
@@ -2028,46 +2257,149 @@ def lammps_ext_calc(atoms,ace):
         os.remove(tmpdir+"log.lammps")
 
 
-    #ka=ace.pot.split("_")[0]
-    #print('aa:'+ka+":",type(ka))
-    if ace.pot.split("_")[0] == "runner":
-        LAMMPS_COMMAND = my.scripts()+'/executables/lmp_fidis_par_runner'
-        #print("LAMMPS_COMMAND 1",LAMMPS_COMMAND)
-    else:
-        #print("LAMMPS_COMMAND 2",LAMMPS_COMMAND)
-        LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+    ###############################################################
+    # IF get elastic constants
+    ###############################################################
+    if get_elastic_constants:
+        execute_file = 'in.elastic'
+        if ace.verbose:
+            print('written ',tmpdir+'/potential.mod')
+        lammps_write_inputfile_from_command(folder=tmpdir,filename='potential.mod',command=lammps_ext_elastic_potential_mod(ace))
+        my.cp(scripts()+'/lammps_scripts/elastic/in.elastic',tmpdir+'/in.elastic')
+        my.cp(scripts()+'/lammps_scripts/elastic/displace.mod',tmpdir+'/displace.mod')
+        lammps_write_inputfile_from_command(folder=tmpdir,filename='init.mod',command=lammps_ext_elastic_init_mod(ace,positions='pos.lmp'))
+        if ace.verbose:
+            print('written ',tmpdir+'/'+execute_file)
 
-    #print("LAMMPS_COMMAND",LAMMPS_COMMAND)
-    #sys.exit()
-
+    ###############################################################
+    # cd to folder and run lammps
+    ###############################################################
     with cd(tmpdir):  # this cd's savely into folder
         # RUN LAMMPS
         # without SHELL no LD LIBRARY PATH
         #print('pwd',os.getcwd())
-        call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
+        if ace.verbose:
+            print(LAMMPS_COMMAND+" < "+execute_file+" > /dev/null")
+        call([LAMMPS_COMMAND+" < "+execute_file+" > /dev/null"],shell=True)
 
-        #print('pwd2',os.getcwd())
-        #sys.exit()
-        ### extract energy and forces
-        ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
-        ene=float(ene)
-        #print('ene',ene,'lammps in eV')
-        #print('ace units',ace.units)
-        if ace.units.lower() == 'ev':
-            pass
-        elif ace.units.lower() == 'hartree':
-            ene = ene*0.036749325
-        elif ace.units.lower() == 'hartree_pa':
-            ene = ene*0.036749325/atoms.get_number_of_atoms()
-        elif ace.units.lower() == 'mev_pa':
-            ene = ene*1000./atoms.get_number_of_atoms()
+        ###############################################################
+        # extract energy and forces
+        ###############################################################
+        if not get_elastic_constants:
+            ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
+            ene=float(ene)
+            #print('ene',ene,'lammps in eV')
+            #print('ace units',ace.units)
+            if ace.units.lower() == 'ev':
+                pass
+            elif ace.units.lower() == 'hartree':
+                ene = ene*0.036749325
+            elif ace.units.lower() == 'hartree_pa':
+                ene = ene*0.036749325/atoms.get_number_of_atoms()
+            elif ace.units.lower() == 'mev_pa':
+                ene = ene*1000./atoms.get_number_of_atoms()
+            else:
+                sys.exit('units '+ace.units+' unknown! Exit!')
+            #print('ene out',ene,ace.units)
         else:
-            sys.exit('units '+ace.units+' unknown! Exit!')
-        #print('ene out',ene,ace.units)
+            elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
+            #print(elastic_constants)
+            ene = elastic_constants
 
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
+
+
+def ase_repeat_structure(atoms,repeat):
+    atomsc = atoms.repeat(repeat)
+    cell_o = atoms.get_cell()
+    cell_n = cell_o * repeat
+
+
+    pos_o = atoms.get_positions()
+    for_o = atoms.get_forces()
+    nat_o = atoms.get_number_of_atoms()
+    #print()
+    #print(pos_o)
+    #print()
+    #print('sh old',pos_o.shape)
+    #print('nat_o',nat_o)
+    nat_n = nat_o*repeat**3
+    #print('nat_n',nat_n)
+    pos_n = np.zeros((nat_n,3))
+    for_n = np.zeros((nat_n,3))
+    #print('sh new',pos_n.shape)
+    ## create translation matrix
+    N1 = N2 = N3 = repeat
+    var1 = np.mgrid[ 0:N1, 0:N2, 0:N3 ]
+    ntrans1 = var1[0,:,:].flatten(1)
+    ntrans2 = var1[1,:,:].flatten(1)
+    ntrans3 = var1[2,:,:].flatten(1)
+    transmat = np.zeros( [ len(ntrans1),3] )
+    transmat[:,0] = ntrans1
+    transmat[:,1] = ntrans2
+    transmat[:,2] = ntrans3
+    #print('tr',transmat)
+    sclattpos = np.dot( transmat, cell_o )
+
+    for ij, sclatt in enumerate(sclattpos):
+        #print('-> ij',ij,sclatt)
+        for idx,i in enumerate(pos_o):
+            #print('ij',ij,'i',i,type(ij),type(i))
+            #print('-> pos_o',i,'--->',sclatt+i)
+            pos_n[ij*nat_o+idx] = sclatt + pos_o[idx]
+            for_n[ij*nat_o+idx] = for_o[idx]
+            #print('i',i,pos_n[ij+idx])
+
+    #print('pos c ??')
+    atomsc.set_positions(pos_n)
+    #print(atomsc.get_positions()[:5])
+    #sys.exit()
+    return atomsc,for_n
+
+
+def convert_energy(ene,units_in_,units_out_,frame,verbose=False):
+    known = [ "hartree_pa", "ev_pa", "mev_pa", 'ev', "hartree" ]
+    units_in  = units_in_.lower()
+    units_out = units_out_.lower()
+    if verbose:
+        print('units_in :',units_in)
+        print('units_out:',units_out)
+    if units_in not in known or units_out not in known:
+        print('units_in :',units_in)
+        print('units_out:',units_out)
+        print('known    :',known)
+        sys.exit("units_in or units_out not in known")
+
+    units_in_split  = units_in.split("_")
+    units_out_split = units_out.split("_")
+    #print('us in ',units_in_split,units_in_split[0])
+    #print('us out',units_out_split,units_out_split[0])
+    #print('ene in',ene)
+
+    if units_in_split[0] == units_out_split[0]:
+        pass
+    elif units_in_split[0] == 'ev' and units_out_split[0] == 'hartree':
+        if verbose:
+            print('111',aseunits.Hartree)
+        ene = ene / aseunits.Hartree
+    elif units_in_split[0] == 'hartree' and units_out_split[0] == 'ev':
+        ene = ene * aseunits.Hartree
+        if verbose:
+            print('2222',aseunits.Hartree)
+    else: sys.exit('conversion from to now yet implemented')
+    if verbose:
+        print('ene (1)',ene)
+
+    if len(units_in_split) == 2 and len(units_out_split) == 1:
+        ene = ene * frame.get_number_of_atoms()
+    elif len(units_in_split) == 1 and len(units_out_split) == 2:
+        ene = ene / frame.get_number_of_atoms()
+    if verbose:
+        print('ene (2)',ene)
+    return ene
+
 
 def get_latest_n2p2_pot():
     checkfor = scripts()+"/potentials/n2p2_v*ag/"

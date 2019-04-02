@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: debd44f17b3ea952030024c7ec49eea6ca1cec73
+# execution time: 0.346927881241 seconds.
+
+getEnergies_byLammps.py -wr -i SimpleAlDeformations_scf.runner

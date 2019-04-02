@@ -237,10 +237,10 @@ def install_lammps(args):
     subprocess.call(["make", 'mode=shlib',serialfidis])  # serialfidis can be fidis,serial,mpi
     os.chdir(args.install_folder+"/python")
     print()
-    print("************ install.py ************")
-    print('pwd:',os.getcwd())
-    subprocess.call(["chmod", 'u+x','install.py'])
-    subprocess.call(['./install.py'])
+    #print("************ install.py ************")  # is not necessary anymore since I added to $PYTHONPATH and LD_LIBRARY_PATH manually
+    #print('pwd:',os.getcwd())
+    #subprocess.call(["chmod", 'u+x','install.py'])
+    #subprocess.call(['./install.py'])
     return
 
 def install_n2p2(args):

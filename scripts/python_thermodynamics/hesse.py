@@ -520,10 +520,16 @@ def help(p = None):
 
 class hesseclass( object ):
     '''
+    you could do:
+    hessematrix = hesse.read_Hessematrix(try_readfile+"_hessematrix")
+    hes = hesse.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000)
+    free_ene      = hes.ene_atom
+    free_ene_cell = hes.ene_cell
+
     defines everything related to the harmonic approximation.
     defines eigenfrequencies and Free Energy from HesseMatrix
     '''
-    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True, Tmax = False):
+    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True, Tmax = False, T0shift_ev_atom = 0.):
         '''
         units of h (hessematrix): [eV/Angstrom^2]
         if HesseMatrix is imported units are expected in [hartree/bohrradius^2]
@@ -537,8 +543,15 @@ class hesseclass( object ):
         self.M = None
         self.freqs = False
         self.freqsunsorted = False
-        self.ene_atom = False
-        self.ene_cell = None
+        self.ene_atom = False                       # vecotr temperature and free ene
+        self.ene_cell = False                       # vector temperature and free ene
+        self.ene_atom_only = False                  # vecotr free ene (no temperature)
+        self.ene_cell_only = False                  # vector free ene (no temperature)
+        self.ene_atom_only_ev = False               # vecotr free ene (no temperature) in eV
+        self.ene_cell_only_ev = False               # vector free ene (no temperature) in eV
+        self.T0shift_ev_atom = T0shift_ev_atom
+        self.ene_atom_only_ev_T0shifted = False     # vecotr free ene (no temperature) in eV
+        self.ene_cell_only_ev_T0shifted = False     # vector free ene (no temperature) in eV
 
         self._verbose = None
         self.__verbose = None
@@ -557,11 +570,11 @@ class hesseclass( object ):
         self.writeoutput = False
 
         if args:
-            self._verbose = args.verbose
-            self.inputfile = args.inputfile
-            self.listin = args.elements
-            self._l = args.l
-            self._fm = args.fm
+            self._verbose   = args.verbose
+            self.inputfile  = args.inputfile
+            self.listin     = args.elements
+            self._l         = args.l
+            self._fm        = args.fm
             self.writeoutput = True  # when called from shell
 
         if self._verbose:
@@ -894,7 +907,12 @@ class hesseclass( object ):
         #plt.clim([-temp,temp])
 
     def get_freqs(self, tol = 1e-5): #1e-8):
-        ''' returnes Exact Freqs in [meV] of supercell without the three zero frequencies '''
+        ''' returnes Exact Freqs in [meV] of supercell without the three zero frequencies
+            needs
+                self.H (Hessematrix)
+                self.M (Mass matrix)
+
+        '''
         from numpy import linalg
 
         # You have: hbar(hartree/(bohrradius^2 u))^(1/2)
@@ -986,12 +1004,19 @@ class hesseclass( object ):
             out[T,1] = fqh_atom(TT, self.freqs )
 
         self.ene_atom = out
+        self.ene_atom_only = out[:,1]
+        self.ene_atom_only_ev = out[:,1]/1000.
+        self.ene_atom_only_ev_T0shifted = self.ene_atom_only_ev + self.T0shift_ev_atom     # vecotr free ene (no temperature) in eV
         return self.ene_atom
 
     def get_ene_cell(self):
         ''' returns free energy in [meV] as a function of T in [K] per supercell '''
         out = np.copy(self.get_ene_atom())
         out[:,1] = out[:,1]*float(self.atoms)
+        self.ene_cell = out
+        self.ene_cell_only = out[:,1]
+        self.ene_cell_only_ev = out[:,1]/1000.
+        self.ene_cell_only_ev_T0shifted = self.ene_cell_only_ev + self.T0shift_ev_atom*float(self.atoms)     # vecotr free ene (no temperature) in eV
         return out
 
     def write_freqs(self, filename = 'ExactFreqs'):
@@ -1028,7 +1053,7 @@ class hesseclass( object ):
             print("self.filename",filename)
             print("self._filename_addstring:",self._filename_addstring)
             print("---------------------------------------")
-        if self.ene_cell != None:
+        if type(self.ene_cell) != bool:
             np.savetxt(filename, self.ene_cell,fmt='%.12f')
 
 

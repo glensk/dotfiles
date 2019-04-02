@@ -26,7 +26,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     for i in checkfor:
         weights = 'weights.'+i+'.'+nr_+'.out'
         if not os.path.isfile(weights):
-            sys.exit(weights+" does not exist")
+            weights = '_weights/weights.'+i+'.'+nr_+'.out'
+            if not os.path.isfile(weights):
+                sys.exit(weights+" does not exist")
         else:
             print(weights,'exist')
 
@@ -41,10 +43,17 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     my.cp('input.data',folder+'/input.data')
     print('cp input.nn')
     my.cp('input.nn',folder+'/input.nn')
+    if os.path.isfile('learning-curve.out'):
+        print('cp learning-curve.out')
+        my.cp('learning-curve.out',folder+'/learning-curve.out')
+
+
     for i in checkfor:
         weights = 'weights.'+i+'.'+nr_+'.out'
+        if not os.path.isfile(weights):
+            weights = '_weights/weights.'+i+'.'+nr_+'.out'
         print('cp',weights)
-        my.cp(weights,folder+'/weights.'+i+'.out')
+        my.cp(weights,folder+'/weights.'+i+'.data')
     return
 
 if __name__ == '__main__':

@@ -68,6 +68,10 @@ for c in ["*"]:
         testf=0.2
         train_fraction=1.-testf
         lc = np.loadtxt(i) #+'/learning-curve.out')
+        #print('lc',lc,lc.shape)
+        if len(lc.shape) == 1:
+            lc = np.array([lc])
+        #print('lc.sh',lc.shape)
         len_ = len(lc[:,1])
         #print(lc[:,1])
         #print(len(lc[:,1]))
