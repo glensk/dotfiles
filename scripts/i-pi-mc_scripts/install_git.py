@@ -107,6 +107,7 @@ def git_clone(args,specify_depth = True,checkout=False):
     if args.branch != False:
         do = do + ["-b",args.branch]
     do = do + [args.git,args.install_folder]
+    print('do: ',do)
     subprocess.call(do)
     os.chdir(args.install_folder)
     print('pwd:',os.getcwd())
@@ -139,15 +140,17 @@ def install_lammps(args):
     '''
     if args.install == "lammps_runner":
         git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
-        extension = "runner"
+        extension = [ "runner" ]
     elif args.install == "lammps_n2p2":
         git_clone(args,specify_depth = True)
-        extension = "n2p2"
+        extension = [ "n2p2" ]
+        extension = [ "n2p2", "runner" ]
         n2p2_folder=args.sources_folder+"/n2p2"
         if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
+    print('extension:',extension)
 
     os.chdir(args.install_folder)
-    if extension == "n2p2":
+    if "n2p2" in extension:
         # ln -s $n2p2_folder lib/nnp
         # cp -r $n2p2_folder/src/interface/LAMMPS/src/USER-NNP src
         os.symlink(n2p2_folder, "lib/nnp")
@@ -160,18 +163,24 @@ def install_lammps(args):
 
 
     list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC" ]
-    if args.install == "lammps_runner": list = list + [ "yes-USER-RUNNER" ]
-    if args.install == "lammps_n2p2":   list = list + [ "yes-user-nnp" ]
+    if "runner" in extension:
+        list = list + [ "yes-USER-RUNNER" ]
+        my.cp(my.scripts()+"/lammps_scripts/src_runner/pair_runner.cpp", args.install_folder+'/src/pair_runner.cpp')
+        my.cp(my.scripts()+"/lammps_scripts/src_runner/pair_runner.h", args.install_folder+'/src/pair_runner.h')
+        my.cp(my.scripts()+"/lammps_scripts/src_runner/USER-RUNNER", args.install_folder+'/src/USER-RUNNER')
+    if "n2p2"   in extension:  list = list + [ "yes-user-nnp" ]
     for i in list:
         subprocess.call(["make", i])
 
     if args.install == "lammps_runner":
         my.sed("pair_runner.h","^#define MAXNEIGH.*","#define MAXNEIGH 500")
 
-    if extension == "runner": checkdir = 'USER-RUNNER'
-    if extension == "n2p2": checkdir = 'USER-NNP'
-    if not os.path.isdir(checkdir):
-        sys.exit(checkdir+" does not exist; Exit")
+    checkdir = []
+    if "runner" in extension: checkdir = checkdir + ['USER-RUNNER']
+    if "n2p2" in extension: checkdir = checkdir + ['USER-NNP']
+    for i in checkdir:
+        if not os.path.isdir(i):
+            sys.exit(checkdir+" does not exist; Exit")
 
     import socket
     hostname = socket.gethostname()
@@ -224,8 +233,8 @@ def install_lammps(args):
     executable = 'lmp_'+serialfidis
     if not os.path.isfile(executable):
         sys.exit(executable +" does not exist, .... was not created; Exit")
-    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_par_"+extension)
-    my.cp(executable,my.scripts()+"/executables/"+executable+"_par_"+extension)
+    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_par") #_"+extension)
+    my.cp(executable,my.scripts()+"/executables/"+executable+"_par") #_"+extension)
     print()
 
     ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
@@ -234,7 +243,9 @@ def install_lammps(args):
     print()
     print("************ make mode=shlib xxxx ************")
     os.chdir(args.install_folder+"/src")
-    subprocess.call(["make", 'mode=shlib',serialfidis])  # serialfidis can be fidis,serial,mpi
+    print()
+    bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+    print()
     os.chdir(args.install_folder+"/python")
     print()
     #print("************ install.py ************")  # is not necessary anymore since I added to $PYTHONPATH and LD_LIBRARY_PATH manually

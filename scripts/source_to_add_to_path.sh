@@ -37,7 +37,14 @@ if [ "`hostname`" = "mac" ];then
     export EIGEN_ROOT="/Users/glensk/miniconda2/" # conda install -c conda-forge gsl
 fi
 
-export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+#export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+if [ -e $SCR/executables/lmp_$onhost\_par ];then  # dont use "$SCR/ex..." quotes on fidis --> will not work
+    #echo 'does yes'
+    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost\_par"
+else
+    #echo 'does not'
+    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+fi
 export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
 export N2P2_PATH="$HOME/sources/n2p2/"
 
