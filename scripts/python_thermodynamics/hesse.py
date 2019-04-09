@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 # /Users/glensk/Dropbox/proj/current_parabola_to_morse/Al_displacements_2x2x2sc_quer/4.04Ang_0.3_quer_wirklich
 # hesse.py al -ene -p m --potparam 0.300 1.478 2.856
 # hesse.py al -ene -p mc1 --potparam 0.283 1.48 2.856 0.749 0.372
@@ -137,6 +137,9 @@ def fqh_cell(T, ExactFreqs = None):
     harmonic free energy for whole supercell
     '''
     kB=0.086173423
+    #print('exact freqs check',ExactFreqs)
+    if type(ExactFreqs) == bool:
+        sys.exit("exact freqs should not be bool")
     return np.sum(ExactFreqs/2+(kB*T*np.log(1-np.exp(-ExactFreqs/(kB * T)))) )
 
 def fqh_atom(T, ExactFreqs = None):
@@ -274,6 +277,7 @@ def read_Hessematrix(hessematrixfile = "HesseMatrix_sphinx" ):
     #You want:eV/angstrom^2
     #    *97.173617
     #    /0.010290859
+    #print('normal function')
     return hessematrix
 
 def qh_forces(dpos = None, h = None ):
@@ -520,10 +524,16 @@ def help(p = None):
 
 class hesseclass( object ):
     '''
+    you could do:
+    hessematrix = hesse.read_Hessematrix(try_readfile+"_hessematrix")
+    hes = hesse.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = False, Tmax=1000)
+    free_ene      = hes.ene_atom
+    free_ene_cell = hes.ene_cell
+
     defines everything related to the harmonic approximation.
     defines eigenfrequencies and Free Energy from HesseMatrix
     '''
-    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True, Tmax = False):
+    def __init__( self, args = False , listin = False, H = False, show_negative_eigenvalues = True, Tmax = False, T0shift_ev_atom = 0.):
         '''
         units of h (hessematrix): [eV/Angstrom^2]
         if HesseMatrix is imported units are expected in [hartree/bohrradius^2]
@@ -537,12 +547,20 @@ class hesseclass( object ):
         self.M = None
         self.freqs = False
         self.freqsunsorted = False
-        self.ene_atom = False
-        self.ene_cell = None
+        self.ene_atom = False                       # vecotr temperature and free ene
+        self.ene_cell = False                       # vector temperature and free ene
+        self.ene_atom_only = False                  # vecotr free ene (no temperature)
+        self.ene_cell_only = False                  # vector free ene (no temperature)
+        self.ene_atom_only_ev = False               # vecotr free ene (no temperature) in eV
+        self.ene_cell_only_ev = False               # vector free ene (no temperature) in eV
+        self.T0shift_ev_atom = T0shift_ev_atom
+        self.ene_atom_only_ev_T0shifted = False     # vecotr free ene (no temperature) in eV
+        self.ene_cell_only_ev_T0shifted = False     # vector free ene (no temperature) in eV
 
         self._verbose = None
         self.__verbose = None
         self.show_negative_eigenvalues = show_negative_eigenvalues
+        self.has_negative_eigenvalues = False
         self.listin = listin      # listin   --> 'Al', 'Si1Al31'
         self.inputfile = "Hessematrix_sphinx"
         self._inputfile_default = "Hessematrix_sphinx"
@@ -557,11 +575,11 @@ class hesseclass( object ):
         self.writeoutput = False
 
         if args:
-            self._verbose = args.verbose
-            self.inputfile = args.inputfile
-            self.listin = args.elements
-            self._l = args.l
-            self._fm = args.fm
+            self._verbose   = args.verbose
+            self.inputfile  = args.inputfile
+            self.listin     = args.elements
+            self._l         = args.l
+            self._fm        = args.fm
             self.writeoutput = True  # when called from shell
 
         if self._verbose:
@@ -894,7 +912,12 @@ class hesseclass( object ):
         #plt.clim([-temp,temp])
 
     def get_freqs(self, tol = 1e-5): #1e-8):
-        ''' returnes Exact Freqs in [meV] of supercell without the three zero frequencies '''
+        ''' returnes Exact Freqs in [meV] of supercell without the three zero frequencies
+            needs
+                self.H (Hessematrix)
+                self.M (Mass matrix)
+
+        '''
         from numpy import linalg
 
         # You have: hbar(hartree/(bohrradius^2 u))^(1/2)
@@ -934,16 +957,18 @@ class hesseclass( object ):
             print("-----------------------------------------")
 
         ### check if we have negative parts
+        #print('eigenvalues[:10]',ev[:10])  # disp 0.01 [-0.002159 -0.000444 ....  disp 0.03 [-0.002021 -0.000523
         if ev[0] < 0:
-            if self.show_negative_eigenvalues:
-                _printred("NEGATIVE EIGENVALUES!")
+            self.has_negative_eigenvalues = True
+            _printred("NEGATIVE EIGENVALUES! try global minimization: e = ace.ene(frame   ,atomrelax=True,minimizer='mh')")
+            if self.show_negative_eigenvalues == "True":
                 print("ev[0]:",ev[0])
                 print("ev:",ev)
             self.freqsNEGATIVE = ev*dynMatToFreq
-            if self.show_negative_eigenvalues:
+            if self.show_negative_eigenvalues == "True":
                 np.savetxt("ExactFreqs_NEGATIVE",self.freqsNEGATIVE)
                 print("np.sqrt(ev)*dynMatToFreq:",np.sqrt(ev)*dynMatToFreq)
-            sys.exit("ERROR: Negative Eigenvalues : "+str(ev[0]))
+            sys.exti("ERROR: Negative Eigenvalues : "+str(ev[0]))
 
         a = np.sqrt(ev)*dynMatToFreq
         aunsorted = np.sqrt(evunsorted)*dynMatToFreq
@@ -953,9 +978,9 @@ class hesseclass( object ):
         if a[0] == -0. : a[0] = 0
         if a[1] == -0. : a[1] = 0
         if a[2] == -0. : a[2] = 0
-        if a[0] != 0 : my.exit("a[0] "+str(a[0])+" is not 0")
-        if a[1] != 0 : my.exit("a[1] "+str(a[1])+" is not 0")
-        if a[2] != 0 : my.exit("a[2] "+str(a[2])+" is not 0")
+        if a[0] != 0 : my.exit("eigenvalue of hessematrix a[0] "+str(a[0])+" is not 0")
+        if a[1] != 0 : my.exit("eigenvalue of hessematrix a[1] "+str(a[1])+" is not 0")
+        if a[2] != 0 : my.exit("eigenvalue of hessematrix a[2] "+str(a[2])+" is not 0")
 
         out = np.nan_to_num(a[3:])
         outunsorted = np.nan_to_num(aunsorted)
@@ -986,12 +1011,19 @@ class hesseclass( object ):
             out[T,1] = fqh_atom(TT, self.freqs )
 
         self.ene_atom = out
+        self.ene_atom_only = out[:,1]
+        self.ene_atom_only_ev = out[:,1]/1000.
+        self.ene_atom_only_ev_T0shifted = self.ene_atom_only_ev + self.T0shift_ev_atom     # vecotr free ene (no temperature) in eV
         return self.ene_atom
 
     def get_ene_cell(self):
         ''' returns free energy in [meV] as a function of T in [K] per supercell '''
         out = np.copy(self.get_ene_atom())
         out[:,1] = out[:,1]*float(self.atoms)
+        self.ene_cell = out
+        self.ene_cell_only = out[:,1]
+        self.ene_cell_only_ev = out[:,1]/1000.
+        self.ene_cell_only_ev_T0shifted = self.ene_cell_only_ev + self.T0shift_ev_atom*float(self.atoms)     # vecotr free ene (no temperature) in eV
         return out
 
     def write_freqs(self, filename = 'ExactFreqs'):
@@ -1028,7 +1060,7 @@ class hesseclass( object ):
             print("self.filename",filename)
             print("self._filename_addstring:",self._filename_addstring)
             print("---------------------------------------")
-        if self.ene_cell != None:
+        if type(self.ene_cell) != bool:
             np.savetxt(filename, self.ene_cell,fmt='%.12f')
 
 

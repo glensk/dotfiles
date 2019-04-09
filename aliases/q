@@ -1,6 +1,15 @@
 #!/bin/sh
 squeue -u "$USER" --format "%A %t %C %M %Z %N" | awk '{printf "%8s %3s %4s %10s %10s (%-s)\n",$1,$2,$3,$4,$5,$6}' | sed 's|()||' | sort
 
+if [ "$1" = "+1d" ];then
+    echo "PD jos plus one day"
+    id=`squeue -u "$USER" --format "%A %t %C %M %Z %N" | awk '{printf "%8s %3s %4s %10s %10s (%-s)\n",$1,$2,$3,$4,$5,$6}' | sed 's|()||' | sort | grep "PD" | awk '{print $1}'`
+    for i in $id;do
+        echo "scontrol update JobId=$i StartTime=now+1days"
+        scontrol update JobId=$i StartTime=now+1days
+    done
+fi
+
 
 #echo
 #sacct -u $USER --starttime 2018-12-01 --format=JobID,state,WorkDir,Comment #| grep -v "[0-9].bat" | grep -v "[0-9].ext" | grep -v "[0-9]\.0"

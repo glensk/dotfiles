@@ -1,0 +1,47 @@
+par:        T (K)   Ediff (eV)        mdmin
+ene:    E_current   E_previous   Difference
+msg: Performing initial optimization.
+msg: Using existing minima file with 3 prior minima: minima.traj
+msg: Optimization: qn00000
+ene:  -9789.89152
+msg: Max distance to closest minimum: 0.000 A
+msg: Found previously found minimum.
+par:    1100.0000       0.5000            2
+msg: Molecular dynamics: md00001
+msg: Optimization: qn00001
+ene:  -9789.89302  -9789.89152     -0.00151
+msg: Max distance to last minimum: 0.343 A
+msg: Re-found last minimum.
+par:    1210.0000       0.5000            2
+msg: Molecular dynamics: md00002
+msg: Optimization: qn00002
+ene:  -9790.09661  -9789.89302     -0.20358
+msg: Max distance to last minimum: 0.624 A
+msg: Max distance to closest minimum: 0.131 A
+msg: Found previously found minimum.
+par:    1331.0000       0.5000            2
+msg: Restoring last minimum.
+msg: Molecular dynamics: md00003
+msg: Optimization: qn00003
+ene:  -9790.09961  -9789.89302     -0.20659
+msg: Max distance to last minimum: 0.599 A
+msg: Max distance to closest minimum: 0.111 A
+msg: Found previously found minimum.
+par:    1464.1000       0.5000            2
+msg: Restoring last minimum.
+msg: Molecular dynamics: md00004
+msg: Optimization: qn00004
+ene:  -9789.88830  -9789.89302      0.00472
+msg: Max distance to last minimum: 0.281 A
+msg: Re-found last minimum.
+par:    1610.5100       0.5000            2
+msg: Molecular dynamics: md00005
+msg: Optimization: qn00005
+ene:  -9790.10157  -9789.88830     -0.21327
+msg: Max distance to last minimum: 0.679 A
+msg: Max distance to closest minimum: 0.114 A
+msg: Found previously found minimum.
+par:    1771.5610       0.5000            2
+msg: Restoring last minimum.
+msg: Molecular dynamics: md00006
+msg: Optimization: qn00006

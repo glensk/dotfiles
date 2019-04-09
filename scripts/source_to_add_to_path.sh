@@ -24,18 +24,27 @@ _python_thermodynamics="$SCR/python_thermodynamics/"
 _ase_lammps="$HOME/sources/lammps_source_cosmo"
 _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
+_lammps_source="$HOME/sources/lammps_n2p2/"
 addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps1:$_lammps2:$_ase_lammps/python:$_ipi_source"
 
 export PATH="$PATH:$addeverywhere"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$_n2p2_lib"
-_n2p2_mac_predict="$HOME/miniconda2/lib"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ase_lammps/src:$_n2p2_lib:$_lammps_source/src"
+
 if [ "`hostname`" = "mac" ];then
+    _n2p2_mac_predict="$HOME/miniconda2/lib"
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$_n2p2_mac_predict"
     export GSL_ROOT="/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005" # conda install -c conda-forge gsl
     export EIGEN_ROOT="/Users/glensk/miniconda2/" # conda install -c conda-forge gsl
 fi
 
-export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+#export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+if [ -e $SCR/executables/lmp_$onhost\_par ];then  # dont use "$SCR/ex..." quotes on fidis --> will not work
+    #echo 'does yes'
+    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost\_par"
+else
+    #echo 'does not'
+    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+fi
 export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
 export N2P2_PATH="$HOME/sources/n2p2/"
 
@@ -44,6 +53,7 @@ if [ "$PYTHONPATH" = "" ];then
 else
     export PYTHONPATH="$PYTHONPATH:$addeverywhere"  # need "export" for python
 fi
+export PYTHONPATH="$PYTHONPATH:$_lammps_source/python"  # lammps with python
 export scripts=$SCR
 export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
 
