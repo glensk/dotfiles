@@ -9,11 +9,17 @@ def help(p = None):
     string = ''' helptext '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
-    #p.add_argument('-i','--inputfile', required=True, type=str,default=False, help="name of the inputfile inputfile")
+    p.add_argument('-f','--folder', required=False, type=str,default=False, help="folder of the simulation.pos_0.xyz file")
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
-def todo(args):
+def ipi2libatom(cdfolder=False):
+    if cdfolder != False:
+        if not os.path.isdir(cdfolder):
+            sys.exit("cdfolder "+str(cdfolder)+" does not exist!")
+        os.chdir(cdfolder)
+        print("os.getcwd():",os.getcwd())
+
     datafile_try = [ 'data.lmp', 'data.runnerformat.lmp' ]
     datafile = False
     for i in datafile_try:
@@ -50,16 +56,13 @@ def todo(args):
     myutils.cp("simulation.pos_0.xyz","simulation.pos_libatom.xyz")
     print('sed... ??')
     import subprocess
-    subprocess.call(['sed --in-place \'s|#.*|Lattice='+str(a)+" 0 0 "+str(d)+" "+str(b)+" 0 "+str(d)+" "+str(f)+" "+str(c)+'|g\' simulation.pos_libatom.xyz'],shell=True)
+    subprocess.call(['sed --in-place \'s|#.*|Lattice="'+str(a)+" 0 0 "+str(d)+" "+str(b)+" 0 "+str(d)+" "+str(f)+" "+str(c)+'"|g\' simulation.pos_libatom.xyz'],shell=True)
     #myutils.sed("simulation.pos_libatom.xyz",'#.*',"Lattice="+str(a)+" 0 0 "+str(d)+" "+str(b)+" 0 "+str(d)+" "+str(f)+" "+str(c))  # this is too slow
-
-    #if not os.path.isfile(args.inputfile):
-    #    sys.exit("inputfile "+args.inputfile+" does not exist")
     return
 
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
-    todo(args)
+    ipi2libatom(cdfolder=args.folder)
 
 
