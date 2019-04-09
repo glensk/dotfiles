@@ -48,7 +48,9 @@ def todo(args):
     print()
     print('cp...')
     myutils.cp("simulation.pos_0.xyz","simulation.pos_libatom.xyz")
-    print('sed...')
+    print('sed... ??')
+    import subprocess
+    subprocess.call(['sed --in-place \'s|#.*|Lattice='+str(a)+" 0 0 "+str(d)+" "+str(b)+" 0 "+str(d)+" "+str(f)+" "+str(c)+'|g\' simulation.pos_libatom.xyz'],shell=True)
     #myutils.sed("simulation.pos_libatom.xyz",'#.*',"Lattice="+str(a)+" 0 0 "+str(d)+" "+str(b)+" 0 "+str(d)+" "+str(f)+" "+str(c))  # this is too slow
 
     #if not os.path.isfile(args.inputfile):
