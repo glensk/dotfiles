@@ -9,7 +9,7 @@ def help(p = None):
     string = ''' helptext '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
-    p.add_argument('-i','--inputfile', required=True, type=str,default=False, help="name of the inputfile inputfile")
+    #p.add_argument('-i','--inputfile', required=True, type=str,default=False, help="name of the inputfile inputfile")
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
@@ -45,7 +45,11 @@ def todo(args):
     print('-->a',a,b,c,'def',d,e,f)
     print()
     print('-->x',a,"0","0",d,b,"0",d,f,c)
-    myutils.sed(
+    print()
+    print('cp...')
+    myutils.cp("simulation.pos_0.xyz","simulation.pos_libatom.xyz")
+    print('sed...')
+    #myutils.sed("simulation.pos_libatom.xyz",'#.*',"Lattice="+str(a)+" 0 0 "+str(d)+" "+str(b)+" 0 "+str(d)+" "+str(f)+" "+str(c))  # this is too slow
 
     #if not os.path.isfile(args.inputfile):
     #    sys.exit("inputfile "+args.inputfile+" does not exist")
