@@ -1,0 +1,44 @@
+#########################################################
+# from https://github.com/felixmusil/deploy_glosim
+#########################################################
+
+#########################################################
+# INSTALL PYTHON
+#########################################################
+
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+bash ~/miniconda.sh -b -p $HOME/miniconda
+export PATH="$HOME/miniconda/bin:$PATH"
+
+conda create -n gap python=2.7 -y
+source activate gap
+pip install ase ipython
+pip install numpy==1.15.1
+
+#########################################################
+# INSTALL QUIP
+#########################################################
+Don't forget to clone the deploy_glosim repo into the git folder  ( cd $HOME/sources; git clone https://github.com/felixmusil/deploy_glosim)
+sudo apt-get install gcc gfortran libblas-dev liblapack-dev
+## for mac do the following instead of sudo apt-get...
+# sudo port install gcc6
+# sudo port select --set gcc mp-gcc6
+# sudo port install openblas
+
+export GIT_PATH=/local/git
+export QUIP_ARCH=linux_x86_64_gfortran_openmp # or darwin_x86_64_gfortran_openmp for mac
+export MACHINE=local # fidis
+cd $GIT_PATH 
+git clone --recursive https://github.com/libAtoms/QUIP.git
+cd QUIP
+git checkout 1d7624fd4023b5fd44c26d0335616f32fc714a64 
+cp -r $GIT_PATH/deploy_glosim/files/GAP* $GIT_PATH/QUIP/src/
+mkdir build
+mkdir build/$QUIP_ARCH
+cp -r $GIT_PATH/deploy_glosim/files/GAP* $GIT_PATH/QUIP/src/
+cp $GIT_PATH/deploy_glosim/files/Makefile.inc_${MACHINE} $GIT_PATH/QUIP/build/$QUIP_ARCH/Makefile.inc
+make 
+make quippy
+make install-quippy
+
+
