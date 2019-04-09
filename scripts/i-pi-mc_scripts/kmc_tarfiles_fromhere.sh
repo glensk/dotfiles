@@ -1,6 +1,6 @@
 #!/bin/sh
 hier=`pwd`
-tarfiles="KMC_QCACHE KMC_ECACHE KMC_AL6XXX"
+tarfiles="KMC_QCACHE KMC_ECACHE KMC_AL6XXX simulation.pos_0.xyz"
 outof=`echo "$tarfiles" | wc -l`
 now=1
 for tar in $tarfiles;do
@@ -14,9 +14,9 @@ for tar in $tarfiles;do
         cd $hier
         cd $folder
         pwd
-        [ "$tar" == "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX_out" ] && rm KMC_AL6XXX_out   # just if previous KMC_AL6xxx_out existed 
-        [ "$tar" == "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX" ] && kmc_get_vacancy_radius_vs_time.sh 
-        [ "$tar" == "KMC_AL6XXX" ] && awk '{print $1*2.4e-17,$3}' KMC_AL6XXX > KMC_AL6XXX_out
+        #[ "$tar" == "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX_out" ] && rm KMC_AL6XXX_out   # just if previous KMC_AL6xxx_out existed 
+        #[ "$tar" == "KMC_AL6XXX" ] && [ -e "KMC_AL6XXX" ] && kmc_get_vacancy_radius_vs_time.sh 
+        #[ "$tar" == "KMC_AL6XXX" ] && awk '{print $1*2.4e-17,$3}' KMC_AL6XXX > KMC_AL6XXX_out
         rm -f .sendx_*
 
         #du -sh $tar 
