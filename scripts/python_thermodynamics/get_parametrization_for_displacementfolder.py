@@ -109,6 +109,7 @@ class get_all_disps():
             alat=False,
             dofor=False,
             verbose=False,
+            verbose2=False,
             only_return_parametrization_file=False,
 
             folder_alat_lattice_T0K = False,
@@ -141,6 +142,7 @@ class get_all_disps():
         self.alat = alat
         self.dofor = dofor
         self.verbose = verbose
+        self.verbose2 = verbose2
         self.only_return_parametrization_file = only_return_parametrization_file
         self.folder_alat_lattice_T0K = folder_alat_lattice_T0K
         self.shift_parametrization_to_alat = shift_parametrization_to_alat
@@ -324,12 +326,20 @@ class get_all_disps():
         # create POSITIONs  ( which combines all positions )
         ###########################################################################
         self.disps = []
-        disp_vs_force1 = np.zeros((len(self.folder_alldisp),2))
-        disp_vs_force2 = np.zeros((len(self.folder_alldisp),2))
-        disp_vs_force1_110 = np.zeros((len(self.folder_alldisp),2))
-        disp_vs_force2_110 = np.zeros((len(self.folder_alldisp),2))
-        self.disp_vs_force = np.zeros((len(self.folder_alldisp)*2,2))
-        self.disp_vs_force_110 = np.zeros((len(self.folder_alldisp)*2,2))
+        disp_vs_force1          = np.zeros((len(self.folder_alldisp),2))
+        disp_vs_force2          = np.zeros((len(self.folder_alldisp),2))
+        disp_vs_force1_110      = np.zeros((len(self.folder_alldisp),2))
+        disp_vs_force2_110      = np.zeros((len(self.folder_alldisp),2))
+        self.disp_vs_force      = np.zeros((len(self.folder_alldisp)*2,2))
+        self.disp_vs_force_110  = np.zeros((len(self.folder_alldisp)*2,2))
+        self.dist_0_05_05_at0   = np.zeros((len(self.folder_alldisp),3))
+        self.dist_0_05_05_at1   = np.zeros((len(self.folder_alldisp),3))
+
+        self.force_0_05_05      = np.zeros((len(self.folder_alldisp),3))
+        self.force_45_45_0      = np.zeros((len(self.folder_alldisp),3))
+        self.force_0_05_05_rest = np.zeros((len(self.folder_alldisp),3))
+        self.force_05_05_0_rest = np.zeros((len(self.folder_alldisp),3))
+
         da = len(self.folder_alldisp)
         if self.verbose:
             print()
@@ -436,7 +446,6 @@ class get_all_disps():
             #print('idx_05_05_0 (the index ot the atom at 05_05_0)',idx_05_05_0)
             p_05_05_0 = pos[idx_05_05_0]
             f_05_05_0 = forces[idx_05_05_0]
-            #print('idx',disp,f_05_05_0)
 
             idx_1_1_0 = getindex(pos/self.alat,np.array([1.,1.,0]))
             p_1_1_0 = pos[idx_1_1_0]
@@ -447,39 +456,51 @@ class get_all_disps():
                 print("p_05_05_0",p_05_05_0)
                 print("f_05_05_0",f_05_05_0)
 
-            try:
-                idx_45_45_0 = getindex(pos/self.alat,np.array([round(self.sc-0.5,12),round(self.sc-0.5,12),0]))
-                #print('idx_-05_-05_0 (the index ot the atom at -05_-05_0)',idx_45_45_0)
-            except IndexError:
-                print("ERROR, alat for idx_45_45_0",alat)
-                print("search:",np.array([round(self.sc-0.5,12),round(self.sc-0.5,12),0])) #round(a,14)
-                print("pos",pos/alat)
-                sys.exit()
-
-            try:
-                idx_40_40_0 = getindex(pos/self.alat,np.array([round(self.sc-1.0,12),round(self.sc-1.0,12),0]))
-                #print('idx_-05_-05_0 (the index ot the atom at -05_-05_0)',idx_45_45_0)
-            except IndexError:
-                print("ERROR, alat for idx_40_40_0",alat)
-                print("search:",np.array([round(self.sc-1.0,12),round(self.sc-1.0,12),0])) #round(a,14)
-                print("pos",pos/alat)
-                sys.exit()
+            #def dosearch():
 
 
+            def dosearch(search,str,pos,selfalat):
+                try:
+                    #idx_45_45_0 = getindex(pos/self.alat,np.array([round(self.sc-0.5,12),round(self.sc-0.5,12),0]))
+                    idx_45_45_0 = getindex(pos/selfalat,np.array(search))
+                    #print('idx_-05_-05_0 (the index ot the atom at -05_-05_0)',idx_45_45_0)
+                except IndexError:
+                    print("ERROR, alat for "+str,selfalat)
+                    print("search:",np.array(search)) #round(a,14)
+                    print("pos",pos/selfalat)
+                    sys.exit()
+                return idx_45_45_0
 
+            idx_45_45_0 = dosearch([round(self.sc-0.5,12),round(self.sc-0.5,12),0],"idx_45_45_0",pos,self.alat)
+            p_45_45_0   =    pos[idx_45_45_0]
+            f_45_45_0   = forces[idx_45_45_0]
+
+            idx_40_40_0 = dosearch([round(self.sc-1.0,12),round(self.sc-1.0,12),0],"idx_40_40_0",pos,self.alat)
+            p_40_40_0   =    pos[idx_40_40_0]
+            f_40_40_0   = forces[idx_40_40_0]
+
+            idx_45_0_45 = dosearch([round(self.sc-0.5,12),0,round(self.sc-0.5,12)],"idx_45_0_45",pos,self.alat)
+            p_45_0_45   =    pos[idx_45_0_45]
+            f_45_0_45   = forces[idx_45_0_45]
 
             if self.verbose > 1:
                 print("idx_45_45_0",idx_45_45_0)
-
-            p_45_45_0 = pos[idx_45_45_0]
-            f_45_45_0 = forces[idx_45_45_0]
-            f_40_40_0 = forces[idx_40_40_0]
-            if self.verbose:
                 print('idx',disp,'repulsive force:',f_05_05_0,'attractive force:',f_45_45_0)
 
             idx_0_05_05 = getindex(pos/self.alat,np.array([0,0.5,0.5]))
             p_0_05_05 = pos[idx_0_05_05]
             f_0_05_05 = forces[idx_0_05_05]
+
+            d_0_05_05_at0 = p_0_05_05-pos[0]
+            d_0_05_05_at1 = p_0_05_05 - p_05_05_0
+
+            self.dist_0_05_05_at0[idx] = d_0_05_05_at0
+            self.dist_0_05_05_at1[idx] = d_0_05_05_at1
+            self.force_0_05_05[idx] = f_0_05_05
+            self.force_45_45_0[idx] = f_45_45_0
+            if self.verbose2:
+                print('idx',disp,'f_0_05_05:',f_0_05_05,'attractive force:',d_0_05_05_at0, LA.norm(d_0_05_05_at0))
+
 
 
 
@@ -554,7 +575,6 @@ class get_all_disps():
             self.disp_vs_force_110[idx+da,1] = disp_vs_force2_110[idx,1]
 
 
-
         self.disp_vs_force = restrict_xrange_of_array(array = self.disp_vs_force,
                          xmin = self.nndist - self.rmin_distmax,
                          xmax = self.nndist + self.rmax_distmax)
@@ -596,8 +616,8 @@ class get_all_disps():
 
         fit_compare = np.zeros((len(fit.fit),6))
         fit_compare[:,0] = fit.fit[:,0]
-        fit_compare[:,1] = self.disp_vs_force[:,1]
-        fit_compare[:,2] = fit.fit[:,1]
+        fit_compare[:,1] = self.disp_vs_force[:,1]   # actual (VASP) forces
+        fit_compare[:,2] = fit.fit[:,1]              # fitted morse forces
         if type(fitmc1) != bool:
             fit_compare[:,3] = fitmc1.fit[:,1]
         fit_compare[:,4] = fit_compare[:,1] - fit.fit[:,1]
@@ -659,7 +679,84 @@ class get_all_disps():
             if self.only_return_parametrization_file == True:
                 return parametrizationfile_morse
 
+        ##############################################################################
+        # force on 0_05_05 (previously tox)
+        # Weight 1Morse 05_05_0
+        # Weight 4Morse 0_05_05
+        ##############################################################################
+        if False:
+            print('dist between pos[0] and pos_0_05_05')
+            params = fit.parameters
+            print('p',params)
+            for idx,i in enumerate(self.dist_0_05_05_at0):
+                fm = hesse.Morse_derivative(LA.norm(i), *params)
+                fv = hesse.getefvec(i,params,pot = 'm')
+                self.force_0_05_05_rest[idx] = self.force_0_05_05[idx] + fv[1]
+                print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
+            #print(self.dist_0_05_05_at0)
+            print()
+            print('force on 0_05_05       remaining forces on 0_05_05          this should be a sum of')
+            print('                       (after substr. morse)                a*vec at_000 + b*vec at_05050')
+            for idx,i in enumerate(self.dist_0_05_05_at0):
+                print(self.force_0_05_05[idx],self.force_0_05_05_rest[idx],self.dist_0_05_05_at0[idx],self.dist_0_05_05_at1[idx])
+            print()
+            for idx,i in enumerate(self.dist_0_05_05_at0):
+                print(self.force_0_05_05[idx],abs(self.force_0_05_05_rest[idx]),abs(self.force_0_05_05_rest[idx]).sum()*4.)
 
+            from lmfit import Model,minimize
+            print('alat',self.alat,self.alat/np.sqrt(2.))
+            print(disp_vs_force1)
+            morsemodel = Model(hesse.Morse_derivative)
+            morsemodel.set_param_hint('re' ,value=self.alat/np.sqrt(2.), vary=False)
+            morsemodel.set_param_hint('De' ,value=0.25, min=0.01, max=0.5)
+            morsemodel.set_param_hint('aa' ,value=1.5,  min=1.0,  max=3.0)
+
+
+            r1 = disp_vs_force1[:,0]
+            y1 = disp_vs_force1[:,1]
+            #for idx,i in enumerate(r1):print(r1[idx],y1[idx])
+            result = morsemodel.fit(y1, r=r1)
+            print('vgl (obtained by fit)',params)
+            print('vgl (only repulsive )',np.round([result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')],3))
+
+            r1a = disp_vs_force2[:,0]
+            y1a = disp_vs_force2[:,1]
+            rall = np.concatenate((r1, r1a), axis=None)
+            yall = np.concatenate((y1, y1a), axis=None)
+            #for idx,i in enumerate(rall):print(rall[idx],yall[idx])
+            result = morsemodel.fit(yall, r=rall)
+            print('vgl (all forces     )',np.round([result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')],3))
+
+            raddx =  LA.norm(self.dist_0_05_05_at0,axis=1)
+            raddy = -LA.norm(abs(self.force_0_05_05),axis=1)
+            np.savetxt(self.dofor+'/disp_vs_forces_weighted.dat',np.transpose([raddx,raddy]))
+            for i in [1,2,3,4]:
+                rall = np.concatenate((rall, raddx), axis=None)
+                yall = np.concatenate((yall, raddy), axis=None)
+                #for idx,i in enumerate(rall):print(rall[idx],yall[idx])
+                result = morsemodel.fit(yall, r=rall)
+                print('vgl (all forces '+str(i)+'   )',np.round([result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')],3))
+            params_weighted = [result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')]
+            np.savetxt(self.dofor+'/disp_fit.parameters_morse_weighted.dat',params_weighted)
+            print('saved in',self.dofor)
+            print("STILL DID NOT INCLUDE THE ATTRACTIVE PART TIMES 4")
+            for idx,i in enumerate(self.dist_0_05_05_at0):
+                fm = hesse.Morse_derivative(LA.norm(i), *params_weighted)
+                fv = hesse.getefvec(i,params,pot = 'm')
+                self.force_0_05_05_rest[idx] = self.force_0_05_05[idx] + fv[1]
+                print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
+            sys.exit('this parametrization, even for T=0K displacements, is not optimal!, try to add attractive forces on 0_45_45')
+
+
+        #print('force on 0_05_05 after subtracting mores')
+        #print('fp',*fit.parameters)
+        #fp = hesse.Morse_derivative(2.9, *fit.parameters)
+        #print('fp 2.9 ',fp)
+        #fp = hesse.Morse_derivative(2.95, *fit.parameters)
+        #print('fp 2.95',fp)
+        #print('at @ 05_05_0 -> pushes 0_05_05 in x and z')
+        #print('at @ 00_00_0 -> pushes 0_05_05 in y and z and in sec approx in x y ')
+        #sys.exit()
 
 
         ### here some stoff for disp 0.1
@@ -877,6 +974,7 @@ if __name__ == '__main__':
 
 
         p.add_argument('-v','--verbose',help='verbose', action='count', default=False)
+        p.add_argument('-v2','--verbose2',help='verbose2', action='count', default=False)
         return p
     p = help()
     args = p.parse_args()
@@ -898,6 +996,7 @@ if __name__ == '__main__':
                 sc=args.supercell,
                 dofor=args.folder,
                 verbose=args.verbose,
+                verbose2=args.verbose2,
                 only_return_parametrization_file=args.only_return_parametrization_file,
 
                 folder_alat_lattice_T0K = args.folder_alat_lattice_T0K,

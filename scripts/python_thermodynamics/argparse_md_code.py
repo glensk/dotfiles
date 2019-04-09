@@ -52,7 +52,7 @@ def help(p = None):
     - argparse_md_code.py -rp $testfolder_al_disp/POSITIONs -v -D_mor 0.2793 -a_mor 1.432673 -a 4.13 -N 5 -waf
     - argparse_md_code.py  -f $basefolder/ti/ti_original_hesse/Al/lambda0.0_20604/ -v -wa  (for lambda 0.0 and 1.0 gives same ene std harm)
 
-    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2   # this is the old parametrization
+    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2   # parametrization from the 2x2x2 supercell displacements (I think)
 	==> (Al) ene_std:   8.8 for_std:  0.157  dudl/2:   7.4  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43267  D_mor 0.27930 ||(PRL NO )
 	==> (Ag) ene_std:  16.6 for_std:  0.447  dudl/2:  26.8  ||| alat 4.310 ||| alat_mor 4.250 a_mor 1.86396  D_mor 0.18942 ||(PRL NO )
 	==> (Au) ene_std:  19.4 for_std:  0.299  dudl/2:  24.9  ||| alat 4.250 ||| alat_mor 4.250 a_mor 1.86396  D_mor 0.18942 ||(PRL YES)
@@ -63,19 +63,7 @@ def help(p = None):
 	==> (Pt) ene_std:  31.8 for_std:  0.421  dudl/2:  34.8  ||| alat 4.100 ||| alat_mor 4.100 a_mor 1.78089  D_mor 0.28964 ||(PRL NO )
 	==> (Rh) ene_std:   6.1 for_std:  0.201  dudl/2:   3.2  ||| alat 3.980 ||| alat_mor 3.980 a_mor 1.78328  D_mor 0.22483 ||(PRL YES)
 
-    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5_alat_mor_T0K  # seems a mixed blessing, sometimes works, sometimes not...
-  	==> (Al) ene_std:   4.0 for_std:  0.104  dudl/2:   1.9  ||| alat 4.130 ||| alat_mor 4.054 a_mor 1.51085  D_mor 0.22675 ||(PRL YES)
-  	==> (Ag) ene_std:   7.1 for_std:  0.240  dudl/2:   9.9  ||| alat 4.310 ||| alat_mor 4.170 a_mor 2.02203  D_mor 0.07629 ||(PRL NO )
-  	==> (Au) ene_std:  11.3 for_std:  0.185  dudl/2:  11.8  ||| alat 4.250 ||| alat_mor 4.170 a_mor 1.91739  D_mor 0.17024 ||(PRL YES)
-  	==> (Cu) ene_std:   7.0 for_std:  0.260  dudl/2:   0.3  ||| alat 3.750 ||| alat_mor 3.644 a_mor 1.99523  D_mor 0.12707 ||(PRL YES)
-  	==> (Ir) ene_std:  21.7 for_std:  0.708  dudl/2:   4.7  ||| alat 3.990 ||| alat_mor 3.880 a_mor 1.98876  D_mor 0.22729 ||(PRL YES)
-  	==> (Pb) ene_std:   3.3 for_std:  0.086  dudl/2:   0.1  ||| alat 5.130 ||| alat_mor 5.035 a_mor 1.72439  D_mor 0.04996 ||(PRL YES)
-  	==> (Pd) ene_std:   8.0 for_std:  0.312  dudl/2:   1.7  ||| alat 4.100 ||| alat_mor 3.985 a_mor 1.85532  D_mor 0.16740 ||(PRL YES)
-  	==> (Pt) ene_std:  14.3 for_std:  0.358  dudl/2:   8.1  ||| alat 4.100 ||| alat_mor 3.980 a_mor 1.86887  D_mor 0.23838 ||(PRL YES)
-  	==> (Rh) ene_std:  20.0 for_std:  0.569  dudl/2:   3.9  ||| alat 3.980 ||| alat_mor 3.840 a_mor 1.89434  D_mor 0.17953 ||(PRL NO )
-
-    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5_alat_mor_current_alat  # consistent lattice with morse
-    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5   # (this is actually similar)
+    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5   # parametrization from the 5x5x5 supercells
         ==> (Al) ene_std:   6.5 for_std:  0.110  dudl/2:   5.3  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.51085  D_mor 0.22675 ||(PRL YES)
         ==> (Ag) ene_std:   2.8 for_std:  0.063  dudl/2:   3.4  ||| alat 4.310 ||| alat_mor 4.310 a_mor 2.02203  D_mor 0.07629 ||(PRL NO )
         ==> (Au) ene_std:  17.8 for_std:  0.272  dudl/2:  22.7  ||| alat 4.250 ||| alat_mor 4.250 a_mor 1.91739  D_mor 0.17024 ||(PRL YES)
@@ -86,12 +74,24 @@ def help(p = None):
         ==> (Pt) ene_std:  26.2 for_std:  0.346  dudl/2:  28.4  ||| alat 4.100 ||| alat_mor 4.100 a_mor 1.86887  D_mor 0.23838 ||(PRL NO )
         ==> (Rh) ene_std:   6.8 for_std:  0.217  dudl/2:   3.2  ||| alat 3.980 ||| alat_mor 3.980 a_mor 1.89434  D_mor 0.17953 ||(PRL YES)
 
+    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5_alat_mor_T0K  # seems a mixed blessing, sometimes works, sometimes not...
+  	==> (Al) ene_std:   4.0 for_std:  0.104  dudl/2:   1.9  ||| alat 4.130 ||| alat_mor 4.054 a_mor 1.51085  D_mor 0.22675 ||(PRL YES)+
+  	==> (Ag) ene_std:   7.1 for_std:  0.240  dudl/2:   9.9  ||| alat 4.310 ||| alat_mor 4.170 a_mor 2.02203  D_mor 0.07629 ||(PRL NO )--
+  	==> (Au) ene_std:  11.3 for_std:  0.185  dudl/2:  11.8  ||| alat 4.250 ||| alat_mor 4.170 a_mor 1.91739  D_mor 0.17024 ||(PRL YES)+
+  	==> (Cu) ene_std:   7.0 for_std:  0.260  dudl/2:   0.3  ||| alat 3.750 ||| alat_mor 3.644 a_mor 1.99523  D_mor 0.12707 ||(PRL YES)--
+  	==> (Ir) ene_std:  21.7 for_std:  0.708  dudl/2:   4.7  ||| alat 3.990 ||| alat_mor 3.880 a_mor 1.98876  D_mor 0.22729 ||(PRL YES)--
+  	==> (Pb) ene_std:   3.3 for_std:  0.086  dudl/2:   0.1  ||| alat 5.130 ||| alat_mor 5.035 a_mor 1.72439  D_mor 0.04996 ||(PRL YES)-
+  	==> (Pd) ene_std:   8.0 for_std:  0.312  dudl/2:   1.7  ||| alat 4.100 ||| alat_mor 3.985 a_mor 1.85532  D_mor 0.16740 ||(PRL YES)-
+  	==> (Pt) ene_std:  14.3 for_std:  0.358  dudl/2:   8.1  ||| alat 4.100 ||| alat_mor 3.980 a_mor 1.86887  D_mor 0.23838 ||(PRL YES)-
+  	==> (Rh) ene_std:  20.0 for_std:  0.569  dudl/2:   3.9  ||| alat 3.980 ||| alat_mor 3.840 a_mor 1.89434  D_mor 0.17953 ||(PRL NO )-
+
+    - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5_alat_mor_current_alat  # consistent lattice with morse
     - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2 -gpf_dispfolder_5x5x5 -gpf_dispfolder_cf110 999
-    ==> (Al) ene_std:   7.1 for_std:  0.121  dudl/2:   5.8  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.48337  D_mor 0.24190 ||(PRL YES)-
+    ==> (Al) ene_std:   7.1 for_std:  0.121  dudl/2:   5.8  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.48337  D_mor 0.24190 ||(PRL YES)o
     ==> (Ag) ene_std:   2.5 for_std:  0.058  dudl/2:   2.7  ||| alat 4.310 ||| alat_mor 4.310 a_mor 2.04471  D_mor 0.07274 ||(PRL NO )+
     ==> (Au) ene_std:  16.0 for_std:  0.239  dudl/2:  20.1  ||| alat 4.250 ||| alat_mor 4.250 a_mor 1.96352  D_mor 0.15298 ||(PRL YES)+  (std 6.7 possible)
     ==> (Cu) ene_std:   1.9 for_std:  0.044  dudl/2:   0.5  ||| alat 3.750 ||| alat_mor 3.750 a_mor 2.00776  D_mor 0.12481 ||(PRL YES)+
-    ==> (Ir) ene_std:   9.4 for_std:  0.311  dudl/2:   6.2  ||| alat 3.990 ||| alat_mor 3.990 a_mor 1.94468  D_mor 0.25800 ||(PRL YES)-
+    ==> (Ir) ene_std:   9.4 for_std:  0.311  dudl/2:   6.2  ||| alat 3.990 ||| alat_mor 3.990 a_mor 1.94468  D_mor 0.25800 ||(PRL YES)+
     ==> (Pb) ene_std:   3.8 for_std:  0.074  dudl/2:   2.2  ||| alat 5.130 ||| alat_mor 5.130 a_mor 1.56174  D_mor 0.07429 ||(PRL NO )-
     ==> (Pd) ene_std:   6.8 for_std:  0.099  dudl/2:   2.6  ||| alat 4.100 ||| alat_mor 4.100 a_mor 1.89152  D_mor 0.15303 ||(PRL YES)+
     ==> (Pt) ene_std:  20.2 for_std:  0.273  dudl/2:  21.2  ||| alat 4.100 ||| alat_mor 4.100 a_mor 1.97067  D_mor 0.18950 ||(PRL YES)+
@@ -221,9 +221,13 @@ def help(p = None):
        help=argparse.SUPPRESS, default=False)
 
 
+    p.add_argument('-s_a_mor',          '--sweep_a_mor', required=False, default=False, type=float,
+       help='sweep a_mor variable and return for_std as funcion of a_mor')
     p.add_argument('-gpf_dispfolder_setfolder',          '--gpf_dispfolder_setfolder', required=False, default=False, type=str,
        help=argparse.SUPPRESS)
     p.add_argument('-gpf_dispfolder_5x5x5',              '--gpf_dispfolder_5x5x5', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
+    p.add_argument('-gpf_dispfolder_5x5x5_weighted',     '--gpf_dispfolder_5x5x5_weighted', required=False, action='store_true',
        help=argparse.SUPPRESS, default=False)
     p.add_argument('-gpf_dispfolder_5x5x5_alat_mor_T0K', '--gpf_dispfolder_5x5x5_alat_mor_T0K', required=False, action='store_true',
        help=argparse.SUPPRESS, default=False)
@@ -566,6 +570,7 @@ def obtain_parametrization_E_from_parametrize_displacements_skript(args): #KKK
 
     if         args.gpf_dispfolder_5x5x5 \
             or args.gpf_dispfolder_setfolder \
+            or args.gpf_dispfolder_5x5x5_weighted \
             or args.gpf_dispfolder_5x5x5_alat_mor_T0K \
             or args.gpf_dispfolder_5x5x5_alat_mor_current_alat \
             or args.gpf_dispfolder_alat_lattice_T0K \
@@ -573,10 +578,13 @@ def obtain_parametrization_E_from_parametrize_displacements_skript(args): #KKK
             or args.gpf_dispfolder_correct_for_110_forces:
 
         sc = False
-        if args.gpf_dispfolder_5x5x5 or args.gpf_dispfolder_5x5x5_alat_mor_T0K: sc = 5
+        if     args.gpf_dispfolder_5x5x5 \
+            or args.gpf_dispfolder_5x5x5_weighted \
+            or args.gpf_dispfolder_5x5x5_alat_mor_T0K \
+            or args.gpf_dispfolder_5x5x5_alat_mor_current_alat: sc = 5
+
 	if args.gpf_dispfolder_5x5x5_alat_mor_current_alat:
 	    args.gpf_dispfolder_shift_parametrization_to_alat = args.alat
-	    sc = 5
 
         ele = get_param_disp.get_all_disps(
                 element=args.element,
@@ -589,6 +597,8 @@ def obtain_parametrization_E_from_parametrize_displacements_skript(args): #KKK
                 )
 
         paramfile = ele.parametrize_it()
+        if args.gpf_dispfolder_5x5x5_weighted == True:
+            paramfile = ele.dofor+'/disp_fit.parameters_morse_weighted.dat'
         #print('pf',paramfile)
         #sys.exit()
         param = np.loadtxt(paramfile)
@@ -1371,7 +1381,7 @@ if __name__ == '__main__':
         args.dudl_lambda_0 = "--"
         args.dudl_lambda_1 = "--"
 
-
+        # for sweepabc in [1,2,3,4]
         for args.lambda_ in lam01_:
             obtain_input_folder_A_for_f_md_2x2x2_30(args)  # f_md_2x2x2_30
             obtain_input_folder_B_and_related_files(args)  # once args.folder is defined this is very good
@@ -1450,11 +1460,13 @@ if __name__ == '__main__':
                 ov1(args.read_forces),
                 ov1(args.read_uoutcar),
                 ov1(args.write_positions_rel)]
-            print('command')
-            print(command)
-            print(" ".join(command))
+            if args.verbose:
+                print('command')
+                print(command)
+                print(" ".join(command))
             call(command,stdout=devnull)
-            print("------- BACK in argparse_my_code.py -------")
+            if args.verbose:
+                print("------- BACK in argparse_my_code.py -------")
             #print('args.stdout 1',args.stdout)
             read_in_results(args)
             #print('args.lambda_',args.lambda_)
