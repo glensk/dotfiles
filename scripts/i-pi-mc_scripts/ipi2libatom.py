@@ -3,6 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import os,sys,argparse
+import myutils
 
 def help(p = None):
     string = ''' helptext '''
@@ -44,6 +45,7 @@ def todo(args):
     print('-->a',a,b,c,'def',d,e,f)
     print()
     print('-->x',a,"0","0",d,b,"0",d,f,c)
+    myutils.sed(
 
     #if not os.path.isfile(args.inputfile):
     #    sys.exit("inputfile "+args.inputfile+" does not exist")
