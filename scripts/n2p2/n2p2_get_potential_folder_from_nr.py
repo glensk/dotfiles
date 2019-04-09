@@ -48,6 +48,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
             print(weights,'exist')
 
     folder = "potential_"+str(args.nr)+'/'
+    folder = "potential/"
     if os.path.isdir(folder):
         sys.exit(folder+' does already exist!')
 
@@ -69,6 +70,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
             weights = '_weights/weights.'+i+'.'+nr_+'.out'
         print('cp',weights)
         my.cp(weights,folder+'/weights.'+i+'.data')
+        my.cp(weights,folder+'/weights.'+i+'.'+nr_+'.out')
     return
 
 if __name__ == '__main__':

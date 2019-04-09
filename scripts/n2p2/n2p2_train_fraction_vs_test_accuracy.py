@@ -184,6 +184,12 @@ for c in ["*"]:
         #if len(j[path_].split("tf_0.2_job_21maa_fr_ff0.01215")) == 2:
         #    print('j[epochs_]',j[epochs_],'j[3]',j[3])
         #    print('test1',j[epochs_] - 250)
-
+        #print('j j j',j[1])
+        if j[1] > 999: j[1] = 999.9
+        if j[2] > 999: j[2] = 999.9
+        if j[4] > 999: j[4] = 999.9
+        if j[5] > 999: j[5] = 999.9
+        if j[7] > 999: j[7] = 999.9
+        if j[8] > 999: j[8] = 999.9
         print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || [%4.0f]  %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9]      ,j[epochs_],j[path_]))
 

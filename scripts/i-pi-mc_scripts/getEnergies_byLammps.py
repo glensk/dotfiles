@@ -1263,8 +1263,10 @@ def test2_elastic(ace):
     ace.elastic_relax = True
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
     ace.print_variables('bbb')
-    ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at")
-    print('cc')
+    ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
+    print('ace.c44:',ace.c44)
+    #print('ace.elastic_constants:',ace.elastic_constants)
+    #print('cc')
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'

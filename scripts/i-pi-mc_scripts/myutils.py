@@ -1622,15 +1622,18 @@ class ase_calculate_ene( object ):
             #ase_write('pos.runner',frame,format='runner')
             print('-------------- lammps_ext_calc -----------')
         ene_pot_lmp = lammps_ext_calc(frame,self,get_elastic_constants=get_all_constants)
+        #print('ene_pot_lmp...kk',ene_pot_lmp)
+        #sys.exit('88')
 
-        if type(text) != bool:
-            text = printred(text)
-            #if get_all_constants == True:
-            ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
-            #else:
-            #    ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
-            #ene_pot_lmp = ene_pot_lmp.replace('C44all =', printred('C44all ='))
-        print("relaxed? "+str(self.elastic_relax)+";",ene_pot_lmp)
+        if verbose:
+            if type(text) != bool:
+                text = printred(text)
+                #if get_all_constants == True:
+                ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
+                #else:
+                #    ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
+                #ene_pot_lmp = ene_pot_lmp.replace('C44all =', printred('C44all ='))
+            print("relaxed? "+str(self.elastic_relax)+";",ene_pot_lmp)
         return
 
     def get_elastic(self,atomsin=False,verbose=False):
@@ -2319,6 +2322,9 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     #    #print("LAMMPS_COMMAND 1",LAMMPS_COMMAND)
     #else:
     #    #print("LAMMPS_COMMAND 2",LAMMPS_COMMAND)
+    if ace.verbose:
+        print("get_elastic_constants",get_elastic_constants)
+
     LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
     if ace.verbose:
         print("LAMMPS_COMMAND",LAMMPS_COMMAND)
@@ -2403,12 +2409,22 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
                 sys.exit('units '+ace.units+' unknown! Exit!')
             #print('ene out',ene,ace.units)
         else:
-            if get_elastic_constants == True:
-                elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
-            else:
-                elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant "+get_elastic_constants+"\""],shell=True).strip()
-            #print(elastic_constants)
-            ene = elastic_constants
+            ace.elastic_constants = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
+            #ace.elastic_constants_ = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True)
+            ace.c44 = check_output(["tail -300 log.lammps | grep \"^Elastic Constant C44\""],shell=True).strip().split(" ")[4]
+            #print('aa c44',float(ace.c44))
+            #print('aa el',ace.elastic_constants_)
+            #for ij in ace.elastic_constants_:
+            #    print('ij',ij)
+            #sys.exit('ace44')
+
+            #if get_elastic_constants == True:
+            #    elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
+            #else:
+            #    elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant "+get_elastic_constants+"\""],shell=True).strip()
+            #print('ec',elastic_constants.split(" "))
+            #sys.exit('ec')
+            ene = ace.elastic_constants
 
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
