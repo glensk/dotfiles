@@ -1567,13 +1567,31 @@ void calculate_forces_energy_la(double dt,int verbose) {
         // tox forces (those are like in hessematrix and therefore noot so
         // good)
         // --> need to be redifined: for tox between atom 0 and atom 1:
-        // 0 has 11 other neighbors with certain distances, think which ones
+        // at0 @ [0,0,0] has 11 other neighbors with certain distances, think which ones
         //   are relevant [1a,2a,3a,4a,...,11a]
-        // 1 has also 11 other neighbors, think which ones are relevant
+        // at1 @ [0.5, 0.5, 0] has also 11 other neighbors, think which ones are relevant
         //   [1b,2b,3b,4b,...,11b]
         // ... probably only the atoms which are in the intersection of the
         // fist and second list!
-        // this would be the 4 atoms on [0.5 0 0.5] [ 0.5 0 -0.5] [ 0 0.5 0.5] and [0 0.5 -0.5]
+        // this would be the 4 atoms on at3 == [0.5 0 0.5] at4 == [ 0.5 0 -0.5] at5 == [ 0 0.5 0.5] and at6 == [0 0.5 -0.5]
+        // - wie wuerde eine parametrisierung aussehen:
+        // r == dist between at0 and at1
+        // for every pair, loop over [ a3, a4, a5, a6 ]
+        //           atx-aty
+        //  Forces[r,at0-a3 ] makes force on at0 and at3
+        //  Forces[r,at0-a4 ] makes forces on atx and aty
+        //  Forces[r,at0-a5 ]
+        //  Forces[r,at0-a6 ]
+        //  Forces[r,at1-a3 ]
+        //  Forces[r,at1-a4 ]
+        //  Forces[r,at1-a5 ]
+        //  Forces[r,at1-a6 ]
+        //  ---> remaining force on at3 has to be split between at0 and at1
+        //  ---> a) get remaining force on at3
+        //  ---> b) get vectors between [at0 and at3] and [at1 and at3]
+        //
+        // - wie wuerde eine parametrisierung aussehen: Force[r,..] =
+        //
         //
         // Was man sich zuerst anschauen sollte:
         // -------------------------------------

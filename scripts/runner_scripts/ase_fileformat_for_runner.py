@@ -168,16 +168,17 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
         ####################################################
         # forces
         ####################################################
-        if setforces_ase_units == False:
-            try: forces = atoms.get_forces()/units.Hartree * units.Bohr
-            except:
-                sys.stderr.write("No forces found, setting them to 0\n")
-                forces = np.zeros((nat,3))
+        if type(setforces_ase_units) == bool:
+            if setforces_ase_units == False:
+                try: forces = atoms.get_forces()/units.Hartree * units.Bohr
+                except:
+                    sys.stderr.write("No forces found, setting them to 0\n")
+                    forces = np.zeros((nat,3))
         else:
             if type(setforces_ase_units) == str:
                 forces = np.zeros((nat,3))
             else:
-                forces = setforces_ase_units
+                forces = setforces_ase_units/units.Hartree * units.Bohr
 
         ####################################################
         # energy
@@ -188,6 +189,7 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
                 sys.stderr.write("No energy found, setting it to 0\n")
                 energy = 0
         else:
+            #print('uh',units.Hartree)
             energy = setenergy_eV/units.Hartree
 
         #atoms.wrap()

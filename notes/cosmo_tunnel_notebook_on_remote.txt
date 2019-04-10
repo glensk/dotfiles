@@ -19,3 +19,17 @@ cd /local/scratch/glensk/Dropbox/Albert/kmc/results/20190220_andrea_soap
 jupyter notebook --no-browser --port=8889
 on mac: ssh -N -f -L localhost:8888:localhost:8889 glensk@cosmopc15.epfl.ch
 browser: http://localhost:8888
+
+
+
+
+#############################################################################
+# on fidis   (open notebook on mac) Works!
+#############################################################################
+cd /home/glensk/kmc/run_michele
+conda activate gap
+jupyter notebook --no-browser --port=8889
+on mac: ssh -N -f -L localhost:8886:localhost:8889 glensk@fidis.epfl.ch
+in browser: http://localhost:8886
+
+

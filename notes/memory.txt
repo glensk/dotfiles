@@ -1,0 +1,7 @@
+to find out how much memory is used/free:
+
+free -m
+
+or 
+
+vmstat -s
