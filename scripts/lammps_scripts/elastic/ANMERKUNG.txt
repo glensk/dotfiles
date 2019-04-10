@@ -1,0 +1,3 @@
+$dotfiles/scripts/executables/lmp_fidis_par_runner < in.elastic
+$dotfiles/scripts/executables/lmp_fidis < in.elastic  # for n2p2 potential
+from: /home/glensk/sources/lammps_original_fidis/examples/ELASTIC/tmp

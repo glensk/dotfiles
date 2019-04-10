@@ -37,6 +37,7 @@ from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
 import shutil
 import time
+import myutils as my
 
 
 start_time = time.time()
@@ -181,7 +182,22 @@ def cp(src=False,dest=False):
     else:
         print("source is:",src_is,":",src)
         print("dest   is:",dest_is,":",dest)
-        sys.exit()
+        basename = os.path.basename(src)
+        print("basename:",os.path.basename(src))
+        to = dest+'/'+basename
+        print('to',to)
+        def copyDirectory(src, dest):
+            try:
+                shutil.copytree(src, dest)
+            # Directories are the same
+            except shutil.Error as e:
+                print('Directory not copied. Error: %s' % e)
+            # Any error saying that the directory doesn't exist
+            except OSError as e:
+                print('Directory not copied. Error: %s' % e)
+        print('copy...')
+        copyDirectory(src, to)
+    return
 
 def rm(src):
     os.remove(src)
@@ -979,6 +995,8 @@ class ase_calculate_ene( object ):
                 'variable nnpDir string \"'+fullpath+'\"'
                 ]
 
+        #print('spp',self.pot.split("_")[0])
+        #sys.exit()
         if self.pot.split("_")[0] == "n2p2":
             # showewsum 1 showew yes resetew no maxew 1000000
             self.lmpcmd = self.lmpcmd + [
@@ -991,8 +1009,8 @@ class ase_calculate_ene( object ):
         elif self.pot.split("_")[0] == "runner":
             self.lmpcmd = self.lmpcmd + [
                 "# thermo 1 # for geopt",
-                "pair_style runner dir ${nnpDir} showew no resetew yes maxew 1000000",
-                "pair_coeff * * 10.0",
+                "pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000",
+                "pair_coeff * * 7.937658735",
             ]
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
 
@@ -1493,10 +1511,19 @@ class ase_calculate_ene( object ):
 
         #### load the elastic stuff
         from parcalc import ClusterVasp, ParCalculate
-
         from elastic import get_pressure, BMEOS, get_strain
         from elastic import get_elementary_deformations, scan_volumes
         from elastic import get_BM_EOS, get_elastic_tensor
+
+        print('ene   ',self.ene(atoms_h))
+        print('stress1',atoms_h.get_stress())
+        self.ase_relax_cellshape_and_volume_only(atoms_h,verbose=False)
+        print('stress2',atoms_h.get_stress())
+        cryst = atoms_h.copy()
+        #print('stress2',cryst.get_isotropic_pressure(cryst.get_stress()))
+
+        sys.exit()
+
 
         # Create elementary deformations (systems are ase frames)
         #print('sys',elastic.__file__)
@@ -1511,6 +1538,8 @@ class ase_calculate_ene( object ):
         ## Elastic tensor by internal routine
         #Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
         #print("Cij (GPa):", Cij/units.GPa)
+        return
+
     def get_calculator(self,atoms):
         if self.calculator == "lammps":
             asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=self.keep_alive)
@@ -1578,6 +1607,7 @@ class ase_calculate_ene( object ):
         if verbose: self.check_frame('get_murn 1 in',frame=atoms_murn)
         self.ase_relax_cellshape_and_volume_only(atoms_murn,verbose=verbose)
         if verbose: self.check_frame('get_murn 2 atfer cellshape relax',frame=atoms_murn)
+
         if atomrelax:
             self.ase_relax_atomic_positions_only(atoms_murn,fmax=0.0002,verbose=False)
             if verbose: self.check_frame('get_murn 2 atfer atomrelax only',frame=atoms_murn)
@@ -1974,13 +2004,16 @@ def ipi_ext_calc(atoms,ace):
 
 def lammps_ext_calc(atoms,ace):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
+
     ### mkdir tmpdir
     tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
+    print('doint the calculation in lammps, externally, in folder',tmpdir)
 
     ### write input structure
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
+    atoms.set_calculator(None)
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
     #sys.exit('pos now written or not')
 
@@ -1994,12 +2027,27 @@ def lammps_ext_calc(atoms,ace):
     if os.path.isfile(tmpdir+'log.lammps'):
         os.remove(tmpdir+"log.lammps")
 
-    LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+
+    #ka=ace.pot.split("_")[0]
+    #print('aa:'+ka+":",type(ka))
+    if ace.pot.split("_")[0] == "runner":
+        LAMMPS_COMMAND = my.scripts()+'/executables/lmp_fidis_par_runner'
+        #print("LAMMPS_COMMAND 1",LAMMPS_COMMAND)
+    else:
+        #print("LAMMPS_COMMAND 2",LAMMPS_COMMAND)
+        LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
+
+    #print("LAMMPS_COMMAND",LAMMPS_COMMAND)
+    #sys.exit()
 
     with cd(tmpdir):  # this cd's savely into folder
+        # RUN LAMMPS
         # without SHELL no LD LIBRARY PATH
+        #print('pwd',os.getcwd())
         call([LAMMPS_COMMAND+" < in.lmp > /dev/null"],shell=True)
 
+        #print('pwd2',os.getcwd())
+        #sys.exit()
         ### extract energy and forces
         ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
         ene=float(ene)
@@ -2016,6 +2064,7 @@ def lammps_ext_calc(atoms,ace):
         else:
             sys.exit('units '+ace.units+' unknown! Exit!')
         #print('ene out',ene,ace.units)
+
     if ace.verbose > 1:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene

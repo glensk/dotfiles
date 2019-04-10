@@ -582,9 +582,9 @@ def get_al_fcc_equilibrium(ace):
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
     ace.ase_relax_cellshape_and_volume_only(frame_al,verbose=False)
     ace.al_fcc = frame_al
-    ace.al_fcc_ene_pa = ace.ene(frame_al)/frame_al.get_number_of_atoms()
+    ace.al_fcc_ene_pa = my.ase_vpa(ace.al_fcc)
     ace.al_fcc_vol_pa = frame_al.get_volume()/frame_al.get_number_of_atoms()
-    print("NN Al vpa @T=0K",ace.al_fcc_vol_pa)
+    print("NN Al vpa @T=0K",ace.al_fcc_vol_pa,"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     print('e_ and f_ al should all be done consistently from the NN!!!')
     ase_write(ace.savefolder+"al_fcc.runner",frame_al,format='runner')
     return
@@ -614,9 +614,128 @@ def get_basic_NN_energies_ace(ace):
     if not os.path.isdir(ace.savefolder):
         my.mkdir(ace.savefolder)
 
+    #frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.03,cubic=True,create_fake_vacancy=False,whichcell="fcc")
+    # C44all
+    # 40.1762067931243  al
+    # 40.1762067627001  al
+    # 52.3875591015767 si
+
+    # Si
+    # Elastic Constant C11all = 136.951872420799 GPa
+    # Elastic Constant C22all = 136.951870251035 GPa
+    # Elastic Constant C33all = 136.951870434092 GPa
+    # Elastic Constant C12all = 68.7962276151488 GPa
+    # Elastic Constant C13all = 68.7962277236933 GPa
+    # Elastic Constant C23all = 68.7962266425085 GPa
+    # Elastic Constant C44all = 52.3875591015767 GPa
+    # Elastic Constant C55all = 52.3875590464374 GPa
+    # Elastic Constant C66all = 52.3875591511106 GPa
+    # Elastic Constant C14all = -7.63148567537807e-07 GPa
+    # Elastic Constant C15all = 1.036739006653e-06 GPa
+    # Elastic Constant C16all = 1.69785575105367e-07 GPa
+    # Elastic Constant C24all = -7.75491201417651e-07 GPa
+    # Elastic Constant C25all = 1.00497435500108e-06 GPa
+    # Elastic Constant C26all = 2.73579569168824e-07 GPa
+    # Elastic Constant C34all = -7.14263247816296e-07 GPa
+    # Elastic Constant C35all = 1.02181487250832e-06 GPa
+    # Elastic Constant C36all = 8.20344360612355e-08 GPa
+    # Elastic Constant C45all = -8.33022749808536e-08 GPa
+    # Elastic Constant C46all = -1.8577445282579e-08 GPa
+    # Elastic Constant C56all = 7.68573192938922e-08 GPa
+    # =========================================
+    # Average properties for a cubic crystal
+    # =========================================
+    # Bulk Modulus = 91.5147752298476 GPa
+    # Shear Modulus 1 = 52.3875590997082 GPa
+    # Shear Modulus 2 = 34.0778218540961 GPa
+    # Poisson Ratio = 0.334371145467076
+
+
+    # Al
+    # Elastic Constant C11all = 118.536731726306 GPa
+    # Elastic Constant C22all = 118.536733377826 GPa
+    # Elastic Constant C33all = 118.536733292448 GPa
+    # Elastic Constant C12all = 61.1070415144043 GPa
+    # Elastic Constant C13all = 61.107041497506 GPa
+    # Elastic Constant C23all = 61.107042362909 GPa
+    # Elastic Constant C44all = 40.1762067627001 GPa
+    # Elastic Constant C55all = 40.1762067539713 GPa
+    # Elastic Constant C66all = 40.1762068076 GPa
+    # Elastic Constant C14all = 4.19704988494673e-07 GPa
+    # Elastic Constant C15all = -5.27649623017288e-08 GPa
+    # Elastic Constant C16all = -1.31818687193703e-06 GPa
+    # Elastic Constant C24all = 3.26218552990317e-07 GPa
+    # Elastic Constant C25all = -7.03521171465282e-08 GPa
+    # Elastic Constant C26all = -1.28016772589816e-06 GPa
+    # Elastic Constant C34all = 3.40317003743058e-07 GPa
+    # Elastic Constant C35all = -7.57789770032277e-08 GPa
+    # Elastic Constant C36all = -1.29923000771166e-06 GPa
+    # Elastic Constant C45all = -8.81725904211233e-08 GPa
+    # Elastic Constant C46all = -1.23484279007751e-08 GPa
+    # Elastic Constant C56all = -7.95288527993884e-08 GPa
+    # =========================================
+    # Average properties for a cubic crystal
+    # =========================================
+    # Bulk Modulus = 80.2502721273576 GPa
+    # Shear Modulus 1 = 40.1762067747571 GPa
+    # Shear Modulus 2 = 28.7148455036268 GPa
+    # Poisson Ratio = 0.340156745931842
+    # Total wall time: 0:00:00
+    #
+    # Al equilibrium
+    # =========================================
+    # Components of the Elastic Constant Tensor
+    # =========================================
+    # Elastic Constant C11all = 118.536732897085 GPa
+    # Elastic Constant C22all = 118.536734430908 GPa
+    # Elastic Constant C33all = 118.536732307181 GPa
+    # Elastic Constant C12all = 61.1070426952492 GPa
+    # Elastic Constant C13all = 61.1070416045365 GPa
+    # Elastic Constant C23all = 61.107042461058 GPa
+    # Elastic Constant C44all = 40.1762067982596 GPa    ***
+    # Elastic Constant C55all = 40.176206764599 GPa
+    # Elastic Constant C66all = 40.1762067923422 GPa
+    # Elastic Constant C14all = 2.32166198948779e-07 GPa
+    # Elastic Constant C15all = -5.51779462662733e-07 GPa
+    # Elastic Constant C16all = 1.39736496745813e-07 GPa
+    # Elastic Constant C24all = 2.79218923090633e-07 GPa
+    # Elastic Constant C25all = -4.58316588102582e-07 GPa
+    # Elastic Constant C26all = 1.60659803833679e-07 GPa
+    # Elastic Constant C34all = 2.52902267617589e-07 GPa
+    # Elastic Constant C35all = -5.07286570542874e-07 GPa
+    # Elastic Constant C36all = 1.61640589938079e-07 GPa
+    # Elastic Constant C45all = -4.91853888892711e-08 GPa
+    # Elastic Constant C46all = -3.30812460761806e-08 GPa
+    # Elastic Constant C56all = -2.17586010388693e-08 GPa
+    # =========================================
+    # Average properties for a cubic crystal
+    # =========================================
+    # Bulk Modulus = 80.2502725729847 GPa
+    # Shear Modulus 1 = 40.1762067850669 GPa
+    # Shear Modulus 2 = 28.7148454790552 GPa
+    # Poisson Ratio = 0.340156746847066
+    # Total wall time: 0:00:00
+
+
+
+    #frame_si = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=0,cubic=False,create_fake_vacancy=False,whichcell="dc")
+    #ase_write('pos_si.lmp',frame_si,format='lammps-runner')
     get_al_fcc_equilibrium(ace)
     get_mg_hcp_equilibrium(ace)
     get_si_dc_equilibrium(ace)
+    ene_pot_lmp = my.lammps_ext_calc(ace.al_fcc,ace)
+    #ase_write('pos_al.lmp',ace.al_fcc,format='lammps-runner')
+    #get_vpa(
+    print("NN 1 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
+    ace.ase_relax_cellshape_and_volume_only(ace.al_fcc,verbose=False)
+    print("NN 2 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
+    vinet = ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False,write_energies=False)
+    print("NN 3 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
+    ace.ase_relax_cellshape_and_volume_only(ace.al_fcc,verbose=False)
+    print('vinet',vinet)
+
+    print("NN 4 Al vpa @T=0K",my.ase_vpa(ace.al_fcc)) #,"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
+    sys.exit('ace fcc al si dc')
 
     get_dilute_formation_energy(text="NN dilute formation energy Si ",sc=4,nsi=1,nmg=0,e_si_diamond_pa=ace.si_dc_ene_pa,ace=ace,t2="Kobayashi 0.375 eV")
     get_dilute_formation_energy(text="NN dilute formation energy Mg ",sc=4,nsi=0,nmg=1,e_si_diamond_pa=ace.mg_hcp_ene_pa,ace=ace,t2="Kobayashi 0.090 eV")
@@ -932,7 +1051,8 @@ def test_Mg2Si(ace):
     try_read = ace.savefolder+"h_Mg2Si1_at_NN_relaxed"
     #print('try read',try_read)
     get_formation_energy(ace,frame,"Mg2Si (fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True,try_harmonic_readfile=try_read)
-    #print('mg2si',frame.get_stress())
+    print('mg2si stress:',frame.get_stress())
+    print('mg2si stress:',frame.get_isotropic_pressure(frame.get_stress()))
     #print('vinet',ace.get_murn(frame),my.ase_vpa(frame))
     print()
     return
@@ -983,11 +1103,11 @@ def test_formation_energies(pot,geopt,verbose):
     print("#############################################################################")
     print()
     #test_si_si_vac(ace)
-    #test_Mg2Si(ace)
-    test_Mg9Si5(ace)
-    #test_Mg9Si5_pos(ace)
-    test_beta2_bulk(ace)
-    #test_betaprime_mg9si5_find_global_min(ace,f_dilute_si, f_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
+    test_Mg2Si(ace)
+    #test_Mg9Si5(ace)
+    ##test_Mg9Si5_pos(ace)
+    #test_beta2_bulk(ace)
+    ##test_betaprime_mg9si5_find_global_min(ace,f_dilute_si, f_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
     return
 
 def test2_elastic(pot,geopt,verbose):
@@ -1000,9 +1120,48 @@ def test2_elastic(pot,geopt,verbose):
     path = tests+'/Al-Mg-Si/Mg2Si/POSCAR'
     frame = ase_read(path,format="vasp")
 
-    ace.get_elastic(frame,verbose=False)
 
+    # test elastic ase module
+    #ace.get_elastic(frame,verbose=False)
+
+    #######################################################################
+    # try directly from lammps
+    #######################################################################
+    #ace.get_calculator(frame)
+    #print('frame stress',frame.get_stress())
+    #ace.ase_relax_cellshape_and_volume_only(frame)
+    #print('frame stress',frame.get_stress())
+    #ase_write('pos.runner',frame,format='runner')
+
+    #######################################################################
+    # try directly from lammps withou spcifying calculator ->>>>>>> works
+    #######################################################################
+    #ase_write('pos.lmp',frame,format='lammps-runner')
+
+
+    #######################################################################
+    # unset calculator ->>>>>>>>>>>>>>> works
+    #######################################################################
+    #ace.get_calculator(frame)
+    #print('frame stress',frame.get_stress())
+    #ace.ase_relax_cellshape_and_volume_only(frame)
+    #print('frame stress',frame.get_stress())
+    #ase_write('pos.runner',frame,format='runner')
+    #frame.set_calculator(None)
+    #ase_write('pos.lmp',frame,format='lammps-runner')
+
+    #######################################################################
+    # adapted lammps_ext_calc to unset calculator
+    #######################################################################
+    ace.get_calculator(frame)
+    print('frame stress',frame.get_stress())
+    ace.ase_relax_cellshape_and_volume_only(frame)
+    print('frame stress',frame.get_stress())
+    ase_write('pos.runner',frame,format='runner')
+    ene_pot_lmp = my.lammps_ext_calc(frame,ace)
+    print('ene from lammps',ene_pot_lmp)
     return
+
 
 
 if __name__ == "__main__":

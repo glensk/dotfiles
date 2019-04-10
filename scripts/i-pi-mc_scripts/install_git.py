@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","ipi_cosmo","n2p2","lammps","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -25,7 +25,9 @@ branch['ipi']           = False # get all the branches and not just feat/kmc
 address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
 
-address["lammps"]       = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
+address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]  = False
+address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
+address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
 
 
 def help(p = None ,known=known):
@@ -70,18 +72,26 @@ def install_(args,known):
         my.mkdir(args.sources_folder)
 
     if args.install_folder == False:
-        args.install_folder = args.install
+        args.install_folder = args.sources_folder+args.install
+
+    print('args.install       :',args.install)
+    print('args.sources_folder:',args.sources_folder)
+    print('args.install_folder:',args.install_folder)
+    print()
+    if os.path.isdir(args.install_folder):
+        sys.exit('args.install_folder '+args.install_folder+' does already exist; Exit')
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-        if args.install in ['ipi']              : git_clone(args,specify_depth = False)
+        if args.install in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
         if args.install in ['ipi_cosmo']        : git_clone(args)
         if args.install in ['aiida-alloy']      : git_clone(args)
         if args.install in ['atomsk']           : install_atomsk(args)
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         if args.install in ['n2p2']             : install_n2p2(args)
         if args.install in ['vmd']              : install_vmd(args)
-        if args.install in ['lammps']           : install_lammps(args)
+        if args.install in ['lammps_runner']    : install_lammps(args)
+        if args.install in ['lammps_n2p2']      : install_lammps(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -90,7 +100,7 @@ def install_(args,known):
     return
 
 
-def git_clone(args,specify_depth = True):
+def git_clone(args,specify_depth = True,checkout=False):
     do = ["git","clone"]
     if specify_depth == True:
         do = do + ["--depth","1"]
@@ -101,6 +111,8 @@ def git_clone(args,specify_depth = True):
     os.chdir(args.install_folder)
     print('pwd:',os.getcwd())
     subprocess.call(["git","branch"])
+    if checkout != False:
+        subprocess.call(["git","checkout",checkout])
     return
 
 def install_lbzip(args):
@@ -122,15 +134,114 @@ def install_lbzip(args):
     return
 
 def install_lammps(args):
-    sys.exit("not yet finished")
-    subprocess.call(["git","clone","--depth","1","https://github.com/lammps/lammps.git",args.install_folder])
+    ''' lammps_runner works on fidis && mac
+        lammps_n2p2   works on fidis
+    '''
+    if args.install == "lammps_runner":
+        git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
+        extension = "runner"
+    elif args.install == "lammps_n2p2":
+        git_clone(args,specify_depth = True)
+        extension = "n2p2"
+        n2p2_folder=args.sources_folder+"/n2p2"
+        if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
+
     os.chdir(args.install_folder)
+    if extension == "n2p2":
+        # ln -s $n2p2_folder lib/nnp
+        # cp -r $n2p2_folder/src/interface/LAMMPS/src/USER-NNP src
+        os.symlink(n2p2_folder, "lib/nnp")
+        my.cp(n2p2_folder+'/src/interface/LAMMPS/src/USER-NNP','src/')
+
+    print('os.getcwd() (1)',os.getcwd())
     os.chdir("src")
+    print('os.getcwd() (2)',os.getcwd())
     subprocess.call(["make", "clean-all",])
-    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER_MISC"]
+
+
+    list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC" ]
+    if args.install == "lammps_runner": list = list + [ "yes-USER-RUNNER" ]
+    if args.install == "lammps_n2p2":   list = list + [ "yes-user-nnp" ]
     for i in list:
         subprocess.call(["make", i])
 
+    if args.install == "lammps_runner":
+        my.sed("pair_runner.h","^#define MAXNEIGH.*","#define MAXNEIGH 500")
+
+    if extension == "runner": checkdir = 'USER-RUNNER'
+    if extension == "n2p2": checkdir = 'USER-NNP'
+    if not os.path.isdir(checkdir):
+        sys.exit(checkdir+" does not exist; Exit")
+
+    import socket
+    hostname = socket.gethostname()
+    print('hostname',hostname)
+    if hostname == 'fidis':
+        serialfidis = 'fidis'
+    elif hostname == 'mac':
+        serialfidis = 'serial'
+
+    if hostname == 'fidis':
+        if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
+            my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
+
+        print("module load ... && make fidis")
+        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
+        print()
+
+
+
+    elif hostname == 'mac':
+        print("####################################################################")
+        print("# for mac you want to have the true gcc working: conda install gcc #")
+        print("# libnnp and nnp-predict can be compiled to make n2p2 predict energies from input.data")
+        print("# libnnpif is not working yet.")
+        print("#")
+        print("# in n2p2: cd src; make libnnp COMP=gnu # did not work in following steps in the end")
+        print("#")
+        print("# %g++ --version  --> needs to point to ---> g++ (GCC) 4.8.5")
+        print("# in n2p2: cd src; cd libnnp; make static COMP=gnu # !!! THIS worked!!!! (with g++)")
+        print("# in n2p2: cd src/application/nnp-predict; make static COMP=gnu # !!! THIS worked!!!! (with g++)")
+        print("#")
+        print("# /Users/glensk/sources/n2p2/src/application/nnp-predict/nnp-predict input.data     # !!! wow, worked on mac!!!")
+        print("#")
+        print("# %find ~/sources/n2p2 -name \"InterfaceLammps.h\"")
+        print("#      /Users/glensk/sources/n2p2/include/InterfaceLammps.h")
+        print("#      /Users/glensk/sources/n2p2/src/libnnpif/InterfaceLammps.h")
+        print("#")
+        print("####################################################################")
+        subprocess.call(["make", "serial"])
+        print()
+    else:
+        sys.exit("hostname "+hostname+" not set up yet")
+
+    print()
+    print("************ make done ************")
+    print()
+    print("************ copy executable ************")
+    #### copy the executable
+    os.chdir(args.install_folder+"/src")
+    executable = 'lmp_'+serialfidis
+    if not os.path.isfile(executable):
+        sys.exit(executable +" does not exist, .... was not created; Exit")
+    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_par_"+extension)
+    my.cp(executable,my.scripts()+"/executables/"+executable+"_par_"+extension)
+    print()
+
+    ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
+    #subprocess.call(["make", 'mpi-stubs'])
+    #subprocess.call(["make", 'g++_serial','mode=shlib'])
+    print()
+    print("************ make mode=shlib xxxx ************")
+    os.chdir(args.install_folder+"/src")
+    subprocess.call(["make", 'mode=shlib',serialfidis])  # serialfidis can be fidis,serial,mpi
+    os.chdir(args.install_folder+"/python")
+    print()
+    print("************ install.py ************")
+    print('pwd:',os.getcwd())
+    subprocess.call(["chmod", 'u+x','install.py'])
+    subprocess.call(['./install.py'])
+    return
 
 def install_n2p2(args):
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
@@ -142,14 +253,31 @@ def install_n2p2(args):
     #my.cp("makefile.intel","makefile.intel.back")
     #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
+    hostname = socket.gethostname()
+
+    if hostname == 'fidis':
+        COMP="intel"
+    if hostname == 'mac':
+        COMP="gnu"
+        #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
+        #EIGEN = /Users/glensk/miniconda2/
+
     # makefile
-    my.sed("makefile","^COMP=.*","COMP=intel")
+    my.sed("makefile","^COMP=.*","COMP="+COMP)
     my.sed("makefile","^PROJECT_DIR.*","PROJECT_DIR=./")
     my.sed("makefile","^LIB=libnnp.so libnnpif.so libnnptrain.so pynnp.so","LIB=libnnp.so libnnpif.so libnnptrain.so") # remove pynnp.so
     # makefile.intel
     my.sed("makefile.intel","^PROJECT_GSL=.*","PROJECT_GSL=${GSL_ROOT}/include")
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
     my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
+    if hostname == 'mac':
+        my.sed("makefile.gnu","^PROJECT_GSL=.*","PROJECT_GSL=./")  # try also with the acutal paths
+        my.sed("makefile.gnu","^PROJECT_EIGEN=.*","PROJECT_EIGEN=./")  # try also with the actual paths
+        # on mac: conda install gcc
+        # on mac: conda install -c conda-forge gsl   # has now the libgsl... in ~/miniconda2/lib
+        # on mac: conda install -c omnia eigen3
+        # or
+        # on mac: conda install -c conda-forge eigen
     f = open("makefile.intel", "r");contents = f.readlines();f.close();insert=0
     for idx,i in enumerate(contents):
         if i[:14] == "PROJECT_EIGEN=": insert = idx
