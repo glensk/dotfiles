@@ -1381,129 +1381,175 @@ if __name__ == '__main__':
         args.dudl_lambda_0 = "--"
         args.dudl_lambda_1 = "--"
 
-        # for sweepabc in [1,2,3,4]
-        for args.lambda_ in lam01_:
-            obtain_input_folder_A_for_f_md_2x2x2_30(args)  # f_md_2x2x2_30
-            obtain_input_folder_B_and_related_files(args)  # once args.folder is defined this is very good
-            get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist(args)
-            obtain_parametrization_E_from_parametrize_displacements_skript(args)
-            obtain_parametrization_G_from_calculate_energy_and_forces(args)
-            #obtain_parametrization_I_from_
-            # get parameters when (gpdisp)  can be either from disp_fit.parameters_morse.dat or from calculate_energy_and_forces.
-            #if args.get_parametrization_from_displacements:
-            #    parameters = Analyze_Forces_and_make_parametrization.get_all_disps(dofor=args.get_parametrization_from_displacements)
-            #has_parametrization   = check_for_disp_fit_parameters_morse(args)
-            get_alat_mor(args)
-            print_parameters(args,idx="(11)")
+
+        D_mor_sweep = False
+        a_mor_sweep = False
+
+        D_mor_range = 0.07
+        D_mor_step  = 0.03
+        D_mor_sweep = np.arange(0 - D_mor_range ,0 + D_mor_range,D_mor_step)
+        print("D_mor_sweep",D_mor_sweep)
+
+        a_mor_range = 0.07
+        a_mor_step  = 0.03
+        a_mor_sweep = np.arange(0 - a_mor_range ,0 + a_mor_range,a_mor_step)
+        print("a_mor_sweep",a_mor_sweep)
+
+        anz = 1
+        sweep = []  # first, this is a fake sweep, this will be filled once the
+        for DD in D_mor_sweep:
+            for aa in a_mor_sweep:
+                print(anz,'DD, aa',DD,aa)
+                anz+=1
+                sweep.append([DD,aa])
+        print()
+        for ddaa in sweep:
+            print('iii',ddaa)
+        sys.exit('33')
 
 
-            ##############################################################################
-            # now all variables should be defined
-            ##############################################################################
-            prepare_input_file(file_orig,file_comp,args)
-            if args.verbose:
-                print("############ compiling (gcc)... ###############################################")
-            if os.path.exists('a.out'):os.remove('a.out')
-            if os.path.exists('out_dudl.dat'):os.remove('out_dudl.dat')
-            call(["gcc", file_comp])  # on cmmc this shoudl be icc
-            if not os.path.exists('a.out'):
-                call(["icc", file_comp])  # on cmmc this shoudl be icc
-            if not os.path.exists('a.out'): sys.exit("no file a.out found! compilation problem")
-            if args.verbose:
-                print("############ starting with following parameters ... ###########################")
-            if args.read_positions and args.read_uoutcar and args.steps == 0:
-                args.steps = getlines_file(args.read_uoutcar)
 
-            if args.read_positions and not args.read_uoutcar and args.steps == 0:
-                args.steps = getsteps_POSITIONSfile(args.read_positions,args)
-
-            args.temperature = str(float(args.temperature))
-            timestep = str(int(args.timestep)/1000.)
+        for sweep_idx,sweep in enumerate(sweep):
+            args.D_mor = sweep[sweep_idx,0]
+            args.a_mor = sweep[sweep_idx,1]
+            for args.lambda_ in lam01_:
+                print('a_mor',args.a_mor) # 1.84
+                print('D_mor',args.D_mor) # 0.24
+                sys.exit('123')
 
 
-            if args.verbose:
-                print('START with args.temperature :',pvi(args.temperature,typee=float))
-                print('START with args.timestep    :',args.timestep,'(fs)')
-                print('START with timestep         :',timestep,'(ps)')
-                print('START with args.steps       :',pvi(args.steps))
-                print('START with write_every      :',str(args.write_every))
-                print('START with read_positions   :',ov1(args.read_positions))
-                print('START with verbose          :',ov1(args.verbose))
-                print('START with write_analyze    :',ov1(args.write_analyze))
-                print('START with read_hesse       :',ov1(args.read_hesse))
-                print('START with read_forces      :',ov1(args.read_forces))
-                print('START with read_uoutcar     :',ov1(args.read_uoutcar))
-                #sys.exit('kkkkabel')
-                print()
-            if int(args.steps) == 0:
-                myexit("Error: Number of steps is 0")
-            if args.verbose:
-                print("############ running md_long_tox_compile.c ... ##################################")
-                #sys.exit('111111111111111')
-                #                , T               ,dt           ,zeitschr  ,l                    ,read_pos, verbose, write_analyze , read_hesse
-                #call(  ["./a.out", args.temperature,timestep,args.steps,str(args.write_every),read_pos,verbose, write_analyze , read_hesse,read_forces,read_uoutcar])
-                print(printred('some input variables ar in COMPILING section and here ..... remove one'))
-                print(printred('forinstance write_analyze'))
+                #########################################################################
+                # get the parametrization
+                #########################################################################
+                obtain_input_folder_A_for_f_md_2x2x2_30(args)  # f_md_2x2x2_30
+                obtain_input_folder_B_and_related_files(args)  # once args.folder is defined this is very good
+                get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist(args)
+                obtain_parametrization_E_from_parametrize_displacements_skript(args)
+                obtain_parametrization_G_from_calculate_energy_and_forces(args)
+                #obtain_parametrization_I_from_
+                # get parameters when (gpdisp)  can be either from disp_fit.parameters_morse.dat or from calculate_energy_and_forces.
+                #if args.get_parametrization_from_displacements:
+                #    parameters = Analyze_Forces_and_make_parametrization.get_all_disps(dofor=args.get_parametrization_from_displacements)
+                #has_parametrization   = check_for_disp_fit_parameters_morse(args)
+                get_alat_mor(args)
+                print_parameters(args,idx="(11)")
 
-            devnull = None   # print to screen
-            if args.verbose_m1 or args.verbose_m2:
-                devnull = open(os.devnull, 'w')
-            command =   ["./a.out",
-                ov0(args.temperature,float),
-                timestep,
-                ov1(args.steps),
-                str(args.write_every),
-                ov1(args.read_positions),
-                ov1(args.verbose),
-                ov1(args.write_analyze) ,
-                ov1(args.read_hesse),
-                ov1(args.read_forces),
-                ov1(args.read_uoutcar),
-                ov1(args.write_positions_rel)]
-            if args.verbose:
-                print('command')
-                print(command)
-                print(" ".join(command))
-            call(command,stdout=devnull)
-            if args.verbose:
-                print("------- BACK in argparse_my_code.py -------")
-            #print('args.stdout 1',args.stdout)
-            read_in_results(args)
-            #print('args.lambda_',args.lambda_)
-            #print("??",args.element,"std:",args.stdout,"l0:",args.dudl_lambda_0,"l1:",args.dudl_lambda_1)
-            #print('args.stdout 2',args.stdout)
+                if sweep_idx == 0:
+                    D_mor_sweep = np.arange(args.D_mor - D_mor_range ,args.D_mor + D_mor_range,D_mor_step)
+                    a_mor_sweep = np.arange(args.a_mor - a_mor_range ,args.a_mor + a_mor_range,a_mor_step)
+                    for sweep_idx_tmp,sweep_tmp in enumerate(sweep):
+                        sweep[sweep_idx,0] = ??
+                        sweep[sweep_idx,1] = ??
 
-            if args.test:
-                print("###############################################################################")
-                print("comparing result (energy, forces, dudl ...)")
-                print("###############################################################################")
-                print(args.folder)
-                forces_old = compare_last_forces(args.folder)
-                compare_dudl(args)
-                if args.calculate_energy_and_forces != bool:
-                    print(printgreen("has calculate_energy_and_forces"))
-                else:
-                    print(printred("does not have old calculate_energy_and_forces"))
 
+
+                ##############################################################################
+                # now all variables should be defined
+                ##############################################################################
+                prepare_input_file(file_orig,file_comp,args)
+                if args.verbose:
+                    print("############ compiling (gcc)... ###############################################")
+                if os.path.exists('a.out'):os.remove('a.out')
+                if os.path.exists('out_dudl.dat'):os.remove('out_dudl.dat')
+                call(["gcc", file_comp])  # on cmmc this shoudl be icc
+                if not os.path.exists('a.out'):
+                    call(["icc", file_comp])  # on cmmc this shoudl be icc
+                if not os.path.exists('a.out'): sys.exit("no file a.out found! compilation problem")
+                if args.verbose:
+                    print("############ starting with following parameters ... ###########################")
+                if args.read_positions and args.read_uoutcar and args.steps == 0:
+                    args.steps = getlines_file(args.read_uoutcar)
+
+                if args.read_positions and not args.read_uoutcar and args.steps == 0:
+                    args.steps = getsteps_POSITIONSfile(args.read_positions,args)
+
+                args.temperature = str(float(args.temperature))
+                timestep = str(int(args.timestep)/1000.)
+
+
+                if args.verbose:
+                    print('START with args.temperature :',pvi(args.temperature,typee=float))
+                    print('START with args.timestep    :',args.timestep,'(fs)')
+                    print('START with timestep         :',timestep,'(ps)')
+                    print('START with args.steps       :',pvi(args.steps))
+                    print('START with write_every      :',str(args.write_every))
+                    print('START with read_positions   :',ov1(args.read_positions))
+                    print('START with verbose          :',ov1(args.verbose))
+                    print('START with write_analyze    :',ov1(args.write_analyze))
+                    print('START with read_hesse       :',ov1(args.read_hesse))
+                    print('START with read_forces      :',ov1(args.read_forces))
+                    print('START with read_uoutcar     :',ov1(args.read_uoutcar))
+                    #sys.exit('kkkkabel')
+                    print()
+                if int(args.steps) == 0:
+                    myexit("Error: Number of steps is 0")
+                if args.verbose:
+                    print("############ running md_long_tox_compile.c ... ##################################")
+                    #sys.exit('111111111111111')
+                    #                , T               ,dt           ,zeitschr  ,l                    ,read_pos, verbose, write_analyze , read_hesse
+                    #call(  ["./a.out", args.temperature,timestep,args.steps,str(args.write_every),read_pos,verbose, write_analyze , read_hesse,read_forces,read_uoutcar])
+                    print(printred('some input variables ar in COMPILING section and here ..... remove one'))
+                    print(printred('forinstance write_analyze'))
+
+                devnull = None   # print to screen
+                if args.verbose_m1 or args.verbose_m2:
+                    devnull = open(os.devnull, 'w')
+                command =   ["./a.out",
+                    ov0(args.temperature,float),
+                    timestep,
+                    ov1(args.steps),
+                    str(args.write_every),
+                    ov1(args.read_positions),
+                    ov1(args.verbose),
+                    ov1(args.write_analyze) ,
+                    ov1(args.read_hesse),
+                    ov1(args.read_forces),
+                    ov1(args.read_uoutcar),
+                    ov1(args.write_positions_rel)]
+                if args.verbose:
+                    print('command')
+                    print(command)
+                    print(" ".join(command))
+                call(command,stdout=devnull)
+                if args.verbose:
+                    print("------- BACK in argparse_my_code.py -------")
+                #print('args.stdout 1',args.stdout)
+                read_in_results(args)
+                #print('args.lambda_',args.lambda_)
+                #print("??",args.element,"std:",args.stdout,"l0:",args.dudl_lambda_0,"l1:",args.dudl_lambda_1)
+                #print('args.stdout 2',args.stdout)
+
+                if args.test:
+                    print("###############################################################################")
+                    print("comparing result (energy, forces, dudl ...)")
+                    print("###############################################################################")
+                    print(args.folder)
+                    forces_old = compare_last_forces(args.folder)
+                    compare_dudl(args)
+                    if args.calculate_energy_and_forces != bool:
+                        print(printgreen("has calculate_energy_and_forces"))
+                    else:
+                        print(printred("does not have old calculate_energy_and_forces"))
+
+                #print('args.dudl_lambda_0',args.dudl_lambda_0)
+                #print('args.dudl_lambda_1',args.dudl_lambda_1)
+                ### now the loop over lambdas is finished
+
+
+
+            if args.do_both_lambdas == False:
+	        free_ene_err = 0.
+	        PRL_L = "(PRL -  )"
+            else:
+	        free_ene_err = np.abs((args.dudl_lambda_0 - args.dudl_lambda_1)/2.)
+	        PRL_L = "(PRL NO )"
+                if free_ene_err <= my_atom.PRL_L[args.element]+0.5:
+                    PRL_L = "(PRL YES)"
             #print('args.dudl_lambda_0',args.dudl_lambda_0)
             #print('args.dudl_lambda_1',args.dudl_lambda_1)
-            ### now the loop over lambdas is finished
-
-
-
-        if args.do_both_lambdas == False:
-	    free_ene_err = 0.
-	    PRL_L = "(PRL -  )"
-        else:
-	    free_ene_err = np.abs((args.dudl_lambda_0 - args.dudl_lambda_1)/2.)
-	    PRL_L = "(PRL NO )"
-            if free_ene_err <= my_atom.PRL_L[args.element]+0.5:
-                PRL_L = "(PRL YES)"
-        #print('args.dudl_lambda_0',args.dudl_lambda_0)
-        #print('args.dudl_lambda_1',args.dudl_lambda_1)
-        #sys.exit()
-	#import unicodedata
-	#print("I am " + unicodedata.lookup("GREEK SMALL LETTER PI"))
-	#print("I am " + unicodedata.lookup("GREEK SMALL LETTER DELTA"))
-	#DELTA=unicodedata.lookup("GREEK CAPITAL LETTER DELTA")
-        print(("==> ("+args.element+") ene_std: {ene_std:5.1f} for_std: {for_std:6.5f}  dudl/2: {free_ene_err:5.1f}  ||| alat {alat:4.3f} ||| alat_mor {alat_mor:4.3f} a_mor {a_mor:7.5f}  D_mor {D_mor:7.5f} ||"+PRL_L).format(ene_std=args.ene_std_lam1, for_std=args.for_std_lam1, free_ene_err=free_ene_err,alat_mor=args.alat_mor,alat=args.alat,delta=1. - args.alat_mor/args.alat,a_mor=args.a_mor,D_mor=args.D_mor))
+            #sys.exit()
+	    #import unicodedata
+	    #print("I am " + unicodedata.lookup("GREEK SMALL LETTER PI"))
+	    #print("I am " + unicodedata.lookup("GREEK SMALL LETTER DELTA"))
+	    #DELTA=unicodedata.lookup("GREEK CAPITAL LETTER DELTA")
+            print(("==> ("+args.element+") ene_std: {ene_std:5.1f} for_std: {for_std:6.5f}  dudl/2: {free_ene_err:5.1f}  ||| alat {alat:4.3f} ||| alat_mor {alat_mor:4.3f} a_mor {a_mor:7.5f}  D_mor {D_mor:7.5f} ||"+PRL_L).format(ene_std=args.ene_std_lam1, for_std=args.for_std_lam1, free_ene_err=free_ene_err,alat_mor=args.alat_mor,alat=args.alat,delta=1. - args.alat_mor/args.alat,a_mor=args.a_mor,D_mor=args.D_mor))
