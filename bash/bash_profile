@@ -15,7 +15,7 @@
 #echo "in .bash_profile, `hostname | grep -o fidis`"
 
 case "$-" in
-  # only for interactive shell login on fidis or daint --> load zsh
+  # only for interactive shell login on fidis or daint or cosmopc --> load zsh
   # for interactive shell login on fidis or daint --> load zsh
   # when login to f210 (worknode fidis cluster) or actually any host besides daint / fidis -> do not load zsh
   *i*)
@@ -23,5 +23,6 @@ case "$-" in
   # echo hostname `hostname`
   [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l
   [ "`hostname | grep -o fidis`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+  [ "`hostname | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
    ;;
 esac
