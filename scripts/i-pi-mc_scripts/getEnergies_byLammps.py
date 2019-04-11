@@ -160,12 +160,12 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     else:
         print('ace units',ace.units.split("_"))
         sys.exit('ace units not known')
-    atom_energy_Mg = ace.mypot.atom_energy["Mg"]*conv
-    atom_energy_Si = ace.mypot.atom_energy["Si"]*conv
-    atom_energy_Al = ace.mypot.atom_energy["Al"]*conv
-    #print("atom_energy_Mg",atom_energy_Mg,ace.units,"one_atom",ace.mypot.atom_energy["Mg"],"hartee_pa")
-    #print("atom_energy_Si",atom_energy_Si,ace.units,"one_atom",ace.mypot.atom_energy["Si"],"hartree_pa")
-    #print("atom_energy_Al",atom_energy_Al,ace.units,"one_atom",ace.mypot.atom_energy["Al"],"hartree_pa")
+    atom_energy_Mg = ace.pot.atom_energy["Mg"]*conv
+    atom_energy_Si = ace.pot.atom_energy["Si"]*conv
+    atom_energy_Al = ace.pot.atom_energy["Al"]*conv
+    #print("atom_energy_Mg",atom_energy_Mg,ace.units,"one_atom",ace.pot.atom_energy["Mg"],"hartee_pa")
+    #print("atom_energy_Si",atom_energy_Si,ace.units,"one_atom",ace.pot.atom_energy["Si"],"hartree_pa")
+    #print("atom_energy_Al",atom_energy_Al,ace.units,"one_atom",ace.pot.atom_energy["Al"],"hartree_pa")
 
 
     calc_DFT = True
