@@ -221,8 +221,10 @@ def help(p = None):
        help=argparse.SUPPRESS, default=False)
 
 
-    p.add_argument('-s_a_mor',          '--sweep_a_mor', required=False, default=False, type=float,
+    p.add_argument('-sa',          '--sweep_a_mor', required=False, default=False, action='store_true',
        help='sweep a_mor variable and return for_std as funcion of a_mor')
+    p.add_argument('-sd',          '--sweep_D_mor', required=False, default=False, action='store_true',
+       help='sweep D_mor variable and return for_std as funcion of D_mor')
     p.add_argument('-gpf_dispfolder_setfolder',          '--gpf_dispfolder_setfolder', required=False, default=False, type=str,
        help=argparse.SUPPRESS)
     p.add_argument('-gpf_dispfolder_5x5x5',              '--gpf_dispfolder_5x5x5', required=False, action='store_true',
@@ -1381,43 +1383,51 @@ if __name__ == '__main__':
         args.dudl_lambda_0 = "--"
         args.dudl_lambda_1 = "--"
 
+        def get_sweep_range(args):
+            print("vvvvvvvvvvvvvvvvvv")
+            D_mor_range = 0.04 # 0.06
+            if args.sweep_D_mor:
+                D_mor_sweep = np.linspace(args.D_mor - D_mor_range/2., args.D_mor + D_mor_range/2., num=4)
 
-        D_mor_sweep = False
-        a_mor_sweep = False
+            else:
+                D_mor_sweep = [args.D_mor]
+            print("D_mor_sweep (temporary)",D_mor_sweep)
 
-        D_mor_range = 0.07
-        D_mor_step  = 0.03
-        D_mor_sweep = np.arange(0 - D_mor_range ,0 + D_mor_range,D_mor_step)
-        print("D_mor_sweep",D_mor_sweep)
+            a_mor_range = 0.01 #0.06
+            if args.sweep_a_mor:
+                a_mor_sweep = np.linspace(args.a_mor - a_mor_range/2., args.a_mor + a_mor_range/2., num=3)
+            else:
+                a_mor_sweep = [args.a_mor]
+            print("a_mor_sweep (temporary)",a_mor_sweep)
 
-        a_mor_range = 0.07
-        a_mor_step  = 0.03
-        a_mor_sweep = np.arange(0 - a_mor_range ,0 + a_mor_range,a_mor_step)
-        print("a_mor_sweep",a_mor_sweep)
+            print()
+            sweep = [[False,False,False]]  # first, this is a fake sweep, this will be filled once the
+            print()
+            print('sweep (1)',sweep)
+            print()
+            if len(D_mor_sweep) > 1 or len(a_mor_sweep) > 1:
+                sweep = []
+                for DD in D_mor_sweep:
+                    for aa in a_mor_sweep:
+                        print('DD, aa:',DD,aa)
+                        sweep.append([DD,aa,False])
+                print()
+                print('sweep (2)',sweep)
+                print()
+                for ddaa in sweep:
+                    print('iii loop:',ddaa)
+            else:
+                sweep = [[args.D_mor,args.a_mor,False]]
+            print("^^^^^^^^^^^^^^^^^^")
+            return sweep
 
-        anz = 1
-        sweep = []  # first, this is a fake sweep, this will be filled once the
-        for DD in D_mor_sweep:
-            for aa in a_mor_sweep:
-                print(anz,'DD, aa',DD,aa)
-                anz+=1
-                sweep.append([DD,aa])
-        print()
-        for ddaa in sweep:
-            print('iii',ddaa)
-        sys.exit('33')
+        sweep_all = get_sweep_range(args)
+        print('sweep_all (1)',sweep_all)
 
 
 
-        for sweep_idx,sweep in enumerate(sweep):
-            args.D_mor = sweep[sweep_idx,0]
-            args.a_mor = sweep[sweep_idx,1]
+        for sweep_idx,sweep in enumerate(sweep_all):
             for args.lambda_ in lam01_:
-                print('a_mor',args.a_mor) # 1.84
-                print('D_mor',args.D_mor) # 0.24
-                sys.exit('123')
-
-
                 #########################################################################
                 # get the parametrization
                 #########################################################################
@@ -1435,13 +1445,16 @@ if __name__ == '__main__':
                 print_parameters(args,idx="(11)")
 
                 if sweep_idx == 0:
-                    D_mor_sweep = np.arange(args.D_mor - D_mor_range ,args.D_mor + D_mor_range,D_mor_step)
-                    a_mor_sweep = np.arange(args.a_mor - a_mor_range ,args.a_mor + a_mor_range,a_mor_step)
-                    for sweep_idx_tmp,sweep_tmp in enumerate(sweep):
-                        sweep[sweep_idx,0] = ??
-                        sweep[sweep_idx,1] = ??
+                    print('a!!',args.a_mor)
+                    print('D!!',args.D_mor)
+                    sweep_all = get_sweep_range(args)
+                    print('sweep_all (2)',sweep_all)
+                    print('sweep_all (3) x',sweep_all[0])
+                    print('sweep_all (4) x',sweep_all[0][0])
+                    print('sweep_all (5) y',sweep_all[0][1])
 
-
+                args.D_mor = sweep_all[sweep_idx][0]
+                args.a_mor = sweep_all[sweep_idx][1]
 
                 ##############################################################################
                 # now all variables should be defined
@@ -1553,3 +1566,15 @@ if __name__ == '__main__':
 	    #print("I am " + unicodedata.lookup("GREEK SMALL LETTER DELTA"))
 	    #DELTA=unicodedata.lookup("GREEK CAPITAL LETTER DELTA")
             print(("==> ("+args.element+") ene_std: {ene_std:5.1f} for_std: {for_std:6.5f}  dudl/2: {free_ene_err:5.1f}  ||| alat {alat:4.3f} ||| alat_mor {alat_mor:4.3f} a_mor {a_mor:7.5f}  D_mor {D_mor:7.5f} ||"+PRL_L).format(ene_std=args.ene_std_lam1, for_std=args.for_std_lam1, free_ene_err=free_ene_err,alat_mor=args.alat_mor,alat=args.alat,delta=1. - args.alat_mor/args.alat,a_mor=args.a_mor,D_mor=args.D_mor))
+            sweep_all[sweep_idx][2] = args.for_std_lam1
+            #if sweep_idx == 0 and len(sweep_all) > 1:
+            if len(sweep_all) > 1:
+               print(sweep_all[sweep_idx])
+
+        if len(sweep_all) > 1:
+            print()
+            print(sweep_all)
+            mat = np.asarray(sweep_all)
+            np.savetxt('arrout.dat',mat)
+            D = np.unique(mat[:,0])
+            a = np.unique(mat[:,1])

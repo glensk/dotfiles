@@ -34,7 +34,7 @@ def runner_run_mode_1_1(filename_in,mode,test_fraction,test):
     1.0 obtain input.data (== structures in runner format)
     1.1 runner
     1.2 choose most important symmetry functions (CurSel.py)
-    1.2 get the correct representation/function.date
+    1.2 get the correct representation/function.data
         (with CurSel.py derived symmetry functions)
     2.  get the potential
     '''

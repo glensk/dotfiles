@@ -2,3 +2,26 @@ scp -r lopanits@cosmopc23:/home/lopanits/source/runner ./
 
 to compile:
 in runner folder: make serial  (at least on cosmopcxx)
+
+
+cosmopc15% ldd RuNNer.serial.cosmopc.natascha.x
+  linux-vdso.so.1 (0x00007ffe103da000)
+      libgfortran.so.3 => /usr/lib/x86_64-linux-gnu/libgfortran.so.3 (0x00007f8786211000)
+      libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f8785e73000)
+      libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f8785a82000)
+      libquadmath.so.0 => /usr/lib/x86_64-linux-gnu/libquadmath.so.0 (0x00007f8785842000)
+      libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f878562a000)
+      /lib64/ld-linux-x86-64.so.2 (0x00007f8786542000)
+
+
+a) haveing input.data and input.nn -> get function.data
+    - in input.nn change test fraction to 0.1 and to  runner_mode 1 (to get function data)
+    - run ./RuNNer.serial.cosmopc.natascha.x > logfile (you'll might need the logfile for cursel)
+    - this takes only a couple of minutes
+
+b) having input.data and input.nn and function.data and testing.data and trainstruct.data and trainforces.data:
+    - in input.nn keep test fraction at 0.1 and change to runner_mode 2
+    - comment use_old_weights_short 
+    - run ./RuNNer.serial.cosmopc.natascha.x > logfile (you'll might need the logfile for cursel)
+
+

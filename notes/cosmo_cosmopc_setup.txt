@@ -9,3 +9,5 @@ sudo apt install libeigen3-dev
 
 sudo su  ( to become root)
 then you can look at /sys/var/logfiles
+
+sudo apt-get install libgfortran3 # tried when trying to use runner again after half a year on cosmopc
