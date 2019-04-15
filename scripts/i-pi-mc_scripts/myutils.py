@@ -18,7 +18,11 @@ except ImportError:
     pass
 from ase.spacegroup import crystal
 from ase.constraints import StrainFilter
-from ase.constraints import ExpCellFilter
+try:
+    from ase.constraints import ExpCellFilter
+except ImportError:
+    pass
+
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
@@ -1613,7 +1617,7 @@ class ase_calculate_ene( object ):
         #print('stress original frame:',frame.get_stress())
         #print('5x')
         if verbose:
-            print('frame cell',frame.get_cell())
+            print('frame cell::',frame.get_cell())
         if self.elastic_relax == True:
             self.ase_relax_cellshape_and_volume_only(frame)
         if verbose:
