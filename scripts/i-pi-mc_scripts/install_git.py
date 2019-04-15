@@ -189,9 +189,12 @@ def install_lammps(args):
     print('hostname',hostname)
     if hostname == 'fidis':
         serialfidis = 'fidis'
-    elif hostname == 'mac':
+    else:
         serialfidis = 'serial'
+    #elif hostname == 'mac':
+    #    serialfidis = 'serial'
 
+    ## compile serial or parallel
     if hostname == 'fidis':
         if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
             my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
@@ -224,7 +227,8 @@ def install_lammps(args):
         subprocess.call(["make", "serial"])
         print()
     else:
-        sys.exit("hostname "+hostname+" not set up yet")
+        subprocess.call(["make", "serial"])
+        #sys.exit("hostname "+hostname+" not set up yet")
 
     print()
     print("************ make done ************")
