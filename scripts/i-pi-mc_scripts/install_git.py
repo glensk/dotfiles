@@ -27,8 +27,9 @@ branch['aiida-alloy']   = False
 
 address["lammps"]        = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
 address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]   = False
-address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
-address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
+#address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
+#address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
+address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
 
 
 def help(p = None ,known=known):
@@ -250,7 +251,10 @@ def install_lammps(args):
     print("************ make mode=shlib xxxx ************")
     os.chdir(args.install_folder+"/src")
     print()
-    bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+    if hostname == 'fidis':
+        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+    else:
+        bash_command("make mode=shlib serial",os.getcwd())
     print()
     os.chdir(args.install_folder+"/python")
     print()
