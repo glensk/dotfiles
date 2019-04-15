@@ -25,7 +25,8 @@ branch['ipi']           = False # get all the branches and not just feat/kmc
 address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
 
-address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]  = False
+address["lammps"]        = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
+address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]   = False
 address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
 address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
 
@@ -137,11 +138,12 @@ def install_lbzip(args):
 def install_lammps(args):
     ''' lammps_runner works on fidis && mac
         lammps_n2p2   works on fidis
+        on fidis, the executable works with runner and n2p2
     '''
     if args.install == "lammps_runner":
         git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
         extension = [ "runner" ]
-    elif args.install == "lammps_n2p2":
+    elif args.install == "lammps_n2p2" or args.install == "lammps":
         git_clone(args,specify_depth = True)
         extension = [ "n2p2" ]
         extension = [ "n2p2", "runner" ]
