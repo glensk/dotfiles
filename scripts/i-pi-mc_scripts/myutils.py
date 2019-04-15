@@ -793,7 +793,7 @@ class mypot( object ):
         return
 
     def print_variables(self,text=""):
-        if self.verbose:
+        if self.verbose > 1:
             print("calss mypot      ",text)
             print("self.elements    ",self.elements)
             print("self.atom_energy ",self.atom_energy)
@@ -1035,7 +1035,7 @@ class ase_calculate_ene( object ):
 
 
     def print_variables(self,text=""):
-        if self.verbose:
+        if self.verbose > 1:
             tt = 'ase_calculate_ene, self.'
             print()
             print(text,tt+'pot.pot       :',self.pot.pot)    # : n2p2_v2ag
@@ -1096,7 +1096,7 @@ class ase_calculate_ene( object ):
 
 
 
-        if self.verbose:
+        if self.verbose > 1:
             tt = 'ase_calculate_ene, self.'
             print(tt+'pot.pot     :',self.pot.pot)        # : n2p2_v2ag
             print(tt+'pot.potpath :',self.pot.potpath)   # :
