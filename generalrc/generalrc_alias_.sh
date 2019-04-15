@@ -262,6 +262,8 @@ $1 umount_fidis_scratch 'umount -f /scratch/glensk; echo umounted /scratch/glens
 $1 mount_fidis_home 'sshfs glensk@fidis.epfl.ch:/home/glensk/ /home/glensk -o reconnect -C; echo mounted /home/glensk' 
 $1 umount_fidis_home 'umount -f /home/glensk; echo umounted /home/glensk'
 
+$1 mount_cosmopc_home 'sshfs glensk@cosmopc15.epfl.ch:/home/glensk/ /home/glensk -o reconnect -C; echo mounted /home/glensk' 
+$1 umount_cosmopc_home 'umount -f /home/glensk; echo umounted /home/glensk'
 
 
 $1 mount_pc_scratch 'sshfs glensk@cosmopc15.epfl.ch:/local/scratch/glensk/ /local/scratch/glensk -o reconnect -C; echo mounted /local/scratch/glensk/'

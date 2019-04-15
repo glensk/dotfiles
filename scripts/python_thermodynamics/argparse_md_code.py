@@ -198,6 +198,8 @@ def help(p = None):
     ### specify folder to import POSITIONs from
     p.add_argument('-fmd30',   '--f_md_2x2x2_30' , default=False,required=False,action='store_true',
        help='run/evolve the MD on from the displacements/ti folder for set element using 30__PTS_dosall')
+    p.add_argument('--f_d_5x5x5','-f_d_5x5x5' , default=False,required=False,action='store_true',
+       help='run/evolve the MD on from the displacements folder for set element in the 5x5x5 supercell')
     p.add_argument('-f',   '--folder', required=False,
        help='Define folder to look for POSITIONs or HesseMatrix_sphinx file', type=str, default=False)
     p.add_argument('-fandp',   '--folder_and_parametrization', required=False,
@@ -621,11 +623,10 @@ def obtain_parametrization_E_from_parametrize_displacements_skript(args): #KKK
         print_parameters(args,idx="(E)")
         return
 
-def obtain_input_folder_A_for_f_md_2x2x2_30(args):
+def obtain_input_folder_A_for_f_md_2x2x2_30_f_d_5x5x5(args):
     if args.verbose:
-        print("############ obtain_input_folder_A_for_f_md_2x2x2_30 ... #################################")
-
-    if args.f_md_2x2x2_30 == False:
+        print("############ obtain_input_folder_A_for_f_md_2x2x2_30_f_d_5x5x5 ... #################################")
+    if args.f_md_2x2x2_30 == False and args.f_d_5x5x5 == False:
         return False
 
     if args.f_md_2x2x2_30:
@@ -650,13 +651,19 @@ def obtain_input_folder_A_for_f_md_2x2x2_30(args):
                         sys.exit('folder not found xxx;Exit')
             return folder
         args.folder = getpath_MD_30(kp="3x3x3",lam=args.lambda_)
-        if args.verbose:
-            print('ARGS.FOLDER',args.folder)
-        if args.alat == False:
-            args.alat = np.loadtxt(args.folder+'/cell')[0,0]/2
-        #args.read_hesse = False  # do I need this?
-        print_parameters(args,idx="(A)")
-        return
+
+    print('aaxxx',args.f_d_5x5x5)
+    if args.f_d_5x5x5:
+        args.folder = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/"+args.element+"/5x5x5sc_quer_2x2x2kp_vasp4/"
+        return "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/"+args.element+"/5x5x5sc_quer_2x2x2kp_vasp4/"
+
+    if args.verbose:
+        print('ARGS.FOLDER',args.folder)
+    if args.alat == False:
+        args.alat = np.loadtxt(args.folder+'/cell')[0,0]/2
+    #args.read_hesse = False  # do I need this?
+    print_parameters(args,idx="(A)")
+    return
 
 def obtain_input_folder_B_and_related_files(args):
     if args.verbose:
@@ -1385,17 +1392,20 @@ if __name__ == '__main__':
 
         def get_sweep_range(args):
             print("vvvvvvvvvvvvvvvvvv")
-            D_mor_range = 0.04 # 0.06
+            D_mor_range = 0.003 # D ~ 0.2
+            D_mor_range = 0.02 # D ~ 0.2
+            D_mor_points = 5
             if args.sweep_D_mor:
-                D_mor_sweep = np.linspace(args.D_mor - D_mor_range/2., args.D_mor + D_mor_range/2., num=4)
+                D_mor_sweep = np.linspace(args.D_mor - D_mor_range/2., args.D_mor + D_mor_range/2., num=D_mor_points)
 
             else:
                 D_mor_sweep = [args.D_mor]
             print("D_mor_sweep (temporary)",D_mor_sweep)
 
-            a_mor_range = 0.01 #0.06
+            a_mor_range = 0.1 # a ~ 1.8
+            a_mor_points = 10
             if args.sweep_a_mor:
-                a_mor_sweep = np.linspace(args.a_mor - a_mor_range/2., args.a_mor + a_mor_range/2., num=3)
+                a_mor_sweep = np.linspace(args.a_mor - a_mor_range/2., args.a_mor + a_mor_range/2., num=a_mor_points)
             else:
                 a_mor_sweep = [args.a_mor]
             print("a_mor_sweep (temporary)",a_mor_sweep)
@@ -1431,7 +1441,7 @@ if __name__ == '__main__':
                 #########################################################################
                 # get the parametrization
                 #########################################################################
-                obtain_input_folder_A_for_f_md_2x2x2_30(args)  # f_md_2x2x2_30
+                obtain_input_folder_A_for_f_md_2x2x2_30_f_d_5x5x5(args)  # f_md_2x2x2_30
                 obtain_input_folder_B_and_related_files(args)  # once args.folder is defined this is very good
                 get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist(args)
                 obtain_parametrization_E_from_parametrize_displacements_skript(args)
@@ -1578,3 +1588,7 @@ if __name__ == '__main__':
             np.savetxt('arrout.dat',mat)
             D = np.unique(mat[:,0])
             a = np.unique(mat[:,1])
+            print("D",D)
+            print("a",a)
+            for idx,i in enumerate(D):
+                np.savetxt('sweep_'+str(D[idx])+".dat",mat[np.where(mat[:,0] == D[idx])[0]][:,[1,2]])

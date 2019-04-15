@@ -218,10 +218,10 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
         nat = atoms.get_number_of_atoms()
         positions = atoms.get_positions(wrap=False)/units.Bohr  # Wrapping takes huge amout of time
         for idx in xrange(nat):
-            fileobj.write('atom  %16.10f %16.10f %16.10f  %3s  %1.1f %1.1f   %16.10f %16.10f %16.10f\n' % (positions[idx,0],positions[idx,1],positions[idx,2],atoms[idx].symbol,0.0,0.0,forces[idx][0],forces[idx][1],forces[idx][2]))
+            fileobj.write('atom  %16.10f %16.10f %16.10f  %3s  %1.1f %1.1f   %15.8e %15.8e %15.8e\n' % (positions[idx,0],positions[idx,1],positions[idx,2],atoms[idx].symbol,0.0,0.0,forces[idx][0],forces[idx][1],forces[idx][2]))
 
 
 
-        fileobj.write('energy %16.15f\n' % energy)
+        fileobj.write('energy %.15e\n' % energy)
         fileobj.write('charge 0.0000\n')
         fileobj.write('end\n')
