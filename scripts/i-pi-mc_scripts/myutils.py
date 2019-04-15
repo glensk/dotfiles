@@ -1607,6 +1607,7 @@ class ase_calculate_ene( object ):
     def get_elastic_external(self,atomsin=False,verbose=False,text=False,get_all_constants=False):
         ''' the function will never change the atomsobject '''
         print('######## get_elastic_external #############')
+        #print("LMP",LAMMPS_COMMAND)
 
         #print('1')
         #if self.elastic != True:
