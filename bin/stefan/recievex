@@ -7,7 +7,10 @@
 #@     tar --use-compress-program=lbzip2 -xvf archive.tar.bzip2
 #@ fi
 #@ rm archive.tar.bzip2
+basename=`basename $0`
 
+#[ "$basename" = "recievex" ] && echo do the tar
+#exit
 filename="sendx.tar.bzip2"
 #echo $onhost
 #exit
@@ -24,6 +27,7 @@ else
     rsync --progress --remove-source-files -av -e ssh $address:~/.exchange/$filename . 
 fi
 
+[ "$basename" = "recievexnountar" ] && echo no unar && exit
 #echo ":$1:"
 tar=`command -v gtar`
 [ "$tar" = "" ] && tar=`command -v tar`
