@@ -3,7 +3,7 @@
 basename=`basename $0`
 [ "$basename" = "sendx" ] && echo is sendx
 [ "$basename" = "sendx2" ] && echo is sendx22
-exit
+#exit
 sendtarred=""
 if [ "`basename $0`" = "sendxtarred" ];then
     getname=`tar.bzip2_file_or_folder.sh $* | tail -1`
