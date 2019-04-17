@@ -25,9 +25,11 @@ branch['ipi']           = False # get all the branches and not just feat/kmc
 address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
 
-address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]  = False
-address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
-address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
+address["lammps"]        = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False
+address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]   = False
+#address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
+#address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
+address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
 
 
 def help(p = None ,known=known):
@@ -137,11 +139,12 @@ def install_lbzip(args):
 def install_lammps(args):
     ''' lammps_runner works on fidis && mac
         lammps_n2p2   works on fidis
+        on fidis, the executable works with runner and n2p2
     '''
     if args.install == "lammps_runner":
         git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
         extension = [ "runner" ]
-    elif args.install == "lammps_n2p2":
+    elif args.install == "lammps_n2p2" or args.install == "lammps":
         git_clone(args,specify_depth = True)
         extension = [ "n2p2" ]
         extension = [ "n2p2", "runner" ]
@@ -187,9 +190,12 @@ def install_lammps(args):
     print('hostname',hostname)
     if hostname == 'fidis':
         serialfidis = 'fidis'
-    elif hostname == 'mac':
+    else:
         serialfidis = 'serial'
+    #elif hostname == 'mac':
+    #    serialfidis = 'serial'
 
+    ## compile serial or parallel
     if hostname == 'fidis':
         if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
             my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
@@ -222,7 +228,8 @@ def install_lammps(args):
         subprocess.call(["make", "serial"])
         print()
     else:
-        sys.exit("hostname "+hostname+" not set up yet")
+        subprocess.call(["make", "serial"])
+        #sys.exit("hostname "+hostname+" not set up yet")
 
     print()
     print("************ make done ************")
@@ -244,7 +251,10 @@ def install_lammps(args):
     print("************ make mode=shlib xxxx ************")
     os.chdir(args.install_folder+"/src")
     print()
-    bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+    if hostname == 'fidis':
+        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+    else:
+        bash_command("make mode=shlib serial",os.getcwd())
     print()
     os.chdir(args.install_folder+"/python")
     print()

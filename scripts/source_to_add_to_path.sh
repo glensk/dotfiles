@@ -24,7 +24,8 @@ _python_thermodynamics="$SCR/python_thermodynamics/"
 _ase_lammps="$HOME/sources/lammps_source_cosmo"
 _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
-_lammps_source="$HOME/sources/lammps_n2p2/"
+#_lammps_source="$HOME/sources/lammps_n2p2/"
+_lammps_source="$HOME/sources/lammps/"
 addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps1:$_lammps2:$_ase_lammps/python:$_ipi_source"
 
 export PATH="$PATH:$addeverywhere"
@@ -38,13 +39,16 @@ if [ "`hostname`" = "mac" ];then
 fi
 
 #export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
-if [ -e $SCR/executables/lmp_$onhost\_par ];then  # dont use "$SCR/ex..." quotes on fidis --> will not work
-    #echo 'does yes'
-    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost\_par"
-else
-    #echo 'does not'
-    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
-fi
+#if [ -e $SCR/executables/lmp_$onhost\_par ];then  # dont use "$SCR/ex..." quotes on fidis --> will not work
+#    #echo 'does yes'
+#    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost\_par"
+#else
+#    #echo 'does not'
+#    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+#fi
+# @@ on fidis this can do runner and n2p2
+export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+
 export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
 export N2P2_PATH="$HOME/sources/n2p2/"
 

@@ -18,7 +18,11 @@ except ImportError:
     pass
 from ase.spacegroup import crystal
 from ase.constraints import StrainFilter
-from ase.constraints import ExpCellFilter
+try:
+    from ase.constraints import ExpCellFilter
+except ImportError:
+    pass
+
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
@@ -709,7 +713,7 @@ class mypot( object ):
 
         self.pot_all    = False   # n2p2_v1ag
 
-        self.trigger_set_path_manual = ["setpath","potpath","pp"]
+        self.trigger_set_path_manual = ["setpath","potpath","pp", ".", "..", "../" ]
         self.verbose    = verbose
 
         self.elements    = False  # list e.g. ['Al', 'Mg', 'Si']
@@ -792,8 +796,8 @@ class mypot( object ):
                         self.atom_energy = d
         return
 
-    def print_variables(self,text=""):
-        if self.verbose > 1:
+    def print_variables(self,text="",print_nontheless=False):
+        if self.verbose > 1 or print_nontheless:
             print("calss mypot      ",text)
             print("self.elements    ",self.elements)
             print("self.atom_energy ",self.atom_energy)
@@ -811,15 +815,22 @@ class mypot( object ):
         ##########################################
         # get potential from path
         ##########################################
+        if self.potpath == False and self.potpath_in == False and self.pot in [ ".." , "../", "." ]:
+            self.potpath_in = os.path.abspath(self.pot)
+
         if self.potpath_in != False and self.potpath == False:
+            #print('ka')
+            #if self.potpath_in == ".":
+            #    self.potpath_in =
             if not os.path.isdir(self.potpath_in):
-                sys.exit(self.potpath_in+" does not exist!")
+                sys.exit(self.potpath_in+" does not exist! (1)")
             checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
             for i in checkfiles:
                 if not os.path.isfile(self.potpath_in+"/"+i):
-                    sys.exit(self.potpath_in+"/"+i+" does not exist!")
+                    sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
                 #else:
                 #    print(self.potpath_in+"/"+i)
+            #if self.verbose: print('aa',self.potpath_in)
             self.potpath = os.path.abspath(self.potpath_in)
 
             with open(self.potpath_in+"/input.nn") as fp:
@@ -1038,15 +1049,15 @@ class ase_calculate_ene( object ):
         if self.verbose > 1:
             tt = 'ase_calculate_ene, self.'
             print()
-            print(text,tt+'pot.pot       :',self.pot.pot)    # : n2p2_v2ag
-            print(text,tt+'units         :',self.units)      # : ev
-            print(text,tt+'geopt         :',self.geopt)      # : False
-            print(text,tt+'elastic       :',self.elastic)    # : False
-            print(text,tt+'nsteps        :',self.nsteps)     # : 0
-            print(text,tt+'lmpcmd        :',self.lmpcmd)     # : False
-            print(text,tt+'kmc           :',self.kmc)        # : False
-            print(text,tt+'temp          :',self.temp)       # : False
-            print(text,tt+'verbose       :',self.verbose)       # : False
+            print(text,tt+'pot.pot      (1) :',self.pot.pot)    # : n2p2_v2ag
+            print(text,tt+'units        (1) :',self.units)      # : ev
+            print(text,tt+'geopt        (1) :',self.geopt)      # : False
+            print(text,tt+'elastic      (1) :',self.elastic)    # : False
+            print(text,tt+'nsteps       (1) :',self.nsteps)     # : 0
+            print(text,tt+'lmpcmd       (1) :',self.lmpcmd)     # : False
+            print(text,tt+'kmc          (1) :',self.kmc)        # : False
+            print(text,tt+'temp         (1) :',self.temp)       # : False
+            print(text,tt+'verbose      (1) :',self.verbose)       # : False
             print()
         return
 
@@ -1098,25 +1109,25 @@ class ase_calculate_ene( object ):
 
         if self.verbose > 1:
             tt = 'ase_calculate_ene, self.'
-            print(tt+'pot.pot     :',self.pot.pot)        # : n2p2_v2ag
-            print(tt+'pot.potpath :',self.pot.potpath)   # :
-            print(tt+'pot.pottype :',self.pot.pottype)   # :
+            print(tt+'pot.pot     (Y) :',self.pot.pot)        # : n2p2_v2ag
+            print(tt+'pot.potpath (Y) :',self.pot.potpath)   # :
+            print(tt+'pot.pottype (Y) :',self.pot.pottype)   # :
 
         #sys.exit()
         # this depends only on the potential which is already defined
         # so should be easy to make this general.
         self.lmpcmd = self.lammps_command_masses()
 
-        if self.pot.pot.split("_")[0] == "n2p2":
+        if self.pot.pottype == "n2p2":
             # showewsum 1 showew yes resetew no maxew 1000000
             self.lmpcmd = self.lmpcmd + self.lammps_command_potential_n2p2()
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
 
-        elif self.pot.pot.split("_")[0] == "runner":
+        elif self.pot.pottype == "runner":
             self.lmpcmd = self.lmpcmd + self.lammps_command_potential_runner()
             self.atom_types = {'Mg':1,'Al':2,'Si':3}
         else:
-            sys.exit('pot '+str(self.pot.pot)+' not found!')
+            sys.exit('pot '+str(self.pot.pot)+' not found! (X)')
 
         if self.kmc:
             if self.ffsocket == "unix": add = "unix"
@@ -1596,6 +1607,7 @@ class ase_calculate_ene( object ):
     def get_elastic_external(self,atomsin=False,verbose=False,text=False,get_all_constants=False):
         ''' the function will never change the atomsobject '''
         print('######## get_elastic_external #############')
+        #print("LMP",LAMMPS_COMMAND)
 
         #print('1')
         #if self.elastic != True:
@@ -1613,9 +1625,10 @@ class ase_calculate_ene( object ):
         #print('stress original frame:',frame.get_stress())
         #print('5x')
         if verbose:
-            print('frame cell',frame.get_cell())
+            print('frame cell::',frame.get_cell())
+            print('verbose   ::',verbose)
         if self.elastic_relax == True:
-            self.ase_relax_cellshape_and_volume_only(frame)
+            self.ase_relax_cellshape_and_volume_only(frame,verbose=verbose)
         if verbose:
             print('stress relaxed frame :',frame.get_stress())
             print('frame cell',frame.get_cell())
@@ -1717,9 +1730,12 @@ class ase_calculate_ene( object ):
     def ase_relax_cellshape_and_volume_only(self,atoms,verbose=False):
         ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
         self.keep_alive = True
+        #print('1')
         self.get_calculator(atoms)
+        #print('2')
 
-        if verbose: self.check_frame('ase_relax_cellshape_and_volume_only in',frame=atoms)
+        if verbose: self.check_frame('ase_relax_cellshape_and_volume_only in',frame=atoms,verbose=verbose)
+        #print('3')
 
         sf = StrainFilter(atoms)
         logfile="-" # output to screen
@@ -2013,14 +2029,20 @@ class ase_calculate_ene( object ):
 
 
     def check_frame(self,text,frame=False,verbose=True,setupcalc=True):
+        #print('a')
         if type(text) != str:
             raise TypeError("need a text!")
+        #print('b')
 
         if setupcalc == True:
+            #print('c',verbose)
             self.keep_alive = True
             self.get_calculator(frame)
+        #print('d',verbose)
 
-        #print('fgs',frame.get_stress())
+        if verbose:
+            print('check_frame::')
+            print('check_frame::',frame.get_stress())
         check_stress_max = round(abs(frame.get_stress()).max(),5)
         check_vpa = round(ase_vpa(frame),2)  # only 2 digits can be nicely fitted
         check_force_max = round(abs(frame.get_forces()).max(),5)

@@ -59,6 +59,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     units = ace.units
     print('ace.pot.pot      :',ace.pot.pot)
     print('ace.pot.fullpath :',ace.pot.potpath)
+    ace.pot.print_variables(print_nontheless=True)
     print()
 
     ### when want to assess some formation energies
