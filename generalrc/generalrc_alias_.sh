@@ -74,6 +74,7 @@ $1 ...... 'cd ../../..'
 
 #$1 rx 'recievex'
 $1 rx '$dotfiles/bin/stefan/recievex'
+$1 rxnountar '$dotfiles/bin/stefan/recievexnountar'
 $1 rxo '$dotfiles/bin/stefan/recievexoxford'
 $1 sx 'sendx'
 $1 sxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; cp ../lammps_pos_to_sum.py .; sendx lammps_pos_to_sum.py;cd $hier'

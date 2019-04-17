@@ -2217,7 +2217,7 @@ def get_inputvariables_from_c_skript_md_long_tox_job():
     #print 'alat:',alat
     #print 'dt:',dt
     args.supercell = sc
-    args.dt = dt
+    args.dt = dt/10**12
     args.alat = alat
     return
 
@@ -10771,6 +10771,12 @@ def get_correct_input_variables(args):
         print("usestruct       :",args.usestruct)
         print("number of atoms :",args.atoms)
         print("qvec            :",args.qvec)  # qvec            : [['l', '0', '0'], ['t', '0', '0']]
+
+    if args.dt > 20:
+        sys.exit('Error: your timestep dt seems too large...')
+    if args.dt < 0.1:
+        sys.exit('Error: your timestep dt seems quite small, is it corect?')
+
     if type(args.qvec) == bool:
         sys.exit("ERROR: specify qvec!")
     if type(args.dt) == bool:
