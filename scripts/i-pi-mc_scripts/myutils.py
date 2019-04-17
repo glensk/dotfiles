@@ -796,8 +796,8 @@ class mypot( object ):
                         self.atom_energy = d
         return
 
-    def print_variables(self,text=""):
-        if self.verbose > 1:
+    def print_variables(self,text="",print_nontheless=False):
+        if self.verbose > 1 or print_nontheless:
             print("calss mypot      ",text)
             print("self.elements    ",self.elements)
             print("self.atom_energy ",self.atom_energy)
