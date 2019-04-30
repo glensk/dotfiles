@@ -6,7 +6,7 @@ import numpy as np
 import glob #,pathlib
 from copy import deepcopy
 from socket import gethostname
-from shutil import copyfile
+import shutil
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
@@ -193,13 +193,13 @@ def cp(src=False,dest=False):
         dest_is = "dir"
     if src_is == "file" and dest_is == False:
         # possibly because dest does not exist
-        copyfile(src,dest)
+        shutil.copyfile(src,dest)
     elif src_is == "file" and dest_is == "file":
-        copyfile(src,dest)
+        shutil.copyfile(src,dest)
     elif src_is == "file" and dest_is == "dir":
         basename = os.path.basename(src)
         #print("basename:",os.path.basename(src))
-        copyfile(src,dest+"/"+basename)
+        shutil.copyfile(src,dest+"/"+basename)
     else:
         print("source is:",src_is,":",src)
         print("dest   is:",dest_is,":",dest)
@@ -1063,10 +1063,15 @@ class ase_calculate_ene( object ):
 
 
     def lammps_command_potential_n2p2(self):
+        units_giulio_ene = "0.0367493254"
+        ase_units_ene    = "0.03674932247495664" # 1./ase.units.Hartree
+
+        units_giulio_bohr = "1.8897261328"
+        ase_units_bohr    = "1.8897261258369282" # 1./ase.units.Bohr
         command = [
         # showewsum 1 showew yes resetew no maxew 1000000
         'variable nnpDir string \"'+self.pot.potpath+'\"',
-        "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261328 cfenergy 0.0367493254",
+        "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength "+ase_units_bohr+" cfenergy "+ase_units_ene,
         "pair_coeff * * 11.0",
         "#write_data ./pos.data # would this be the final struct?"
         ]
@@ -2357,6 +2362,18 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ###############################################################
     tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
+    folder = tmpdir
+
+    # delete all previous file in folder
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+        except Exception as e:
+            print(e)
+
     print('doing the calculation in lammps, externally, in folder',tmpdir)
 
     ###############################################################
@@ -2419,6 +2436,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             ene=float(ene)
             #print('ene',ene,'lammps in eV')
             #print('ace units',ace.units)
+            print('ace.units.lower()',ace.units.lower())
             if ace.units.lower() == 'ev':
                 pass
             elif ace.units.lower() == 'hartree':

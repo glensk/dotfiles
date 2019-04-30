@@ -1,0 +1,22 @@
+from:
+/scratch/glensk/TEST_RUNNER_VS_n2p2/n2p2_v2ag_5000m2_24_24_adapted_atomic_energies/input.nn
+
+%getEnergies_byLammps.py -p . -e
+%infile           : None
+%ace.pot.pot      : n2p2_frompath
+%ace.pot.fullpath : /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_4998
+%calss mypot
+%self.elements     ['Al', 'Mg', 'Si']
+%self.atom_energy  {'Mg': -16.7493351, 'Si': -5.5274864, 'Al': -19.6283516}
+%self.pot          n2p2_frompath
+%self.pot_all      False
+%self.potpath      /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_4998
+%self.potpath_in   /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_4998
+%self.pottype      n2p2
+%self.verbose      0
+%
+%
+%######## get_elastic_external #############
+%doing the calculation in lammps, externally, in folder /home/glensk/._tmp_lammps/
+%ace.c44: 41.4693708892048
+%

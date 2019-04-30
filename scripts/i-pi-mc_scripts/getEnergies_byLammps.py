@@ -47,6 +47,8 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
 
     '''
+    print('infile           :',infile)
+
     ### get ace object for the chosen potential
     if test or teste: units='eV'
     ace = ase_calculate_ene(pot=pot,
@@ -68,7 +70,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         my.create_READMEtxt(os.getcwd())
         sys.exit('test done! Exit')
 
-    if teste:
+    if teste or elastic:
         ace.elastic = True
         ace.print_variables('aaa')
         test2_elastic(ace)
