@@ -139,7 +139,8 @@ def install_lbzip(args):
 def install_lammps(args):
     ''' lammps_runner works on fidis && mac
         lammps_n2p2   works on fidis
-        on fidis, the executable works with runner and n2p2
+        lammps works on fidis (n2p2 & runner working)
+        lammps works on cosmopc (runner working, n2p2 would need to make work first)
     '''
     import socket
     hostname = socket.gethostname()
@@ -246,13 +247,20 @@ def install_lammps(args):
     print("************ make done ************")
     print()
     print("************ copy executable ************")
+    print("************ copy executable ************")
+    print("************ copy executable ************")
+    print("************ copy executable ************")
+    print("************ copy executable ************")
+    print("************ copy executable ************")
+    print("************ copy executable ************")
+    print("************ copy executable ************")
     #### copy the executable
     os.chdir(args.install_folder+"/src")
     executable = 'lmp_'+serialfidis
     if not os.path.isfile(executable):
         sys.exit(executable +" does not exist, .... was not created; Exit")
     print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
-    my.cp(executable,my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
+    my.cp(executable,my.scripts()+"/executables/lmp"+hostname+"_"+ser_or_par) #_"+extension)
     print()
 
     ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
@@ -275,6 +283,7 @@ def install_lammps(args):
     #print('pwd:',os.getcwd())
     #subprocess.call(["chmod", 'u+x','install.py'])
     #subprocess.call(['./install.py'])
+    print('copied ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
     return
 
 def install_n2p2(args):
