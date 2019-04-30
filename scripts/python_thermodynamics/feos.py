@@ -119,7 +119,7 @@ def run2(command=None, dont_raise_exceptino = False):
 
     # Poll process for new output until finished
     for line in iter(process.stdout.readline, ""):
-        print(line, end=' ')
+        print(line) #, end=' ')
         output += line
     process.wait()
     exitCode = process.returncode

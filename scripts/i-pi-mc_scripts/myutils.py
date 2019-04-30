@@ -2363,6 +2363,8 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
     folder = tmpdir
+
+    # delete all previous file in folder
     for the_file in os.listdir(folder):
         file_path = os.path.join(folder, the_file)
         try:
