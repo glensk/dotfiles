@@ -170,6 +170,9 @@ def install_lammps(args):
         else:
             extension = [ "runner" ]
 
+        if hostname == "mac":
+            extension = [ "runner" ]
+
         #if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
     print('extension:',extension)
 
