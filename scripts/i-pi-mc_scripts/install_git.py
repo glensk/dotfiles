@@ -7,7 +7,8 @@ import myutils as my
 import subprocess
 import myutils
 
-known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+#known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -92,8 +93,7 @@ def install_(args,known):
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         if args.install in ['n2p2']             : install_n2p2(args)
         if args.install in ['vmd']              : install_vmd(args)
-        if args.install in ['lammps_runner']    : install_lammps(args)
-        if args.install in ['lammps_n2p2']      : install_lammps(args)
+        if args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
@@ -141,15 +141,35 @@ def install_lammps(args):
         lammps_n2p2   works on fidis
         on fidis, the executable works with runner and n2p2
     '''
-    if args.install == "lammps_runner":
-        git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
-        extension = [ "runner" ]
-    elif args.install == "lammps_n2p2" or args.install == "lammps":  # this is thre preferred way and tries to install both, lammps and runner
+    import socket
+    hostname = socket.gethostname()
+    print('hostname',hostname)
+    if hostname == 'fidis':
+        serialfidis = 'fidis'
+        ser_or_par = "par"
+    else:
+        serialfidis = 'serial'
+        ser_or_par = "ser"
+    #elif hostname == 'mac':
+    #    serialfidis = 'serial'
+    #    ser_or_par  = "ser"
+
+
+
+    #if args.install in ["lammps_runner"]:
+    #    git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
+    #    extension = [ "runner" ]
+    if args.install in [ 'lammps', "lammps_n2p2" ,"lammps_runner"]:  # this is thre preferred way and tries to install both, lammps and runner
         git_clone(args,specify_depth = True)
-        extension = [ "n2p2" ]
-        extension = [ "n2p2", "runner" ]
+
         n2p2_folder=args.sources_folder+"/n2p2"
-        if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
+        if os.path.isdir(n2p2_folder):
+            #extension = [ "n2p2" ]
+            extension = [ "n2p2", "runner" ] # this is thre preferred way and tries to install both, lammps and runner (e.g. on fidis)
+        else:
+            extension = [ "runner" ]
+
+        #if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
     print('extension:',extension)
 
     os.chdir(args.install_folder)
@@ -185,15 +205,6 @@ def install_lammps(args):
         if not os.path.isdir(i):
             sys.exit(checkdir+" does not exist; Exit")
 
-    import socket
-    hostname = socket.gethostname()
-    print('hostname',hostname)
-    if hostname == 'fidis':
-        serialfidis = 'fidis'
-    else:
-        serialfidis = 'serial'
-    #elif hostname == 'mac':
-    #    serialfidis = 'serial'
 
     ## compile serial or parallel
     if hostname == 'fidis':
@@ -225,10 +236,10 @@ def install_lammps(args):
         print("#      /Users/glensk/sources/n2p2/src/libnnpif/InterfaceLammps.h")
         print("#")
         print("####################################################################")
-        subprocess.call(["make", "serial"])
+        subprocess.call(["make", serialfidis])  # serialfidis = "serial"
         print()
     else:
-        subprocess.call(["make", "serial"])
+        subprocess.call(["make", serialfidis])   # serialfidis = "serial"
         #sys.exit("hostname "+hostname+" not set up yet")
 
     print()
@@ -240,8 +251,8 @@ def install_lammps(args):
     executable = 'lmp_'+serialfidis
     if not os.path.isfile(executable):
         sys.exit(executable +" does not exist, .... was not created; Exit")
-    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_par") #_"+extension)
-    my.cp(executable,my.scripts()+"/executables/"+executable+"_par") #_"+extension)
+    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
+    my.cp(executable,my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
     print()
 
     ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
@@ -249,13 +260,14 @@ def install_lammps(args):
     #subprocess.call(["make", 'g++_serial','mode=shlib'])
     print()
     print("************ make mode=shlib xxxx ************")
-    print("**** this i think makes the library liblammps.so in the lammps/scr foler which is necessary for ase lammps calcs; to be checked")
+    print("**** this creates the library liblammps.so in the lammps/scr foler which is necessary for ase lammps calcs")
+    print("**** make chmod u+x $dotfiles/scripts/executables/lmp_fidis_par ")
     os.chdir(args.install_folder+"/src")
     print()
     if hostname == 'fidis':
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
     else:
-        bash_command("make mode=shlib serial",os.getcwd())
+        bash_command("make mode=shlib "+serialfidis,os.getcwd())
     print()
     os.chdir(args.install_folder+"/python")
     print()
@@ -279,7 +291,8 @@ def install_n2p2(args):
 
     if hostname == 'fidis':
         COMP="intel"
-    if hostname == 'mac':
+    #if hostname == 'mac':
+    else:
         COMP="gnu"
         #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
         #EIGEN = /Users/glensk/miniconda2/
