@@ -2436,6 +2436,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             ene=float(ene)
             #print('ene',ene,'lammps in eV')
             #print('ace units',ace.units)
+            print('ace.units.lower()',ace.units.lower())
             if ace.units.lower() == 'ev':
                 pass
             elif ace.units.lower() == 'hartree':
