@@ -6,7 +6,7 @@ import numpy as np
 import glob #,pathlib
 from copy import deepcopy
 from socket import gethostname
-from shutil import copyfile
+import shutil
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 from ase.build import bulk as ase_build_bulk
@@ -193,13 +193,13 @@ def cp(src=False,dest=False):
         dest_is = "dir"
     if src_is == "file" and dest_is == False:
         # possibly because dest does not exist
-        copyfile(src,dest)
+        shutil.copyfile(src,dest)
     elif src_is == "file" and dest_is == "file":
-        copyfile(src,dest)
+        shutil.copyfile(src,dest)
     elif src_is == "file" and dest_is == "dir":
         basename = os.path.basename(src)
         #print("basename:",os.path.basename(src))
-        copyfile(src,dest+"/"+basename)
+        shutil.copyfile(src,dest+"/"+basename)
     else:
         print("source is:",src_is,":",src)
         print("dest   is:",dest_is,":",dest)
@@ -2362,6 +2362,16 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ###############################################################
     tmpdir = os.environ['HOME']+"/._tmp_lammps/"
     mkdir(tmpdir)
+    folder = tmpdir
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+        except Exception as e:
+            print(e)
+
     print('doing the calculation in lammps, externally, in folder',tmpdir)
 
     ###############################################################
