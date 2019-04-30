@@ -1,0 +1,64 @@
+verdi shell
+uuid = "4e672bb6-2289-4a60-a482-27927b560cef"
+calc = load_node(uuid)
+
+calc.out.CALL.out.retrieved.get_abs_path()
+    --> /home/glensk/aiida/.aiida/repository-al6xxx_test/repository/node/25/3d/979f-119e-46af-9f10-f922bef1e081
+
+cd /home/glensk/aiida/.aiida/repository-al6xxx_test/repository/node/25/3d/979f-119e-46af-9f10-f922bef1e081/path
+cd path
+vi aiida.out
+
+!    total energy              =    -152.11624623 Ry
+                               =    -76.058123115 hartree (exact)
+                               =    -2069.6469483711144 eV (-76.058123115 * ase.units.Hartree)
+
+calc.out.output_parameters.get_attr('energy') -> -2069.6467526152082
+it seems aiidas conversion number is 27.211383451 while ase is 27.211386024367243
+aiida -> ase = 27.211386024367243/27.211383451 = (1.0000000945695116) not opt
+        -2069.6469483711144/-2069.6467526152082= 1.0000000945842116 <<<<----!!!
+conv2 = 1.0000000945842116  (brings aiida units to ase units)
+
+calc.out.output_parameters.get_attr('energy') * conv2 / ase.units.Hartree 
+ == -76.058123115
+
+
+in ase:
+>>> -152.11624623 *ase.units.Hartree / 2.
+>>> -2069.6469483711144  eV (ase exact)
+>>> -2069646.9483711144  meV (ase exact)
+>>> -517411.7370927786 meV/pa
+>>> -76.058123115 hartree   (exact)
+
+>>> -76.058115921103095  from current output
+>>>
+
+uuid = "5759f25d-3ce4-4a1f-8762-12d3399401f3"
+calc2 = load_node(uuid)
+calc2.out.CALL.out.retrieved.get_abs_path()
+--> /home/glensk/aiida/.aiida/repository-al6xxx_test/repository/node/98/2b/3e91-4d55-4c8e-be7a-43353542b818
+!    total energy              =   -1275.10216436 Ry
+                               =   -637.55108218 hartree (exact)
+calc2.out.output_parameters.get_attr('energy') --> -17348.646966544973  (eV)
+calc2.out.output_parameters.get_attr('energy') * conv2 / ase.units.Hartree 
+                               =   -637.5510821800002
+calc2.out.output_parameters.get_attr('energy') * conv2 
+                               =   -17348.64860745307
+
+>>> ase.units.Hartree/ase.units.Bohr/2.
+>>> 25.711033545240323
+>>> aiida: 25.711031209285363
+>>> convf = 25.711033545240323/25.711031209285363 = 1.0000000908541917  # for forces
+
+force [0,0] roiginal aiida.out:     0.01168047 Ry/au
+calc2.out.output_array.get_array('forces')[-1][0][0] --> 0.3003169287091214  (ev/ang)
+
+calc2.out.output_array.get_array('forces')[-1][0][0]*convf = 0.30031695599417324
+calc2.out.output_array.get_array('forces')[-1][0][0]*convf*ase.units.Bohr/ase.units.Hartree*2. = 0.01168047
+
+with new export: -637.551082180000208 (energy hartree)
+    force: 0.0058402350 
+
+    >>> 0.0058402350*2.
+    >>> 0.01168047
+
