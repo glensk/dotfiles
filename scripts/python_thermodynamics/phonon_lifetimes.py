@@ -2213,11 +2213,14 @@ def get_inputvariables_from_c_skript_md_long_tox_job():
     sc = int(float(os.popen("grep \"^N              :\" out_info.txt| awk '{print $3}'").read().rstrip()))
     alat = float(os.popen("grep \"^alat_lattice   :\" out_info.txt| awk '{print $3}'").read().rstrip())
     dt = int(float(os.popen("grep \"^dt             :\" out_info.txt| awk '{print $3}'").read().rstrip())*10**15)
-    #print 'sc:',sc
-    #print 'alat:',alat
-    #print 'dt:',dt
+    l = int(float(os.popen("grep \"^l              :\" out_info.txt| awk '{print $3}'").read().rstrip()))
+    #print('sc:',sc)
+    #print('alat:',alat)
+    if l != 1:
+        print('dt (grep fromskript):',dt)
+        print('l  (grep fromskript):',l)
     args.supercell = sc
-    args.dt = dt/10**12
+    args.dt = (dt*l)/10**12
     args.alat = alat
     return
 
@@ -10744,7 +10747,7 @@ def get_correct_input_variables(args):
     if args.supercell == False or args.alat == False or args.dt == False:
         get_inputvariables_from_vasp_job()
     ########################################
-    # in case of c skript job md_long_tox
+    # in case of md_long_tox (LA) c skript
     ########################################
     if args.supercell == args.alat == args.dt == False:
         get_inputvariables_from_c_skript_md_long_tox_job()
@@ -10772,11 +10775,11 @@ def get_correct_input_variables(args):
         print("number of atoms :",args.atoms)
         print("qvec            :",args.qvec)  # qvec            : [['l', '0', '0'], ['t', '0', '0']]
 
-    if args.dt > 20:
+    if args.dt > 30:
         sys.exit('Error: your timestep dt seems too large...')
     if args.dt < 0.1:
         sys.exit('Error: your timestep dt seems quite small, is it corect?')
-
+    #sys.exit('ka')
     if type(args.qvec) == bool:
         sys.exit("ERROR: specify qvec!")
     if type(args.dt) == bool:
