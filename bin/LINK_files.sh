@@ -310,3 +310,11 @@ cd $dotfiles
 git rm --cached *.pyc
 find . -name '*.pyc' | xargs -n 1 git rm --cached
 
+# set rights for id_rsa
+chmod 400 $HOME/.ssh/id_rsa
+
+echo
+echo "set up passwords to be able to sx and rx without password"
+echo "### pw is normal (normal zwei ohne sterne 1234)"
+ssh-copy-id -i $HOME/.ssh/id_rsa.pub aglensk@ela.cscs.ch
+

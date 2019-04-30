@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: e5bdb609de476ce5c4d50f476734471a0bd24516
-# execution time: 5.89671802521 seconds.
-
-getEnergies_byLammps.py -i ../fps-5000.data -p runner_v2dg --units hartree -idx :10

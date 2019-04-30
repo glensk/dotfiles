@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: 2f37dc5ab4b403a7f7c9abe7860ded418a9edda9
-# execution time: 176.513706923 seconds.
-
-getEnergies_byLammps.py -i fps-5000.data -p runner_v2dg --units meV_pa

@@ -1063,10 +1063,15 @@ class ase_calculate_ene( object ):
 
 
     def lammps_command_potential_n2p2(self):
+        units_giulio_ene = "0.0367493254"
+        ase_units_ene    = "0.03674932247495664" # 1./ase.units.Hartree
+
+        units_giulio_bohr = "1.8897261328"
+        ase_units_bohr    = "1.8897261258369282" # 1./ase.units.Bohr
         command = [
         # showewsum 1 showew yes resetew no maxew 1000000
         'variable nnpDir string \"'+self.pot.potpath+'\"',
-        "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261328 cfenergy 0.0367493254",
+        "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength "+ase_units_bohr+" cfenergy "+ase_units_ene,
         "pair_coeff * * 11.0",
         "#write_data ./pos.data # would this be the final struct?"
         ]

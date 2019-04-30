@@ -1,0 +1,15 @@
+  potential         std   C44     std 57 KMC (meV/pa)
+  -----------------------------------------------
+1 runner_v0_16            22.4
+2 runner_v0_32            27.2
+3 runner_v0_64            35.6
+4 runner_v0_v1dg          35.6  (as runner_v0_64; little differences in atom_energy)
+5 runner_v0_v2dg          33.4  (different kalman settings, test_fr, random_seed)
+  
+6 runner_v3ag_4998        40.14   40
+7 runner_v3ag_5000        36.07   152
+  
+-> diff (6 vs 7) -> either  2 structures have wrong energy OR high significnat effect of random seed/ train vs test struct
+
+-> check different random seeds with 5000
+-> check different random seeds with 4998
