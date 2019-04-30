@@ -15,12 +15,12 @@ np.set_printoptions(precision=6)    # print only 6 digist after .
 def _printred(var):
     ENDC = '\033[0m'
     red = '\033[31m'
-    print red + str(var) + ENDC
+    print(red + str(var) + ENDC)
 
 def _printgreen(var):
     ENDC = '\033[0m'
     red = '\033[32m'
-    print red + str(var) + ENDC
+    print(red + str(var) + ENDC)
 
 def is_int(x):
     try:
@@ -119,7 +119,7 @@ def run2(command=None, dont_raise_exceptino = False):
 
     # Poll process for new output until finished
     for line in iter(process.stdout.readline, ""):
-        print line,
+        print(line, end=' ')
         output += line
     process.wait()
     exitCode = process.returncode
@@ -411,7 +411,7 @@ class eos(object):
                             sys.exit("which eos is this?")
                         self.parameters = np.loadtxt(filecheck[0])
         if self.parameters == None:
-            print "Did not find EOS file (EViet*, EMurn*, EBirch*)"
+            print("Did not find EOS file (EViet*, EMurn*, EBirch*)")
             return None
         import sympy
         V = sympy.Symbol('V')
@@ -463,8 +463,8 @@ class eos(object):
         self.datax = datax
         self.datay = datay
         if self._verbose:
-            print "datax:",datax
-            print "datay:",datay
+            print("datax:",datax)
+            print("datay:",datay)
 
         if len(datax) is not len(datay):
             sys.exit("volumes_per_atom have different lenght than energies_per_atom")
@@ -480,7 +480,7 @@ class eos(object):
             #guess = [ eps, rm ]
             guess = [ 16. , volume_enemin ]
         if self._verbose:
-            print "guess:",guess
+            print("guess:",guess)
 
         # fit to data
         from scipy import optimize
@@ -513,19 +513,19 @@ class eos(object):
             self.parameters = [self.e0, self.v0, self.b0, self.b0der]
         if self._verbose:
             _printgreen(">>> "+str(self.equation)+" <<< ",)
-            print("pars: "+str(self.parameters))
+            print(("pars: "+str(self.parameters)))
 
         # fit (it would be more nice to solve maximum energy and plot to corr. volume)
         dx = max([abs(datax.min() - self.v0), abs(datax.max() - self.v0)])*1.03
         if self._verbose:
-            print "datax",datax
-            print "datax.min()",datax.min()
-            print "self.v0",self.v0
-            print "datax.max",datax.max()
-            print "dx",dx
+            print("datax",datax)
+            print("datax.min()",datax.min())
+            print("self.v0",self.v0)
+            print("datax.max",datax.max())
+            print("dx",dx)
         self.fitvolumes = np.linspace(self.v0 - dx, self.v0 + dx, num=points)
         if self._verbose:
-            print("fm:",self.fitvolumes,"aaa",parameters)
+            print(("fm:",self.fitvolumes,"aaa",parameters))
         self.fitenergies = eos(self.fitvolumes, *parameters)
 
 
@@ -549,9 +549,9 @@ class eos(object):
         # delta to fit
         self.fitdeltas = eos(datax, *parameters) - datay
         if self._verbose:
-            print "datay:",datay
-            print "datan:", eos(datax, *parameters)
-            print "fitde:",self.fitdeltas
+            print("datay:",datay)
+            print("datan:", eos(datax, *parameters))
+            print("fitde:",self.fitdeltas)
 
         # check if delta to fit has no hop (e.g. due to change in NGX(F))
         #d = np.diff(self.fitdeltas)/np.diff(self.datax)
@@ -566,8 +566,8 @@ class eos(object):
             m2="Have a look at eos.fitdeltas; "
             m3="A possible cause is if NGX is changed between volumes. "
             m4="VASP might do this automatically!"
-            print "abs gradient fitdeltas:",abs(self._fitdeltas_grad)
-            print "abs greater:",self._fitdeltas_grad_greater
+            print("abs gradient fitdeltas:",abs(self._fitdeltas_grad))
+            print("abs greater:",self._fitdeltas_grad_greater)
             _printred(m1+m2+m3+m4+m0)
             #np.savetxt('datain.dat',np.transpose([datax,datay]))
             #np.savetxt('datafit.dat',np.transpose([datax,eos(datax, *parameters)]))
@@ -598,7 +598,7 @@ class eos(object):
         folder = os.path.split(os.path.realpath(self.inputfile))[0]
 
         # energy.dat.fit
-        print "writing: "+file1
+        print("writing: "+file1)
         np.savetxt(
                 folder + "/" + file1,
                 np.transpose([self.fitvolumes_in, self.fitenergies_in]),
@@ -610,9 +610,9 @@ class eos(object):
         if self._scale_output != 1:
             add = "_"+str(self._scale_output)
         if self._verbose:
-            print "self._atoms:",self._atoms
-            print "self._scale_output:",self._scale_output
-            print "add:",add
+            print("self._atoms:",self._atoms)
+            print("self._scale_output:",self._scale_output)
+            print("add:",add)
 
         # get filename if different fome (energy)_b_32(.dat)
         if os.path.basename(self.inputfile)[:6] == "energy":
@@ -623,19 +623,19 @@ class eos(object):
                 else:
                     add = add+add_check
         if self._verbose:
-            print "add_check:",add_check
-            print "add:",add
+            print("add_check:",add_check)
+            print("add:",add)
 
 
 
         #print "_scale_output:",self._scale_output
         #print "atoms:",self._atoms
         self._outfile = "E"+self.equation[:1].upper()+self.equation[1:].lower()+str(add)
-        print "writing",self._outfile
-        print "e0:",self.e0
-        print "v0:",self.v0
-        print "b0:",self.b0
-        print "b0der:",self.b0der
+        print("writing",self._outfile)
+        print("e0:",self.e0)
+        print("v0:",self.v0)
+        print("b0:",self.b0)
+        print("b0der:",self.b0der)
         if self.e0 != None and self.b0 != None and self.b0der != None:
             np.savetxt(
             folder + "/" + self._outfile,
@@ -768,5 +768,5 @@ if __name__ == '__main__':
         eos.fit_to_energy_vs_volume_data(eos.datax, eos.datay)
         eos.write_data()
         _printgreen("DONE!")
-        print ""
+        print("")
     #eos.plot()
