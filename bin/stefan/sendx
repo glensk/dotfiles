@@ -1,5 +1,9 @@
 #!/bin/sh
 [ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
+basename=`basename $0`
+[ "$basename" = "sendx" ] && echo is sendx
+[ "$basename" = "sendx2" ] && echo is sendx22
+#exit
 sendtarred=""
 if [ "`basename $0`" = "sendxtarred" ];then
     getname=`tar.bzip2_file_or_folder.sh $* | tail -1`
@@ -35,12 +39,15 @@ rm -f $tosend
 
 
 ####### move to ~/.exchange ############################
-#address="aglen@gate.rzg.mpg.de"  # garching
-address="aglensk@ela.cscs.ch"    # ela, part of daint
+address1="aglensk@ela.cscs.ch"    # ela, part of daint
+address2="aglen@gate.rzg.mpg.de"  # garching
+address=$address1
+[ "$basename" = "sendx2" ] && address=$address2
+
 
 echo "address: $address"
 echo "scp sendx.tar.bzip2 $address:~/.exchange/"
-if [ "`hostname | grep -o daint`" = "daint" ];then
+if [ "`hostname | grep -o daint`" = "daint" ];then  # in case of garching this is not directly accessible, therefore can stay like that
     mv $tosend ~/.exchange/
 else
     scp $tosend $address:~/.exchange/

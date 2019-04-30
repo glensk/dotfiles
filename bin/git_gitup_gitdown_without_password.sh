@@ -1,5 +1,6 @@
 #!/bin/sh
 if [ ! -e ".git" ];then
+echo normal dotfile require old pw with one
 echo dotfiles $dotfiles
 cd $dotfiles
 else
