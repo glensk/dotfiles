@@ -49,6 +49,14 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     '''
     print('infile           :',infile)
 
+    if 'LD_LIBRARY_PATH' not in os.environ:
+        os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
+
+    print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
+    # this is just to check if lammps is working with ase
+    from lammps import lammps
+    lmp = lammps()
+
     ### get ace object for the chosen potential
     if test or teste: units='eV'
     ace = ase_calculate_ene(pot=pot,

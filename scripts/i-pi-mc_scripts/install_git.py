@@ -148,12 +148,12 @@ def install_lammps(args):
     if hostname == 'fidis':
         serialfidis = 'fidis'
         ser_or_par = "par"
+    elif hostname == 'mac':
+        serialfidis = 'serial'
+        ser_or_par  = "ser"
     else:
         serialfidis = 'serial'
         ser_or_par = "ser"
-    #elif hostname == 'mac':
-    #    serialfidis = 'serial'
-    #    ser_or_par  = "ser"
 
 
 
@@ -219,7 +219,8 @@ def install_lammps(args):
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
         print()
 
-
+    ## copy the pythonfiel (adapted) to make
+    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     elif hostname == 'mac':
         print("####################################################################")
