@@ -57,7 +57,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
     print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
-    lmp = lammps()
+    lammps()
 
     ### get ace object for the chosen potential
     if test or teste: units='eV'
