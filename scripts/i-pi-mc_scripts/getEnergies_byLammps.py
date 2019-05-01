@@ -49,6 +49,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     '''
     print('infile           :',infile)
 
+    ### check if ase runneer format is known
+    my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False)
+
     ### get ace object for the chosen potential
     if test or teste: units='eV'
     ace = ase_calculate_ene(pot=pot,
