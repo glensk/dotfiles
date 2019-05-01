@@ -1612,6 +1612,15 @@ class ase_calculate_ene( object ):
     def get_elastic_external(self,atomsin=False,verbose=False,text=False,get_all_constants=False):
         ''' the function will never change the atomsobject '''
         print('######## get_elastic_external #############')
+        from lammps import lammps
+        print('hier1')
+        print(os.environ['HOME'])
+        print()
+        print(os.environ['LD_LIBRARY_PATH'])
+        print()
+        lmp = lammps()
+        print('hier2')
+        sys.exit('hier')
         #print("LMP",LAMMPS_COMMAND)
 
         #print('1')

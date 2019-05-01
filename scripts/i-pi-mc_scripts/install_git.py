@@ -263,7 +263,7 @@ def install_lammps(args):
     if not os.path.isfile(executable):
         sys.exit(executable +" does not exist, .... was not created; Exit")
     print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
-    my.cp(executable,my.scripts()+"/executables/lmp"+hostname+"_"+ser_or_par) #_"+extension)
+    my.cp(executable,my.scripts()+"/executables/lmp_"+hostname+"_"+ser_or_par) #_"+extension)
     print()
 
     ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
