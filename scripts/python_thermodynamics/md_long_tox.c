@@ -2064,6 +2064,9 @@ void write_temperature_average(FILE *file_out_temp) {
 }
 
 // related to md
+// most easy: standard verlet algorithm
+// better: velocity verlet
+// best: SHAKE method
 void verletstep_from_velocities(double dt,FILE *file_out_temp,double faktor_verlet) {
         int ind1,ind2;
         double dum; //,tempout; //j,ka,kb,kc;

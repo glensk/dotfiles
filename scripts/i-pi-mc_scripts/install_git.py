@@ -148,12 +148,12 @@ def install_lammps(args):
     if hostname == 'fidis':
         serialfidis = 'fidis'
         ser_or_par = "par"
+    elif hostname == 'mac':
+        serialfidis = 'serial'
+        ser_or_par  = "ser"
     else:
         serialfidis = 'serial'
         ser_or_par = "ser"
-    #elif hostname == 'mac':
-    #    serialfidis = 'serial'
-    #    ser_or_par  = "ser"
 
 
 
@@ -168,6 +168,9 @@ def install_lammps(args):
             #extension = [ "n2p2" ]
             extension = [ "n2p2", "runner" ] # this is thre preferred way and tries to install both, lammps and runner (e.g. on fidis)
         else:
+            extension = [ "runner" ]
+
+        if hostname == "mac":
             extension = [ "runner" ]
 
         #if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
@@ -216,7 +219,8 @@ def install_lammps(args):
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
         print()
 
-
+    ## copy the pythonfiel (adapted) to make
+    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     elif hostname == 'mac':
         print("####################################################################")
@@ -260,7 +264,7 @@ def install_lammps(args):
     if not os.path.isfile(executable):
         sys.exit(executable +" does not exist, .... was not created; Exit")
     print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
-    my.cp(executable,my.scripts()+"/executables/lmp"+hostname+"_"+ser_or_par) #_"+extension)
+    my.cp(executable,my.scripts()+"/executables/lmp_"+hostname+"_"+ser_or_par) #_"+extension)
     print()
 
     ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py

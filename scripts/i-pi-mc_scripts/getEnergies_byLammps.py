@@ -49,8 +49,18 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     '''
     print('infile           :',infile)
 
+<<<<<<< HEAD
     ### check if ase runneer format is known
     my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False)
+=======
+    if 'LD_LIBRARY_PATH' not in os.environ:
+        os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
+
+    print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
+    # this is just to check if lammps is working with ase
+    from lammps import lammps
+    lmp = lammps()
+>>>>>>> 5a90f99c7b146a8cb790e334b649ca00b3aa3e57
 
     ### get ace object for the chosen potential
     if test or teste: units='eV'
