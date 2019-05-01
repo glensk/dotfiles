@@ -9,6 +9,7 @@ from socket import gethostname
 import shutil
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
+import ase
 from ase.build import bulk as ase_build_bulk
 from ase.constraints import StrainFilter
 import hesse
@@ -41,7 +42,6 @@ except ImportError:
     pass
 from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
-import shutil
 import time
 import myutils as my
 from ase import units as aseunits
@@ -1612,15 +1612,19 @@ class ase_calculate_ene( object ):
     def get_elastic_external(self,atomsin=False,verbose=False,text=False,get_all_constants=False):
         ''' the function will never change the atomsobject '''
         print('######## get_elastic_external #############')
-        from lammps import lammps
-        print('hier1')
-        print(os.environ['HOME'])
-        print()
-        print(os.environ['LD_LIBRARY_PATH'])
-        print()
-        lmp = lammps()
-        print('hier2')
-        sys.exit('hier')
+        #print('HOME             :',os.environ['HOME'])
+        #print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
+        #print('hier1')
+        #print(os.environ['HOME'])
+        #print('hier2')
+        #print(os.environ['LD_LIBRARY_PATH'])
+        #print('hier2.2')
+        #print(os.environ['PYTHONPATH'])
+        #from lammps import lammps
+        #print('hier3')
+        #lmp = lammps()
+        #print('hier4')
+        #sys.exit('hier')
         #print("LMP",LAMMPS_COMMAND)
 
         #print('1')
@@ -2587,6 +2591,111 @@ def get_latest_n2p2_pot():
     potout = "n2p2_v"+str(ver[-1])+"ag"
     #print('ver',ver,"->",potout)
     return potout
+
+
+def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False):
+    ''' adds formats runner and lammps-runner to ase '''
+
+    ### get the known formats
+    known_formats = []
+    x = ase.io.formats.all_formats
+    for i in x:
+        known_formats.append(i)
+
+    ### show the known formats
+    if show:
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(x)
+
+
+    ### check if formats are known by ase
+    missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]
+    def checkformats(typ,verbose):
+        if typ in known_formats:
+            if verbose: print(typ,"known in formats.py")
+            return True
+        else:
+            if verbose: print(typ,"not known in formats.py")
+            return False
+
+    for i in [ 'runner', 'lammps-runner', 'lammps-data' ]:
+        formats_known = checkformats(i,verbose)
+        if formats_known == False: add_missing_formats = True
+
+
+    ### copies the missing format files
+    if copy_formats or add_missing_formats:
+        if verbose:
+            print('cc',ase.io.__file__)
+        scripts = my.scripts()
+        from_ = scripts+"/runner_scripts/ase_fileformat_for_"
+        to = os.path.dirname(ase.io.__file__)+"/"
+        for ff in missing:
+            #print('copying ',from_+ff,'to',to+ff)
+            if verbose: print('copying ',ff,'to',to+ff)
+            shutil.copyfile(from_+ff,to+ff)
+
+
+    ### check if necessary files for formats are known
+    if add_missing_formats:  # copies the missing format files
+        print('adapting ase formats.py .... ')
+
+        formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
+        if verbose:
+            print('formatspy',formatspy)
+
+        if not os.path.isfile(formatspy):
+            print('formatspy',formatspy)
+            sys.exit('did not find '+str(formatspy))
+
+
+        f = open(formatspy, "r")
+        contents = f.readlines()
+        f.close()
+        insert=0
+        insert2=0
+        for idx,i in enumerate(contents):
+            #print('i',idx,i)
+            #print("|"+i[:20]+"|")
+            if i[:20] == "    'abinit': ('ABIN":
+                insert = idx
+            if i[:30] == "    'lammps-data': 'lammpsdata":
+                insert2 = idx
+
+        writeformatspy = False
+        if 'runner' in x:
+            print('runner        format are already added in formats.py (of ase).')
+        else:
+            contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+            writeformatspy = True
+
+        if 'ipi' in x:
+            print('ipi           format are already added in formats.py (of ase).')
+        else:
+            contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
+            writeformatspy = True
+
+        if 'lammps-runner' in x:
+            print('lammps-runner format are already added in formats.py (of ase).')
+        else:
+            contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
+            contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
+            writeformatspy = True
+
+        if writeformatspy == True:
+            print('now changing formatspy')
+            print('insert',insert)
+
+            f = open(formatspy, "w")
+            contents = "".join(contents)
+            f.write(contents)
+            f.close()
+        else:
+            print('everything was already in formats.py')
+
+    return known_formats
+
 
 if __name__ == "__main__":
     pass
