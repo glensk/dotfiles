@@ -308,10 +308,31 @@ def install_n2p2(args):
     hostname = socket.gethostname()
 
     if hostname == 'fidis':
-        COMP="intel"
-    #if hostname == 'mac':
+        COMP="intel"   # currently icpc && mpiicpc are used; icc should be equivalent to icpc
+    elif hostname == 'mac':
+        COMP = "intel"  # makes problems on mac
+        COMP = "gnu"
+        # on mac you can always try
+        # cd /Users/glensk/sources/n2p2/src/libnnp
+        # %make or %make COMP=gnu -j4 shared or make COMP=gnu  # seem all to be fairly similar
+        # with COMP=gnu this works for the standard clang g++ but not for the conda gcc
+        # GSL & Eigen are only necessary for training see https://compphysvienna.github.io/n2p2/ (section code structure)
+        # the compilatin of libnnpif fails ... could try with intel suite to compile (would also need mpic++)
+        #
+        # now, first installed all latest intel compilers such that icc, icpc and ifort are version 19.0
+        # need: Intel® Parallel Studio XE Composer Edition for C++ macOS
+        # need: Intel® Parallel Studio XE Composer Edition for Fortran macOS
+        #
+        # then install openmpi with the intel compilers
+        # see: https://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-open-mpi-with-the-intel-compilers
+        # for openmpi: ./configure --prefix=/usr/local CC=icc CXX=icpc F77=ifort FC=ifort CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64  (use /usr/local since icc,icpc,ifort are also from /usr/local
+        # for openmpi: make all install
+        #  in makefile gnu can try CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64
+        # with openmpi ithen should have something like mpic++ (gnu)
+        #
+        # in makefile gnu can try CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64
     else:
-        COMP="gnu"
+        COMP="gnu" # cosmopc15
         # on mac now EIGEN_ROOT and GSL_ROOT are defined in $scripts/dotfiles/scripts/source_to_add_to_path.sh
         #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
         #EIGEN = /Users/glensk/miniconda2/
@@ -325,6 +346,10 @@ def install_n2p2(args):
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
     my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
     if hostname == 'mac':
+        my.sed("makefile.gnu","-fopenmp","#-fopenmp")  # try also with the acutal paths
+        # with this libnnp compiles, current probs with libnnpif
+        # if in makefiel PROJECT_OPTIONS+= -DNOMPI this defines weather wether to compie with/without MPI and used mpic++ (with) and g++ (without)
+    if False:
         ## conda activate basegcc !!!!!!!!!!!!
         my.sed("makefile.gnu","^PROJECT_GSL=.*","PROJECT_GSL=./")  # try also with the acutal paths
         my.sed("makefile.gnu","^PROJECT_EIGEN=.*","PROJECT_EIGEN=./")  # try also with the actual paths
@@ -351,7 +376,7 @@ def install_n2p2(args):
     makefiles_to_change = [ "libnnp","libnnpif", "libnnptrain"]
     for lib in makefiles_to_change:
         my.sed(lib+"/makefile","^PROJECT_DIR.*","PROJECT_DIR=../..")
-        my.sed(lib+"/makefile","^COMP=.*","COMP=intel")
+        #my.sed(lib+"/makefile","^COMP=.*","COMP="+COMP)
 
     # module load on fidis
     print("cc",os.getcwd())

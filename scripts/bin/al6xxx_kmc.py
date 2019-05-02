@@ -1,0 +1,1 @@
+../i-pi-mc_scripts/al6xxx_kmc.py
