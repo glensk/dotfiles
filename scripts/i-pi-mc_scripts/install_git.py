@@ -2,7 +2,7 @@
 from __future__ import print_function
 import argparse
 
-import sys,os
+import sys,os,socket
 import myutils as my
 import subprocess
 import myutils
@@ -32,6 +32,8 @@ address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";              
 #address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
 address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
 
+address["n2p2"]          = "https://github.com/CompPhysVienna/n2p2.git";
+branch['n2p2']           = 'develop' # this branch is necessary to get scaling.data (or function.data... one of both)
 
 def help(p = None ,known=known):
     string='''e.g. install_git.py -i atomsk'''
@@ -137,10 +139,10 @@ def install_lbzip(args):
     return
 
 def install_lammps(args):
-    ''' lammps_runner works on fidis && mac
-        lammps_n2p2   works on fidis
-        lammps works on fidis (n2p2 & runner working)
-        lammps works on cosmopc (runner working, n2p2 would need to make work first)
+    '''
+        fidis   : works for runner & n2p2
+        mac     : works for runner
+        cosmopc : works for runner
     '''
     import socket
     hostname = socket.gethostname()
@@ -209,6 +211,8 @@ def install_lammps(args):
         if not os.path.isdir(i):
             sys.exit(checkdir+" does not exist; Exit")
 
+    ## copy the pythonfiel (adapted) to make
+    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     ## compile serial or parallel
     if hostname == 'fidis':
@@ -219,8 +223,6 @@ def install_lammps(args):
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
         print()
 
-    ## copy the pythonfiel (adapted) to make
-    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     elif hostname == 'mac':
         print("####################################################################")
@@ -291,6 +293,9 @@ def install_lammps(args):
     return
 
 def install_n2p2(args):
+    '''
+    see https://compphysvienna.github.io/n2p2/ for more details
+    '''
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
     os.chdir(args.install_folder)
     subprocess.call(["git","branch"])
@@ -307,6 +312,7 @@ def install_n2p2(args):
     #if hostname == 'mac':
     else:
         COMP="gnu"
+        # on mac now EIGEN_ROOT and GSL_ROOT are defined in $scripts/dotfiles/scripts/source_to_add_to_path.sh
         #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
         #EIGEN = /Users/glensk/miniconda2/
 
@@ -319,6 +325,7 @@ def install_n2p2(args):
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
     my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
     if hostname == 'mac':
+        ## conda activate basegcc !!!!!!!!!!!!
         my.sed("makefile.gnu","^PROJECT_GSL=.*","PROJECT_GSL=./")  # try also with the acutal paths
         my.sed("makefile.gnu","^PROJECT_EIGEN=.*","PROJECT_EIGEN=./")  # try also with the actual paths
         # on mac: conda install gcc
@@ -349,7 +356,8 @@ def install_n2p2(args):
     # module load on fidis
     print("cc",os.getcwd())
     # @fidis
-    bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
+    if hostname == 'fidis':
+        bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
     # @daint
     #bash_command("module load daint-mc intel craype cray-mpich intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
 
