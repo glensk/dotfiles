@@ -326,7 +326,10 @@ def install_n2p2(args):
         # then install openmpi with the intel compilers
         # see: https://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-open-mpi-with-the-intel-compilers
         # for openmpi: ./configure --prefix=/usr/local CC=icc CXX=icpc F77=ifort FC=ifort CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64  (use /usr/local since icc,icpc,ifort are also from /usr/local
-        # for openmpi: make all install
+        # for openmpi:  make
+        # if this fails -> download the whole intes suite for c++ (and not just parts)
+        #
+        # for openmpi:  make all install  -> this did not work out
         #  in makefile gnu can try CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64
         # with openmpi ithen should have something like mpic++ (gnu)
         #
