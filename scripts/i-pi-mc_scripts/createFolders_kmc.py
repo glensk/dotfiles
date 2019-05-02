@@ -107,7 +107,9 @@ def createjob(
 
     ##### here only chck if the potential can be set up. (in.lmp)
     ##### the same command is then executed for every kmc folder
-    ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
+    ace = mu.ase_calculate_ene(pot=pot,
+            potpath=False,
+            units='eV',geopt=False,kmc=True,verbose=verbose)
     mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
@@ -154,7 +156,7 @@ def createjob(
     print('temp          ',temp,"K")
     print()
     print('mypot.pot     ',mypot.pot)
-    print('mypot.fullpath',mypot.fullpath)
+    print('mypot.potpath ',mypot.potpath)
     print()
     print('directory     ',directory)
     print('submit        ',submit)
@@ -201,8 +203,11 @@ def createjob(
 
 
         # create in.lmp
-        ace = mu.ase_calculate_ene(pot,units='eV',geopt=False,kmc=True,verbose=verbose)
-        mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
+        ace = mu.ase_calculate_ene(pot=pot,potpath=mypot.potpath,
+                units='eV',geopt=False,kmc=True,verbose=verbose)
+        address = socket.gethostname()+"_"+os.path.basename(jobdir)
+        print('address',address)
+        mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
         mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.runnerformat.lmp',ace=ace)
 
 
@@ -242,7 +247,7 @@ def createjob(
         mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
 
         mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
-        addressline = '<address> '+socket.gethostname()+' </address>'
+        addressline = '<address> '+address+' </address>'
         if ffsocket == "unix":
             mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline+' <latency> 1e-3 </latency>')
         if ffsocket == "inet":
