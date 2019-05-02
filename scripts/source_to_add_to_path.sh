@@ -24,7 +24,7 @@ _python_thermodynamics="$SCR/python_thermodynamics/"
 _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
 #_lammps_source="$HOME/sources/lammps_n2p2/"
-_lammps_source="$HOME/sources/lammps/"
+_lammps_source="$HOME/sources/lammps"
 _bin="$SCR/bin"
 #addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ase_lammps/python:$_ipi_source"
 #addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ipi_source"
@@ -39,7 +39,12 @@ export PATH="$PATH:$addeverywhere"
 ##### LD_LIBRARY_PATH
 #####################
 # the $_lammps_source/src holds the liblammps.so which is necessary to use lammps in ase
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$_n2p2_lib:$_lammps_source/src"
+MY_LD_LIBRARY_PATH="$_n2p2_lib:$_lammps_source/src"
+if [ "$LD_LIBRARY_PATH" = "" ];then
+    export LD_LIBRARY_PATH="$MY_LD_LIBRARY_PATH"
+else
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MY_LD_LIBRARY_PATH"
+fi
 
 #####################
 ##### PYHON_PATH
