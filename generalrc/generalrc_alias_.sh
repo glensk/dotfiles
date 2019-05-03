@@ -72,20 +72,15 @@ $1 .. 'cd ..'
 $1 .... 'cd ../..'
 $1 ...... 'cd ../../..'
 
-#$1 rx 'recievex'
-$1 rx '$dotfiles/bin/stefan/recievex'
-$1 rxnountar '$dotfiles/bin/stefan/recievexnountar'
-$1 rxo '$dotfiles/bin/stefan/recievexoxford'
-$1 sx 'sendx'
-$1 sxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; cp ../lammps_pos_to_sum.py .; sendx lammps_pos_to_sum.py;cd $hier'
-$1 rxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; recievex; cp lammps_pos_to_sum.py .. ;cd $hier'
+#$1 sxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; cp ../lammps_pos_to_sum.py .; sendx lammps_pos_to_sum.py;cd $hier'
+#$1 rxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; recievex; cp lammps_pos_to_sum.py .. ;cd $hier'
 
 
 
 ##############################
 # system
 ##############################
-$1 clearpath 'source $dotfiles/bin/clearpath.sh'
+$1 clearpath 'source $dotfiles/aliases/clearpath.sh'
 $1 ra '$dotfiles/generalrc/generalrc_alias_renew.sh'
 $1 la 'ls -la'
 $1 ll 'ls -la'
@@ -110,7 +105,7 @@ $1 s './run.sh'
 $1 pu 'pushd `pwd`'
 $1 po 'popd'
 
-$1 extract '$dotfiles/bin/extract.sh'
+$1 extract '$dotfiles/aliases/extract.sh'
 
 $1 monthly_update 'cd $dotfiles/cron;./monthlyupdate.sh'
 
