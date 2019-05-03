@@ -1095,7 +1095,7 @@ class ase_calculate_ene( object ):
                 ]
         return command
 
-    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet'):
+    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
@@ -1121,7 +1121,8 @@ class ase_calculate_ene( object ):
         #sys.exit()
         # this depends only on the potential which is already defined
         # so should be easy to make this general.
-        self.lmpcmd = self.lammps_command_masses()
+        self.lmpcmd = [ "########## lmpcmd.begin #############" ]
+        self.lmpcmd = self.lmpcmd + self.lammps_command_masses()
 
         if self.pot.pottype == "n2p2":
             # showewsum 1 showew yes resetew no maxew 1000000
@@ -1137,17 +1138,20 @@ class ase_calculate_ene( object ):
         if self.kmc:
             if self.ffsocket == "unix": add = "unix"
             if self.ffsocket == "inet": add = ""
+            if address == False:
+                address = gethostname()
             self.lmpcmd = self.lmpcmd + [
                 "",
                 "timestep 0.001   # timestep (ps)",
                 "velocity all create "+str(self.temp)+" 4928459",  # create initial velocities 4928459 is random seed for velocity initialization"
                 "thermo 1   # screen output interval (timesteps)",
-                "fix 1 all ipi "+str(gethostname())+" 12345 "+str(add),
+                "fix 1 all ipi "+str(address)+" 12345 "+str(add),
                 ]
                 # with n2p2 in the parallel version, inet is not working
                 # "fix 1 all ipi fidis 12345",     # for fidis job
                 # "fix 1 all ipi mac 77776 unix",  # for mac job
 
+        self.lmpcmd = self.lmpcmd + [ "########## lmpcmd.end  #############" ]
         if self.verbose > 1:
             print('...lmpcmd',self.lmpcmd)
         self.print_variables()

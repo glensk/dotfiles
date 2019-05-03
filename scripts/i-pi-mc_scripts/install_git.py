@@ -2,13 +2,13 @@
 from __future__ import print_function
 import argparse
 
-import sys,os
+import sys,os,socket
 import myutils as my
 import subprocess
 import myutils
 
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -31,6 +31,12 @@ address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";              
 #address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
 #address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
 address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
+
+address["n2p2"]          = "https://github.com/CompPhysVienna/n2p2.git";
+branch['n2p2']           = 'develop' # this branch is necessary to get scaling.data (or function.data... one of both)
+
+address["units"]         = "http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"
+branch["units"]          = False
 
 
 def help(p = None ,known=known):
@@ -93,6 +99,7 @@ def install_(args,known):
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         if args.install in ['n2p2']             : install_n2p2(args)
         if args.install in ['vmd']              : install_vmd(args)
+        if args.install in ['units']            : install_units(args)
         if args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
 
         # not working yet
@@ -118,10 +125,26 @@ def git_clone(args,specify_depth = True,checkout=False):
         subprocess.call(["git","checkout",checkout])
     return
 
+def install_units(args):
+    print('pwd',os.getcwd())
+    subprocess.call(["wget","http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"])
+    subprocess.call(["tar","-xvf","units-2.18.tar.gz"])
+    home = os.environ["HOME"]
+    print('HOME:',home)
+    with my.cd("units-2.18"):
+        print('configure ....')
+        subprocess.call(['./configure','--prefix='+home+'/.local'])
+        print('make ....')
+        subprocess.call(['make'])
+        print('make install ....')
+        subprocess.call(['make','install'])
+    return
+
 def install_lbzip(args):
     ''' works on fidis
         works on mac (also not necessary, since alredy installed)
     '''
+    print('pwd',os.getcwd())
     print("wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz")
     subprocess.call(["wget","http://archive.lbzip2.org/lbzip2-2.5.tar.gz"])
     subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
@@ -137,10 +160,10 @@ def install_lbzip(args):
     return
 
 def install_lammps(args):
-    ''' lammps_runner works on fidis && mac
-        lammps_n2p2   works on fidis
-        lammps works on fidis (n2p2 & runner working)
-        lammps works on cosmopc (runner working, n2p2 would need to make work first)
+    '''
+        fidis   : works for runner & n2p2
+        mac     : works for runner
+        cosmopc : works for runner
     '''
     import socket
     hostname = socket.gethostname()
@@ -209,6 +232,8 @@ def install_lammps(args):
         if not os.path.isdir(i):
             sys.exit(checkdir+" does not exist; Exit")
 
+    ## copy the pythonfiel (adapted) to make
+    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     ## compile serial or parallel
     if hostname == 'fidis':
@@ -219,8 +244,6 @@ def install_lammps(args):
         bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
         print()
 
-    ## copy the pythonfiel (adapted) to make
-    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     elif hostname == 'mac':
         print("####################################################################")
@@ -291,6 +314,9 @@ def install_lammps(args):
     return
 
 def install_n2p2(args):
+    '''
+    see https://compphysvienna.github.io/n2p2/ for more details
+    '''
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
     os.chdir(args.install_folder)
     subprocess.call(["git","branch"])
@@ -303,10 +329,35 @@ def install_n2p2(args):
     hostname = socket.gethostname()
 
     if hostname == 'fidis':
-        COMP="intel"
-    #if hostname == 'mac':
+        COMP="intel"   # currently icpc && mpiicpc are used; icc should be equivalent to icpc
+    elif hostname == 'mac':
+        COMP = "intel"  # makes problems on mac
+        COMP = "gnu"
+        # on mac you can always try
+        # cd /Users/glensk/sources/n2p2/src/libnnp
+        # %make or %make COMP=gnu -j4 shared or make COMP=gnu  # seem all to be fairly similar
+        # with COMP=gnu this works for the standard clang g++ but not for the conda gcc
+        # GSL & Eigen are only necessary for training see https://compphysvienna.github.io/n2p2/ (section code structure)
+        # the compilatin of libnnpif fails ... could try with intel suite to compile (would also need mpic++)
+        #
+        # now, first installed all latest intel compilers such that icc, icpc and ifort are version 19.0
+        # need: Intel@ Parallel Studio XE Composer Edition for C++ macOS
+        # need: Intel@ Parallel Studio XE Composer Edition for Fortran macOS
+        #
+        # then install openmpi with the intel compilers
+        # see: https://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-open-mpi-with-the-intel-compilers
+        # for openmpi: ./configure --prefix=/usr/local CC=icc CXX=icpc F77=ifort FC=ifort CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64  (use /usr/local since icc,icpc,ifort are also from /usr/local
+        # for openmpi:  make
+        # if this fails -> download the whole intes suite for c++ (and not just parts)
+        #
+        # for openmpi:  make all install  -> this did not work out
+        #  in makefile gnu can try CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64
+        # with openmpi ithen should have something like mpic++ (gnu)
+        #
+        # in makefile gnu can try CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64
     else:
-        COMP="gnu"
+        COMP="gnu" # cosmopc15
+        # on mac now EIGEN_ROOT and GSL_ROOT are defined in $scripts/dotfiles/scripts/source_to_add_to_path.sh
         #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
         #EIGEN = /Users/glensk/miniconda2/
 
@@ -319,6 +370,11 @@ def install_n2p2(args):
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
     my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
     if hostname == 'mac':
+        my.sed("makefile.gnu","-fopenmp","#-fopenmp")  # try also with the acutal paths
+        # with this libnnp compiles, current probs with libnnpif
+        # if in makefiel PROJECT_OPTIONS+= -DNOMPI this defines weather wether to compie with/without MPI and used mpic++ (with) and g++ (without)
+    if False:
+        ## conda activate basegcc !!!!!!!!!!!!
         my.sed("makefile.gnu","^PROJECT_GSL=.*","PROJECT_GSL=./")  # try also with the acutal paths
         my.sed("makefile.gnu","^PROJECT_EIGEN=.*","PROJECT_EIGEN=./")  # try also with the actual paths
         # on mac: conda install gcc
@@ -344,12 +400,13 @@ def install_n2p2(args):
     makefiles_to_change = [ "libnnp","libnnpif", "libnnptrain"]
     for lib in makefiles_to_change:
         my.sed(lib+"/makefile","^PROJECT_DIR.*","PROJECT_DIR=../..")
-        my.sed(lib+"/makefile","^COMP=.*","COMP=intel")
+        #my.sed(lib+"/makefile","^COMP=.*","COMP="+COMP)
 
     # module load on fidis
     print("cc",os.getcwd())
     # @fidis
-    bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
+    if hostname == 'fidis':
+        bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
     # @daint
     #bash_command("module load daint-mc intel craype cray-mpich intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
 

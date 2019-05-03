@@ -11,19 +11,21 @@
 #########################################################################
 #anacondaold="/usr/local/bin"   # use this to install macvim @mac otherwise interference with homebrew python
 #anaconda="$HOME/anaconda/bin"  # don't load anaconda on cmmc since the module is available
-svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)
-homebrew="/usr/local/sbin"
+svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)  # on mac is there anyhow
+homebrew="/usr/local/sbin"  # lets try without homebrew stuff
 b1="/usr/bin"                  # on mac it is there anyhow.
 
 # stuff which should always be added
-bin0="$dotfiles/bin"       # Dropbox binaries
-bin1="$dotfiles/sources_bin"
-bin2="$dotfiles/bin/stefan"
-bin3="$dotfiles/bin/phonon_lifetimes"
+#bin0="$dotfiles/bin"       # Dropbox binaries  -> now in aliases
+#bin1="$dotfiles/sources_bin"  # folder does not exist
+#bin2="$dotfiles/bin/stefan"
+#bin3="$dotfiles/bin/phonon_lifetimes" # not necessary
 bin4="$dotfiles/aliases"  
 bin5="$HOME/.local/bin"      # needs to be there for lbzip2
 
-export PATH="$PATH:$svnctags:$homebrew:$b1:$bin0:$bin1:$bin2:$bin3:$bin4:$bin5:$bin6"
+#export PATH="$PATH:$svnctags:$homebrew:$b1:$bin0:$bin1:$bin2:$bin3:$bin4:$bin5:$bin6"
+#export PATH="$PATH:$svnctags:$homebrew:$b1:$bin4:$bin5"
+export PATH="$PATH:$bin4:$bin5"
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
@@ -56,7 +58,7 @@ if [ "$onhost" = "mac" ];then
     pyphonopy2=""   # may be lib64 instead  no path needed now when using phono3py
 
 
-    # $LD_LIBRARY_PATH add on mac
+    # $LD_LIBRARY_PATH add on mac  # for which programm did I use this?
     ldvasp="$HOME/local/lib"
     ldphonopylapack="/usr/local/opt/lapack/lib"
     ldphonopyopenblas="/usr/local/opt/openblas/lib"
@@ -64,6 +66,6 @@ if [ "$onhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
     export PATH="$sed:$brew:$phonopy:$PATH"   # brew necessary to load coreutils
-    export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH"
-    export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"
+    #export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH" # lets try without ... dont know for which progs I used those
+    #export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"  # lets try without
 fi

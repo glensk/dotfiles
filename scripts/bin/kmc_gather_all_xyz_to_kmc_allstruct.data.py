@@ -1,0 +1,1 @@
+../i-pi-mc_scripts/kmc_gather_all_xyz_to_kmc_allstruct.data.py

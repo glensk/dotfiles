@@ -1,0 +1,1 @@
+../qe-aiida/install_quantum_espresso.sh

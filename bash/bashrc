@@ -60,5 +60,5 @@ source ~/.generalrc
 
 
 # added by Miniconda3 installer
-export PATH="/users/aglensk/miniconda3/bin:$PATH"
+#export PATH="/users/aglensk/miniconda3/bin:$PATH"
 fi

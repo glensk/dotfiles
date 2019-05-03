@@ -1,0 +1,1 @@
+../qe-aiida/aiida_install.sh
