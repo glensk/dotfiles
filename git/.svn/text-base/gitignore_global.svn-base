@@ -1,0 +1,159 @@
+#excludesfile = /home/glensk/Dropbox/scripts/dotfiles/git/gitignore_global
+# yo wo
+# iterm2
+.DS_Store
+*.mode1v3
+*.mode2v3
+*.move1v3
+*.pbxuser
+*.perspective
+*.perspectivev3
+iTerm.xcodeproj/project.pbxproj
+build/
+.DS_Store
+iTerm.xcodeproj/*
+*.pbxproj
+canary.xml
+testing.xml
+testing_changes.html
+iTerm.plist
+
+# svn we will keep with git only small file
+.svn
+*.svn
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.o
+*.so
+*.mod
+*.g
+*.f
+*.L 
+
+# following stuff from https://github.com/github/gitignore/blob/master
+# vim
+##################
+.*.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+
+# PyCharm
+# http://www.jetbrains.com/pycharm/webhelp/project.html
+.idea
+.iml
+
+
+# Linux
+.*
+!.gitignore
+*~
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Libraries
+#*.lib # we need them for vasp
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+
+# Latex
+*.acn
+*.acr
+*.alg
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.fdb_latexmk
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.maf
+*.mtc
+*.mtc0
+*.nav
+*.nlo
+*.out
+*.pdfsync
+*.ps
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdy
+*.tdo
+
+
+# Python
+*.py[cod]
+
+#C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject

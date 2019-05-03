@@ -1,0 +1,59 @@
+(aiida) 14:37:15 glensk@cosmopc15 /home/glensk
+%verdi profile list
+Info: configuration folder: /home/glensk/aiida/.aiida
+Info: default profile is highlighted and marked by the * symbol
+  al6xxx
+* al6xxx_test
+(aiida) 14:37:26 glensk@cosmopc15 /home/glensk
+%verdi profile show
+Attribute               Value
+----------------------  --------------------------------------------------------
+aiidadb_backend         sqlalchemy
+aiidadb_engine          postgresql_psycopg2
+aiidadb_host            localhost
+aiidadb_name            aiida_al6xxx_test
+aiidadb_pass            aiidadb
+aiidadb_port            5432
+aiidadb_repository_uri  file:///home/glensk/aiida/.aiida/repository-al6xxx_test/
+aiidadb_user            aiida
+default_user_email      albert.glensk@gmail.com
+profile_uuid            776d80ce3d72422883b9b44f9c46a2d5
+(aiida) 14:37:41 glensk@cosmopc15 /home/glensk
+%pg_dump -U aiida -h localhost -w -d "aiida_al6xxx_test" > aiida_al6xxx_test.psql
+pg_dump: [archiver (db)] connection to database "aiida_al6xxx_test" failed: fe_sendauth: no password supplied
+(aiida) 14:38:31 glensk@cosmopc15 /home/glensk
+%pg_dump -U aiida -h localhost -W -d "aiida_al6xxx_test" > aiida_al6xxx_test.psql
+zsh: file exists: aiida_al6xxx_test.psql
+(aiida) 14:38:46 glensk@cosmopc15 /home/glensk
+%rm aiida_al6xxx_test.psql
+(aiida) 14:38:49 glensk@cosmopc15 /home/glensk
+%pg_dump -U aiida -h localhost -W -d "aiida_al6xxx_test" > aiida_al6xxx_test.psql
+Password:
+(aiida) 14:39:08 glensk@cosmopc15 /home/glensk
+%ls
+5x5x5_n2p2_v1ag_1000K_1Vac_3Mg_3Si__0.8pctVac_2.4pctMg_2.4pctSi_10.0rcut/
+Downloads/
+Pictures/
+aiida/
+ase_in_site_packages/
+code/
+getSF/
+miniconda3/
+sources/
+tmp/
+BetaPrime_structures_relax.input.data
+Dropbox@
+README_2019-03-11_17:04.txt
+aiida_al6xxx_test.psql
+aiida_exported_group_BetaPrime_structures_relax.input.data
+base_computers_code.aiida
+google_drive@
+scripts@
+v@
+(aiida) 14:39:11 glensk@cosmopc15 /home/glensk
+%du -sh aiida_al6xxx_test.psql
+74M  aiida_al6xxx_test.psql
+(aiida) 14:39:18 glensk@cosmopc15 /home/glensk
+
+
+rsync -ahWv --no-compress --exclude '/sandbox' /home/glensk/aiida/.aiida/repository-al6xxx_test/ /home/glensk/aiida_backup_20190327/

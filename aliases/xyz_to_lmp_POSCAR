@@ -1,0 +1,1 @@
+echo "load xyz from ovito and save as lmp file, this can also be scripted with ovito"

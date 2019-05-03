@@ -1,0 +1,22 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: c54e583e2fea0c7578c0ad5aae5213906a4ef9a0
+
+aiida_export_group_to_runner.py -gn from_KMC3_remaining21.data.group_calc
+
+
+## this 4 structures failed.
+using write_pwbase_torunner a5c12f50-36fa-47ce-87e1-16ae3e56cf69
+uuid: 699017f7-13b7-4f45-8bb5-797fed1151de (pk: 102523) cell[0] [43.373885  0.        0.      ]
+Error forces not obtained, skipping this structure...
+
+using write_pwbase_torunner 0d169d1b-b225-45f2-8df3-0855da9b61d0
+uuid: 9d4cf97a-c1db-43d6-bfd7-640bd62e18bf (pk: 102537) cell[0] [43.373885  0.        0.      ]
+Error forces not obtained, skipping this structure...
+
+using write_pwbase_torunner 2c81aa76-305b-442b-b36f-433953b6d32e
+uuid: 7abeba5d-754f-496f-9f01-48bd03181054 (pk: 102530) cell[0] [43.373885  0.        0.      ]
+Error forces not obtained, skipping this structure...
+
+using write_pwbase_torunner 015c97b9-3f16-43dc-915d-07412a6c363a
+uuid: 6a6de10a-70b5-4992-bd18-9117cd46bc28 (pk: 102588) cell[0] [43.373885  0.        0.      ]
+Error forces not obtained, skipping this structure...

@@ -1,0 +1,70 @@
+if [[ $- == *i* ]];then  # only in interactive shell
+
+gettime="false"
+#gettime="true"
+loadzsh="true"          # shuts all zst settings on/off
+
+if [ "$loadzsh" = "true" ];then
+    if [ "$gettime" = "true" ];then
+        date=`which date`
+        [ "`hostname | grep -o mac`" = "mac" ] && date=/usr/local/opt/coreutils/libexec/gnubin/date
+        
+        getms() {
+            # for mac: /usr/local/opt/coreutils/libexec/gnubin/date +%s%N
+            $date +%s%N
+        }
+    
+        gt() {
+            ka=$*
+            tlast=`echo "$ka" | awk '{print $1}'`
+            tnow=`getms`
+            diff=`echo $tlast $tnow | awk '{printf "%.1f\n", ($2-$1)/10000000}'`
+            echo $tnow $tlast $diff
+        }
+    fi
+
+
+#[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
+# in zsh first load compinit and bashcompinit (in first line)
+autoload -U colors && colors                    # necessary for prompt colors (0.00s)
+autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) 
+autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
+[ "$gettime" = "true" ] && gett=`gt $gett` #&& echo "compinit    : $gett"
+
+#################################################################
+# oh-my-zsh: DONT USE IT!!! do this first in zsh; IT IS WAY TOO SLOW!!!!!! DONT USE IT !!!!!
+# but the way it colors the history-substring-search is great!
+# time zsh (mit  oh-my-zsh): 0.15-0.16 
+# time zsh (ohne oh-my-zsh): 0.07-0.07 
+# time zsh (mit zsh-syntax-highlighting history-substring-search): 0.14 
+#################################################################
+#source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh  # 13timeunits (4without)
+#source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh  # 4timeunits (4without)
+
+#################################################################
+# declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
+#################################################################
+[ -z "$PYTHONPATH" ] && PYTHONPATH=""
+
+#################################################################
+# read in general variables on{mac,cmmc,cmmd},printloadstat
+#################################################################
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "PHYTHONPATH : $gett https://carlosbecker.com/posts/speeding-up-zsh/"
+source ~/.generalrc
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.generalrc: $gett generalrc" # (https://carlosbecker.com/posts/speeding-up-zsh/)"
+
+#source $MODULESHOME/init/bash    # necessary for zsh or other init shells
+#source $MODULESHOME/init/bash    # necessary for zsh or other init shells
+#source $MODULESHOME/init/bash    # necessary for zsh or other init shells
+# time zsh
+# 0) completely empty             : 0.01s
+# 1) 0+ autoload colors/bashinit  : 0.01s 
+# 1) 1+ autoload compinit         : 0.04s (comptinit) = 0.03s
+# 2) 1+ alles before . generalrc  : 0.04s 
+# 3) 2+ . generalrc               : 0.05s (generalrc) = 0.011s (from bashrc)
+# 4) 3+ zsh_set                   : 0.06s (zsh_set  ) = 0.01s
+# 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
+autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) repeat here to get completion for notes without restarting shell again
+#autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
+fi
+fi

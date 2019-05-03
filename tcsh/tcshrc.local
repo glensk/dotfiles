@@ -1,0 +1,70 @@
+## necessary for interactive sessions
+switch("$host")
+
+        case "$mylaptop":
+                # only necessary when interactive shell
+#alias mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica'
+                alias m             'mathematica'
+#alias math          '/Applications/Mathematica.app/Contents/MacOS/MathKernel'
+                # MathematicaScript  /Applications/Mathematica9_license.app/Contents/MacOS/MathematicaScript
+                breaksw
+
+            #case "$myhost":
+	case "cmpc*":
+                set prompt="\n%T %{\033[1;31m%}%B%n%b@%{\033[1;31m%}%U%m%u %B%/%b \n%{\033[0m%}%#"
+                limit stacksize unlimited
+                #module load sphinx/current
+                # only necessary when interactive shell
+                #set mm=`ls /opt/mathematica/ | sed 's|/$||'`
+                #module load mathematica/$mm
+                #module load mathematica
+                setenv PRINTER cmcopy1166  # sets default printer
+                #alias m 	"/opt/mathematica/$mm/Executables/mathematica"
+                #alias math  "/opt/mathematica/$mm/Executables/math"
+                alias win1 	'rdesktop -a16 -d MPIE -u a.glensk -g 1680x984 cmwts1'
+                alias win2 	'rdesktop -a16 -d MPIE -u a.glensk -g 1680x984 cmwts2'
+                alias win3 	'rdesktop -a16 -d MPIE -u a.glensk -g 1680x984 cmwts3'
+                # make session not die
+                #( xclock -d -padding -8 -geometry 1x1-0+999 > /dev/null ) > & /dev/null &
+		        breaksw
+
+        case "cmmc*"
+                limit stacksize unlimited
+                #set prompt="\n%T %{\033[1;35m%}%B%n%b@%{\033[1;35m%}%U%m%u %B%/%b \n%{\033[0m%}%#"
+                set prompt="\n%T %{\033[1;36m%}%B%n%b@%{\033[1;36m%}%U%m%u %B%/%b \n%{\033[0m%}%#"
+                breaksw
+
+        case "cmmd002*"
+                limit stacksize unlimited
+                set prompt="\n%T %{\033[1;34m%}%B%n%b@%{\033[1;34m%}%U%m%u %B%/%b \n%{\033[0m%}%#"
+                ### fuer getGibbsEnergyOfFormation.sh
+                setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/opt/intel/Compiler/11.1/073/mkl/lib/em64t/         ### fuer getGibbsEnergyOfFormation.sh
+                #set prompt="\n[%h] %T %B%n%b@%B%{\033[34m%}%M%{\033[0m%}%b  %B%~%b\n%#"
+                setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/home/grabowski/libs/
+                setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/home/glensk/
+                set path = (/lib64 $path)
+                # make session not die
+                #( xclock -d -padding -8 -geometry 1x1-0+999 > /dev/null ) > & /dev/null &
+                # to make xmgrace work
+                setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/opt/intel/lib/intel64
+                setenv PATH ${PATH}:/data/grabowski/xmgrace/bin/
+                setenv PYTHONPATH ${HOME}/Dropbox/scripts/python/add_cmmd/argparse-1.2.1:${PYTHONPATH}
+                breaksw
+
+      case "cmdft*"
+                limit stacksize unlimited
+                set prompt="\n%T %{\033[1;34m%}%B%n%b@%{\033[1;34m%}%U%m%u %B%/%b \n%{\033[0m%}%#"
+                #setenv PYTHONPATH ${HOME}/Dropbox/scripts/python/add_cmmd/argparse-1.2.1:${PYTHONPATH}
+                breaksw
+
+      case "cmmd*"
+                set prompt="\n%T %{\033[1;34m%}%B%n%b@%{\033[1;34m%}%U%m%u %B%/%b \n%{\033[0m%}%#"
+                setenv PYTHONPATH ${HOME}/Dropbox/scripts/python/add_cmmd/argparse-1.2.1:${PYTHONPATH}
+                #( xclock -d -padding -8 -geometry 1x1-0+999 > /dev/null ) > & /dev/null &
+                breaksw
+      
+      case "cmmd001*"
+                module load openmpi/1.5/intelcomp
+	  breaksw
+endsw
+

@@ -1,0 +1,4 @@
+#!/bin/zsh
+echo $*
+echo
+DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par $* 

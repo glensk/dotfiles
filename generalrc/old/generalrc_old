@@ -1,0 +1,83 @@
+echo
+echo
+echo "##### in generalrc"
+
+setenv myhost cmpc34.mpie.de   # cmpc25=wolfgang; cmpc07=biswanath;
+setenv myhost cmpc34
+setenv mylaptop mac
+setenv submithost cmmd002.mpie.de
+
+
+onmac="false"
+oncmmc="false"
+oncmmd="false"
+oncmpc="false"
+
+echo host:$host:
+echo mylaptop:$mylaptop:
+# for local setting see tcsh/tcsh.local!!!!!!!
+if [ "$host" = "$mylaptop" ];then
+    #################################
+    # onmac
+    #################################
+    onmac="true"
+    [ "$printloadstat" = "true" ] && echo schleife 1
+    alias trash="rmtrash"
+    alias   del="rmtrash"
+    alias rm="echo Use 'del', or the full path i.e. '/bin/rm'"
+    alias ctagsnew='/usr/local/Cellar/ctags/5.8/bin/ctags -R .'
+
+else
+[ "$printloadstat" = "true" ] && echo "schleife 1 no host:$host: mylapto:$mylaptop:"
+if [ "`echo $host | grep -o cmpc`" = "cmpc" ];then
+    #################################
+    # oncmpc
+    #################################
+    # christoph changed in /etc/profile.d/gxhivemgr.sh: if test x"$PS1" = x || echo
+    # "$0" | grep -qv bash ; then :; else
+    oncmpc="true"
+    [ "$printloadstat" = "true" ] && echo schleife 2
+    export TMPDIR="/scratch/$USER"  # this keeps ctags from installing on mac
+    limit stacksize unlimited      # this has to go in thermodynamics folder
+else
+if [ "`echo $host | grep -o cmmd`" = "cmmd" ];then
+    #################################
+    # oncmmd
+    #################################
+    oncmmd="true"
+    [ "$printloadstat" = "true" ] && echo schleife 3
+    limit stacksize unlimited      # this has to go in thermodynamics folder
+    module load sge 
+    module load vasp/parallel/4.6-tdi
+    # loads for getGibbsEnergyOfFormation.sh !!!!!! see tcsh/tcsh.local !!!!!!
+else
+if [ "`echo $host | grep -o cmmc`" = "cmmc" ];then
+    #################################
+    # oncmmc
+    #################################
+    oncmmc="true"
+    [ "$printloadstat" = "true" ] && echo schleife 4
+    module load intel impi mkl
+    module load grace
+    module load vasp/5.3.5
+    module load git
+    limit stacksize unlimited      # this has to go in thermodynamics folder
+fi;fi;fi;fi
+
+if [ "$printloadstat" = "true" ];then
+echo oncmmc:$oncmmc:
+echo oncmmd:$oncmmd:
+echo oncmpc:$oncmpc:
+echo onmac:$onmac:
+fi
+
+
+
+
+
+
+
+
+echo "##### out generalrc"
+echo
+echo

@@ -1,0 +1,8 @@
+-------------------
+mjr Thu Jul 10 2014
+-------------------
+adapted/generated MAKE/Makefile.hydra 
+cd src/ && make yes-standard yes-USER-COLVARS yes-USER-MOLFILE no-gpu no-VORONOI no-KIM
+adapt Makefile.i* in the generated lib/* (remove -lompstubs) 
+and make there
+make hydra

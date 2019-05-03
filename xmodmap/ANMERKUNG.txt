@@ -1,0 +1,9 @@
+eigentlich belegung
+
+keycode 63 = Command Key
+keycode 66 = alt/option key
+
+you can find out by executing xev in the shell when x11 is open
+
+a great page with information: http://www.emacswiki.org/emacs/MetaKeyProblems
+

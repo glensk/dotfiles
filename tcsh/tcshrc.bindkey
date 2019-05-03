@@ -1,0 +1,38 @@
+##########################################################################
+### XXX ### bindkey			                                ##
+## If you want to know which is the representation of another key 	##
+## combination, go at the prompt of your tcsh. Press "Ctrl v" keys and 	##
+## then the combinations key you want to use. The shell will		##
+## give you the right code back.	                                ##
+##########################################################################
+#bindkey '^L'        forward-word        # control l
+bindkey '^M'        backward-word       # control h
+#bindkey '^D'        delete-word
+#bindkey '^A'        beginning-of-line   # ctrl+a   in vi:ctrl+^
+#bindkey '^E'        end-of-line         # ctrl+e   in vi:ctrl+$
+#bindkey '^[[1~'     beginning-of-line   # Home taste
+#bindkey '^[[4~'     end-of-line         # End taste
+
+
+
+
+## F2 : set the mark command to cursor position.
+## first: while in console mode, second: while in X
+#bindkey  '^[[[B'    set-mark-command 
+#bindkey  '^[OQ'     set-mark-command 
+#
+## F3 : move cursor to the marked position.
+##   # first: while in console mode, second: while in X
+#bindkey   '^[[[C'   exchange-point-and-mark 
+#bindkey   '^[OR'    exchange-point-and-mark 
+# F2 : set the mark command to cursor position.
+# first: while in console mode, second: while in X
+bindkey ^[[N set-mark-command
+bindkey ^[OQ set-mark-command 
+
+# F3 : move cursor to the marked position.
+# first: while in console mode, second: while in X
+bindkey ^[[O exchange-point-and-mark
+bindkey ^[OR exchange-point-and-mark 
+
+bindkey "^R" i-search-back

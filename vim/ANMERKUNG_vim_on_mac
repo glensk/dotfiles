@@ -1,0 +1,21 @@
+        <Esc>                Escape key
+        <C-G>                CTRL-G
+        <Up>                 cursor up key
+        <C-LeftMouse>        Control- left mouse click
+        <S-F11>              Shifted function key 11
+        <M-a>                Meta- a  ('a' with bit 8 set)
+        <M-A>                Meta- A  ('A' with bit 8 set)
+        <t_kd>               "kd" termcap entry (cursor down key)
+
+Meat stands for the option (alt) key on mac
+       "D" stands for the modifier key
+
+<D-s>
+
+
+map <C-LEFT> <ESC>:tabp<CR>      " works, maps control leftkeyarrow to tabprevious
+map <C-RIGHT> <ESC>:tabn<CR>     " works, see above
+
+
+zM          fold all
+za          fold this definitin

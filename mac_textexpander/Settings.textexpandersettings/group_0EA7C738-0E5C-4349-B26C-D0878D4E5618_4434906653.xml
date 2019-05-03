@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>expandAfterMode</key>
+	<integer>0</integer>
+	<key>expanderExceptionsMode</key>
+	<integer>4</integer>
+	<key>name</key>
+	<string>My Snippets</string>
+	<key>snippetPlists</key>
+	<array>
+		<dict>
+			<key>abbreviation</key>
+			<string>;sig</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2011-06-01T00:38:03Z</date>
+			<key>label</key>
+			<string>Default signature</string>
+			<key>modificationDate</key>
+			<date>2016-07-31T22:23:09Z</date>
+			<key>plainText</key>
+			<string>-------------------------------------------------------------
+Albert Glensk
+Haeselerstraße 23a
+40470 Düsseldorf, Germany
+
+Tel.: +49 211 4685 8788
+Fax: +49 211 2936 6732
+Mobil: +49 (0)160 950 46896</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>F7124F93-0B72-4696-8A2E-E44DB879B49F</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;web</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2011-06-01T00:29:51Z</date>
+			<key>label</key>
+			<string>My URL</string>
+			<key>modificationDate</key>
+			<date>2011-06-01T00:29:51Z</date>
+			<key>plainText</key>
+			<string>http://www.smilesoftware.com/</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>4D1EF3A1-9491-4851-93CC-DB47E72001D8</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;home</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2011-06-01T00:28:22Z</date>
+			<key>label</key>
+			<string>Home address</string>
+			<key>modificationDate</key>
+			<date>2016-02-12T08:38:40Z</date>
+			<key>plainText</key>
+			<string>Haeselerstr. 23a
+40470 Düsseldorf
+</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>19A04825-34B2-4514-91F3-E9C31ECE7ADC</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;ph</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2011-06-01T00:27:37Z</date>
+			<key>label</key>
+			<string>Phone number</string>
+			<key>modificationDate</key>
+			<date>2016-02-12T08:38:10Z</date>
+			<key>plainText</key>
+			<string>(+49) 160 950 46896</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>4AEA8CB9-0360-4508-9DAB-EF22D91BB4C4</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;em</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2011-06-01T00:26:51Z</date>
+			<key>label</key>
+			<string>Email</string>
+			<key>modificationDate</key>
+			<date>2016-02-12T08:37:46Z</date>
+			<key>plainText</key>
+			<string>albert.glensk@gmail.com</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>88A5859C-26A7-4D8D-904D-30AAAE53A5CB</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>ttime</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2012-01-11T23:30:56Z</date>
+			<key>label</key>
+			<string>Current time</string>
+			<key>modificationDate</key>
+			<date>2016-02-11T19:06:59Z</date>
+			<key>plainText</key>
+			<string>%1I:%M %p</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>28CFFBFB-3224-4068-9DFB-73B242EFEEAA</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>ddate</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2012-01-11T23:30:56Z</date>
+			<key>label</key>
+			<string>Today's date</string>
+			<key>modificationDate</key>
+			<date>2016-02-11T19:06:59Z</date>
+			<key>plainText</key>
+			<string>%B %e, %Y</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>CE101F5A-C5CC-43C0-B75D-81F13AC134B1</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;wf</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-07-16T18:19:54Z</date>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2016-11-02T10:04:04Z</date>
+			<key>plainText</key>
+			<string>@Waiting for: </string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;mpie</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2016-12-12T08:38:08Z</date>
+			<key>label</key>
+			<string>address MPIE</string>
+			<key>modificationDate</key>
+			<date>2018-02-12T23:41:58Z</date>
+			<key>plainText</key>
+			<string>-------------------------------------------------------------
+Dr. Albert Glensk
+Computational Materials Design
+Max-Planck-Institut für Eisenforschung
+Düsseldorf, Germany
+
+Tel: +49 211 6792 540
+
+-------------------------------------------------------------
+Max-Planck-Institut für Eisenforschung GmbH
+Max-Planck-Straße 1
+D-40237 Düsseldorf
+
+Handelsregister B 2533
+Amtsgericht Düsseldorf
+
+Geschäftsführung
+Prof. Dr. Gerhard Dehm
+Prof. Dr. Jörg Neugebauer
+Prof. Dr. Dierk Raabe
+Dr. Kai de Weldige
+
+Ust.-Id.-Nr.: DE 11 93 58 514
+Steuernummer: 105 5891 1000
+
+
+Please consider that invitations and e-mails of our institute are
+only valid if they end with …@mpie.de.
+If you are not sure of the validity please contact rco@mpie.de
+
+Bitte beachten Sie, dass Einladungen zu Veranstaltungen und E-Mails
+aus unserem Haus nur mit der Endung …@mpie.de gültig sind.
+In Zweifelsfällen wenden Sie sich bitte an rco@mpie.de
+-------------------------------------------------------------</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>BC33ECF7-628D-494F-98CC-D3E4F666D93C</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;pl</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-04-19T20:59:50Z</date>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-04-20T06:36:15Z</date>
+			<key>plainText</key>
+			<string>~/Thermodynamics/python_thermodynamics/lammps_pos_to_sum.py </string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>51390208-208A-4CD7-92E1-F0D15A36FA28</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;cdpt</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-04-20T06:33:51Z</date>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-04-20T06:36:53Z</date>
+			<key>plainText</key>
+			<string>cd ~/Thermodynamics/python_thermodynamics/</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>BD409DA0-899D-4904-A16A-AB705D2383DB</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;vpl</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2017-04-19T20:59:50Z</date>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2017-04-20T06:36:21Z</date>
+			<key>plainText</key>
+			<string>vi ~/Thermodynamics/python_thermodynamics/lammps_pos_to_sum.py </string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>5658D12E-1C53-45FE-8A11-3B785F183405</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;priv</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2018-01-22T11:38:07Z</date>
+			<key>label</key>
+			<string>address private</string>
+			<key>modificationDate</key>
+			<date>2018-01-22T11:39:07Z</date>
+			<key>plainText</key>
+			<string>-------------------------------------------------------------
+Albert Glensk
+Haeselerstraße 23a
+40470 Düsseldorf, Germany
+
+Tel.: +49 211 4685 8788
+Fax: +49 211 2936 6732
+Mobil: +49 (0)160 950 46896</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>17255D19-8848-4C4F-9588-1DE4EFFCA491</string>
+		</dict>
+		<dict>
+			<key>abbreviation</key>
+			<string>;ch</string>
+			<key>abbreviationMode</key>
+			<integer>0</integer>
+			<key>creationDate</key>
+			<date>2018-07-27T05:47:54Z</date>
+			<key>label</key>
+			<string></string>
+			<key>modificationDate</key>
+			<date>2018-07-27T05:48:46Z</date>
+			<key>plainText</key>
+			<string>Chemin de la Pommeraie 21</string>
+			<key>snippetType</key>
+			<integer>0</integer>
+			<key>uuidString</key>
+			<string>2913FC2D-C95F-4180-B65C-16AFC1D28221</string>
+		</dict>
+	</array>
+	<key>snippetUUIDs</key>
+	<array>
+		<string>F7124F93-0B72-4696-8A2E-E44DB879B49F</string>
+		<string>4D1EF3A1-9491-4851-93CC-DB47E72001D8</string>
+		<string>19A04825-34B2-4514-91F3-E9C31ECE7ADC</string>
+		<string>4AEA8CB9-0360-4508-9DAB-EF22D91BB4C4</string>
+		<string>88A5859C-26A7-4D8D-904D-30AAAE53A5CB</string>
+		<string>28CFFBFB-3224-4068-9DFB-73B242EFEEAA</string>
+		<string>CE101F5A-C5CC-43C0-B75D-81F13AC134B1</string>
+		<string>EECBC2ED-0940-4A4F-8CB3-D4E8CF5EAB59</string>
+		<string>BC33ECF7-628D-494F-98CC-D3E4F666D93C</string>
+		<string>51390208-208A-4CD7-92E1-F0D15A36FA28</string>
+		<string>BD409DA0-899D-4904-A16A-AB705D2383DB</string>
+		<string>5658D12E-1C53-45FE-8A11-3B785F183405</string>
+		<string>17255D19-8848-4C4F-9588-1DE4EFFCA491</string>
+		<string>2913FC2D-C95F-4180-B65C-16AFC1D28221</string>
+	</array>
+	<key>suggestAbbreviations</key>
+	<integer>1</integer>
+	<key>updateFrequency</key>
+	<integer>0</integer>
+	<key>uuidString</key>
+	<string>0EA7C738-0E5C-4349-B26C-D0878D4E5618</string>
+	<key>writable</key>
+	<integer>1</integer>
+</dict>
+</plist>

@@ -1,0 +1,8 @@
+verdi group list -A
+  40  NN_relaxed_Mg5Si6_n2p2_v2ag                                                   albert.glensk@gmail.com
+  41  NN_relaxed_Mg5Si6_n2p2_v2ag_calc                                              albert.glensk@gmail.com
+  42  NN_relaxed_Mg4Al3Si4_n2p2_v2ag                                                albert.glensk@gmail.com
+  43  NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc                                           albert.glensk@gmail.com
+  44  NN_relaxed_Mg5Al2Si4_n2p2_v2ag                                                albert.glensk@gmail.com
+  45  NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc                                           albert.glensk@gmail.com
+

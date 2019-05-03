@@ -1,0 +1,25 @@
+--python-kinds=-iv
+--exclude=build
+--exclude=dist
+
+# hopefully this is a comment the following is from http://stackoverflow.com/questions/8119405/create-tags-file-for-latex-for-labels-and-bib-items
+#--langdef=tex2
+#--langmap=tex2:.tex
+#--regex-tex2=/\\label[ \t]*\*?\{[ \t]*([^}]*)\}/\1/l,label/
+#
+#--langdef=bib
+#--langmap=bib:.bib
+#--regex-bib=/^@[A-Za-z]+\{([^,]*)/\1/b,bib/
+
+
+# https://caffeinatedcode.wordpress.com/2009/11/16/simple-latex-ctags-and-taglist/
+#--langdef=latex
+#--langmap=latex:.tex
+#--regex-latex=/\\label\{([^}]*)\}/\1/l,label/
+#--regex-latex=/\\section\{([^}]*)\}/\1/s,section/
+#--regex-latex=/\\subsection\{([^}]*)\}/\1/t,subsection/
+#--regex-latex=/\\subsubsection\{([^}]*)\}/\1/u,subsubsection/
+#--regex-latex=/\\section\*\{([^}]*)\}/\1/s,section/
+#--regex-latex=/\\subsection\*\{([^}]*)\}/\1/t,subsection/
+#--regex-latex=/\\subsubsection\*\{([^}]*)\}/\1/u,subsubsection/
+

@@ -1,0 +1,136 @@
+export BASH_CONF="bashrc"
+[ -z "$PS1" ] && return    # If not running interactively, don't do anything
+[ -f /etc/bash_completion ] && source /etc/bash_completion  # Enable programmable completion features.
+complete -d cd   # cd goo<TAB> suggest only all directories which start with goo...
+#!!!! MUCH TOO SLOW [ -f /usr/local/etc/bash_completion ] &&  source /usr/local/etc/bash_completion  # Enable programmable completion features. DONT USE $(brew --prefix) !!!!!! TAKES TOO MUCH TIME TO LOAD ## but also without this takes 0.16s time to load
+
+
+
+# PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
+#PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
+#PROMPT_COMMAND='echo -ne "\033]0;\w ${PWD}\007"'
+#PROMPT_COMMAND='echo -ne "\033]0; ${PWD##*/}\007"'  # just last dir
+
+
+#set -o vi #  vi editing mode instead of emacs editing mode  # NO ! DESTROYS MAPPINGS IN ITERM
+
+# http://blog.sanctum.geek.nz/terminal-annoyances/
+#stty -ixon   # can sometimes 
+[[ $- == *i* ]] && stty -ixon
+
+# Disk is cheap. Memory is cheap. My memory isn't! Keep a lot of
+# history by default. 10K lines seems to go back about 6 months, and
+# captures all of the wacky one-off shell scripts that I might want
+# again later.
+#[ "$printbashinfo" = "True" ] && echo "--> .bashrc : settings"
+export HISTSIZE=10000
+export HISTFILESIZE=${HISTSIZE}
+# see: http://aplawrence.com/Linux/bash_history.html
+# don't put duplicate lines in the history. See bash(1) for more options
+export HISTCONTROL=erasedups
+#export HISTCONTROL='ignoreboth' # Avoid succesive duplicates in the bash command history.
+# Append commands to the history every time a prompt is shown,
+# instead of after closing the session.
+#PROMPT_COMMAND='history -a'
+
+
+ulimit -S -c 0      # Don't want coredumps.
+set -o notify
+set -o noclobber
+set -o ignoreeof
+
+set show-all-if-ambiguous on
+set completion-ignore-case on
+
+# Enable options: to check in bash:  shopt cdable_vars
+shopt -s cdspell        # autocorrection of misspelled folder
+shopt -s cdable_vars    # may define vars as folders and do cd $var1
+shopt -s checkhash
+shopt -s checkwinsize
+shopt -s sourcepath
+shopt -s no_empty_cmd_completion
+shopt -s histappend histreedit histverify   # histapped makes history usable across diffrent shells
+shopt -s extglob        # Enable egrep-style pattern matching
+shopt -s histappend     # Append commands to command history (~/.bash_history) instead of overwriting
+shopt -s cmdhist        # ... and keep multi line commands together
+shopt -s autocd         # turn on implicit cd
+shopt -s histverify     # Allow to review a history substitution result by loading the resulting line into the editing buffer, rather than directly executing it.
+shopt -s histreedit     # If set, and readline is being used, a user is given the opportunity to re-edit a failed history substitution.
+
+# Disable options:
+shopt -u mailwarn
+unset MAILCHECK        # Don't want my shell to warn me of incoming mail.
+
+#Setup history searches
+#bind '&quot;\e[A&quot;:history-search-backward'                      # makes error message
+#bind '&quot;\e[B&quot;:history-search-forward'                     # makes error message
+#bind 'set match-hidden-files off'  # dont show dot files on tab # makes error message
+
+#[ "$host" = "$mylaptop" ] && bash -c 'echo -ne "\033]6;1;bg;green;brightness;255\a"'  # sets default tab color to green, for other colors see ssh.sh
+#[ "$host" = "$mylaptop" ] && echo -ne "\033]6;1;bg;green;brightness;255\a"  # sets default tab color to green, for other colors see ssh.sh
+
+set autolist
+set filesc
+# append '/' to dirnames
+export INPUTRC=~/.inputrc
+
+#you will no longer have to hit the <Tab> key twice to produce a list of all possible completions. A single <Tab> will suffice. This setting is highly recommended. 
+set show-all-if-ambiguous on 
+
+
+#Adding this to your /etc/inputrc or ~/.inputrc will result in a character being appended to any file-names returned by completion, in much the same way as ls -F works
+set visible-stats on
+
+#source $HOME/Downloads/bash_completion/bash_completion
+
+#Setting the following makes bash erase duplicate commands in your history:
+export HISTCONTROL="erasedups:ignoreboth"
+
+#set colored-stats on
+
+# # autojump 
+# echo autojump
+# [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh
+# export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND ;} history -a"
+# # export AUTOJUMP_AUTOCOMPLETE_CMDS='cp vim' what is this for?
+# 
+# echo fasd
+# eval "$(fasd --init auto)"
+# eval "$(fasd --init posix-alias bash-hook bash-ccomp bash-ccomp-install)"
+
+
+#source $HOME/scripts/dotfiles/bash/bash_completion_python
+
+#fasd_cache="$HOME/.fasd-init-bash"
+#if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+#  fasd --init posix-alias bash-hook bash-ccomp bash-ccomp-install >| "$fasd_cache"
+#fi
+#source "$fasd_cache"
+#unset fasd_cache
+
+#alias a='fasd -a'        # any
+#alias s='fasd -si'       # show / search / select
+#alias d='fasd -d'        # directory
+#alias f='fasd -f'        # file
+#alias sd='fasd -sid'     # interactive directory selection
+#alias sf='fasd -sif'     # interactive file selection
+#alias z='fasd_cd -d'     # cd, same functionality as j in autojump
+#alias zz='fasd_cd -d -i' # cd with interactive selection
+#alias v='f -e vim' # quick opening files with vim
+
+#[ "$printbashinfo" = "True" ] && echo "--> .bashrc : colorstuff"
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+eval `dircolors -b $HOME/.dir_colors`
+set colored-stats on
+# Usefull stuff:
+# bind -P shows keyboard shortcuts  \e ESC   \C ctrl   
+# http://www.catonmat.net/blog/bash-vi-editing-mode-cheat-sheet/
+#
+# makes tab show colors in bash
+#echo " !!!!!!!! colored-stats on!"
+#set colored-stats on
+#echo " !!!!!!!! bashrc done"
+
+# try to get tab expansion before hitting return
+# bind Space:magic-space  # dont do this; destroyz casual tab

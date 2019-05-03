@@ -1,0 +1,167 @@
+#################################################################
+# navigation
+#################################################################
+#alias ls 	    'ls -F -H -v --color=tty'   # -v sorts numerical -H: follow symbolic links
+alias la        'ls -la'
+alias ll        'ls -l --color=auto'
+alias rm        'rm -f'
+alias cd        'cd \!* && sp && ls'
+alias mcd       'mkdir -p \!*; cd \!*'
+alias finder-cd-to-current-finder-dir    'cd `finder-list-current-finder-dir`'
+alias -         'cd -' 
+alias n         'cd `tn.sh`'  # go to corresponding nas folder
+alias d         'cd `td.sh`'  # go to corresponding data folder
+alias l         'cd `ti_high_0_create_Folders_vasp.sh -l`'  # go to corresponding high folder
+alias h         'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high folder
+
+#################################################################
+# host specific
+#################################################################
+# que (everywhere not @ submithost)
+if ( "$host" != "$submithost" ) then
+    alias qhost     'qhost.sh'
+    alias qstat     'qstat.sh'
+    alias qdel      'qdel.sh'
+    alias qalter    'qalter.sh'
+    alias qsub      'qsub.sh'
+    alias qls       'qls.sh -u'
+    alias qhold     'qhold.sh'
+    alias qrls      'qrls.sh'
+endif
+ 
+if ( "$host" == "cmmd001.mpie.de" ) then
+    alias vi 'vi -v'
+endif
+
+if ( "$host" == "mac" ) then
+    alias xmgrace   '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace'
+    alias units     '$HOME/scripts/bin/units/units-1.88/units'
+    alias sed       '$HOME/scripts/bin/sed/sed-4.2/build/bin/sed-4.2'
+    alias mvim      'open /Applications/MacVim.app'
+endif
+
+#################################################################
+# ssh
+#################################################################
+# ssh per tunnel : ssh -X bzg@cmmc001.gc.rzg.mpg.de -R 47540:cmmc1.mpie.de:80    (wobei die 540 im tunnel der telefonnummer entsprechne sollen)
+alias ssh           'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'   # -X for loading locas stuff locally (xmgrace)
+alias sshimmer      'ssh.sh -Y -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200'
+alias gate          'sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias gatelinux     'sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias gatehydra     'sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias cluster       'sshimmer -t glensk@$submithost         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias gar           'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias gar1           'sshimmer -t aglen@cmmc001.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias gar2           'sshimmer -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias 001           'sshimmer -t glensk@cmmd001.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias 002           'sshimmer -t glensk@cmmd002.mpie.de         "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias cmpc          'sshimmer -t glensk@$myhost.mpie.de             "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+alias $myhost       'sshimmer -t glensk@$myhost.mpie.de             "[ -e `th.sh` ] && cd `th.sh`; tcsh"'
+#alias gatepow       "ssh -X -o ServerAliveInterval=1600 -o ServerAliveCountMax=1200 aglen@vip.rzg.mpg.de"
+
+#################################################################
+# moule sge ...
+#################################################################
+
+alias qstatn    'qstatn -d'
+
+#################################################################
+# general 
+#################################################################
+alias vi        'vim -v'
+alias grep      'grep --color=auto -d skip'    # skips directories
+alias bc        'bc -l'
+alias cp        'cp -a'
+alias rl        'source $HOME/.$myshell\rc'
+alias xmgrace   'xmgrace -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+alias x         'xmgrace -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+alias tarfolder 'tar -zcvf \!*.tar.gz \!*'
+alias untargz   'tar -xvf'
+alias untar     'tar xfv'
+alias untarbz2  'tar -xf'
+alias ungz      'gzip -d'
+alias untgz     'tar -xvf'
+alias unz       'uncompress'
+alias unbz2     'tar -jxvf'
+alias killall   'killall -9'
+alias latexit   'latex Text_Glensk.tex ; dvips Text_Glensk.dvi ; ps2pdf Text_Glensk.ps; bibtex Text_Glensk'
+alias gnuplot   'gnuplot -persist'
+alias q         'vi ~/scripts/commands/todo'
+alias i         'ipython'
+alias load_last_saved_settings '$HOME/Dropbox/scripts/dotfiles/mac_KeyRemap4MacBook/load_last_saved_settings.sh'
+alias df        'df -h | grep glensk'
+alias sp        'settitlepath.sh'
+alias con       'google contacts list --fields name,email,phone_number,address,birthday --title "(?i).*\!*"'
+alias pingtest  'ping 69.20.11.136'
+alias pingtestgoogle    'ping 173.194.69.102'   # ping google.com   # this also get you directly to google.com in the browser without DNS\
+alias pingmit   'ping 18.62.0.96'				# this can be directly opened without DNS in google/firefox
+alias echor 	'echo "\033[1;31m\!*\033[m"'
+alias echog 	'echo "\033[1;32m\!*\033[m"'
+alias echob 	'echo "\033[1;34m\!*\033[m"'
+alias echoB 	'echo "\033[1m\!*\033[m"'
+alias xc        'xclock -d -brief -padding -8 -geometry 1x1-0+999'
+alias undo      'undo -i'
+
+#################################################################
+# olle stuff
+#################################################################
+alias olle_1_process_outcar         '$olletrunk/bin/process_outcar_4.6.py'
+alias olle_2_workflow               'cat $olletrunkshared/WORKFLOW'
+alias olle_2_workflowvi             'vi $olletrunkshared/WORKFLOW'
+alias olle_3_getforceconstants100   'getforceconstants.skript infile.ucposcar infile.ssposcar 100'
+alias olle_3_getforceconstants3     'getforceconstants.skript infile.ucposcar infile.ssposcar 3'
+alias olle_4_extract_forceconstants './extract_forceconstants'
+alias olle_5_link                   'ln -s {out,in}file.forceconstant'
+alias olle_6_hessematrix            '$olletrunk/remap_forceconstant/remap_forceconstant'
+alias process_outcar_4.6.py         '/Users/glensk/Dropbox/scripts/codes_to_try/olle_trunk_savefiles/process_outcar_4.6.py'
+
+#################################################################
+# git / svn
+#################################################################
+alias gu		'gitup.sh'
+alias gd		'gitdown.sh'
+#alias gs        'cd ~/scripts | echo "";;git status -u'
+alias ss        'cd ~/Thermodynamics | echo "";;svn status -u'
+alias sup       'svn add ~/scripts/dotfiles/vim/view/*;echo;echo jo'
+alias sv        '$HOME/scripts/bin/sv.sh'
+
+#################################################################
+# garching
+#################################################################
+#alias garmount  'sshfs aglen@cmmc001.bc.rzg.mpg.de:/cmmc/u/aglen/v /nas/glensk/vgar/ -o reconnect -C -o workaround=all,Ciphers="blowfish-cbc"'
+alias garblazej 'ssh bzg@cmmc001.bc.rzg.mpg.de'
+alias scpfromcmmc 'scp -r aglen@cmmc001.bc.rzg.mpg.de:\!:1 \!:2'
+alias scptocmmc 'scp -r \!:1 aglen@cmmc001.bc.rzg.mpg.de:\!:2'
+alias s4 '~/start.4.6.28.tid.quick.sh'
+alias v4 '~/start.4.6.28.tid.quick.sh'
+alias s5  '~/start.5.3.5.20cores.sh'
+alias s52 '~/start.5.3.5.20cores.sh'
+alias v5  '~/start.5.3.5.20cores.sh'
+alias v52 '~/start.5.3.5.20cores.sh'
+
+set        mnas='sshfs glensk@cmpc03.mpie.de:/nas/glensk /nas/glensk'
+set    mnascmmc='sshfs glensk@cmpc03.mpie.de:/nas/glensk/cmmc /u/aglen'
+set   mnascmmcu='sshfs glensk@cmpc03.mpie.de:/nas/glensk/cmmc /cmmc/u/aglen'
+set     muaglen='sshfs aglen@cmmc001.bc.rzg.mpg.de:/u/aglen /u/aglen'
+set mcmmcuaglen='sshfs aglen@cmmc001.bc.rzg.mpg.de:/u/aglen /cmmc/u/aglen'
+set  mountimmer='-o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes;'
+#set mountimmer='-o reconnect -C -o workaround=all,transform_symlinks,BatchMode=yes,allow_other,default_permissions;'  # hilft auch nicht um auf dem cmmc zu schreiben
+
+if ( "$host" == "$mylaptop" ) then
+alias mountgar      "umountgar;$muaglen $mountimmer;echo "/u/aglen";$mcmmcuaglen $mountimmer;echo "/cmmc/u/aglen";"
+alias garmount      "mountgar"
+
+alias umountgar     "umount -f /u/aglen; umount -f /cmmc/u/aglen;"
+alias garumoung     "umountgar"
+
+alias mountnas      "$mnas      $mountimmer;echo "/nas/glensk";"
+alias nasmount      'mountnas'
+
+alias mountgarUebernas  "$mnascmmc  $mountimmer;echo "/u/aglen";$mnascmmcu $mountimmer; echo "/cmmc/u/aglen/""
+alias garmountUebernas  "mountgarnas"
+
+#alias nasumount 'umount /nas/glensk; umount /u/aglen; umount /cmmc/u/aglen'
+#alias umountnas 'umount /nas/glensk; umount /u/aglen; umount /cmmc/u/aglen'
+#alias umountgar 'fusermount -u /nas/glensk/cmmc'
+#alias garumount 'fusermount -u /nas/glensk/cmmc'
+endif

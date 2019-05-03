@@ -1,0 +1,31 @@
+#!/bin/zsh -f
+#echo 1
+thePath="$( osascript<<END
+try
+	tell application "Finder" to set the source_folder to (folder of the front window) as alias
+on error -- no open folder windows
+	set the source_folder to path to desktop folder as alias
+end try
+
+set thePath to (POSIX path of the source_folder as string)
+set result to thePath
+END
+ )" 2> /dev/null
+ 
+
+
+if [[ -n "${thePath%/*}" ]]; then
+    #echo 1
+    if [[ -d "$thePath" ]]; then
+        #echo 2
+        path=`echo "${thePath%/}"`
+        #echo pp:$path
+        echo $path
+    else 
+        #echo 3
+        cd "${thePath%/*}"
+    fi
+    
+else 
+   echo "/" 
+fi 

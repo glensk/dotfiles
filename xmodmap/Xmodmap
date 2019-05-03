@@ -1,0 +1,19 @@
+! following 6 linces commented out on 11.April 2015
+clear Mod1
+clear Mod2
+keycode 63 = Meta_L
+keycode 66 = Mode_switch
+add Mod1 = Meta_L
+add Mod2 = Mode_switch
+!
+!
+!! following from http://blog.dispatched.ch/
+!! clear CMD of it's regular task, whatever that might be
+!clear mod4
+!
+!! configure CTRL and CMD to act as left Control
+!keycode 133 = Control_L NoSymbol Control_L
+!keycode 37 = Control_L NoSymbol Control_L
+!
+!! use CTRL and CMD to act as left Control
+!add control = Control_L

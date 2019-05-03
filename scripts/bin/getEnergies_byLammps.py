@@ -1,0 +1,1 @@
+../i-pi-mc_scripts/getEnergies_byLammps.py

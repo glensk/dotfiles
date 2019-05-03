@@ -1,0 +1,27 @@
+-----------------------------------------------------------------------
+jj Fri Oct 28 2016: installed OPENKIM 1.7.3 from source 
+----------------------------------------------------------------------
+module load intel/17.0
+
+./configure --prefix=/u/system/SLES11/soft/pyiron/lammps/lammps-30Jul16/openkim --compiler-suite=INTEL
+
+for i in $(wget -q -O - "$@" https://openkim.org/kim-items/models/alphabetical | grep '<a href="/dev-kim-item/' | sed 's\</a></td>\\g' | sed 's\">\ \g' | awk '{print $3 }'); do make add-$i; done; 
+
+make 
+
+make install
+
+wget -q -O - "$@" https://openkim.org/kim-items/models/alphabetical | grep '<a href="/dev-kim-item/' | sed 's\</a></td>\\g' | sed 's\">\ \g' | awk '{print $3 }' > openkimpotentials.txt
+
+
+
+
+-----------------------------------------------------------------------
+jj Fri Oct 28 2016: installed LAMMPS 30Jul16 from source as 2016-07-30
+-----------------------------------------------------------------------
+module load intel/17.0 fftw/3.3.4 impi/5.1.3
+
+adapted/generated MAKE/Makefile.cmmc (Intel, MKL, FFTW)
+cd src/ && make yes-kim 
+
+make cmmc

@@ -1,0 +1,5 @@
+virtualenv /home/glensk/aiida/
+set AIIDA_PATH environment variable to:
+%echo $AIIDA_PATH
+/home/glensk/aiida/.aiida
+

@@ -1,0 +1,11 @@
+#compdef simple
+
+# you may wish to modify the expansion options here
+# PS: 'f' is the flag making one entry per line
+cmds=( ${(uf)"$(< ~/simple-complete)"} ) 
+
+# main advantage here is that it is easy to understand, see alternative below
+_describe 'a description of the completion options' cmds
+
+# this is the equivalent _arguments command... too complex for what it does
+## _arguments '*:foo:(${cmds})'

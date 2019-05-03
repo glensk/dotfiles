@@ -1,0 +1,44 @@
+# .bash_profile
+
+# Get the aliases and functions
+#if [ -f ~/.bashrc ]; then
+#	. ~/.bashrc
+#fi
+
+# User specific environment and startup programs
+#echo PATH-
+#echo PATH- $PATH
+#echo PATH-
+#PATH=$PATH:$HOME/.local/bin:$HOME/bin
+#export PATH
+
+#echo "in .bash_profile, `hostname | grep -o fidis`"
+
+case "$-" in
+  # only for interactive shell login on fidis or daint or cosmopc --> load zsh
+  # for interactive shell login on fidis or daint --> load zsh
+  # when login to f210 (worknode fidis cluster) or actually any host besides daint / fidis -> do not load zsh
+  *i*)
+  # THIS LOOP IS ONLY ENTERED FOR INTERACTIVE LOGINS AND NOT OTHERWISE (ssh -C "command")
+  # echo hostname `hostname`
+  [ "`hostname | grep -o daint`" = "daint" ] && unset FPATH && exec /bin/zsh -l
+  [ "`hostname | grep -o fidis`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+  [ "`hostname | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
+   ;;
+esac
+
+## >>> conda initialize >>>
+## !! Contents within this block are managed by 'conda init' !!
+#__conda_setup="$('/Users/glensk/anaconda2/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+#if [ $? -eq 0 ]; then
+#    eval "$__conda_setup"
+#else
+#    if [ -f "/Users/glensk/anaconda2/etc/profile.d/conda.sh" ]; then
+#        . "/Users/glensk/anaconda2/etc/profile.d/conda.sh"
+#    else
+#        export PATH="/Users/glensk/anaconda2/bin:$PATH"
+#    fi
+#fi
+#unset __conda_setup
+## <<< conda initialize <<<
+

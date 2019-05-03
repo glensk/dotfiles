@@ -1,0 +1,42 @@
+#!/bin/sh
+
+#@ scp aglen@gate.rzg.mpg.de:~/.exchange/archive.tar.bzip2 .
+#@ if [ "`hostname`" = "mac" ];then
+#@     tar -jxvf archive.tar.bzip2
+#@ else
+#@     tar --use-compress-program=lbzip2 -xvf archive.tar.bzip2
+#@ fi
+#@ rm archive.tar.bzip2
+basename=`basename $0`
+
+#[ "$basename" = "recievex" ] && echo do the tar
+#exit
+filename="sendx.tar.bzip2"
+#echo $onhost
+#exit
+if [ "$onhost" = "daint" ];then
+    ### get file when on daint
+    mv ~/.exchange/$filename .
+else
+    ### get file when somewhere else
+    address=`grep "address1=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address1="||' | sed 's|".*||'`
+    [ "$basename" = "recievex2" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
+    [ "$basename" = "recievex2nountar" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
+    echo "address   : $address"
+    
+    # USE RSYNC SINCE IT CAN DELETE THE FILE AFTERWARDS
+    #echo "copy $address:~/.exchange/$filename ."
+    # the --remove-source-files is a savety feature to ensure that not the wrong file is recieved by accident
+    rsync --progress --remove-source-files -av -e ssh $address:~/.exchange/$filename . 
+fi
+
+[ "$basename" = "recievexnountar" ] && echo no unar && exit
+[ "$basename" = "recievex2nountar" ] && echo no unar && exit
+#echo ":$1:"
+tar=`command -v gtar`
+[ "$tar" = "" ] && tar=`command -v tar`
+echo "tar       : $tar"
+echo 
+echo "---------------------- untarring following files -----------------"
+$tar -xvf $filename 
+rm $filename 

@@ -1,0 +1,76 @@
+
+###############################################################################
+# MD simulation for PB-US AlMgSi with NN potential
+###############################################################################
+
+###############################################################################
+# VARIABLES
+###############################################################################
+clear
+variable dt              equal  0.001               # timestep (ps)
+variable intThermo       equal  1                   # screen output interval (timesteps)
+variable numSteps        equal  200000              # total number of simulation timesteps (timesteps)
+variable runnerCutoff    equal  7.937658735         # largest symmetry function cutoff (Angstrom)                                    
+variable mass1           equal  24.305              # mass for element 1 (Mg)  (g/mol)
+variable mass2           equal  26.9815385          # mass for element 2 (Al) (g/mol)
+variable mass3           equal  28.0855             # mass for element 3 (Si) (g/mol)
+variable nameStartCfg    string "data.lmp"          # name of the starting configuration file
+variable runnerDir       string "/home/glensk/nn_potentials/v2_daniele_giofre" # directory containing RuNNer files (potential)
+# set initial velocity distribution
+variable initTemp        equal  300.0               # initial temperature (K)
+variable velSeed         equal  4928459             # seed for random number generator
+# NVT integrator (Nose-Hoover)
+variable startTemp       equal  300.0               # starting temperature for thermostat (K)
+variable stopTemp        equal  300.0               # final temperature for thermostat (K)
+variable tDamp           equal  0.02                # thermostat damping factor (ps)
+variable intTD           equal  100                 # thermodynamics dump file interval (timesteps)
+variable nameTD          string "traj/td"           # thermodynamics file name
+variable varVolume       equal  vol                 # variable required to print volume
+variable varKE           equal  ke                  # variable required to print kinetic energy
+###############################################################################
+# SETUP
+###############################################################################
+units metal                                         # define unit system (metal = Angstrom, eV, ps, g/mol)
+boundary p p p                                      # set periodic boundary conditions
+atom_style atomic           
+box tilt large                                      # set atomic style for particles
+read_data ${nameStartCfg}                           # read start configuration
+mass 1 ${mass1}                                                          
+mass 2 ${mass2}
+mass 3 ${mass3}
+pair_style runner dir ${runnerDir} showewsum 1 showew yes resetew no maxew 1000000               # set up pair style runner
+pair_coeff * * ${runnerCutoff}                      # set up pair style coefficients
+timestep ${dt}                                      # set timestep
+velocity all create ${initTemp} ${velSeed}          # create initial velocities
+thermo ${intThermo}                                 # set screen output
+#thermo_style custom step temp etotal pe 
+#thermo_modify line multi format float "%8.8f"
+
+#dump		       1 all xtc 100 traj.xtc
+#dump_modify 1 unwrap yes
+#dump		       2 all xyz 500 traj.xyz
+#dump_modify 2 unwrap yes
+
+
+#write_data test.data
+
+###############################################################################
+# SIMULATION
+###############################################################################
+#min_style cg
+#minimize 1.0e-12 1.0e-12 1 1
+#run  ${numSteps} 
+
+fix 1 all ipi f099 12345 
+#fix 1 all nvt temp ${startTemp} ${stopTemp} 0.100
+# fix 1 all nvt temp ${startTemp} ${stopTemp} ${tDamp}                                 # set up integrator
+run ${numSteps}                                                                        # RUN SIMULATION
+
+#write_restart ${nameRestartEnd}                                                         # write final configuration (binary)
+###############################################################################
+# CLEAN UP
+###############################################################################
+#undump XYZ
+#unfix AVE_TD
+#unfix INT
+###############################################################################

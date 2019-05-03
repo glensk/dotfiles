@@ -1,0 +1,1 @@
+cp /scratch/glensk/n2p2_24_24/random_seed_102376/weights.012.000087.out weights.012.data

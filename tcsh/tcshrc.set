@@ -1,0 +1,134 @@
+# see http://www.tcsh.org/tcsh.html/Special_shell_variables.html
+#set implicitcd  !!! destroys login to cmpc when in folder ~/scripts/dotfiles but ~/scripts/dotfiles/bin works    # Turn on implicit cd operation (go into directory without cd) 
+set noclobber	            # When set prevent output redirection from overwriting existing files
+set noding                  # dont print ding when hour changes
+set color                   # when tab you will see files in color
+set autolist 	            # Press tab key to autocomplete the name of the file or a directory
+set autoexpand	            # needed to expand !$
+set colorcat                # enable color escape sequence for native language system 
+set history = 2000000		# length of history 
+set savehist = 2000000		# to gain commands after logout
+unset histfile              # logging makes slow the logout
+set histdup=erase           # removes duplicats from history =all makes sometime last command go away
+set nobeep                  # Dont beep at all
+set symlinks=chase          # possible: 'chase': goes to real link; 'ignore':keeps folderstructue 'expand':keeps folderstructure expand links to their true value
+#set printexitvalue         # If the exit value is non-zero, print it.
+set fignore=(.d .o)         # files to be ignored for completition  // ignore .d files in /bin/usr of mac
+unset autologout            # if Don't want to be autologed out #You can "set autologout=3" to log you out after 3 minutes of idle time.
+#setenv EDITOR 'subl -w'     # recommended by http://pages.physics.cornell.edu/~myers/teaching/ComputationalMethods/python/ipython.html
+
+# 3) For completion similar to bash, it is recommended to also
+# add the following line to your .tcshrc/.cshrc:
+set autolist=ambiguous
+# It will tell tcsh to list the possible completion choices.
+set listmax = 10000         # listmax and listmaxrows can be set to limit the number of
+set listmaxrows = 1000      # items and rows (respectively) that are listed without 
+                            # asking first. 
+### colors for shell
+#setenv CLICOLOR 1
+#setenv LSCOLORS GxFxCxDxBxegedabagaced
+
+# to add
+# :*.tex=00;31
+#setenv LS_COLORS '*.JPG=8;03;33:*.tex=00;31:*.sh=00;33:*.ps=00;33:*.pdf=00;33:*.gz=01;03;31:*.agr=01;03;35:*.tif=01;03;33:*.eps=01;03;33:*.png=01;03;33:*.jpg=01;03;33:*.nb=01;03;35:*parameters.dat=00;31:*reference_folder=00;31:*ANMERKUNG=00;31:*ANMERKUNGEN=00;31:*.tgz=00;31:*.tbz2=00;31:*mapping=00;31:*Makefile=00;37:*makefile=00;37:ln=04;34:or=5;34;41'
+#setenv LS_COLORS '*.avi=31:*.bmp=31:*.flc=31:*.fli=31:*.flv=31:*.gif=31:*.jpeg=31:*.jpg=31:*.mid=31:*.mov=31:*.mp3=31:*.mpeg=31:*.mpg=31:*.nes=31:*.pls=31:*.png=31:*.swf=31:*.wav=31:*.xbm=31:*.xpm=31:*.bz2=33:*.gz=33:*.img=33:*.iso=33:*.jar=33:*.tar=33:*.tar.gz=33:*.tar.xz=33:*.tbz=33:*.tgz=33:*.xz=33:*.zip=33:*.1=35:*.asc=35:*.csv=35:*.doc=35:*.htm=35:*.html=35:*.info=35:*.log=35:*.man=35:*.nfo=35:*.pdf=35:*.pod=35:*.ps=35:*.sig=35:*.tex=35:*.txt=35:*.cshrc=36:*.exrc=36:*.history=36:*.inputrc=36:*.login=36:*.logout=36:*.mailrc=36:*.muttrc=36:*.nano=36:*.netrc=36:*.newsrc=36:*.pid=36:*.profile=36:*.shrc=36:*.tcshrc=36:*.xinitrc=36:*.4th=1;30:*.asm=1;30:*.awk=1;30:*.c=1;30:*.cpp=1;30:*.css=1;30:*.diff=1;30:*.git=1;30:*.h=1;30:*.js=1;30:*.lex=1;30:*.lisp=1;30:*.lua=1;30:*.patch=1;30:*.php=1;30:*.pl=1;30:*.py=1;30:*.rb=1;30:*.sed=1;30:*.sh=1;30:*.sql=1;30:*.tcl=1;30:*.xml=1;30:*.yak=1;30:Makefile=1;30:no=0:fi=0:di=34:ln=1;35:pi=33:so=1;35:do=1;35:bd=1;33:cd=1;32:ex=1;32'
+
+# example LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:*.deb=90'
+# LS_COLOR
+# di  Directory
+# fi  File
+# ln  Symbolic Link
+# pi  Fifo file
+# so  Socket file
+# bd  Block (buffered) special file
+# cd  Character (unbuffered) special file
+# or  Symbolic Link pointing to a non-existent file (orphan)
+# mi  Non-existent file pointed to by a symbolic link (visible when you type ls -l)
+# ex  File which is executable (ie. has 'x' set in permissions). 
+#
+
+# 01;03;033
+# ^^ Effects
+#    ^^ 
+#       ^^ Color
+#Effects  
+#00 Default colour
+#01 Bold04Underlined
+#05 Flashing text
+#07 Reversetd           - working
+#08 Concealed
+
+
+#01;03;37 --white
+#01;03;33 --orange
+
+# 0 = Default Colour
+# 1 = Bold
+# 4 = Underlined
+# 5 = Flashing Text
+# 7 = Reverse Field
+
+# Color
+# 30 =    Black
+# 31 =    Red
+# 32 =    Green
+# 33 =    Orange(/Yellow)
+# 34 =    Blue
+# 35 =    Purple
+# 36 =    Cyan
+# 37 =    White/(Grey)
+
+# Background
+# 40 =    Black Background
+# 41 =    Red Background
+# 42 =    Green Background
+# 43 =    Orange Background
+# 44 =    Blue Background
+# 45 =    Purple Background
+# 46 =    Cyan Background
+# 47 =    Grey Background
+
+# Extra colors
+# 90 =    Dark Grey
+# 91 =    Light Red
+# 92 =    Light Green
+# 93 =    Yellow
+# 94 =    Light Blue
+# 95 =    Light Purple
+# 96 =    Turquoise
+# 100 =   Dark Grey Background
+# 101 =   Light Red Background
+# 102 =   Light Green Background
+# 103 =   Yellow Background
+# 104 =   Light Blue Background
+# 105 =   Light Purple Background
+# 106 =   Turquoise Background 
+#
+#
+#
+#
+#
+# %{\033[31m%}%m%{\033[0m%} 
+#The '31' and the %m have been bolded above because those are the only things you change. The 31 is the color code, and the %m is obviously where you put whatever you want to color. The rest of it is the same for every color coding; the beginning starts coloring, and the stuff afterwards stops coloring ('0' switches it back to default text color). You can use the following color codes:
+#
+#30 - black
+#31 - red
+#32 - green
+#33 - yellow
+#34 - blue
+#35 - magenta
+#36 - cyan
+#37 - white
+#
+#
+#
+# %{\033[1;31m%}%m%{\033[0m%} 
+#In this case, the '1' will make the following color bold. You can use the following modifiers:
+#
+#0 - normal
+#1 - bold
+#2 - normal again
+#3 - background color
+#4 - underline the text
+#5 - blinking
+# 

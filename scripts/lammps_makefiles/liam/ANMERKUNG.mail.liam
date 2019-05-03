@@ -1,0 +1,36 @@
+- put the macbook makefiles in your lammps directory's src/MAKE/MINE path and run "make clean-liammac(_mpi); make liammac(_mpi) -j4" to compile the serial (mpi) version using four cores.
+- change neighbour.cpp around line 1895 (or search "skin ="); just comment out (using //) the if that throws an error when skin is negative and you should be good to go!
+
+git clone https://github.com/lammps/lammps.git
+
+
+####################################
+# on mac (serial - liamsmakefile)
+####################################
+mkdir lammps/src/MAKE/MINE
+cd lammps/src/MAKE/MINE
+cp Makefile.liammac  to this folder
+cd ../../ (you are now in source folder)
+cd STUB
+make
+cd ../ (you are now again in sorurce folder)
+make clean-all
+make clean-liammac
+make liammac   (not using j4 since this did not work out)
+./lmp_liammac  (is the executable)
+
+
+####################################
+# on mac (serial)
+####################################
+cd lammps/src
+make serial 
+--> creates ./lmp_serial
+
+
+####################################
+# on mac (serial)
+####################################
+cd lammps/src
+make mac
+

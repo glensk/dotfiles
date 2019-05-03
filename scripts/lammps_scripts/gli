@@ -1,0 +1,21 @@
+#!/bin/sh
+[ ! -e "$1" ] && echo $1 does not exist && exit
+cp $1/{in_file_dynamics.in,positions.*.dat,*.eam.alloy*} .
+#ang=`pwd | grep -o "[0-9]*.[0-9]*Ang" | tail -1 | sed 's|Ang||'`
+#ang2=`pwd | sed 's|.*/||'`
+#[ ! -e "$1/POSCAR" ] && [ -e "$1/POSCAR_$ang" ] && echo found $1/POSCAR_$ang && cp $1/POSCAR_$ang POSCAR
+#[ ! -e "$1/POSCAR" ] && [ ! -e "$1/POSCAR_$ang" ] && [ -e "$1/POSCAR_$ang2" ] && echo found $1/POSCAR_$ang2 && cp $1/POSCAR_$ang2 POSCAR
+#[ -f $1/WAVECAR ] && [ "`du $1/WAVECAR | awk '{print $1}'`" -ge "20" ] && cp $1/WAVECAR .
+#
+#[ -f $1/HesseMatrix_sphinx ] && cp $1/HesseMatrix_sphinx .
+#[ -f $1/EqCoords_direct ] && cp $1/EqCoords_direct .
+#[ -f $1/parameters.dat ] && cp $1/parameters.dat .
+#[ -f $1/createFolders.sh ] && cp $1/createFolders.sh .
+#[ -f $1/eqList_vacancy_2x2x2sc ] && cp $1/eqList_vacancy_2x2x2sc .
+#[ -f $1/POSCAR_2x2x2sc ] && cp $1/POSCAR_2x2x2sc .
+#[ -f $1/POSCAR_3x3x3sc ] && cp $1/POSCAR_3x3x3sc .
+#[ -f $1/mapping ] && cp $1/mapping .
+#[ -f $1/pairpot ] && cp $1/pairpot .
+#[ -f $1/cell ] && cp $1/cell .
+#[ -f $1/calculate_energy_and_forces ] && cp $1/calculate_energy_and_forces .
+

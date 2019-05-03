@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: d1c5492d00a0d45f11dfb54c7c8ef0c732c17407
+# execution time: 2.59558606148 seconds.
+
+getEnergies_byLammps.py -i aiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data -p n2p2_v1ag -u mev_pa -wr

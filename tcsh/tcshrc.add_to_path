@@ -1,0 +1,51 @@
+##################################################################
+### for current svn
+##################################################################
+set path = (/usr/local/bin $path)
+
+
+##################################################################
+### pycharm
+##################################################################
+#setenv JAVA_HOME /usr/local/java/jdk1.6.0_26
+#alias pycharm '$HOME/Dropbox/scripts/unix_tools/pycharm.sh'  # this is just an alias
+
+
+##################################################################
+### vmd (to show atomic structures)
+##################################################################
+#setenv VMDINSTALLNAME vmd
+#setenv VMDINSTALLBINDIR /home/glensk/scripts/unix_tools/vmd/bin
+#setenv VMDINSTALLLIBRARYDIR /home/glensk/scripts/unix_tools/vmd/lib
+
+
+##################################################################
+### for phon dario alfe
+##################################################################
+alias phon '$HOME/scripts/phonons/phon_dario_alfe/install_folder_phon/src/phon'
+
+
+##################################################################
+### for ase
+##################################################################
+setenv ASE_TAGS https://svn.fysik.dtu.dk/projects/ase/tags/
+setenv PYTHONPATH ${HOME}/ase-3.7.1:${PYTHONPATH}
+setenv PATH ${HOME}/ase/tools:${PATH}
+
+
+##################################################################
+## for phonopy (works everywhere)
+##################################################################
+setenv phonpath /Users/glensk/scripts/phonons/atushi_togo_phonopy/install_folder_phonopy/phonopy-1.7.2
+setenv PYTHONPATH "${PYTHONPATH}:$phonpath/lib/python"   # may be lib64 instead
+set path = ($phonpath/bin $path)
+
+
+##################################################################
+### for trunk olle Hellman
+##################################################################
+setenv olletrunk $HOME/scripts/codes_to_try/olle_trunk
+setenv olletrunkshared $HOME/scripts/codes_to_try/olle_trunk_Shared
+setenv DYLD_LIBRARY_PATH /opt/intel/composer_xe_2013.3.171/mkl/lib:/opt/intel/composer_xe_2013.3.171/compiler/lib/
+set path = ($olletrunk/bin $path) # only workin at cmmd002
+#set path = ($olletrunk/extract_forceconstants $path)

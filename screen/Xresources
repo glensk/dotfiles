@@ -1,0 +1,14 @@
+XTerm*saveLines: 0
+XTerm*vt100.translations: #override \n\
+  Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+  Lock Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+  Lock @Num_Lock Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+  @Num_Lock Ctrl <Btn4Down>: string(0x1b) string("[25S") \n\
+  <Btn4Down>: string(0x1b) string("[5S") \n\
+  Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+  Lock Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+  Lock @Num_Lock Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+  @Num_Lock Ctrl <Btn5Down>: string(0x1b) string("[25T") \n\
+  <Btn5Down>: string(0x1b) string("[5T") \n\
+  Shift <KeyPress> Prior: string(0x1b) string("[25S") \n\
+  Shift <KeyPress> Next: string(0x1b) string("[25T") \n

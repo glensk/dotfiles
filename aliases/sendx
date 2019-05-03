@@ -1,0 +1,60 @@
+#!/bin/sh
+[ "$1" = "" ] && echo "ERROR: please specify a directory as first argument!" && exit
+basename=`basename $0`
+[ "$basename" = "sendx" ] && echo is sendx
+[ "$basename" = "sendx2" ] && echo is sendx22
+#exit
+sendtarred=""
+if [ "`basename $0`" = "sendxtarred" ];then
+    getname=`tar.bzip2_file_or_folder.sh $* | tail -1`
+    getnametest=`echo $getname | grep -o "success"`
+    sendtarred=`echo $getname | awk '{print $3}'`
+    if [ "$getnametest" = "success" ];then
+        #echo "success:$getname | testedfor:$getnametest:"
+        echo "sendtarred: $sendtarred"
+    else
+        echo "ERROR: $getname | testedfor:$getnametest:"
+        exit
+    fi
+fi
+
+datum=`date +"%Y_%m_%d__%H:%M:%S"`
+filename=".sendx_$datum"
+#echo $filename
+touch $filename
+echo `pwd` > $filename
+echo $* >> $filename
+
+
+##### TAR the file ######################################
+#tar --use-compress-program=lbzip2 -cvf archive.tar.bzip2 $filename $*
+#tar -cvf archive.tar.bzip2 $filename $*
+#[ -e "name-of-archive.tar.gz" ] && rm name-of-archive.tar.gz
+#tar -czvf name-of-archive.tar.gz $filename $*
+tosend="sendx.tar.bzip2"
+rm -f $tosend
+[ "$sendtarred" = "" ] && tar.bzip2_file_or_folder_for_sendx.sh $*
+[ "$sendtarred" != "" ] && tar.bzip2_file_or_folder_for_sendx.sh $sendtarred
+[ ! -e "$tosend" ] && echo tar did not work out since no $tosend created && exit
+
+
+####### move to ~/.exchange ############################
+address1="aglensk@ela.cscs.ch"    # ela, part of daint
+address2="aglen@gate.rzg.mpg.de"  # garching
+address=$address1
+[ "$basename" = "sendx2" ] && address=$address2
+
+
+echo "address: $address"
+echo "scp sendx.tar.bzip2 $address:~/.exchange/"
+if [ "`hostname | grep -o daint`" = "daint" ];then  # in case of garching this is not directly accessible, therefore can stay like that
+    mv $tosend ~/.exchange/
+else
+    scp $tosend $address:~/.exchange/
+fi
+
+
+###### remove the rm $tosend archive  ######################
+[ -e "$tosend" ] && rm $tosend 
+
+

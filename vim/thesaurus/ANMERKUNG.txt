@@ -1,0 +1,3 @@
+wget http://www.gutenberg.org/dirs/etext02/mthes10.zip
+Archive:  mthes10.zip
+unzip mthes10.zip

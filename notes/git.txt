@@ -1,0 +1,217 @@
+########################
+Set Up Git
+########################
+yum install git                                                             #get git
+git config --global user.name "glensk"                                      #set username
+git config --global user.email "albert.glensk@gmail.com"                    #set email
+git config --global credential.helper cache                                 #set Password caching you don't want to type your username and password every time
+git config --global credential.helper 'cache --timeout=3600'                #By default git will cache your password for 15 minutes. You can change this if you like
+
+
+git config --global user.name "gpleyson"
+git config --global user.email "dagatkarimlan@gmail.com"
+
+# set default so that all changes are always pushed to the repository
+git config --global push.default "matching"
+
+# set default so that you avoid unnecessary commits
+git config --global branch.autosetuprebase always 
+
+git config --global color.status auto
+git config --global color.branch auto 
+
+git config --global core.editor vim 
+
+To query your Git settings, execute the following command:
+git config --list 
+
+# Configure Git to use this file
+# as global .gitignor
+git config --global core.excludesfile ~/.gitignore 
+
+########################
+########################
+git commit -a -m "Initial commit"   # with -a add newstuff should not be necessary
+git remote update
+# to push use the command:
+# git push [target]
+# default for [target] is origin
+# git push [remote-name] [branch-name=master]
+git push origin 
+git push origin master
+
+# show the details of the remote repo called origin
+git remote show origin 
+
+# show the existing defined remote repositories
+git remote
+
+# pull in the latest changes of your remote repository
+git pull
+
+# To see remote repos(itories)
+git remote -v
+
+# schow branches
+git branch -a
+
+############### DONE #######################
+git branch --set-upstream master origin/master
+git branch --set-upstream master remotes/origin/master
+
+#################################
+# committing
+#################################
+git clone https://glensk@bitbucket.org/glensk/scripts.git
+git clone https://glensk@bitbucket.org/glensk/scripts.git/Thermodynamics
+git add -u  # so that it will only stage the modified files.
+git commit -a   # commit only the modifications.
+
+###################
+git remote update
+git pull to get latest version
+#############
+git add -A
+git commit -m "txt"
+git push
+#############
+
+der .git folder des repositories kann einfach in ein bestehendes svn repository kopiert werden.... wenn alles glatt laeuft kann weiterhin git und svn genutzt werden
+mac_tools
+
+
+##############
+git branch
+git reset --hard origin/master  ## when you see *(no branch) and mater underneeth
+git checkout master             ## to get back to master branch when on *(no branch)
+
+git push --force origin
+git pull
+git rebase --abort
+
+
+### git status -u gives: 
+# On branch master
+# Your branch and 'origin/master' have diverged,
+# and have 3 and 2 different commits each, respectively.
+#
+nothing to commit (working directory clean)
+
+git submodule add https://github.com/jcf/vim-latex.git dotfiles/vim/bundle/vim-latex
+
+
+
+###################################################################################
+git co https://glensk@bitbucket.org/glensk/scriptsnew.git
+###################################################################################
+#
+# git get remote url: 
+git config --get remote.origin.url
+
+###################################################################################
+aiida-alloy
+###################################################################################
+https://gitlab.com/daniel.marchand/aiida-alloy
+pw: mit zwei doppel s nix weiter
+
+
+
+###################################################################################
+working with forks
+###################################################################################
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+git remote -v (now shows upstream)
+git remote set-url upstream  https://github.com/cosmo-epfl/i-pi.git   # to change upstream
+git fetch upstream # to get all branches, also from upstream
+git diff feat/kmc:ipi/engine/motion/geop.py remotes/upstream/bugfix/geop_softexit:ipi/engine/motion/geop.py  # show diff of particular file/branch ...
+
+# with michele
+git stash # get get rid of the changes I made.
+git checkout master # Branch 'master' set up to track remote branch 'master' from 'upstream' by rebasing. Switched to a new branch 'master'
+git fetch upstream master
+git merge upstream/master 
+git checkout feat/kmc
+git merge master # did not work
+
+%git merge master --allow-unrelated-histories
+Auto-merging ipi/inputs/motion/motion.py
+CONFLICT (add/add): Merge conflict in ipi/inputs/motion/motion.py
+Auto-merging ipi/inputs/motion/geop.py
+CONFLICT (add/add): Merge conflict in ipi/inputs/motion/geop.py
+Auto-merging ipi/engine/motion/geop.py
+CONFLICT (add/add): Merge conflict in ipi/engine/motion/geop.py
+Auto-merging ipi/engine/motion/__init__.py
+CONFLICT (add/add): Merge conflict in ipi/engine/motion/__init__.py
+Auto-merging ipi/engine/ensembles.py
+CONFLICT (add/add): Merge conflict in ipi/engine/ensembles.py
+Automatic merge failed; fix conflicts and then commit the result.
+
+
+# tried:
+git pull https://github.com/cosmo-epfl/i-pi.git feat/kmc
+
+# tried 2
+install_git.py -i ipi -if ipi_my_checkout1
+
+# tried 3
+install_git.py -i ipi -if ipi_my_checkout2
+git pull https://github.com/cosmo-epfl/i-pi.git feat/kmc # this now has conflicts. HEAD <<<< ...
+git rebase --skip # makes the conflicts go away and applies micheles changes.
+(however: when git pull, those changes disappear again. which I therefore did not do the next time)
+git remote set-url upstream  https://github.com/cosmo-epfl/i-pi.git  # did not work but:
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+
+
+# tried 4
+install_git.py -i ipi -if ipi_my_checkout3
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+git remote -v
+git --version # 2.17
+git fetch upstream feat/kmc
+git branch -a
+    # * feat/kmc
+    remotes/origin/feat/kmc
+    remotes/upstream/feat/kmc
+git checkout remotes/upstream/feat/kmc
+git checkout feat/kmc
+git checkout --patch remotes/upstream/feat/kmc ipi/engine/motion/geop.py
+
+install_git.py -i ipi -if ipi_my_checkout4
+git remote add upstream https://github.com/cosmo-epfl/i-pi.git
+git fetch upstream  # to see what michele has added.
+git diff feat/kmc:ipi/engine/motion/al6xxx_kmc.py remotes/upstream/feat/kmc:ipi/engine/motion/al6xxx_kmc.py  # shows the 2 comments michele added
+git checkout --patch remotes/upstream/feat/kmc ipi/engine/motion/al6xxx_kmc.py
+git checkout --patch remotes/upstream/feat/kmc ipi/inputs/motion/geop.py
+git commit -m "merged with micheles changes"
+git push # did not work
+git pull 
+git push # now did work
+
+
+git diff --name-only  # to show only changed files of current branch
+
+install_git.py -i ipi -if ipi_my_checkout7
+git fetch # does not shwo feat/wrap_unwrap branch
+
+
+git pull  
+git push # did not work,  'Note about fast-forwards' in 'git push --help' for details.
+
+git pull origin feat/wrap_unwrap
+git pull
+
+install_git.py -i ipi -if ipi_my_checkout9
+git remote add upstream https://github.com/i-pi/i-pi.git
+
+
+try next time: git push origin HEAD
+
+micheles way:
+git clone https://github.com/glensk/i-pi.git
+cd i-pi
+git checkout feat/wrap_unwrap
+git pull
+mv ~/mux-positions.py tools/py/mux-positions.py
+git commit -a "Fixing mux-positions"
+git push
+

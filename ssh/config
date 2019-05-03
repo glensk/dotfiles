@@ -1,0 +1,131 @@
+PermitLocalCommand yes
+
+Host cluster
+    HostbasedAuthentication yes
+    EnableSSHKeysign        yes
+    HostName cmmd002.mpie.de
+    User glensk
+    ServerAliveInterval 1600
+    ServerAliveCountMax 1000
+    ForwardX11Trusted yes
+    TCPKeepAlive yes
+
+Host cmpc34
+    HostName cmpc34
+    User glensk
+    ServerAliveInterval 1600
+    ServerAliveCountMax 1000
+    ForwardX11Trusted yes
+    TCPKeepAlive yes
+
+Host cmpc
+    HostName cmpc03.mpie.de
+    User glensk
+    ServerAliveInterval 1600
+    ServerAliveCountMax 1000
+    ForwardX11Trusted yes
+    TCPKeepAlive yes
+
+Host garching
+    User aglen
+    Hostname cmmc001.bc.rzg.mpg.de
+    IdentityFile /home/glensk/.ssh/garching
+
+Host garching2
+    User aglen
+    Hostname cmmc001.bc.rzg.mpg.de
+    IdentityFile /Users/glensk/.ssh/garching2
+
+
+Host gatefromcmmc
+    User aglen
+    Hostname gate.rzg.mpg.de
+    IdentityFile /cmmc/u/aglen/.ssh/gatefromcmmc
+
+#ssh-copy-id -i ~/.ssh/id_rsa.pub aglen@gate.rzg.mpg.de
+Host gate
+ HostName gate.rzg.mpg.de
+ User aglen
+ IdentityFile /Users/glensk/.ssh/gate
+
+#Host gar
+# HostName cmmc002.bc.rzg.mpg.de
+# User aglen
+# ProxyCommand ssh -q -Y aglen@gate.rzg.mpg.de -W %h:%p
+
+#Host cmmc002
+#HostName cmmc002.bc.rzg.mpg.de
+#User aglen
+#ProxyCommand ssh -W %h:%p gatezero.rzg.mpg.de 2>/dev/null
+#GSSAPIAuthentication yes
+#GSSAPIDelegateCredentials yes
+
+
+Host cmmc002*
+ HostName cmmc002.bc.rzg.mpg.de
+ User aglen
+ ProxyCommand ssh aglen@gatezero.rzg.mpg.de /usr/bin/netcat %h %p 2> /dev/null
+ GSSAPIAuthentication yes
+ GSSAPIDelegateCredentials yes
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub aglen@gatezero.rzg.mpg.de (after running ssh-keygen)
+Host gar
+HostName gatezero.rzg.mpg.de
+User aglen
+GSSAPIAuthentication yes
+GSSAPIDelegateCredentials yes
+ControlMaster auto
+ControlPath ~/.ssh/control:%h:%p:%r
+
+####################################################################################
+# epfl
+####################################################################################
+
+#ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@lsmxsrv2.epfl.ch
+Host lsmx
+ HostName lsmxsrv2.epfl.ch
+ User glensk
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
+Host fidis
+ HostName fidis.epfl.ch
+ User glensk
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@cosmopc15.epfl.ch
+Host cosmopc pc
+ HostName cosmopc15.epfl.ch
+ User glensk
+
+# ssh-copy-id -i ~/.ssh/id_rsa.pub aglensk@ela.cscs.ch (normal zwei ohne sterne 1234)
+# can go to ela from mac (without pw)
+# can go to ela from fidis (without pw)
+# can go to ela from cosmopc (without pw)
+# pw:  (normal zwei ohne sterne 1234)
+Host ela
+ HostName ela.cscs.ch
+ User aglensk
+
+#Host daint
+# HostName daint.cscs.ch
+# User aglensk
+# ProxyCommand ssh -q -Y aglensk@ela.cscs.ch -W %h:%p
+
+Host daint*
+ HostName daint.cscs.ch
+ User aglensk
+ ProxyCommand ssh aglensk@ela.cscs.ch /usr/bin/netcat %h %p 2> /dev/null
+
+
+# make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
+# information how to set up passwordless login to cmmc see christophs mail: google
+# for keygen: https://mail.google.com/mail/ca/u/0/#search/keygen/1544e58f7bf9e136
+# @cmmc001: cat ./garching.pub >> ./authorized_keys   --> was for loginfree cmpc34
+# @cmmc001: cat ./garching2.pub >> ./authorized_keys --> was for  loginfree mac
+
+#Host cmmc*
+#    HostName %h.bc.rzg.mpg.de
+#    User aglen
+#    ServerAliveInterval 1600
+#    ServerAliveCountMax 1000
+#    ForwardX11Trusted yes
+#    TCPKeepAlive yes

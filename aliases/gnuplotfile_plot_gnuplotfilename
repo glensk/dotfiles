@@ -1,0 +1,31 @@
+#!/usr/bin/env gnuplot
+#set title "Walt pedometer" font ",14" textcolor rgbcolor "royalblue"
+#set timefmt "%y/%m/%d"
+#set xdata time
+
+# 1) change the default colors to more pleasant ones and make the lines a little bit thicker
+set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 1 lw 2 # --- red
+set style line 2 lc rgb '#5e9c36' pt 6 ps 1 lt 1 lw 2 # --- green
+
+# 2) put the border more to the background by applying it only on the left and bottom part and put it and the tics in gray
+set style line 11 lc rgb '#808080' lt 1
+set border 3 back ls 11
+set tics nomirror
+
+# 3) add a slight grid to make it easier to follow the exact position of the curves
+set style line 12 lc rgb '#808080' lt 0 lw 1
+set grid back ls 12
+
+#set mxtics
+#set mytics
+#set style line 12 lc rgb '#ddccdd' lt 1 lw 1.5
+#set style line 13 lc rgb '#ddccdd' lt 1 lw 0.5
+#set grid xtics mxtics ytics mytics back ls 12, ls 13
+
+
+set pointsize 2
+set terminal x11  enhanced title "Walt's steps " persist raise  # terminal wxt does not work at mac
+name1=system("echo $gnuplotfilename")
+plot name1 using 1:2 with linespoints notitle
+##########  #!/usr/bin/gnuplot -persist
+

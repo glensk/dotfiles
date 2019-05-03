@@ -1,0 +1,5 @@
+#!/bin/sh
+#echo hallo $1
+[ "$2" == "" ] && cat $dotfiles/commands/$1
+[ "$2" != "" ] && vi $dotfiles/commands/$1
+

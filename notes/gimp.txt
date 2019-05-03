@@ -1,0 +1,6 @@
+beim oeffnen der eps datei die resolution auf 300 stellen
+dann zum speichern: export und wieder als eps speichern
+nun sollte das scrollen fluessig funktionieren
+
+to add ssh key:
+https://help.github.com/en/articles/adding-a-new-ssh-key-to-your-github-account

@@ -1,0 +1,18 @@
+%getEnergies_byLammps.py -p . -e
+%infile           : None
+%ace.pot.pot      : runner_frompath
+%ace.pot.fullpath : /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v3ag_4998
+%calss mypot
+%self.elements     ['Al', 'Mg', 'Si']
+%self.atom_energy  {'Mg': -16.7493351, 'Si': -5.5274864, 'Al': -19.6283516}
+%self.pot          runner_frompath
+%self.pot_all      False
+%self.potpath      /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v3ag_4998
+%self.potpath_in   /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v3ag_4998
+%self.pottype      runner
+%self.verbose      0
+%
+%
+%######## get_elastic_external #############
+%doing the calculation in lammps, externally, in folder /home/glensk/._tmp_lammps/
+%ace.c44: 40.1377519202578

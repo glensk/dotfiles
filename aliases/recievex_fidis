@@ -1,0 +1,32 @@
+#!/bin/sh
+
+#@ scp aglen@gate.rzg.mpg.de:~/.exchange/archive.tar.bzip2 .
+#@ if [ "`hostname`" = "mac" ];then
+#@     tar -jxvf archive.tar.bzip2
+#@ else
+#@     tar --use-compress-program=lbzip2 -xvf archive.tar.bzip2
+#@ fi
+#@ rm archive.tar.bzip2
+
+    
+
+#scp aglen@gate.rzg.mpg.de:~/.exchange/name-of-archive.tar.gz .
+
+# USE RSYNC SINCE IT CAN DELETE THE FILE AFTERWARDS
+echo "copy aglen@gate.rzg.mpg.de:~/.exchange/name-of-archive.tar.gz and remove it on gate afterwards... "
+#rsync --progress --remove-source-files -av -e ssh aglen@gate.rzg.mpg.de:~/.exchange/name-of-archive.tar.gz . 
+rsync --progress --remove-source-files -av -e ssh fidis:~/.exchange/name-of-archive.tar.gz . 
+
+echo ":$1:"
+if [ "$1" = "" ];then
+    echo "#### entpacken"
+    if [ "`hostname`" = "mac" ];then
+        gtar -xzvf name-of-archive.tar.gz
+    else
+        tar -xzvf name-of-archive.tar.gz
+    fi
+    rm name-of-archive.tar.gz
+
+else
+    echo "#### nicht entpacken"
+fi
