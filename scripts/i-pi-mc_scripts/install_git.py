@@ -8,7 +8,7 @@ import subprocess
 import myutils
 
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -34,6 +34,10 @@ address["lammps_runner"] = "https://github.com/lammps/lammps.git";              
 
 address["n2p2"]          = "https://github.com/CompPhysVienna/n2p2.git";
 branch['n2p2']           = 'develop' # this branch is necessary to get scaling.data (or function.data... one of both)
+
+address["units"]         = "http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"
+branch["units"]          = False
+
 
 def help(p = None ,known=known):
     string='''e.g. install_git.py -i atomsk'''
@@ -95,6 +99,7 @@ def install_(args,known):
         if args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         if args.install in ['n2p2']             : install_n2p2(args)
         if args.install in ['vmd']              : install_vmd(args)
+        if args.install in ['units']            : install_units(args)
         if args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
 
         # not working yet
@@ -120,10 +125,26 @@ def git_clone(args,specify_depth = True,checkout=False):
         subprocess.call(["git","checkout",checkout])
     return
 
+def install_units(args):
+    print('pwd',os.getcwd())
+    subprocess.call(["wget","http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"])
+    subprocess.call(["tar","-xvf","units-2.18.tar.gz"])
+    home = os.environ["HOME"]
+    print('HOME:',home)
+    with my.cd("units-2.18"):
+        print('configure ....')
+        subprocess.call(['./configure','--prefix='+home+'/.local'])
+        print('make ....')
+        subprocess.call(['make'])
+        print('make install ....')
+        subprocess.call(['make','install'])
+    return
+
 def install_lbzip(args):
     ''' works on fidis
         works on mac (also not necessary, since alredy installed)
     '''
+    print('pwd',os.getcwd())
     print("wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz")
     subprocess.call(["wget","http://archive.lbzip2.org/lbzip2-2.5.tar.gz"])
     subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
@@ -320,8 +341,8 @@ def install_n2p2(args):
         # the compilatin of libnnpif fails ... could try with intel suite to compile (would also need mpic++)
         #
         # now, first installed all latest intel compilers such that icc, icpc and ifort are version 19.0
-        # need: Intel® Parallel Studio XE Composer Edition for C++ macOS
-        # need: Intel® Parallel Studio XE Composer Edition for Fortran macOS
+        # need: Intel@ Parallel Studio XE Composer Edition for C++ macOS
+        # need: Intel@ Parallel Studio XE Composer Edition for Fortran macOS
         #
         # then install openmpi with the intel compilers
         # see: https://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-open-mpi-with-the-intel-compilers

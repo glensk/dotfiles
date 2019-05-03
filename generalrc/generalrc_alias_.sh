@@ -184,7 +184,6 @@ $1 qstatn 'qstatn -d'
     $1 math '/Applications/Mathematica.app/Contents/MacOS/MathKernel' && \
     $1 mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica' && \
     #$1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
-    $1 units '$dotfiles/bin/units/units-1.88/units' && \
     $1 top 'top -o cpu' && \
     $1 trash "rmtrash" && \
     $1 del "rmtrash" && \
