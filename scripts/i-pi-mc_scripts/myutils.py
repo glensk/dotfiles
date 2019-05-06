@@ -446,7 +446,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
         #print('uuid',uuid)
         #stress = atoms.get_stress()
         #print('stress:',stress)
-    except RuntimeError:
+    except: # RuntimeError:
         print("had runtime error")
         ene = 0.
         #stress = False
@@ -798,15 +798,15 @@ class mypot( object ):
 
     def print_variables(self,text="",print_nontheless=False):
         if self.verbose > 1 or print_nontheless:
-            print("calss mypot      ",text)
-            print("self.elements    ",self.elements)
-            print("self.atom_energy ",self.atom_energy)
-            print("self.pot         ",self.pot)
-            print("self.pot_all     ",self.pot_all)
-            print("self.potpath     ",self.potpath)
-            print("self.potpath_in  ",self.potpath_in)
-            print("self.pottype     ",self.pottype)
-            print("self.verbose     ",self.verbose)
+            #print("calss mypot      ",text)
+            print(text,"self.elements    ",self.elements)
+            print(text,"self.atom_energy ",self.atom_energy)
+            print(text,"self.pot         ",self.pot)
+            print(text,"self.pot_all     ",self.pot_all)
+            print(text,"self.potpath     ",self.potpath)
+            print(text,"self.potpath_in  ",self.potpath_in)
+            print(text,"self.pottype     ",self.pottype)
+            print(text,"self.verbose     ",self.verbose)
             print()
 
     def get(self):
@@ -1112,7 +1112,7 @@ class ase_calculate_ene( object ):
 
 
 
-        if self.verbose > 1:
+        if self.verbose > 2:
             tt = 'ase_calculate_ene, self.'
             print(tt+'pot.pot     (Y) :',self.pot.pot)        # : n2p2_v2ag
             print(tt+'pot.potpath (Y) :',self.pot.potpath)   # :
@@ -1196,7 +1196,7 @@ class ase_calculate_ene( object ):
         if atomrelax == False and self.geopt == True:
             atomrelax = True
         #print('svb',self.verbose)
-        if self.verbose > 1:
+        if self.verbose > 2:
             print()
             print("#####################################################")
             print('##--lmpcmd:',self.lmpcmd)
@@ -1369,7 +1369,7 @@ class ase_calculate_ene( object ):
         #if self.verbose:
         #    print('ene',ene)
         #return ene,ene/atoms.get_number_of_atoms()*1000.
-        if self.verbose > 1:
+        if self.verbose > 2:
             show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
             print()
             print()
@@ -1401,7 +1401,7 @@ class ase_calculate_ene( object ):
         if atomrelax == False and self.geopt == True:
             atomrelax = True
         #print('svb',self.verbose)
-        if self.verbose > 1:
+        if self.verbose > 2:
             print()
             print("#####################################################")
             print('##--lmpcmd:',self.lmpcmd)
@@ -1551,16 +1551,17 @@ class ase_calculate_ene( object ):
             print("XXX vpa:",atoms_or_constraint.get_volume()/atoms.get_number_of_atoms())
 
         if self.verbose > 1:
-            print('ZZ done2')
+            print('ZZ done243')
 
         if self.verbose > 1:
-            print('ZZ done2')
+            print('ZZ done236')
             print('ZZ self.units',self.units)
         ######################################################
         # calculate the energy
         ######################################################
         #print('atxxx',atoms)
         ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        #print('jo')
         if print_minimization_to_screen:
             print('atoms')
             print(atoms.get_positions()[:3])
@@ -1573,7 +1574,7 @@ class ase_calculate_ene( object ):
         #if self.verbose:
         #    print('ene',ene)
         #return ene,ene/atoms.get_number_of_atoms()*1000.
-        if self.verbose > 1:
+        if self.verbose > 2:
             show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
             print()
             print()
@@ -2396,7 +2397,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ###############################################################
     # write input structure (pos.lmp)
     ###############################################################
-    if ace.verbose > 1:
+    if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.set_calculator(None)
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
@@ -2483,7 +2484,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             #sys.exit('ec')
             ene = ace.elastic_constants
 
-    if ace.verbose > 1:
+    if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
 
