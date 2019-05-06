@@ -71,23 +71,24 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     units = ace.units
     print('ace.pot.pot      :',ace.pot.pot)
     print('ace.pot.fullpath :',ace.pot.potpath)
-    ace.pot.print_variables(print_nontheless=True)
-    print()
+    ace.pot.print_variables(print_nontheless=True,text=">>")
 
     ### when want to assess some formation energies
     if test:
+        print('>> test')
         test_formation_energies(ace)
         my.create_READMEtxt(os.getcwd())
         sys.exit('test done! Exit')
 
     if teste or elastic:
+        print('>> elastic')
         ace.elastic = True
-        ace.print_variables('aaa')
         test2_elastic(ace)
         my.create_READMEtxt(os.getcwd())
         sys.exit('teste done! Exit')
 
     if test3:
+        print('>> test3')
         test3_do(ace)
         sys.exit('test3 done! Exit')
 
@@ -117,7 +118,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         print()
         print("ERROR!")
         sys.exit('0 strucutres to calculate? Something went wrong when importing the infile \"'+infile+'\" (mayby you need to change the \"format_in\" of the file? currently \"'+format_in+'\"')
-    show_positions = True
+
+    # show positions of first structure?
+    show_positions = False
     if show_positions:
         print(frames[0].positions)
         print()
@@ -135,6 +138,11 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     if write_runner:
         write_runner = 'runner.out'
     print('write_runner                 :',write_runner)
+    print('--pick_concentration_al      :',pick_concentration_al)
+    print('--pick_atoms_al              :',pick_atoms_al)
+    print('--pick_number_of_atoms       :',pick_number_of_atoms)
+    print('--pick_forcesmax             :',pick_forcesmax)
+    print('--pick_cellshape             :',pick_cellshape)
     print()
 
     ana_mg_conz      = np.empty(structures_to_calc);ana_mg_conz[:]  = np.nan
@@ -210,12 +218,14 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     min_at_id = 0
     min_at_orig = 0
     for idx,i in enumerate(range(structures_to_calc)):
-        print('iii',i)
-        print('kkk',frames[i].get_forces())
+        #print('iii',i)
+        #print('kkk',frames[i].get_forces())
         ana_atoms_ = frames[i].get_number_of_atoms()
+        #print('ama_atoms_',ana_atoms_)
         if verbose > 2:
             print('i',i,'ana_atoms',ana_atoms_)
         for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        #print('kk',for_DFTmax_)
         d = my.ase_get_chemical_symbols_to_conz(frames[i])
         if verbose > 2:
             print('i',i,'d',d)
@@ -231,7 +241,6 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
                 cellshape="Q"
                 #if ana_atoms_ == 4
                 #if pos[0,0] == pos[0,1] == pos[
-
         ### when check for particular picks
         if pick_number_of_atoms >= 0 and ana_atoms_ != pick_number_of_atoms:
             continue
@@ -239,12 +248,18 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             continue
         if pick_atoms_al >= 0 and n["Al"] != pick_atoms_al:
             continue
-        if pick_forcesmax ==0 and for_DFTmax_ > 0.001:
+        if pick_forcesmax >=0 and for_DFTmax_ > pick_forcesmax:
             continue
         #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
         if pick_cellshape >= 0 and cellshape not in ["Q"]:
             continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
+        if cellshape == "?":
+            print('frames[i].cell')
+            print(frames[i].cell)
+        #if cellshape == "Q":
+        #    print('frames[i].positions')
+        #    print(frames[i].positions)
 
         if calc_analysis: ### analysis stuff
             ana_atoms[idx] = ana_atoms_
@@ -281,7 +296,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         if calc_DFT: ### ene from DFT
             ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
 
-            if verbose > be_very_verbose:
+            if verbose > 2: #be_very_verbose:
                 my.show_ase_atoms_content(frames[i],showfirst=3,comment = "STAT2")
             if verbose > 1:
                 print('ene_DFT[idx]     :',ene_DFT[idx],units)
@@ -1296,9 +1311,10 @@ def test2_elastic(ace):
     #get_al_fcc_equilibrium(ace)
     ace.elastic_relax = True
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
-    ace.print_variables('bbb')
     ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
-    print('ace.c44:',ace.c44)
+    print('ace.c44:',ace.c44,type(ace.c44))
+    print('aa',ace.pot.potpath)
+    np.savetxt(ace.pot.potpath+"/elastic.dat",np.array([np.float(ace.c44)]))
     #print('ace.elastic_constants:',ace.elastic_constants)
     #print('cc')
     sys.exit()
