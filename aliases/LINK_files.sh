@@ -90,7 +90,7 @@ fi
 echo "                                 ... successfull"
 cd $dotfiles
 chmod u+x $dotfiles/generalrc/*
-chmod u+x $dotfiles/bin/*
+chmod u+x $dotfiles/aliases/*
 chmod u+x $dotfiles/scripts/lammps_scripts/*
 
 

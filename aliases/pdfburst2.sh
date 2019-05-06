@@ -4,5 +4,5 @@
 [ ! -f "$1" ] && echo file $1 not found && exit
 
 
-$HOME/Dropbox/scripts/dotfiles/bin/cpdf-binaries/OSX-Intel/cpdf $1 -split -chunk 2 -o $time\_out%%%.pdf
+$HOME/Dropbox/scripts/dotfiles/aliases/cpdf-binaries/OSX-Intel/cpdf $1 -split -chunk 2 -o $time\_out%%%.pdf
 

@@ -97,6 +97,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         sys.exit("Error: Missing option \"--infile\" / \"-i\".")
 
     ### read in the structures
+    print('reading infile ...',infile)
+    if infile == 'POSCAR': format_in = "vasp"
+
     my.check_isfile_or_isfiles([infile],verbose=verbose)
     frames = ase_read(infile,index=structures_idx,format=format_in)
 
@@ -110,6 +113,16 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         structures_to_calc = 1
 
     print('structures_to_calc           :',structures_to_calc)
+    if structures_to_calc == 0:
+        print()
+        print("ERROR!")
+        sys.exit('0 strucutres to calculate? Something went wrong when importing the infile \"'+infile+'\" (mayby you need to change the \"format_in\" of the file? currently \"'+format_in+'\"')
+    show_positions = True
+    if show_positions:
+        print(frames[0].positions)
+        print()
+        print(frames[0].cell)
+
     print()
     print('pot                          :',pot)
     print()
@@ -197,10 +210,18 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     min_at_id = 0
     min_at_orig = 0
     for idx,i in enumerate(range(structures_to_calc)):
+        print('iii',i)
+        print('kkk',frames[i].get_forces())
         ana_atoms_ = frames[i].get_number_of_atoms()
+        if verbose > 2:
+            print('i',i,'ana_atoms',ana_atoms_)
         for_DFTmax_ = np.abs(frames[i].get_forces()).max()
         d = my.ase_get_chemical_symbols_to_conz(frames[i])
+        if verbose > 2:
+            print('i',i,'d',d)
         n = my.ase_get_chemical_symbols_to_number_of_species(frames[i])
+        if verbose > 2:
+            print('i',i,'n',n)
         cell = frames[i].get_cell()
         pos = frames[i].get_positions()
         cellshape = "?"
