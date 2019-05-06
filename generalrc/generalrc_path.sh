@@ -21,11 +21,12 @@ b1="/usr/bin"                  # on mac it is there anyhow.
 #bin2="$dotfiles/bin/stefan"
 #bin3="$dotfiles/bin/phonon_lifetimes" # not necessary
 bin4="$dotfiles/aliases"  
-bin5="$HOME/.local/bin"      # needs to be there for lbzip2
+bin5="$HOME/.local/bin"      # needs to be there for lbzip2,units (this should be placed to beginning of PATH! (to overload defaults)
 
 #export PATH="$PATH:$svnctags:$homebrew:$b1:$bin0:$bin1:$bin2:$bin3:$bin4:$bin5:$bin6"
 #export PATH="$PATH:$svnctags:$homebrew:$b1:$bin4:$bin5"
-export PATH="$PATH:$bin4:$bin5"
+#export PATH="$PATH:$bin4:$bin5"  # no, put bin5 and bin4 at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
+export PATH="$bin4:$bin5:$PATH"  # no, put bin5 and bin4 at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
