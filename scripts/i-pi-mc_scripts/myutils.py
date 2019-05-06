@@ -1691,18 +1691,29 @@ class ase_calculate_ene( object ):
 
 
         #### load the elastic stuff
-        from parcalc import ClusterVasp, ParCalculate
-        from elastic import get_pressure, BMEOS, get_strain
-        from elastic import get_elementary_deformations, scan_volumes
-        from elastic import get_BM_EOS, get_elastic_tensor
+        #from parcalc import ClusterVasp, ParCalculate
+        #from elastic import get_pressure, BMEOS, get_strain
+        #from elastic import get_elementary_deformations, scan_volumes
+        #from elastic import get_BM_EOS, get_elastic_tensor
 
         print('ene   ',self.ene(atoms_h))
         print('stress1',atoms_h.get_stress())
         self.ase_relax_cellshape_and_volume_only(atoms_h,verbose=False)
         print('stress2',atoms_h.get_stress())
-        cryst = atoms_h.copy()
-        #print('stress2',cryst.get_isotropic_pressure(cryst.get_stress()))
+        print('cell',atoms_h.get_cell())
+        cell_ref = (atoms_h.copy()).get_cell()
 
+        for i in [0.98,0.99,1.00,1.01, 1.02, 1.03]:
+            cell_work = cell_ref.copy()
+            #print('cell_ref',atoms_h.get_cell())
+            cell_work[0,0] = cell_work[0,0]*i
+            #print('cell_ref',cell_ref)
+            atoms_h.set_cell(cell_work,scale_atoms=True)
+            #print('cell_ref?',atoms_h.get_cell())
+            print('strain',i,'stress?',atoms_h.get_stress())
+            #print('cell_ref',cell_ref)
+
+        from elastic.elastic import get_cart_deformed_cell
         sys.exit()
 
 

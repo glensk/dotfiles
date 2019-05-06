@@ -33,13 +33,14 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
 @click.option('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
 @click.option('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
+@click.option('--pick_c44/--no-pick_c44','-pc44',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
 
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
 @click.option('--verbose','-v',count=True)
 
 
 def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,
-        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape):
+        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
@@ -143,6 +144,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     print('--pick_number_of_atoms       :',pick_number_of_atoms)
     print('--pick_forcesmax             :',pick_forcesmax)
     print('--pick_cellshape             :',pick_cellshape)
+    print('--pick_c44                   :',pick_c44)
     print()
 
     ana_mg_conz      = np.empty(structures_to_calc);ana_mg_conz[:]  = np.nan
@@ -253,7 +255,12 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
         if pick_cellshape >= 0 and cellshape not in ["Q"]:
             continue
+        #print("pick_c44",pick_c44,":"+cellshape+":")
+        if pick_c44 == True and cellshape != "?":
+            #print('nc')
+            continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
+        #print('idx',idx,'wow')
         if cellshape == "?":
             print('frames[i].cell')
             print(frames[i].cell)
@@ -1317,6 +1324,11 @@ def test2_elastic(ace):
     np.savetxt(ace.pot.potpath+"/elastic.dat",np.array([np.float(ace.c44)]))
     #print('ace.elastic_constants:',ace.elastic_constants)
     #print('cc')
+    print()
+    print(frame_al.get_cell())
+    #stress = ace.stress(frame_al)
+    #print('stress',stress)
+    ace.get_elastic(frame_al)
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'
