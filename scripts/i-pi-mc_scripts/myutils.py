@@ -1696,40 +1696,173 @@ class ase_calculate_ene( object ):
         #from elastic import get_elementary_deformations, scan_volumes
         #from elastic import get_BM_EOS, get_elastic_tensor
 
-        print('ene   ',self.ene(atoms_h))
-        print('stress1',atoms_h.get_stress())
+        print('############## from elastic ################')
+        if False:
+            print('ene   ',self.ene(atoms_h))
+            print('stress1',atoms_h.get_stress())
         self.ase_relax_cellshape_and_volume_only(atoms_h,verbose=False)
-        print('stress2',atoms_h.get_stress())
-        print('cell',atoms_h.get_cell())
-        cell_ref = (atoms_h.copy()).get_cell()
+        if False:
+            print('stress2',atoms_h.get_stress())
+            print('cell',atoms_h.get_cell())
+
+
+	cell_ref = (atoms_h.copy()).get_cell()
+        atoms_work = atoms_h.copy()
+        self.ase_relax_cellshape_and_volume_only(atoms_work,verbose=False)
 
         for i in [0.98,0.99,1.00,1.01, 1.02, 1.03]:
             cell_work = cell_ref.copy()
             #print('cell_ref',atoms_h.get_cell())
-            cell_work[0,0] = cell_work[0,0]*i
+            cell_work[0,0] = cell_ref[0,0]*i
             #print('cell_ref',cell_ref)
-            atoms_h.set_cell(cell_work,scale_atoms=True)
+            atoms_work.set_cell(cell_work,scale_atoms=True)
             #print('cell_ref?',atoms_h.get_cell())
-            print('strain',i,'stress?',atoms_h.get_stress())
+            if False:
+                print('strain',i,'stress?',atoms_work.get_stress())
             #print('cell_ref',cell_ref)
 
-        from elastic.elastic import get_cart_deformed_cell
-        sys.exit()
 
 
-        # Create elementary deformations (systems are ase frames)
-        #print('sys',elastic.__file__)
-        systems = get_elementary_deformations(atoms_h, n=5, d=0.33)
-        print(systems)
-        print()
-        print(systems[0])
+        ################################################################
+        # from elastic
+        # http://wolf.ifj.edu.pl/elastic/lib-usage.html
+        ################################################################
+	#print()
+	#print()
+	#print()
+        from elastic.elastic import get_cart_deformed_cell, get_lattice_type, get_elementary_deformations
+        from elastic import get_pressure, BMEOS, get_strain
+        from elastic import get_BM_EOS, get_elastic_tensor
+        from parcalc import ParCalculate
 
-        # Run the stress calculations on deformed cells
-        res = ParCalculate(systems, asecalcLAMMPS)
+        sym = get_lattice_type(atoms_h)
+        print('sym',sym)
+        # Create 10 deformation points on the a axis
+        systems = []
+        ss=[]
+        for d in np.linspace(-0.2,0.2,10):
+	    # get_cart_deformed_cell:
+            # The axis is specified as follows: 0,1,2 = x,y,z ;
+            # sheers: 3,4,5 = yz, xz, xy.
+            # d: The size of the deformation is in percent and degrees, respectively.
+            struct = get_cart_deformed_cell(atoms_h, axis=0, size=d)
+	    #print('struct :',struct.get_cell())
+	    #print('atoms_h:',atoms_h.get_cell())
+	    stress = struct.get_stress()
+            strain = get_strain(struct, atoms_h)
+	    pressure = get_pressure(stress)
+            if False:
+                print("stress:",stress)
+                print("strain:",strain)
+	        print('pressure:',pressure)
+            ss.append([strain, stress])
+            systems.append(struct)
 
-        ## Elastic tensor by internal routine
-        #Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
-        #print("Cij (GPa):", Cij/units.GPa)
+        def myparcalc():
+	    systems_all = get_elementary_deformations(atoms_h, n=5, d=0.33)
+            if type(systems_all) != type([]) :
+                sysl=[systems_all]
+                #print('11')
+            else:
+                sysl=systems_all
+                #print('22')
+
+            res = []
+            for n,s in enumerate(sysl):
+                s.get_potential_energy()
+                res.append([n,s])
+            return [r for ns,s in enumerate(sysl) for nr,r in res if nr==ns]
+        res = myparcalc()
+        Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
+        print("Cij (GPa):", Cij/aseunits.GPa)
+
+        ss=np.array(ss)
+        lo=min(ss[:,0,0])
+        hi=max(ss[:,0,0])
+        mi=(lo+hi)/2
+        wi=(hi-lo)/2
+        xa=np.linspace(mi-1.1*wi,mi+1.1*wi, 50)
+
+        # Now fit the polynomials to the data to get elastic constants
+        # C11 component
+        f=np.polyfit(ss[:,0,0],ss[:,1,0],3)
+        c11=f[-2]/aseunits.GPa
+	#print('ffff')
+	#print(f)
+	#print()
+	#print(f[-2])
+
+        # C12 component
+        f=np.polyfit(ss[:,0,0],ss[:,1,1],3)
+        c12=f[-2]/aseunits.GPa
+
+        np.savetxt('c11.dat',np.transpose([ss[:,0,0],ss[:,1,0]]))
+        print('C11 = %.3f GPa, C12 = %.3f GPa => K= %.3f GPa' % (
+                    c11, c12, (c11+2*c12)/3))
+
+        ################################################################
+        # daniels manual way
+        ################################################################
+	from daniel_strainstuff import _gen_strainmatrix, _apply_strain
+	from daniel_strainstuff import _2lammpslattice
+	from daniel_lmprun import _find_compliance_viaenergy
+	from daniel_lmprun import run_fcc, _print_compliance_components
+        from lammps import lammps
+        lmp = lammps()
+
+        print('############## daniels way  ################')
+        sys.exit('does not work out yet, all energies are 0')
+        lattice_const = 4.045831
+        strain_range = np.arange(-0.002, 0.002, 0.0002)
+        V0 = lattice_const ** 3
+        strain_definition=np.array([1,0,0,0,0,0])
+        C11 = _find_compliance_viaenergy(lmp, strain_definition,strain_range, lattice_const)
+
+        sys.exit('daniels way test done')
+        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
+        e=0.002
+
+
+
+	def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
+	    lattice_const = 4.045831
+            x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
+	    e_M = _gen_strainmatrix(e1=e1,e2=e2,e3=e3,e4=e4,e5=e5,e6=e6)
+	    print('e_M',e_M)
+	    lattice = _apply_strain(x_M, e_M)
+            print('lattie',lattice)
+	    lattice = _2lammpslattice(lattice)
+            print('lattie',lattice)
+	    print('yes4')
+	    sys.exit()
+
+	    #debug
+	    #print lattice
+
+	    run_fcc(lmp, lattice_const, lattice)
+	    return lmp
+
+	from lammps import lammps
+	lmp = lammps()
+        print('---------------')
+
+	lmp = _run_lammps_at_strain(lmp, e1=e)
+        _print_compliance_components(lmp, "C1")
+
+	lmp = _run_lammps_at_strain(lmp, e2=e)
+	_print_compliance_components(lmp, "C2")
+
+	lmp = _run_lammps_at_strain(lmp, e3=e)
+	_print_compliance_components(lmp, "C3")
+
+	lmp = _run_lammps_at_strain(lmp, e4=e)
+	_print_compliance_components(lmp, "C4")
+
+	lmp = _run_lammps_at_strain(lmp, e5=e)
+	_print_compliance_components(lmp, "C5")
+
+	lmp = _run_lammps_at_strain(lmp, e6=e)
+	_print_compliance_components(lmp, "C6")
         return
 
     def get_calculator(self,atoms):
