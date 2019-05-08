@@ -8,6 +8,7 @@ struct 34: energy by ** = -17716.00769155667 eV --> correct
 uuid = uuid34
 load_node(uuid)
 calc = load_node(uuid)
+calc.get_abs_path()
 calc.out.CALL.out.retrieved.get_abs_path()
 struct 34: energy aiida.out = -1302.10268241 rydberg == -17716.008 eV --> correct
 
