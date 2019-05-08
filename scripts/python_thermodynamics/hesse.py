@@ -6,7 +6,6 @@ from __future__ import print_function
 # ~/Thermodynamics/python_thermodynamics/hesse.py al -eneext -v
 # /Users/glensk/Dropbox/proj/proj_current/__2017.01_phonon_linewidth_al/__2015.08_phonon_lifetimes_2_for_munich/calculations/allq_Al_2_4.13_1000000steps_timestep0.001_totaltime10000ps_900K_dump_10_test_manual_short/check_one_disp/coords_pyton_forces_1
 
-#from . import my_atom as atom
 import my_atom as atom
 import os
 import sys
