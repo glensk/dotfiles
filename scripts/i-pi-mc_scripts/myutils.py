@@ -1705,8 +1705,7 @@ class ase_calculate_ene( object ):
             print('stress2',atoms_h.get_stress())
             print('cell',atoms_h.get_cell())
 
-
-	cell_ref = (atoms_h.copy()).get_cell()
+        cell_ref = (atoms_h.copy()).get_cell()
         atoms_work = atoms_h.copy()
         self.ase_relax_cellshape_and_volume_only(atoms_work,verbose=False)
 
@@ -1727,9 +1726,6 @@ class ase_calculate_ene( object ):
         # from elastic
         # http://wolf.ifj.edu.pl/elastic/lib-usage.html
         ################################################################
-	#print()
-	#print()
-	#print()
         from elastic.elastic import get_cart_deformed_cell, get_lattice_type, get_elementary_deformations
         from elastic import get_pressure, BMEOS, get_strain
         from elastic import get_BM_EOS, get_elastic_tensor
@@ -1741,25 +1737,26 @@ class ase_calculate_ene( object ):
         systems = []
         ss=[]
         for d in np.linspace(-0.2,0.2,10):
-	    # get_cart_deformed_cell:
+            # get_cart_deformed_cell:
             # The axis is specified as follows: 0,1,2 = x,y,z ;
             # sheers: 3,4,5 = yz, xz, xy.
             # d: The size of the deformation is in percent and degrees, respectively.
             struct = get_cart_deformed_cell(atoms_h, axis=0, size=d)
-	    #print('struct :',struct.get_cell())
-	    #print('atoms_h:',atoms_h.get_cell())
-	    stress = struct.get_stress()
+            print()
+            print('struct :',struct.get_cell())
+            print('atoms_h:',atoms_h.get_cell())
+            stress = struct.get_stress()
             strain = get_strain(struct, atoms_h)
-	    pressure = get_pressure(stress)
-            if False:
+            pressure = get_pressure(stress)
+            if True:
                 print("stress:",stress)
                 print("strain:",strain)
-	        print('pressure:',pressure)
+                print('pressure:',pressure)
             ss.append([strain, stress])
             systems.append(struct)
 
         def myparcalc():
-	    systems_all = get_elementary_deformations(atoms_h, n=5, d=0.33)
+            systems_all = get_elementary_deformations(atoms_h, n=5, d=0.33)
             if type(systems_all) != type([]) :
                 sysl=[systems_all]
                 #print('11')
@@ -1787,26 +1784,26 @@ class ase_calculate_ene( object ):
         # C11 component
         f=np.polyfit(ss[:,0,0],ss[:,1,0],3)
         c11=f[-2]/aseunits.GPa
-	#print('ffff')
-	#print(f)
-	#print()
-	#print(f[-2])
+        #print('ffff')
+        #print(f)
+        #print()
+        #print(f[-2])
 
         # C12 component
         f=np.polyfit(ss[:,0,0],ss[:,1,1],3)
         c12=f[-2]/aseunits.GPa
 
-        np.savetxt('c11.dat',np.transpose([ss[:,0,0],ss[:,1,0]]))
+        #np.savetxt('c11.dat',np.transpose([ss[:,0,0],ss[:,1,0]]))
         print('C11 = %.3f GPa, C12 = %.3f GPa => K= %.3f GPa' % (
                     c11, c12, (c11+2*c12)/3))
 
         ################################################################
         # daniels manual way
         ################################################################
-	from daniel_strainstuff import _gen_strainmatrix, _apply_strain
-	from daniel_strainstuff import _2lammpslattice
-	from daniel_lmprun import _find_compliance_viaenergy
-	from daniel_lmprun import run_fcc, _print_compliance_components
+        from daniel_strainstuff import _gen_strainmatrix, _apply_strain
+        from daniel_strainstuff import _2lammpslattice
+        from daniel_lmprun import _find_compliance_viaenergy
+        from daniel_lmprun import run_fcc, _print_compliance_components
         from lammps import lammps
         lmp = lammps()
 
@@ -1824,45 +1821,45 @@ class ase_calculate_ene( object ):
 
 
 
-	def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
-	    lattice_const = 4.045831
-            x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
-	    e_M = _gen_strainmatrix(e1=e1,e2=e2,e3=e3,e4=e4,e5=e5,e6=e6)
-	    print('e_M',e_M)
-	    lattice = _apply_strain(x_M, e_M)
-            print('lattie',lattice)
-	    lattice = _2lammpslattice(lattice)
-            print('lattie',lattice)
-	    print('yes4')
-	    sys.exit()
+    def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
+        lattice_const = 4.045831
+        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
+        e_M = _gen_strainmatrix(e1=e1,e2=e2,e3=e3,e4=e4,e5=e5,e6=e6)
+        print('e_M',e_M)
+        lattice = _apply_strain(x_M, e_M)
+        print('lattie',lattice)
+        lattice = _2lammpslattice(lattice)
+        print('lattie',lattice)
+        print('yes4')
+        sys.exit()
 
-	    #debug
-	    #print lattice
+        #debug
+        #print lattice
 
-	    run_fcc(lmp, lattice_const, lattice)
-	    return lmp
+        run_fcc(lmp, lattice_const, lattice)
+        return lmp
 
-	from lammps import lammps
-	lmp = lammps()
+        from lammps import lammps
+        lmp = lammps()
         print('---------------')
 
-	lmp = _run_lammps_at_strain(lmp, e1=e)
+        lmp = _run_lammps_at_strain(lmp, e1=e)
         _print_compliance_components(lmp, "C1")
 
-	lmp = _run_lammps_at_strain(lmp, e2=e)
-	_print_compliance_components(lmp, "C2")
+        lmp = _run_lammps_at_strain(lmp, e2=e)
+        _print_compliance_components(lmp, "C2")
 
-	lmp = _run_lammps_at_strain(lmp, e3=e)
-	_print_compliance_components(lmp, "C3")
+        lmp = _run_lammps_at_strain(lmp, e3=e)
+        _print_compliance_components(lmp, "C3")
 
-	lmp = _run_lammps_at_strain(lmp, e4=e)
-	_print_compliance_components(lmp, "C4")
+        lmp = _run_lammps_at_strain(lmp, e4=e)
+        _print_compliance_components(lmp, "C4")
 
-	lmp = _run_lammps_at_strain(lmp, e5=e)
-	_print_compliance_components(lmp, "C5")
+        lmp = _run_lammps_at_strain(lmp, e5=e)
+        _print_compliance_components(lmp, "C5")
 
-	lmp = _run_lammps_at_strain(lmp, e6=e)
-	_print_compliance_components(lmp, "C6")
+        lmp = _run_lammps_at_strain(lmp, e6=e)
+        _print_compliance_components(lmp, "C6")
         return
 
     def get_calculator(self,atoms):
@@ -2613,7 +2610,22 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         else:
             ace.elastic_constants = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
             #ace.elastic_constants_ = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True)
-            ace.c44 = check_output(["tail -300 log.lammps | grep \"^Elastic Constant C44\""],shell=True).strip().split(" ")[4]
+            co = check_output(["tail -300 log.lammps | grep \"^Elastic Constant C44\" | sed 's|.*= ||' | sed 's|GPa.*||'"],shell=True)
+            #print('co')
+            #print(co)
+
+            co1 = co.strip()
+            #print('co1')
+            #print(co1)
+            co11 = str(co1.decode("utf-8"))
+            #print('co11')
+            #print(co11)
+
+            #co2 = co1.split(" ")
+            #print('co2')
+            #print(co2)
+            #ace.c44 = co2[4]
+            ace.c44 = co11
             #print('aa c44',float(ace.c44))
             #print('aa el',ace.elastic_constants_)
             #for ij in ace.elastic_constants_:
