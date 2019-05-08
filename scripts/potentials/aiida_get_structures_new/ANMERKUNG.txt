@@ -1,0 +1,4 @@
+All of this has used the aiida_export_group_to_runner.py which considers the 
+
+conversion_aiida_ase_forces = 1.0000000908541917
+conversion_aiida_ase_energy = 1.0000000945842116
