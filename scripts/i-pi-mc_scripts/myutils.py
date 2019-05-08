@@ -710,6 +710,7 @@ class mypot( object ):
         self.potpath_in = potpath
         self.potpath    = False
         self.pottype    = False       # n2p2/runner
+        self.potDONE    = False         # n2p2_v1ag
 
         self.pot_all    = False   # n2p2_v1ag
 
@@ -718,7 +719,6 @@ class mypot( object ):
 
         self.elements    = False  # list e.g. ['Al', 'Mg', 'Si']
         self.atom_energy = False
-
         return
 
 
@@ -796,7 +796,7 @@ class mypot( object ):
                         self.atom_energy = d
         return
 
-    def print_variables(self,text="",print_nontheless=False):
+    def print_variables_mypot(self,text="",print_nontheless=False):
         if self.verbose > 1 or print_nontheless:
             #print("calss mypot      ",text)
             print(text,"self.elements    ",self.elements)
@@ -806,11 +806,12 @@ class mypot( object ):
             print(text,"self.potpath     ",self.potpath)
             print(text,"self.potpath_in  ",self.potpath_in)
             print(text,"self.pottype     ",self.pottype)
+            print(text,"self.potDONE     ",self.potDONE)
             print(text,"self.verbose     ",self.verbose)
             print()
 
     def get(self):
-        self.print_variables('get potential: in')
+        self.print_variables_mypot('get potential: in')
 
         ##########################################
         # get potential from path
@@ -848,7 +849,16 @@ class mypot( object ):
             ##########################################
             self.get_potpath()
         self.get_elements_and_atomic_energies()
-        self.print_variables('get potential: out')
+        self.print_variables_mypot('get potential: out')
+
+
+        ### check if self.pottype can be computed on this host!
+        add = ' Your lammps version does not seem to work with '+self.pottype+"!"
+        if self.pottype == "runner" and os.path.isdir(os.environ["LAMMPSPATH"]+"/src/USER-RUNNER") == False:
+            sys.exit("ERROR: "+os.environ["LAMMPSPATH"]+"/src/USER-RUNNER not found!"+add)
+        if self.pottype == "n2p2" and os.path.isdir(os.environ["LAMMPSPATH"]+"/src/USER-NNP") == False:
+            sys.exit("ERROR: "+os.environ["LAMMPSPATH"]+"/src/USER-NNP not found!"+add)
+        self.potDONE = True
         return
 
 def pot_all():
@@ -1045,9 +1055,9 @@ class ase_calculate_ene( object ):
         return
 
 
-    def print_variables(self,text=""):
+    def print_variables_ase(self,text=""):
         if self.verbose > 1:
-            tt = 'ase_calculate_ene, self.'
+            tt = 'ase_calculate_ene.'
             print()
             print(text,tt+'pot.pot      (1) :',self.pot.pot)    # : n2p2_v2ag
             print(text,tt+'units        (1) :',self.units)      # : ev
@@ -1100,7 +1110,8 @@ class ase_calculate_ene( object ):
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
         '''
-        self.pot.get()
+        if self.pot.potDONE == False:
+            self.pot.get()
 
         self.kmc = kmc
         self.temp = temp
@@ -1113,10 +1124,11 @@ class ase_calculate_ene( object ):
 
 
         if self.verbose > 2:
-            tt = 'ase_calculate_ene, self.'
-            print(tt+'pot.pot     (Y) :',self.pot.pot)        # : n2p2_v2ag
-            print(tt+'pot.potpath (Y) :',self.pot.potpath)   # :
-            print(tt+'pot.pottype (Y) :',self.pot.pottype)   # :
+            tt = 'pot_to_ase_lmp_cmd_A '
+            print(tt+'pot.pot    :',self.pot.pot)        # : n2p2_v2ag
+            print(tt+'pot.potpath:',self.pot.potpath)   # :
+            print(tt+'pot.pottype:',self.pot.pottype)   # :
+            print()
 
         #sys.exit()
         # this depends only on the potential which is already defined
@@ -1153,8 +1165,8 @@ class ase_calculate_ene( object ):
 
         self.lmpcmd = self.lmpcmd + [ "########## lmpcmd.end  #############" ]
         if self.verbose > 1:
-            print('...lmpcmd',self.lmpcmd)
-        self.print_variables()
+            print('HERE THE lmpcmd I got',self.lmpcmd)
+        self.print_variables_ase("pot_to_ase_lmp_cmd_FIN")
         return
 
     def define_wrapped_self_atoms(self,atoms=False):
@@ -1343,8 +1355,8 @@ class ase_calculate_ene( object ):
             print('UUU atomrelax:',atomrelax)
             print('UUU cellrelax:',cellrelax)
             print("UUU nat:",atoms.get_number_of_atoms())
-            print("UUU pos:",atoms.get_positions()[:4])
-            print("UUU for:",atoms.get_forces()[:4])
+            print("UUU pos[:4]:",atoms.get_positions()[:4])
+            print("UUU for[:4]:",atoms.get_forces()[:4])
             print("UUU fmx:",abs(atoms.get_forces()).max())
             print("UUU vol:",atoms.get_volume())
             print("UUU vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
@@ -1384,10 +1396,14 @@ class ase_calculate_ene( object ):
             cellshaperelax=False,
             cellvolumerelax=False,
             print_minimization_to_screen=False,
-            minimizer="LGBFGS"):
+            minimizer="LGBFGS",
+            debug=False):
         ''' atoms is an ase object
             if don_change_atomsobject is chosen,
         '''
+        if debug:
+            print_minimization_to_screen=True
+            print('777 degub is on for calculation of ene')
         ## now the atoms object is not changed
         #atoms = atomsin.copy()
         atoms = self.define_wrapped_self_atoms(atoms)
@@ -1401,7 +1417,7 @@ class ase_calculate_ene( object ):
         if atomrelax == False and self.geopt == True:
             atomrelax = True
         #print('svb',self.verbose)
-        if self.verbose > 2:
+        if self.verbose > 2 or debug:
             print()
             print("#####################################################")
             print('##--lmpcmd:',self.lmpcmd)
@@ -1424,6 +1440,8 @@ class ase_calculate_ene( object ):
         self.get_calculator(atoms)
 
         ### attach to atoms to relax the cell
+        if debug:
+            print('attaching constraints')
         constraint = False
         if cellrelax == True: # and atomrelax == False:
             constraint = StrainFilter(atoms)  # this relaxes the cell shape & the volume while keeping atomic positions fixed
@@ -1532,23 +1550,16 @@ class ase_calculate_ene( object ):
                     return np.nan
 
         if print_minimization_to_screen:
-            print('UUU atomrelax:',atomrelax)
-            print('UUU cellrelax:',cellrelax)
-            print("UUU nat:",atoms.get_number_of_atoms())
-            print("UUU pos:",atoms.get_positions()[:4])
-            print("UUU for:",atoms.get_forces()[:4])
-            print("UUU fmx:",abs(atoms.get_forces()).max())
-            print("UUU vol:",atoms.get_volume())
-            print("UUU vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
-        if print_minimization_to_screen:
-            print('XXX atomrelax:',atomrelax)
-            print('XXX cellrelax:',cellrelax)
-            print("XXX nat:",atoms_or_constraint.get_number_of_atoms())
-            print("XXX pos:",atoms_or_constraint.get_positions()[:4])
-            print("XXX for:",atoms_or_constraint.get_forces()[:4])
-            print("XXX fmx:",abs(atoms_or_constraint.get_forces()).max())
-            print("XXX vol:",atoms_or_constraint.get_volume())
-            print("XXX vpa:",atoms_or_constraint.get_volume()/atoms.get_number_of_atoms())
+            print('UUA atomrelax:',atomrelax)
+            print('UUA cellrelax:',cellrelax)
+            print("UUA nat:",atoms.get_number_of_atoms())
+            print("UUA pos[:4]:",atoms.get_positions()[:4])
+            #print('for',atoms.get_forces.__module__)
+            #print('for',atoms.get_forces.__globals__)
+            print("UUA for:",atoms.get_forces()[:4])
+            print("UUA fmx:",abs(atoms.get_forces()).max())
+            print("UUA vol:",atoms.get_volume())
+            print("UUA vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
 
         if self.verbose > 1:
             print('ZZ done243')
@@ -2754,7 +2765,7 @@ def get_latest_n2p2_pot():
     return potout
 
 
-def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False):
+def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=False):
     ''' adds formats runner and lammps-runner to ase '''
 
     ### get the known formats
@@ -2769,6 +2780,10 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(x)
 
+    ### get formatspy
+    formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
+    if verbose or show_formatspy:
+        print('formatspy',formatspy)
 
     ### check if formats are known by ase
     missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]
@@ -2802,9 +2817,6 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
     if add_missing_formats:  # copies the missing format files
         print('adapting ase formats.py .... ')
 
-        formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
-        if verbose:
-            print('formatspy',formatspy)
 
         if not os.path.isfile(formatspy):
             print('formatspy',formatspy)
