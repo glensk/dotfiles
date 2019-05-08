@@ -37,21 +37,29 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
 @click.option('--verbose','-v',count=True)
+@click.option('--debug','-d',count=True)
 
 
-def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,
+def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,
         pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
     getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
+    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pnat 4 -paal 4 -pfm 0.0001 -v -u meV_pa -pc44
+    getEnergies_byLammps.py -p . -e
 
     '''
     print('infile           :',infile)
 
+    hostname = my.hostname()
+    if lmp == True:
+        ase = False
+
+
     ### check if ase runneer format is known
-    my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False)
+    my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False,show_formatspy=True)
 
     ### check if lammps is working with ase
     if 'LD_LIBRARY_PATH' not in os.environ:
@@ -68,11 +76,13 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             geopt=geopt,
             elastic=elastic,
             verbose=verbose)
+
+    ### get the potential
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     print('ace.pot.pot      :',ace.pot.pot)
     print('ace.pot.fullpath :',ace.pot.potpath)
-    ace.pot.print_variables(print_nontheless=True,text=">>")
+    ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
     ### when want to assess some formation energies
     if test:
@@ -129,6 +139,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
 
     print()
     print('pot                          :',pot)
+    print()
+    print('ase                          :',ase)
+    print('lmp                          :',lmp)
     print()
     print('units                        :',units)
     print('geopt                        :',geopt)
@@ -220,14 +233,16 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     min_at_id = 0
     min_at_orig = 0
     for idx,i in enumerate(range(structures_to_calc)):
-        #print('iii',i)
-        #print('kkk',frames[i].get_forces())
+        if debug:
+            print('iii',i)
+            print('kkk',frames[i].get_forces())
         ana_atoms_ = frames[i].get_number_of_atoms()
         #print('ama_atoms_',ana_atoms_)
         if verbose > 2:
             print('i',i,'ana_atoms',ana_atoms_)
         for_DFTmax_ = np.abs(frames[i].get_forces()).max()
-        #print('kk',for_DFTmax_)
+        if debug:
+            print('kk',for_DFTmax_)
         d = my.ase_get_chemical_symbols_to_conz(frames[i])
         if verbose > 2:
             print('i',i,'d',d)
@@ -255,14 +270,13 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
         if pick_cellshape >= 0 and cellshape not in ["Q"]:
             continue
-        #print("pick_c44",pick_c44,":"+cellshape+":")
         if pick_c44 == True and cellshape != "?":
             #print('nc')
             continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
         #print('idx',idx,'wow')
-        if False: #cellshape == "?":
-            print('frames[i].cell')
+        if pick_c44 or debug: #cellshape == "?":
+            print('XX frames[i].cell')
             print(frames[i].cell)
         #if cellshape == "Q":
         #    print('frames[i].positions')
@@ -299,7 +313,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
 
 
         added=""
-        #print(frames[idx].get_positions())
+        if debug:
+            print("GG")
+            print(frames[idx].get_positions())
         if calc_DFT: ### ene from DFT
             ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
 
@@ -316,17 +332,31 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         else:
             sys.exit("either per atom or per structure")
 
+
+        if debug:
+            print("BB before ene_DFT_wo_atomic")
         ene_DFT_wo_atomic[idx] = ene_DFT[idx] - ene_DFT_atomic[idx]
+        if debug:
+            print("AAaa ipi")
 
         if ipi == True:  ### ene from ipi
             atoms_tmp = copy.deepcopy(frames[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
 
+        if debug:
+            print("AAbb ase")
         if ase == True:  ### ene from ase (without writing lammps files)
             atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since frames change when geoopt
             if ace.geopt == False:
+                if debug:
+                    print("AAA")
                 ace.pot_to_ase_lmp_cmd()
-                ene_pot_ase[idx] = ace.ene(atoms_tmp)
+                if debug:
+                    print("BBB before: ene_pot_ase")
+                ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=False)
+                #ene_pot_ase[idx] = my.ase_enepot(atoms_tmp)
+                if debug:
+                    print("CCC")
                 if pot == "runner_v2dg" and False: # only in case we load DFT energies from new DFT calcs
                     n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
                     ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
@@ -376,6 +406,8 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             if lmp == False:
                 ene_pot[idx] = copy.deepcopy(ene_pot_ase[idx])
 
+        if debug:
+            print("AAcc lmp")
         if lmp == True:  ### ene from lammps (by writing lammps files)
             atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since atoms change when geoopt
             ene_pot_lmp[idx] = my.lammps_ext_calc(atoms_tmp,ace)
