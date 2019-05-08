@@ -21,12 +21,13 @@ def n2p2_get_best_test_nr_from_learning_curve(folder):
     print('folder',folder)
 
     # in case this is a n2p2 job:
-    if os.path.isfile(folder+"/learning-curve.out"):
+    if os.path.isfile(folder+"/learning-curve.out") and not os.path.isfile(folder+"/optweights.012.out"):
         a = np.loadtxt(folder+"/learning-curve.out")
         best_testset = np.argmin(a[:,2])
         #print('best_testset',best_testset)
-    elif os.path.isfile(folder+"/learning_curve_test.dat"):
-        a = np.loadtxt(folder+"/learning_curve_test.dat")
+    elif os.path.isfile(folder+"/learning-curve.out"):
+        #a = np.loadtxt(folder+"/learning_curve_test.dat")
+        a = np.loadtxt(folder+"/learning-curve.out")
         #print(a)
         #print()
         #print(a[:,1])
@@ -42,13 +43,13 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     nr_ = str(args.nr).zfill(6)
     if not os.path.isfile('scaling.data'):
         sys.exit('scaling.data does not exist (1)')
-    print('scaling.data : exists')
+    #print('scaling.data : exists')
     if not os.path.isfile('input.data'):
         sys.exit('input.data does not exist (2)')
-    print('input.data   : exists')
+    #print('input.data   : exists')
     if not os.path.isfile('input.nn'):
         sys.exit('input.nn does not exist (3)')
-    print('input.nn     : exists')
+    #print('input.nn     : exists')
 
 
     checkfor = [ '012', '013', '014' ]
@@ -66,9 +67,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
             weights = weights3
             typ = 'runner'
         else:
-            print(weights1, "does not exist")
-            print(weights2, "does not exist")
-            print(weights3, "does not exist")
+            sys.exit(weights1+" does not exist")
+            sys.exit(weights2+" does not exist")
+            sys.exit(weights3+" does not exist")
             sys.exit("weights files not found (4)")
         print(weights,'exist')
         return weights,typ

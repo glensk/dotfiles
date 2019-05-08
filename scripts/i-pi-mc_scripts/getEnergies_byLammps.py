@@ -261,7 +261,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
         #print('idx',idx,'wow')
-        if cellshape == "?":
+        if False: #cellshape == "?":
             print('frames[i].cell')
             print(frames[i].cell)
         #if cellshape == "Q":
