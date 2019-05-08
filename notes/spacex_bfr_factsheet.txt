@@ -1,2 +1,7 @@
-301 stainless steel "in the beginning" (apparently they will change it later)
+301 austenitic stainless steel "in the beginning" (apparently they will change it later)
 heat at mars reentry: 1700degrees Celcius ~ 2000K
+Grade
+
+301 (numbers indicate percentage of material by weight): (so ca 70%Fe by weight)
+Carbon Manganese Phosphorous Sulfur Silicon Chromium       Nickel       Nitrogen
+0.15   2.00      0.045       0.030  0.75    16.00 – 18.00  6.00 – 8.00  0.10
