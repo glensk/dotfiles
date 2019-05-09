@@ -36,11 +36,12 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--pick_c44/--no-pick_c44','-pc44',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
 
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
+@click.option('--write_analysis/--no-write_analysis','-wa',required=False,default=False,help='write ene_{DFT,pot}... default: False')
 @click.option('--verbose','-v',count=True)
 @click.option('--debug','-d',count=True)
 
 
-def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,
+def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,write_analysis,
         pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
@@ -80,8 +81,6 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     ### get the potential
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
-    print('ace.pot.pot      :',ace.pot.pot)
-    print('ace.pot.fullpath :',ace.pot.potpath)
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
     ### when want to assess some formation energies
@@ -522,69 +521,70 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         #print("in",what.shape,"out",whatout.shape,name)
         return whatout
 
-    ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
-    ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
-    ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
-    ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
-    ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
+    if write_analysis:
+        ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
+        ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
+        ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
+        ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
+        ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
-    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
-    ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
-    for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
-    ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
-    ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
-    ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
-    ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
-    ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
-    ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
-    ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
-    ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
-    if len(ene_pot) != 0:
-        np.savetxt("ene_DFT.npy",ene_DFT,header=units)
-        np.savetxt("ene_pot.npy",ene_pot,header=units)
-        np.savetxt("ene_diff.npy",ene_diff,header=units)
-        np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
-        np.savetxt("ene_std.npy",ene_std,header=units)
+        ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
+        ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
+        for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
+        ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
+        ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
+        ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
+        ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
+        ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
+        ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
+        ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
+        ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
+        if len(ene_pot) != 0:
+            np.savetxt("ene_DFT.npy",ene_DFT,header=units)
+            np.savetxt("ene_pot.npy",ene_pot,header=units)
+            np.savetxt("ene_diff.npy",ene_diff,header=units)
+            np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
+            np.savetxt("ene_std.npy",ene_std,header=units)
 
-        ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
-        ### write analyze.csv
-        try:
-            np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
-        except IndexError:
-            print('len',len(ene_DFT))
-            print(ene_DFT.shape)
-            print(ene_diff_abs.shape)
-            print(ene_DFT_wo_atomic.shape)
-            print(ene_pot_wo_atomic.shape)
-            print(for_DFTmax.shape)
-            print(ana_mg_conz.shape)
-            print(ana_si_conz.shape)
-            print(ana_al_conz.shape)
-            print(ana_atoms.shape)
-            print(ana_vol.shape)
-            print(ana_vol_pa.shape)
-            print(ana_dist_min.shape)
-            print('cant save ene_all.npy')
+            ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
+            ### write analyze.csv
+            try:
+                np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+            except IndexError:
+                print('len',len(ene_DFT))
+                print(ene_DFT.shape)
+                print(ene_diff_abs.shape)
+                print(ene_DFT_wo_atomic.shape)
+                print(ene_pot_wo_atomic.shape)
+                print(for_DFTmax.shape)
+                print(ana_mg_conz.shape)
+                print(ana_si_conz.shape)
+                print(ana_al_conz.shape)
+                print(ana_atoms.shape)
+                print(ana_vol.shape)
+                print(ana_vol_pa.shape)
+                print(ana_dist_min.shape)
+                print('cant save ene_all.npy')
 
-        analyze = np.transpose([
-            np.arange(len(ene_DFT)),   # i
-            ene_diff_abs,          # diff
-            ene_DFT_wo_atomic,     # E_wo
-            for_DFTmax,            # for
-            ana_mg_conz,
-            ana_si_conz,
-            ana_al_conz,
-            ana_atoms,
-            ana_vol,
-            ana_vol_pa,
-            ana_dist_min,
-            ana_VOL_diff_norm])
-        #print('a',analyze.shape)
-        #print('a',analyze.shape[0])
-        #analyze_len = analyze.shape[1] - 1
-        analyze_len = analyze.shape[0] - 1
-        #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
-        np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+            analyze = np.transpose([
+                np.arange(len(ene_DFT)),   # i
+                ene_diff_abs,          # diff
+                ene_DFT_wo_atomic,     # E_wo
+                for_DFTmax,            # for
+                ana_mg_conz,
+                ana_si_conz,
+                ana_al_conz,
+                ana_atoms,
+                ana_vol,
+                ana_vol_pa,
+                ana_dist_min,
+                ana_VOL_diff_norm])
+            #print('a',analyze.shape)
+            #print('a',analyze.shape[0])
+            #analyze_len = analyze.shape[1] - 1
+            analyze_len = analyze.shape[0] - 1
+            #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+            np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
     my.create_READMEtxt(os.getcwd())

@@ -27,7 +27,7 @@ except ImportError:
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
-    pass
+    print("ERROR when importing LAMMPSlib ... possibly you have to change your (conda/aiida) environment")
 
 from feos import eos
 from ase.io import read as ase_read
@@ -799,15 +799,16 @@ class mypot( object ):
     def print_variables_mypot(self,text="",print_nontheless=False):
         if self.verbose > 1 or print_nontheless:
             #print("calss mypot      ",text)
-            print(text,"self.elements    ",self.elements)
-            print(text,"self.atom_energy ",self.atom_energy)
             print(text,"self.pot         ",self.pot)
-            print(text,"self.pot_all     ",self.pot_all)
             print(text,"self.potpath     ",self.potpath)
             print(text,"self.potpath_in  ",self.potpath_in)
+            print(text,"self.potlib      ",self.potlib)
+            print(text,"self.elements    ",self.elements)
+            print(text,"self.atom_energy ",self.atom_energy)
             print(text,"self.pottype     ",self.pottype)
             print(text,"self.potDONE     ",self.potDONE)
             print(text,"self.verbose     ",self.verbose)
+            print(text,"self.pot_all     ",self.pot_all)
             print()
 
     def get(self):
@@ -854,10 +855,11 @@ class mypot( object ):
 
         ### check if self.pottype can be computed on this host!
         add = ' Your lammps version does not seem to work with '+self.pottype+"!"
-        if self.pottype == "runner" and os.path.isdir(os.environ["LAMMPSPATH"]+"/src/USER-RUNNER") == False:
-            sys.exit("ERROR: "+os.environ["LAMMPSPATH"]+"/src/USER-RUNNER not found!"+add)
-        if self.pottype == "n2p2" and os.path.isdir(os.environ["LAMMPSPATH"]+"/src/USER-NNP") == False:
-            sys.exit("ERROR: "+os.environ["LAMMPSPATH"]+"/src/USER-NNP not found!"+add)
+        if self.pottype == "runner": self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
+        if self.pottype == "n2p2":   self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
+
+        if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
+            sys.exit("ERROR: "+self.potlib+" not found!"+add)
         self.potDONE = True
         return
 
@@ -2783,7 +2785,7 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
     ### get formatspy
     formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
     if verbose or show_formatspy:
-        print('formatspy',formatspy)
+        print('>> formatspy       ',formatspy)
 
     ### check if formats are known by ase
     missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]
@@ -2815,7 +2817,8 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
 
     ### check if necessary files for formats are known
     if add_missing_formats:  # copies the missing format files
-        print('adapting ase formats.py .... ')
+        if verbose:
+            print('adapting ase formats.py .... ')
 
 
         if not os.path.isfile(formatspy):
@@ -2838,19 +2841,22 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
 
         writeformatspy = False
         if 'runner' in x:
-            print('runner        format are already added in formats.py (of ase).')
+            if verbose:
+                print('runner        format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
             writeformatspy = True
 
         if 'ipi' in x:
-            print('ipi           format are already added in formats.py (of ase).')
+            if verbose:
+                print('ipi           format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
             writeformatspy = True
 
         if 'lammps-runner' in x:
-            print('lammps-runner format are already added in formats.py (of ase).')
+            if verbose:
+                print('lammps-runner format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
             contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
@@ -2865,7 +2871,8 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
             f.write(contents)
             f.close()
         else:
-            print('everything was already in formats.py')
+            if verbose:
+                print('everything was already in formats.py')
 
     return known_formats
 
