@@ -13,7 +13,7 @@
 #########################################################
 if [ "`hostname | \grep -o mac`" = "mac" ];then
     # umount and then mount /nas/glensk
-    /Users/glensk/Dropbox/scripts/dotfiles/bin/nasmount.sh
+    /Users/glensk/Dropbox/scripts/dotfiles/aliases/nasmount.sh
     #echo myhost:$myhost: # works: cmpc34
     # login to cmpc and mount cmmc
     echo "########### ---->> in"

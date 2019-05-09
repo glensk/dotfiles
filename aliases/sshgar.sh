@@ -44,4 +44,4 @@ fi
 ##############################################################
 # old login: from mac -> cmpc -> cmmc 
 ##############################################################
-#ssh.sh -t -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200 glensk@$myhost.mpie.de "/home/glensk/Dropbox/scripts/dotfiles/bin/ssh.sh -Y -X -t aglen@$to.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd `/Users/glensk/Dropbox/scripts/dotfiles/bin/th.sh /u/aglen`;zsh\""
+#ssh.sh -t -Y -X -o ServerAliveInterval=160 -o ServerAliveCountMax=1200 glensk@$myhost.mpie.de "/home/glensk/Dropbox/scripts/dotfiles/aliases/ssh.sh -Y -X -t aglen@$to.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd `/Users/glensk/Dropbox/scripts/dotfiles/aliases/th.sh /u/aglen`;zsh\""

@@ -107,7 +107,7 @@ fi
 #    #echo "#######################################"
 #    #echo "#### update cmmc ######################"
 #    #echo "#######################################"
-#    #ssh.sh -t glensk@$myhost.mpie.de "/home/glensk/Dropbox/Albert/scripts/dotfiles/bin/ssh.sh -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd /cmmc/u/aglen/Dropbox/Albert/scripts/dotfiles;module load git;./bin/gitdown.sh\""
+#    #ssh.sh -t glensk@$myhost.mpie.de "/home/glensk/Dropbox/Albert/scripts/dotfiles/aliases/ssh.sh -t aglen@cmmc002.bc.rzg.mpg.de -R 48540:cmcc1.mpie.de:80 \"cd /cmmc/u/aglen/Dropbox/Albert/scripts/dotfiles;module load git;./bin/gitdown.sh\""
 #    #echo
 #    #echo
 #    #echo

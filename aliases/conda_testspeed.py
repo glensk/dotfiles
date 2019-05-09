@@ -2,9 +2,9 @@
 import numpy as np
 # from https://www.infoworld.com/article/3187484/software/how-does-a-20x-speed-up-in-python-grab-you.html
 # to test:
-# python $dotfiles/bin/conda_testspeed.py
+# python $dotfiles/aliases/conda_testspeed.py
 # source activate intelpy
-# python $dotfiles/bin/conda_testspeed.py   # yields about 10x speedup
+# python $dotfiles/aliases/conda_testspeed.py   # yields about 10x speedup
 import time
 
 N = 102400

@@ -19,9 +19,9 @@ if [ "$onhost" = "daint" ];then
     mv ~/.exchange/$filename .
 else
     ### get file when somewhere else
-    address=`grep "address1=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address1="||' | sed 's|".*||'`
-    [ "$basename" = "recievex2" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
-    [ "$basename" = "recievex2nountar" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/bin/stefan/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
+    address=`grep "address1=" $HOME/Dropbox/Albert/scripts/dotfiles/aliases/sendx | tail -1 | sed 's|.*address1="||' | sed 's|".*||'`
+    [ "$basename" = "recievex2" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/aliases/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
+    [ "$basename" = "recievex2nountar" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/aliases/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
     echo "address   : $address"
     
     # USE RSYNC SINCE IT CAN DELETE THE FILE AFTERWARDS

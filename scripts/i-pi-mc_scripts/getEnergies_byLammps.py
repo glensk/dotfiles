@@ -33,24 +33,34 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
 @click.option('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
 @click.option('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
+@click.option('--pick_c44/--no-pick_c44','-pc44',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
 
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
+@click.option('--write_analysis/--no-write_analysis','-wa',required=False,default=False,help='write ene_{DFT,pot}... default: False')
 @click.option('--verbose','-v',count=True)
+@click.option('--debug','-d',count=True)
 
 
-def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,
-        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape):
+def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,write_analysis,
+        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
     getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
+    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pnat 4 -paal 4 -pfm 0.0001 -v -u meV_pa -pc44
+    getEnergies_byLammps.py -p . -e
 
     '''
     print('infile           :',infile)
 
+    hostname = my.hostname()
+    if lmp == True:
+        ase = False
+
+
     ### check if ase runneer format is known
-    my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False)
+    my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False,show_formatspy=True)
 
     ### check if lammps is working with ase
     if 'LD_LIBRARY_PATH' not in os.environ:
@@ -67,27 +77,28 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             geopt=geopt,
             elastic=elastic,
             verbose=verbose)
+
+    ### get the potential
     ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
-    print('ace.pot.pot      :',ace.pot.pot)
-    print('ace.pot.fullpath :',ace.pot.potpath)
-    ace.pot.print_variables(print_nontheless=True)
-    print()
+    ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
     ### when want to assess some formation energies
     if test:
+        print('>> test')
         test_formation_energies(ace)
         my.create_READMEtxt(os.getcwd())
         sys.exit('test done! Exit')
 
     if teste or elastic:
+        print('>> elastic')
         ace.elastic = True
-        ace.print_variables('aaa')
         test2_elastic(ace)
         my.create_READMEtxt(os.getcwd())
         sys.exit('teste done! Exit')
 
     if test3:
+        print('>> test3')
         test3_do(ace)
         sys.exit('test3 done! Exit')
 
@@ -97,6 +108,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         sys.exit("Error: Missing option \"--infile\" / \"-i\".")
 
     ### read in the structures
+    print('reading infile ...',infile)
+    if infile == 'POSCAR': format_in = "vasp"
+
     my.check_isfile_or_isfiles([infile],verbose=verbose)
     frames = ase_read(infile,index=structures_idx,format=format_in)
 
@@ -110,8 +124,23 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         structures_to_calc = 1
 
     print('structures_to_calc           :',structures_to_calc)
+    if structures_to_calc == 0:
+        print()
+        print("ERROR!")
+        sys.exit('0 strucutres to calculate? Something went wrong when importing the infile \"'+infile+'\" (mayby you need to change the \"format_in\" of the file? currently \"'+format_in+'\"')
+
+    # show positions of first structure?
+    show_positions = False
+    if show_positions:
+        print(frames[0].positions)
+        print()
+        print(frames[0].cell)
+
     print()
     print('pot                          :',pot)
+    print()
+    print('ase                          :',ase)
+    print('lmp                          :',lmp)
     print()
     print('units                        :',units)
     print('geopt                        :',geopt)
@@ -122,6 +151,12 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     if write_runner:
         write_runner = 'runner.out'
     print('write_runner                 :',write_runner)
+    print('--pick_concentration_al      :',pick_concentration_al)
+    print('--pick_atoms_al              :',pick_atoms_al)
+    print('--pick_number_of_atoms       :',pick_number_of_atoms)
+    print('--pick_forcesmax             :',pick_forcesmax)
+    print('--pick_cellshape             :',pick_cellshape)
+    print('--pick_c44                   :',pick_c44)
     print()
 
     ana_mg_conz      = np.empty(structures_to_calc);ana_mg_conz[:]  = np.nan
@@ -197,10 +232,22 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
     min_at_id = 0
     min_at_orig = 0
     for idx,i in enumerate(range(structures_to_calc)):
+        if debug:
+            print('iii',i)
+            print('kkk',frames[i].get_forces())
         ana_atoms_ = frames[i].get_number_of_atoms()
+        #print('ama_atoms_',ana_atoms_)
+        if verbose > 2:
+            print('i',i,'ana_atoms',ana_atoms_)
         for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        if debug:
+            print('kk',for_DFTmax_)
         d = my.ase_get_chemical_symbols_to_conz(frames[i])
+        if verbose > 2:
+            print('i',i,'d',d)
         n = my.ase_get_chemical_symbols_to_number_of_species(frames[i])
+        if verbose > 2:
+            print('i',i,'n',n)
         cell = frames[i].get_cell()
         pos = frames[i].get_positions()
         cellshape = "?"
@@ -210,7 +257,6 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
                 cellshape="Q"
                 #if ana_atoms_ == 4
                 #if pos[0,0] == pos[0,1] == pos[
-
         ### when check for particular picks
         if pick_number_of_atoms >= 0 and ana_atoms_ != pick_number_of_atoms:
             continue
@@ -218,12 +264,22 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             continue
         if pick_atoms_al >= 0 and n["Al"] != pick_atoms_al:
             continue
-        if pick_forcesmax ==0 and for_DFTmax_ > 0.001:
+        if pick_forcesmax >=0 and for_DFTmax_ > pick_forcesmax:
             continue
         #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
         if pick_cellshape >= 0 and cellshape not in ["Q"]:
             continue
+        if pick_c44 == True and cellshape != "?":
+            #print('nc')
+            continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
+        #print('idx',idx,'wow')
+        if pick_c44 or debug: #cellshape == "?":
+            print('XX frames[i].cell')
+            print(frames[i].cell)
+        #if cellshape == "Q":
+        #    print('frames[i].positions')
+        #    print(frames[i].positions)
 
         if calc_analysis: ### analysis stuff
             ana_atoms[idx] = ana_atoms_
@@ -256,11 +312,13 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
 
 
         added=""
-        #print(frames[idx].get_positions())
+        if debug:
+            print("GG")
+            print(frames[idx].get_positions())
         if calc_DFT: ### ene from DFT
             ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
 
-            if verbose > be_very_verbose:
+            if verbose > 2: #be_very_verbose:
                 my.show_ase_atoms_content(frames[i],showfirst=3,comment = "STAT2")
             if verbose > 1:
                 print('ene_DFT[idx]     :',ene_DFT[idx],units)
@@ -273,17 +331,31 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         else:
             sys.exit("either per atom or per structure")
 
+
+        if debug:
+            print("BB before ene_DFT_wo_atomic")
         ene_DFT_wo_atomic[idx] = ene_DFT[idx] - ene_DFT_atomic[idx]
+        if debug:
+            print("AAaa ipi")
 
         if ipi == True:  ### ene from ipi
             atoms_tmp = copy.deepcopy(frames[i])
             ene_pot_ipi[idx] = my.ipi_ext_calc(atoms_tmp,ace)
 
+        if debug:
+            print("AAbb ase")
         if ase == True:  ### ene from ase (without writing lammps files)
             atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since frames change when geoopt
             if ace.geopt == False:
+                if debug:
+                    print("AAA")
                 ace.pot_to_ase_lmp_cmd()
-                ene_pot_ase[idx] = ace.ene(atoms_tmp)
+                if debug:
+                    print("BBB before: ene_pot_ase")
+                ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=False)
+                #ene_pot_ase[idx] = my.ase_enepot(atoms_tmp)
+                if debug:
+                    print("CCC")
                 if pot == "runner_v2dg" and False: # only in case we load DFT energies from new DFT calcs
                     n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
                     ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
@@ -333,6 +405,8 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
             if lmp == False:
                 ene_pot[idx] = copy.deepcopy(ene_pot_ase[idx])
 
+        if debug:
+            print("AAcc lmp")
         if lmp == True:  ### ene from lammps (by writing lammps files)
             atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since atoms change when geoopt
             ene_pot_lmp[idx] = my.lammps_ext_calc(atoms_tmp,ace)
@@ -447,69 +521,70 @@ def get_energies(infile,format_in,pot,potpath,verbose,structures_idx,units,geopt
         #print("in",what.shape,"out",whatout.shape,name)
         return whatout
 
-    ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
-    ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
-    ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
-    ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
-    ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
+    if write_analysis:
+        ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
+        ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
+        ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
+        ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
+        ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
-    ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
-    ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
-    for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
-    ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
-    ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
-    ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
-    ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
-    ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
-    ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
-    ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
-    ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
-    if len(ene_pot) != 0:
-        np.savetxt("ene_DFT.npy",ene_DFT,header=units)
-        np.savetxt("ene_pot.npy",ene_pot,header=units)
-        np.savetxt("ene_diff.npy",ene_diff,header=units)
-        np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
-        np.savetxt("ene_std.npy",ene_std,header=units)
+        ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
+        ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
+        for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
+        ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
+        ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
+        ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
+        ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
+        ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
+        ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
+        ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
+        ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
+        if len(ene_pot) != 0:
+            np.savetxt("ene_DFT.npy",ene_DFT,header=units)
+            np.savetxt("ene_pot.npy",ene_pot,header=units)
+            np.savetxt("ene_diff.npy",ene_diff,header=units)
+            np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
+            np.savetxt("ene_std.npy",ene_std,header=units)
 
-        ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
-        ### write analyze.csv
-        try:
-            np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
-        except IndexError:
-            print('len',len(ene_DFT))
-            print(ene_DFT.shape)
-            print(ene_diff_abs.shape)
-            print(ene_DFT_wo_atomic.shape)
-            print(ene_pot_wo_atomic.shape)
-            print(for_DFTmax.shape)
-            print(ana_mg_conz.shape)
-            print(ana_si_conz.shape)
-            print(ana_al_conz.shape)
-            print(ana_atoms.shape)
-            print(ana_vol.shape)
-            print(ana_vol_pa.shape)
-            print(ana_dist_min.shape)
-            print('cant save ene_all.npy')
+            ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
+            ### write analyze.csv
+            try:
+                np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+            except IndexError:
+                print('len',len(ene_DFT))
+                print(ene_DFT.shape)
+                print(ene_diff_abs.shape)
+                print(ene_DFT_wo_atomic.shape)
+                print(ene_pot_wo_atomic.shape)
+                print(for_DFTmax.shape)
+                print(ana_mg_conz.shape)
+                print(ana_si_conz.shape)
+                print(ana_al_conz.shape)
+                print(ana_atoms.shape)
+                print(ana_vol.shape)
+                print(ana_vol_pa.shape)
+                print(ana_dist_min.shape)
+                print('cant save ene_all.npy')
 
-        analyze = np.transpose([
-            np.arange(len(ene_DFT)),   # i
-            ene_diff_abs,          # diff
-            ene_DFT_wo_atomic,     # E_wo
-            for_DFTmax,            # for
-            ana_mg_conz,
-            ana_si_conz,
-            ana_al_conz,
-            ana_atoms,
-            ana_vol,
-            ana_vol_pa,
-            ana_dist_min,
-            ana_VOL_diff_norm])
-        #print('a',analyze.shape)
-        #print('a',analyze.shape[0])
-        #analyze_len = analyze.shape[1] - 1
-        analyze_len = analyze.shape[0] - 1
-        #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
-        np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+            analyze = np.transpose([
+                np.arange(len(ene_DFT)),   # i
+                ene_diff_abs,          # diff
+                ene_DFT_wo_atomic,     # E_wo
+                for_DFTmax,            # for
+                ana_mg_conz,
+                ana_si_conz,
+                ana_al_conz,
+                ana_atoms,
+                ana_vol,
+                ana_vol_pa,
+                ana_dist_min,
+                ana_VOL_diff_norm])
+            #print('a',analyze.shape)
+            #print('a',analyze.shape[0])
+            #analyze_len = analyze.shape[1] - 1
+            analyze_len = analyze.shape[0] - 1
+            #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+            np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
     my.create_READMEtxt(os.getcwd())
@@ -1275,11 +1350,17 @@ def test2_elastic(ace):
     #get_al_fcc_equilibrium(ace)
     ace.elastic_relax = True
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
-    ace.print_variables('bbb')
     ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
-    print('ace.c44:',ace.c44)
+    print('ace.c44:',ace.c44,type(ace.c44))
+    #print('aa',ace.pot.potpath)
+    np.savetxt(ace.pot.potpath+"/elastic.dat",np.array([np.float(ace.c44)]))
     #print('ace.elastic_constants:',ace.elastic_constants)
     #print('cc')
+    #print()
+    #print(frame_al.get_cell())
+    #stress = ace.stress(frame_al)
+    #print('stress',stress)
+    ace.get_elastic(frame_al)
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'

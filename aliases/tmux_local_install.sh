@@ -17,7 +17,7 @@ cd $HOME/tmux_tmp
 #wget -O tmux-${TMUX_VERSION}.tar.gz http://sourceforge.net/projects/tmux/files/tmux/tmux-${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz/download
 #wget https://github.com/downloads/libevent/libevent/libevent-2.0.19-stable.tar.gz
 #wget ftp://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz
-cp $HOME/Dropbox/scripts/dotfiles/bin/tmux_sources/* .
+cp $HOME/Dropbox/scripts/dotfiles/aliases/tmux_sources/* .
 # extract files, configure, and compile
 
 ############

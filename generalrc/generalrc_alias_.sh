@@ -45,6 +45,8 @@ $1 h 'cd `ti_low_0_create_Folders_vasp.sh -hit`'  # go to corresponding high fol
 $1 rl 'source $HOME/.`echo $currentshell`rc'    # ist zsh unter zsh
 $1 c 'j'    # for autojump
 
+$1 aliases 'cd $dotfiles/aliases'
+$1 dl      'cd $HOME/Downloads'
 $1 scripts 'cd $HOME/Dropbox/Albert/scripts'
 $1 dot     'cd $dotfiles'
 $1 v       'cd $HOME/Dropbox/Albert/v'
