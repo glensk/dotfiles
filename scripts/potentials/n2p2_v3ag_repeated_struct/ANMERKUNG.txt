@@ -1,0 +1,1 @@
+/scratch/glensk/n2p2_train_5000_test_c44/5000_new_DFT_ene_repeat_small_structures_test_4_14_longer/_weights
