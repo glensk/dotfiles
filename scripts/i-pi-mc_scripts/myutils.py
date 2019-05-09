@@ -903,6 +903,7 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print(atoms.get_positions()[:showfirst])
     print('## elements get_chemical_symbols()')
     print(atoms.get_chemical_symbols()) #[:showfirst])
+    print(list(set(atoms.get_chemical_symbols())))
     print('## atoms.cell')
     print(atoms.cell)
     print('## aa.get_cell_lengths_and_angles()')
@@ -1429,6 +1430,7 @@ class ase_calculate_ene( object ):
         if debug:
             print_minimization_to_screen=True
             print('777 degub is on for calculation of ene')
+        #unique_elements = list(set(atoms.get_chemical_symbols()))
         ## now the atoms object is not changed
         #atoms = atomsin.copy()
         atoms = self.define_wrapped_self_atoms(atoms)
@@ -1462,6 +1464,8 @@ class ase_calculate_ene( object ):
         if atomrelax == False: keep_alive = False
         if atomrelax == True:  keep_alive = True
         self.keep_alive = keep_alive
+        if debug:
+            print('ATTACHING CALCULATOR!!')
         self.get_calculator(atoms)
 
         ### attach to atoms to relax the cell
