@@ -1360,7 +1360,7 @@ def test2_elastic(ace):
     #print(frame_al.get_cell())
     #stress = ace.stress(frame_al)
     #print('stress',stress)
-    ace.get_elastic(frame_al)
+    ace.get_elastic(frame_al,verbose=ace.verbose)
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'

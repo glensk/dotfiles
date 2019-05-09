@@ -130,6 +130,7 @@ def n2p2_get_scaling_and_function_data():
         sys.exit(folder+" already exists!")
 
     mkdir(folder)
+    create_READMEtxt()
     os.chdir(folder)
     cp("../input.data")
     cp("../input.nn")
@@ -140,6 +141,28 @@ def n2p2_get_scaling_and_function_data():
     return
 
 
+def n2p2_make_training():
+    if not os.path.isfile("input.data"):
+        sys.exit("Need input.data file")
+    if not os.path.isfile("input.nn"):
+        sys.exit("Need input.nn file")
+    if not os.path.isfile("function.data"):
+        sys.exit("Need function.data file")
+    submitfile = scripts()+"/n2p2/submit_training.sh"
+    if not os.path.isfile(submitfile):
+        sys.exit("Need "+submitfile+" file!")
+
+    if not os.path.isfile("scaling.data"):
+        if not os.path.isfile("get_scaling/scaling.data"):
+            sys.exit("get_scaling/scaling.data missing")
+        else:
+            cp("get_scaling/scaling.data","scaling.data")
+
+    cp(submitfile)
+
+    submitjob(submitdebug=False,submit=True,jobdir=os.getcwd(),submitskript="submit_training.sh")
+    create_READMEtxt()
+    return
 
 def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
     if jobdir == False:
@@ -1749,21 +1772,27 @@ class ase_calculate_ene( object ):
         # Create 10 deformation points on the a axis
         systems = []
         ss=[]
-        for d in np.linspace(-0.2,0.2,10):
+        for d in np.linspace(-0.2,0.2,11):
             # get_cart_deformed_cell:
             # The axis is specified as follows: 0,1,2 = x,y,z ;
             # sheers: 3,4,5 = yz, xz, xy.
             # d: The size of the deformation is in percent and degrees, respectively.
             struct = get_cart_deformed_cell(atoms_h, axis=0, size=d)
-            print()
-            print('struct :',struct.get_cell())
-            print('atoms_h:',atoms_h.get_cell())
+            if verbose:
+                print()
+            strc = struct.get_cell()
+            if verbose:
+                print('d      ',d)
+                print('struct :',strc[0],strc[1],strc[2])
+            strca = atoms_h.get_cell()
+            if verbose:
+                print('atoms_h:',strca[0],strca[1],strca[2])
             stress = struct.get_stress()
             strain = get_strain(struct, atoms_h)
             pressure = get_pressure(stress)
-            if True:
-                print("stress:",stress)
-                print("strain:",strain)
+            if verbose:
+                print("stress :",stress)
+                print("strain :",strain)
                 print('pressure:',pressure)
             ss.append([strain, stress])
             systems.append(struct)
@@ -1821,17 +1850,46 @@ class ase_calculate_ene( object ):
         lmp = lammps()
 
         print('############## daniels way  ################')
-        sys.exit('does not work out yet, all energies are 0')
-        lattice_const = 4.045831
-        strain_range = np.arange(-0.002, 0.002, 0.0002)
-        V0 = lattice_const ** 3
-        strain_definition=np.array([1,0,0,0,0,0])
-        C11 = _find_compliance_viaenergy(lmp, strain_definition,strain_range, lattice_const)
+        for d in np.linspace(-0.2,0.2,3):
+            struct = get_cart_deformed_cell(atoms_h, axis=3, size=d)
+            if verbose:
+                print()
+            strc = struct.get_cell()
+            if verbose:
+                print('d      ',d)
+                print('struct :',strc[0],strc[1],strc[2])
+            strca = atoms_h.get_cell()
+            if verbose:
+                print('atoms_h:',strca[0],strca[1],strca[2])
+            stress = struct.get_stress()
+            strain = get_strain(struct, atoms_h)
+            pressure = get_pressure(stress)
+            if verbose:
+                print("stress :",stress)
+                print("strain :",strain)
 
-        sys.exit('daniels way test done')
-        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
-        e=0.002
+        def my_get_cart_deformed_cell(base_cryst, size=1):
+            from ase.atoms import Atoms
+            cryst = Atoms(base_cryst)
+            uc = base_cryst.get_cell()
+            s = size/100.0
+            L = np.diag(np.ones(3))
+            print(L)
+            print()
+            L[1, 2] += s/2.
+            L[2, 1] += s/2.
+            print(L)
+            print()
+            uc = np.dot(uc, L)
+            cryst.set_cell(uc, scale_atoms=True)
+            return cryst
 
+        cryst = my_get_cart_deformed_cell(atoms_h, size=0.2)
+        stress = cryst.get_stress()
+        print(cryst.get_cell())
+        print('st',stress)
+        print('st C44',1000*stress[3]/aseunits.GPa/2.)
+        return
 
 
     def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
