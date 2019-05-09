@@ -52,7 +52,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     getEnergies_byLammps.py -p . -e
 
     '''
-    print('infile           :',infile)
+    print('infile               :',infile)
 
     hostname = my.hostname()
     if lmp == True:
@@ -65,7 +65,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     ### check if lammps is working with ase
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
-    print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
+    print('LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
     lammps()
 
@@ -234,12 +234,15 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     for idx,i in enumerate(range(structures_to_calc)):
         if debug:
             print('iii',i)
-            print('kkk',frames[i].get_forces())
         ana_atoms_ = frames[i].get_number_of_atoms()
-        #print('ama_atoms_',ana_atoms_)
+        if debug:
+            print('ama_atoms_',ana_atoms_)
         if verbose > 2:
             print('i',i,'ana_atoms',ana_atoms_)
-        for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        try:
+            for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        except RuntimeError:
+            for_DFTmax_ = 0
         if debug:
             print('kk',for_DFTmax_)
         d = my.ase_get_chemical_symbols_to_conz(frames[i])
@@ -315,7 +318,10 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         if debug:
             print("GG")
             print(frames[idx].get_positions())
+
         if calc_DFT: ### ene from DFT
+            if debug:
+                print("DD before ene_DFT")
             ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
 
             if verbose > 2: #be_very_verbose:
@@ -352,7 +358,15 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
                 ace.pot_to_ase_lmp_cmd()
                 if debug:
                     print("BBB before: ene_pot_ase")
-                ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=False)
+                    #kk = atoms_tmp.get_potential_energy()
+                    #print('kk',kk)
+                ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=debug)
+                #np.savetxt("forces.dat",atoms_tmp.get_forces())
+                np.savetxt("forces_x.dat",atoms_tmp.get_forces()[:,0])
+                ase_write("POSCAR_out",atoms_tmp,format="vasp")
+                sys.exit()
+                if debug:
+                    print("BBB after: ene_pot_ase")
                 #ene_pot_ase[idx] = my.ase_enepot(atoms_tmp)
                 if debug:
                     print("CCC")
