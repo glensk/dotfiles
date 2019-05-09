@@ -1772,17 +1772,12 @@ class ase_calculate_ene( object ):
         # Create 10 deformation points on the a axis
         systems = []
         ss=[]
-<<<<<<< HEAD
         for d in np.linspace(-0.2,0.2,11):
-=======
-        for d in np.linspace(-0.2,0.2,10):
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
             # get_cart_deformed_cell:
             # The axis is specified as follows: 0,1,2 = x,y,z ;
             # sheers: 3,4,5 = yz, xz, xy.
             # d: The size of the deformation is in percent and degrees, respectively.
             struct = get_cart_deformed_cell(atoms_h, axis=0, size=d)
-<<<<<<< HEAD
             if verbose:
                 print()
             strc = struct.get_cell()
@@ -1798,17 +1793,6 @@ class ase_calculate_ene( object ):
             if verbose:
                 print("stress :",stress)
                 print("strain :",strain)
-=======
-            print()
-            print('struct :',struct.get_cell())
-            print('atoms_h:',atoms_h.get_cell())
-            stress = struct.get_stress()
-            strain = get_strain(struct, atoms_h)
-            pressure = get_pressure(stress)
-            if True:
-                print("stress:",stress)
-                print("strain:",strain)
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
                 print('pressure:',pressure)
             ss.append([strain, stress])
             systems.append(struct)
@@ -1866,7 +1850,6 @@ class ase_calculate_ene( object ):
         lmp = lammps()
 
         print('############## daniels way  ################')
-<<<<<<< HEAD
         for d in np.linspace(-0.2,0.2,3):
             struct = get_cart_deformed_cell(atoms_h, axis=3, size=d)
             if verbose:
@@ -1908,96 +1891,6 @@ class ase_calculate_ene( object ):
         print('st C44',1000*stress[3]/aseunits.GPa/2.)
         return
 
-
-    def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
-        lattice_const = 4.045831
-        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
-        e_M = _gen_strainmatrix(e1=e1,e2=e2,e3=e3,e4=e4,e5=e5,e6=e6)
-        print('e_M',e_M)
-        lattice = _apply_strain(x_M, e_M)
-        print('lattie',lattice)
-        lattice = _2lammpslattice(lattice)
-        print('lattie',lattice)
-        print('yes4')
-        sys.exit()
-
-        #debug
-        #print lattice
-
-        run_fcc(lmp, lattice_const, lattice)
-        return lmp
-
-        from lammps import lammps
-        lmp = lammps()
-        print('---------------')
-
-        lmp = _run_lammps_at_strain(lmp, e1=e)
-        _print_compliance_components(lmp, "C1")
-
-        lmp = _run_lammps_at_strain(lmp, e2=e)
-        _print_compliance_components(lmp, "C2")
-
-        lmp = _run_lammps_at_strain(lmp, e3=e)
-        _print_compliance_components(lmp, "C3")
-
-        lmp = _run_lammps_at_strain(lmp, e4=e)
-        _print_compliance_components(lmp, "C4")
-
-=======
-        sys.exit('does not work out yet, all energies are 0')
-        lattice_const = 4.045831
-        strain_range = np.arange(-0.002, 0.002, 0.0002)
-        V0 = lattice_const ** 3
-        strain_definition=np.array([1,0,0,0,0,0])
-        C11 = _find_compliance_viaenergy(lmp, strain_definition,strain_range, lattice_const)
-
-        sys.exit('daniels way test done')
-        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
-        e=0.002
-
-
-
-    def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
-        lattice_const = 4.045831
-        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
-        e_M = _gen_strainmatrix(e1=e1,e2=e2,e3=e3,e4=e4,e5=e5,e6=e6)
-        print('e_M',e_M)
-        lattice = _apply_strain(x_M, e_M)
-        print('lattie',lattice)
-        lattice = _2lammpslattice(lattice)
-        print('lattie',lattice)
-        print('yes4')
-        sys.exit()
-
-        #debug
-        #print lattice
-
-        run_fcc(lmp, lattice_const, lattice)
-        return lmp
-
-        from lammps import lammps
-        lmp = lammps()
-        print('---------------')
-
-        lmp = _run_lammps_at_strain(lmp, e1=e)
-        _print_compliance_components(lmp, "C1")
-
-        lmp = _run_lammps_at_strain(lmp, e2=e)
-        _print_compliance_components(lmp, "C2")
-
-        lmp = _run_lammps_at_strain(lmp, e3=e)
-        _print_compliance_components(lmp, "C3")
-
-        lmp = _run_lammps_at_strain(lmp, e4=e)
-        _print_compliance_components(lmp, "C4")
-
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
-        lmp = _run_lammps_at_strain(lmp, e5=e)
-        _print_compliance_components(lmp, "C5")
-
-        lmp = _run_lammps_at_strain(lmp, e6=e)
-        _print_compliance_components(lmp, "C6")
-        return
 
     def get_calculator(self,atoms):
         if self.verbose > 1:
