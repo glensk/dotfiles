@@ -2,14 +2,27 @@
 
 from __future__ import print_function
 import numpy as np
-import glob,sys,os
-<<<<<<< HEAD
+import glob,sys,os,argparse
 from myutils import q,grep
-=======
-from myutils import q
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
 
-verbose = False
+def help(p = None):
+    string = ''' helptext '''
+    p = argparse.ArgumentParser(description=string,
+            formatter_class=argparse.RawTextHelpFormatter)
+    p.add_argument('-s','--from_subfolder', help='from_subfolder', action='count', default=True)
+    p.add_argument('-q','--from_que'      , help='from_que'      , action='count', default=False)
+    p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    return p
+
+p = help()
+args = p.parse_args()
+if args.from_que == True: args.from_subfolder = False
+verbose = args.verbose
+
+print('args.from_subfolder',args.from_subfolder)
+print('args.from_que      ',args.from_que)
+print('args.verbose       ',args.verbose)
+
 fo=sorted(glob.glob(os.getcwd()+"/*/learning-curve.out"))
 if verbose:
     print('----- currently considered pathes -----')
@@ -58,7 +71,19 @@ def pp():
     print(12*a)
 
 
-for c in ["*"]:
+pp()
+pp()
+print("#             || rmse  /  rmse        || rmse / rmse         || [stes]")
+print("#train        || test  /  train       || train/ test         || [total]")
+print("#frac         || min   /      (@step) || min  /      (@step) ||         path")
+pp()
+
+##########################################################
+#for c in ["*"]:  # jst use the subfolder
+subfolder = ["*"]
+if args.from_que == True:
+    subfolder = path
+for c in subfolder:    # from the ones in the que
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
     fo=sorted(glob.glob(c+"/learning-curve.out"))
     #print('fo::',fo)
@@ -67,8 +92,7 @@ for c in ["*"]:
     out=[]
     out2=[]
     for i in fo:
-<<<<<<< HEAD
-        print('test_que:',i)
+        #print('test_que:',i)
         inputnn=i.replace('learning-curve.out', 'input.nn')
         elastic=i.replace('learning-curve.out', 'elastic.dat')
         testf= np.float(grep(inputnn,"test_fraction")[0].split()[1])
@@ -79,11 +103,6 @@ for c in ["*"]:
         #print('c44',c44)
         #testf=float(i.split("_")[1])
         #testf=0.2
-=======
-        #print('test_que:',i)
-        #testf=float(i.split("_")[1])
-        testf=0.2
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
         train_fraction=1.-testf
         lc = np.loadtxt(i) #+'/learning-curve.out')
         #print('lc',lc,lc.shape)
@@ -132,7 +151,6 @@ for c in ["*"]:
             round(testrmse_at_trainmin*1000.*27.211384,2),    # j[5]
             trainmin_idx,                              # j[6]
 
-<<<<<<< HEAD
             round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
             round(testminf_at_testmin*51.422063*1000,2),    # j[8]
             testmin_idx,                              # j[9]
@@ -140,14 +158,6 @@ for c in ["*"]:
             len_,                                   # epochs_
             c44,                                    # c44_
             i                                       # path_
-=======
-            round(trainminf_at_testmin*51.422063*1000,2),      # j[4]
-            round(testminf_at_testmin*51.422063*1000,2),    # j[5]
-            testmin_idx,                              # j[6]
-
-            len_,                                   # j[7] len
-            i                                       # j[8] path
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
             ])
 
     np.set_printoptions(precision=2)
@@ -170,24 +180,13 @@ for c in ["*"]:
     #    print("%0.2f  %6.1f  (%4.0f) %5.1f  (%4.0f) [%4.0f]   %s"%(j[0],j[1],j[4],j[2],j[5],j[6],j[3]))
     #print()
     #print()
-    pp()
-    pp()
-    print("#             || rmse  /  rmse        || rmse / rmse         || [stes]")
-    print("#train        || test  /  train       || train/ test         || [total]")
-    print("#frac         || min   /      (@step) || min  /      (@step) ||         path")
-    pp()
     for idj,j in enumerate(out2): # for every line
         run = "    "
         NJC = "    "
         que = "    "
-<<<<<<< HEAD
         epochs_=len(j) - 3
         c44_=len(j) - 2
         path_=len(j) - 1
-=======
-        path_=len(j) - 1
-        epochs_=len(j) - 2
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
         #print('a',path_,j,'--->',j[11])
         #sys.exit()
         #print('kk',j[path_].split("/learning-curve.out"))
@@ -225,9 +224,5 @@ for c in ["*"]:
         if j[5] > 999: j[5] = 999.9
         if j[7] > 999: j[7] = 999.9
         if j[8] > 999: j[8] = 999.9
-<<<<<<< HEAD
         print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_] ,j[epochs_],j[path_]))
-=======
-        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || [%4.0f]  %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9]      ,j[epochs_],j[path_]))
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
 

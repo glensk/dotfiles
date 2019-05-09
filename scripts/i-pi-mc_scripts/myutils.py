@@ -1850,7 +1850,7 @@ class ase_calculate_ene( object ):
         lmp = lammps()
 
         print('############## daniels way  ################')
-        for d in np.linspace(-0.2,0.2,3):
+        for d in np.linspace(-0.2,0.2,5):
             struct = get_cart_deformed_cell(atoms_h, axis=3, size=d)
             if verbose:
                 print()
@@ -1868,14 +1868,16 @@ class ase_calculate_ene( object ):
                 print("stress :",stress)
                 print("strain :",strain)
 
-        def my_get_cart_deformed_cell(base_cryst, size=1):
+        def my_get_cart_deformed_cell(base_cryst, size=1,verbose=False):
             from ase.atoms import Atoms
             cryst = Atoms(base_cryst)
             uc = base_cryst.get_cell()
             s = size/100.0
             L = np.diag(np.ones(3))
-            print(L)
-            print()
+            #L = L * 0.9997
+            if verbose:
+                print(L)
+                print()
             L[1, 2] += s/2.
             L[2, 1] += s/2.
             print(L)
@@ -1884,11 +1886,29 @@ class ase_calculate_ene( object ):
             cryst.set_cell(uc, scale_atoms=True)
             return cryst
 
+
+        print()
+        print("########### now only one deformed cell ###########")
         cryst = my_get_cart_deformed_cell(atoms_h, size=0.2)
         stress = cryst.get_stress()
         print(cryst.get_cell())
-        print('st',stress)
+        print('stress                ',stress)
+        print('stress/2              ',stress/2.)
+        print('stress/aeunits.GPa2/2.',stress/aseunits.GPa/2.)
+        print('stress/aeunits.GPa2   ',stress/aseunits.GPa)
+        print('stress',1000*stress/aseunits.GPa/2.)
         print('st C44',1000*stress[3]/aseunits.GPa/2.)
+        print()
+        print()
+        print()
+        print("########### get murn structures ###########")
+        print('linsp',np.linspace(-0.03,0.03,9))
+        for d in np.linspace(-0.03,0.03,9):
+            cryst.set_cell(atoms_h.get_cell()*(1.+d), scale_atoms=True)
+            #print('ah--',atoms_h.get_cell()/4.)
+            #print('volh',atoms_h.get_volume()/4.)
+            print('volc',cryst.get_volume()/4.,cryst.get_potential_energy())
+            ase_write("out_murn.runner",cryst,format='runner',append=True)
         return
 
 
