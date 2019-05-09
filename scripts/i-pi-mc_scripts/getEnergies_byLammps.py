@@ -508,7 +508,8 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         if verbose > 0 and printed == False:
             printhere()
 
-    np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
+    if write_analysis:
+        np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
     if write_runner:
         print('out.runner written')
@@ -1360,11 +1361,7 @@ def test2_elastic(ace):
     #print(frame_al.get_cell())
     #stress = ace.stress(frame_al)
     #print('stress',stress)
-<<<<<<< HEAD
     ace.get_elastic(frame_al,verbose=ace.verbose)
-=======
-    ace.get_elastic(frame_al)
->>>>>>> 2d8b29cbedccdb777ba047cb2f000518ae6a74a2
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'
