@@ -44,7 +44,8 @@ def aiida_submit_job(args):
             group_name=group_name,
             group_description="",
             parse_comments_path=False,
-            parse_comments_structure=False
+            parse_comments_structure=False,
+            supress_readme = False
             )
 
     # launch the job

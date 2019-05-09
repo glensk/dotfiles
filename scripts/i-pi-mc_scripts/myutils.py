@@ -27,7 +27,7 @@ except ImportError:
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
-    pass
+    print("ERROR when importing LAMMPSlib ... possibly you have to change your (conda/aiida) environment")
 
 from feos import eos
 from ase.io import read as ase_read
@@ -446,7 +446,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
         #print('uuid',uuid)
         #stress = atoms.get_stress()
         #print('stress:',stress)
-    except RuntimeError:
+    except: # RuntimeError:
         print("had runtime error")
         ene = 0.
         #stress = False
@@ -710,6 +710,7 @@ class mypot( object ):
         self.potpath_in = potpath
         self.potpath    = False
         self.pottype    = False       # n2p2/runner
+        self.potDONE    = False         # n2p2_v1ag
 
         self.pot_all    = False   # n2p2_v1ag
 
@@ -718,7 +719,6 @@ class mypot( object ):
 
         self.elements    = False  # list e.g. ['Al', 'Mg', 'Si']
         self.atom_energy = False
-
         return
 
 
@@ -796,21 +796,23 @@ class mypot( object ):
                         self.atom_energy = d
         return
 
-    def print_variables(self,text="",print_nontheless=False):
+    def print_variables_mypot(self,text="",print_nontheless=False):
         if self.verbose > 1 or print_nontheless:
-            print("calss mypot      ",text)
-            print("self.elements    ",self.elements)
-            print("self.atom_energy ",self.atom_energy)
-            print("self.pot         ",self.pot)
-            print("self.pot_all     ",self.pot_all)
-            print("self.potpath     ",self.potpath)
-            print("self.potpath_in  ",self.potpath_in)
-            print("self.pottype     ",self.pottype)
-            print("self.verbose     ",self.verbose)
+            #print("calss mypot      ",text)
+            print(text,"self.pot         ",self.pot)
+            print(text,"self.potpath     ",self.potpath)
+            print(text,"self.potpath_in  ",self.potpath_in)
+            print(text,"self.potlib      ",self.potlib)
+            print(text,"self.elements    ",self.elements)
+            print(text,"self.atom_energy ",self.atom_energy)
+            print(text,"self.pottype     ",self.pottype)
+            print(text,"self.potDONE     ",self.potDONE)
+            print(text,"self.verbose     ",self.verbose)
+            print(text,"self.pot_all     ",self.pot_all)
             print()
 
     def get(self):
-        self.print_variables('get potential: in')
+        self.print_variables_mypot('get potential: in')
 
         ##########################################
         # get potential from path
@@ -848,7 +850,17 @@ class mypot( object ):
             ##########################################
             self.get_potpath()
         self.get_elements_and_atomic_energies()
-        self.print_variables('get potential: out')
+        self.print_variables_mypot('get potential: out')
+
+
+        ### check if self.pottype can be computed on this host!
+        add = ' Your lammps version does not seem to work with '+self.pottype+"!"
+        if self.pottype == "runner": self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
+        if self.pottype == "n2p2":   self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
+
+        if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
+            sys.exit("ERROR: "+self.potlib+" not found!"+add)
+        self.potDONE = True
         return
 
 def pot_all():
@@ -1045,9 +1057,9 @@ class ase_calculate_ene( object ):
         return
 
 
-    def print_variables(self,text=""):
+    def print_variables_ase(self,text=""):
         if self.verbose > 1:
-            tt = 'ase_calculate_ene, self.'
+            tt = 'ase_calculate_ene.'
             print()
             print(text,tt+'pot.pot      (1) :',self.pot.pot)    # : n2p2_v2ag
             print(text,tt+'units        (1) :',self.units)      # : ev
@@ -1100,7 +1112,8 @@ class ase_calculate_ene( object ):
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
         '''
-        self.pot.get()
+        if self.pot.potDONE == False:
+            self.pot.get()
 
         self.kmc = kmc
         self.temp = temp
@@ -1112,11 +1125,12 @@ class ase_calculate_ene( object ):
 
 
 
-        if self.verbose > 1:
-            tt = 'ase_calculate_ene, self.'
-            print(tt+'pot.pot     (Y) :',self.pot.pot)        # : n2p2_v2ag
-            print(tt+'pot.potpath (Y) :',self.pot.potpath)   # :
-            print(tt+'pot.pottype (Y) :',self.pot.pottype)   # :
+        if self.verbose > 2:
+            tt = 'pot_to_ase_lmp_cmd_A '
+            print(tt+'pot.pot    :',self.pot.pot)        # : n2p2_v2ag
+            print(tt+'pot.potpath:',self.pot.potpath)   # :
+            print(tt+'pot.pottype:',self.pot.pottype)   # :
+            print()
 
         #sys.exit()
         # this depends only on the potential which is already defined
@@ -1153,8 +1167,8 @@ class ase_calculate_ene( object ):
 
         self.lmpcmd = self.lmpcmd + [ "########## lmpcmd.end  #############" ]
         if self.verbose > 1:
-            print('...lmpcmd',self.lmpcmd)
-        self.print_variables()
+            print('HERE THE lmpcmd I got',self.lmpcmd)
+        self.print_variables_ase("pot_to_ase_lmp_cmd_FIN")
         return
 
     def define_wrapped_self_atoms(self,atoms=False):
@@ -1196,7 +1210,7 @@ class ase_calculate_ene( object ):
         if atomrelax == False and self.geopt == True:
             atomrelax = True
         #print('svb',self.verbose)
-        if self.verbose > 1:
+        if self.verbose > 2:
             print()
             print("#####################################################")
             print('##--lmpcmd:',self.lmpcmd)
@@ -1343,8 +1357,8 @@ class ase_calculate_ene( object ):
             print('UUU atomrelax:',atomrelax)
             print('UUU cellrelax:',cellrelax)
             print("UUU nat:",atoms.get_number_of_atoms())
-            print("UUU pos:",atoms.get_positions()[:4])
-            print("UUU for:",atoms.get_forces()[:4])
+            print("UUU pos[:4]:",atoms.get_positions()[:4])
+            print("UUU for[:4]:",atoms.get_forces()[:4])
             print("UUU fmx:",abs(atoms.get_forces()).max())
             print("UUU vol:",atoms.get_volume())
             print("UUU vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
@@ -1369,7 +1383,7 @@ class ase_calculate_ene( object ):
         #if self.verbose:
         #    print('ene',ene)
         #return ene,ene/atoms.get_number_of_atoms()*1000.
-        if self.verbose > 1:
+        if self.verbose > 2:
             show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
             print()
             print()
@@ -1384,10 +1398,14 @@ class ase_calculate_ene( object ):
             cellshaperelax=False,
             cellvolumerelax=False,
             print_minimization_to_screen=False,
-            minimizer="LGBFGS"):
+            minimizer="LGBFGS",
+            debug=False):
         ''' atoms is an ase object
             if don_change_atomsobject is chosen,
         '''
+        if debug:
+            print_minimization_to_screen=True
+            print('777 degub is on for calculation of ene')
         ## now the atoms object is not changed
         #atoms = atomsin.copy()
         atoms = self.define_wrapped_self_atoms(atoms)
@@ -1401,7 +1419,7 @@ class ase_calculate_ene( object ):
         if atomrelax == False and self.geopt == True:
             atomrelax = True
         #print('svb',self.verbose)
-        if self.verbose > 1:
+        if self.verbose > 2 or debug:
             print()
             print("#####################################################")
             print('##--lmpcmd:',self.lmpcmd)
@@ -1424,6 +1442,8 @@ class ase_calculate_ene( object ):
         self.get_calculator(atoms)
 
         ### attach to atoms to relax the cell
+        if debug:
+            print('attaching constraints')
         constraint = False
         if cellrelax == True: # and atomrelax == False:
             constraint = StrainFilter(atoms)  # this relaxes the cell shape & the volume while keeping atomic positions fixed
@@ -1532,35 +1552,29 @@ class ase_calculate_ene( object ):
                     return np.nan
 
         if print_minimization_to_screen:
-            print('UUU atomrelax:',atomrelax)
-            print('UUU cellrelax:',cellrelax)
-            print("UUU nat:",atoms.get_number_of_atoms())
-            print("UUU pos:",atoms.get_positions()[:4])
-            print("UUU for:",atoms.get_forces()[:4])
-            print("UUU fmx:",abs(atoms.get_forces()).max())
-            print("UUU vol:",atoms.get_volume())
-            print("UUU vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
-        if print_minimization_to_screen:
-            print('XXX atomrelax:',atomrelax)
-            print('XXX cellrelax:',cellrelax)
-            print("XXX nat:",atoms_or_constraint.get_number_of_atoms())
-            print("XXX pos:",atoms_or_constraint.get_positions()[:4])
-            print("XXX for:",atoms_or_constraint.get_forces()[:4])
-            print("XXX fmx:",abs(atoms_or_constraint.get_forces()).max())
-            print("XXX vol:",atoms_or_constraint.get_volume())
-            print("XXX vpa:",atoms_or_constraint.get_volume()/atoms.get_number_of_atoms())
+            print('UUA atomrelax:',atomrelax)
+            print('UUA cellrelax:',cellrelax)
+            print("UUA nat:",atoms.get_number_of_atoms())
+            print("UUA pos[:4]:",atoms.get_positions()[:4])
+            #print('for',atoms.get_forces.__module__)
+            #print('for',atoms.get_forces.__globals__)
+            print("UUA for:",atoms.get_forces()[:4])
+            print("UUA fmx:",abs(atoms.get_forces()).max())
+            print("UUA vol:",atoms.get_volume())
+            print("UUA vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
 
         if self.verbose > 1:
-            print('ZZ done2')
+            print('ZZ done243')
 
         if self.verbose > 1:
-            print('ZZ done2')
+            print('ZZ done236')
             print('ZZ self.units',self.units)
         ######################################################
         # calculate the energy
         ######################################################
         #print('atxxx',atoms)
         ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        #print('jo')
         if print_minimization_to_screen:
             print('atoms')
             print(atoms.get_positions()[:3])
@@ -1573,7 +1587,7 @@ class ase_calculate_ene( object ):
         #if self.verbose:
         #    print('ene',ene)
         #return ene,ene/atoms.get_number_of_atoms()*1000.
-        if self.verbose > 1:
+        if self.verbose > 2:
             show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED ASE INTERNAL CALUCLATION")
             print()
             print()
@@ -1690,34 +1704,175 @@ class ase_calculate_ene( object ):
 
 
         #### load the elastic stuff
-        from parcalc import ClusterVasp, ParCalculate
-        from elastic import get_pressure, BMEOS, get_strain
-        from elastic import get_elementary_deformations, scan_volumes
-        from elastic import get_BM_EOS, get_elastic_tensor
+        #from parcalc import ClusterVasp, ParCalculate
+        #from elastic import get_pressure, BMEOS, get_strain
+        #from elastic import get_elementary_deformations, scan_volumes
+        #from elastic import get_BM_EOS, get_elastic_tensor
 
-        print('ene   ',self.ene(atoms_h))
-        print('stress1',atoms_h.get_stress())
+        print('############## from elastic ################')
+        if False:
+            print('ene   ',self.ene(atoms_h))
+            print('stress1',atoms_h.get_stress())
         self.ase_relax_cellshape_and_volume_only(atoms_h,verbose=False)
-        print('stress2',atoms_h.get_stress())
-        cryst = atoms_h.copy()
-        #print('stress2',cryst.get_isotropic_pressure(cryst.get_stress()))
+        if False:
+            print('stress2',atoms_h.get_stress())
+            print('cell',atoms_h.get_cell())
 
+        cell_ref = (atoms_h.copy()).get_cell()
+        atoms_work = atoms_h.copy()
+        self.ase_relax_cellshape_and_volume_only(atoms_work,verbose=False)
+
+        for i in [0.98,0.99,1.00,1.01, 1.02, 1.03]:
+            cell_work = cell_ref.copy()
+            #print('cell_ref',atoms_h.get_cell())
+            cell_work[0,0] = cell_ref[0,0]*i
+            #print('cell_ref',cell_ref)
+            atoms_work.set_cell(cell_work,scale_atoms=True)
+            #print('cell_ref?',atoms_h.get_cell())
+            if False:
+                print('strain',i,'stress?',atoms_work.get_stress())
+            #print('cell_ref',cell_ref)
+
+
+
+        ################################################################
+        # from elastic
+        # http://wolf.ifj.edu.pl/elastic/lib-usage.html
+        ################################################################
+        from elastic.elastic import get_cart_deformed_cell, get_lattice_type, get_elementary_deformations
+        from elastic import get_pressure, BMEOS, get_strain
+        from elastic import get_BM_EOS, get_elastic_tensor
+        from parcalc import ParCalculate
+
+        sym = get_lattice_type(atoms_h)
+        print('sym',sym)
+        # Create 10 deformation points on the a axis
+        systems = []
+        ss=[]
+        for d in np.linspace(-0.2,0.2,10):
+            # get_cart_deformed_cell:
+            # The axis is specified as follows: 0,1,2 = x,y,z ;
+            # sheers: 3,4,5 = yz, xz, xy.
+            # d: The size of the deformation is in percent and degrees, respectively.
+            struct = get_cart_deformed_cell(atoms_h, axis=0, size=d)
+            print()
+            print('struct :',struct.get_cell())
+            print('atoms_h:',atoms_h.get_cell())
+            stress = struct.get_stress()
+            strain = get_strain(struct, atoms_h)
+            pressure = get_pressure(stress)
+            if True:
+                print("stress:",stress)
+                print("strain:",strain)
+                print('pressure:',pressure)
+            ss.append([strain, stress])
+            systems.append(struct)
+
+        def myparcalc():
+            systems_all = get_elementary_deformations(atoms_h, n=5, d=0.33)
+            if type(systems_all) != type([]) :
+                sysl=[systems_all]
+                #print('11')
+            else:
+                sysl=systems_all
+                #print('22')
+
+            res = []
+            for n,s in enumerate(sysl):
+                s.get_potential_energy()
+                res.append([n,s])
+            return [r for ns,s in enumerate(sysl) for nr,r in res if nr==ns]
+        res = myparcalc()
+        Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
+        print("Cij (GPa):", Cij/aseunits.GPa)
+
+        ss=np.array(ss)
+        lo=min(ss[:,0,0])
+        hi=max(ss[:,0,0])
+        mi=(lo+hi)/2
+        wi=(hi-lo)/2
+        xa=np.linspace(mi-1.1*wi,mi+1.1*wi, 50)
+
+        # Now fit the polynomials to the data to get elastic constants
+        # C11 component
+        f=np.polyfit(ss[:,0,0],ss[:,1,0],3)
+        c11=f[-2]/aseunits.GPa
+        #print('ffff')
+        #print(f)
+        #print()
+        #print(f[-2])
+
+        # C12 component
+        f=np.polyfit(ss[:,0,0],ss[:,1,1],3)
+        c12=f[-2]/aseunits.GPa
+
+        #np.savetxt('c11.dat',np.transpose([ss[:,0,0],ss[:,1,0]]))
+        print('C11 = %.3f GPa, C12 = %.3f GPa => K= %.3f GPa' % (
+                    c11, c12, (c11+2*c12)/3))
+
+        ################################################################
+        # daniels manual way
+        ################################################################
+        from daniel_strainstuff import _gen_strainmatrix, _apply_strain
+        from daniel_strainstuff import _2lammpslattice
+        from daniel_lmprun import _find_compliance_viaenergy
+        from daniel_lmprun import run_fcc, _print_compliance_components
+        from lammps import lammps
+        lmp = lammps()
+
+        print('############## daniels way  ################')
+        sys.exit('does not work out yet, all energies are 0')
+        lattice_const = 4.045831
+        strain_range = np.arange(-0.002, 0.002, 0.0002)
+        V0 = lattice_const ** 3
+        strain_definition=np.array([1,0,0,0,0,0])
+        C11 = _find_compliance_viaenergy(lmp, strain_definition,strain_range, lattice_const)
+
+        sys.exit('daniels way test done')
+        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
+        e=0.002
+
+
+
+    def _run_lammps_at_strain(lmp, e1=0,e2=0,e3=0,e4=0,e5=0,e6=0):
+        lattice_const = 4.045831
+        x_M=np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
+        e_M = _gen_strainmatrix(e1=e1,e2=e2,e3=e3,e4=e4,e5=e5,e6=e6)
+        print('e_M',e_M)
+        lattice = _apply_strain(x_M, e_M)
+        print('lattie',lattice)
+        lattice = _2lammpslattice(lattice)
+        print('lattie',lattice)
+        print('yes4')
         sys.exit()
 
+        #debug
+        #print lattice
 
-        # Create elementary deformations (systems are ase frames)
-        #print('sys',elastic.__file__)
-        systems = get_elementary_deformations(atoms_h, n=5, d=0.33)
-        print(systems)
-        print()
-        print(systems[0])
+        run_fcc(lmp, lattice_const, lattice)
+        return lmp
 
-        # Run the stress calculations on deformed cells
-        res = ParCalculate(systems, asecalcLAMMPS)
+        from lammps import lammps
+        lmp = lammps()
+        print('---------------')
 
-        ## Elastic tensor by internal routine
-        #Cij, Bij = get_elastic_tensor(atoms_h, systems=res)
-        #print("Cij (GPa):", Cij/units.GPa)
+        lmp = _run_lammps_at_strain(lmp, e1=e)
+        _print_compliance_components(lmp, "C1")
+
+        lmp = _run_lammps_at_strain(lmp, e2=e)
+        _print_compliance_components(lmp, "C2")
+
+        lmp = _run_lammps_at_strain(lmp, e3=e)
+        _print_compliance_components(lmp, "C3")
+
+        lmp = _run_lammps_at_strain(lmp, e4=e)
+        _print_compliance_components(lmp, "C4")
+
+        lmp = _run_lammps_at_strain(lmp, e5=e)
+        _print_compliance_components(lmp, "C5")
+
+        lmp = _run_lammps_at_strain(lmp, e6=e)
+        _print_compliance_components(lmp, "C6")
         return
 
     def get_calculator(self,atoms):
@@ -2396,7 +2551,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ###############################################################
     # write input structure (pos.lmp)
     ###############################################################
-    if ace.verbose > 1:
+    if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.set_calculator(None)
     atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
@@ -2468,7 +2623,22 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         else:
             ace.elastic_constants = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
             #ace.elastic_constants_ = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True)
-            ace.c44 = check_output(["tail -300 log.lammps | grep \"^Elastic Constant C44\""],shell=True).strip().split(" ")[4]
+            co = check_output(["tail -300 log.lammps | grep \"^Elastic Constant C44\" | sed 's|.*= ||' | sed 's|GPa.*||'"],shell=True)
+            #print('co')
+            #print(co)
+
+            co1 = co.strip()
+            #print('co1')
+            #print(co1)
+            co11 = str(co1.decode("utf-8"))
+            #print('co11')
+            #print(co11)
+
+            #co2 = co1.split(" ")
+            #print('co2')
+            #print(co2)
+            #ace.c44 = co2[4]
+            ace.c44 = co11
             #print('aa c44',float(ace.c44))
             #print('aa el',ace.elastic_constants_)
             #for ij in ace.elastic_constants_:
@@ -2483,7 +2653,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             #sys.exit('ec')
             ene = ace.elastic_constants
 
-    if ace.verbose > 1:
+    if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
     return ene
 
@@ -2597,7 +2767,7 @@ def get_latest_n2p2_pot():
     return potout
 
 
-def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False):
+def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=False):
     ''' adds formats runner and lammps-runner to ase '''
 
     ### get the known formats
@@ -2612,6 +2782,10 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(x)
 
+    ### get formatspy
+    formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
+    if verbose or show_formatspy:
+        print('>> formatspy       ',formatspy)
 
     ### check if formats are known by ase
     missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]
@@ -2643,11 +2817,9 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
 
     ### check if necessary files for formats are known
     if add_missing_formats:  # copies the missing format files
-        print('adapting ase formats.py .... ')
-
-        formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
         if verbose:
-            print('formatspy',formatspy)
+            print('adapting ase formats.py .... ')
+
 
         if not os.path.isfile(formatspy):
             print('formatspy',formatspy)
@@ -2669,19 +2841,22 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
 
         writeformatspy = False
         if 'runner' in x:
-            print('runner        format are already added in formats.py (of ase).')
+            if verbose:
+                print('runner        format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
             writeformatspy = True
 
         if 'ipi' in x:
-            print('ipi           format are already added in formats.py (of ase).')
+            if verbose:
+                print('ipi           format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
             writeformatspy = True
 
         if 'lammps-runner' in x:
-            print('lammps-runner format are already added in formats.py (of ase).')
+            if verbose:
+                print('lammps-runner format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
             contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
@@ -2696,7 +2871,8 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
             f.write(contents)
             f.close()
         else:
-            print('everything was already in formats.py')
+            if verbose:
+                print('everything was already in formats.py')
 
     return known_formats
 
