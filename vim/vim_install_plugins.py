@@ -47,7 +47,6 @@ vimsignature = "https://github.com/kshenoy/vim-signature.git"
 #pyfoldering = "git://github.com/vim-scripts/Efficient-python-folding.git" # works also without
 systastic = "https://github.com/scrooloose/syntastic.git"
 #nerdtree = "git://github.com/scrooloose/nerdtree.git"
-vimlatex = "https://github.com/jcf/vim-latex.git"
 
 
 #pymode = "git://github.com/klen/python-mode.git"
@@ -58,6 +57,8 @@ tabcompletion = "https://github.com/ervandew/supertab.git"
 toggletruefalse = "https://github.com/AndrewRadev/switch.vim.git"
 searchcounter = "https://github.com/henrik/vim-indexed-search.git"
 easymotion = "https://github.com/easymotion/vim-easymotion.git"
+#vimlatex = "https://github.com/jcf/vim-latex.git"
+vimlatex = "https://github.com/vim-latex/vim-latex.git"
 checkit(vundle)          # necessary
 checkit(vimsignature)    # necessary  set a mark (prss m c in normal mode)
 checkit(toggletruefalse) # necessary switsches True to False and so non
