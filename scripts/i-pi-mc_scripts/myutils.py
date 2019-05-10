@@ -1925,6 +1925,32 @@ class ase_calculate_ene( object ):
             #print('volh',atoms_h.get_volume()/4.)
             print('volc',cryst.get_volume()/4.,cryst.get_potential_energy())
             #ase_write("out_murn.runner",cryst,format='runner',append=True)
+
+        V0 = 16.476413798491
+        a0 = (4.*V0)**(1./3.)
+        print("V0",V0)
+        print("a0",a0)
+        cryst.set_cell(np.diag(np.ones(3))*a0, scale_atoms=True)
+        print(np.diag(np.ones(3)))
+        print(np.diag(np.ones(3))*a0)
+        cell = cryst.get_cell()
+        print('-->cryst.cell:',cryst.get_cell())
+        print()
+        #for d in [0,0.01,-0.01]: #np.linspace(-0.01,0.01,3):
+        for d in np.linspace(-0.01,0.01,3):
+            print()
+            cryst.set_cell(cell*(1.+d), scale_atoms=True)
+            print('cell0',cryst.get_cell())
+            print('cell1',cell)
+            print('-->d',d,'    volc',cryst.get_volume()/4.,cryst.get_potential_energy())
+            #ase_write("out_c_check.runner",cryst,format='runner',append=True)
+        print()
+        print("##########")
+        cryst.set_cell(cell, scale_atoms=True)
+        cryst = my_get_cart_deformed_cell(cryst, size=0.2)
+        print('cell0 ',cryst.get_cell())
+        print('cell0v',cryst.get_volume()/4.)
+        #ase_write("out_c_check.runner",cryst,format='runner',append=True)
         return
 
 
