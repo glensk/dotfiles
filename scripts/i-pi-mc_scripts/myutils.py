@@ -1924,7 +1924,7 @@ class ase_calculate_ene( object ):
             #print('ah--',atoms_h.get_cell()/4.)
             #print('volh',atoms_h.get_volume()/4.)
             print('volc',cryst.get_volume()/4.,cryst.get_potential_energy())
-            ase_write("out_murn.runner",cryst,format='runner',append=True)
+            #ase_write("out_murn.runner",cryst,format='runner',append=True)
         return
 
 
