@@ -456,7 +456,10 @@ def ase_get_unique_frames(frames):
 
 
 def ase_enepot(atoms,units='eV',verbose=False):
-    ''' units: eV, eV_pa, hartree, hartree_pa '''
+    ''' units: eV, eV_pa, hartree, hartree_pa
+        check before if calculator is attached
+    '''
+
     #print('now in ene')
     #print('ac',atoms.cell)
     try:
@@ -470,7 +473,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
         #stress = atoms.get_stress()
         #print('stress:',stress)
     except: # RuntimeError:
-        print("had runtime error")
+        #print("had runtime error, e.g. ther cant be an energy in the POSCAR")
         ene = 0.
         #stress = False
     if verbose > 1:
@@ -734,6 +737,8 @@ class mypot( object ):
         self.potpath    = False
         self.pottype    = False       # n2p2/runner
         self.potDONE    = False         # n2p2_v1ag
+        self.potlib     = False         # n2p2_v1ag
+        self.potcutoff     = False         # n2p2_v1ag
 
         self.pot_all    = False   # n2p2_v1ag
 
@@ -826,6 +831,7 @@ class mypot( object ):
             print(text,"self.potpath     ",self.potpath)
             print(text,"self.potpath_in  ",self.potpath_in)
             print(text,"self.potlib      ",self.potlib)
+            print(text,"self.potcutoff   ",self.potcutoff)
             print(text,"self.elements    ",self.elements)
             print(text,"self.atom_energy ",self.atom_energy)
             print(text,"self.pottype     ",self.pottype)
@@ -878,8 +884,12 @@ class mypot( object ):
 
         ### check if self.pottype can be computed on this host!
         add = ' Your lammps version does not seem to work with '+self.pottype+"!"
-        if self.pottype == "runner": self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
-        if self.pottype == "n2p2":   self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
+        if self.pottype == "runner":
+            self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
+            self.potcutoff = 14.937658735
+        if self.pottype == "n2p2":
+            self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
+            self.potcutoff = 11.0
 
         if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
             sys.exit("ERROR: "+self.potlib+" not found!"+add)
@@ -903,6 +913,7 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print(atoms.get_positions()[:showfirst])
     print('## elements get_chemical_symbols()')
     print(atoms.get_chemical_symbols()) #[:showfirst])
+    print(list(set(atoms.get_chemical_symbols())))
     print('## atoms.cell')
     print(atoms.cell)
     print('## aa.get_cell_lengths_and_angles()')
@@ -1098,27 +1109,29 @@ class ase_calculate_ene( object ):
 
 
     def lammps_command_potential_n2p2(self):
-        units_giulio_ene = "0.0367493254"
+        #units_giulio_ene = "0.0367493254"
         ase_units_ene    = "0.03674932247495664" # 1./ase.units.Hartree
 
-        units_giulio_bohr = "1.8897261328"
+        #units_giulio_bohr = "1.8897261328"
         ase_units_bohr    = "1.8897261258369282" # 1./ase.units.Bohr
         command = [
         # showewsum 1 showew yes resetew no maxew 1000000
         'variable nnpDir string \"'+self.pot.potpath+'\"',
         "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength "+ase_units_bohr+" cfenergy "+ase_units_ene,
-        "pair_coeff * * 11.0",
-        "#write_data ./pos.data # would this be the final struct?"
+        "pair_coeff * * "+str(self.pot.potcutoff),
+        #"#write_data ./pos.data # would this be the final struct?"
         ]
         return command
 
     def lammps_command_potential_runner(self):
         command = [
         # comment
-        "# thermo 1 # for geopt",
+        #"# thermo 1 # for geopt",
         'variable nnpDir string \"'+self.pot.potpath+'\"',
         "pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000",
-        "pair_coeff * * 7.937658735"
+        #"# pair_coeff * * 7.937658735",
+        #"pair_coeff * *  14.937658735"
+        "pair_coeff * * "+str(self.pot.potcutoff)
         ]
         return command
 
@@ -1429,6 +1442,7 @@ class ase_calculate_ene( object ):
         if debug:
             print_minimization_to_screen=True
             print('777 degub is on for calculation of ene')
+        #unique_elements = list(set(atoms.get_chemical_symbols()))
         ## now the atoms object is not changed
         #atoms = atomsin.copy()
         atoms = self.define_wrapped_self_atoms(atoms)
@@ -1462,6 +1476,8 @@ class ase_calculate_ene( object ):
         if atomrelax == False: keep_alive = False
         if atomrelax == True:  keep_alive = True
         self.keep_alive = keep_alive
+        if debug:
+            print('ATTACHING CALCULATOR!!')
         self.get_calculator(atoms)
 
         ### attach to atoms to relax the cell
@@ -2822,7 +2838,7 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
     ### get formatspy
     formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
     if verbose or show_formatspy:
-        print('>> formatspy       ',formatspy)
+        print('>> formatspy        :',formatspy)
 
     ### check if formats are known by ase
     missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]

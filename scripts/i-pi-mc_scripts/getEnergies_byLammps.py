@@ -36,13 +36,15 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--pick_c44/--no-pick_c44','-pc44',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
 
 @click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
+@click.option('--write_forces/--no-write_forces','-wf',required=False,default=False,help='write forces.out of particular strucuture')
+@click.option('--write_forcesx/--no-write_forcesx','-wfx',required=False,default=False,help='write forcesx.out of particular strucuture')
 @click.option('--write_analysis/--no-write_analysis','-wa',required=False,default=False,help='write ene_{DFT,pot}... default: False')
 @click.option('--verbose','-v',count=True)
 @click.option('--debug','-d',count=True)
 
 
 def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,write_analysis,
-        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44):
+        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44,write_forces,write_forcesx):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
@@ -52,7 +54,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     getEnergies_byLammps.py -p . -e
 
     '''
-    print('infile           :',infile)
+    print('infile               :',infile)
 
     hostname = my.hostname()
     if lmp == True:
@@ -65,7 +67,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     ### check if lammps is working with ase
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
-    print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
+    print('LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
     lammps()
 
@@ -234,12 +236,15 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     for idx,i in enumerate(range(structures_to_calc)):
         if debug:
             print('iii',i)
-            print('kkk',frames[i].get_forces())
         ana_atoms_ = frames[i].get_number_of_atoms()
-        #print('ama_atoms_',ana_atoms_)
+        if debug:
+            print('ama_atoms_',ana_atoms_)
         if verbose > 2:
             print('i',i,'ana_atoms',ana_atoms_)
-        for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        try:
+            for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+        except RuntimeError:
+            for_DFTmax_ = 0
         if debug:
             print('kk',for_DFTmax_)
         d = my.ase_get_chemical_symbols_to_conz(frames[i])
@@ -315,7 +320,10 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         if debug:
             print("GG")
             print(frames[idx].get_positions())
+
         if calc_DFT: ### ene from DFT
+            if debug:
+                print("DD before ene_DFT")
             ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
 
             if verbose > 2: #be_very_verbose:
@@ -352,7 +360,19 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
                 ace.pot_to_ase_lmp_cmd()
                 if debug:
                     print("BBB before: ene_pot_ase")
-                ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=False)
+                    #kk = atoms_tmp.get_potential_energy()
+                    #print('kk',kk)
+                ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=debug)
+                if write_forces or write_forcesx:
+                    if write_forcesx:
+                        np.savetxt("forcesx.dat",atoms_tmp.get_forces()[:,0])
+                    if write_forces:
+                        np.savetxt("forces.dat",atoms_tmp.get_forces())
+                    #ase_write("POSCAR_out",atoms_tmp,format="vasp")
+                    #ase_write("POSCAR_out40.runner",atoms_tmp,format="runner")
+                    #sys.exit()
+                if debug:
+                    print("BBB after: ene_pot_ase")
                 #ene_pot_ase[idx] = my.ase_enepot(atoms_tmp)
                 if debug:
                     print("CCC")
@@ -470,6 +490,10 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
             print('nat',nat,'(repeat '+str(repeat)+') -> nat',nat*(3**repeat),"min_at",min_at,"min_at_orig",min_at_orig,'(min id '+str(min_at_id)+") max_at",max_at,"max_at_orig",max_at_orig,'(max id'+str(max_at_id)+")")
 
         ene_pot_wo_atomic[idx] = ene_pot[idx] - ene_DFT_atomic[idx]
+        #print('ene_potxx',ene_pot)
+        #print('ene_DFT_atomicxx',ene_DFT_atomic)
+        #print('ene_pot_wo_atomicxx',ene_pot_wo_atomic)
+
         ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
         ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
         ene_mean[idx] = ene_diff[:idx+1].mean()
@@ -497,7 +521,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
             fmt_one = '%10.'+str(show)+'f'
             fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
             ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
-            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],frames[i].get_number_of_atoms(),n["Si"],n["Mg"],n["Al"],ene_DFT[idx],ene_pot[idx],ene_DFT_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+            print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],frames[i].get_number_of_atoms(),n["Si"],n["Mg"],n["Al"],ene_DFT[idx],ene_pot[idx],ene_pot_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
             return
 
 
