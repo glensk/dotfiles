@@ -23,6 +23,10 @@ print('args.from_subfolder',args.from_subfolder)
 print('args.from_que      ',args.from_que)
 print('args.verbose       ',args.verbose)
 
+#ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
+#for i in ru:
+#    print(i)
+#sys.exit()
 fo=sorted(glob.glob(os.getcwd()+"/*/learning-curve.out"))
 if verbose:
     print('----- currently considered pathes -----')
@@ -85,79 +89,108 @@ if args.from_que == True:
     subfolder = path
 for c in subfolder:    # from the ones in the que
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
-    fo=sorted(glob.glob(c+"/learning-curve.out"))
-    #print('fo::',fo)
-    #if len(fo) == 0:
+    fn=sorted(glob.glob(c+"/learning-curve.out"))
+    ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
+    fo = fn+ru
+    #for i in fo:
+    #    print('fo',i,os.path.basename(i))
+
+    ##if len(fo) == 0:
     #    fo=glob.glob("tf_*_"+c+"*learning-curve.out")
     out=[]
     out2=[]
     for i in fo:
         #print('test_que:',i)
-        inputnn=i.replace('learning-curve.out', 'input.nn')
-        elastic=i.replace('learning-curve.out', 'elastic.dat')
+        basename = os.path.basename(i)
+        inputnn=i.replace(basename, 'input.nn')
+        elastic=i.replace(basename, 'elastic.dat')
         testf= np.float(grep(inputnn,"test_fraction")[0].split()[1])
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
         else:
             c44 = 0
-        #print('c44',c44)
-        #testf=float(i.split("_")[1])
-        #testf=0.2
         train_fraction=1.-testf
-        lc = np.loadtxt(i) #+'/learning-curve.out')
-        #print('lc',lc,lc.shape)
+
+        ## grep from learning-curve.out
+        if basename == "learning-curve.out":
+            lc = np.loadtxt(i) #+'/learning-curve.out')
+            lc[:,1] = lc[:,1]*1000.*27.211384
+            lc[:,2] = lc[:,2]*1000.*27.211384
+            lc[:,3] = lc[:,3]*1000.*51.422063
+            lc[:,4] = lc[:,4]*1000.*51.422063
+            #round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
+
+        elif basename == "log.fit":
+            f = open(i, "r")
+            contents = f.readlines()
+            f.close()
+            ene = []
+            force = []
+            all = []
+            for idx,ii in enumerate(contents):
+                if ii[:7] == " ENERGY":
+                    lst = ii.split()[1:4]
+                    eneone = [float(iii) for iii in lst]
+                    ene.append(eneone)
+                    allone = [0,0,0,0,0]
+                    allone[0] = eneone[0]
+                    allone[1] = eneone[1]*1000.
+                    allone[2] = eneone[2]*1000.
+                if ii[:7] == " FORCES":
+                    lst = ii.split()[1:4]
+                    forceone = [float(iii) for iii in lst]
+                    force.append(forceone)
+                    allone[3] = forceone[1]*1000.
+                    allone[4] = forceone[2]*1000.
+                    all.append(allone)
+            ene = np.asarray(ene)
+            force = np.asarray(force)
+            all = np.asarray(all)
+            lc = all
+            #print(ene[:3])
+            #print(force[:3])
+            #print(all[:3])
+            #print('lc',lc)
+            #sys.exit()
+
         if len(lc.shape) == 1:
             lc = np.array([lc])
-        #print('lc.sh',lc.shape)
         len_ = len(lc[:,1])
-        #print(lc[:,1])
-        #print(len(lc[:,1]))
-        #sys.exit()
-
         trainmin                = lc[:,1].min()
         trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]
         testrmse_at_trainmin    = lc[:,2][trainmin_idx]
+        testmin                 = lc[:,2].min()
+        testmin_idx             = np.where(testmin==lc[:,2])[0][0]
+        trainrmse_at_testmin    = lc[:,1][testmin_idx]
+        trainminf_at_testmin    = lc[:,3][testmin_idx]
+        testminf_at_testmin     = lc[:,4][testmin_idx]
 
-        testmin       = lc[:,2].min()
-        testmin_idx   = np.where(testmin==lc[:,2])[0][0]
-        trainrmse_at_testmin  = lc[:,1][testmin_idx]
+        path__ = i.replace(os.getcwd()+'/',"")
 
-        #trainminf   = lc[:,3].min()
-        #trainminf_  = np.where(trainminf==lc[:,3])[0][0]
-        trainminf_at_testmin = lc[:,3][testmin_idx]
-
-        #testminf    = lc[:,4].min()
-        #testminf_   = np.where(testminf==lc[:,4])[0][0]
-        testminf_at_testmin  = lc[:,4][testmin_idx]
-
-        #print('train_fraction',train_fraction,'trainmin',np.where(trainmin==lc[:,1])[0][0],trainmin*1000.,'testmin',np.where(testmin==lc[:,2])[0][0],testmin*1000.)
-        #out.append([
-        #    train_fraction,                         # j[0]
-        #    testmin*1000.*27.211384,                # j[1]
-        #    trainmin*1000.*27.211384,               # j[2]
-        #    i,                                      # j[3] path
-        #    testmin_idx,                               # j[4]
-        #    trainmin_idx,                              # j[5]
-        #    len_                                    # j[6]
-        #    ])
         out2.append([
             round(train_fraction,2),                # j[0]
 
-            round(testmin*1000.*27.211384,2),       # j[1]
-            round(trainrmse_at_testmin*1000.*27.211384,2),     # j[2]
+            #round(testmin*1000.*27.211384,2),       # j[1]
+            round(testmin,2),       # j[1]
+            #round(trainrmse_at_testmin*1000.*27.211384,2),     # j[2]
+            round(trainrmse_at_testmin,2),     # j[2]
             testmin_idx,                               # j[3]
 
-            round(trainmin*1000.*27.211384,2),      # j[4]
-            round(testrmse_at_trainmin*1000.*27.211384,2),    # j[5]
+            #round(trainmin*1000.*27.211384,2),      # j[4]
+            round(trainmin,2),      # j[4]
+            #round(testrmse_at_trainmin*1000.*27.211384,2),    # j[5]
+            round(testrmse_at_trainmin,2),    # j[5]
             trainmin_idx,                              # j[6]
 
-            round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
-            round(testminf_at_testmin*51.422063*1000,2),    # j[8]
+            #round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
+            #round(testminf_at_testmin*51.422063*1000,2),    # j[8]
+            round(trainminf_at_testmin,2),      # j[7]
+            round(testminf_at_testmin,2),    # j[8]
             testmin_idx,                              # j[9]
 
             len_,                                   # epochs_
             c44,                                    # c44_
-            i                                       # path_
+            path__                                       # path_
             ])
 
     np.set_printoptions(precision=2)
@@ -225,4 +258,6 @@ for c in subfolder:    # from the ones in the que
         if j[7] > 999: j[7] = 999.9
         if j[8] > 999: j[8] = 999.9
         print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_] ,j[epochs_],j[path_]))
+
+
 
