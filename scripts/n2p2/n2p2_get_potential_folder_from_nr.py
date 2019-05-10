@@ -106,6 +106,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
         elif typ == 'runner':
             my.cp(weights,folder+'/weights.'+i+'.data')
             my.cp(weights,folder+'/optweights.'+i+'.out')
+    os.chdir(folder)
+    my.create_READMEtxt(directory=os.getcwd(),add=False)
     return
 
 if __name__ == '__main__':
