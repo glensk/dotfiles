@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: c54e583e2fea0c7578c0ad5aae5213906a4ef9a0
+
+aiida_submit_runnerfile.py -i POSCAR_out40.runner -cm scf
