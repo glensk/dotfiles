@@ -53,7 +53,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
 
 
     checkfor = [ '012', '013', '014' ]
-    def get_weightsfile(i,nr_):
+    def get_weightsfile(i,nr_,verbose=False):
         weights1 = 'weights.'+i+'.'+nr_+'.out'
         weights2 = '_weights/weights.'+i+'.'+nr_+'.out'
         weights3 = 'optweights.'+i+'.out'
@@ -61,7 +61,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
             weights = weights1
             typ = 'n2p2'
         elif os.path.isfile(weights2):
-            weights = weights1
+            weights = weights2
             typ = 'n2p2'
         elif os.path.isfile(weights3):
             weights = weights3
@@ -75,7 +75,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
         return weights,typ
 
     for i in checkfor:
-        get_weightsfile(i,nr_)
+        weights, typ = get_weightsfile(i,nr_)
+
 
     folder = "potential_"+str(args.nr)+'/'
     folder = "potential/"
