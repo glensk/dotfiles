@@ -1,0 +1,4 @@
+feos.py -i energy.dat -ue meV
+4.039313496 lattice constant
+
+daniel used 7.6344935484 bohrradius = 4.04 angstrom (exact using gnu units)
