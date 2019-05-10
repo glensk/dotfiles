@@ -13,7 +13,7 @@ fi
 #_ipi="$SCR/i-pi-mc_scripts"
 #_runner="$SCR/runner_scripts"
 #_n2p2="$SCR/n2p2"
-_aiida="$HOME/sources/aiida-alloy/"
+#_aiida="$HOME/sources/aiida-alloy/"
 #_aiida_o="$SCR/qe-aiida/"
 #_aiida_s="$SCR/qe-aiida/aiida_solutejobs_scripts/"
 #_aiida_a="$SCR/qe-aiida/aiida_analyze/"
@@ -27,7 +27,8 @@ export LAMMPSPATH="$HOME/sources/lammps"
 _bin="$SCR/bin"
 #addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ase_lammps/python:$_ipi_source"
 #addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ipi_source"
-addeverywhere="$_bin:$_aiida:$_ipi_source"
+#addeverywhere="$_bin:$_aiida:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
+addeverywhere="$_bin:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
 
 #####################
 ##### PATH
