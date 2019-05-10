@@ -1,3 +1,6 @@
+def get_stress(work):
+    return work.out.output_parameters.get_dict()['stress']
+
 In [16]: work_pure = load_node("0456e85e-0514-494c-92c2-e3b098d72ebc")
 
 In [17]: pure_stress = get_stress(work_pure)
