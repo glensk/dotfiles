@@ -2665,9 +2665,10 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             if ace.units.lower() == 'ev':
                 pass
             elif ace.units.lower() == 'hartree':
-                ene = ene*0.036749325
+                #ene = ene*0.036749325
+                ene = ene*(1./aseunits.Hartree)
             elif ace.units.lower() == 'hartree_pa':
-                ene = ene*0.036749325/atoms.get_number_of_atoms()
+                ene = ene*(1./aseunits.Hartree)/atoms.get_number_of_atoms()
             elif ace.units.lower() == 'mev_pa':
                 ene = ene*1000./atoms.get_number_of_atoms()
             else:
