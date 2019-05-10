@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 76ec7635af968040bede9b17fbe394438212b454
+# execution time: 1.29297113419 seconds.
+
+n2p2_get_potential_folder_from_nr.py 

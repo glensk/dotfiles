@@ -93,6 +93,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     if os.path.isfile('learning-curve.out'):
         print('cp learning-curve.out')
         my.cp('learning-curve.out',folder+'/learning-curve.out')
+    if os.path.isfile('logfile_mode2'):
+        print('cp logfile_mode2')
+        my.cp('logfile_mode2',folder+'/log.fit')
 
     for i in checkfor:
         weights,typ = get_weightsfile(i,nr_)
@@ -103,6 +106,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
         elif typ == 'runner':
             my.cp(weights,folder+'/weights.'+i+'.data')
             my.cp(weights,folder+'/optweights.'+i+'.out')
+    os.chdir(folder)
+    my.create_READMEtxt(directory=os.getcwd(),add=False)
     return
 
 if __name__ == '__main__':
