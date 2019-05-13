@@ -25,17 +25,12 @@ def n2p2_get_best_test_nr_from_learning_curve(folder):
     else:
         job = 'n2p2'
 
-    print('job',job)
+    #print('job',job)
     if job == 'n2p2':
         learning_curve_file = folder+"/learning-curve.out"
 
     if job == 'runner':
-        if os.path.isfile(folder+"/log.fit"):
-            learning_curve_file = folder+"/log.fit"
-        elif os.path.isfile(folder+"/logfile_mode2"):
-            learning_curve_file = folder+"/logfile_mode2"
-        else:
-            sys.exit("RuNNer learning_curve_file "+learning_curve_file+" does not exist!")
+        learning_curve_file = my.n2p2_runner_get_learning_curve(folder+"/log.fit",only_get_filename=True)
 
     if not os.path.isfile(learning_curve_file):
         sys.exit(learning_curve_file+" does not exist!")
