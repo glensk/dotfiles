@@ -100,7 +100,7 @@ for c in subfolder:    # from the ones in the que
     out=[]
     out2=[]
     for i in fo:
-        print('test_que:',i)
+        #print('test_que:',i)
         basename = os.path.basename(i)
         inputnn=i.replace(basename, 'input.nn')
         elastic=i.replace(basename, 'elastic.dat')
@@ -121,12 +121,13 @@ for c in subfolder:    # from the ones in the que
         except KeyError:
             si = 0
 
-        print('pot_atom_energy Mg',mg,si,al,inputnn)
+        #print('pot_atom_energy Mg',mg,si,al,inputnn)
 
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
         else:
             c44 = 0
+
         if os.path.isfile(elastic_ene):
             c44e = np.loadtxt(elastic_ene)
         else:

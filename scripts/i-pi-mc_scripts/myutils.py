@@ -1743,7 +1743,10 @@ class ase_calculate_ene( object ):
         # from elastic
         # http://wolf.ifj.edu.pl/elastic/lib-usage.html
         ################################################################
-        from elastic.elastic import get_cart_deformed_cell, get_lattice_type, get_elementary_deformations
+        try:
+            from elastic.elastic import get_cart_deformed_cell, get_lattice_type, get_elementary_deformations
+        except ImportError:
+            return
         from elastic import get_pressure, BMEOS, get_strain
         from elastic import get_BM_EOS, get_elastic_tensor
         from parcalc import ParCalculate
@@ -2369,6 +2372,10 @@ def string_to_index_an_array(array,string):
 
 
 def q():
+    host = hostname()
+    #print('host',host)
+    if host != 'fidis':
+        return [],[],[]
     out=check_output(['q'])
     debug=False
     out2=out.split('\n')
@@ -3020,10 +3027,46 @@ def inputnn_get_atomic_symbols_and_atom_energy(inputnn):
             atom_energy = d
         return elements, atom_energy
 
-def n2p2_runner_get_learning_curve(filename):
+def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=False):
     ''' filename is path to log.fit (runner) or learning-curve.out '''
-    #print('filename:',filename)
+    if verbose:
+        print()
+        print('filename in:',filename)
+    type = 'n2p2'
     basename = os.path.basename(filename)
+    folder = os.path.abspath(filename.replace(basename,''))
+    tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
+    changefilename = False
+
+    if verbose:
+        print('filename mid',filename)
+        print('basename mid',basename)
+        print('type     mid',type)
+
+    if os.path.isfile(folder+'/optweights.012.out'): # and basename == "learning-curve.out":
+        changefilename = True
+    if os.path.isfile(folder+'/tmpweights.012.out'): # and basename == "learning-curve.out":
+        changefilename = True
+    if verbose:
+        print('changefilename',changefilename)
+
+    if changefilename == True:
+        for i in tryname:
+            filename = folder+"/"+i
+            if os.path.isfile(filename):
+                type = 'runner'
+                break
+    if not os.path.isfile(filename):
+        sys.exit(filename+" does not exist!")
+
+    basename = os.path.basename(filename)
+    if False:
+        print('filename out',filename)
+        print('basename out',basename)
+        print('type     out',type)
+
+    if only_get_filename == True:
+        return filename
 
     if basename == "learning-curve.out": # n2p2
         lc = np.loadtxt(filename) #+'/learning-curve.out')
@@ -3031,7 +3074,7 @@ def n2p2_runner_get_learning_curve(filename):
         lc[:,2] = lc[:,2]*1000.*27.211384
         lc[:,3] = lc[:,3]*1000.*51.422063
         lc[:,4] = lc[:,4]*1000.*51.422063
-    elif basename in ["log.fit","logfile_mode2"]:          # runner
+    elif basename in tryname:          # runner
         f = open(filename, "r")
         contents = f.readlines()
         f.close()
@@ -3041,6 +3084,9 @@ def n2p2_runner_get_learning_curve(filename):
         for idx,ii in enumerate(contents):
             if ii[:7] == " ENERGY":
                 lst = ii.split()[1:4]
+                #print('lst',lst)
+                if lst[2] == 'NaN':
+                    lst = [ '0','0','0']
                 eneone = [float(iii) for iii in lst]
                 ene.append(eneone)
                 allone = [0,0,0,0,0]
