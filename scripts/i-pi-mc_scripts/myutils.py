@@ -1891,7 +1891,7 @@ class ase_calculate_ene( object ):
         print('atoms_h.get_potential():',e0)
         print('atoms_h.V0',V0)
         print()
-        for d in np.linspace(-0.4,0.4,9):
+        for d in np.linspace(-0.1,0.1,4):
             sd = 0.2
             sd = d
             s = sd/100.
@@ -1913,8 +1913,8 @@ class ase_calculate_ene( object ):
             de = (enecryst/vol - e0/vol)*(2./(s**2.))
             de2 = (de)/aseunits.GPa
             #print(d,'de',de2)
-            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene:',de2)
-        np.savetxt("elastic_ene.dat",np.array([de*2.]))
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene(de2):',de2)
+        np.savetxt("elastic_ene.dat",np.array([de2]))
         sys.exit()
         print()
         cryst = my_get_cart_deformed_cell(atoms_h, size=0.2,vol=False)
