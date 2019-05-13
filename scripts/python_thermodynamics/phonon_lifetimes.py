@@ -10775,7 +10775,7 @@ def get_correct_input_variables(args):
         print("number of atoms :",args.atoms)
         print("qvec            :",args.qvec)  # qvec            : [['l', '0', '0'], ['t', '0', '0']]
 
-    if args.dt > 30:
+    if args.dt > 50:
         sys.exit('Error: your timestep dt seems too large...')
     if args.dt < 0.1:
         sys.exit('Error: your timestep dt seems quite small, is it corect?')
