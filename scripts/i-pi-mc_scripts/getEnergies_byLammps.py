@@ -8,6 +8,7 @@ import myutils as my
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
 from ase.io import write as ase_write
+from ase import units as aseunits
 
 CONTEXT_SETTINGS = my.get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
@@ -204,9 +205,9 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     if ace.units.split("_")[0] == 'hartree':
         conv = 1.
     elif ace.units.split("_")[0] == 'ev':
-        conv = 27.211384    # hartree to ev
+        conv = aseunits.Hartree #27.211384    # hartree to ev
     elif ace.units.split("_")[0] == 'mev':
-        conv = 27211.384    # hartree to ev
+        conv = aseunits.Hartree*1000. #27211.384    # hartree to ev
     else:
         print('ace units',ace.units.split("_"))
         sys.exit('ace units not known')

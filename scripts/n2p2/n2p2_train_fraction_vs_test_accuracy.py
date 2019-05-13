@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import glob,sys,os,argparse
-from myutils import q,grep
+import myutils as my
 
 def help(p = None):
     string = ''' helptext '''
@@ -33,7 +33,7 @@ if verbose:
     for i in fo:
         print(i)
     print()
-id,stat,path = q()
+id,stat,path = my.q()
 if verbose:
     print('----- currently in the que -----')
     for idx,i in enumerate(id):
@@ -104,11 +104,34 @@ for c in subfolder:    # from the ones in the que
         basename = os.path.basename(i)
         inputnn=i.replace(basename, 'input.nn')
         elastic=i.replace(basename, 'elastic.dat')
-        testf= np.float(grep(inputnn,"test_fraction")[0].split()[1])
+        elastic_ene=i.replace(basename, 'elastic_ene.dat')
+        testf = my.inputnn_get_testfraction(inputnn)
+        pot_elements, pot_atom_energy = my.inputnn_get_atomic_symbols_and_atom_energy(inputnn)
+        #print('pe',pot_atom_energy,inputnn)
+        try:
+            mg = int(pot_atom_energy["Mg"])*-1
+        except KeyError:
+            mg = 0
+        try:
+            al = int(pot_atom_energy["Al"])*-1
+        except KeyError:
+            al = 0
+        try:
+            si = int(pot_atom_energy["Si"])*-1
+        except KeyError:
+            si = 0
+
+        print('pot_atom_energy Mg',mg,si,al)
+
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
         else:
             c44 = 0
+        if os.path.isfile(elastic_ene):
+            c44e = np.loadtxt(elastic_ene)
+        else:
+            c44e = 0
+        train_fraction=1.-testf
         train_fraction=1.-testf
 
         ## grep from learning-curve.out
@@ -190,34 +213,19 @@ for c in subfolder:    # from the ones in the que
 
             len_,                                   # epochs_
             c44,                                    # c44_
+            c44e,                                    # c44_
             path__                                       # path_
             ])
 
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
-    #print("#            (eV)               (eV)")
-    #print("#train_frac testmin (step)    trainmin (step) path")
-    #print(out)
-    #print(out[out[:,0].argsort()])
-    out=sorted(out,key=lambda x: x[0])
     out2=sorted(out2,key=lambda x: x[0])
-    #print(out2)
-    #print()
-    #for j in out2:
-    #    print(j)
-    #print('-----')
-    #l=out2
-    #print('\n'.join(['%i: %s' % (n, l[n]) for n in xrange(len(l))]))
-    #print('My list:', *out2, sep='\n- ')
-    #for idj,j in enumerate(out): # for every line
-    #    print("%0.2f  %6.1f  (%4.0f) %5.1f  (%4.0f) [%4.0f]   %s"%(j[0],j[1],j[4],j[2],j[5],j[6],j[3]))
-    #print()
-    #print()
     for idj,j in enumerate(out2): # for every line
         run = "    "
         NJC = "    "
         que = "    "
-        epochs_=len(j) - 3
+        epochs_=len(j) - 4
+        c44e_=len(j) - 3
         c44_=len(j) - 2
         path_=len(j) - 1
         #print('a',path_,j,'--->',j[11])
@@ -257,7 +265,7 @@ for c in subfolder:    # from the ones in the que
         if j[5] > 999: j[5] = 999.9
         if j[7] > 999: j[7] = 999.9
         if j[8] > 999: j[8] = 999.9
-        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_] ,j[epochs_],j[path_]))
+        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_]))
 
 
 
