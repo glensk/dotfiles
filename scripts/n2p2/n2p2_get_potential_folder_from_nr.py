@@ -19,21 +19,33 @@ def n2p2_get_best_test_nr_from_learning_curve(folder):
         sys.exit(folder+' does not exist! (7)')
     folder = os.path.abspath(folder)
     print('folder',folder)
+    job = False
+    if not os.path.isfile(folder+"/optweights.012.out"):
+        job = "n2p2"
+    else
+        job = 'runner'
 
-    # in case this is a n2p2 job:
-    if os.path.isfile(folder+"/learning-curve.out") and not os.path.isfile(folder+"/optweights.012.out"):
-        a = np.loadtxt(folder+"/learning-curve.out")
-        best_testset = np.argmin(a[:,2])
-        #print('best_testset',best_testset)
-    elif os.path.isfile(folder+"/learning-curve.out"):
-        #a = np.loadtxt(folder+"/learning_curve_test.dat")
-        a = np.loadtxt(folder+"/learning-curve.out")
-        #print(a)
-        #print()
-        #print(a[:,1])
-        best_testset = np.argmin(a[:,1])
-    else:
-        sys.exit(folder+"/learning-curve.out does not exist (8)")
+    if job = 'n2p2:
+        if os.path.isfile(folder+"/learning-curve.out"):
+            learning_curve_file = folder+"/learning-curve.out"
+    if job = 'runner':
+        if os.path.isfile(folder+"/log.fit"):
+            learning_curve_file = folder+"/log.fit"
+
+    learning_curve = lc = my.n2p2_runner_get_learning_curve(learning_curve_file)
+    best_testset = np.argmin(lc[:,2])
+            #a = np.loadtxt(folder+"/learning-curve.out")
+            #best_testset = np.argmin(a[:,2])
+            #print('best_testset',best_testset)
+        #elif os.path.isfile(folder+"/learning-curve.out"):
+        #    #a = np.loadtxt(folder+"/learning_curve_test.dat")
+        #    a = np.loadtxt(folder+"/learning-curve.out")
+        #    #print(a)
+        #    #print()
+        #    #print(a[:,1])
+        #    best_testset = np.argmin(a[:,1])
+        #else:
+        #    sys.exit(folder+"/learning-curve.out does not exist (8)")
 
     print('best testset :',best_testset)
     #sys.exit()
