@@ -100,7 +100,7 @@ for c in subfolder:    # from the ones in the que
     out=[]
     out2=[]
     for i in fo:
-        #print('test_que:',i)
+        print('test_que:',i)
         basename = os.path.basename(i)
         inputnn=i.replace(basename, 'input.nn')
         elastic=i.replace(basename, 'elastic.dat')
@@ -134,57 +134,17 @@ for c in subfolder:    # from the ones in the que
         train_fraction=1.-testf
         train_fraction=1.-testf
 
-        ## grep from learning-curve.out
-        if basename == "learning-curve.out":
-            lc = np.loadtxt(i) #+'/learning-curve.out')
-            lc[:,1] = lc[:,1]*1000.*27.211384
-            lc[:,2] = lc[:,2]*1000.*27.211384
-            lc[:,3] = lc[:,3]*1000.*51.422063
-            lc[:,4] = lc[:,4]*1000.*51.422063
-            #round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
+        learning_curve = lc = my.n2p2_runner_get_learning_curve(i)
 
-        elif basename == "log.fit":
-            f = open(i, "r")
-            contents = f.readlines()
-            f.close()
-            ene = []
-            force = []
-            all = []
-            for idx,ii in enumerate(contents):
-                if ii[:7] == " ENERGY":
-                    lst = ii.split()[1:4]
-                    eneone = [float(iii) for iii in lst]
-                    ene.append(eneone)
-                    allone = [0,0,0,0,0]
-                    allone[0] = eneone[0]
-                    allone[1] = eneone[1]*1000.
-                    allone[2] = eneone[2]*1000.
-                if ii[:7] == " FORCES":
-                    lst = ii.split()[1:4]
-                    forceone = [float(iii) for iii in lst]
-                    force.append(forceone)
-                    allone[3] = forceone[1]*1000.
-                    allone[4] = forceone[2]*1000.
-                    all.append(allone)
-            ene = np.asarray(ene)
-            force = np.asarray(force)
-            all = np.asarray(all)
-            lc = all
-            #print(ene[:3])
-            #print(force[:3])
-            #print(all[:3])
-            #print('lc',lc)
-            #sys.exit()
-
-        if len(lc.shape) == 1:
-            lc = np.array([lc])
         len_ = len(lc[:,1])
-        trainmin                = lc[:,1].min()
-        trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]
-        testrmse_at_trainmin    = lc[:,2][trainmin_idx]
-        testmin                 = lc[:,2].min()
-        testmin_idx             = np.where(testmin==lc[:,2])[0][0]
-        trainrmse_at_testmin    = lc[:,1][testmin_idx]
+        trainmin                = lc[:,1].min()                      # best train RMSE
+        trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]  # best train index
+        testrmse_at_trainmin    = lc[:,2][trainmin_idx]              # test RMSE @ train index
+
+        testmin                 = lc[:,2].min()                      # best test RMSE
+        testmin_idx             = np.where(testmin==lc[:,2])[0][0]   # best test index
+        trainrmse_at_testmin    = lc[:,1][testmin_idx]               # train RMSE @ test index
+
         trainminf_at_testmin    = lc[:,3][testmin_idx]
         testminf_at_testmin     = lc[:,4][testmin_idx]
 
