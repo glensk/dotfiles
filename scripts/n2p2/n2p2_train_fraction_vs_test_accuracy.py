@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import glob,sys,os,argparse
-import myutis as my
+import myutils as my
 
 def help(p = None):
     string = ''' helptext '''
@@ -106,7 +106,23 @@ for c in subfolder:    # from the ones in the que
         elastic=i.replace(basename, 'elastic.dat')
         elastic_ene=i.replace(basename, 'elastic_ene.dat')
         testf = my.inputnn_get_testfraction(inputnn)
-        testf= np.float(my.grep(inputnn,"test_fraction")[0].split()[1])
+        pot_elements, pot_atom_energy = my.inputnn_get_atomic_symbols_and_atom_energy(inputnn)
+        #print('pe',pot_atom_energy,inputnn)
+        try:
+            mg = int(pot_atom_energy["Mg"])*-1
+        except KeyError:
+            mg = 0
+        try:
+            al = int(pot_atom_energy["Al"])*-1
+        except KeyError:
+            al = 0
+        try:
+            si = int(pot_atom_energy["Si"])*-1
+        except KeyError:
+            si = 0
+
+        print('pot_atom_energy Mg',mg,si,al)
+
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
         else:
