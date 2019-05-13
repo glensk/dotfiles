@@ -20,17 +20,27 @@ def n2p2_get_best_test_nr_from_learning_curve(folder):
     folder = os.path.abspath(folder)
     print('folder',folder)
     job = False
-    if not os.path.isfile(folder+"/optweights.012.out"):
-        job = "n2p2"
-    else
-        job = 'runner'
+    if os.path.isfile(folder+"/optweights.012.out"):
+        job = "runner"
+    else:
+        job = 'n2p2'
 
-    if job = 'n2p2:
-        if os.path.isfile(folder+"/learning-curve.out"):
-            learning_curve_file = folder+"/learning-curve.out"
-    if job = 'runner':
+    print('job',job)
+    if job == 'n2p2':
+        learning_curve_file = folder+"/learning-curve.out"
+
+    if job == 'runner':
         if os.path.isfile(folder+"/log.fit"):
             learning_curve_file = folder+"/log.fit"
+        elif os.path.isfile(folder+"/logfile_mode2"):
+            learning_curve_file = folder+"/logfile_mode2"
+        else:
+            sys.exit("RuNNer learning_curve_file "+learning_curve_file+" does not exist!")
+
+    if not os.path.isfile(learning_curve_file):
+        sys.exit(learning_curve_file+" does not exist!")
+
+    print('learning_curve_file',learning_curve_file)
 
     learning_curve = lc = my.n2p2_runner_get_learning_curve(learning_curve_file)
     best_testset = np.argmin(lc[:,2])
