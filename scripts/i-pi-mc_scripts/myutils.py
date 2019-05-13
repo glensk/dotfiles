@@ -738,7 +738,7 @@ class mypot( object ):
         self.pottype    = False       # n2p2/runner
         self.potDONE    = False         # n2p2_v1ag
         self.potlib     = False         # n2p2_v1ag
-        self.potcutoff     = False         # n2p2_v1ag
+        self.potcutoff  = False         # n2p2_v1ag
 
         self.pot_all    = False   # n2p2_v1ag
 
@@ -783,45 +783,10 @@ class mypot( object ):
             self.pottype = self.pot.split("_")[0]
             if self.pottype == "runner" or self.pottype == "n2p2":
                 inputnn = self.potpath+"/input.nn"
-                if os.path.isfile(inputnn):
-                    ##### get elements
-                    lines = grep(inputnn,"^elements")
-                    if len(lines) == 1:
-                        line = lines[0]
-                        line_elements_ = line.split()[1:]
-                        self.elements = []
-                        for i in line_elements_:
-                            #print(i)
-                            if i in my_atom.atomic_symbols:
-                                #print("yo",i)
-                                self.elements.append(i)
-                            else:
-                                break
-                        #print('elements ++',self.elements)
 
-                    ##### get atomic energies
-                    lines = grep(inputnn,"^atom_energy")
-                    ele_list = []
-                    ene_list = []
-                    d = {}
-                    for i in lines:
-                        if i.split()[1] in self.elements:
-                            ele = i.split()[1]
-                            ene = float(i.split()[2])
-                            #print('lines',i.split(),"--------->>",ele,ene,type(ene))
-                            ele_list.append(ele)
-                            ene_list.append(ene)
-                            #print("ele_list",ele_list)
-                    #print
-                    self.elements = ele_list
-                    #print('ele_final:',ele_list)
-                    #print('ene_final',ene_list)
-                    if len(ele_list) == len(ene_list):
-                        d = {}
-                        for idx,i in enumerate(ele_list):
-                            d[i] = ene_list[idx]
-                        self.elements = ele_list
-                        self.atom_energy = d
+            if os.path.isfile(inputnn):
+                self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy(inputnn)
+
         return
 
     def print_variables_mypot(self,text="",print_nontheless=False):
@@ -3011,6 +2976,50 @@ def inputnn_get_testfraction(file):
 def inputnn_get_trainfraction(file):
     test_fraction = inputnn_get_testfraction(file)
     return test_fraction - 1.
+
+def inputnn_get_atomic_symbols_and_atom_energy(inputnn):
+    elements = []
+    if os.path.isfile(inputnn):
+        ##### get elements
+        lines = grep(inputnn,"^elements")
+        if len(lines) == 1:
+            line = lines[0]
+            line_elements_ = line.split()[1:]
+            elements = []
+            for i in line_elements_:
+                #print(i)
+                if i in my_atom.atomic_symbols:
+                    #print("yo",i)
+                    elements.append(i)
+                else:
+                    break
+            #print('elements ++',self.elements)
+
+        ##### get atomic energies
+        lines = grep(inputnn,"^atom_energy")
+        ele_list = []
+        ene_list = []
+        d = {}
+        for i in lines:
+            if i.split()[1] in elements:
+                ele = i.split()[1]
+                ene = float(i.split()[2])
+                #print('lines',i.split(),"--------->>",ele,ene,type(ene))
+                ele_list.append(ele)
+                ene_list.append(ene)
+                #print("ele_list",ele_list)
+        #print
+        elements = ele_list
+        #print('ele_final:',ele_list)
+        #print('ene_final',ene_list)
+        if len(ele_list) == len(ene_list):
+            d = {}
+            for idx,i in enumerate(ele_list):
+                d[i] = ene_list[idx]
+            elements = ele_list
+            atom_energy = d
+        return elements, atom_energy
+
 
 
 if __name__ == "__main__":
