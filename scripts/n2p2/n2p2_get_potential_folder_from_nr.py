@@ -96,6 +96,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     if os.path.isfile('logfile_mode2'):
         print('cp logfile_mode2')
         my.cp('logfile_mode2',folder+'/log.fit')
+    if os.path.isfile('log.fit'):
+        print('cp log.fit')
+        my.cp('log.fit',folder+'/log.fit')
 
     for i in checkfor:
         weights,typ = get_weightsfile(i,nr_)
