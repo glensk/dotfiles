@@ -1,0 +1,19 @@
+26.4 34.0 41.4 || [ 401] n2p2_v2ag_10_10/learning-curve.out
+25.4 33.8 41.0 || [ 401] n2p2_v2ag_14_14/learning-curve.out
+24.7 33.4 40.6 || [ 722] n2p2_v2ag/learning-curve.out
+24.6 32.9 39.8 || [ 721] n2p2_v2ag_few_c44/learning-curve.out
+25.5 32.9 40.0 || [ 695] n2p2_v2ag_many_c44/learning-curve.out
+25.8 34.2 41.5 || [ 907] n2p2_v3ag_4998/learning-curve.out
+27.9 34.3 41.6 || [ 954] n2p2_v3ag_5000/learning-curve.out
+25.2 31.3 38.0 || [  16] n2p2_v3ag_repeated_struct/learning-curve.out
+95.8 32.9 40.0 || [ 101] runner_4998_21/log.fit
+75.9 29.5 35.9 || [ 101] runner_4998_21_restart/log.fit
+79.6 19.3 22.4 || [ 101] runner_v0_16/log.fit
+28.8 22.7 27.2 || [ 101] runner_v0_32/log.fit
+21.3 29.4 35.6 || [  58] runner_v0_64/log.fit
+21.3 29.4 35.6 || [  58] runner_v0_v1dg/log.fit
+26.6 33.3 40.2 || [ 101] runner_v3ag_4998/log.fit
+48.9 29.8 36.1 || [ 101] runner_v3ag_5000/log.fit
+35.0 25.8 31.1 || [  24] runner_v3ag_5020_tmp/log.fit
+44.3 28.7 34.6 || [  23] runner_v3ag_5037_tmp/log.fit
+

@@ -1884,10 +1884,12 @@ class ase_calculate_ene( object ):
                 print("stress :",stress)
                 print("strain :",strain)
 
-        def my_get_cart_deformed_cell(base_cryst, size=1,verbose=False):
+        def my_get_cart_deformed_cell(base_cryst, size=1,verbose=False,vol=False):
             from ase.atoms import Atoms
             cryst = Atoms(base_cryst)
             uc = base_cryst.get_cell()
+            if vol != False:
+                uc = base_cryst.get_cell()*vol
             s = size/100.0
             L = np.diag(np.ones(3))
             #L = L * 0.9997
@@ -1901,8 +1903,9 @@ class ase_calculate_ene( object ):
                 L[0, 1] += s/2.
                 L[1, 0] += s/2.
                 L[2, 2] += (s**2.)/(4.-s**2.)
-            print(L)
-            print()
+            if verbose:
+                print(L)
+                print()
             uc = np.dot(uc, L)
             cryst.set_cell(uc, scale_atoms=True)
             return cryst
@@ -1910,8 +1913,46 @@ class ase_calculate_ene( object ):
 
         print()
         print("########### now only one deformed cell ###########")
-        cryst = my_get_cart_deformed_cell(atoms_h, size=0.2)
-        stress = cryst.get_stress()
+        print('atoms_h.get_cell()     :')
+        print(atoms_h.get_cell())
+        print('atoms_h.get_stress()   :')
+        print(atoms_h.get_stress())
+        volfact = 1.0000
+        atoms_h.set_cell(atoms_h.get_cell()*volfact, scale_atoms=True)
+        e0 = atoms_h.get_potential_energy()
+        V0 = atoms_h.get_volume()
+        print('atoms_h.get_cell()     :')
+        print(atoms_h.get_cell())
+        print('atoms_h.get_potential():',e0)
+        print('atoms_h.V0',V0)
+        print()
+        for d in np.linspace(-0.4,0.4,9):
+            sd = 0.2
+            sd = d
+            s = sd/100.
+            #cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=False)
+            cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=volfact)
+            stress = cryst.get_stress()
+            enecryst = cryst.get_potential_energy()
+            vol = cryst.get_volume()
+            if True:
+                if False:
+                    print()
+                    print('cryst.get_cell()     :')
+                    print(cryst.get_cell())
+                    print('cryst.get_stress()   :')
+                    print(cryst.get_stress())
+                if False:
+                    print('cryst.energy:',enecryst)
+                    print('cryst.get_volume()')
+            de = (enecryst/vol - e0/vol)*(2./(s**2.))
+            de2 = (de)/aseunits.GPa
+            #print(d,'de',de2)
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene:',de2)
+        np.savetxt("elastic_ene.dat",np.array([de*2.]))
+        sys.exit()
+        print()
+        cryst = my_get_cart_deformed_cell(atoms_h, size=0.2,vol=False)
         print(cryst.get_cell())
         print('stress                ',stress)
         print('stress/2              ',stress/2.)
@@ -1919,10 +1960,12 @@ class ase_calculate_ene( object ):
         print('stress/aeunits.GPa2   ',stress/aseunits.GPa)
         print('stress',1000*stress/aseunits.GPa/2.)
         print('st C44',1000*stress[3]/aseunits.GPa/2.)
+        print('st C44',1000*stress[5]/aseunits.GPa/2.)
         print()
         print()
         print()
         print("########### get murn structures ###########")
+        sys.exit()
         print('linsp',np.linspace(-0.03,0.03,9))
         for d in np.linspace(-0.03,0.03,9):
             cryst.set_cell(atoms_h.get_cell()*(1.+d), scale_atoms=True)

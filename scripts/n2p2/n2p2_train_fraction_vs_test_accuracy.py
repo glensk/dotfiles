@@ -104,11 +104,17 @@ for c in subfolder:    # from the ones in the que
         basename = os.path.basename(i)
         inputnn=i.replace(basename, 'input.nn')
         elastic=i.replace(basename, 'elastic.dat')
+        elastic_ene=i.replace(basename, 'elastic_ene.dat')
         testf= np.float(grep(inputnn,"test_fraction")[0].split()[1])
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
         else:
             c44 = 0
+        if os.path.isfile(elastic_ene):
+            c44e = np.loadtxt(elastic_ene)
+        else:
+            c44e = 0
+        train_fraction=1.-testf
         train_fraction=1.-testf
 
         ## grep from learning-curve.out
@@ -190,6 +196,7 @@ for c in subfolder:    # from the ones in the que
 
             len_,                                   # epochs_
             c44,                                    # c44_
+            c44e,                                    # c44_
             path__                                       # path_
             ])
 
@@ -217,7 +224,8 @@ for c in subfolder:    # from the ones in the que
         run = "    "
         NJC = "    "
         que = "    "
-        epochs_=len(j) - 3
+        epochs_=len(j) - 4
+        c44e_=len(j) - 3
         c44_=len(j) - 2
         path_=len(j) - 1
         #print('a',path_,j,'--->',j[11])
@@ -257,7 +265,7 @@ for c in subfolder:    # from the ones in the que
         if j[5] > 999: j[5] = 999.9
         if j[7] > 999: j[7] = 999.9
         if j[8] > 999: j[8] = 999.9
-        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_] ,j[epochs_],j[path_]))
+        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_]))
 
 
 
