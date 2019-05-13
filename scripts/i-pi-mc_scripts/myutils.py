@@ -1894,8 +1894,13 @@ class ase_calculate_ene( object ):
             if verbose:
                 print(L)
                 print()
-            L[1, 2] += s/2.
-            L[2, 1] += s/2.
+            if False: # not volume conserving
+                L[1, 2] += s/2.
+                L[2, 1] += s/2.
+            if True: # volume conserving
+                L[0, 1] += s/2.
+                L[1, 0] += s/2.
+                L[2, 2] += (s**2.)/(4.-s**2.)
             print(L)
             print()
             uc = np.dot(uc, L)
@@ -1950,7 +1955,7 @@ class ase_calculate_ene( object ):
         cryst = my_get_cart_deformed_cell(cryst, size=0.2)
         print('cell0 ',cryst.get_cell())
         print('cell0v',cryst.get_volume()/4.)
-        #ase_write("out_c_check.runner",cryst,format='runner',append=True)
+        ase_write("out_c_check_vol_cons.runner",cryst,format='runner',append=True)
         return
 
 
