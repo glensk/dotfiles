@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import glob,sys,os,argparse
-from myutils import q,grep
+import myutis as my
 
 def help(p = None):
     string = ''' helptext '''
@@ -33,7 +33,7 @@ if verbose:
     for i in fo:
         print(i)
     print()
-id,stat,path = q()
+id,stat,path = my.q()
 if verbose:
     print('----- currently in the que -----')
     for idx,i in enumerate(id):
@@ -105,7 +105,8 @@ for c in subfolder:    # from the ones in the que
         inputnn=i.replace(basename, 'input.nn')
         elastic=i.replace(basename, 'elastic.dat')
         elastic_ene=i.replace(basename, 'elastic_ene.dat')
-        testf= np.float(grep(inputnn,"test_fraction")[0].split()[1])
+        testf = my.inputnn_get_testfraction(inputnn)
+        testf= np.float(my.grep(inputnn,"test_fraction")[0].split()[1])
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
         else:
@@ -202,24 +203,7 @@ for c in subfolder:    # from the ones in the que
 
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
-    #print("#            (eV)               (eV)")
-    #print("#train_frac testmin (step)    trainmin (step) path")
-    #print(out)
-    #print(out[out[:,0].argsort()])
-    out=sorted(out,key=lambda x: x[0])
     out2=sorted(out2,key=lambda x: x[0])
-    #print(out2)
-    #print()
-    #for j in out2:
-    #    print(j)
-    #print('-----')
-    #l=out2
-    #print('\n'.join(['%i: %s' % (n, l[n]) for n in xrange(len(l))]))
-    #print('My list:', *out2, sep='\n- ')
-    #for idj,j in enumerate(out): # for every line
-    #    print("%0.2f  %6.1f  (%4.0f) %5.1f  (%4.0f) [%4.0f]   %s"%(j[0],j[1],j[4],j[2],j[5],j[6],j[3]))
-    #print()
-    #print()
     for idj,j in enumerate(out2): # for every line
         run = "    "
         NJC = "    "

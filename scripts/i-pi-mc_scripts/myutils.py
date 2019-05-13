@@ -3004,6 +3004,14 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
 
     return known_formats
 
+def inputnn_get_testfraction(file):
+    test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
+    return test_fraction
+
+def inputnn_get_trainfraction(file):
+    test_fraction = inputnn_get_testfraction(file)
+    return test_fraction - 1.
+
 
 if __name__ == "__main__":
     pass
