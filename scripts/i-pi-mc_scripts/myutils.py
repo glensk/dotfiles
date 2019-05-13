@@ -3031,7 +3031,7 @@ def n2p2_runner_get_learning_curve(filename):
         lc[:,2] = lc[:,2]*1000.*27.211384
         lc[:,3] = lc[:,3]*1000.*51.422063
         lc[:,4] = lc[:,4]*1000.*51.422063
-    elif basename == "log.fit":          # runner
+    elif basename in ["log.fit","logfile_mode2"]:          # runner
         f = open(filename, "r")
         contents = f.readlines()
         f.close()
