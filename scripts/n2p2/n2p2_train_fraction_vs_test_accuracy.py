@@ -121,7 +121,7 @@ for c in subfolder:    # from the ones in the que
         except KeyError:
             si = 0
 
-        print('pot_atom_energy Mg',mg,si,al)
+        print('pot_atom_energy Mg',mg,si,al,inputnn)
 
         if os.path.isfile(elastic):
             c44 = np.loadtxt(elastic)
@@ -189,6 +189,10 @@ for c in subfolder:    # from the ones in the que
         testminf_at_testmin     = lc[:,4][testmin_idx]
 
         path__ = i.replace(os.getcwd()+'/',"")
+
+        trainmin = al
+        testrmse_at_trainmin = mg
+        trainmin_idx = si
 
         out2.append([
             round(train_fraction,2),                # j[0]
