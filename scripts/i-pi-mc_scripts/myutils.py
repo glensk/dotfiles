@@ -1891,7 +1891,7 @@ class ase_calculate_ene( object ):
         print('atoms_h.get_potential():',e0)
         print('atoms_h.V0',V0)
         print()
-        for d in np.linspace(-0.4,0.4,9):
+        for d in np.linspace(-0.1,0.1,4):
             sd = 0.2
             sd = d
             s = sd/100.
@@ -1913,8 +1913,8 @@ class ase_calculate_ene( object ):
             de = (enecryst/vol - e0/vol)*(2./(s**2.))
             de2 = (de)/aseunits.GPa
             #print(d,'de',de2)
-            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene:',de2)
-        np.savetxt("elastic_ene.dat",np.array([de*2.]))
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene(de2):',de2)
+        np.savetxt("elastic_ene.dat",np.array([de2]))
         sys.exit()
         print()
         cryst = my_get_cart_deformed_cell(atoms_h, size=0.2,vol=False)
@@ -3020,6 +3020,54 @@ def inputnn_get_atomic_symbols_and_atom_energy(inputnn):
             atom_energy = d
         return elements, atom_energy
 
+def n2p2_runner_get_learning_curve(filename):
+    ''' filename is path to log.fit (runner) or learning-curve.out '''
+    #print('filename:',filename)
+    basename = os.path.basename(filename)
+
+    if basename == "learning-curve.out": # n2p2
+        lc = np.loadtxt(filename) #+'/learning-curve.out')
+        lc[:,1] = lc[:,1]*1000.*27.211384
+        lc[:,2] = lc[:,2]*1000.*27.211384
+        lc[:,3] = lc[:,3]*1000.*51.422063
+        lc[:,4] = lc[:,4]*1000.*51.422063
+    elif basename == "log.fit":          # runner
+        f = open(filename, "r")
+        contents = f.readlines()
+        f.close()
+        ene = []
+        force = []
+        all = []
+        for idx,ii in enumerate(contents):
+            if ii[:7] == " ENERGY":
+                lst = ii.split()[1:4]
+                eneone = [float(iii) for iii in lst]
+                ene.append(eneone)
+                allone = [0,0,0,0,0]
+                allone[0] = eneone[0]
+                allone[1] = eneone[1]*1000.
+                allone[2] = eneone[2]*1000.
+            if ii[:7] == " FORCES":
+                lst = ii.split()[1:4]
+                forceone = [float(iii) for iii in lst]
+                force.append(forceone)
+                allone[3] = forceone[1]*1000.
+                allone[4] = forceone[2]*1000.
+                all.append(allone)
+        ene = np.asarray(ene)
+        force = np.asarray(force)
+        all = np.asarray(all)
+        lc = all
+        #print(ene[:3])
+        #print(force[:3])
+        #print(all[:3])
+        #print('lc',lc)
+        #sys.exit()
+
+        if len(lc.shape) == 1:
+            lc = np.array([lc])
+
+    return lc
 
 
 if __name__ == "__main__":
