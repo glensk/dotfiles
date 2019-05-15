@@ -57,11 +57,19 @@ def printoutcolor(red,var,ENDC):
 
 
 def printred(*var):
-    #print "lenred:",len(var)
     red = '\033[31m'
     ENDC = '\033[0m'
     return printoutcolor(red,var,ENDC)
 
+def printgreen(*var):
+    red = '\033[32m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
+def printblue(*var):
+    red = '\033[34m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
 
 def grep(filepath,string):
     out = []
@@ -2984,7 +2992,7 @@ def inputnn_get_trainfraction(file):
     test_fraction = inputnn_get_testfraction(file)
     return test_fraction - 1.
 
-def inputnn_get_atomic_symbols_and_atom_energy(inputnn):
+def inputnn_get_atomic_symbols_and_atom_energy(inputnn,verbose=False):
     elements = []
     if os.path.isfile(inputnn):
         ##### get elements
@@ -3000,13 +3008,13 @@ def inputnn_get_atomic_symbols_and_atom_energy(inputnn):
                     elements.append(i)
                 else:
                     break
-            #print('elements ++',self.elements)
+        if verbose:
+            print('elements ++',elements)
 
         ##### get atomic energies
         lines = grep(inputnn,"^atom_energy")
         ele_list = []
         ene_list = []
-        d = {}
         for i in lines:
             if i.split()[1] in elements:
                 ele = i.split()[1]
@@ -3015,16 +3023,34 @@ def inputnn_get_atomic_symbols_and_atom_energy(inputnn):
                 ele_list.append(ele)
                 ene_list.append(ene)
                 #print("ele_list",ele_list)
-        #print
-        elements = ele_list
-        #print('ele_final:',ele_list)
-        #print('ene_final',ene_list)
+        if verbose:
+            print('1 ele_final:',ele_list,len(ele_list))
+            print('1 ene_final',ene_list,len(ene_list))
+
+        if len(ele_list) == len(ene_list) == 0:
+            ele_list = elements
+        else:
+            elements = ele_list
+
+        if verbose:
+            print('2 ele_final:',ele_list)
+            print('2 ene_final',ene_list)
+        if len(ene_list) == 0 and len(ele_list) != 0:
+            ene_list = list(np.zeros(len(ele_list)))
+        if verbose:
+            print('3 ele_final:',ele_list)
+            print('3 ene_final',ene_list)
+
+        d = {}
         if len(ele_list) == len(ene_list):
             d = {}
             for idx,i in enumerate(ele_list):
                 d[i] = ene_list[idx]
             elements = ele_list
             atom_energy = d
+        if verbose:
+            print("elements,",elements)
+            print("atom_energy",atom_energy)
         return elements, atom_energy
 
 def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=False):
@@ -3112,6 +3138,10 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
 
         if len(lc.shape) == 1:
             lc = np.array([lc])
+
+    if lc.shape == (1,0):
+        lc = np.zeros((1,5))
+
 
     return lc
 

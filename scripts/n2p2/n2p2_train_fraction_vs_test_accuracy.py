@@ -9,6 +9,7 @@ def help(p = None):
     string = ''' helptext '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
+    p.add_argument('-sbtrain','--sort_by_trainfraction'      , help='sort output by trainfractino'      , action='count', default=False)
     p.add_argument('-s','--from_subfolder', help='from_subfolder', action='count', default=True)
     p.add_argument('-q','--from_que'      , help='from_que'      , action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
@@ -77,9 +78,9 @@ def pp():
 
 pp()
 pp()
-print("#             || rmse  /  rmse        || rmse / rmse         || [stes]")
-print("#train        || test  /  train       || train/ test         || [total]")
-print("#frac         || min   /      (@step) || min  /      (@step) ||         path")
+print("#           ||    ENERGY (RMSE)    ||          || FORCES (RMSE)|| C44  || KMC  || [stes]")
+print("#train      || test / train        ||          || train/ test  || C44  || std  || [total]")
+print("#frac       || min  /       (@step)||          || min  /       || C44  ||      ||   path")
 pp()
 
 ##########################################################
@@ -92,22 +93,29 @@ for c in subfolder:    # from the ones in the que
     fn=sorted(glob.glob(c+"/learning-curve.out"))
     ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
     fo = fn+ru
-    #for i in fo:
-    #    print('fo',i,os.path.basename(i))
+    for i in fo:
+        print('fo',i,os.path.basename(i))
 
     ##if len(fo) == 0:
     #    fo=glob.glob("tf_*_"+c+"*learning-curve.out")
-    out=[]
+    #out=[]
     out2=[]
     for i in fo:
-        #print('test_que:',i)
+        #print('aaa:',i)
         basename = os.path.basename(i)
         inputnn=i.replace(basename, 'input.nn')
+        kmcstdfile=i.replace(basename, 'kmc57/ene_std.npy')
         elastic=i.replace(basename, 'elastic.dat')
         elastic_ene=i.replace(basename, 'elastic_ene.dat')
         testf = my.inputnn_get_testfraction(inputnn)
         pot_elements, pot_atom_energy = my.inputnn_get_atomic_symbols_and_atom_energy(inputnn)
         #print('pe',pot_atom_energy,inputnn)
+        if os.path.isfile(kmcstdfile):
+            kmcstd_all = np.loadtxt(kmcstdfile)
+            kmcstd = kmcstd_all[-1]
+        else:
+            kmcstd = 0
+
         try:
             mg = int(pot_atom_energy["Mg"])*-1
         except KeyError:
@@ -136,8 +144,16 @@ for c in subfolder:    # from the ones in the que
         train_fraction=1.-testf
 
         learning_curve = lc = my.n2p2_runner_get_learning_curve(i)
+        #print('len',len(lc),lc.shape)
 
-        len_ = len(lc[:,1])
+        #if len(lc) == 1:
+        #    print('---')
+        #    print(lc)
+        #    print('---')
+        epochs_ = len(lc[:,1])
+        #print('len',len(lc),epochs_)
+        #print()
+
         trainmin                = lc[:,1].min()                      # best train RMSE
         trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]  # best train index
         testrmse_at_trainmin    = lc[:,2][trainmin_idx]              # test RMSE @ train index
@@ -155,6 +171,7 @@ for c in subfolder:    # from the ones in the que
         testrmse_at_trainmin = mg
         trainmin_idx = si
 
+        #print('bbb:',i)
         out2.append([
             round(train_fraction,2),                # j[0]
 
@@ -176,7 +193,8 @@ for c in subfolder:    # from the ones in the que
             round(testminf_at_testmin,2),    # j[8]
             testmin_idx,                              # j[9]
 
-            len_,                                   # epochs_
+            kmcstd,
+            epochs_,                                   # epochs_
             c44,                                    # c44_
             c44e,                                    # c44_
             path__                                       # path_
@@ -184,15 +202,17 @@ for c in subfolder:    # from the ones in the que
 
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
-    out2=sorted(out2,key=lambda x: x[0])
+    if args.sort_by_trainfraction:
+        out2=sorted(out2,key=lambda x: x[0])
     for idj,j in enumerate(out2): # for every line
         run = "    "
         NJC = "    "
         que = "    "
+        kmcstd =len(j) - 5
         epochs_=len(j) - 4
-        c44e_=len(j) - 3
-        c44_=len(j) - 2
-        path_=len(j) - 1
+        c44_   =len(j) - 3
+        c44e_  =len(j) - 2
+        path_  =len(j) - 1
         #print('a',path_,j,'--->',j[11])
         #sys.exit()
         #print('kk',j[path_].split("/learning-curve.out"))
@@ -230,7 +250,22 @@ for c in subfolder:    # from the ones in the que
         if j[5] > 999: j[5] = 999.9
         if j[7] > 999: j[7] = 999.9
         if j[8] > 999: j[8] = 999.9
-        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_]))
+        if j[kmcstd] > 999: j[kmcstd] = 999
+        #print('j',j[1],j[2]) ene
+        #print('j',j[7],j[8]) forces
 
+        stringout = run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f) || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"
+        elementout = (         j[0] ,  j[1],  j[2],   j[3],     j[4], j[5],  j[6],      j[7],  j[8],  j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_])
 
+        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || [%4.0f] %s"
+        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[epochs_],j[path_])
 
+        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
+        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
+
+        if (j[1]+j[2])/2. < 3. and (j[7]+j[8])/2. < 30.:
+            print(my.printgreen(stringout)%elementout)
+        elif (j[1]+j[2])/2. > 10. or (j[7]+j[8])/2. > 60.:
+            print(my.printred(stringout)%elementout)
+        else:
+            print(stringout%elementout)

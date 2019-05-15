@@ -2,3 +2,4 @@ All of this has used the aiida_export_group_to_runner.py which considers the
 
 conversion_aiida_ase_forces = 1.0000000908541917
 conversion_aiida_ase_energy = 1.0000000945842116
+cat aiida_exported_group_v1ag_fps3134_first20_calc__all_steps.input.data aiida_exported_group_kmc_1000K_4_calc__all_steps.input.data aiida_exported_group_from_KMC3_remaining21.data.group_calc__all_steps.input.data > aiida_exported_group_KMC57.data
