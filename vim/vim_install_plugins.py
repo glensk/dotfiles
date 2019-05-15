@@ -57,8 +57,8 @@ tabcompletion = "https://github.com/ervandew/supertab.git"
 toggletruefalse = "https://github.com/AndrewRadev/switch.vim.git"
 searchcounter = "https://github.com/henrik/vim-indexed-search.git"
 easymotion = "https://github.com/easymotion/vim-easymotion.git"
-#vimlatex = "https://github.com/jcf/vim-latex.git"
-vimlatex = "https://github.com/vim-latex/vim-latex.git"
+vimlatex = "https://github.com/jcf/vim-latex.git"
+#vimlatex = "https://github.com/vim-latex/vim-latex.git"  # had problems
 checkit(vundle)          # necessary
 checkit(vimsignature)    # necessary  set a mark (prss m c in normal mode)
 checkit(toggletruefalse) # necessary switsches True to False and so non

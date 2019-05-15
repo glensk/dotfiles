@@ -91,6 +91,10 @@ Host fidis
  HostName fidis.epfl.ch
  User glensk
 
+Host helvetios
+ HostName helvetios.epfl.ch
+ User glensk
+
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@cosmopc15.epfl.ch
 Host cosmopc pc
  HostName cosmopc15.epfl.ch
