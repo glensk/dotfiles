@@ -25,10 +25,11 @@ _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
 export LAMMPSPATH="$HOME/sources/lammps"
 _bin="$SCR/bin"
+_bin2="$SCR/../aliases"
 #addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ase_lammps/python:$_ipi_source"
 #addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ipi_source"
 #addeverywhere="$_bin:$_aiida:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
-addeverywhere="$_bin:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
+addeverywhere="$_bin:$_bin2:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
 
 #####################
 ##### PATH

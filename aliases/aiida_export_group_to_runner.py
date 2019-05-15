@@ -122,6 +122,7 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
 
     print(scf_node,'cell[0]',cell[0]*ANGSTROM_TO_BOHRRADIUS)
     print('cell  :',cell[0],cell[1],cell[2])
+    vvv = ase_structure.get_volume()/ase_structure.get_number_of_atoms()
     print('volume:',ase_structure.get_volume()/ase_structure.get_number_of_atoms())
     print('volume:',ase_structure.get_volume())
     print('stress:',stress)
@@ -152,6 +153,7 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
 
     print('V0',V0,'vol',vol)
     print('ene   :',energy,"eV")
+    print('V0, ene (meV_pa):',vvv,energy/ase_structure.get_number_of_atoms()*1000.)
     print('c44 EN:',c44,"GPa")
 
     write_runner_commentline(fileout, pwbasenode.uuid, extra_comments=extra_comments)
