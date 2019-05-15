@@ -28,6 +28,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
 @click.option('--teste/--no-teste','-te',default=False,help='Assess elastic constants.')
 @click.option('--test3/--no-test3','-t3',default=False,help='test3')
+@click.option('--testkmc/--no-testkmc','-kmc',default=False,help='test accuracy of kmc structures')
 
 @click.option('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
 @click.option('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
@@ -44,7 +45,7 @@ CONTEXT_SETTINGS = my.get_click_defaults()
 @click.option('--debug','-d',count=True)
 
 
-def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,ase,lmp,ipi,write_runner,write_analysis,
+def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,testkmc,ase,lmp,ipi,write_runner,write_analysis,
         pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44,write_forces,write_forcesx):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
@@ -55,6 +56,11 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     getEnergies_byLammps.py -p . -e
 
     '''
+    if testkmc:
+        infile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
+        units = "meV_pa"
+        verbose = True
+
     print('infile               :',infile)
 
     hostname = my.hostname()
@@ -377,14 +383,40 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
                 #ene_pot_ase[idx] = my.ase_enepot(atoms_tmp)
                 if debug:
                     print("CCC")
-                if pot == "runner_v2dg" and False: # only in case we load DFT energies from new DFT calcs
-                    n = my.ase_get_chemical_symbols_to_number_of_species(atoms[i])
+                ###### old atom energies (giulio/daniele)
+                # print('at al',atom_energy_Al,"meV",atom_energy_Al/conv,"hartree") # at al -65558.634493 meV -2.4092354 hartree
+                # print('at mg',atom_energy_Mg,"meV",atom_energy_Mg/conv,"hartree") # at mg -1703619.48966 meV -62.606862 hartree
+                # print('at si',atom_energy_Si,"meV",atom_energy_Si/conv,"hartree") # at si -151289.41503 meV -5.5597835 hartree
+
+                ###### new atom energies
+                # print('at al',atom_energy_Al,"meV",atom_energy_Al/conv,"hartree") # at al -534123.115151 meV -19.6286626 hartree
+                # print('at mg',atom_energy_Mg,"meV",atom_energy_Mg/conv,"hartree") # at mg -455772.609452 meV -16.7493346 hartree
+                # print('at si',atom_energy_Si,"meV",atom_energy_Si/conv,"hartree") # at si -150410.566175 meV -5.5274864 hartree
+
+                #if pot == "runner_v2dg" and False: # only in case we load DFT energies from new DFT calcs
+                if atom_energy_Mg/conv < -17.0:  # we did load the "old" energies
+                    #n = my.ase_get_chemical_symbols_to_number_of_species(atoms_tmp[i])
                     ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
                     ### -lied by the number of atoms, this can only work if energies are
                     ### not calculated by _pa
-                    ene_Al = 468.845752582        # runner - n2p2: -2.4092354 - -19.6286626 = 17.2194272 hartree == 468.56444 eV
-                    ene_Mg = -1247.77831679       # runner - n2p2: -62.6068620 - -16.7493346 =  -45.8575274  hartree == -1247.8468 eV
-                    ene_Si = -0.0161424965998     # runner_v2dg-n2p2_v1ag atomic energy: -5.5597835 - -5.5274864 = -.0322971 hartree == -0.87884879
+                    new_Si = -5.5274864*conv    # == -150410.566175 (meV)
+                    new_Mg = -16.7493346*conv    # == -455772.609452 (meV)
+                    new_Al = -19.6286626*conv    # == -534123.115151 (meV)
+
+                    ene_Si = (atom_energy_Si - new_Si )/1000.  # (-151289.41503 - -150410.566175) / 1000. = -0.87884879 eV
+                    ene_Mg = (atom_energy_Mg - new_Mg )/1000.
+                    ene_Al = (atom_energy_Al - new_Al )/1000.
+
+                    #print('atomSi',atom_energy_Si)  # -151289.41503
+                    #print("new_Si",new_Si)
+
+                    #print("ene_Si",ene_Si)  # -0.878848855568 (eV)
+                    #print("ene_Mg",ene_Mg)  # -1247.8468802 (eV)
+                    #print("ene_Al",ene_Al)  # 468.564480658 (eV)
+
+                    #ene_Al = 468.845752582        # runner - n2p2: -2.4092354 - -19.6286626 = 17.2194272 hartree == 468.56444 eV
+                    #ene_Mg = -1247.77831679       # runner - n2p2: -62.6068620 - -16.7493346 =  -45.8575274  hartree == -1247.8468 eV
+                    #ene_Si = -0.0161424965998     # runner_v2dg-n2p2_v1ag atomic energy: -5.5597835 - -5.5274864 = -.0322971 hartree == -0.87884879 eV
 
                     ### correction in eV
                     correction = ene_Al*n["Al"] + ene_Si*n["Si"] + ene_Mg*n["Mg"]
@@ -396,6 +428,8 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
                             correction = correction * 1000.
 
                     ene_pot_ase[idx] = ene_pot_ase[idx] - correction
+
+
                 stress = atoms_tmp.get_stress()
                 #print('stress',stress)
 
@@ -546,6 +580,11 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
 
         #print("in",what.shape,"out",whatout.shape,name)
         return whatout
+    if os.path.isfile('log.lammps'):
+        os.remove('log.lammps')
+
+    if testkmc:
+        ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
     if write_analysis:
         ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)

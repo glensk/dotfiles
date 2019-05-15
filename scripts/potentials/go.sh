@@ -6,7 +6,12 @@ for i in $f;do
     fo=`echo $i | sed 's|input.nn||'`
     echo $fo
     cd $fo
-    getEnergies_byLammps.py -p . -e
+
+    mkdir kmc57
+    cd kmc57
+    getEnergies_byLammps.py -p ../ -kmc
+
+    #getEnergies_byLammps.py -p . -e
     cd $hier
 done
 
