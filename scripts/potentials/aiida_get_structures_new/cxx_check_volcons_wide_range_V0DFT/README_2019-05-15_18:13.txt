@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: f00c1f66f293aae55f4e7ec23ccd9b0ba40048bf
+
+aiida_submit_runnerfile.py -i out_c_check_vol_cons_widerange_DFTV0.runner -cm scf
