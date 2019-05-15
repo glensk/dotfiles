@@ -77,9 +77,9 @@ def pp():
 
 pp()
 pp()
-print("#             || rmse  /  rmse        || rmse / rmse         || [stes]")
-print("#train        || test  /  train       || train/ test         || [total]")
-print("#frac         || min   /      (@step) || min  /      (@step) ||         path")
+print("#           ||    ENERGY (RMSE)    ||          || FORCES (RMSE)|| C44  || [stes]")
+print("#train      || test / train        ||          || train/ test  || C44  || [total]")
+print("#frac       || min  /       (@step)||          || min  /       || C44  ||         path")
 pp()
 
 ##########################################################
@@ -230,7 +230,16 @@ for c in subfolder:    # from the ones in the que
         if j[5] > 999: j[5] = 999.9
         if j[7] > 999: j[7] = 999.9
         if j[8] > 999: j[8] = 999.9
-        print(run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f)  || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"%(j[0],j[1],j[2],j[3],j[4],j[5],j[6],   j[7],j[8],j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_]))
+        #print('j',j[1],j[2]) ene
+        #print('j',j[7],j[8]) forces
 
+        stringout = run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f) || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"
+        elementout = (         j[0] ,  j[1],  j[2],   j[3],     j[4], j[5],  j[6],      j[7],  j[8],  j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_])
 
+        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || [%4.0f] %s"
+        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[epochs_],j[path_])
 
+        if (j[1]+j[2])/2. < 3. and (j[7]+j[8])/2. < 60.:
+            print(my.printgreen(stringout)%elementout)
+        else:
+            print(stringout%elementout)

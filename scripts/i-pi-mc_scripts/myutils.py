@@ -57,11 +57,19 @@ def printoutcolor(red,var,ENDC):
 
 
 def printred(*var):
-    #print "lenred:",len(var)
     red = '\033[31m'
     ENDC = '\033[0m'
     return printoutcolor(red,var,ENDC)
 
+def printgreen(*var):
+    red = '\033[32m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
+def printblue(*var):
+    red = '\033[34m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
 
 def grep(filepath,string):
     out = []
