@@ -1,5 +1,5 @@
-"Plugin 'jcf/vim-latex.git'                          " latex
-Plugin 'https://github.com/vim-latex/vim-latex.git'  " latex
+Plugin 'jcf/vim-latex.git'                          " latex
+"Plugin 'https://github.com/vim-latex/vim-latex.git'  " latex
 " Plugin 'gerw/vim-latex-suite.git'                   " seems to be newer
 let g:Tex_IgnoredWarnings = 
     \'Underfull'."\n".
