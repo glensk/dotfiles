@@ -119,13 +119,17 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
 
     ase_structure = scf_node.inp.structure.get_ase()
     cell = ase_structure.get_cell()
-    #print('volume:',vol/ase_structure.get_number_of_atoms())
 
     print(scf_node,'cell[0]',cell[0]*ANGSTROM_TO_BOHRRADIUS)
     print('cell  :',cell[0],cell[1],cell[2])
     print('volume:',ase_structure.get_volume()/ase_structure.get_number_of_atoms())
+    print('volume:',ase_structure.get_volume())
     print('stress:',stress)
-    print('c44   :',stress[2][1]*1000./2.,"GPa")
+    print('c44 ST:',stress[2][1]*1000./2.,"GPa")
+    e0 = -2149.85053966
+    V0 = 16.476413798802568*4.
+    strain = 0.2
+
     positions = ase_structure.get_positions()
     elements = ase_structure.get_chemical_symbols()
 
@@ -135,6 +139,20 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
         print('Error forces not obtained, skipping this structure...')
         return
     energy = scf_node.out.output_parameters.get_attr('energy') * conversion_aiida_ase_energy
+    vol = ase_structure.get_volume()
+    #((-2149.85053966--2149.85051177)*2./((0.2/100.)**2.)/(16.47639732238896*4))/aseunits.GPa
+    #((e0--2149.85051177)*2./((0.2/100.)**2.)/(16.47639732238896*4))/aseunits.GPa
+
+    c44 = ((e0/V0-energy/vol)*2./((strain/100.)**2.))/units.GPa
+    c44 = ((e0-energy)*2./((0.2/100.)**2.)/(16.47639732238896*4))/units.GPa
+    c44 = ((e0-energy)*2./((0.2/100.)**2.)/(vol))/units.GPa
+    c44 = ((e0-energy)*2./vol/((0.2/100.)**2.))/units.GPa
+    c44 = ((e0/vol-energy/vol)*2./1./((0.2/100.)**2.))/units.GPa
+    c44 = ((e0/V0-energy/vol)*2./1./((0.2/100.)**2.))/units.GPa
+
+    print('V0',V0,'vol',vol)
+    print('ene   :',energy,"eV")
+    print('c44 EN:',c44,"GPa")
 
     write_runner_commentline(fileout, pwbasenode.uuid, extra_comments=extra_comments)
     write_runner_cell(fileout, cell)
@@ -264,12 +282,6 @@ def createjob(group_name, filename, write_only_relaxed, supress_readme, verbose)
     for node in all_nodes:
         stress = get_stress(load_node(node.uuid))
 
-        #ase_structure = node.get_ase()
-        #cell = ase_structure.get_cell()
-        #vol  = ase_structure.get_volume()
-        #print('cell  :',cell)
-        #print('stress:',stress)
-        #print('volume:',vol/ase_structure.get_number_of_atoms())
         if verbose:
             print("Writing node: {}".format(node.uuid))
 

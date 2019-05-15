@@ -19,21 +19,38 @@ def n2p2_get_best_test_nr_from_learning_curve(folder):
         sys.exit(folder+' does not exist! (7)')
     folder = os.path.abspath(folder)
     print('folder',folder)
-
-    # in case this is a n2p2 job:
-    if os.path.isfile(folder+"/learning-curve.out") and not os.path.isfile(folder+"/optweights.012.out"):
-        a = np.loadtxt(folder+"/learning-curve.out")
-        best_testset = np.argmin(a[:,2])
-        #print('best_testset',best_testset)
-    elif os.path.isfile(folder+"/learning-curve.out"):
-        #a = np.loadtxt(folder+"/learning_curve_test.dat")
-        a = np.loadtxt(folder+"/learning-curve.out")
-        #print(a)
-        #print()
-        #print(a[:,1])
-        best_testset = np.argmin(a[:,1])
+    job = False
+    if os.path.isfile(folder+"/optweights.012.out"):
+        job = "runner"
     else:
-        sys.exit(folder+"/learning-curve.out does not exist (8)")
+        job = 'n2p2'
+
+    #print('job',job)
+    if job == 'n2p2':
+        learning_curve_file = folder+"/learning-curve.out"
+
+    if job == 'runner':
+        learning_curve_file = my.n2p2_runner_get_learning_curve(folder+"/log.fit",only_get_filename=True)
+
+    if not os.path.isfile(learning_curve_file):
+        sys.exit(learning_curve_file+" does not exist!")
+
+    print('learning_curve_file',learning_curve_file)
+
+    learning_curve = lc = my.n2p2_runner_get_learning_curve(learning_curve_file)
+    best_testset = np.argmin(lc[:,2])
+            #a = np.loadtxt(folder+"/learning-curve.out")
+            #best_testset = np.argmin(a[:,2])
+            #print('best_testset',best_testset)
+        #elif os.path.isfile(folder+"/learning-curve.out"):
+        #    #a = np.loadtxt(folder+"/learning_curve_test.dat")
+        #    a = np.loadtxt(folder+"/learning-curve.out")
+        #    #print(a)
+        #    #print()
+        #    #print(a[:,1])
+        #    best_testset = np.argmin(a[:,1])
+        #else:
+        #    sys.exit(folder+"/learning-curve.out does not exist (8)")
 
     print('best testset :',best_testset)
     #sys.exit()
@@ -96,6 +113,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     if os.path.isfile('logfile_mode2'):
         print('cp logfile_mode2')
         my.cp('logfile_mode2',folder+'/log.fit')
+    if os.path.isfile('log.fit'):
+        print('cp log.fit')
+        my.cp('log.fit',folder+'/log.fit')
 
     for i in checkfor:
         weights,typ = get_weightsfile(i,nr_)
@@ -107,7 +127,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
             my.cp(weights,folder+'/weights.'+i+'.data')
             my.cp(weights,folder+'/optweights.'+i+'.out')
     os.chdir(folder)
-    my.create_READMEtxt(directory=os.getcwd(),add=False)
+    my.create_READMEtxt(directory=os.getcwd(),add="# pwd: "+os.getcwd())
     return
 
 if __name__ == '__main__':
