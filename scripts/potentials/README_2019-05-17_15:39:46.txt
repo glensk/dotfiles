@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 04c313c2619b980a159cd08a6e39aada89b770e9
+# execution time: 0.253002166748 seconds.
+
+getEnergies_byLammps.py -p runner_v3ag_5000_7650_new_input_data_2 -pc44 -i /home/glensk/Dropbox/Albert/scripts/dotfiles//scripts/potentials/aiida_get_structures_new/cxx_check_volcons_wide_range_V0DFT/aiida_exported_group_out_c_check_vol_cons_widerange_DFTV0.runner_calc__all_steps.input.data

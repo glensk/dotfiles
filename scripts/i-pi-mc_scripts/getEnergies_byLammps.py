@@ -301,10 +301,10 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
         #print('idx',idx,'wow')
         if pick_c44 or debug: #cellshape == "?":
-            print('XX frames[i].cell')
-            print(frames[i].cell)
-            print('strain',frames[i].cell[0,1]/frames[i].cell[0,0])
-            print('volume',frames[i].get_volume())
+            #print('XX frames[i].cell')
+            #print(frames[i].cell)
+            strain = frames[i].cell[0,1]/frames[i].cell[0,0]
+            print('XX volume',frames[i].get_volume(),'strain',round(strain,5))
         #if cellshape == "Q":
         #    print('frames[i].positions')
         #    print(frames[i].positions)
