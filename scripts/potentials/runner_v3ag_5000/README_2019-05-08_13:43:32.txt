@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: b714519d632e7f1af3cba80f3878dc5df877ff88
-# execution time: 4.1415541172 seconds.
-
-getEnergies_byLammps.py -i /Users/glensk/Dropbox/Albert/scripts/dotfiles//scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pnat 4 -paal 4 -pfm 0.0001 -v -u meV_pa -pc44
