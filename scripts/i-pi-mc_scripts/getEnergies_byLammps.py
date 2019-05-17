@@ -52,12 +52,17 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
     getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
     getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
-    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pnat 4 -paal 4 -pfm 0.0001 -v -u meV_pa -pc44
+    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pfm 0.0001 -pc44
+    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pc44
     getEnergies_byLammps.py -p . -e
 
     '''
     if testkmc:
         infile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
+        units = "meV_pa"
+        verbose = True
+
+    if pick_c44:
         units = "meV_pa"
         verbose = True
 
@@ -281,14 +286,25 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
         if pick_cellshape >= 0 and cellshape not in ["Q"]:
             continue
-        if pick_c44 == True and cellshape != "?":
+        if pick_c44 == True:
+            if n["Al"] != 4:
+                continue
+            if n["Mg"] > 0:
+                continue
+            if n["Si"] > 0:
+                continue
+            if cellshape in [ "R", "Q" ]:
+                continue
+            #if cellshape != "?":
             #print('nc')
-            continue
+            #continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
         #print('idx',idx,'wow')
         if pick_c44 or debug: #cellshape == "?":
             print('XX frames[i].cell')
             print(frames[i].cell)
+            print('strain',frames[i].cell[0,1]/frames[i].cell[0,0])
+            print('volume',frames[i].get_volume())
         #if cellshape == "Q":
         #    print('frames[i].positions')
         #    print(frames[i].positions)
