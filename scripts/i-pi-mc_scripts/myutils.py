@@ -1931,16 +1931,23 @@ class ase_calculate_ene( object ):
         #for d in np.linspace(-0.1,0.1,4):
         points = 10
         ene_vs_strain = np.zeros((points,2))
+        ene_vs_strain_wo = np.zeros((points,2))
         for idx,d in enumerate(np.linspace(-10.,10.,points)):
             sd = 0.2
             sd = d
             s = sd/100.
-            ene_vs_strain[idx,0] = s
+
             cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=False)
             cell = cryst.get_cell()
+            scheck =strain= cell[0,1]/cell[0,0]*2.
+            print('straincheck',s,scheck)
+            ene_vs_strain[idx,0] = s
+            ene_vs_strain[idx,0] = scheck
+            ene_vs_strain_wo[idx,0] = scheck
             stress = cryst.get_stress()
-            enecryst = cryst.get_potential_energy()  # eV for whole cell
-            ene_vs_strain[idx,1] = (enecryst-e0)*1000./cryst.get_number_of_atoms()
+            enecryst_eV_cell = cryst.get_potential_energy()  # eV for whole cell
+            ene_vs_strain[idx,1] = (enecryst_eV_cell-e0)*1000./cryst.get_number_of_atoms()
+            ene_vs_strain_wo[idx,1] = (enecryst_eV_cell)*1000./cryst.get_number_of_atoms()
             vol = cryst.get_volume()
 
             if True:
@@ -1951,17 +1958,17 @@ class ase_calculate_ene( object ):
                     print('cryst.get_stress()   :')
                     print(cryst.get_stress())
                 if False:
-                    print('cryst.energy:',enecryst)
+                    print('cryst.energy:',enecryst_eV_cell)
                     print('cryst.get_volume()')
-            #de = (enecryst/vol - e0/V0)*(2./(s**2.))
-            C44 = (enecryst - e0)/vol*(2./(s**2.))
+            C44 = (enecryst_eV_cell - e0)/vol*(2./(strain**2.))
             ase_write("out_c_check_vol_cons_widerange_DFTV0.runner",cryst,format='runner',append=True)
             #print(d,'de',de2)
             atb = ANGSTROM_TO_BOHRRADIUS = 1./aseunits.Bohr
-            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(10),'ene',enecryst,'c44:',str(round(C44/aseunits.GPa,2)).ljust(5),cell[0]*atb,cell[2]*atb) #stress)
-            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(10),'ene',enecryst,'c44:',str(round(C44/aseunits.GPa,2)).ljust(5),cell[0],cell[2]) #stress)
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(10),'ene',enecryst_eV_cell,'c44:',str(round(C44/aseunits.GPa,2)).ljust(5),cell[0]*atb,cell[2]*atb) #stress)
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(10),'ene',enecryst_eV_cell,'c44:',str(round(C44/aseunits.GPa,2)).ljust(5),cell[0],cell[2]) #stress)
         np.savetxt("elastic_ene.dat",np.array([C44]))
         np.savetxt("ene_vs_strain_NN.dat",ene_vs_strain)
+        np.savetxt("ene_vs_strain_NN_wo.dat",ene_vs_strain_wo)
         sys.exit()
         print()
         cryst = my_get_cart_deformed_cell(atoms_h, size=0.2,vol=False)
