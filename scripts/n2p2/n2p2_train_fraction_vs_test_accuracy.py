@@ -93,8 +93,8 @@ for c in subfolder:    # from the ones in the que
     fn=sorted(glob.glob(c+"/learning-curve.out"))
     ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
     fo = fn+ru
-    for i in fo:
-        print('fo',i,os.path.basename(i))
+    #for i in fo:
+    #    print('fo',i,os.path.basename(i))
 
     ##if len(fo) == 0:
     #    fo=glob.glob("tf_*_"+c+"*learning-curve.out")
@@ -262,8 +262,10 @@ for c in subfolder:    # from the ones in the que
 
         stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
         elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
-
-        if (j[1]+j[2])/2. < 3. and (j[7]+j[8])/2. < 30.:
+        #print('j',j[4])
+        if (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
+            print(my.printblue(stringout)%elementout)
+        elif (j[1]+j[2])/2. < 3.5 and (j[7]+j[8])/2. < 30.:
             print(my.printgreen(stringout)%elementout)
         elif (j[1]+j[2])/2. > 10. or (j[7]+j[8])/2. > 60.:
             print(my.printred(stringout)%elementout)

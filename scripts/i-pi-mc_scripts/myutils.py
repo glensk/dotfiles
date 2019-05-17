@@ -71,6 +71,7 @@ def printblue(*var):
     ENDC = '\033[0m'
     return printoutcolor(red,var,ENDC)
 
+
 def grep(filepath,string):
     out = []
     file = open(filepath, "r")
@@ -1710,7 +1711,7 @@ class ase_calculate_ene( object ):
         atomrelax = False
         if atomrelax == False: keep_alive = False
         if atomrelax == True:  keep_alive = True
-        asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
+        #asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
         #atoms_h.set_calculator(asecalcLAMMPS)  # wird in parcalc.py gesetzt
         #/home/glensk/miniconda2/lib/python2.7/site-packages/parcalc/parcalc.py
 
@@ -1893,8 +1894,31 @@ class ase_calculate_ene( object ):
         print(atoms_h.get_cell())
         print('atoms_h.get_stress()   :')
         print(atoms_h.get_stress())
-        volfact = 1.0000
-        atoms_h.set_cell(atoms_h.get_cell()*volfact, scale_atoms=True)
+        volfact = 1.0111  # C44 36.86712322917455  vol (68.43265399591313) = 17.108163499  d = 0.557 ang^3
+        volfact = 1.0051  # C44 39.770796753113444 vol (67.22160401031846) = 16.805401003  d = 0.254 ang^3
+        volfact = 1.0011  # C44 41.41759291379788  vol (66.42222758795769) = 16.605556897  d = 0.055 ang^3
+        volfact = 1.0001  # C44 41.793101000472575 vol (66.2233786205119)  = 16.555844655  d = 0.005 ang^3
+        volfact = 1.0000  # C44 41.82985611457602  vol (66.20351557966632) = 16.550878895  d = 0.000 ang^3
+        volfact = 0.995477787394 # C44 43.3418676  vol (65.30941200550778) = 16.550878895  d = 0.000 ang^3
+        volfact = 0.             # C44 42.3672012  vol (65.90412920697601) = 16.476032301  d = 0.075 ang^3
+
+        # DFT                                      vol (65.905655194)      = 16.476413798491  (first converged)
+        # DFT                                      vol (65.904129207)      = 16.476032301744  (beset converge)
+        V0DFT = 16.476413798491 #  first converged
+        V0DFT = 16.476032301744 #  beset converge
+        a0DFT = (4.*V0DFT)**(1./3.)
+        volfact = ((V0DFT*4.)/66.20351557966632)
+        print('volfact',volfact)
+
+        #cryst.set_cell(np.diag(np.ones(3))*a0, scale_atoms=True)
+        #cell = cryst.get_cell()
+        #cryst = my_get_cart_deformed_cell(cryst, size=0.2)
+
+        if volfact >= 1.0:
+            atoms_h.set_cell(atoms_h.get_cell()*volfact, scale_atoms=True)
+        else:
+            atoms_h.set_cell(np.diag(np.ones(3))*a0DFT, scale_atoms=True)
+
         e0 = atoms_h.get_potential_energy()
         V0 = atoms_h.get_volume()
         print('atoms_h.get_cell()     :')
@@ -1902,12 +1926,15 @@ class ase_calculate_ene( object ):
         print('atoms_h.get_potential():',e0)
         print('atoms_h.V0',V0)
         print()
-        for d in np.linspace(-0.1,0.1,4):
+        print('volum0',V0,'   s 0               ene0: e0',e0)
+        print('----------------------------------------------------------------------------------------')
+        #for d in np.linspace(-0.1,0.1,4):
+        for d in np.linspace(-10.,10.,10):
             sd = 0.2
             sd = d
             s = sd/100.
-            #cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=False)
-            cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=volfact)
+            cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=False)
+            cell = cryst.get_cell()
             stress = cryst.get_stress()
             enecryst = cryst.get_potential_energy()
             vol = cryst.get_volume()
@@ -1921,11 +1948,12 @@ class ase_calculate_ene( object ):
                 if False:
                     print('cryst.energy:',enecryst)
                     print('cryst.get_volume()')
-            de = (enecryst/vol - e0/vol)*(2./(s**2.))
-            de2 = (de)/aseunits.GPa
+            #de = (enecryst/vol - e0/V0)*(2./(s**2.))
+            C44 = (enecryst - e0)/vol*(2./(s**2.))
+            ase_write("out_c_check_vol_cons_widerange_DFTV0.runner",cryst,format='runner',append=True)
             #print(d,'de',de2)
-            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene(de2):',de2)
-        np.savetxt("elastic_ene.dat",np.array([de2]))
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene(de2):',C44/aseunits.GPa,stress)
+        np.savetxt("elastic_ene.dat",np.array([C44]))
         sys.exit()
         print()
         cryst = my_get_cart_deformed_cell(atoms_h, size=0.2,vol=False)
@@ -1950,7 +1978,8 @@ class ase_calculate_ene( object ):
             print('volc',cryst.get_volume()/4.,cryst.get_potential_energy())
             #ase_write("out_murn.runner",cryst,format='runner',append=True)
 
-        V0 = 16.476413798491
+        V0 = 16.476413798491 #  first converged
+        V0 = 16.476032301744 #  beset converge
         a0 = (4.*V0)**(1./3.)
         print("V0",V0)
         print("a0",a0)
