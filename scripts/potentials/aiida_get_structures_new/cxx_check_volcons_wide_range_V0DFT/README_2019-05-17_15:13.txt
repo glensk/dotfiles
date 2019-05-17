@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: 9b52a354d7d91a8b193187eadd435a0e7702fd05
+
+aiida_export_group_to_runner.py -gn out_c_check_vol_cons_widerange_DFTV0.runner_calc
