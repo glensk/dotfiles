@@ -21,5 +21,7 @@
 16.0 04.01.2019 Weih
 15.0 05.02.2019 Ski Susanne Geb
 14.0 05.04.2019 Ski
+13.0 14.05.2019 Liam/Sarah Cern
+12.0 14.05.2019 Liam/Sarah Wandern
 
 
