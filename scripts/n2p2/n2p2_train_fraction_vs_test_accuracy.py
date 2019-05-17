@@ -11,6 +11,7 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-sbtrain','--sort_by_trainfraction'      , help='sort output by trainfractino'      , action='count', default=False)
     p.add_argument('-s','--from_subfolder', help='from_subfolder', action='count', default=True)
+    p.add_argument('-o','--only_best_converged', help='show only best converged job when several restarts', action='count', default=True)
     p.add_argument('-q','--from_que'      , help='from_que'      , action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
@@ -74,8 +75,8 @@ if verbose:
 def pp():
     a="-----------"
     print(12*a)
-
-
+pp()
+print(' - n2p2 has spikes for t_t_l')
 pp()
 pp()
 print("#           ||    ENERGY (RMSE)    ||          || FORCES (RMSE)|| C44  || KMC  || [stes]")
@@ -83,15 +84,18 @@ print("#train      || test / train        ||          || train/ test  || C44  ||
 print("#frac       || min  /       (@step)||          || min  /       || C44  ||      ||   path")
 pp()
 
+
 ##########################################################
 #for c in ["*"]:  # jst use the subfolder
 subfolder = ["*"]
 if args.from_que == True:
     subfolder = path
+allfolder = []
 for c in subfolder:    # from the ones in the que
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
     fn=sorted(glob.glob(c+"/learning-curve.out"))
-    ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
+    #ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
+    ru=sorted(glob.glob(c+"/log.fit"))
     fo = fn+ru
     #for i in fo:
     #    print('fo',i,os.path.basename(i))
@@ -102,12 +106,45 @@ for c in subfolder:    # from the ones in the que
     out2=[]
     for i in fo:
         #print('aaa:',i)
+        # i        : runner_v0_64/log.fit
+        # basename : log.fit
+        # folder   : runner_v0_64
         basename = os.path.basename(i)
-        inputnn=i.replace(basename, 'input.nn')
-        kmcstdfile=i.replace(basename, 'kmc57/ene_std.npy')
-        elastic=i.replace(basename, 'elastic.dat')
-        elastic_ene=i.replace(basename, 'elastic_ene.dat')
-        testf = my.inputnn_get_testfraction(inputnn)
+        folder = i.replace(basename, '')[:-1]
+        allfolder.append(folder)
+
+        def foldername_search_restartname(folder):
+            iteration = folder.split("_")[-1] # 1 2 tmp
+            preiteration = "_".join(folder.split("_")[:-1]) # 1 2 tmp
+            #print('i       ',i)              # runner_4998_21_3/log.fit
+            #print('folder  ',folder)         # runner_4998_21_3
+            #print('iteration',iteration)      # 1 2 tmp
+            #print('preiteration',preiteration)      # 1 2 tmp
+            try:
+                search = preiteration+"_"+str(int(iteration)+1)
+                #print('search',search)
+            except ValueError:
+                return False
+            return search
+
+        foldern = foldername_search_restartname(folder)
+        #print('folder  ',folder)         # runner_4998_21_3
+        #print('foldern ',foldern)
+        #print()
+        #print('basename',basename)       # log.fit
+        #print()
+        #sys.exit()
+        inputnn     =i.replace(basename, 'input.nn')
+        kmcstdfile  =i.replace(basename, 'kmc57/ene_std.npy')
+        elastic     =i.replace(basename, 'elastic.dat')
+        elastic_ene =i.replace(basename, 'elastic_ene.dat')
+        testf       = my.inputnn_get_testfraction(inputnn)
+        nodes_short = my.inputnn_get_nodes_short(inputnn,as_string=True)
+        activation_short = my.inputnn_get_activation_short(inputnn)
+        nn = nodes_short+"__"+activation_short
+        #print('nodes_short',nodes_short)
+        #print('activation_short',activation_short)
+        #print("nn",nn)
         pot_elements, pot_atom_energy = my.inputnn_get_atomic_symbols_and_atom_energy(inputnn)
         #print('pe',pot_atom_energy,inputnn)
         if os.path.isfile(kmcstdfile):
@@ -193,11 +230,13 @@ for c in subfolder:    # from the ones in the que
             round(testminf_at_testmin,2),    # j[8]
             testmin_idx,                              # j[9]
 
+            foldern,                                     # path_
+            nn,
             kmcstd,
             epochs_,                                   # epochs_
             c44,                                    # c44_
             c44e,                                    # c44_
-            path__                                       # path_
+            folder                                       # path_
             ])
 
     np.set_printoptions(precision=2)
@@ -208,11 +247,16 @@ for c in subfolder:    # from the ones in the que
         run = "    "
         NJC = "    "
         que = "    "
+        foldern =len(j) - 7
+        if j[foldern] in allfolder:
+            continue
+        nn     =len(j) - 6
         kmcstd =len(j) - 5
         epochs_=len(j) - 4
         c44_   =len(j) - 3
         c44e_  =len(j) - 2
-        path_  =len(j) - 1
+        path_  = folder = len(j) - 1
+        #print('-->',j[nn],j[foldern])
         #print('a',path_,j,'--->',j[11])
         #sys.exit()
         #print('kk',j[path_].split("/learning-curve.out"))
@@ -254,20 +298,25 @@ for c in subfolder:    # from the ones in the que
         #print('j',j[1],j[2]) ene
         #print('j',j[7],j[8]) forces
 
-        stringout = run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f) || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"
-        elementout = (         j[0] ,  j[1],  j[2],   j[3],     j[4], j[5],  j[6],      j[7],  j[8],  j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_])
+        #stringout = run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f) || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"
+        #elementout = (         j[0] ,  j[1],  j[2],   j[3],     j[4], j[5],  j[6],      j[7],  j[8],  j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_])
 
-        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || [%4.0f] %s"
-        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[epochs_],j[path_])
+        #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || [%4.0f] %s"
+        #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[epochs_],j[path_])
 
-        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
-        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
+        #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
+        #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
+
+        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %s"
+        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
+
         #print('j',j[4])
         if (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
             print(my.printblue(stringout)%elementout)
-        elif (j[1]+j[2])/2. < 3.5 and (j[7]+j[8])/2. < 30.:
+        elif (j[1]+j[2])/2. < 4.0 and (j[7]+j[8])/2. < 30.:
             print(my.printgreen(stringout)%elementout)
         elif (j[1]+j[2])/2. > 10. or (j[7]+j[8])/2. > 60.:
             print(my.printred(stringout)%elementout)
         else:
             print(stringout%elementout)
+#print('aall',allfolder)

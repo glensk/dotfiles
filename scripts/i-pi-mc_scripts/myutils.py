@@ -1929,15 +1929,20 @@ class ase_calculate_ene( object ):
         print('volum0',V0,'   s 0               ene0: e0',e0)
         print('----------------------------------------------------------------------------------------')
         #for d in np.linspace(-0.1,0.1,4):
-        for d in np.linspace(-10.,10.,10):
+        points = 10
+        ene_vs_strain = np.zeros((points,2))
+        for idx,d in enumerate(np.linspace(-10.,10.,points)):
             sd = 0.2
             sd = d
             s = sd/100.
+            ene_vs_strain[idx,0] = s
             cryst = my_get_cart_deformed_cell(atoms_h, size=sd,vol=False)
             cell = cryst.get_cell()
             stress = cryst.get_stress()
-            enecryst = cryst.get_potential_energy()
+            enecryst = cryst.get_potential_energy()  # eV for whole cell
+            ene_vs_strain[idx,1] = (enecryst-e0)*1000./cryst.get_number_of_atoms()
             vol = cryst.get_volume()
+
             if True:
                 if False:
                     print()
@@ -1952,8 +1957,11 @@ class ase_calculate_ene( object ):
             C44 = (enecryst - e0)/vol*(2./(s**2.))
             ase_write("out_c_check_vol_cons_widerange_DFTV0.runner",cryst,format='runner',append=True)
             #print(d,'de',de2)
-            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(20),'ene',enecryst,'c44ene(de2):',C44/aseunits.GPa,stress)
+            atb = ANGSTROM_TO_BOHRRADIUS = 1./aseunits.Bohr
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(10),'ene',enecryst,'c44:',str(round(C44/aseunits.GPa,2)).ljust(5),cell[0]*atb,cell[2]*atb) #stress)
+            print("volume",str(vol).ljust(20),'s',str(round(s,5)).ljust(10),'ene',enecryst,'c44:',str(round(C44/aseunits.GPa,2)).ljust(5),cell[0],cell[2]) #stress)
         np.savetxt("elastic_ene.dat",np.array([C44]))
+        np.savetxt("ene_vs_strain_NN.dat",ene_vs_strain)
         sys.exit()
         print()
         cryst = my_get_cart_deformed_cell(atoms_h, size=0.2,vol=False)
@@ -3016,6 +3024,22 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
 def inputnn_get_testfraction(file):
     test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
     return test_fraction
+
+def inputnn_get_nodes_short(file,as_string=False):
+    nn = (grep(file,"global_nodes_short")[0]).split()
+    #print(nn.index("#"))
+    nna_str = nn[1:nn.index("#")]
+    if as_string == True:
+        return "_".join(nna_str)
+    nna_int = list(map(int, nna_str))
+    #print('nna_str:',nna_int)
+    return np.array(nna_int)
+
+def inputnn_get_activation_short(file):
+    nn = (grep(file,"global_activation_short")[0]).split()
+    nna = nn[1:nn.index("#")]
+    nnb = "_".join(nna)
+    return nnb
 
 def inputnn_get_trainfraction(file):
     test_fraction = inputnn_get_testfraction(file)
