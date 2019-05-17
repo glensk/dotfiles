@@ -125,7 +125,7 @@ def create_READMEtxt(directory=False,add=False):
     print()
     return
 
-def n2p2_get_scaling_and_function_data():
+def n2p2_get_scaling_and_function_data(submitdebug=True):
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
@@ -145,8 +145,8 @@ def n2p2_get_scaling_and_function_data():
     cp("../input.nn")
     cp(submitfile)
 
-    submitjob(submitdebug=True,jobdir=os.getcwd(),submitskript="submit_scaling_debug.sh")
-    create_READMEtxt()
+    submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript="submit_scaling_debug.sh")
+    create_READMEtxt(add="submitdebug = "+str(submitdebug))
     return
 
 
