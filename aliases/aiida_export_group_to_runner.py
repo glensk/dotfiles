@@ -129,7 +129,7 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
     print('c44 ST:',stress[2][1]*1000./2.,"GPa")
     strain = cell[0,1]/cell[0,0]*2.
     e0_meV_pa = -537462.638416432193
-    e0_eV = e0_meV_pa/1000.*4  # from EVinet
+    e0_eV = e0_meV_pa/1000.*4.  # from EVinet
     print('strain',strain,'e0 (eV)',e0_eV)
     e0 = -2149.85053966
     V0 = 16.476413798802568*4.
@@ -164,7 +164,7 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
     write_runner_cell(fileout, cell)
     write_runner_atomlines(fileout, positions, elements, atomicforce_array=atomicforce_array)
     write_runner_finalline(fileout, energy=energy)
-    return strain, energy-e0_eV
+    return strain, energy,e0_eV,vol
 
 def get_timesorted_trajectories(relaxworkcalc):
     q = QueryBuilder()
@@ -286,9 +286,13 @@ def createjob(group_name, filename, write_only_relaxed, supress_readme, verbose)
         return work.out.output_parameters.get_dict()['stress']
 
     strainfile = 'ene_vs_strain_DFT.dat'
+    strainfile_wo = 'ene_vs_strain_DFT_wo.dat'
     if os.path.isfile(strainfile):
         os.remove(strainfile)
+    if os.path.isfile(strainfile_wo):
+        os.remove(strainfile_wo)
     filestrain = open(strainfile, "w")
+    filestrain_wo = open(strainfile_wo, "w")
     for node in all_nodes:
         stress = get_stress(load_node(node.uuid))
 
@@ -301,8 +305,12 @@ def createjob(group_name, filename, write_only_relaxed, supress_readme, verbose)
         elif isinstance(node, WorkCalculation):
             process_label = node.get_attrs()['_process_label']
             if process_label == "PwBaseWorkChain":
-                strain, enediff = write_pwbase_torunner(fileout, node,stress=stress)
+                strain, energy, e0_eV,vol = write_pwbase_torunner(fileout, node,stress=stress)
+                enediff =  energy - e0_eV
+                C44 = (enediff)/vol*(2./(strain**2.))
+                print('C44',str(round(C44/units.GPa,2)))
                 filestrain.write(str(strain)+" "+ str(enediff*1000./4.)+"\n")
+                filestrain_wo.write(str(strain)+" "+ str(energy*1000./4.)+"\n")
             elif process_label == "PwRelaxWorkChain":
                 write_pwrelax_torunner(fileout, node, write_only_relaxed,verbose)
             else:
@@ -312,6 +320,7 @@ def createjob(group_name, filename, write_only_relaxed, supress_readme, verbose)
 
     fileout.close()
     filestrain.close()
+    filestrain_wo.close()
     return
 
 
