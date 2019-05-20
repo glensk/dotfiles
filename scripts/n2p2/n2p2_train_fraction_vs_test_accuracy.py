@@ -91,6 +91,8 @@ subfolder = ["*"]
 if args.from_que == True:
     subfolder = path
 allfolder = []
+drawn1 = False
+drawn2 = False
 for c in subfolder:    # from the ones in the que
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
     fn=sorted(glob.glob(c+"/learning-curve.out"))
@@ -104,6 +106,12 @@ for c in subfolder:    # from the ones in the que
     #    fo=glob.glob("tf_*_"+c+"*learning-curve.out")
     #out=[]
     out2=[]
+    out_runner_conv = []
+    out_runner_unconv = []
+    out_n2p2_conv = []
+    out_n2p2_unconv = []
+    out_conv = []
+    out_unconv = []
     for i in fo:
         #print('aaa:',i)
         # i        : runner_v0_64/log.fit
@@ -128,6 +136,7 @@ for c in subfolder:    # from the ones in the que
             return search
 
         foldern = foldername_search_restartname(folder)
+        runner_n2p2 = folder.split("_")[0]
         #print('folder  ',folder)         # runner_4998_21_3
         #print('foldern ',foldern)
         #print()
@@ -210,113 +219,151 @@ for c in subfolder:    # from the ones in the que
 
         #print('bbb:',i)
         out2.append([
-            round(train_fraction,2),                # j[0]
+            round(train_fraction,2),                            # j[0]
 
-            #round(testmin*1000.*27.211384,2),       # j[1]
-            round(testmin,2),       # j[1]
+            #round(testmin*1000.*27.211384,2),                  # j[1]
+            round(testmin,2),                                   # j[1]
+
             #round(trainrmse_at_testmin*1000.*27.211384,2),     # j[2]
-            round(trainrmse_at_testmin,2),     # j[2]
-            testmin_idx,                               # j[3]
+            round(trainrmse_at_testmin,2),                      # j[2]
+            testmin_idx,                                        # j[3]
 
-            #round(trainmin*1000.*27.211384,2),      # j[4]
-            round(trainmin,2),      # j[4]
-            #round(testrmse_at_trainmin*1000.*27.211384,2),    # j[5]
-            round(testrmse_at_trainmin,2),    # j[5]
-            trainmin_idx,                              # j[6]
+            #round(trainmin*1000.*27.211384,2),                 # j[4]
+            round(trainmin,2),                                  # j[4]
+            #round(testrmse_at_trainmin*1000.*27.211384,2),     # j[5]
+            round(testrmse_at_trainmin,2),                      # j[5]
+            trainmin_idx,                                       # j[6]
 
             #round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
-            #round(testminf_at_testmin*51.422063*1000,2),    # j[8]
-            round(trainminf_at_testmin,2),      # j[7]
-            round(testminf_at_testmin,2),    # j[8]
-            testmin_idx,                              # j[9]
+            #round(testminf_at_testmin*51.422063*1000,2),       # j[8]
+            round(trainminf_at_testmin,2),                      # j[7]
+            round(testminf_at_testmin,2),                       # j[8]
+            testmin_idx,                                        # j[9]
 
-            foldern,                                     # path_
-            nn,
-            kmcstd,
-            epochs_,                                   # epochs_
-            c44,                                    # c44_
-            c44e,                                    # c44_
-            folder                                       # path_
+            runner_n2p2,                                        # j[10]
+            foldern,                                            # j[11] path_
+            nn,                                                 # j[12]
+            kmcstd,                                             # j[13]
+            epochs_,                                            # j[14] epochs_
+            c44,                                                # j[15] c44_
+            c44e,                                               # j[16] c44_
+            folder                                              # j[17] path_
             ])
 
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
+    #print('oo',len(out2))
+    #print('oo',len(out2[0]))
+    #print('oo',len(out2[0])-3)
+    #sys.exit()
+    #for i in out2:
+    #    print(i[15])
     if args.sort_by_trainfraction:
         out2=sorted(out2,key=lambda x: x[0])
-    for idj,j in enumerate(out2): # for every line
-        run = "    "
-        NJC = "    "
-        que = "    "
-        foldern =len(j) - 7
-        if j[foldern] in allfolder:
-            continue
-        nn     =len(j) - 6
-        kmcstd =len(j) - 5
-        epochs_=len(j) - 4
-        c44_   =len(j) - 3
-        c44e_  =len(j) - 2
-        path_  = folder = len(j) - 1
-        #print('-->',j[nn],j[foldern])
-        #print('a',path_,j,'--->',j[11])
-        #sys.exit()
-        #print('kk',j[path_].split("/learning-curve.out"))
-        #print('0j[path_]',j[path_])
-        path_before_learningcurve = j[path_].split("/learning-curve.out")[0]  # random_seed_2234125
-        #print('1j[path_]',j[path_])
-        path_before_learningcurve = os.getcwd()+"/"+path_before_learningcurve
-        #print('2j[path_]',path_before_learningcurve)
-        if path_before_learningcurve in checkpath_run:
-            run = "(R) "
-        if path_before_learningcurve in checkpath_que:
-            run = "(Q) "
-        if j[epochs_] - 250 < j[3]:
-            NJC = "NJC "
-        if len(j[path_].split("vorlage_parallel_mode2")) == 2:
-            continue   # no difference just makes fitting faster/slower
-        if len(j[path_].split("vorlage_parallel_mode3")) == 2:
-            continue   # no difference just makes fitting faster/slower
-        if len(j[path_].split("ff0.02115_kalman1")) == 2:
-            continue   # does not run correctly
-        if len(j[path_].split("ff0.02115_vorlage_kalman1")) == 2:
-            continue   # does not run correctly
-        if len(j[path_].split("ff0.02115_normalize_nodes")) == 2:
-            continue # too slow
-        if len(j[path_].split("vorlage_force_weight_12")) == 2:
-            continue
 
-        #if len(j[path_].split("tf_0.2_job_21maa_fr_ff0.01215")) == 2:
-        #    print('j[epochs_]',j[epochs_],'j[3]',j[3])
-        #    print('test1',j[epochs_] - 250)
-        #print('j j j',j[1])
-        if j[1] > 999: j[1] = 999.9
-        if j[2] > 999: j[2] = 999.9
-        if j[4] > 999: j[4] = 999.9
-        if j[5] > 999: j[5] = 999.9
-        if j[7] > 999: j[7] = 999.9
-        if j[8] > 999: j[8] = 999.9
-        if j[kmcstd] > 999: j[kmcstd] = 999
-        #print('j',j[1],j[2]) ene
-        #print('j',j[7],j[8]) forces
+    out2=sorted(out2,key=lambda x: x[2])  # das ist nach dem train ergebnis
+    out2=sorted(out2,key=lambda x: x[len(out2[0])-3])  # das ist nach dem train ergebnis
+    #for exec_conv_unconv in [ ["n2p2","conv"],[ "n2p2", "unconv"], ['runner','conv'],['runner','unconv']]:
+    #for exec_conv_unconv in [ ["n2p2","green"],[ "n2p2", "white"], ['n2p2','red'],['n2p2','blue'],["runner","green"],[ "runner", "white"], ['runner','red'],['runner','blue']]:
+    for exec_conv_unconv_a in ["n2p2","runner"]:
+        for exec_conv_unconv_b in ["orange","green","white",'red','blue']:
+            exec_conv_unconv = [exec_conv_unconv_a,exec_conv_unconv_b]
+            for idj,j in enumerate(out2): # for every line
+                run = "    "
+                NJC = "    "
+                que = "    "
+                runner_n2p2 =len(j) - 8
+                foldern =len(j) - 7
+                if j[foldern] in allfolder:
+                    continue
+                nn     =len(j) - 6
+                kmcstd =len(j) - 5
+                epochs_=len(j) - 4
+                c44_   =len(j) - 3
+                c44e_  =len(j) - 2
+                path_  = folder = len(j) - 1
+                #print('-->',j[nn],j[foldern])
+                #print('a',path_,j,'--->',j[11])
+                #sys.exit()
+                #print('kk',j[path_].split("/learning-curve.out"))
+                #print('0j[path_]',j[path_])
+                path_before_learningcurve = j[path_].split("/learning-curve.out")[0]  # random_seed_2234125
+                #print('1j[path_]',j[path_])
+                path_before_learningcurve = os.getcwd()+"/"+path_before_learningcurve
+                #print('2j[path_]',path_before_learningcurve)
+                if path_before_learningcurve in checkpath_run:
+                    run = "(R) "
+                if path_before_learningcurve in checkpath_que:
+                    run = "(Q) "
+                if j[epochs_] - 250 < j[3]:
+                    NJC = "NJC "
+                if len(j[path_].split("vorlage_parallel_mode2")) == 2:
+                    continue   # no difference just makes fitting faster/slower
+                if len(j[path_].split("vorlage_parallel_mode3")) == 2:
+                    continue   # no difference just makes fitting faster/slower
+                if len(j[path_].split("ff0.02115_kalman1")) == 2:
+                    continue   # does not run correctly
+                if len(j[path_].split("ff0.02115_vorlage_kalman1")) == 2:
+                    continue   # does not run correctly
+                if len(j[path_].split("ff0.02115_normalize_nodes")) == 2:
+                    continue # too slow
+                if len(j[path_].split("vorlage_force_weight_12")) == 2:
+                    continue
 
-        #stringout = run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f) || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"
-        #elementout = (         j[0] ,  j[1],  j[2],   j[3],     j[4], j[5],  j[6],      j[7],  j[8],  j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_])
+                #if len(j[path_].split("tf_0.2_job_21maa_fr_ff0.01215")) == 2:
+                #    print('j[epochs_]',j[epochs_],'j[3]',j[3])
+                #    print('test1',j[epochs_] - 250)
+                #print('j j j',j[1])
+                if j[1] > 999: j[1] = 999.9
+                if j[2] > 999: j[2] = 999.9
+                if j[4] > 999: j[4] = 999.9
+                if j[5] > 999: j[5] = 999.9
+                if j[7] > 999: j[7] = 999.9
+                if j[8] > 999: j[8] = 999.9
+                if j[kmcstd] > 999: j[kmcstd] = 999
+                #print('j',j[1],j[2]) ene
+                #print('j',j[7],j[8]) forces
 
-        #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || [%4.0f] %s"
-        #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[epochs_],j[path_])
+                #stringout = run+NJC+"%0.2f  || %5.1f /%5.1f  (%4.0f) ||%5.1f /%5.1f (%4.0f) || %5.1f /%5.1f (%4.0f) || c44 %3.1f %3.1f || [%4.0f] %s"
+                #elementout = (         j[0] ,  j[1],  j[2],   j[3],     j[4], j[5],  j[6],      j[7],  j[8],  j[9],     j[c44_], j[c44e_] ,j[epochs_],j[path_])
 
-        #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
-        #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
+                #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || [%4.0f] %s"
+                #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[epochs_],j[path_])
 
-        stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %s"
-        elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
+                #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
+                #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
 
-        #print('j',j[4])
-        if (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
-            print(my.printblue(stringout)%elementout)
-        elif (j[1]+j[2])/2. < 4.0 and (j[7]+j[8])/2. < 30.:
-            print(my.printgreen(stringout)%elementout)
-        elif (j[1]+j[2])/2. > 10. or (j[7]+j[8])/2. > 60.:
-            print(my.printred(stringout)%elementout)
-        else:
-            print(stringout%elementout)
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %s"
+                elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
+
+                conv_unconv = "unconv"
+                if j[4] < 3:
+                    takecolor = 'orange'
+                elif (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
+                    takecolor = "blue"
+                elif j[c44_] < 10:
+                    takecolor = "blue"
+                elif (j[1]+j[2])/2. > 10. or (j[7]+j[8])/2. > 60.:
+                    takecolor = "red"
+                elif (j[1]+j[2])/2. < 4.0 and (j[7]+j[8])/2. < 35.:
+                    takecolor = "green"
+                    conv_unconv = "conv"
+                else:
+                    takecolor = "white"
+
+                if drawn1 == False and exec_conv_unconv[0] == 'runner':
+                    print('------------------------------------------------------------------'*2)
+                    drawn1 = True
+                #if exec_conv_unconv[0] == j[runner_n2p2] and exec_conv_unconv[1] == conv_unconv:
+                if exec_conv_unconv[0] == j[runner_n2p2] and exec_conv_unconv[1] == takecolor:
+                    if takecolor == "orange":
+                        print(my.printorange(stringout)%elementout)
+                    if takecolor == "green":
+                        print(my.printgreen(stringout)%elementout)
+                    if takecolor == "blue":
+                        print(my.printblue(stringout)%elementout)
+                    if takecolor == "red":
+                        print(my.printred(stringout)%elementout)
+                    if takecolor == "white":
+                        print(stringout%elementout)
 #print('aall',allfolder)
