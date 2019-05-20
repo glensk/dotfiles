@@ -12,6 +12,7 @@ def help(p = None):
     p.add_argument('-f','--folder', type=str,default=".", help="folder to evalute")
     p.add_argument('-nr', type=str,default=False, help="number of the potential inputfile e.g. 18 for weights.012.000018.out")
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    p.add_argument('-tmp','--tmp', help='make potential_tmp instead of potential', action='count', default=False)
     return p
 
 def n2p2_get_best_test_nr_from_learning_curve(folder):
@@ -97,6 +98,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
 
     folder = "potential_"+str(args.nr)+'/'
     folder = "potential/"
+    if args.tmp:
+        folder = "potential_tmp/"
     if os.path.isdir(folder):
         sys.exit(folder+' does already exist!')
 
