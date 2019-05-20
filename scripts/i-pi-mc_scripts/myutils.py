@@ -3056,6 +3056,10 @@ def inputnn_get_testfraction(file):
     test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
     return test_fraction
 
+def inputnn_get_random_seed(file):
+    random_seed = np.float(grep(file,"random_seed")[0].split()[1])
+    return random_seed
+
 def inputnn_get_nodes_short(file,as_string=False):
     nn = (grep(file,"global_nodes_short")[0]).split()
     #print(nn.index("#"))
