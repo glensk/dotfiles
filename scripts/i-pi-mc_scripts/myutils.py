@@ -76,6 +76,25 @@ def printblue(*var):
     ENDC = '\033[0m'
     return printoutcolor(red,var,ENDC)
 
+def printpink(*var):
+    red = '\033[35m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
+def printturquise(*var):
+    red = '\033[36m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
+def printwhite(*var): # stechend
+    red = '\033[37m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
+def printgrey(*var):
+    red = '\033[38m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
 
 def grep(filepath,string):
     out = []

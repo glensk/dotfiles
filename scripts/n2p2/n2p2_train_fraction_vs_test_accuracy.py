@@ -337,13 +337,15 @@ for c in subfolder:    # from the ones in the que
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
 
                 conv_unconv = "unconv"
-                if j[4] < 3:
-                    takecolor = 'orange'
-                elif (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
-                    takecolor = "blue"
+
+                ## erstmak die komischen aussortieren
+                if (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
+                    takecolor = "blue"  # wiered
                 elif j[c44_] < 10:
-                    takecolor = "blue"
-                elif (j[1]+j[2])/2. > 10. or (j[7]+j[8])/2. > 60.:
+                    takecolor = "blue"  # wiered
+                elif j[4] < 3:  # old
+                    takecolor = 'orange'
+                elif (j[1]+j[2])/2. > 4. or (j[7]+j[8])/2. >= 35.:
                     takecolor = "red"
                 elif (j[1]+j[2])/2. < 4.0 and (j[7]+j[8])/2. < 35.:
                     takecolor = "green"
