@@ -66,6 +66,11 @@ def printgreen(*var):
     ENDC = '\033[0m'
     return printoutcolor(red,var,ENDC)
 
+def printorange(*var):
+    red = '\033[33m'
+    ENDC = '\033[0m'
+    return printoutcolor(red,var,ENDC)
+
 def printblue(*var):
     red = '\033[34m'
     ENDC = '\033[0m'
