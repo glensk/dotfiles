@@ -1,0 +1,7 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 9894b0406811cb64872623b3915a49cd56f84f37
+# execution time: 2.7970700264 seconds.
+# pwd: /home/glensk/TEST_RUNNER_VS_n2p2/runner_5000new_24_24_runner_mode_2_testfraction_0.1_newexp_newatomic_energies_converged_m2/potential_tmp
+
+n2p2_get_potential_folder_from_nr.py -tmp
