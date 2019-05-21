@@ -32,4 +32,16 @@ jupyter notebook --no-browser --port=8889
 on mac: ssh -N -f -L localhost:8886:localhost:8889 glensk@fidis.epfl.ch
 in browser: http://localhost:8886
 
+or
+conda activate gap
+jupyter notebook --no-browser --port=8886
+on mac: ssh -N -f -L localhost:8889:localhost:8886 glensk@fidis.epfl.ch
+in browser: http://localhost:8889
+
+or
+
+
+
+
+
 

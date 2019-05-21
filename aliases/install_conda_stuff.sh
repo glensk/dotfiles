@@ -65,6 +65,8 @@ echo "${RED}ase${NC}"
 conda install -y -c conda-forge ase
 echo "${RED}seaborn${NC}"
 conda install -y seaborn
+conda install -y tqdm
+
 echo "${RED}lmfit${NC}"
 conda install -y -c conda-forge lmfit # for phonon_lifetimes.py kette.py ...
 echo "${RED}jupyter_contrib_nbextension${NC}"
