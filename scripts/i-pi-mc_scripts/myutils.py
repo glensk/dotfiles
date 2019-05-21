@@ -4,6 +4,7 @@ import os,sys,re
 import click
 import numpy as np
 import glob #,pathlib
+from tqdm import tqdm_notebook, tnrange
 from copy import deepcopy
 from socket import gethostname
 import shutil
@@ -13,10 +14,16 @@ import ase
 from ase.build import bulk as ase_build_bulk
 from ase.constraints import StrainFilter
 import hesse
+try:
+    import quippy
+except ImportError:
+    pass
+
 try:  # not in aiida ase
     from ase.constraints import ExpCellFilter
 except ImportError:
     pass
+
 from ase.spacegroup import crystal
 from ase.constraints import StrainFilter
 try:
@@ -336,7 +343,7 @@ def check_isfile_or_isfiles(path,pathnames=False,envvar=False,verbose=False):
         sys.exit('unknown type file type path '+str(path))
     return
 
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,create_fake_vacancy=False,whichcell="fcc"):
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -383,24 +390,44 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,crea
     #    atomsc[i].symbol = 'Si'
 
     # This is the order which ipi kmc expects
-    for i in np.arange(nsi):
-        atomsc[i].symbol = 'Si'
-    for i in np.arange(nsi,nmg+nsi):
-        atomsc[i].symbol = 'Mg'
+    if type(normal_ordering) == bool:
+        for i in np.arange(nsi):
+            atomsc[i].symbol = 'Si'
+        for i in np.arange(nsi,nmg+nsi):
+            atomsc[i].symbol = 'Mg'
 
-    if create_fake_vacancy == False:
+        if create_fake_vacancy == False:
+            for i in np.arange(nvac):
+                del atomsc[-1]
+        elif create_fake_vacancy == True:
+            startsubst = -1
+            for i in np.arange(nvac):
+                #print('startsubst',startsubst)
+                atomsc[startsubst].symbol = 'V'
+                startsubst -= 1
+        else:
+            sys.exit("create_fake_vacancy has to be True or False")
+    elif type(normal_ordering) == str:
         for i in np.arange(nvac):
-            del atomsc[-1]
-    elif create_fake_vacancy == True:
-        startsubst = -1
-        for i in np.arange(nvac):
-            #print('startsubst',startsubst)
-            atomsc[startsubst].symbol = 'V'
-            startsubst -= 1
+            atomsc[i].symbol = 'V'
+        normal_ordering_element = normal_ordering.split("_")[0]
+        normal_ordering_pos     = normal_ordering.split("_")[1]
+        #print('normal_ordering_element',normal_ordering_element)
+        #symb = 'Si'
+        #symb = 'Mg'
+        symb = normal_ordering_element
+        if normal_ordering_pos == '0':
+            return atomsc
+        if normal_ordering_pos == '1':
+            atomsc[1].symbol = symb
+        if normal_ordering_pos == '2':
+            atomsc[5].symbol = symb
+        if normal_ordering_pos == '3':
+            atomsc[25].symbol = symb
     else:
-        sys.exit("create_fake_vacancy has to be True or False")
-    number_of_atoms = atomsc.get_number_of_atoms()
-    nal = number_of_atoms - nsi - nmg
+        sys.exit('random_ordering has to be of type bool or str!')
+    #number_of_atoms = atomsc.get_number_of_atoms()
+    #nal = number_of_atoms - nsi - nmg
     #ase.io.write('kalmp',atomsc,format='lammps-dump')
     return atomsc
 
@@ -2943,66 +2970,55 @@ def get_latest_n2p2_pot():
     return potout
 
 
-def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=False):
-    ''' adds formats runner and lammps-runner to ase '''
+class ase_get_known_formats_class():
+    """
+    helptext
+    """
+    def __init__(self,verbose=False):
+        self.formatspy              = os.path.dirname(ase.io.__file__)+"/formats.py"
+        self.all_known_formats      = []
+        self.all_known_formats_ase  = False
+        self.my_formats_shall       = [ 'runner',   'lammps-runner', 'lammps-data'   ,'ipi'   , 'quippy'    ]
+        self.my_formats_filenames   = [ "runner.py","lammpsrunner.py","lammpsdata.py","ipi.py", "quippy.py" ]
+        self.my_formats_is          = []
+        self.verbose                = verbose
+        self.needcopy_since_missing = False
+        return
 
-    ### get the known formats
-    known_formats = []
-    x = ase.io.formats.all_formats
-    for i in x:
-        known_formats.append(i)
+    def get_all_known_formats(self):
+        if len(self.all_known_formats) == 0:
+            self.all_known_formats_ase = ase.io.formats.all_formats
+            for i in self.all_known_formats_ase:
+                self.all_known_formats.append(i)
+        return
 
-    ### show the known formats
-    if show:
-        import pprint
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(x)
-
-    ### get formatspy
-    formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
-    if verbose or show_formatspy:
-        print('>> formatspy        :',formatspy)
-
-    ### check if formats are known by ase
-    missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py" ]
-    def checkformats(typ,verbose):
-        if typ in known_formats:
-            if verbose: print(typ,"known in formats.py")
+    def check_if_format_in_know_formats(self,typ):
+        if typ in self.all_known_formats:
+            if self.verbose: print(">> formats.py knows", typ)
             return True
         else:
-            if verbose: print(typ,"not known in formats.py")
+            self.verbose = True
+            if self.verbose: print(">> ERROR, formats.py does not know",typ)
             return False
 
-    for i in [ 'runner', 'lammps-runner', 'lammps-data' ]:
-        formats_known = checkformats(i,verbose)
-        if formats_known == False: add_missing_formats = True
-
-
-    ### copies the missing format files
-    if copy_formats or add_missing_formats:
-        if verbose:
-            print('cc',ase.io.__file__)
+    def copy(self):
         scripts = my.scripts()
         from_ = scripts+"/runner_scripts/ase_fileformat_for_"
         to = os.path.dirname(ase.io.__file__)+"/"
-        for ff in missing:
+        for ff in self.my_formats_filenames:
             #print('copying ',from_+ff,'to',to+ff)
-            if verbose: print('copying ',ff,'to',to+ff)
+            if self.verbose:
+                print('copying ',from_+ff)
+                print('                    to',to+ff)
             shutil.copyfile(from_+ff,to+ff)
 
+    def adapt_formatspy(self,writeformatspy = False):
+        # check if formatspy exist
+        if not os.path.isfile(self.formatspy):
+            print('formatspy',self.formatspy)
+            sys.exit('did not find '+str(self.formatspy))
 
-    ### check if necessary files for formats are known
-    if add_missing_formats:  # copies the missing format files
-        if verbose:
-            print('adapting ase formats.py .... ')
-
-
-        if not os.path.isfile(formatspy):
-            print('formatspy',formatspy)
-            sys.exit('did not find '+str(formatspy))
-
-
-        f = open(formatspy, "r")
+        f = open(self.formatspy, "r")
         contents = f.readlines()
         f.close()
         insert=0
@@ -3015,23 +3031,18 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
             if i[:30] == "    'lammps-data': 'lammpsdata":
                 insert2 = idx
 
-        writeformatspy = False
-        if 'runner' in x:
-            if verbose:
-                print('runner        format are already added in formats.py (of ase).')
-        else:
-            contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
-            writeformatspy = True
+        for fo in [ 'runner', 'ipi', 'quippy' ]:
+            if fo in self.all_known_formats_ase:
+                if self.verbose:
+                    print(fo.ljust(14)+'format are already added in formats.py (of ase).')
+            else:
+                print(fo.ljust(14)+'format NOT KNOWN in formats.py (of ase, WILL BE ADDED).')
+                contents.insert(insert, "    '"+fo+"': ('"+fo+" input file', '+F'),\n")
+                writeformatspy = True
 
-        if 'ipi' in x:
-            if verbose:
-                print('ipi           format are already added in formats.py (of ase).')
-        else:
-            contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
-            writeformatspy = True
 
-        if 'lammps-runner' in x:
-            if verbose:
+        if 'lammps-runner' in self.all_known_formats_ase:
+            if self.verbose:
                 print('lammps-runner format are already added in formats.py (of ase).')
         else:
             contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
@@ -3039,18 +3050,180 @@ def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=Fa
             writeformatspy = True
 
         if writeformatspy == True:
-            print('now changing formatspy')
-            print('insert',insert)
+            print('! adapting formatspy ... ! (seems to be save in any case)')
+            #print('insert',insert)
 
-            f = open(formatspy, "w")
+            f = open(self.formatspy, "w")
             contents = "".join(contents)
             f.write(contents)
             f.close()
         else:
-            if verbose:
-                print('everything was already in formats.py')
+            if self.verbose:
+                print('everything was already in',self.formatspy)
+        return
 
-    return known_formats
+    def check_if_default_formats_known(self,copy_and_adapt_formatspy_anyhow=False):
+        self.get_all_known_formats()
+        if self.verbose: print(">> formats.py", self.formatspy)
+        for i in self.my_formats_shall:
+            if self.check_if_format_in_know_formats(i) == False: self.needcopy_since_missing = True
+
+        if self.needcopy_since_missing == True or copy_and_adapt_formatspy_anyhow == True: # only in this case copy stuff and add to formats.py
+            self.verbose = True
+            self.copy()
+            self.adapt_formatspy(writeformatspy = copy_and_adapt_formatspy_anyhow)
+        return
+
+def is_upper_triangular(arr, atol=1e-8):
+    """test for upper triangular matrix based on numpy"""
+    # must be (n x n) matrix
+    assert len(arr.shape)==2
+    assert arr.shape[0] == arr.shape[1]
+    return np.allclose(np.tril(arr, k=-1), 0., atol=atol)
+
+def convert_cell(cell,pos):
+    """
+    Convert a parallelepipedal (forming right hand basis)
+    to lower triangular matrix LAMMPS can accept. This
+    function transposes cell matrix so the bases are column vectors
+    """
+    cell = np.matrix.transpose(cell)
+    if not is_upper_triangular(cell):
+        # rotate bases into triangular matrix
+        tri_mat = np.zeros((3, 3))
+        A = cell[:, 0]
+        B = cell[:, 1]
+        C = cell[:, 2]
+        tri_mat[0, 0] = np.linalg.norm(A)
+        Ahat = A / np.linalg.norm(A)
+        AxBhat = np.cross(A, B) / np.linalg.norm(np.cross(A, B))
+        tri_mat[0, 1] = np.dot(B, Ahat)
+        tri_mat[1, 1] = np.linalg.norm(np.cross(Ahat, B))
+        tri_mat[0, 2] = np.dot(C, Ahat)
+        tri_mat[1, 2] = np.dot(C, np.cross(AxBhat, Ahat))
+        tri_mat[2, 2] = np.linalg.norm(np.dot(C, AxBhat))
+
+        # create and save the transformation for coordinates
+        volume = np.linalg.det(cell)
+        trans = np.array([np.cross(B, C), np.cross(C, A), np.cross(A, B)])
+        trans /= volume
+        coord_transform = np.dot(tri_mat, trans)
+        pos = np.dot(coord_transform, pos.transpose())
+        pos = pos.transpose()
+
+        return tri_mat, pos
+    else:
+        return cell, pos
+
+
+#def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=False):
+#    ''' adds formats runner and lammps-runner to ase '''
+#
+#    ### get the known formats
+#    known_formats = []
+#    x = ase.io.formats.all_formats
+#    for i in x:
+#        known_formats.append(i)
+#
+#    ### show the known formats
+#    if show_known_formats:
+#        import pprint
+#        pp = pprint.PrettyPrinter(indent=4)
+#        pp.pprint(x)
+#
+#    ### get formatspy
+#    formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
+#    if verbose or show_formatspy:
+#        print('>> formatspy        :',formatspy)
+#
+#    ### check if formats are known by ase
+#    missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py", "quippy.py" ]
+#    def checkformats(typ,verbose):
+#        if typ in known_formats:
+#            if verbose: print(">> formats.py knows", typ)
+#            return True
+#        else:
+#            if verbose: print(">> ERROR, formats.py does not know",typ)
+#            return False
+#
+#    for i in [ 'runner', 'lammps-runner', 'lammps-data' ]:
+#        formats_known = checkformats(i,verbose)
+#        if formats_known == False: add_missing_formats = True
+#
+#
+#    ### copies the missing format files
+#    if copy_formats or add_missing_formats:
+#        if verbose:
+#            print('cc',ase.io.__file__)
+#        scripts = my.scripts()
+#        from_ = scripts+"/runner_scripts/ase_fileformat_for_"
+#        to = os.path.dirname(ase.io.__file__)+"/"
+#        for ff in missing:
+#            #print('copying ',from_+ff,'to',to+ff)
+#            if verbose: print('copying ',ff,'to',to+ff)
+#            shutil.copyfile(from_+ff,to+ff)
+#
+#
+#    ### check if necessary files for formats are known
+#    if add_missing_formats:  # copies the missing format files
+#        if verbose:
+#            print('adapting ase formats.py .... ')
+#
+#
+#        if not os.path.isfile(formatspy):
+#            print('formatspy',formatspy)
+#            sys.exit('did not find '+str(formatspy))
+#
+#
+#        f = open(formatspy, "r")
+#        contents = f.readlines()
+#        f.close()
+#        insert=0
+#        insert2=0
+#        for idx,i in enumerate(contents):
+#            #print('i',idx,i)
+#            #print("|"+i[:20]+"|")
+#            if i[:20] == "    'abinit': ('ABIN":
+#                insert = idx
+#            if i[:30] == "    'lammps-data': 'lammpsdata":
+#                insert2 = idx
+#
+#        writeformatspy = False
+#        if 'runner' in x:
+#            if verbose:
+#                print('runner        format are already added in formats.py (of ase).')
+#        else:
+#            contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
+#            writeformatspy = True
+#
+#        if 'ipi' in x:
+#            if verbose:
+#                print('ipi           format are already added in formats.py (of ase).')
+#        else:
+#            contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
+#            writeformatspy = True
+#
+#        if 'lammps-runner' in x:
+#            if verbose:
+#                print('lammps-runner format are already added in formats.py (of ase).')
+#        else:
+#            contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
+#            contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
+#            writeformatspy = True
+#
+#        if writeformatspy == True:
+#            print('now changing formatspy')
+#            print('insert',insert)
+#
+#            f = open(formatspy, "w")
+#            contents = "".join(contents)
+#            f.write(contents)
+#            f.close()
+#        else:
+#            if verbose:
+#                print('everything was already in formats.py')
+#
+#    return known_formats
 
 def inputnn_get_testfraction(file):
     test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
@@ -3229,9 +3402,118 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
 
     if lc.shape == (1,0):
         lc = np.zeros((1,5))
-
-
     return lc
+
+
+#######################################################################################
+## SOAP funcions
+#######################################################################################
+def get_rawsoap(at, gs=0.3, co=3.0, cotw=0.5, nmax=9, lmax=6, cw=1.0, nrm=True, zlist=[], central_z=0, x_cmd=""):
+    """
+    gs gaussian widths
+    co cutoff radius
+    cotw you don't care
+    n radial basis functions
+    l spherical harmonics basis
+    zlist list of atomic numbers the SOAPS will see
+    central_z list of atomic numbers you will center on : IT DEFINES THE NUMBER OF ROWS of the rawsoaps
+
+    """
+    if len(zlist)==0:
+        zlist = np.unique(np.asarray(at.z))
+    nz = len(zlist)
+    lspecies = "n_species="+str(nz)+" species_Z={"+(" ".join(np.asarray(zlist,dtype=str)))+"}"
+    soapstr=("soap central_reference_all_species=F normalise="+("T" if nrm else "F")+" central_weight="+str(cw)+
+               "  covariance_sigma0=0.0 atom_sigma="+str(gs)+" cutoff="+str(co)+" cutoff_transition_width="+str(cotw)+
+               " n_max="+str(nmax)+" l_max="+str(lmax)+' '+lspecies+' Z='+str(central_z)+' '+x_cmd)
+    desc = quippy.descriptors.Descriptor(soapstr )
+    at.set_cutoff(co);
+    at.calc_connect();
+    return zlist, desc.calc(at)["descriptor"]
+
+def get_soap2_vec(rawsoap, zlist, zglobal=None,nmax=False,lmax=False):
+    isoap = 0
+    isqrttwo = 1.0/np.sqrt(2.0)
+    njsoap = {}; ipair = {}
+
+    if zglobal is None:
+        zglobal = zlist
+    njsoap = np.zeros((len(zglobal),nmax,len(zglobal),nmax,lmax+1))
+    zmap = np.zeros(len(zlist),int)
+    for s in xrange(len(zlist)):
+        zmap[s] = zglobal.index(zlist[s])
+    for s1 in xrange(len(zlist)):
+        z1 = zmap[s1]
+        for n1 in xrange(nmax):
+            for s2 in xrange(s1+1):
+                z2 = zmap[s2]
+                for n2 in xrange(nmax if s2<s1 else n1+1):
+                    soap_element = rawsoap[isoap:isoap+lmax+1]
+                    if (s1 != s2 or n1 != n2):
+                        soap_element *= isqrttwo  # undo the normalization since we will actually sum over all pairs in all directions!
+                    njsoap[z1,n1,z2,n2,:] = soap_element
+                    njsoap[z2,n2,z1,n1,:] = soap_element
+                    isoap+=lmax+1
+    return njsoap
+
+def do_fps(x, d=0):
+    if d == 0 : d = len(x)
+    n = len(x)
+    iy = np.zeros(d, int)
+    # faster evaluation of Euclidean distance
+    n2 = np.sum(x**2,axis=1)
+    iy[0] = np.random.randint(0, n)
+    dl = n2 + n2[iy[0]] - 2* np.dot(x, x[iy[0]])
+    lmin = np.zeros(d)
+    for i in range(1,d):
+        iy[i] = np.argmax(dl)
+        lmin[i-1] = dl[iy[i]]
+        if i%1000 ==0: print("max min dist %f" %( dl[iy[i]]))
+        nd = n2 + n2[iy[i]] - 2*np.dot(x,x[iy[i]])
+        dl = np.minimum(dl, nd)
+    return iy, lmin
+
+def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,13,14], central_z=23 ):
+    rsoap = []
+    #nmax = 8   # 12
+    #lmax = 6  # 9
+    #co = 4  # cutoff radius, 3.0  ## is this in angstrom?
+    gs = 0.5 # gaussian width, 0.3
+    cotw = gs
+    det = "c"+str(co)+"-g"+str(gs)+"-nrm-cw"
+    #zlist = [12,13,14]  # why is this working, even without specifying the vacancy/Vanadium ....? [12,13,14,23]
+    ztot = len(zlist)
+    nsoap = ztot**2 * nmax**2 * (1+lmax)
+    ntot = len(kmcxyz)
+    print('rsoap ...')
+    for at in tqdm_notebook(kmcxyz):
+        #progress(i,len(kmcxyz))
+        # andrea used a zentral_z=0
+        # the next line could be potentially done parallel...
+        zliat, soaps = get_rawsoap(at, nmax=nmax, lmax=lmax, co=co, gs=gs, cotw=cotw, nrm=False, cw=1, zlist=zlist, central_z=central_z,
+                                   x_cmd="cutoff_dexp=2 cutoff_scale=3.0 cutoff_rate=2.0")
+        rsoap.append((zliat, soaps))
+    print('rsoap done ...')
+
+    soap2 = []
+    print('soap2 ...')
+    for i in tnrange(ntot):
+        progress(i,ntot)
+        izl, soaps = rsoap[i]
+        lenv = np.zeros((len(soaps), ztot, nmax, ztot, nmax, 1+lmax))
+        for s in range(len(soaps)):
+            lenv[s] = get_soap2_vec(soaps[s], izl, zlist,nmax=nmax,lmax=lmax)
+        soap2.append(lenv)
+    print('soap2 done ...')
+    print('esoap2 ...')
+    esoap2 = []
+    for s in soap2:
+        progress(i,len(soap2))
+        for e in s:
+            esoap2.append(e.flatten())
+    print('esoap2 done ...')
+    esoap2 = np.asarray(esoap2)
+    return rsoap, esoap2
 
 
 if __name__ == "__main__":

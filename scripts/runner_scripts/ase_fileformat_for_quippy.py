@@ -4,10 +4,12 @@ compatible with standard XYZ format."""
 import sys
 from ase.atoms import Atoms
 from ase.io.extxyz import read_extxyz as read_xyz, write_extxyz as write_xyz
-from numpy.linalg import norm
 import numpy as np
+from numpy.linalg import norm
+#from copy import copy,deepcopy
 
-__all__ = ['read_ipi', 'write_ipi']
+
+__all__ = ['read_quippy', 'write_quippy']
 
 def is_upper_triangular(arr, atol=1e-8):
     """test for upper triangular matrix based on numpy"""
@@ -15,6 +17,7 @@ def is_upper_triangular(arr, atol=1e-8):
     assert len(arr.shape)==2
     assert arr.shape[0] == arr.shape[1]
     return np.allclose(np.tril(arr, k=-1), 0., atol=atol)
+
 
 def convert_cell(cell,pos):
     """
@@ -51,8 +54,12 @@ def convert_cell(cell,pos):
     else:
         return cell, pos
 
+
+
 #def simple_read_xyz(fileobj, index):
-def read_ipi(fileobj, index):
+def read_quippy(fileobj, index):
+    print('ERROR: this will still read in something in ipi format')
+    sys.exit()
     lines = fileobj.readlines()
     natoms = int(lines[0])
     cell_str = lines[1]
@@ -83,20 +90,28 @@ def read_ipi(fileobj, index):
 
 
 #def simple_write_xyz(fileobj, images, comment=''):
-def write_ipi(fileobj, images, comment=''):
+def write_quippy(fileobj, images, comment=''):
     if len(images) != 1:
-         sys.exit('you can only give write_ipi one frame at a time!')
+        sys.exit('you can only give write_quippy one frame at a time!')
     frame = images[0].copy()
-
-    symbols = frame.get_chemical_symbols()
-    laa = frame.get_cell_lengths_and_angles()
-    comment = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+" Step: 4  Bead: 0 positions{angstrom} cell{angstrom}"
+    #laa = images[0].get_cell_lengths_and_angles()
+    #print('oldpos')
+    #print((images[0].positions)[:5])
+    #print('--------')
+    #print((frame.positions)[:5])
     newcell, newpos = convert_cell(frame.cell, frame.positions)
+    laa = np.matrix.transpose(newcell)
+    #print('newpos')
+    #print(newpos[:5])
     frame.set_cell(newcell)
     frame.set_positions(newpos)
 
+    # Lattice="14.34366105636912 0 0 7.171830528184559 12.421974858089195 0 7.171830528184559 4.140658286029731 11.71155021051156"
+    comment = 'Lattice="'+str(laa[0,0])+"  "+str(laa[0,1])+"  "+str(laa[0,2])+"  "+str(laa[1,0])+"  "+str(laa[1,1])+"  "+str(laa[1,2])+"  "+str(laa[2,0])+"  "+str(laa[2,1])+"  "+str(laa[2,2])+'"'
+    #print('aa',(frame.get_positions())[:5])
+    symbols = frame.get_chemical_symbols()
     natoms = len(symbols)
-    #for atoms in images:
+    #for atoms in frame:
     fileobj.write('%d\n%s\n' % (natoms, comment))
     for s, (x, y, z) in zip(symbols, frame.positions):
         fileobj.write('%-2s %16.8f %16.8f %16.8f\n' % (s, x, y, z))
