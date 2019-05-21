@@ -23,6 +23,9 @@ setenv () {
 function iterm_title {
         echo -ne "\033]0;"$*"\007"
 }
+
+
+
 #setenv () { export $1=$2 }
 
 #aliastcshtobash () {
@@ -117,3 +120,27 @@ virtualenv_activate () {
      fi;
      source $ACTIVATE_SCRIPT
 }
+
+start_notebook_fidis () {
+    ipynbs=`find . -maxdepth 1 -name "*.ipynb"`
+    echo ipynbs ":$ipynbs:"
+    if [ "$ipynbs" != "" ];then
+        echo
+        echo 'starting: conda activate gap'
+        echo 'starting: jupyter notebook --no-browser --port=8886'
+        echo 'open the notebook on mac: open_notebok_from_fidis'
+        echo
+        echo
+        conda activate gap
+        jupyter notebook --no-browser --port=8886
+    else
+        echo "no ipynb notebooks found"
+    fi
+}
+
+open_notebook_from_fidis () {
+    lsof -ti:8889 | xargs kill -9
+    ssh -N -f -L localhost:8889:localhost:8886 glensk@fidis.epfl.ch
+    open http://localhost:8889
+}
+

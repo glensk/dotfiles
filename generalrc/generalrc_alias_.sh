@@ -74,6 +74,7 @@ $1 cd.. 'cd ..'
 $1 .. 'cd ..'
 $1 .... 'cd ../..'
 $1 ...... 'cd ../../..'
+$1 e 'exit'
 
 #$1 sxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; cp ../lammps_pos_to_sum.py .; sendx lammps_pos_to_sum.py;cd $hier'
 #$1 rxlp 'hier=`pwd`;cd ~/Thermodynamics/python_thermodynamics/save_old; recievex; cp lammps_pos_to_sum.py .. ;cd $hier'
