@@ -2,6 +2,7 @@
 from __future__ import print_function
 import os,sys,random
 import socket
+import numpy as np
 from shutil import copyfile
 import click
 
@@ -69,6 +70,10 @@ def createjob(
     to evaluate energies vs. realtime use:\n
             %kmc_show_time_xmgrace.sh seed*/KMC_AL6XXX
     """
+    ### check if ase runner/quippy/lammpps-data formats are known
+    ase_formats = mu.ase_get_known_formats_class(verbose=True)
+    ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
+
     # definex ffsocket inet/unix
     if nodes == 1:
         ffsocket = "unix"
@@ -137,8 +142,16 @@ def createjob(
 
 
     # make the atomic structure
-    atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,create_fake_vacancy = True)
-    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
+    if True:
+
+        #mu.ase_get_known_formats(show=True, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=True)
+        for i in [ 'Mg', 'Si' ]:
+            for ii in [ 0,1,2,3]:
+                atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,create_fake_vacancy = True,normal_ordering=i+'_'+str(ii))
+                atomsc_fakevac.write('data_test.quippy.xyz',format='quippy',append=True)
+                atomsc_fakevac.write('data_test.ipi',append=True)
+
+        sys.exit()
 
 
     # show the input variables

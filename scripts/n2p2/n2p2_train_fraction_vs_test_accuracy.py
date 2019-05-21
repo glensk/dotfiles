@@ -148,6 +148,7 @@ for c in subfolder:    # from the ones in the que
         elastic     =i.replace(basename, 'elastic.dat')
         elastic_ene =i.replace(basename, 'elastic_ene.dat')
         testf       = my.inputnn_get_testfraction(inputnn)
+        random_seed = my.inputnn_get_random_seed(inputnn)
         nodes_short = my.inputnn_get_nodes_short(inputnn,as_string=True)
         activation_short = my.inputnn_get_activation_short(inputnn)
         nn = nodes_short+"__"+activation_short
@@ -240,14 +241,15 @@ for c in subfolder:    # from the ones in the que
             round(testminf_at_testmin,2),                       # j[8]
             testmin_idx,                                        # j[9]
 
-            runner_n2p2,                                        # j[10]
-            foldern,                                            # j[11] path_
-            nn,                                                 # j[12]
-            kmcstd,                                             # j[13]
-            epochs_,                                            # j[14] epochs_
-            c44,                                                # j[15] c44_
-            c44e,                                               # j[16] c44_
-            folder                                              # j[17] path_
+            random_seed,                                        # j[10]
+            runner_n2p2,                                        # j[1]
+            foldern,                                            # j[1] path_
+            nn,                                                 # j[1]
+            kmcstd,                                             # j[1]
+            epochs_,                                            # j[1] epochs_
+            c44,                                                # j[1] c44_
+            c44e,                                               # j[1] c44_
+            folder                                              # j[1] path_
             ])
 
     np.set_printoptions(precision=2)
@@ -272,6 +274,7 @@ for c in subfolder:    # from the ones in the que
                 run = "    "
                 NJC = "    "
                 que = "    "
+                random_seed =len(j) - 9
                 runner_n2p2 =len(j) - 8
                 foldern =len(j) - 7
                 if j[foldern] in allfolder:
@@ -336,8 +339,10 @@ for c in subfolder:    # from the ones in the que
                 stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
 
-                conv_unconv = "unconv"
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %8.0f | %s"
+                elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[random_seed],j[path_])
 
+                conv_unconv = "unconv"
                 ## erstmak die komischen aussortieren
                 if (j[1]+j[2])/2. < 0.1 or j[4] == 0.0:
                     takecolor = "blue"  # wiered
