@@ -66,15 +66,16 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
         units = "meV_pa"
         verbose = True
 
-    print('infile               :',infile)
 
     hostname = my.hostname()
     if lmp == True:
         ase = False
 
+    print('infile               :',infile)
 
-    ### check if ase runneer format is known
-    my.ase_get_known_formats(show=False,add_missing_formats=False, copy_formats=True,verbose=False,show_formatspy=True)
+    ### check if ase runner/quippy/lammpps-data formats are known
+    ase_formats = my.ase_get_known_formats_class()
+    ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
 
     ### check if lammps is working with ase
     if 'LD_LIBRARY_PATH' not in os.environ:

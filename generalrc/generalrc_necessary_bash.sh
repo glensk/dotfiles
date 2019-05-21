@@ -23,6 +23,9 @@ setenv () {
 function iterm_title {
         echo -ne "\033]0;"$*"\007"
 }
+
+
+
 #setenv () { export $1=$2 }
 
 #aliastcshtobash () {
@@ -116,4 +119,20 @@ virtualenv_activate () {
          return;
      fi;
      source $ACTIVATE_SCRIPT
+}
+
+start_notebook_fidis () {
+    ipynbs=`find . -maxdepth 1 -name "*.ipynb"`
+    echo ipynbs ":$ipynbs:"
+    if [ "$ipynbs" != "" ];then
+        echo
+        echo 'starting: conda activate gap'
+        echo 'starting: jupyter notebook --no-browser --port=8886'
+        echo
+        echo
+        conda activate gap
+        jupyter notebook --no-browser --port=8886
+    else
+        echo "no ipynb notebooks found"
+    fi
 }
