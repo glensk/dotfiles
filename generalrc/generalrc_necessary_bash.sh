@@ -128,6 +128,7 @@ start_notebook_fidis () {
         echo
         echo 'starting: conda activate gap'
         echo 'starting: jupyter notebook --no-browser --port=8886'
+        echo 'open the notebook on mac: open_notebok_from_fidis'
         echo
         echo
         conda activate gap
@@ -136,3 +137,10 @@ start_notebook_fidis () {
         echo "no ipynb notebooks found"
     fi
 }
+
+open_notebook_from_fidis () {
+    lsof -ti:8889 | xargs kill -9
+    ssh -N -f -L localhost:8889:localhost:8886 glensk@fidis.epfl.ch
+    open http://localhost:8889
+}
+
