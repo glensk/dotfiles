@@ -1,7 +1,7 @@
 self.nsites = 64  # for a 4^3 supercell
 self.natoms = self.nsites - self.nvac
 
-self.dbeads[0].q[0,:]): --> actual positions
+self.dbeads[0].q[0,:]): --> actual positions (in bohrradius)
 self.sites[self.unique_idx(self.state)].copy()*bohr_to_ang
 
 self.sites:  
