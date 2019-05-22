@@ -12,20 +12,17 @@ def help(p = None):
     p.add_argument('-f','--folder', type=str,default=".", help="folder to evalute")
     p.add_argument('-nr', type=str,default=False, help="number of the potential inputfile e.g. 18 for weights.012.000018.out")
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    p.add_argument('-l','--get_last_epoch', help='get potential from last epoch', action='count', default=False)
     p.add_argument('-tmp','--tmp', help='make potential_tmp instead of potential', action='count', default=False)
     return p
 
-def n2p2_get_best_test_nr_from_learning_curve(folder):
+def n2p2_get_best_test_nr_from_learning_curve(folder,get_last_epoch=False):
     if not os.path.isdir(folder):
         sys.exit(folder+' does not exist! (7)')
     folder = os.path.abspath(folder)
     print('folder',folder)
-    job = False
-    if os.path.isfile(folder+"/optweights.012.out"):
-        job = "runner"
-    else:
-        job = 'n2p2'
-
+    print('get_last_epoch',get_last_epoch)
+    job = my.inputnn_runner_or_n2p2(folder+'/input.nn')
     #print('job',job)
     if job == 'n2p2':
         learning_curve_file = folder+"/learning-curve.out"
@@ -39,7 +36,19 @@ def n2p2_get_best_test_nr_from_learning_curve(folder):
     print('learning_curve_file',learning_curve_file)
 
     learning_curve = lc = my.n2p2_runner_get_learning_curve(learning_curve_file)
+    if get_last_epoch:
+        last_epoch = len(learning_curve) - 1
+        #print('lenxx',last_epoch)
+        #print(lc[last_epoch])
+        print('last epoch:',last_epoch)
+        return last_epoch
+    #print('learning_curve')
+    #print(learning_curve)
     best_testset = np.argmin(lc[:,2])
+    #print('best_testset')
+    #print(best_testset)
+    #print(lc[best_testset])
+    #sys.exit()
             #a = np.loadtxt(folder+"/learning-curve.out")
             #best_testset = np.argmin(a[:,2])
             #print('best_testset',best_testset)
@@ -100,6 +109,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     folder = "potential/"
     if args.tmp:
         folder = "potential_tmp/"
+    if args.get_last_epoch:
+        folder = "potential_last/"
     if os.path.isdir(folder):
         sys.exit(folder+' does already exist!')
 
@@ -131,13 +142,16 @@ def n2p2_make_potential_folder_from_nr(argsnr):
             my.cp(weights,folder+'/optweights.'+i+'.out')
     os.chdir(folder)
     my.create_READMEtxt(directory=os.getcwd(),add="# pwd: "+os.getcwd())
-    return
+    return folder
 
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
     if args.nr == False:
-        args.nr = n2p2_get_best_test_nr_from_learning_curve(args.folder)
-    n2p2_make_potential_folder_from_nr(argsnr=args.nr)
+        args.nr = n2p2_get_best_test_nr_from_learning_curve(args.folder,args.get_last_epoch)
+    folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
+    # we are already in potential folder
+    import subprocess
+    subprocess.call("getEnergies_byLammps.py -p . -e",shell=True)
 
 

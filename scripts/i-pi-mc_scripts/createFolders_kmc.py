@@ -5,6 +5,7 @@ import socket
 import numpy as np
 from shutil import copyfile
 import click
+from utils_rename import diff
 
 # from scripts folder
 import convert_fileformats
@@ -143,13 +144,68 @@ def createjob(
 
     # make the atomic structure
     if True:
+        atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+        nndist = a0/np.sqrt(2.)
+        NN_1_indices = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=nndist,skin=0.1)
+        NN_1_2_indices_tmp = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=a0,skin=0.1)
+        print('NN_1_indices  :',NN_1_indices)
+        NN_2_indices = np.sort(np.array(diff(NN_1_2_indices_tmp,NN_1_indices)))
+        print('NN_2_indices  :',NN_2_indices)
+        NN_1_2_indices = np.concatenate((NN_1_indices, NN_2_indices ))
+        print('NN_1_2_indices:',NN_1_2_indices)
+
+        def mysave(atomsc_fakevac,text=False):
+            if type(text) == bool:
+                sys.exit('define text')
+            atomsc_fakevac.write('data.quippy.xyz',format='quippy',append=True)
+            #atomsc_fakevac.write('data.xyz',format="extxyz",append=True)
+            atomsc_fakevac.write('data'+text+'.quippy.xyz',format='quippy',append=True)
+            #atomsc_fakevac.write('data'+text+'.xyz',format="extxyz",append=True)
+            return
+
+        # fill only 1NN (with one species)
+        for i in [ 'Mg', 'Si' ]:
+            atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+            mysave(atomsc_fakevac,text="1NN")
+            for ii in NN_1_indices:
+                atomsc_fakevac[ii].symbol = i
+                mysave(atomsc_fakevac,text="1NN")
+
+        # fill only 2NN (with one species)
+        for i in [ 'Mg', 'Si' ]:
+            atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+            mysave(atomsc_fakevac,text="2NN")
+            for ii in NN_2_indices:
+                atomsc_fakevac[ii].symbol = i
+                mysave(atomsc_fakevac,text="2NN")
+
+        # fill 1NN and 2NN (with one species)
+        for i in [ 'Mg', 'Si' ]:
+            atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+            mysave(atomsc_fakevac,text="1and2NN")
+            for ii in NN_1_2_indices:
+                atomsc_fakevac[ii].symbol = i
+                mysave(atomsc_fakevac,text="1and2NN")
+
+        # dif compositions in 1NN shell
+        filling = [ 2,4,6,8,10]
+        for fi in filling:
+            atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+            mysave(atomsc_fakevac,text="1NN_diffcomp")
+            for idx,ii in enumerate(NN_1_indices):
+                if idx < fi: ch = "Mg"
+                else: ch = "Si"
+                atomsc_fakevac[ii].symbol = ch
+            mysave(atomsc_fakevac,text="1NN_diffcomp")
+
+
+        sys.exit()
 
         #mu.ase_get_known_formats(show=True, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=True)
         for i in [ 'Mg', 'Si' ]:
-            for ii in [ 0,1,2,3]:
-                atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,create_fake_vacancy = True,normal_ordering=i+'_'+str(ii))
-                atomsc_fakevac.write('data_test.quippy.xyz',format='quippy',append=True)
-                atomsc_fakevac.write('data_test.ipi',append=True)
+            for ii in [ 0,1,2,3,4,5]:
+                atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering=i+'_'+str(ii))
+
 
         sys.exit()
 
