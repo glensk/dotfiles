@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 import numpy as np
-import glob,sys,os,argparse
+import glob,sys,os,argparse,subprocess
 import myutils as my
 
 def help(p = None):
@@ -13,6 +13,8 @@ def help(p = None):
     p.add_argument('-s','--from_subfolder', help='from_subfolder', action='count', default=True)
     p.add_argument('-o','--only_best_converged', help='show only best converged job when several restarts', action='count', default=True)
     p.add_argument('-q','--from_que'      , help='from_que'      , action='count', default=False)
+    p.add_argument('-p','--potential'     , help='potential is in "potential" subfolder'      , action='count', default=False)
+    p.add_argument('-c44','--getc44'     , help='get c44 in potential folder'      , action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
@@ -95,9 +97,16 @@ drawn1 = False
 drawn2 = False
 for c in subfolder:    # from the ones in the que
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
-    fn=sorted(glob.glob(c+"/learning-curve.out"))
+    fm1 = ""
+    if args.potential:
+        fm1 = "/potential"
+    if verbose > 3:
+        print('lookfor',c+fm1+"/learning-curve.out")
+    fn=sorted(glob.glob(c+fm1+"/learning-curve.out"))
+    if verbose > 3:
+        print('fn',fn)
     #ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
-    ru=sorted(glob.glob(c+"/log.fit"))
+    ru=sorted(glob.glob(c+fm1+"/log.fit"))
     fo = fn+ru
     #for i in fo:
     #    print('fo',i,os.path.basename(i))
@@ -113,13 +122,23 @@ for c in subfolder:    # from the ones in the que
     out_conv = []
     out_unconv = []
     for i in fo:
-        #print('aaa:',i)
+        if verbose > 0:
+            print('aaa:',i)
         # i        : runner_v0_64/log.fit
         # basename : log.fit
         # folder   : runner_v0_64
         basename = os.path.basename(i)
         folder = i.replace(basename, '')[:-1]
         allfolder.append(folder)
+        if verbose:
+            print('AA folder',folder)
+        if args.getc44:
+            with my.cd(folder):
+                if verbose:
+                    print("--------->>",os.getcwd())
+                subprocess.call("getEnergies_byLammps.py -p . -e",shell=True)
+        #print(os.getcwd())
+        #sys.exit()
 
         def foldername_search_restartname(folder):
             iteration = folder.split("_")[-1] # 1 2 tmp
@@ -136,9 +155,10 @@ for c in subfolder:    # from the ones in the que
             return search
 
         foldern = foldername_search_restartname(folder)
-        runner_n2p2 = folder.split("_")[0]
-        #print('folder  ',folder)         # runner_4998_21_3
-        #print('foldern ',foldern)
+
+        if verbose > 3:
+            print('folder  ',folder)         # runner_4998_21_3
+            print('foldern ',foldern)
         #print()
         #print('basename',basename)       # log.fit
         #print()
@@ -147,6 +167,10 @@ for c in subfolder:    # from the ones in the que
         kmcstdfile  =i.replace(basename, 'kmc57/ene_std.npy')
         elastic     =i.replace(basename, 'elastic.dat')
         elastic_ene =i.replace(basename, 'elastic_ene.dat')
+
+        runner_n2p2 = my.inputnn_runner_or_n2p2(inputnn)
+
+        #print(inputnn,'runner_n2p2',runner_n2p2)
         testf       = my.inputnn_get_testfraction(inputnn)
         random_seed = my.inputnn_get_random_seed(inputnn)
         nodes_short = my.inputnn_get_nodes_short(inputnn,as_string=True)
@@ -268,9 +292,15 @@ for c in subfolder:    # from the ones in the que
     #for exec_conv_unconv in [ ["n2p2","conv"],[ "n2p2", "unconv"], ['runner','conv'],['runner','unconv']]:
     #for exec_conv_unconv in [ ["n2p2","green"],[ "n2p2", "white"], ['n2p2','red'],['n2p2','blue'],["runner","green"],[ "runner", "white"], ['runner','red'],['runner','blue']]:
     for exec_conv_unconv_a in ["n2p2","runner"]:
+        if args.verbose > 3:
+            print('AA',exec_conv_unconv_a)
         for exec_conv_unconv_b in ["orange","green","white",'red','blue']:
+            if args.verbose > 3:
+                print('BB',exec_conv_unconv_b)
             exec_conv_unconv = [exec_conv_unconv_a,exec_conv_unconv_b]
             for idj,j in enumerate(out2): # for every line
+                if args.verbose > 3:
+                    print('CC',j)
                 run = "    "
                 NJC = "    "
                 que = "    "
@@ -278,6 +308,8 @@ for c in subfolder:    # from the ones in the que
                 runner_n2p2 =len(j) - 8
                 foldern =len(j) - 7
                 if j[foldern] in allfolder:
+                    if args.verbose > 3:
+                        print('DD is in --> continue',j[foldern])
                     continue
                 nn     =len(j) - 6
                 kmcstd =len(j) - 5
@@ -301,16 +333,28 @@ for c in subfolder:    # from the ones in the que
                 if j[epochs_] - 250 < j[3]:
                     NJC = "NJC "
                 if len(j[path_].split("vorlage_parallel_mode2")) == 2:
+                    if args.verbose > 3:
+                        print('exit reason 1')
                     continue   # no difference just makes fitting faster/slower
                 if len(j[path_].split("vorlage_parallel_mode3")) == 2:
+                    if args.verbose > 3:
+                        print('exit reason 2')
                     continue   # no difference just makes fitting faster/slower
                 if len(j[path_].split("ff0.02115_kalman1")) == 2:
+                    if args.verbose > 3:
+                        print('exit reason 3')
                     continue   # does not run correctly
                 if len(j[path_].split("ff0.02115_vorlage_kalman1")) == 2:
+                    if args.verbose > 3:
+                        print('exit reason 4')
                     continue   # does not run correctly
                 if len(j[path_].split("ff0.02115_normalize_nodes")) == 2:
+                    if args.verbose > 3:
+                        print('exit reason 4')
                     continue # too slow
                 if len(j[path_].split("vorlage_force_weight_12")) == 2:
+                    if args.verbose > 3:
+                        print('exit reason 5')
                     continue
 
                 #if len(j[path_].split("tf_0.2_job_21maa_fr_ff0.01215")) == 2:
@@ -336,6 +380,8 @@ for c in subfolder:    # from the ones in the que
                 #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] %s"
                 #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_],j[path_])
 
+                if args.verbose > 3:
+                    print('DD')
                 stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
 
@@ -362,6 +408,9 @@ for c in subfolder:    # from the ones in the que
                     print('------------------------------------------------------------------'*2)
                     drawn1 = True
                 #if exec_conv_unconv[0] == j[runner_n2p2] and exec_conv_unconv[1] == conv_unconv:
+                if args.verbose > 3:
+                    print('EE',exec_conv_unconv[0],j[runner_n2p2])
+                    print('FF',exec_conv_unconv[1],takecolor)
                 if exec_conv_unconv[0] == j[runner_n2p2] and exec_conv_unconv[1] == takecolor:
                     if takecolor == "orange":
                         print(my.printorange(stringout)%elementout)

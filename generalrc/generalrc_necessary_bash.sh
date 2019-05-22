@@ -111,6 +111,22 @@ load_local_anaconda() {
     source activate /u/aglen/conda-envs/my_root
 }
 
+conda_activate() {
+    if [ "`hostname`" = "fidis" ];then
+        echo "module purge"
+        module purge
+    fi
+    if [ -e "$HOME/miniconda2" ];then
+        echo "$HOME/miniconda2"
+        source $HOME/miniconda2/etc/profile.d/conda.sh
+        conda activate
+    elif [ -e "$HOME/miniconda3" ];then
+        echo "$HOME/miniconda3"
+        source $HOME/miniconda3/etc/profile.d/conda.sh
+        conda activate
+    fi
+}
+
 virtualenv_activate () {
      ACTIVATE_SCRIPT=$HOME/virtualenvs/$1/bin/activate;
      if [[ ! -f "$ACTIVATE_SCRIPT" ]]; then
@@ -128,7 +144,7 @@ start_notebook_fidis () {
         echo
         echo 'starting: conda activate gap'
         echo 'starting: jupyter notebook --no-browser --port=8886'
-        echo 'open the notebook on mac: open_notebok_from_fidis'
+        echo 'to open the notebook on mac: open_notebok_from_fidis'
         echo
         echo
         conda activate gap
