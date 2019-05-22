@@ -13,6 +13,7 @@ from datetime import datetime as datetime   # datetime.datetime.now()
 import ase
 from ase.build import bulk as ase_build_bulk
 from ase.constraints import StrainFilter
+from ase.neighborlist import NeighborList, neighbor_list, NewPrimitiveNeighborList
 import hesse
 try:
     import quippy
@@ -298,7 +299,8 @@ class cd:
     """
     Context manager for changing the current working directory
     use:
-    with cd("~/Library"):
+    import myutils as my
+    with my.cd("~/Library"):
         subprocess.call("ls")
 
     """
@@ -408,21 +410,31 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=False,crea
         else:
             sys.exit("create_fake_vacancy has to be True or False")
     elif type(normal_ordering) == str:
-        for i in np.arange(nvac):
-            atomsc[i].symbol = 'V'
         normal_ordering_element = normal_ordering.split("_")[0]
         normal_ordering_pos     = normal_ordering.split("_")[1]
+
+        for i in np.arange(nvac):
+            atomsc[i].symbol = 'V'
         #print('normal_ordering_element',normal_ordering_element)
         #symb = 'Si'
         #symb = 'Mg'
         symb = normal_ordering_element
         if normal_ordering_pos == '0':
             return atomsc
+
+
         if normal_ordering_pos == '1':
             atomsc[1].symbol = symb
         if normal_ordering_pos == '2':
             atomsc[5].symbol = symb
         if normal_ordering_pos == '3':
+            atomsc[25].symbol = symb
+        if normal_ordering_pos == '4':
+            atomsc[1].symbol = symb
+            atomsc[5].symbol = symb
+        if normal_ordering_pos == '5':
+            atomsc[1].symbol = symb
+            atomsc[5].symbol = symb
             atomsc[25].symbol = symb
     else:
         sys.exit('random_ordering has to be of type bool or str!')
@@ -493,6 +505,13 @@ def progress(count, total, status=''):
     sys.stdout.write('[%s] %s%s ... %s\r' % (bar, percents, '%', status))
     sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
     return
+
+
+def ase_get_neighborlist(frame,atomnr=0,cutoff=3.,skin=0.1):
+    NN = NeighborList([cutoff/2.]*frame.get_number_of_atoms(),skin=skin,self_interaction=False,bothways=True,primitive=NewPrimitiveNeighborList)
+    NN.update(frame)
+    NN_indices, offsets = NN.get_neighbors(atomnr)
+    return np.sort(NN_indices)
 
 
 
@@ -3224,6 +3243,13 @@ def convert_cell(cell,pos):
 #                print('everything was already in formats.py')
 #
 #    return known_formats
+def inputnn_runner_or_n2p2(file):
+    rn = grep(file,"runner_mode")
+    #print('type)',type(rn),rn)
+    if type(rn) == list and len(rn) == 0:
+        return "n2p2"
+    else:
+        return "runner"
 
 def inputnn_get_testfraction(file):
     test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
@@ -3473,7 +3499,7 @@ def do_fps(x, d=0):
         dl = np.minimum(dl, nd)
     return iy, lmin
 
-def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,13,14], central_z=23 ):
+def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,13,14], central_z=23,verbose=False,showtdqm=True ):
     rsoap = []
     #nmax = 8   # 12
     #lmax = 6  # 9
@@ -3485,33 +3511,43 @@ def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,
     ztot = len(zlist)
     nsoap = ztot**2 * nmax**2 * (1+lmax)
     ntot = len(kmcxyz)
-    print('rsoap ...')
-    for at in tqdm_notebook(kmcxyz):
+    if verbose:
+        print('rsoap ...')
+    if showtdqm == True:
+        gothrough = tqdm_notebook(kmcxyz)
+    else:
+        gothrough = kmcxyz
+
+    for at in gothrough:
         #progress(i,len(kmcxyz))
         # andrea used a zentral_z=0
         # the next line could be potentially done parallel...
         zliat, soaps = get_rawsoap(at, nmax=nmax, lmax=lmax, co=co, gs=gs, cotw=cotw, nrm=False, cw=1, zlist=zlist, central_z=central_z,
                                    x_cmd="cutoff_dexp=2 cutoff_scale=3.0 cutoff_rate=2.0")
         rsoap.append((zliat, soaps))
-    print('rsoap done ...')
+    if verbose:
+        print('rsoap done ...')
 
     soap2 = []
-    print('soap2 ...')
+    if verbose:
+        print('soap2 ...')
     for i in tnrange(ntot):
-        progress(i,ntot)
+        #progress(i,ntot)
         izl, soaps = rsoap[i]
         lenv = np.zeros((len(soaps), ztot, nmax, ztot, nmax, 1+lmax))
         for s in range(len(soaps)):
             lenv[s] = get_soap2_vec(soaps[s], izl, zlist,nmax=nmax,lmax=lmax)
         soap2.append(lenv)
-    print('soap2 done ...')
-    print('esoap2 ...')
+    if verbose:
+        print('soap2 done ...')
+        print('esoap2 ...')
     esoap2 = []
     for s in soap2:
-        progress(i,len(soap2))
+        #progress(i,len(soap2))
         for e in s:
             esoap2.append(e.flatten())
-    print('esoap2 done ...')
+    if verbose:
+        print('esoap2 done ...')
     esoap2 = np.asarray(esoap2)
     return rsoap, esoap2
 

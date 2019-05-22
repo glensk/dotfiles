@@ -1,2 +1,9 @@
 #!/bin/sh
+ff=`ls -1d *`
+hier=`pwd`
+for f in $ff;do
+    cd $hier
+    echo $f
+    cd $hier
+done
 
