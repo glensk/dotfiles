@@ -111,6 +111,22 @@ load_local_anaconda() {
     source activate /u/aglen/conda-envs/my_root
 }
 
+conda_activate() {
+    if [ "`hostname`" = "fidis" ];then
+        echo "module purge"
+        module purge
+    fi
+    if [ -e "$HOME/miniconda2" ];then
+        echo "$HOME/miniconda2"
+        source $HOME/miniconda2/etc/profile.d/conda.sh
+        conda activate
+    elif [ -e "$HOME/miniconda3" ];then
+        echo "$HOME/miniconda3"
+        source $HOME/miniconda3/etc/profile.d/conda.sh
+        conda activate
+    fi
+}
+
 virtualenv_activate () {
      ACTIVATE_SCRIPT=$HOME/virtualenvs/$1/bin/activate;
      if [[ ! -f "$ACTIVATE_SCRIPT" ]]; then
