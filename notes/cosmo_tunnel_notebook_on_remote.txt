@@ -32,6 +32,10 @@ jupyter notebook --no-browser --port=8889
 on mac: ssh -N -f -L localhost:8886:localhost:8889 glensk@fidis.epfl.ch
 in browser: http://localhost:8886
 
+<<<<<<< HEAD
+later, when port 8886 can not be opened on mac:
+lsof -ti:8886 | xargs kill -9
+=======
 or
 conda activate gap
 jupyter notebook --no-browser --port=8886
@@ -45,3 +49,4 @@ or
 
 
 
+>>>>>>> 6b36bb2e18c1e26f5e805bc4dab24ef50f215441
