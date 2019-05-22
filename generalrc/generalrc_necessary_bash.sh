@@ -144,7 +144,7 @@ start_notebook_fidis () {
         echo
         echo 'starting: conda activate gap'
         echo 'starting: jupyter notebook --no-browser --port=8886'
-        echo 'open the notebook on mac: open_notebok_from_fidis'
+        echo 'to open the notebook on mac: open_notebok_from_fidis'
         echo
         echo
         conda activate gap
