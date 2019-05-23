@@ -2,7 +2,7 @@
  # -*- coding: utf-8 -*-
 from __future__ import print_function
 import numpy as np
-import os,sys,argparse,re
+import os,sys,argparse,re,socket
 from subprocess import call
 
 def help(p = None):
@@ -15,6 +15,7 @@ def help(p = None):
     p.add_argument('-lx', '--log_x', action='store_true', default=False,help='make x axis logarithmic')
     p.add_argument('-ly', '--log_y', action='store_true', default=False,help='make y axis logarithmic')
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    p.add_argument('-x11','--x11', help='ser term to x11', action='count', default=False)
 
     p.add_argument('-xmin','--xmin' , required=False, action='append', type=float,
             help=argparse.SUPPRESS, default=False)
@@ -44,6 +45,8 @@ def set_args_defaults(args,inputfile):
         print('args.max_columns (in)',args.max_columns)
         print("######################## set_args_defaults #######################")
         print()
+    if socket.gethostname() == "mac":
+        args.x11 = True  # since aquaterm does open figurs in the background (but the first one)
     return
 
 def gnuplot_defaults(args):
@@ -69,8 +72,8 @@ def gnuplot_defaults(args):
 
         # 3) add a slight grid to make it easier to follow the exact position
         # of the curves
-        if False:
-            ca("set style line 12 lc rgb '#808080' lt 0 lw 1")
+        if True:
+            ca("set style line 12 lc rgb '#808080' lt 0 lw .1")
             ca("set grid back ls 12")
 
         #ca("set terminal enhanced font 'Verdana,10'")
@@ -84,7 +87,8 @@ def gnuplot_defaults(args):
     ca("#set xrange [0:10]")
     ca("set pointsize 2")
     #ca("set terminal aqua")
-    #ca("set terminal x11")
+    if args.x11:
+        ca("set terminal x11")
     if args.log_log:
         ca("set logscale xy")
     if args.log_x:
@@ -170,6 +174,7 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1):
     return pl
 
 def gnuplot_plot(args):
+    global c
     ################################################
     # make the plot
     ################################################
@@ -230,13 +235,10 @@ def gnuplot_plot(args):
     if args.verbose > 2:
         print("######################## show command BEFORE #####################")
         print(c)
-
     if args.log_log or args.log_x:
-        global c
         c = re.sub(r"#set yrange .*", "set yrange ["+str(args.ymin)+":"+str(args.ymax)+"]", c)
 
     if args.log_log or args.log_x:
-        global c
         c = re.sub(r"#set xrange .*", "set xrange ["+str(args.xmin)+":"+str(args.xmax)+"]", c)
 
     #c_new = c
