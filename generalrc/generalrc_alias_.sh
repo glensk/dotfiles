@@ -125,7 +125,8 @@ $1 bc 'bc -l'
 $1 xmgrace 'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 $1 x   'DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 $1 xll "DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par"
-$1 g gnuplotfile
+$1 g 'gnuplot.py'
+$1 gp 'gnuplot.py'
 $1 untargz 'tar -xvf'
 $1 untar 'tar xfv'
 $1 untarbz2 'tar -xf'
