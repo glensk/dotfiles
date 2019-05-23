@@ -46,44 +46,6 @@ def set_args_defaults(args,inputfile):
         print()
     return
 
-def ca(text,newline = True,verbose=False):
-    verbosity_level = 2
-    global c
-    if verbose > verbosity_level:
-        print('c inside1:',c)
-        print('c inside2:',text)
-    c = c + text
-    if newline == True:
-        c = c + "\n"
-    #print('c inside2:',c)
-    return c
-
-def gnuplot_plotline(inputfile,using=False,columns_tot=1):
-    verbosity_level = 2
-    if args.verbose > verbosity_level:
-        print('--> inputfile        :',inputfile)
-        print('--> using            :',using)
-    global pl
-    if pl == "": pl = "plot "
-
-    if args.verbose > verbosity_level:
-        print('--> xx using          ',using)
-        print('--> xx pl (in)        ',pl)
-    pladd = "\""+inputfile+"\" using "+using+" with linespoints"
-
-    # legend
-    if columns_tot == 1:
-        #pladd = pladd + " notitle,"
-        #pladd = pladd + " title \""+inputfile+"\","
-        pladd = pladd + " title \""+inputfile+" "+str(using)+"\","
-    else:
-        pladd = pladd + " title \""+inputfile+" "+str(using)+"\","
-    pl = pl + pladd
-    if args.verbose > verbosity_level:
-        print('--> xx pladd          ',pladd)
-        print('--> xx pl (out)       ',pl)
-    return pl
-
 def gnuplot_defaults(args):
     ''' general settings '''
     global c
@@ -100,15 +62,19 @@ def gnuplot_defaults(args):
 
         # 2) put the border more to the background by applying it only on the left
         # and bottom part and put it and the tics in gray
-        ca("set style line 11 lc rgb '#808080' lt 1")
-        ca("set border 3 back ls 11")
-        ca("set tics nomirror")
+        if True:
+            ca("set style line 11 lc rgb '#808080' lt 1")
+            #ca("set border 3 back ls 11")
+            ca("set tics nomirror")
 
         # 3) add a slight grid to make it easier to follow the exact position
         # of the curves
-        ca("set style line 12 lc rgb '#808080' lt 0 lw 1")
-        ca("set grid back ls 12")
+        if False:
+            ca("set style line 12 lc rgb '#808080' lt 0 lw 1")
+            ca("set grid back ls 12")
 
+        #ca("set terminal enhanced font 'Verdana,10'")
+        ca("set key font \",10\"")
         #set mxtics
         #set mytics
         #set style line 12 lc rgb '#ddccdd' lt 1 lw 1.5
@@ -117,6 +83,8 @@ def gnuplot_defaults(args):
     ca("#set yrange [0:10]")
     ca("#set xrange [0:10]")
     ca("set pointsize 2")
+    #ca("set terminal aqua")
+    #ca("set terminal x11")
     if args.log_log:
         ca("set logscale xy")
     if args.log_x:
@@ -161,13 +129,51 @@ def x_min_max(args,column):
             args.xmax = cmax
     return
 
+
+
+def ca(text,newline = True,verbose=False):
+    verbosity_level = 2
+    global c
+    if verbose > verbosity_level:
+        print('c inside1:',c)
+        print('c inside2:',text)
+    c = c + text
+    if newline == True:
+        c = c + "\n"
+    #print('c inside2:',c)
+    return c
+
+def gnuplot_plotline(inputfile,using=False,columns_tot=1):
+    verbosity_level = 2
+    if args.verbose > verbosity_level:
+        print('--> inputfile        :',inputfile)
+        print('--> using            :',using)
+    global pl
+    if pl == "": pl = "plot "
+
+    if args.verbose > verbosity_level:
+        print('--> xx using          ',using)
+        print('--> xx pl (in)        ',pl)
+    pladd = "\""+inputfile+"\" using "+using+" with linespoints"
+
+    # legend
+    if columns_tot == 1:
+        #pladd = pladd + " notitle,"
+        #pladd = pladd + " title \""+inputfile+"\","
+        pladd = pladd + " title \""+inputfile+" "+str(using)+"\","
+    else:
+        pladd = pladd + " title \""+inputfile+" "+str(using)+"\","
+    pl = pl + pladd
+    if args.verbose > verbosity_level:
+        print('--> xx pladd          ',pladd)
+        print('--> xx pl (out)       ',pl)
+    return pl
+
 def gnuplot_plot(args):
     ################################################
     # make the plot
     ################################################
     verbosity_level = 1
-    if args.verbose > verbosity_level:
-        print("######################## gnuplot_plot      #######################")
     global pl
     pl = ""
     for idx,inputfile in enumerate(args.inputfile):
@@ -175,7 +181,7 @@ def gnuplot_plot(args):
             set_args_defaults(args,inputfile)
             gnuplot_defaults(args)
         if args.verbose > verbosity_level:
-            print('##########################################')
+            print("######################## gnuplot_plot      #######################")
             print('inputfile',inputfile)
         input = np.loadtxt(inputfile)
         if args.verbose > verbosity_level:
@@ -183,10 +189,13 @@ def gnuplot_plot(args):
             print('input.shape',input.shape)
         if len(input.shape) == 1:
             using = "1"
-            if args.verbose > verbosity_level:
-                print('input',input,input.min(),input.max())
             y_min_max(args,column=input)
             x_min_max(args,column=input)
+            if args.verbose > verbosity_level:
+                print('args.xmin',args.xmin)
+                print('args.xmax',args.xmax)
+                print('args.ymin',args.ymin)
+                print('args.ymax',args.ymax)
             text = gnuplot_plotline(inputfile,using = using,columns_tot = 1)
             ca(text)
         elif len(input.shape) == 2:
@@ -205,14 +214,15 @@ def gnuplot_plot(args):
                     print('input column:',input[:,i-1])
                 y_min_max(args,column=input[:,i-1])
                 if args.verbose > verbosity_level:
+                    print('args.xmin',args.xmin)
+                    print('args.xmax',args.xmax)
                     print('args.ymin',args.ymin)
                     print('args.ymax',args.ymax)
                 text =  gnuplot_plotline(inputfile,using = using,\
                         columns_tot = columns)
                 ca(text)
         if args.verbose > verbosity_level:
-            print('##########################################')
-            print()
+            print("######################## gnuplot_plot      #######################")
             print()
     #    ca("plot \"plot.gnu\" using 1:2 with linespoints notitle,    \"plot.gnu\" using 1:3 with linespoints notitle")
     ca("\nEOF")
@@ -221,15 +231,15 @@ def gnuplot_plot(args):
         print("######################## show command BEFORE #####################")
         print(c)
 
-    global c
-    c = re.sub(r"#set yrange .*", "set yrange ["+str(args.ymin)+":"+str(args.ymax)+"]", c)
+    if args.log_log or args.log_x:
+        global c
+        c = re.sub(r"#set yrange .*", "set yrange ["+str(args.ymin)+":"+str(args.ymax)+"]", c)
 
-    c = re.sub(r"#set xrange .*", "set xrange ["+str(args.xmin)+":"+str(args.xmax)+"]", c)
+    if args.log_log or args.log_x:
+        global c
+        c = re.sub(r"#set xrange .*", "set xrange ["+str(args.xmin)+":"+str(args.xmax)+"]", c)
 
     #c_new = c
-    if args.verbose:
-        print('args.ymin',args.ymin)
-        print('args.ymax',args.ymax)
     if args.verbose:
         print("######################## show command      #######################")
         print(c)
