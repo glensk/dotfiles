@@ -67,11 +67,13 @@ Host cmmc002*
  ProxyCommand ssh aglen@gatezero.rzg.mpg.de /usr/bin/netcat %h %p 2> /dev/null
  GSSAPIAuthentication yes
  GSSAPIDelegateCredentials yes
+ ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub aglen@gatezero.rzg.mpg.de (after running ssh-keygen)
 Host gar
 HostName gatezero.rzg.mpg.de
 User aglen
+ForwardX11 Yes
 GSSAPIAuthentication yes
 GSSAPIDelegateCredentials yes
 ControlMaster auto
@@ -85,20 +87,27 @@ ControlPath ~/.ssh/control:%h:%p:%r
 Host lsmx
  HostName lsmxsrv2.epfl.ch
  User glensk
+ ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
 Host fidis
  HostName fidis.epfl.ch
  User glensk
+ ForwardX11 Yes
+ #ForwardX11Timeout 596h
+
+ #IdentitiFile ~/.ssh/fidis_rsa
 
 Host helvetios
  HostName helvetios.epfl.ch
  User glensk
+ ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@cosmopc15.epfl.ch
 Host cosmopc pc
  HostName cosmopc15.epfl.ch
  User glensk
+ ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub aglensk@ela.cscs.ch (normal zwei ohne sterne 1234)
 # can go to ela from mac (without pw)
@@ -118,6 +127,7 @@ Host daint*
  HostName daint.cscs.ch
  User aglensk
  ProxyCommand ssh aglensk@ela.cscs.ch /usr/bin/netcat %h %p 2> /dev/null
+ ForwardX11 Yes
 
 
 # make sure to chmod go-w ~/.ssh/config when changing this file with git on cmpc34
