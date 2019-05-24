@@ -106,6 +106,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     if typ == "n2p2" and os.path.isfile('learning-curve.out'):
         print('cp learning-curve.out')
         my.cp('learning-curve.out',folder+'/learning-curve.out')
+    if typ == "runner" and os.path.isfile('learning-curve-runner.out'):
+        print('cp learning-curve-runner.out')
+        my.cp('learning-curve.out',folder+'/learning-curve-runner.out')
     if os.path.isfile('logfile_mode2'):
         print('cp logfile_mode2')
         my.cp('logfile_mode2',folder+'/log.fit')
