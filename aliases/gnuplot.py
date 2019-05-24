@@ -11,6 +11,7 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("inputfile",nargs='+') #,help"name of the inputfile(s)")
     p.add_argument('-mc','--max_columns',required=False, type=int,default=False, help="plot maximally first x columns")
+    p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=int, help="which columns to plot")
     p.add_argument('-ll', '--log_log', action='store_true', default=False,help='make a x and y logarithmic (log log plot).')
     p.add_argument('-lx', '--log_x', action='store_true', default=False,help='make x axis logarithmic')
     p.add_argument('-ly', '--log_y', action='store_true', default=False,help='make y axis logarithmic')
@@ -83,6 +84,8 @@ def args_show(args):
         print('args.xmax        ',args.xmax)
         print('args.ymin        ',args.ymin)
         print('args.ymax        ',args.ymax)
+        print()
+        print('args.columns     ',args.columns,"type:",type(args.columns))
         print("######################## args_show(args) #########################")
         print()
         return
@@ -269,6 +272,9 @@ def gnuplot_plot(args):
             if type(args.max_columns) != bool and args.max_columns < columns:
                 columns = args.max_columns
             for i in np.arange(columns)+2:
+                if type(args.columns) == list and i not in args.columns:
+                    print('skipping column',i,'since not in args.columns')
+                    continue
                 if args.verbose > verbosity_level:
                     print("## @@@@@@@@@@@@@@@@@ TWO columns (begin) @@@@@@@@@@@@@@@@@@@@@")
                     print('## ixx',i)
