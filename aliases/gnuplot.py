@@ -44,13 +44,14 @@ def set_args_defaults(args,inputfile):
         print('args.verbose         ',args.verbose)
         print('args.log_log     (in)',args.log_log)
         print('args.max_columns (in)',args.max_columns)
-    if basename == "learning-curve.out":
+    if basename in ["learning-curve.out", 'learning-curve-runner.out']:
         args.log_log = True
         args.max_columns = 2
         #args.scale = True
-        args.scale_y = 27211.386
         args.xlabel = "epochs"
         args.ylabel = "RMSE (meV/at)"
+    if basename == "learning-curve.out":
+        args.scale_y = 27211.386
     if socket.gethostname() == "mac":
         args.x11 = True  # since aquaterm does open figurs in the background (but the first one)
     if args.verbose:
