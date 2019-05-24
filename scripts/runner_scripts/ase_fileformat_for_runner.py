@@ -211,13 +211,13 @@ def write_runner(fileobj,images,comment=None,append=False,setenergy_eV=False,set
             fileobj.write('comment ' + comment)
 
         cell = atoms.get_cell()/units.Bohr
-        for idx in xrange(3):
+        for idx in range(3):
             #fileobj.write("lattice " + str(cell[idx][0]) + " " + str(cell[idx][1]) + " " + str(cell[idx][2]) + "\n")
             fileobj.write('lattice  %16.10f %16.10f %16.10f\n' % (cell[idx][0],cell[idx][1],cell[idx][2]))
 
         nat = atoms.get_number_of_atoms()
         positions = atoms.get_positions(wrap=False)/units.Bohr  # Wrapping takes huge amout of time
-        for idx in xrange(nat):
+        for idx in range(nat):
             fileobj.write('atom  %16.10f %16.10f %16.10f  %3s  %1.1f %1.1f   %15.8e %15.8e %15.8e\n' % (positions[idx,0],positions[idx,1],positions[idx,2],atoms[idx].symbol,0.0,0.0,forces[idx][0],forces[idx][1],forces[idx][2]))
 
 
