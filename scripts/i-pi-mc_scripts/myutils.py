@@ -1748,11 +1748,12 @@ class ase_calculate_ene( object ):
             print('verbose   ::',verbose)
         if self.elastic_relax == True:
             self.ase_relax_cellshape_and_volume_only(frame,verbose=verbose)
-        if verbose:
-            print('stress relaxed frame :',frame.get_stress())
-            print('frame cell',frame.get_cell())
-            #ase_write('pos.runner',frame,format='runner')
-            print('-------------- lammps_ext_calc -----------')
+        print('stress relaxed frame :',frame.get_stress())
+        print('volume relaxed frame :',frame.get_volume())
+        print('ene    relaxed frame :',frame.get_potential_energy())
+        print('frame cell',frame.get_cell())
+        #ase_write('pos.runner',frame,format='runner')
+        print('-------------- lammps_ext_calc -----------')
         ene_pot_lmp = lammps_ext_calc(frame,self,get_elastic_constants=get_all_constants)
         #print('ene_pot_lmp...kk',ene_pot_lmp)
         #sys.exit('88')
@@ -1984,10 +1985,14 @@ class ase_calculate_ene( object ):
         #cell = cryst.get_cell()
         #cryst = my_get_cart_deformed_cell(cryst, size=0.2)
 
-        if volfact >= 1.0:
-            atoms_h.set_cell(atoms_h.get_cell()*volfact, scale_atoms=True)
-        else:
-            atoms_h.set_cell(np.diag(np.ones(3))*a0DFT, scale_atoms=True)
+
+        ### This is to be at volume of DFT! (JUST IF YOU WANT TO CHECK HWO LARGE THE
+        ### ERROR WOULD BE IF WE USE THIS (DFT) VOLUME
+        if False:
+            if volfact >= 1.0:
+                atoms_h.set_cell(atoms_h.get_cell()*volfact, scale_atoms=True)
+            else:
+                atoms_h.set_cell(np.diag(np.ones(3))*a0DFT, scale_atoms=True)
 
         e0 = atoms_h.get_potential_energy()
         V0 = atoms_h.get_volume()
@@ -2651,7 +2656,7 @@ def lammps_ext_elastic_init_mod(ace,positions='pos.lmp'):
     "",
     "# Define the finite deformation size. Try several values of this",
     "# variable to verify that results do not depend on it.",
-    "variable up equal 1.0e-6",
+    "variable up equal 1.0e-8",
     "",
     "# Define the amount of random jiggle for atoms",
     "# This prevents atoms from staying on saddle points",
@@ -3345,9 +3350,9 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
     if verbose:
         print()
         print('filename in:',filename)
-    type = 'n2p2'
-    basename = os.path.basename(filename)
+    basename = os.path.basename(filename)  # "learning-curve.out"
     folder = os.path.abspath(filename.replace(basename,''))
+    type = inputnn_runner_or_n2p2(folder+'/input.nn')
     tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
     changefilename = False
 
@@ -3373,11 +3378,10 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
         sys.exit(filename+" does not exist!")
 
     basename = os.path.basename(filename)
-    if False:
+    if True:
         print('filename out',filename)
         print('basename out',basename)
         print('type     out',type)
-
     if only_get_filename == True:
         return filename
 
@@ -3428,6 +3432,11 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
 
     if lc.shape == (1,0):
         lc = np.zeros((1,5))
+    if type == 'runner':
+        np.savetxt("learning-curve-runner.out",lc)
+    #print('lc')
+    #print(lc)
+    #sys.exit()
     return lc
 
 
