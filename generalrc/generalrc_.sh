@@ -24,6 +24,9 @@ onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, c
 setenv host $host;
 setenv onhost $onhost;
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
+setenv dot      "$HOME/Dropbox/Albert/scripts/dotfiles/";
+setenv potentials "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
+setenv pot        "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
 
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
