@@ -3345,9 +3345,9 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
     if verbose:
         print()
         print('filename in:',filename)
-    type = 'n2p2'
-    basename = os.path.basename(filename)
+    basename = os.path.basename(filename)  # "learning-curve.out"
     folder = os.path.abspath(filename.replace(basename,''))
+    type = inputnn_runner_or_n2p2(folder+'/input.nn')
     tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
     changefilename = False
 
@@ -3373,11 +3373,10 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
         sys.exit(filename+" does not exist!")
 
     basename = os.path.basename(filename)
-    if False:
+    if True:
         print('filename out',filename)
         print('basename out',basename)
         print('type     out',type)
-
     if only_get_filename == True:
         return filename
 
@@ -3428,6 +3427,11 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
 
     if lc.shape == (1,0):
         lc = np.zeros((1,5))
+    if type == 'runner':
+        np.savetxt("learning-curve-runner.out",lc)
+    #print('lc')
+    #print(lc)
+    #sys.exit()
     return lc
 
 
