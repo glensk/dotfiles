@@ -188,9 +188,11 @@ def gnuplot_plot(args):
         if args.verbose > verbosity_level:
             print("######################## gnuplot_plot      #######################")
             print('inputfile',inputfile)
+
         input = np.loadtxt(inputfile)
-        if args.verbose > verbosity_level:
+        if args.verbose > verbosity_level+1:
             print('input',input)
+        if args.verbose > verbosity_level:
             print('input.shape',input.shape)
         if len(input.shape) == 1:
             using = "1"
@@ -212,19 +214,25 @@ def gnuplot_plot(args):
                 columns = args.max_columns
             for i in np.arange(columns)+2:
                 if args.verbose > verbosity_level:
-                    print('ixx',i)
+                    print("     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+                    print('     ixx',i)
                 using = "1:"+str(i)
                 #using = "1:(\$"+str(i)+"*27211.386)" # has to be a default
-                if args.verbose > verbosity_level:
-                    print('input column:',input[:,i-1])
+                if args.verbose > verbosity_level+1:
+                    print('     input column:',input[:,i-1])
                 y_min_max(args,column=input[:,i-1])
                 if args.verbose > verbosity_level:
-                    print('args.xmin',args.xmin)
-                    print('args.xmax',args.xmax)
-                    print('args.ymin',args.ymin)
-                    print('args.ymax',args.ymax)
+                    print('     args.xmin',args.xmin)
+                    print('     args.xmax',args.xmax)
+                    print('     args.ymin',args.ymin)
+                    print('     args.ymax',args.ymax)
+                    print('     using    ',using)
+                    print('     columns  ',columns)
                 text =  gnuplot_plotline(inputfile,using = using,\
                         columns_tot = columns)
+                if args.verbose > verbosity_level:
+                    print("    ",text)
+                    print("     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
                 ca(text)
         if args.verbose > verbosity_level:
             print("######################## gnuplot_plot      #######################")
@@ -239,6 +247,8 @@ def gnuplot_plot(args):
         c = re.sub(r"#set yrange .*", "set yrange ["+str(args.ymin)+":"+str(args.ymax)+"]", c)
 
     if args.log_log or args.log_x:
+        if args.xmin <= 0.0:
+            args.xmin = 0.1
         c = re.sub(r"#set xrange .*", "set xrange ["+str(args.xmin)+":"+str(args.xmax)+"]", c)
 
     #c_new = c
