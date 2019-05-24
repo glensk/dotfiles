@@ -45,22 +45,6 @@ def n2p2_get_best_test_nr_from_learning_curve(folder,get_last_epoch=False):
     #print('learning_curve')
     #print(learning_curve)
     best_testset = np.argmin(lc[:,2])
-    #print('best_testset')
-    #print(best_testset)
-    #print(lc[best_testset])
-    #sys.exit()
-            #a = np.loadtxt(folder+"/learning-curve.out")
-            #best_testset = np.argmin(a[:,2])
-            #print('best_testset',best_testset)
-        #elif os.path.isfile(folder+"/learning-curve.out"):
-        #    #a = np.loadtxt(folder+"/learning_curve_test.dat")
-        #    a = np.loadtxt(folder+"/learning-curve.out")
-        #    #print(a)
-        #    #print()
-        #    #print(a[:,1])
-        #    best_testset = np.argmin(a[:,1])
-        #else:
-        #    sys.exit(folder+"/learning-curve.out does not exist (8)")
 
     print('best testset :',best_testset)
     #sys.exit()
@@ -77,6 +61,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     if not os.path.isfile('input.nn'):
         sys.exit('input.nn does not exist (3)')
     #print('input.nn     : exists')
+    typ = my.inputnn_runner_or_n2p2('input.nn')
 
 
     checkfor = [ '012', '013', '014' ]
@@ -86,23 +71,20 @@ def n2p2_make_potential_folder_from_nr(argsnr):
         weights3 = 'optweights.'+i+'.out'
         if os.path.isfile(weights1):
             weights = weights1
-            typ = 'n2p2'
         elif os.path.isfile(weights2):
             weights = weights2
-            typ = 'n2p2'
         elif os.path.isfile(weights3):
             weights = weights3
-            typ = 'runner'
         else:
             sys.exit(weights1+" does not exist")
             sys.exit(weights2+" does not exist")
             sys.exit(weights3+" does not exist")
             sys.exit("weights files not found (4)")
         print(weights,'exist')
-        return weights,typ
+        return weights
 
     for i in checkfor:
-        weights, typ = get_weightsfile(i,nr_)
+        weights = get_weightsfile(i,nr_)
 
 
     folder = "potential_"+str(args.nr)+'/'
@@ -121,18 +103,18 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     my.cp('input.data',folder+'/input.data')
     print('cp input.nn')
     my.cp('input.nn',folder+'/input.nn')
-    if os.path.isfile('learning-curve.out'):
+    if typ == "n2p2" and os.path.isfile('learning-curve.out'):
         print('cp learning-curve.out')
         my.cp('learning-curve.out',folder+'/learning-curve.out')
     if os.path.isfile('logfile_mode2'):
         print('cp logfile_mode2')
         my.cp('logfile_mode2',folder+'/log.fit')
-    if os.path.isfile('log.fit'):
+    if typ == 'runner' and os.path.isfile('log.fit'):
         print('cp log.fit')
         my.cp('log.fit',folder+'/log.fit')
 
     for i in checkfor:
-        weights,typ = get_weightsfile(i,nr_)
+        weights = get_weightsfile(i,nr_)
         print('cp',weights)
         if typ == 'n2p2':
             my.cp(weights,folder+'/weights.'+i+'.data')
