@@ -1,6 +1,4 @@
-2018 (10.5 days):
------------------
-
+----------------------------------- start 1.8.2018 (10.5 days holidays for 2018) out of 28 days
 10.5 11.09.2018 COMDI conference Basel
 10.5 12.09.2018 COMDI conference Basel
 09.5 05.10.2018 Broni/Georg
@@ -12,16 +10,23 @@
 05.0 26.12.2018 Weih
 05.0 27.12.2018 Weih (nope, kein urlaub)
 03.5 28.12.2018 Weih
------------------------------------ uebertrag 3.5 + 14.5
-
-2019 (14.5 days) + 3.5 uebertrag = 18 days
------------------
+----------------------------------- uebertrag 3.5 + (14.5 days holidays for 2019) = 18 dyas
 18.0 
-17.0 03.01.2019 Weih
-16.0 04.01.2019 Weih
-15.0 05.02.2019 Ski Susanne Geb
-14.0 05.04.2019 Ski
-13.0 14.05.2019 Liam/Sarah Cern
-12.0 14.05.2019 Liam/Sarah Wandern
+17.0 1  03.01.2019 Weih                                                               
+16.0 2  04.01.2019 Weihnachten
+15.0 3  05.02.2019 Ski Susanne Geb
+14.0 4  05.04.2019 Ski
+13.0 5  23.04.2019 NN conferenz Duesseldorf besuch
+12.0 6  14.05.2019 Liam/Sarah Cern
+11.0 7  16.05.2019 Liam/Sarah Wandern
+10.0 8  31.05.2019 Notts Treffen (freitag kein brueckentag) (eingetragen)
+ 5.0 13 22.07.2019 Vivi/Geny Walchsee (bis 27.7.2019)       (eingetragen)
+ 2.0 16 29.07.2019 Vivi/Geny Walchsee (bis 31.7.2019)       (eingetragen)
 
-
+----------------------------------- uebertrag xx + (10.5 days for 2019) = xx
+xx
+-(2to3) angfang august eva/marcel
+-0.5 24.12.2019 Weihnachten
+-4   27.-30     Weihnachten
+-0.5 31.12.2019 Weihnachten
+----------------------------------- uebertrag xx + (14.5 days for 2020) = xx

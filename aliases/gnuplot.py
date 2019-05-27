@@ -39,6 +39,19 @@ def help(p = None):
     p.add_argument('-ls','--line_style', choices=["lines","points","linespoints"], default="line", help='plot lines as')
     return p
 
+def get_default_y_label(args,inputfile,column):
+    basename = os.path.basename(inputfile)
+    print('bn',basename)
+    if basename == "KMC_analyze":
+        if column == 2: args.ylabel = "time (ps) : The time psed simulation time."
+        if column == 3: args.ylabel = "time (ps) : The time of the current timestep"
+        if column == 4: args.ylabel = "ecurr (meV)"
+        if column == 5: args.ylabel = "cdf"
+        if column == 6: args.ylabel = "random number 2"
+    print('kk',args.ylabel)
+    #sys.exit()
+    return
+
 def set_args_defaults(args,inputfile):
     basename = os.path.basename(inputfile)
     if args.verbose:
@@ -57,6 +70,9 @@ def set_args_defaults(args,inputfile):
         args.ylabel = "RMSE (meV/at)"
     if basename == "learning-curve.out":
         args.scale_y = 27211.386
+    if basename == "KMC_analyze":
+        args.xlabel = "step"
+        pass
     if socket.gethostname() == "mac":
         args.x11 = True  # since aquaterm does open figurs in the background (but the first one)
     if args.verbose:
@@ -96,6 +112,13 @@ def args_show(args):
         print()
         return
 
+def gnuplot_defaults_labels(args):
+    if args.xlabel:
+        ca("set xlabel \""+args.xlabel+"\"")
+    if args.ylabel:
+        ca("set ylabel \""+args.ylabel+"\"")
+    return
+
 def gnuplot_defaults(args):
     ''' general settings '''
     global c
@@ -133,10 +156,7 @@ def gnuplot_defaults(args):
     ca("#set yrange [0:10]")
     ca("#set xrange [0:10]")
     ca("set pointsize 2")
-    if args.xlabel:
-        ca("set xlabel \""+args.xlabel+"\"")
-    if args.ylabel:
-        ca("set ylabel \""+args.ylabel+"\"")
+
     #ca("set terminal aqua")
     if args.x11:
         ca("set terminal x11")
@@ -326,6 +346,8 @@ def gnuplot_plot(args):
                     print('## args.ymax',args.ymax)
                     print('## using    ',using)
                     print('## columns  ',columns)
+                get_default_y_label(args,inputfile,i)
+                gnuplot_defaults_labels(args)
                 text =  gnuplot_plotline(inputfile,using = using,\
                         columns_tot = columns)
                 ca(text)
