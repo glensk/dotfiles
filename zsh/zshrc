@@ -1,5 +1,5 @@
 if [[ $- == *i* ]];then  # only in interactive shell
-
+#echo "load zsh"
 gettime="false"
 #gettime="true"
 loadzsh="true"          # shuts all zst settings on/off
@@ -31,6 +31,7 @@ autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion)
 autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
 [ "$gettime" = "true" ] && gett=`gt $gett` #&& echo "compinit    : $gett"
 
+#echo "load zsh2"
 #################################################################
 # oh-my-zsh: DONT USE IT!!! do this first in zsh; IT IS WAY TOO SLOW!!!!!! DONT USE IT !!!!!
 # but the way it colors the history-substring-search is great!

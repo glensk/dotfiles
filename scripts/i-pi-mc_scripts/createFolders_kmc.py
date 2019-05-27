@@ -143,6 +143,32 @@ def createjob(
 
     # make the atomic structure
     if True:
+        from ase.io import read as ase_read
+        from ase.io import write as ase_write
+        atomsc_fakevac_i = ase_read('dataxx.extxyz3',index=":",format='extxyz') # works, cell ist not changed
+        print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
+        for idx,i in enumerate(atomsc_fakevac_i):
+            print('aa',atomsc_fakevac_i[idx].positions[0])
+            print('aa',i.positions[0])
+        print('ipi')
+        atomsc_fakevac_i = ase_read('dataxx.ipi2',index=":",format='ipi') # works, cell ist not changed
+        print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
+        for idx,i in enumerate(atomsc_fakevac_i):
+            print('aa',atomsc_fakevac_i[idx].positions[0])
+            print('aa',i.positions[0])
+        print('quippy')
+        atomsc_fakevac_i = ase_read('dataxx.quippy.xyz2',index=":",format='quippy') # works, cell ist not changed
+        print('reading kmc...')
+        atomsc_fakevac_i = ase_read('../simulation.pos_0.xyz',index=":",format='ipi') # works, cell ist not changed
+        print('reading kmc... done')
+        print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
+        print(atomsc_fakevac_i[0].get_chemical_species())
+
+        for idx in np.arange(10):
+            print('aa',atomsc_fakevac_i[idx].positions[-1])
+            #NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
+        sys.exit()
+
         def mysave(atomsc_fakevac,text=False):
             if type(text) == bool:
                 sys.exit('define text')
@@ -168,8 +194,6 @@ def createjob(
         atomsc_fakevac.write('dataxx.extxyz',format='extxyz',append=True)
         atomsc_fakevac.write('dataxx.lammps-data',format='lammps-data',append=True)
         atomsc_fakevac.write('dataxx.lammps-runner',format='lammps-runner',append=True)
-        from ase.io import read as ase_read
-        from ase.io import write as ase_write
 
         atomsc_fakevac_a = ase_read('dataxx.extxyz',format='extxyz') # works, cell ist not changed
         atomsc_fakevac_a.write('dataxx.extxyz2',format='extxyz',append=True) # works, cell is not changed
