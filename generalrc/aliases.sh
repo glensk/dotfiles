@@ -220,8 +220,10 @@ alias gatelinux='sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `t
 alias gatehydra='sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 
 alias fidis='ssh fidis'
+alias f='ssh fidis'
 alias daint='ssh daint'
 alias hel='ssh helvetios'
+alias h='ssh helvetios'
 alias cosmopc='ssh cosmopc'
 alias pc='ssh cosmopc'
 
