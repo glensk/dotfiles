@@ -82,9 +82,11 @@ cmmc)
 	echo "setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
   ;;
 helvetios)
-    setenv myprompttime black;
-    setenv myprompthostuser black;
-    setenv mypromptpath black;
+    setenv myprompttime yellow;
+    setenv myprompthostuser yellow;
+    setenv mypromptpath yellow;
+	setenv SCRATCH /scratch/glensk;
+    module load git;  # to get git 2.17 (instad of 1.8)
   ;;
 *)
 	setenv onhost UNKNOWN;
