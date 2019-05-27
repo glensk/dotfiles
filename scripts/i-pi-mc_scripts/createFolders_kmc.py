@@ -144,16 +144,6 @@ def createjob(
 
     # make the atomic structure
     if True:
-        atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
-        nndist = a0/np.sqrt(2.)
-        NN_1_indices = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=nndist,skin=0.1)
-        NN_1_2_indices_tmp = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=a0,skin=0.1)
-        print('NN_1_indices  :',NN_1_indices)
-        NN_2_indices = np.sort(np.array(diff(NN_1_2_indices_tmp,NN_1_indices)))
-        print('NN_2_indices  :',NN_2_indices)
-        NN_1_2_indices = np.concatenate((NN_1_indices, NN_2_indices ))
-        print('NN_1_2_indices:',NN_1_2_indices)
-
         def mysave(atomsc_fakevac,text=False):
             if type(text) == bool:
                 sys.exit('define text')
@@ -162,6 +152,36 @@ def createjob(
             atomsc_fakevac.write('data'+text+'.quippy.xyz',format='quippy',append=True)
             #atomsc_fakevac.write('data'+text+'.xyz',format="extxyz",append=True)
             return
+
+        nndist = a0/np.sqrt(2.)
+        atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+        NN_1_indices = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=nndist,skin=0.1)
+        print('NN_1_indices',NN_1_indices)
+        atomsc_fakevac.write('dataxx.quippy.xyz',format='quippy',append=True)
+        atomsc_fakevac.write('dataxx.poscar',format='vasp',append=True)
+        atomsc_fakevac.write('dataxx.ipi',format='ipi',append=True)
+        atomsc_fakevac.write('dataxx.xyz',format='xyz',append=True)
+        atomsc_fakevac.write('dataxx.lammps-data',format='lammps-data',append=True)
+        atomsc_fakevac.write('dataxx.lammps-runner',format='lammps-runner',append=True)
+        from ase.io import read as ase_read
+        from ase.io import write as ase_write
+        #atomsc_fakevac_r = ase_read('dataxx.lammps-runner',format='lammps-runner') # not working
+        #atomsc_fakevac_r = ase_read('dataxx.lammps-data',format='lammps-data') # not working
+        #atomsc_fakevac_r = ase_read('dataxx.ipi',format='ipi') # not working
+        atomsc_fakevac_r = ase_read('dataxx.xyz',format='xyz') # not working
+        atomsc_fakevac_r.write('dataxx.poscar_from_xyz',format='vasp',append=True) # this is working
+        atomsc_fakevac_x = ase_read('dataxx.quippy.xyz',format='quippy') # not working
+        atomsc_fakevac_x.write('dataxx.poscar_from_qiuppy_xyz',format='vasp',append=True) # this is working
+
+        sys.exit()
+        NN_1_indices = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=nndist,skin=0.1)
+        NN_1_2_indices_tmp = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=a0,skin=0.1)
+        print('NN_1_indices  :',NN_1_indices)
+        NN_2_indices = np.sort(np.array(diff(NN_1_2_indices_tmp,NN_1_indices)))
+        print('NN_2_indices  :',NN_2_indices)
+        NN_1_2_indices = np.concatenate((NN_1_indices, NN_2_indices ))
+        print('NN_1_2_indices:',NN_1_2_indices)
+
 
         # fill only 1NN (with one species)
         for i in [ 'Mg', 'Si' ]:

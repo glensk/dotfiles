@@ -11,7 +11,7 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("inputfile",nargs='+') #,help"name of the inputfile(s)")
     p.add_argument('-mc','--max_columns',required=False, type=int,default=False, help="plot maximally first x columns")
-    p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=int, help="which columns to plot")
+    p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=string, help="which columns to plot")
     p.add_argument('-ll', '--log_log', action='store_true', default=False,help='make a x and y logarithmic (log log plot).')
     p.add_argument('-lx', '--log_x', action='store_true', default=False,help='make x axis logarithmic')
     p.add_argument('-ly', '--log_y', action='store_true', default=False,help='make y axis logarithmic')
@@ -329,5 +329,7 @@ def gnuplot_plot(args):
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
+    args_show(args)
+    sys.exit()
     gnuplot_plot(args)
     args_show(args)
