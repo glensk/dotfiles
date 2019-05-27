@@ -11,10 +11,11 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("inputfile",nargs='+') #,help"name of the inputfile(s)")
     p.add_argument('-mc','--max_columns',required=False, type=int,default=False, help="plot maximally first x columns")
-    p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=string, help="which columns to plot")
+    p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=str, help="which columns to plot")
     p.add_argument('-ll', '--log_log', action='store_true', default=False,help='make a x and y logarithmic (log log plot).')
     p.add_argument('-lx', '--log_x', action='store_true', default=False,help='make x axis logarithmic')
     p.add_argument('-ly', '--log_y', action='store_true', default=False,help='make y axis logarithmic')
+    p.add_argument('-a','--all',  help='print all columns as a function of first column', action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     p.add_argument('-s','--scale', help='scale axis', action='count', default=False)
     p.add_argument('-x11','--x11', help='ser term to x11', action='count', default=False)
@@ -34,6 +35,8 @@ def help(p = None):
     p.add_argument('-scale_y','--scale_y' ,required=False, action='append', type=float,
             help=argparse.SUPPRESS, default=1.0)
     p.add_argument('-n','--noplot', help=argparse.SUPPRESS, action='count', default=False)
+
+    p.add_argument('-ls','--line_style', choices=["lines","points","linespoints"], default="line", help='plot lines as')
     return p
 
 def set_args_defaults(args,inputfile):
@@ -69,6 +72,7 @@ def args_show(args):
         print("######################## args_show(args) #########################")
         print('args.inputfile   ',args.inputfile)
         print('args.max_columns ',args.max_columns)
+        print('args.all         ',args.all)
 
         print('args.log_log     ',args.log_log)
         print('args.log_x       ',args.log_x)
@@ -85,6 +89,7 @@ def args_show(args):
         print('args.ymin        ',args.ymin)
         print('args.ymax        ',args.ymax)
         print()
+        print('args.line_style  ',args.line_style)
         print('args.columns     ',args.columns,"type:",type(args.columns))
         print("######################## args_show(args) #########################")
         print()
@@ -209,8 +214,12 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1):
     if args.verbose > verbosity_level:
         print('--> xx using          ',using)
         print('--> xx pl (in)        ',pl)
-    #pladd = "\""+inputfile+"\" using "+using+" with linespoints"
-    pladd = "\""+inputfile+"\" using "+using+" with line"
+    if args.line_style == "line":
+        pladd = "\""+inputfile+"\" using "+using+" with line"
+    if args.line_style == "linespoints":
+        pladd = "\""+inputfile+"\" using "+using+" with linespoints"
+    if args.line_style == "points":
+        pladd = "\""+inputfile+"\" using "+using+" with points"
 
     # legend
     if columns_tot == 1:
@@ -234,21 +243,27 @@ def gnuplot_plot(args):
     verbosity_level = 1
     global pl
     pl = ""
+    ###############################################
+    # go over all inputfiles
+    ###############################################
     for idx,inputfile in enumerate(args.inputfile):
         if idx == 0:
             set_args_defaults(args,inputfile)
             gnuplot_defaults(args)
         if args.verbose > verbosity_level:
-            print("######################## gnuplot_plot      #######################")
-            print('## inputfile',inputfile)
+            print("######################## gnuplot_plot begin ######################")
+            print('%% inputfile',inputfile)
 
         input = np.loadtxt(inputfile)
         if args.verbose > verbosity_level+1:
             print('input',input)
         if args.verbose > verbosity_level:
-            print('## input.shape',input.shape)
-            print('## len(input.shape)',len(input.shape))
+            print('%% input.shape',input.shape)
+            print('%% len(input.shape)',len(input.shape))
         if len(input.shape) == 1:
+            ###############################################
+            # in case only one colume, print it as function of [1,2,3, ...]
+            ###############################################
             using = "1"
             if args.scale_y != 1.0:
                 using = "$1*"+str(args.scale_y)+")" # has to be a default
@@ -265,19 +280,38 @@ def gnuplot_plot(args):
             if args.verbose > verbosity_level:
                 print("## @@@@@@@@@@@@@@@@@ one column (end) @@@@@@@@@@@@@@@@@@@@@@@@")
         elif len(input.shape) == 2:
+            ###############################################
+            # go over all columns,
+            # take column 0 as x-column
+            ###############################################
             x_min_max(args,column=input[:,0],inputfile=inputfile)
             columns = input.shape[1] - 1
             if args.verbose > verbosity_level:
-                print('## args.max_columns',args.max_columns)
+                print('%% args.max_columns',args.max_columns)
             if type(args.max_columns) != bool and args.max_columns < columns:
                 columns = args.max_columns
-            for i in np.arange(columns)+2:
-                if type(args.columns) == list and i not in args.columns:
-                    print('skipping column',i,'since not in args.columns')
-                    continue
+            if args.all == False:
+                print("%% args.all == False --> columns = 1")
+                columns = 1
+            gocolumns = np.arange(columns)+2
+            if args.columns:
+                gocolumns = args.columns
+            if args.verbose > verbosity_level:
+                print('%% columns  ',columns)
+                print('%% gocolumns',gocolumns)
+            for idxc,i in enumerate(gocolumns):
+                ###############################################
+                # go over all columns,
+                # take column 0 as x-column
+                ###############################################
                 if args.verbose > verbosity_level:
                     print("## @@@@@@@@@@@@@@@@@ TWO columns (begin) @@@@@@@@@@@@@@@@@@@@@")
                     print('## ixx',i)
+                if type(args.columns) == list and i not in args.columns:
+                    print('## --> skipping column',i,type(i),'since not in args.columns',args.columns)
+                    continue
+                else:
+                    print('## --> adding   column',i,type(i),'since in args.columns',args.columns)
                 using = "1:"+str(i)
                 if args.scale_y != 1.0:
                     using = "1:(\$"+str(i)+"*"+str(args.scale_y)+")" # has to be a default
@@ -298,7 +332,7 @@ def gnuplot_plot(args):
                     print("##",text)
                     print("## @@@@@@@@@@@@@@@@@ TWO columns (end) @@@@@@@@@@@@@@@@@@@@@@@")
         if args.verbose > verbosity_level:
-            print("######################## gnuplot_plot      #######################")
+            print("######################## gnuplot_plot end  #######################")
             print()
     #    ca("plot \"plot.gnu\" using 1:2 with linespoints notitle,    \"plot.gnu\" using 1:3 with linespoints notitle")
     ca("\nEOF")
@@ -329,7 +363,18 @@ def gnuplot_plot(args):
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
+    if type(args.columns) == list:
+        columns_new = []
+        for i in args.columns[0]:
+            try:
+                columns_new.append(int(i))
+            except:
+                columns_new.append(i)
+        #print('cn',columns_new)
+        args.columns = columns_new
+    #print('ag',args.columns)
+    #sys.exit()
     args_show(args)
-    sys.exit()
+    #sys.exit()
     gnuplot_plot(args)
     args_show(args)

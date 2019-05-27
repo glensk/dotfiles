@@ -28,6 +28,8 @@ def convert_cell(cell,pos):
     cell = np.matrix.transpose(cell)
 
     if not is_upper_triangular(cell):
+        #print('quippy cell is not upper_triangular')
+        #print('quippy cell',cell)
         # rotate bases into triangular matrix
         tri_mat = np.zeros((3, 3))
         A = cell[:, 0]
@@ -58,19 +60,25 @@ def convert_cell(cell,pos):
 
 #def simple_read_xyz(fileobj, index):
 def read_quippy(fileobj, index):
-    print('ERROR: this will still read in something in ipi format')
-    sys.exit()
     lines = fileobj.readlines()
     natoms = int(lines[0])
     cell_str = lines[1]
     #print('nat',natoms)
-    #print('cel',cell_str)
+    #print('quippy cel_str',cell_str)
     #print('cel',type(cell_str))
-    lst = cell_str.split()[2:8]
+    #lst = cell_str.split()[1:9]
+    lst = cell_str.split('"')[1].split()
+    #print('quippy lst xx:',lst)
+    #print('quippy lst:',lst)
     cell_out = [float(i) for i in lst]
     #print('out',out)
-    #print('cell_out:')
-    #print(cell_out)
+    #print('quippy cell_out:',cell_out)
+    cell_out_f = np.array(cell_out).reshape((3, 3))
+    #print('quippy cell_out_f:',cell_out_f)
+    #from ase.geometry import cell_to_cellpar
+    #cx = cell_to_cellpar(cell_out_f)
+    #print('cx',cx)
+    #sys.exit('not yet')
     pbc = (True, True, True)
     #print('xxx',cell_str[2])
 
@@ -86,7 +94,7 @@ def read_quippy(fileobj, index):
             symbols.append(symbol)
             positions.append([float(x), float(y), float(z)])
         #atoms[0].set_cell(atoms[0].get_cell_lengths_and_angles()))
-        yield Atoms(symbols=symbols, positions=positions, cell=cell_out, pbc=pbc)
+        yield Atoms(symbols=symbols, positions=positions, cell=cell_out_f, pbc=pbc)
 
 
 #def simple_write_xyz(fileobj, images, comment=''):
@@ -99,7 +107,9 @@ def write_quippy(fileobj, images, comment=''):
     #print((images[0].positions)[:5])
     #print('--------')
     #print((frame.positions)[:5])
+    #print('oldcell quippy:',frame.cell)
     newcell, newpos = convert_cell(frame.cell, frame.positions)
+    #print('newcell quippy:',newcell)
     laa = np.matrix.transpose(newcell)
     #print('newpos')
     #print(newpos[:5])

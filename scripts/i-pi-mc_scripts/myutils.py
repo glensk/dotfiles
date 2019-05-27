@@ -506,14 +506,27 @@ def progress(count, total, status=''):
     sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
     return
 
+def diff(first, second):
+    second = set(second)
+    return [item for item in first if item not in second]
 
 def ase_get_neighborlist(frame,atomnr=0,cutoff=3.,skin=0.1):
     NN = NeighborList([cutoff/2.]*frame.get_number_of_atoms(),skin=skin,self_interaction=False,bothways=True,primitive=NewPrimitiveNeighborList)
+    #print('NN')
     NN.update(frame)
+    #print(NN.get_connectivity_matrix())
+    #for idx,i in enumerate(NN.get_connectivity_matrix()):
+    #    print('idx',idx,i)
     NN_indices, offsets = NN.get_neighbors(atomnr)
+    #print('NN idx:',np.sort(NN_indices))
+    #sys.exit()
     return np.sort(NN_indices)
 
-
+def ase_get_neighborlist_1NN_2NN(frame,atomnr=0,cutoffa=3.,cutoffb=4.5,skin=0.1):
+    NN_1_indices       = ase_get_neighborlist(frame,atomnr=atomnr,cutoff=cutoffa,skin=skin)
+    NN_1_2_indices_tmp = ase_get_neighborlist(frame,atomnr=atomnr,cutoff=cutoffb,skin=skin)
+    NN_2_indices       = np.sort(np.array(diff(NN_1_2_indices_tmp,NN_1_indices)))
+    return NN_1_indices, NN_2_indices
 
 def ase_get_unique_frames(frames):
     '''
@@ -3378,7 +3391,7 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
         sys.exit(filename+" does not exist!")
 
     basename = os.path.basename(filename)
-    if True:
+    if verbose:
         print('filename out',filename)
         print('basename out',basename)
         print('type     out',type)
