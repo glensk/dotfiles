@@ -5,7 +5,6 @@ import socket
 import numpy as np
 from shutil import copyfile
 import click
-from utils_rename import diff
 
 # from scripts folder
 import convert_fileformats
@@ -155,29 +154,69 @@ def createjob(
 
         nndist = a0/np.sqrt(2.)
         atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
-        NN_1_indices = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=nndist,skin=0.1)
-        print('NN_1_indices',NN_1_indices)
+        NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
+        #print('from ....',(atomsc_fakevac.positions)[0])
+        #for i in NN_1_indices:
+        #    print((atomsc_fakevac.positions)[i])
+        print('NN_1_indices (orig  ):',NN_1_indices)
+        print('NN_2_indices (orig  ):',NN_2_indices)
+        #sys.exit()
         atomsc_fakevac.write('dataxx.quippy.xyz',format='quippy',append=True)
         atomsc_fakevac.write('dataxx.poscar',format='vasp',append=True)
-        atomsc_fakevac.write('dataxx.ipi',format='ipi',append=True)
+        atomsc_fakevac.write('dataxx.ipi',format='ipi',append=True) # works, currently so implemented that it canges cell
         atomsc_fakevac.write('dataxx.xyz',format='xyz',append=True)
+        atomsc_fakevac.write('dataxx.extxyz',format='extxyz',append=True)
         atomsc_fakevac.write('dataxx.lammps-data',format='lammps-data',append=True)
         atomsc_fakevac.write('dataxx.lammps-runner',format='lammps-runner',append=True)
         from ase.io import read as ase_read
         from ase.io import write as ase_write
-        #atomsc_fakevac_r = ase_read('dataxx.lammps-runner',format='lammps-runner') # not working
-        #atomsc_fakevac_r = ase_read('dataxx.lammps-data',format='lammps-data') # not working
-        #atomsc_fakevac_r = ase_read('dataxx.ipi',format='ipi') # not working
-        atomsc_fakevac_r = ase_read('dataxx.xyz',format='xyz') # not working
-        atomsc_fakevac_r.write('dataxx.poscar_from_xyz',format='vasp',append=True) # this is working
-        atomsc_fakevac_x = ase_read('dataxx.quippy.xyz',format='quippy') # not working
-        atomsc_fakevac_x.write('dataxx.poscar_from_qiuppy_xyz',format='vasp',append=True) # this is working
 
+        atomsc_fakevac_a = ase_read('dataxx.extxyz',format='extxyz') # works, cell ist not changed
+        atomsc_fakevac_a.write('dataxx.extxyz2',format='extxyz',append=True) # works, cell is not changed
+
+        atomsc_fakevac_b = ase_read('dataxx.xyz',format='xyz') # not working # but this should work
+        atomsc_fakevac_b.write('dataxx.xyz2',format='xyz',append=True) # this is working
+
+        atomsc_fakevac_c = ase_read('dataxx.ipi',format='ipi')  # works, currently so implemented that it canges cell
+        #print('ipi cell',atomsc_fakevac_c.get_cell())
+
+        atomsc_fakevac_c.write('dataxx.ipi2',format='ipi',append=True) # works, just writes the cell it gests.
+        atomsc_fakevac_c.write('dataxx.ipi2_poscar',format='vasp',append=True) # works, just writes the cell it gests.
+        NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac_c,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
+        print('NN_1_indices (ipi   ):',NN_1_indices)
+        print('NN_2_indices (ipi   ):',NN_2_indices)
+        #print('from ....',(atomsc_fakevac_c.positions)[0])
+        #for i in NN_1_indices:
+        #    print((atomsc_fakevac_c.positions)[i])
+
+        atomsc_fakevac_cc = ase_read('dataxx.ipi2_poscar',format='vasp')  # works, currently so implemented that it canges cell
+        atomsc_fakevac_cc.write('dataxx.ipi2_poscar2',format='vasp',append=True)
+        atomsc_fakevac_cc.write('dataxx.ipi2_poscar2_ipi',format='ipi',append=True) # works, just writes the cell it gests.
+        #print('ipi cell2 (ext):',atomsc_fakevac_cc.get_cell())
+        #print()
+        #print('now quippy')
+        atomsc_fakevac_d = ase_read('dataxx.quippy.xyz',format='quippy')
+        #print('quippy cell (ext)',atomsc_fakevac_d.get_cell())
+        atomsc_fakevac_d.write('dataxx.quippy.xyz2',format='quippy',append=True)
+        atomsc_fakevac_d.write('dataxx.quippy.xyz2_extxyz',format='extxyz',append=True)
+        NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac_d,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
+        print('NN_1_indices (quippy):',NN_1_indices)
+        print('NN_2_indices (quippy):',NN_2_indices)
+        #print('from ....',(atomsc_fakevac_d.positions)[0])
+        #for i in NN_1_indices:
+        #    print((atomsc_fakevac_d.positions)[i])
+        path = "/home/glensk/kmc/run_michele/Si6Mg6V1.1_/simulation.pos_libatom_2struct.xyz"
+        atomsc_fakevac_e = ase_read(path,format='quippy')
+
+        NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac_e,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
+        print('NN_1_indices (kmc   ):',NN_1_indices)
+        print('NN_2_indices (kmc   ):',NN_2_indices)
         sys.exit()
+
         NN_1_indices = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=nndist,skin=0.1)
         NN_1_2_indices_tmp = mu.ase_get_neighborlist(atomsc_fakevac,atomnr=0,cutoff=a0,skin=0.1)
         print('NN_1_indices  :',NN_1_indices)
-        NN_2_indices = np.sort(np.array(diff(NN_1_2_indices_tmp,NN_1_indices)))
+        NN_2_indices = np.sort(np.array(mu.diff(NN_1_2_indices_tmp,NN_1_indices)))
         print('NN_2_indices  :',NN_2_indices)
         NN_1_2_indices = np.concatenate((NN_1_indices, NN_2_indices ))
         print('NN_1_2_indices:',NN_1_2_indices)

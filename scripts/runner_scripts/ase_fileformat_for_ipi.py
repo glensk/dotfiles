@@ -25,6 +25,8 @@ def convert_cell(cell,pos):
     cell = np.matrix.transpose(cell)
 
     if not is_upper_triangular(cell):
+        #print('ipi cell is not upper_triangular')
+        #print('ipi cell:',cell)
         # rotate bases into triangular matrix
         tri_mat = np.zeros((3, 3))
         A = cell[:, 0]
@@ -49,6 +51,8 @@ def convert_cell(cell,pos):
 
         return tri_mat, pos
     else:
+        #print('ipi cell is !! upper_triangular')
+        #print('ipi cell:',cell)
         return cell, pos
 
 #def simple_read_xyz(fileobj, index):
@@ -57,13 +61,12 @@ def read_ipi(fileobj, index):
     natoms = int(lines[0])
     cell_str = lines[1]
     #print('nat',natoms)
-    #print('cel',cell_str)
-    #print('cel',type(cell_str))
+    #print('ipi cell_str:',cell_str)
     lst = cell_str.split()[2:8]
-    cell_out = [float(i) for i in lst]
+    #print('ipi lst:',lst)
+    cell_out = [float(i) for i in lst]   # [14.34366105636912, 14.34366105636912, 14.34366105636912, 60.0, 60.0, 60.0]
     #print('out',out)
-    #print('cell_out:')
-    #print(cell_out)
+    #print('cell_out:',cell_out)
     pbc = (True, True, True)
     #print('xxx',cell_str[2])
 

@@ -74,7 +74,7 @@ def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units
     print('infile               :',infile)
 
     ### check if ase runner/quippy/lammpps-data formats are known
-    ase_formats = my.ase_get_known_formats_class()
+    ase_formats = my.ase_get_known_formats_class(verbose=verbose)
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
 
     ### check if lammps is working with ase

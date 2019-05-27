@@ -23,9 +23,10 @@ args = p.parse_args()
 if args.from_que == True: args.from_subfolder = False
 verbose = args.verbose
 
-print('args.from_subfolder',args.from_subfolder)
-print('args.from_que      ',args.from_que)
-print('args.verbose       ',args.verbose)
+if args.verbose:
+    print('args.from_subfolder',args.from_subfolder)
+    print('args.from_que      ',args.from_que)
+    print('args.verbose       ',args.verbose)
 
 #ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
 #for i in ru:
