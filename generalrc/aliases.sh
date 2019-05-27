@@ -218,11 +218,12 @@ alias cmpc='sshimmer -t glensk@cmpc34.mpie.de      "[ -e `th.sh` ] && cd `th.sh`
 alias gate='sshimmer -t aglen@gate.rzg.mpg.de      "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 alias gatelinux='sshimmer -t aglen@woese.opt.rzg.mpg.de "[ -e `th.sh` ] && cd `th.sh`; zsh"'
 alias gatehydra='sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `th.sh`; zsh"'
-#
-#$1 daint 'ssh daint'
-#$1 fidis 'ssh fidis'
-#$1 cosmopc 'ssh cosmopc'
-#$1 pc 'ssh cosmopc'
+
+alias fidis='ssh fidis'
+alias daint='ssh daint'
+alias hel='ssh helvetios'
+alias cosmopc='ssh cosmopc'
+alias pc='ssh cosmopc'
 
 ##############################
 # autocorrect

@@ -143,6 +143,8 @@ def createjob(
 
     # make the atomic structure
     if True:
+        nndist = a0/np.sqrt(2.)
+
         from ase.io import read as ase_read
         from ase.io import write as ase_write
         atomsc_fakevac_i = ase_read('dataxx.extxyz3',index=":",format='extxyz') # works, cell ist not changed
@@ -159,14 +161,22 @@ def createjob(
         print('quippy')
         atomsc_fakevac_i = ase_read('dataxx.quippy.xyz2',index=":",format='quippy') # works, cell ist not changed
         print('reading kmc...')
-        atomsc_fakevac_i = ase_read('../simulation.pos_0.xyz',index=":",format='ipi') # works, cell ist not changed
+        atomsc_fakevac_i = ase_read('../sim.xyz',index=":",format='ipi') # works, cell ist not changed
         print('reading kmc... done')
         print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
-        print(atomsc_fakevac_i[0].get_chemical_species())
+        print((atomsc_fakevac_i[0]).get_cell())
+        print((atomsc_fakevac_i[0]).positions)
+        print((atomsc_fakevac_i[0]).get_chemical_symbols())
+        print([atom.index for atom in atomsc_fakevac_i[0] if atom.symbol == 'V'])
 
         for idx in np.arange(10):
-            print('aa',atomsc_fakevac_i[idx].positions[-1])
-            #NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
+            vac_idx = ([atom.index for atom in atomsc_fakevac_i[idx] if atom.symbol == 'V'])
+            print('vac_idx',vac_idx)
+            for vac in vac_idx:
+                print('aa',atomsc_fakevac_i[idx].positions[vac])
+                NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac_i[idx],atomnr=vac,cutoffa=nndist,cutoffb=a0,skin=0.1)
+                print('NN_1_indices',NN_1_indices)
+                print('NN_2_indices',NN_2_indices)
         sys.exit()
 
         def mysave(atomsc_fakevac,text=False):
@@ -178,7 +188,6 @@ def createjob(
             #atomsc_fakevac.write('data'+text+'.xyz',format="extxyz",append=True)
             return
 
-        nndist = a0/np.sqrt(2.)
         atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
         NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
         #print('from ....',(atomsc_fakevac.positions)[0])
