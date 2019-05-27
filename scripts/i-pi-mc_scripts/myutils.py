@@ -522,6 +522,28 @@ def ase_get_neighborlist(frame,atomnr=0,cutoff=3.,skin=0.1):
     #sys.exit()
     return np.sort(NN_indices)
 
+def count_amount_1NN_around_vacancies(filename,format='ipi',vac_symbol="V"):
+    print('reading',filename,'...')
+    frames = ase_read('../sim.xyz',index=":",format=format)
+    print('reading',filename,'done.')
+    structures = len(frames)
+    print('structures',structures)
+    filename_analyze = filename +  ".1NN.al_mg_si.dat"
+    if os.path.isfile(filename_analyze):
+        al_mg_si = np.loadtxt(filename_analyze)
+    else:
+        al_mg_si = np.zeros((structures,3))
+
+    for idx in np.arange(structures):
+        if al_mg_si[idx][0] != 0:
+            print(idx,'already known')
+            continue
+
+        vac_idx = ([atom.index for atom in frames[idx] if atom.symbol == vac_symbol])
+
+    return
+
+
 def ase_get_neighborlist_1NN_2NN(frame,atomnr=0,cutoffa=3.,cutoffb=4.5,skin=0.1):
     NN_1_indices       = ase_get_neighborlist(frame,atomnr=atomnr,cutoff=cutoffa,skin=skin)
     NN_1_2_indices_tmp = ase_get_neighborlist(frame,atomnr=atomnr,cutoff=cutoffb,skin=skin)

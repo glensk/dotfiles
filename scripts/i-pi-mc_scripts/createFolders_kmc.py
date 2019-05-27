@@ -147,36 +147,65 @@ def createjob(
 
         from ase.io import read as ase_read
         from ase.io import write as ase_write
+
+        ###############################################
+        # get the amount of 1NN in a relly large cell
+        ###############################################
         atomsc_fakevac_i = ase_read('dataxx.extxyz3',index=":",format='extxyz') # works, cell ist not changed
+        #atomsc_fakevac_i = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=10,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
+        #nn = mu.ase_get_neighborlist(atomsc_fakevac_i,atomnr=0,cutoff=3.,skin=0.1)
+        #print("nn",nn,'len',len(nn))
+        #nn = mu.ase_get_neighborlist(atomsc_fakevac_i,atomnr=0,cutoff=8.5,skin=0.1)
+        #print("nn",nn,'len',len(nn))
+        #sys.exit()
+
         print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
+
         for idx,i in enumerate(atomsc_fakevac_i):
             print('aa',atomsc_fakevac_i[idx].positions[0])
-            print('aa',i.positions[0])
+            #print('aa',i.positions[0])
         print('ipi')
         atomsc_fakevac_i = ase_read('dataxx.ipi2',index=":",format='ipi') # works, cell ist not changed
         print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
         for idx,i in enumerate(atomsc_fakevac_i):
             print('aa',atomsc_fakevac_i[idx].positions[0])
-            print('aa',i.positions[0])
+            #print('aa',i.positions[0])
         print('quippy')
         atomsc_fakevac_i = ase_read('dataxx.quippy.xyz2',index=":",format='quippy') # works, cell ist not changed
-        print('reading kmc...')
-        atomsc_fakevac_i = ase_read('../sim.xyz',index=":",format='ipi') # works, cell ist not changed
-        print('reading kmc... done')
-        print(len(atomsc_fakevac_i),type(atomsc_fakevac_i))
-        print((atomsc_fakevac_i[0]).get_cell())
-        print((atomsc_fakevac_i[0]).positions)
-        print((atomsc_fakevac_i[0]).get_chemical_symbols())
-        print([atom.index for atom in atomsc_fakevac_i[0] if atom.symbol == 'V'])
 
-        for idx in np.arange(10):
+
+
+        filename = '../sim.xyz'
+        mu.count_amount_1NN_around_vacancies(filename,format='ipi')
+        sys.exit()
+
+
+        filename = "al_mg_si.dat"
+        if os.path.isfile(filename):
+            al_mg_si = np.loadtxt(filename)
+        else:
+            al_mg_si = np.zeros((len(atomsc_fakevac_i),3))
+
+        for idx in np.arange(go_over):
             vac_idx = ([atom.index for atom in atomsc_fakevac_i[idx] if atom.symbol == 'V'])
-            print('vac_idx',vac_idx)
+            #print('vac_idx',vac_idx)
             for vac in vac_idx:
-                print('aa',atomsc_fakevac_i[idx].positions[vac])
+                #print('aa',atomsc_fakevac_i[idx].positions[vac])
                 NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac_i[idx],atomnr=vac,cutoffa=nndist,cutoffb=a0,skin=0.1)
-                print('NN_1_indices',NN_1_indices)
-                print('NN_2_indices',NN_2_indices)
+                NN_1_sym = [atom.symbol for atom in atomsc_fakevac_i[idx] if atom.index in NN_1_indices]
+                NN_1_al = NN_1_sym.count("Al")
+                NN_1_mg = NN_1_sym.count("Mg")
+                NN_1_si = NN_1_sym.count("Si")
+                print(idx,'NN_1_al',NN_1_al,"NN_1_mg",NN_1_mg,'NN_1_si',NN_1_si)
+                al_mg_si.append([idx,NN_1_al,NN_1_mg,NN_1_si])
+                print(al_mg_si)
+                #if idx in np.arange(go_over)[::2]:
+                #    np.savetxt(
+
+                #sym = ([atom.symbol for atom in atomsc_fakevac_i[idx] if atom.== 'V'])
+
+                #print('NN_1_indices',NN_1_indices)
+                #print('NN_2_indices',NN_2_indices)
         sys.exit()
 
         def mysave(atomsc_fakevac,text=False):
