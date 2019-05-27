@@ -19,6 +19,8 @@
 [ "$ZSH_VERSION" != "" ] && currentshell="zsh"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
+
 host=`hostname`   # 0.001s
 onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
 setenv host $host;
@@ -30,7 +32,6 @@ setenv potentials "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
 ##################################################################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
 source $dotfiles/scripts/source_to_add_to_path.sh
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time s1"
 
@@ -49,7 +50,7 @@ source $generalrc/generalrc_path.sh $onhost
 # ALIASES & PROMPT & tabcolor
 ##############################################
 source $generalrc/aliases.sh
-source $generalrc/generalrc_alias_$currentshell.sh
+#source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
     
 #limit coredumpsize 0    # Disable core dumps # limit command is not know in bash
