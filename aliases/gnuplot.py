@@ -51,6 +51,7 @@ def set_args_defaults(args,inputfile):
     if basename in ["learning-curve.out", 'learning-curve-runner.out']:
         args.log_log = True
         args.max_columns = 2
+        args.columns = [2,3]
         #args.scale = True
         args.xlabel = "epochs"
         args.ylabel = "RMSE (meV/at)"
