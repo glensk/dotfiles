@@ -23,10 +23,9 @@ host=`hostname`   # 0.001s
 onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
 setenv host $host;
 setenv onhost $onhost;
+
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
-setenv dot      "$HOME/Dropbox/Albert/scripts/dotfiles/";
 setenv potentials "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
-setenv pot        "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
 
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
@@ -49,11 +48,7 @@ source $generalrc/generalrc_path.sh $onhost
 ##############################################
 # ALIASES & PROMPT & tabcolor
 ##############################################
-if [ "$onhost" != "UNKNOWN" ];then
-    [ ! -e "$generalrc/generalrc_alias_$onhost" ] && $generalrc/generalrc_alias_renew.sh
-    # this works only for bash and zsh
-    source $generalrc/generalrc_alias_$onhost
-fi
+source $generalrc/aliases.sh
 source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
     

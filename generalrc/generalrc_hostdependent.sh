@@ -81,6 +81,11 @@ cmmc)
     #add2="setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
 	echo "setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
   ;;
+helvetios)
+    setenv myprompttime black;
+    setenv myprompthostuser black;
+    setenv mypromptpath black;
+  ;;
 *)
 	setenv onhost UNKNOWN;
   ;;
