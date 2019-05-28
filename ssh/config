@@ -84,10 +84,10 @@ ControlPath ~/.ssh/control:%h:%p:%r
 ####################################################################################
 
 #ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@lsmxsrv2.epfl.ch
-Host lsmx
- HostName lsmxsrv2.epfl.ch
- User glensk
- ForwardX11 Yes
+#Host lsmx
+# HostName lsmxsrv2.epfl.ch
+# User glensk
+# ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
 Host fidis
