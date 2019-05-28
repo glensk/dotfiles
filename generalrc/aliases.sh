@@ -1,5 +1,7 @@
 #!/bin/sh
 
+function mcd () { mkdir -p $1 && cd $1 }
+
 ####################################################################
 ## ls alias
 ## -v sorts numerical

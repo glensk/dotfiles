@@ -522,25 +522,94 @@ def ase_get_neighborlist(frame,atomnr=0,cutoff=3.,skin=0.1):
     #sys.exit()
     return np.sort(NN_indices)
 
-def count_amount_1NN_around_vacancies(filename,format='ipi',vac_symbol="V"):
+def print_args(args):
+    keys = args.__dict__.keys()
+    values = args.__dict__.values()
+    print('########################################## argparse values (begin) #########')
+    for idx,i in enumerate(keys):
+        print("#",str(keys[idx]).ljust(25),str(values[idx]).ljust(30),str(type(values[idx])).ljust(15),"#")
+    print('########################################## argparse values (end  ) #########')
+    return
+
+def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,format='ipi',vac_symbol="V",save_every = 10):
+    print()
+    print("########### count_amount_1NN_around_vacancies(...) #######################")
     print('reading',filename,'...')
-    frames = ase_read('../sim.xyz',index=":",format=format)
+    frames = ase_read(filename,index=":",format=format)
     print('reading',filename,'done.')
+
     structures = len(frames)
     print('structures',structures)
-    filename_analyze = filename +  ".1NN.al_mg_si.dat"
-    if os.path.isfile(filename_analyze):
-        al_mg_si = np.loadtxt(filename_analyze)
-    else:
-        al_mg_si = np.zeros((structures,3))
 
-    for idx in np.arange(structures):
-        if al_mg_si[idx][0] != 0:
-            print(idx,'already known')
-            continue
+    all_vac_idx = ([atom.index for atom in frames[0] if atom.symbol == vac_symbol])
+    print('all_vac_idx',all_vac_idx)
 
-        vac_idx = ([atom.index for atom in frames[idx] if atom.symbol == vac_symbol])
+    if cutoffa == False:
+        print(frames[0].cell)
+        print(frames[0].get_number_of_atoms())
+        #a0 = frames[0].cell[0,0]/5.*sqrt(2.)
+        nndist = cutoffa = 2.95
+    if cutoffb == False:
+        a0 = cutoffb = 4.09
 
+    if cutoffa == False:sys.exit('cutoffa')
+    if cutoffb == False:sys.exit('cutoffb')
+
+    filename_analyze_all = []
+    al_mg_si_all = []
+    for vac_nr,vac_idx in enumerate(all_vac_idx):
+        filename_analyze = filename +  ".1NN.al_mg_si_vac_"+str(vac_nr)+".dat"
+        filename_analyze_all.append(filename_analyze)
+        print('filename_analyze',filename_analyze)
+
+        if os.path.isfile(filename_analyze):
+            al_mg_si = np.loadtxt(filename_analyze)
+            al_mg_si_all.append(al_mg_si)
+        else:
+            al_mg_si = np.zeros((structures,7))
+            al_mg_si_all.append(al_mg_si)
+    print()
+    print('filename_analyze_all',filename_analyze_all)
+    print()
+
+    for step in np.arange(structures):
+        all_vac_idx = ([atom.index for atom in frames[step] if atom.symbol == vac_symbol])
+        #print('step',step,'all_vac_idx',all_vac_idx)
+        for vac_nr,vac_idx in enumerate(all_vac_idx):
+            if al_mg_si_all[vac_nr][step,0] != 0:
+                anz_1NN = np.sum(al_mg_si[step][1:4])
+                anz_2NN = np.sum(al_mg_si[step][4:7])
+                print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step])
+                #print(al_mg_si[step][1:4])
+                #print('sum',np.sum(al_mg_si[step][1:4]))
+                testanz = False
+                if testanz:
+                    if anz_1NN != 12:
+                        sys.exit("not 12 1NN but "+str(anz_1NN))
+                continue
+
+            NN_1_indices, NN_2_indices = ase_get_neighborlist_1NN_2NN(frames[step],atomnr=vac_idx,cutoffa=cutoffa,cutoffb=cutoffb,skin=skin)
+            NN_1_sym = [atom.symbol for atom in frames[step] if atom.index in NN_1_indices]
+            NN_2_sym = [atom.symbol for atom in frames[step] if atom.index in NN_2_indices]
+            NN_1_al = NN_1_sym.count("Al")
+            NN_1_mg = NN_1_sym.count("Mg")
+            NN_1_si = NN_1_sym.count("Si")
+            NN_2_al = NN_2_sym.count("Al")
+            NN_2_mg = NN_2_sym.count("Mg")
+            NN_2_si = NN_2_sym.count("Si")
+            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NN_1_al:',str(NN_1_al).ljust(4),"NN_1_mg:",NN_1_mg,'NN_1_si:',NN_1_si)
+            al_mg_si_all[vac_nr][step,1] = NN_1_al
+            al_mg_si_all[vac_nr][step,2] = NN_1_mg
+            al_mg_si_all[vac_nr][step,3] = NN_1_si
+            al_mg_si_all[vac_nr][step,4] = NN_2_al
+            al_mg_si_all[vac_nr][step,5] = NN_2_mg
+            al_mg_si_all[vac_nr][step,6] = NN_2_si
+            al_mg_si_all[vac_nr][step,0] = step
+            #print('-------',filename_analyze_all[vac_nr])
+            #print(al_mg_si_all[vac_nr])
+            if step > 0 and step in np.arange(structures)[::save_every]:
+                np.savetxt(filename_analyze_all[vac_nr],al_mg_si_all[vac_nr],fmt='%i')
+                print('saving',filename_analyze_all[vac_nr],'at step',step)
     return
 
 
