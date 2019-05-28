@@ -136,7 +136,11 @@ def get_energies(args):
         filename = "simulation.pos_0.xyz"
         #filename = '../sim.xyz'
         #filename = 'sim.xyz'
-        my.count_amount_1NN_around_vacancies(filename,cutoffa=3.5,cutoffb=4.2,skin=0.1,format='ipi')
+        # 4.23 is too little for Si6Mg6V1.2_ step 797
+        # 4.5  is too much   for Si6Mg6V1.4  step 2372
+        #
+        # 3.5 is too much    for Si6Mg6V1.4 step 2242
+        my.count_amount_1NN_around_vacancies(filename,cutoffa=3.4,cutoffb=4.4,skin=0.1,format='ipi')
         sys.exit()
 
     if args.testkmc:

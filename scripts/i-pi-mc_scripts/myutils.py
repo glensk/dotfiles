@@ -554,6 +554,8 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
 
     if cutoffa == False:sys.exit('cutoffa')
     if cutoffb == False:sys.exit('cutoffb')
+    print('cutoffa',cutoffa)
+    print('cutoffb',cutoffb)
 
     filename_analyze_all = []
     al_mg_si_all = []
@@ -573,6 +575,8 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
     print()
 
     def test_anz_nn(al_mg_si_all,vac_nr,step,exit=False):
+        #if al_mg_si_all[vac_nr][step][0] == 0:
+        #    return True
         anz_1NN = np.sum(al_mg_si_all[vac_nr][step][1:4])
         anz_2NN = np.sum(al_mg_si_all[vac_nr][step][4:7])
         #print(al_mg_si[step][1:4])
@@ -583,18 +587,18 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
         if testanz:
             if anz_1NN != 12:
                 #print('step:',str(step).ljust(6),"not 12 1NN but "+str(anz_1NN),'exit',exit)
-                print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'exit',exit,"not 12 1NN but "+str(anz_1NN))
+                print('step:',str(step).ljust(6),'vac_nr',vac_nr,'already known_a',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'exit',exit,"not 12 1NN but "+str(anz_1NN),'-> REDO')
                 printed = True
                 do_continue = False
                 if exit == True: sys.exit("ERROR")
             if anz_2NN != 6 and printed == False:
                 #print('step:',str(step).ljust(6),"not  6 2NN but "+str(anz_2NN),'exit',exit)
-                print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'exit',exit,"not  6 2NN but "+str(anz_2NN))
+                print('step:',str(step).ljust(6),'vac_nr',vac_nr,'already known_b',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'exit',exit,"not  6 2NN but "+str(anz_2NN),'-> REDO')
                 printed = True
                 do_continue = False
                 if exit == True: sys.exit("ERROR")
         if printed == False:
-            print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step])
+            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'already known_c',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'continue',do_continue)
         return do_continue
 
     for step in np.arange(structures):
@@ -615,7 +619,6 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
             NN_2_al = NN_2_sym.count("Al")
             NN_2_mg = NN_2_sym.count("Mg")
             NN_2_si = NN_2_sym.count("Si")
-            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NN_1_al:',str(NN_1_al).ljust(4),"NN_1_mg:",NN_1_mg,'NN_1_si:',NN_1_si,"NN_2_al",NN_2_al,"NN_2_mg",NN_2_mg,"NN_2_si",NN_2_si)
             al_mg_si_all[vac_nr][step,1] = NN_1_al
             al_mg_si_all[vac_nr][step,2] = NN_1_mg
             al_mg_si_all[vac_nr][step,3] = NN_1_si
@@ -625,6 +628,7 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
             al_mg_si_all[vac_nr][step,0] = step
             anz_1NN = np.sum(al_mg_si_all[vac_nr][step][1:4])
             anz_2NN = np.sum(al_mg_si_all[vac_nr][step][4:7])
+            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NEW/REDO       ',anz_1NN,anz_2NN, "||",str(NN_1_al).ljust(4),NN_1_mg,NN_1_si,"||",NN_2_al,NN_2_mg,NN_2_si)
             #print('-------',filename_analyze_all[vac_nr])
             #print(al_mg_si_all[vac_nr])
             do_continue = test_anz_nn(al_mg_si_all,vac_nr,step,exit=True)
