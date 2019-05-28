@@ -176,36 +176,8 @@ def createjob(
 
 
         filename = '../sim.xyz'
-        mu.count_amount_1NN_around_vacancies(filename,format='ipi')
-        sys.exit()
-
-
-        filename = "al_mg_si.dat"
-        if os.path.isfile(filename):
-            al_mg_si = np.loadtxt(filename)
-        else:
-            al_mg_si = np.zeros((len(atomsc_fakevac_i),3))
-
-        for idx in np.arange(go_over):
-            vac_idx = ([atom.index for atom in atomsc_fakevac_i[idx] if atom.symbol == 'V'])
-            #print('vac_idx',vac_idx)
-            for vac in vac_idx:
-                #print('aa',atomsc_fakevac_i[idx].positions[vac])
-                NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac_i[idx],atomnr=vac,cutoffa=nndist,cutoffb=a0,skin=0.1)
-                NN_1_sym = [atom.symbol for atom in atomsc_fakevac_i[idx] if atom.index in NN_1_indices]
-                NN_1_al = NN_1_sym.count("Al")
-                NN_1_mg = NN_1_sym.count("Mg")
-                NN_1_si = NN_1_sym.count("Si")
-                print(idx,'NN_1_al',NN_1_al,"NN_1_mg",NN_1_mg,'NN_1_si',NN_1_si)
-                al_mg_si.append([idx,NN_1_al,NN_1_mg,NN_1_si])
-                print(al_mg_si)
-                #if idx in np.arange(go_over)[::2]:
-                #    np.savetxt(
-
-                #sym = ([atom.symbol for atom in atomsc_fakevac_i[idx] if atom.== 'V'])
-
-                #print('NN_1_indices',NN_1_indices)
-                #print('NN_2_indices',NN_2_indices)
+        filename = '../simulation.pos_0.xyz'
+        mu.count_amount_1NN_around_vacancies(filename,cutoffa=nndist,cutoffb=a0,skin=0.1,format='ipi')
         sys.exit()
 
         def mysave(atomsc_fakevac,text=False):
