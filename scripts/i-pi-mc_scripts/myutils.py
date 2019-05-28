@@ -534,9 +534,9 @@ def print_args(args):
 def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,format='ipi',vac_symbol="V",save_every = 10):
     print()
     print("########### count_amount_1NN_around_vacancies(...) #######################")
-    print('reading',filename,'...')
+    print('reading',os.path.abspath(filename),'...')
     frames = ase_read(filename,index=":",format=format)
-    print('reading',filename,'done.')
+    print('reading',os.path.abspath(filename),'done.')
 
     structures = len(frames)
     print('structures',structures)
@@ -550,7 +550,7 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
         #a0 = frames[0].cell[0,0]/5.*sqrt(2.)
         nndist = cutoffa = 2.95
     if cutoffb == False:
-        a0 = cutoffb = 4.09
+        a0 = cutoffb = 4.29
 
     if cutoffa == False:sys.exit('cutoffa')
     if cutoffb == False:sys.exit('cutoffb')
@@ -572,21 +572,39 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
     print('filename_analyze_all',filename_analyze_all)
     print()
 
+    def test_anz_nn(al_mg_si_all,vac_nr,step,exit=False):
+        anz_1NN = np.sum(al_mg_si_all[vac_nr][step][1:4])
+        anz_2NN = np.sum(al_mg_si_all[vac_nr][step][4:7])
+        #print(al_mg_si[step][1:4])
+        #print('sum',np.sum(al_mg_si[step][1:4]))
+        testanz = True
+        do_continue = True
+        printed = False
+        if testanz:
+            if anz_1NN != 12:
+                #print('step:',str(step).ljust(6),"not 12 1NN but "+str(anz_1NN),'exit',exit)
+                print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'exit',exit,"not 12 1NN but "+str(anz_1NN))
+                printed = True
+                do_continue = False
+                if exit == True: sys.exit("ERROR")
+            if anz_2NN != 6 and printed == False:
+                #print('step:',str(step).ljust(6),"not  6 2NN but "+str(anz_2NN),'exit',exit)
+                print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'exit',exit,"not  6 2NN but "+str(anz_2NN))
+                printed = True
+                do_continue = False
+                if exit == True: sys.exit("ERROR")
+        if printed == False:
+            print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step])
+        return do_continue
+
     for step in np.arange(structures):
         all_vac_idx = ([atom.index for atom in frames[step] if atom.symbol == vac_symbol])
         #print('step',step,'all_vac_idx',all_vac_idx)
         for vac_nr,vac_idx in enumerate(all_vac_idx):
             if al_mg_si_all[vac_nr][step,0] != 0:
-                anz_1NN = np.sum(al_mg_si[step][1:4])
-                anz_2NN = np.sum(al_mg_si[step][4:7])
-                print('step:',str(step).ljust(6),'already known',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step])
-                #print(al_mg_si[step][1:4])
-                #print('sum',np.sum(al_mg_si[step][1:4]))
-                testanz = False
-                if testanz:
-                    if anz_1NN != 12:
-                        sys.exit("not 12 1NN but "+str(anz_1NN))
-                continue
+                do_continue = test_anz_nn(al_mg_si_all,vac_nr,step,exit=False)
+                if do_continue == True:
+                    continue
 
             NN_1_indices, NN_2_indices = ase_get_neighborlist_1NN_2NN(frames[step],atomnr=vac_idx,cutoffa=cutoffa,cutoffb=cutoffb,skin=skin)
             NN_1_sym = [atom.symbol for atom in frames[step] if atom.index in NN_1_indices]
@@ -597,7 +615,7 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
             NN_2_al = NN_2_sym.count("Al")
             NN_2_mg = NN_2_sym.count("Mg")
             NN_2_si = NN_2_sym.count("Si")
-            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NN_1_al:',str(NN_1_al).ljust(4),"NN_1_mg:",NN_1_mg,'NN_1_si:',NN_1_si)
+            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NN_1_al:',str(NN_1_al).ljust(4),"NN_1_mg:",NN_1_mg,'NN_1_si:',NN_1_si,"NN_2_al",NN_2_al,"NN_2_mg",NN_2_mg,"NN_2_si",NN_2_si)
             al_mg_si_all[vac_nr][step,1] = NN_1_al
             al_mg_si_all[vac_nr][step,2] = NN_1_mg
             al_mg_si_all[vac_nr][step,3] = NN_1_si
@@ -605,11 +623,15 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
             al_mg_si_all[vac_nr][step,5] = NN_2_mg
             al_mg_si_all[vac_nr][step,6] = NN_2_si
             al_mg_si_all[vac_nr][step,0] = step
+            anz_1NN = np.sum(al_mg_si_all[vac_nr][step][1:4])
+            anz_2NN = np.sum(al_mg_si_all[vac_nr][step][4:7])
             #print('-------',filename_analyze_all[vac_nr])
             #print(al_mg_si_all[vac_nr])
+            do_continue = test_anz_nn(al_mg_si_all,vac_nr,step,exit=True)
+
             if step > 0 and step in np.arange(structures)[::save_every]:
                 np.savetxt(filename_analyze_all[vac_nr],al_mg_si_all[vac_nr],fmt='%i')
-                print('saving',filename_analyze_all[vac_nr],'at step',step)
+                print('saving',os.path.abspath(filename_analyze_all[vac_nr]),'at step',step)
     return
 
 
