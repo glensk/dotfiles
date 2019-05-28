@@ -1,0 +1,2 @@
+/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v3ag_5000
+analyze.csv ANMERKUNG.txt elastic.dat elastic_ene.dat ene_all.npy ene_DFT.npy ene_DFT_wo_atomic ene_diff_abs.npy ene_diff_lam_ase.dat ene_diff.npy ene_pot.npy ene_pot_wo_atomic ene_std.npy input.data input.nn learning_curve_test.dat learning_curve_train.dat logfile_mode1 log.fit log.lammps out_c_check.runner out_c_check.runner.save out_murn.runner README_2019-05-08_13:43:32.txt README_2019-05-08_13:44:53.txt scaling.data test.py tmp_assess weights.012.data weights.013.data weights.014.data
