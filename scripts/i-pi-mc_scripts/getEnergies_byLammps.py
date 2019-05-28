@@ -31,6 +31,8 @@ def help(p = None):
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
 
+    p.add_argument('--analyze_kmc_number_1NN_2NN','-akmc',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
+
     p.add_argument('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
     p.add_argument('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
     p.add_argument('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
@@ -130,6 +132,12 @@ def get_energies(args):
     write_forcesx = args.write_forcesx
     write_analysis = args.write_analysis
 
+    if args.analyze_kmc_number_1NN_2NN:
+        filename = "simulation.pos_0.xyz"
+        #filename = '../sim.xyz'
+        #filename = 'sim.xyz'
+        my.count_amount_1NN_around_vacancies(filename,cutoffa=False,cutoffb=False,skin=0.1,format='ipi')
+        sys.exit()
 
     if args.testkmc:
         args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
