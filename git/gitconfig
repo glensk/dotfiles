@@ -13,7 +13,7 @@
 	branch = auto
 [core]
 	editor = vim
-	excludesfile = /home/glensk/.gitignore
+	excludesfile = $HOME/.gitignore
 	pager = cat
 [alias]
     c = commit -m
