@@ -631,7 +631,9 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
             print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NEW/REDO       ',anz_1NN,anz_2NN, "||",str(NN_1_al).ljust(4),NN_1_mg,NN_1_si,"||",NN_2_al,NN_2_mg,NN_2_si)
             #print('-------',filename_analyze_all[vac_nr])
             #print(al_mg_si_all[vac_nr])
-            do_continue = test_anz_nn(al_mg_si_all,vac_nr,step,exit=True)
+            if anz_1NN != 12 or anz_2NN != 6:
+                sys.exit("ERROR see above")
+            #do_continue = test_anz_nn(al_mg_si_all,vac_nr,step,exit=True)
 
             if step > 0 and step in np.arange(structures)[::save_every]:
                 np.savetxt(filename_analyze_all[vac_nr],al_mg_si_all[vac_nr],fmt='%i')
