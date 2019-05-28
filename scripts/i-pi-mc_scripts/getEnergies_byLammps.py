@@ -14,10 +14,36 @@ def help(p = None):
     string = ''' helptext '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
-    p.add_argument('-i', '--inputfile', required=True, type=str,default=False, help="input files containing structures that will be imported by ase")
+    p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
-    p.add_argument('-p' ,'--pot', required=False, choices=[my.pot_all()], default=my.get_latest_n2p2_pot())
+    p.add_argument('-p' ,'--pot', required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot())
+    p.add_argument('--potpath','-pp',type=str,required=False,default=False,help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
+    p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
+    p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
+    p.add_argument('--geopt','-g'    ,action='store_true',help='make a geometry optimization of the atoms.')
+    p.add_argument('--elastic','-e'  ,action='store_true',help='calculate elastic constants (externally by lammps).')
+    p.add_argument('--ase'    ,'-a'  ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
+    p.add_argument('--lmp'    ,'-lmp',action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
+    p.add_argument('--ipi'    ,'-ipi',action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
+    p.add_argument('--test'   ,'-t',  action='store_true',help='Assess formation energies of particular test structures.')
+    p.add_argument('--teste'  ,'-te', action='store_true',help='Assess elastic constants.')
+    p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
+    p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
+
+    p.add_argument('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
+    p.add_argument('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
+    p.add_argument('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
+    p.add_argument('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
+    p.add_argument('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
+    p.add_argument('--pick_c44','-pc44',action='store_true',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
+    p.add_argument('--pick_amount_1NN','-pa_1NN',action='store_true',default=False,required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
+
+    p.add_argument('--write_runner','-wr',  action='store_true',help='default: runner.out')
+    p.add_argument('--write_forces','-wf',  action='store_true',help='write forces.out of particular strucuture')
+    p.add_argument('--write_forcesx','-wfx',action='store_true',help='write forcesx.out of particular strucuture')
+    p.add_argument('--write_analysis','-wa',action='store_true',help='write ene_{DFT,pot}... default: False')
+    p.add_argument('-d','--debug',   help='verbose', action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
@@ -29,6 +55,7 @@ def help(p = None):
 #@click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default=my.get_latest_n2p2_pot())
 #@click.option('--potpath','-pp',type=str,required=False,default=False,help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
 #@click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
+
 #@click.option('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
 #@click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
 #@click.option('--elastic/--no-elastic','-e',default=False,help='calculate elastic constants (externally by lammps).')
@@ -70,24 +97,55 @@ def get_energies(args):
     getEnergies_byLammps.py -p . -e
 
     '''
-    infile = args.infile
+    inputfile = infile = args.inputfile
     format_in = args.format_in
+    pot = args.pot
+    potpath = args.potpath
+    structures_idx = args.structures_idx
 
-    if testkmc:
-        infile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
+    units = args.units
+    debug = args.debug
+    verbose = args.verbose
+
+    geopt = args.geopt
+    elastic = args.elastic
+    ase = args.ase
+    lmp = args.lmp
+    ipi = args.ipi
+
+    test = args.test
+    teste = args.teste
+    test3 = args.test3
+    testkmc = args.testkmc
+    pick_concentration_al = args.pick_concentration_al
+    pick_atoms_al = args.pick_atoms_al
+    pick_number_of_atoms = args.pick_number_of_atoms
+    pick_forcesmax = args.pick_forcesmax
+    pick_cellshape = args.pick_cellshape
+    pick_c44 = args.pick_c44
+    pick_amount_1NN = args.pick_amount_1NN
+
+    write_runner = args.write_runner
+    write_forces = args.write_forces
+    write_forcesx = args.write_forcesx
+    write_analysis = args.write_analysis
+
+
+    if args.testkmc:
+        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
         units = "meV_pa"
         verbose = True
 
-    if pick_c44:
-        units = "meV_pa"
-        verbose = True
+    if args.pick_c44:
+        args.units = "meV_pa"
+        args.verbose = True
 
 
     hostname = my.hostname()
     if lmp == True:
         ase = False
 
-    print('infile               :',infile)
+    print('args.inputfile               :',args.inputfile)
 
     ### check if ase runner/quippy/lammpps-data formats are known
     ase_formats = my.ase_get_known_formats_class(verbose=verbose)
@@ -134,16 +192,16 @@ def get_energies(args):
         sys.exit('test3 done! Exit')
 
 
-    ### check infile
-    if not infile:
+    ### check args.inputfile
+    if not args.inputfile:
         sys.exit("Error: Missing option \"--infile\" / \"-i\".")
 
     ### read in the structures
-    print('reading infile ...',infile)
-    if infile == 'POSCAR': format_in = "vasp"
+    print('reading args.inputfile ...',args.inputfile)
+    if args.inputfile == 'POSCAR': args.format_in = "vasp"
 
-    my.check_isfile_or_isfiles([infile],verbose=verbose)
-    frames = ase_read(infile,index=structures_idx,format=format_in)
+    my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
+    frames = ase_read(args.inputfile,index=structures_idx,format=args.format_in)
 
     ### print stuff to screen
     print('structures_idx               :',structures_idx)
@@ -158,7 +216,7 @@ def get_energies(args):
     if structures_to_calc == 0:
         print()
         print("ERROR!")
-        sys.exit('0 strucutres to calculate? Something went wrong when importing the infile \"'+infile+'\" (mayby you need to change the \"format_in\" of the file? currently \"'+format_in+'\"')
+        sys.exit('0 strucutres to calculate? Something went wrong when importing the args.inputfile \"'+args.inputfile+'\" (mayby you need to change the \"args.format_in\" of the file? currently \"'+args.format_in+'\"')
 
     # show positions of first structure?
     show_positions = False
@@ -168,26 +226,26 @@ def get_energies(args):
         print(frames[0].cell)
 
     print()
-    print('pot                          :',pot)
+    print('pot                          :',args.pot)
     print()
-    print('ase                          :',ase)
-    print('lmp                          :',lmp)
+    print('ase                          :',args.ase)
+    print('lmp                          :',args.lmp)
     print()
-    print('units                        :',units)
-    print('geopt                        :',geopt)
+    print('units                        :',args.units)
+    print('geopt                        :',args.geopt)
     print()
-    print('verbose                      :',verbose)
-    print('lmp                          :',lmp)
-    print('ipi                          :',ipi)
-    if write_runner:
-        write_runner = 'runner.out'
-    print('write_runner                 :',write_runner)
-    print('--pick_concentration_al      :',pick_concentration_al)
-    print('--pick_atoms_al              :',pick_atoms_al)
-    print('--pick_number_of_atoms       :',pick_number_of_atoms)
-    print('--pick_forcesmax             :',pick_forcesmax)
-    print('--pick_cellshape             :',pick_cellshape)
-    print('--pick_c44                   :',pick_c44)
+    print('verbose                      :',args.verbose)
+    print('lmp                          :',args.lmp)
+    print('ipi                          :',args.ipi)
+    if args.write_runner:
+        args.write_runner = 'runner.out'
+    print('write_runner                 :',args.write_runner)
+    print('--pick_concentration_al      :',args.pick_concentration_al)
+    print('--pick_atoms_al              :',args.pick_atoms_al)
+    print('--pick_number_of_atoms       :',args.pick_number_of_atoms)
+    print('--pick_forcesmax             :',args.pick_forcesmax)
+    print('--pick_cellshape             :',args.pick_cellshape)
+    print('--pick_c44                   :',args.pick_c44)
     print()
 
     ana_mg_conz      = np.empty(structures_to_calc);ana_mg_conz[:]  = np.nan
@@ -616,7 +674,7 @@ def get_energies(args):
     if os.path.isfile('log.lammps'):
         os.remove('log.lammps')
 
-    if testkmc:
+    if args.testkmc:
         ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
     if write_analysis:
@@ -1498,7 +1556,5 @@ def test3_do(ace):
 if __name__ == "__main__":
     p = help()
     args = p.parse_args()
-    print('kk',my.get_latest_n2p2_pot())
-    print(args)
-    sys.exit()
+    my.print_args(args)
     get_energies(args)

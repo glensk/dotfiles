@@ -136,6 +136,7 @@ if __name__ == '__main__':
         args.nr = n2p2_get_best_test_nr_from_learning_curve(args.folder,args.get_last_epoch)
     folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
     # we are already in potential folder
+    print('getEnergies_byLammps.py -p . -e # to get c44')
     import subprocess
     subprocess.call("getEnergies_byLammps.py -p . -e",shell=True)
 

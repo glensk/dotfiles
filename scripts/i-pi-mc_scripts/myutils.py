@@ -522,6 +522,15 @@ def ase_get_neighborlist(frame,atomnr=0,cutoff=3.,skin=0.1):
     #sys.exit()
     return np.sort(NN_indices)
 
+def print_args(args):
+    keys = args.__dict__.keys()
+    values = args.__dict__.values()
+    print('########################################## argparse values (begin) #########')
+    for idx,i in enumerate(keys):
+        print("#",str(keys[idx]).ljust(25),str(values[idx]).ljust(30),str(type(values[idx])).ljust(15),"#")
+    print('########################################## argparse values (end  ) #########')
+    return
+
 def count_amount_1NN_around_vacancies(filename,format='ipi',vac_symbol="V"):
     print('reading',filename,'...')
     frames = ase_read('../sim.xyz',index=":",format=format)
