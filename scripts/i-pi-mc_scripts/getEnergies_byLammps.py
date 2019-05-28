@@ -136,7 +136,7 @@ def get_energies(args):
         filename = "simulation.pos_0.xyz"
         #filename = '../sim.xyz'
         #filename = 'sim.xyz'
-        my.count_amount_1NN_around_vacancies(filename,cutoffa=False,cutoffb=False,skin=0.1,format='ipi')
+        my.count_amount_1NN_around_vacancies(filename,cutoffa=3.5,cutoffb=4.2,skin=0.1,format='ipi')
         sys.exit()
 
     if args.testkmc:
