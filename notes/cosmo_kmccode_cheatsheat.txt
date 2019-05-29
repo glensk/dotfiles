@@ -1,11 +1,11 @@
 self.nsites = 64  # for a 4^3 supercell
+self.nvac = 1 # or 2; the number of vacancies in the system
 self.natoms = self.nsites - self.nvac
 
 self.dbeads[0].q[0,:]): --> actual positions (in bohrradius)
 self.sites[self.unique_idx(self.state)].copy()*bohr_to_ang
 
-self.sites:  
-(undisturbed lattice sites) ---> those NEVER change during simulation
+self.sites:   # (undisturbed lattice sites) ---> those NEVER change during simulation
 [[ 0.          0.          0.        ]
  [ 2.71055907  1.56494201  4.42632442]
 ...
@@ -31,10 +31,11 @@ ivac (constant): if 64 atoms sits & 1vac -> ivac = [63]
 ivac (constant): if 64 atoms sits & 2vac -> ivac = [63 ,62]
 ivac (constant): is always the index lattice site associated the vacancy (e.g. 63 when 64 sites)
 
-svac = self.idx[ivac] # lattice site associated with this vacancy
-svac: index of the current vacancy position 
+svac = self.idx[ivac] # lattice !site! associated with this vacancy; ivac is fixed but self.idx array changes with every swap.
+svac: index of the current vacancy position which changes with every KMC step
 
-self.neigh 
+self.neigh  # list of nearest neighbors; if 64 atoms in the system (4x4x4sc) this is an array of 12 elements in 64 rows. 
+            # self.neigh is a fixed list and never changes
 
 ridx: [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
  24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
