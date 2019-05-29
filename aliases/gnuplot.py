@@ -14,6 +14,7 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("inputfile",nargs='+') #,help"name of the inputfile(s)")
     p.add_argument('-mc','--max_columns',required=False, type=int,default=False, help="plot maximally first x columns")
+    p.add_argument('-ps','--pointsize',required=False, type=float,default=1., help="pointsize")
     p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=str, help="which columns to plot")
     p.add_argument('-ll', '--log_log', action='store_true', default=False,help='make a x and y logarithmic (log log plot).')
     p.add_argument('-lx', '--log_x', action='store_true', default=False,help='make x axis logarithmic')
@@ -134,17 +135,25 @@ def gnuplot_defaults(args):
     c = "gnuplot --persist << EOF\n"
 
     if True:
-        ca("set macros")
+        if False:
+            ca("set macros")
         # 1) change the default colors to more pleasant ones and make the lines
         # a little bit thicker
         #ca("set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 1 lw 2 # --- red")
-        ca("set style line 1 lc rgb '#dd181f' lt 1 lw 2 pt 7   # red")
-        ca("set style line 2 lc rgb '#5e9c36' pt 6 ps 1 lt 1 lw 2 # --- green")
-        ca("set style line 3 lc rgb '#0060ad' lt 1 lw 2 pt 5   # blue")
+
+        # pt 7 --> circle
+        # pt 5 --> square
+        # pt 9 --> triangle
+        #ca("set style line 1 lc rgb '#0060ad' lt 1 lw 2 pt 5   # blue")
+        if False:
+            ca("set style line 1 lc rgb '#dd181f' lt 1 lw 2 pt 7   # red")
+            #ca("set style line 2 lc rgb '#5e9c36' lt 1 lw 2 pt 6 ps 1 # --- green")
+            ca("set style line 2 lc rgb '#5e9c36' lt 1 lw 2 pt 5   # green")
+            ca("set style line 3 lc rgb '#0060ad' lt 1 lw 2 pt 9   # blue")
 
         # 2) put the border more to the background by applying it only on the left
         # and bottom part and put it and the tics in gray
-        if True:
+        if False:
             ca("set style line 11 lc rgb '#808080' lt 1")
             #ca("set border 3 back ls 11")
             ca("set tics nomirror")
@@ -152,19 +161,29 @@ def gnuplot_defaults(args):
         # 3) add a slight grid to make it easier to follow the exact position
         # of the curves
         if True:
+            ca("")
+            ca("## linestyle for the grid")
             ca("set style line 12 lc rgb '#808080' lt 0 lw .1")
             ca("set grid back ls 12")
 
-        #ca("set terminal enhanced font 'Verdana,10'")
-        ca("set key font \",10\"")
+        ca("")
+        ca("## font size for legend")
+        #ca("set terminal enhanced font \'Verdana,10\'")
+        #ca('set term x11 font "sans,12"')
+        #ca('set term x11 font "Times-New-Roman,12"')
+        ca('set term aqua font "Times-New-Roman,12"')
+        #ca("set terminal x11 font \'Verdana,10\'")
+        #ca("set key font \",10\"")
         #set mxtics
         #set mytics
         #set style line 12 lc rgb '#ddccdd' lt 1 lw 1.5
         #set style line 13 lc rgb '#ddccdd' lt 1 lw 0.5
         #set grid xtics mxtics ytics mytics back ls 12, ls 13
+    ca("")
     ca("#set yrange [0:10]")
     ca("#set xrange [0:10]")
-    ca("set pointsize 2")
+    ca("")
+    ca("set pointsize "+str(args.pointsize))  # how large should the symbols be?
 
     #ca("set terminal aqua")
     if args.x11:
@@ -249,7 +268,8 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1):
     if args.line_style == "linespoints":
         pladd = "\""+inputfile+"\" using "+using+" with linespoints"
     if args.line_style == "points":
-        pladd = "\""+inputfile+"\" using "+using+" with points"
+        #pladd = "\""+inputfile+"\" using "+using+" with points"
+        pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
 
     # legend
     if columns_tot == 1:
@@ -300,6 +320,7 @@ def gnuplot_plot(args):
             using = "1"
             if args.scale_y != 1.0:
                 using = "$1*"+str(args.scale_y)+")" # has to be a default
+            #if False:
             y_min_max(args,column=input,inputfile=inputfile)
             x_min_max(args,column=input,inputfile=inputfile)
             if args.verbose > verbosity_level:
@@ -346,24 +367,29 @@ def gnuplot_plot(args):
                 else:
                     print('## --> adding   column',i,type(i),'since in args.columns',args.columns)
 
-                #def string_to_using__columns(i):
-                #    return using
+                def string_to_using__columns(i):
+                    # first check if there is an ":" if it is, number before is the x achsis
+                    return using
                 #using = string_to_using__columns(i)
 
                 using = "1:($"+str(i)+")"
                 using = "1:"+str(i)
+                using = str(i)
                 if args.scale_y != 1.0:
                     using = "1:(\$"+str(i)+"*"+str(args.scale_y)+")" # has to be a default
 
+                if args.verbose > verbosity_level:
+                    print('## using    ',using)
+
                 if args.verbose > verbosity_level+1:
                     print('## input column:',input[:,i-1])
-                y_min_max(args,column=input[:,i-1],inputfile=inputfile)
+                if False:
+                    y_min_max(args,column=input[:,i-1],inputfile=inputfile)
                 if args.verbose > verbosity_level:
                     print('## args.xmin',args.xmin)
                     print('## args.xmax',args.xmax)
                     print('## args.ymin',args.ymin)
                     print('## args.ymax',args.ymax)
-                    print('## using    ',using)
                     print('## columns  ',columns)
                 get_default_y_label(args,inputfile,i)
                 gnuplot_defaults_labels(args)
