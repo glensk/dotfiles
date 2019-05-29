@@ -51,6 +51,12 @@ def get_default_y_label(args,inputfile,column):
         if column == 4: args.ylabel = "ecurr (meV)"
         if column == 5: args.ylabel = "cdf"
         if column == 6: args.ylabel = "random number 2"
+    if basename in [ "KMC_analyze_np_analyze.dat", "KMC_analyze_akmc_ipi.dat" ]:
+        if column == 2: args.ylabel = "residency time <400 MD steps>"
+        if column == 3: args.ylabel = "Si atoms in 1NN"
+        if column == 4: args.ylabel = "Mg atoms in 1NN"
+        if column == 5: args.ylabel = "Si+Mg atoms in 1NN"
+        args.xlabel = "MD step"
     print('kk',args.ylabel)
     #sys.exit()
     return
@@ -333,15 +339,22 @@ def gnuplot_plot(args):
                 ###############################################
                 if args.verbose > verbosity_level:
                     print("## @@@@@@@@@@@@@@@@@ TWO columns (begin) @@@@@@@@@@@@@@@@@@@@@")
-                    print('## ixx',i)
+                    print('## i',i)
                 if type(args.columns) == list and i not in args.columns:
                     print('## --> skipping column',i,type(i),'since not in args.columns',args.columns)
                     continue
                 else:
                     print('## --> adding   column',i,type(i),'since in args.columns',args.columns)
+
+                #def string_to_using__columns(i):
+                #    return using
+                #using = string_to_using__columns(i)
+
+                using = "1:($"+str(i)+")"
                 using = "1:"+str(i)
                 if args.scale_y != 1.0:
                     using = "1:(\$"+str(i)+"*"+str(args.scale_y)+")" # has to be a default
+
                 if args.verbose > verbosity_level+1:
                     print('## input column:',input[:,i-1])
                 y_min_max(args,column=input[:,i-1],inputfile=inputfile)
