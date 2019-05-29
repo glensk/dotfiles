@@ -33,6 +33,7 @@ def help(p = None):
 
     p.add_argument('--analyze_kmc_number_1NN_2NN_ext','-akmc_ext',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
     p.add_argument('--analyze_kmc_number_1NN_2NN_ipi','-akmc_ipi',action='store_true',help='make analysis from KMC_analyze')
+    p.add_argument('--analyze_kmc_number_1NN_2NN_post','-akmc_post',action='store_true',help='make analysis from KMC_analyze')
 
     p.add_argument('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
     p.add_argument('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
@@ -134,6 +135,7 @@ def get_energies(args):
     write_analysis = args.write_analysis
 
     if args.analyze_kmc_number_1NN_2NN_ipi:
+        ''' -akmc_ipi '''
         file = "KMC_analyze_head"
         file = "KMC_analyze"
         if not os.path.isfile(file):
@@ -170,22 +172,26 @@ def get_energies(args):
         mode = 'valid'
         mode = 'full'
         mode = 'same'
-        N = 200
+        N = 400
         si_av = np.convolve(si, np.ones((N,))/N, mode=mode)
         mg_av = np.convolve(mg, np.ones((N,))/N, mode=mode)
+        simg_av = np.convolve(si+mg, np.ones((N,))/N, mode=mode)
         dtn_av = np.convolve(dtn, np.ones((N,))/N, mode=mode)
         print('len(si_av)',len(si_av))
         print('len(mg_av)',len(mg_av))
 
-        out = np.zeros((len(cdf),4))
+        out = np.zeros((len(cdf),5))
         out[:,0] = np.arange(len(cdf))
-        out[:,1] = si_av
-        out[:,2] = mg_av
-        out[:,3] = dtn_av
-        np.savetxt(file+"_np_analyze.dat",out)
+        out[:,1] = dtn_av
+        out[:,2] = si_av
+        out[:,3] = mg_av
+        out[:,4] = simg_av
+        np.savetxt(file+"_akmc_ipi.dat",out)
+        print('written',file+"_akmc_ipi.dat")
         sys.exit()
 
     if args.analyze_kmc_number_1NN_2NN_ext:
+        ''' -akmc_ext '''
         filename = "simulation.pos_0.xyz"
         #filename = '../sim.xyz'
         #filename = 'sim.xyz'
@@ -193,7 +199,31 @@ def get_energies(args):
         # 4.5  is too much   for Si6Mg6V1.4  step 2372
         #
         # 3.5 is too much    for Si6Mg6V1.4 step 2242
+
         my.count_amount_1NN_around_vacancies(filename,cutoffa=3.4,cutoffb=4.4,skin=0.1,format='ipi')
+        sys.exit()
+
+    if args.analyze_kmc_number_1NN_2NN_post:
+        a = np.loadtxt("KMC_analyze_akmc_ext")
+        b = np.loadtxt("KMC_analyze_np_analyze.dat")
+        print('a',a.shape)
+        print('b',b.shape)
+        sys.exit()
+
+        fig, ax = plt.subplots(1, 1)
+        #mesh = ax.scatter(projs[:,0],projs[:,1],c=range(projs.shape[0]),s=5,alpha=1,cmap="jet")
+        mesh = ax.scatter(a[:,2],a[:,3],c=range(projs.shape[0]),s=a[:,4],alpha=1,cmap="jet")
+        fig.colorbar(mesh)
+        plt.savefig(r'corr_residency_time.pdf', transparent=True,dpi=600,bbox_inches='tight', pad_inches=0)
+
+
+        al1 = a[:,1]
+        mg1 = a[:,2]
+        si1 = a[:,3]
+        al2 = a[:,4]
+        mg2 = a[:,5]
+        si2 = a[:,6]
+
         sys.exit()
 
     if args.testkmc:

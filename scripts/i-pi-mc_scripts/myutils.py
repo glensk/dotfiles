@@ -531,7 +531,7 @@ def print_args(args):
     print('########################################## argparse values (end  ) #########')
     return
 
-def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,format='ipi',vac_symbol="V",save_every = 10):
+def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,format='ipi',vac_symbol="V",save_every = 10,filename_save="KMC_analyze_akmc_ext"):
     print()
     print("########### count_amount_1NN_around_vacancies(...) #######################")
     print('reading',os.path.abspath(filename),'...')
@@ -539,6 +539,7 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
     print('reading',os.path.abspath(filename),'done.')
 
     structures = len(frames)
+    structures = structures - 1 # just to make the lenght equal between
     print('structures',structures)
 
     all_vac_idx = ([atom.index for atom in frames[0] if atom.symbol == vac_symbol])
@@ -560,7 +561,8 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
     filename_analyze_all = []
     al_mg_si_all = []
     for vac_nr,vac_idx in enumerate(all_vac_idx):
-        filename_analyze = filename +  ".1NN.al_mg_si_vac_"+str(vac_nr)+".dat"
+        #filename_analyze = filename +  ".1NN.al_mg_si_vac_"+str(vac_nr)+".dat"
+        filename_analyze = filename_save+"_"+str(vac_nr)
         filename_analyze_all.append(filename_analyze)
         print('filename_analyze',filename_analyze)
 
@@ -628,16 +630,24 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
             al_mg_si_all[vac_nr][step,0] = step
             anz_1NN = np.sum(al_mg_si_all[vac_nr][step][1:4])
             anz_2NN = np.sum(al_mg_si_all[vac_nr][step][4:7])
-            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NEW/REDO       ',anz_1NN,anz_2NN, "||",str(NN_1_al).ljust(4),NN_1_mg,NN_1_si,"||",NN_2_al,NN_2_mg,NN_2_si)
+            #str_1NN = str(NN_1_al).ljust(3)+str(NN_1_mg).ljust(3)+str(NN_1_si).ljust(3)
+            #str_2NN = str(NN_2_al).ljust(3)+str(NN_2_mg).ljust(3)+str(NN_2_si).ljust(3)
+            #print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NEW/REDO       ',anz_1NN,anz_2NN, "||",str(NN_1_al).ljust(3),NN_1_mg,NN_1_si,"||",NN_2_al,NN_2_mg,NN_2_si)
             #print('-------',filename_analyze_all[vac_nr])
             #print(al_mg_si_all[vac_nr])
             if anz_1NN != 12 or anz_2NN != 6:
+                print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NEW/REDO       ',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'ERROR!')
                 sys.exit("ERROR see above")
+            print('step:',str(step).ljust(6),'vac_nr',vac_nr,'NEW/REDO       ',anz_1NN,anz_2NN, al_mg_si_all[vac_nr][step],'OK')
             #do_continue = test_anz_nn(al_mg_si_all,vac_nr,step,exit=True)
 
             if step > 0 and step in np.arange(structures)[::save_every]:
                 np.savetxt(filename_analyze_all[vac_nr],al_mg_si_all[vac_nr],fmt='%i')
                 print('saving',os.path.abspath(filename_analyze_all[vac_nr]),'at step',step)
+
+    # save everything in the very end
+    np.savetxt(filename_analyze_all[vac_nr],al_mg_si_all[vac_nr],fmt='%i')
+    print('saving (very end)',os.path.abspath(filename_analyze_all[vac_nr]),'at step',step)
     return
 
 
