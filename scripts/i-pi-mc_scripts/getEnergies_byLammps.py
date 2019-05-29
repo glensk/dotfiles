@@ -31,7 +31,8 @@ def help(p = None):
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
 
-    p.add_argument('--analyze_kmc_number_1NN_2NN','-akmc',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
+    p.add_argument('--analyze_kmc_number_1NN_2NN_ext','-akmc_ext',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
+    p.add_argument('--analyze_kmc_number_1NN_2NN_ipi','-akmc_ipi',action='store_true',help='make analysis from KMC_analyze')
 
     p.add_argument('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
     p.add_argument('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
@@ -132,11 +133,67 @@ def get_energies(args):
     write_forcesx = args.write_forcesx
     write_analysis = args.write_analysis
 
-    if args.analyze_kmc_number_1NN_2NN:
+    if args.analyze_kmc_number_1NN_2NN_ipi:
+        file = "KMC_analyze_head"
+        file = "KMC_analyze"
+        if not os.path.isfile(file):
+            sys.exit(str(file)+" does not exist!")
+
+        a = np.loadtxt(file)
+        np.set_printoptions(suppress=False)
+        #print(a)
+        cdf = a[:,4]
+        nrand2 = a[:,5]
+        nrandn = np.ones(len(cdf))/2.
+
+        al = a[:,6]
+        mg = a[:,7]
+        si = a[:,8]
+        dt = -1.0/cdf*np.log(1.0 - nrand2)*2.418884326509e-17
+        dtn = -1.0/cdf*np.log(1.0 - nrandn)*2.418884326509e-17
+        #dt2 = np.zeros(len(cdf))
+        #for i in np.arange(len(cdf)):
+        #    dt2[i] = -1.0/cdf[i]*np.log(1.0 - nrand2[i])*2.418884326509e-17
+        #    print('i',i,'cdf',cdf[i],'nrand2',nrand2[i],'dt2',dt2[i])
+        if args.verbose:
+            print("cdf",cdf)
+            print("nrand2",nrand2)
+            print("nrandn",nrandn)
+            print("al",al)
+            print("mg",mg)
+            print("si",si)
+            print('dt ',dt)
+            print('dtn',dtn)
+            #print('dt2',dt2)
+        print('len(si)',len(si))
+        print('len(mg)',len(mg))
+        mode = 'valid'
+        mode = 'full'
+        mode = 'same'
+        N = 200
+        si_av = np.convolve(si, np.ones((N,))/N, mode=mode)
+        mg_av = np.convolve(mg, np.ones((N,))/N, mode=mode)
+        dtn_av = np.convolve(dtn, np.ones((N,))/N, mode=mode)
+        print('len(si_av)',len(si_av))
+        print('len(mg_av)',len(mg_av))
+
+        out = np.zeros((len(cdf),4))
+        out[:,0] = np.arange(len(cdf))
+        out[:,1] = si_av
+        out[:,2] = mg_av
+        out[:,3] = dtn_av
+        np.savetxt(file+"_np_analyze.dat",out)
+        sys.exit()
+
+    if args.analyze_kmc_number_1NN_2NN_ext:
         filename = "simulation.pos_0.xyz"
         #filename = '../sim.xyz'
         #filename = 'sim.xyz'
-        my.count_amount_1NN_around_vacancies(filename,cutoffa=3.5,cutoffb=4.2,skin=0.1,format='ipi')
+        # 4.23 is too little for Si6Mg6V1.2_ step 797
+        # 4.5  is too much   for Si6Mg6V1.4  step 2372
+        #
+        # 3.5 is too much    for Si6Mg6V1.4 step 2242
+        my.count_amount_1NN_around_vacancies(filename,cutoffa=3.4,cutoffb=4.4,skin=0.1,format='ipi')
         sys.exit()
 
     if args.testkmc:
