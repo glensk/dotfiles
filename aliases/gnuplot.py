@@ -6,7 +6,10 @@ import os,sys,argparse,re,socket
 from subprocess import call
 
 def help(p = None):
-    string = ''' helptext '''
+    string = '''
+    gnuplot.py KMC_analyze -c 7 8 9
+    gnuplot.py KMC_analyze -c 2
+    '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("inputfile",nargs='+') #,help"name of the inputfile(s)")
@@ -373,6 +376,7 @@ def gnuplot_plot(args):
         if args.xmin <= 0.0:
             args.xmin = 0.1
         if args.scale: c = re.sub(r"#set xrange .*", "set xrange ["+str(args.xmin)+":"+str(args.xmax)+"]", c)
+    #c = re.sub(r"#set xrange .*", "set xrange ["+str(4000)+":"+str(7000)+"]", c)
 
     #c_new = c
     if args.verbose:
