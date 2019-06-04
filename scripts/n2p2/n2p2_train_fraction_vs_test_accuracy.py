@@ -168,8 +168,8 @@ for c in subfolder:    # from the ones in the que
         kmcstdfile  =i.replace(basename, 'kmc57/ene_std.npy')
         elastic     =i.replace(basename, 'elastic.dat')
         elastic_ene =i.replace(basename, 'elastic_ene.dat')
-
         runner_n2p2 = my.inputnn_runner_or_n2p2(inputnn)
+        potnum = my.inputnn_get_potential_number_from_weightsfile(inputnn)
 
         #print(inputnn,'runner_n2p2',runner_n2p2)
         testf       = my.inputnn_get_testfraction(inputnn)
@@ -186,7 +186,7 @@ for c in subfolder:    # from the ones in the que
             kmcstd_all = np.loadtxt(kmcstdfile)
             kmcstd = kmcstd_all[-1]
         else:
-            kmcstd = 0
+            kmcstd = '-'
 
         try:
             mg = int(pot_atom_energy["Mg"])*-1
@@ -217,6 +217,9 @@ for c in subfolder:    # from the ones in the que
 
         learning_curve = lc = my.n2p2_runner_get_learning_curve(i)
         #print('len',len(lc),lc.shape)
+        #print('lc')
+        #print(lc)
+        #sys.exit()
 
         #if len(lc) == 1:
         #    print('---')
@@ -228,10 +231,23 @@ for c in subfolder:    # from the ones in the que
 
         trainmin                = lc[:,1].min()                      # best train RMSE
         trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]  # best train index
-        testrmse_at_trainmin    = lc[:,2][trainmin_idx]              # test RMSE @ train index
-
         testmin                 = lc[:,2].min()                      # best test RMSE
         testmin_idx             = np.where(testmin==lc[:,2])[0][0]   # best test index
+
+        #print('potnum',potnum)
+        #print('trainmin_idx',trainmin_idx)
+
+        if potnum != False:
+            trainmin_idx        = potnum
+            testmin_idx         = potnum
+
+        #print('potnum',potnum)
+        #print('trainmin_idx',trainmin_idx)
+        #sys.exit()
+        trainmin                = lc[:,1][trainmin_idx]
+        testrmse_at_trainmin    = lc[:,2][trainmin_idx]              # test RMSE @ train index
+
+        testmin                 = lc[:,2][testmin_idx]                      # best test RMSE
         trainrmse_at_testmin    = lc[:,1][testmin_idx]               # train RMSE @ test index
 
         trainminf_at_testmin    = lc[:,3][testmin_idx]
@@ -368,7 +384,7 @@ for c in subfolder:    # from the ones in the que
                 if j[5] > 999: j[5] = 999.9
                 if j[7] > 999: j[7] = 999.9
                 if j[8] > 999: j[8] = 999.9
-                if j[kmcstd] > 999: j[kmcstd] = 999
+                if j[kmcstd] > 99: j[kmcstd] = 99
                 #print('j',j[1],j[2]) ene
                 #print('j',j[7],j[8]) forces
 
@@ -383,10 +399,10 @@ for c in subfolder:    # from the ones in the que
 
                 if args.verbose > 3:
                     print('DD')
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %s"
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f MC %2.0f || [%4.0f] | %s | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
 
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f || %4.0f || [%4.0f] | %s | %8.0f | %s"
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f |C %2.0f |M %2.0f || [%4.0f] | %s | %8.0f | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[random_seed],j[path_])
 
                 conv_unconv = "unconv"
