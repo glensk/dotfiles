@@ -62,6 +62,15 @@ def get_default_y_label(args,inputfile,column):
     #sys.exit()
     return
 
+def is_int(x):
+    try:
+        a = float(x)
+        b = int(a)
+    except ValueError:
+        return False
+    else:
+        return b==a
+
 def set_args_defaults(args,inputfile):
     basename = os.path.basename(inputfile)
     if args.verbose:
@@ -170,8 +179,8 @@ def gnuplot_defaults(args):
         ca("## font size for legend")
         #ca("set terminal enhanced font \'Verdana,10\'")
         #ca('set term x11 font "sans,12"')
-        #ca('set term x11 font "Times-New-Roman,12"')
-        ca('set term aqua font "Times-New-Roman,12"')
+        ca('set term x11 font "Times-New-Roman,12"')
+        #ca('set term aqua font "Times-New-Roman,12"')
         #ca("set terminal x11 font \'Verdana,10\'")
         #ca("set key font \",10\"")
         #set mxtics
@@ -185,9 +194,10 @@ def gnuplot_defaults(args):
     ca("")
     ca("set pointsize "+str(args.pointsize))  # how large should the symbols be?
 
-    #ca("set terminal aqua")
     if args.x11:
-        ca("set terminal x11")
+        #ca("set terminal x11")
+        #ca("set terminal aqua")
+        pass
     if args.log_log:
         ca("set logscale xy")
     if args.log_x:
@@ -369,17 +379,43 @@ def gnuplot_plot(args):
 
                 def string_to_using__columns(i):
                     # first check if there is an ":" if it is, number before is the x achsis
-                    return using
-                #using = string_to_using__columns(i)
+                    #print('yes')
+                    #print('yes',int(i))
+                    if is_int(i):
+                        return str(i)
 
-                using = "1:($"+str(i)+")"
-                using = "1:"+str(i)
-                using = str(i)
+                    print('&&i ',i)
+                    ba = i.split(":")
+                    print('&&ba',ba,len(ba))
+
+                    ## split x and y columns
+                    if len(ba) == 2:
+                        x = ba[0]
+                        y = ba[1]
+                    else:
+                        x = "1"
+                        y = ba[0]
+                    print('&&x',x)
+                    print('&&y',y)
+                    bb = bb = x+":("+y+")"
+                    print('&&bb',bb)
+
+                    ## make $ to \$
+                    l = bb.split("$")
+                    print('&&l',l)
+                    using = "\$".join(l)
+                    #sys.exit()
+                    return using
+                using = string_to_using__columns(i)
+
+                #using = "1:($"+str(i)+")"
+                #using = "1:"+str(i)
+                #using = str(i)
                 if args.scale_y != 1.0:
                     using = "1:(\$"+str(i)+"*"+str(args.scale_y)+")" # has to be a default
 
                 if args.verbose > verbosity_level:
-                    print('## using    ',using)
+                    print('## using    :',using)
 
                 if args.verbose > verbosity_level+1:
                     print('## input column:',input[:,i-1])
@@ -392,9 +428,14 @@ def gnuplot_plot(args):
                     print('## args.ymax',args.ymax)
                     print('## columns  ',columns)
                 get_default_y_label(args,inputfile,i)
+                if args.verbose > verbosity_level:
+                    print('##xx args.ylabel',args.ylabel)
+                    print('##xx args.xlabel',args.xlabel)
                 gnuplot_defaults_labels(args)
                 text =  gnuplot_plotline(inputfile,using = using,\
                         columns_tot = columns)
+                if args.verbose > verbosity_level:
+                    print('## text:',text)
                 ca(text)
                 if args.verbose > verbosity_level:
                     print("##",text)
@@ -419,9 +460,11 @@ def gnuplot_plot(args):
 
     #c_new = c
     if args.verbose:
-        print("######################## show command      #######################")
+        print()
+        print("######################## show command (begin) ####################")
         print(c)
-        print("######################## show command      #######################")
+        print("######################## show command (end) ######################")
+        print()
 
     #"set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 1 lw 2 # --- red"
     #command = ["gnuplot --persist << EOF\nplot sin(x)\nEOF"]
