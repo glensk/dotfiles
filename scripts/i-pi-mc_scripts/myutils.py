@@ -3398,6 +3398,20 @@ def inputnn_runner_or_n2p2(file):
     else:
         return "runner"
 
+def inputnn_get_potential_number_from_weightsfile(inputnn):
+    weights = inputnn.replace('input.nn', 'weights.013.*.out')
+    print('weights',weights)
+    f = glob.glob(weights)
+    print('f',f)
+    if len(f) == 1:
+        taken = f[0].split("weights.013.")[1].split(".out")[0]
+        print('t',taken)
+        leading_removed = [s.lstrip("0") for s in [taken]][0]
+        # Remove leading
+        print('lr',leading_removed)
+        return int(leading_removed)
+    return False
+
 def inputnn_get_testfraction(file):
     test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
     return test_fraction
