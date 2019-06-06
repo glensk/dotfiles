@@ -21,12 +21,12 @@ def help(p = None):
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
     p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--geopt','-g'    ,action='store_true',help='make a geometry optimization of the atoms.')
-    p.add_argument('--elastic','-e'  ,action='store_true',help='calculate elastic constants (externally by lammps).')
+    p.add_argument('--elastic','-e'  ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
     p.add_argument('--ase'    ,'-a'  ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
     p.add_argument('--lmp'    ,'-lmp',action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
     p.add_argument('--ipi'    ,'-ipi',action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
-    p.add_argument('--test'   ,'-t',  action='store_true',help='Assess formation energies of particular test structures.')
+    p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--teste'  ,'-te', action='store_true',help='Assess elastic constants.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
@@ -51,45 +51,7 @@ def help(p = None):
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
-#CONTEXT_SETTINGS = my.get_click_defaults()
-#@click.command(context_settings=CONTEXT_SETTINGS)
-#
-##@click.option('--infile','-i',required=False,type=str,help='input files containing structures that will be imported by ase')
-##@click.option('--format_in','-fi',type=str,default='runner',help='ase format for reading files')
-#@click.option('--pot','-p',type=click.Choice(my.pot_all()),required=True,default=my.get_latest_n2p2_pot())
-#@click.option('--potpath','-pp',type=str,required=False,default=False,help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
-#@click.option('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
 
-#@click.option('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
-#@click.option('--geopt/--no-geopt','-g',default=False,help='make a geometry optimization of the atoms.')
-#@click.option('--elastic/--no-elastic','-e',default=False,help='calculate elastic constants (externally by lammps).')
-#@click.option('--ase/--no-ase','-a',default=True,help='Do the calculations by the ase interface to lammps.')
-#@click.option('--lmp/--no-lmp','-l',default=False,help='Do the calculations externally by lammps and not through ase interface.')
-#@click.option('--ipi/--no-ipi','-ipi',default=False,help='Do the calculations externally by ipi-lammps and not through ase interface.')
-#
-#@click.option('--test/--no-test','-t',default=False,help='Assess formation energies of particular test structures.')
-#@click.option('--teste/--no-teste','-te',default=False,help='Assess elastic constants.')
-#@click.option('--test3/--no-test3','-t3',default=False,help='test3')
-#@click.option('--testkmc/--no-testkmc','-kmc',default=False,help='test accuracy of kmc structures')
-#
-#@click.option('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
-#@click.option('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
-#@click.option('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
-#@click.option('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
-#@click.option('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
-#@click.option('--pick_c44/--no-pick_c44','-pc44',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
-#@click.option('--pick_amount_1NN/--no-pick_aount_1NN','-pa_1NN',default=False,required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
-#
-#@click.option('--write_runner/--no-write_runner','-wr',required=False,default=False,help='default: runner.out')
-#@click.option('--write_forces/--no-write_forces','-wf',required=False,default=False,help='write forces.out of particular strucuture')
-#@click.option('--write_forcesx/--no-write_forcesx','-wfx',required=False,default=False,help='write forcesx.out of particular strucuture')
-#@click.option('--write_analysis/--no-write_analysis','-wa',required=False,default=False,help='write ene_{DFT,pot}... default: False')
-#@click.option('--verbose','-v',count=True)
-#@click.option('--debug','-d',count=True)
-
-
-#def get_energies(infile,format_in,pot,potpath,verbose,debug,structures_idx,units,geopt,elastic,test,teste,test3,testkmc,ase,lmp,ipi,write_runner,write_analysis,
-#        pick_concentration_al,pick_atoms_al,pick_number_of_atoms,pick_forcesmax,pick_cellshape,pick_c44,write_forces,write_forcesx):
 def get_energies(args):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
@@ -117,7 +79,6 @@ def get_energies(args):
     lmp = args.lmp
     ipi = args.ipi
 
-    test = args.test
     teste = args.teste
     test3 = args.test3
     testkmc = args.testkmc
@@ -254,7 +215,7 @@ def get_energies(args):
     lammps()
 
     ### get ace object for the chosen potential
-    if test or teste: units='eV'
+    if args.test_formation_energies or teste: units='eV'
     ace = ase_calculate_ene(pot=pot,
             potpath=potpath,
             units=units,
@@ -268,11 +229,10 @@ def get_energies(args):
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
     ### when want to assess some formation energies
-    if test:
-        print('>> test')
+    if args.test_formation_energies:
         test_formation_energies(ace)
         my.create_READMEtxt(os.getcwd())
-        sys.exit('test done! Exit')
+        sys.exit('test_formation_energies done! Exit')
 
     if teste or elastic:
         print('>> elastic')
@@ -1571,6 +1531,7 @@ def load_diluete_pure_values():
 
 
 def test_formation_energies(ace):
+    print('>> test_formation_energies')
     ace.written_summary = [False,False,False]
     ace.atTemp = 443
 

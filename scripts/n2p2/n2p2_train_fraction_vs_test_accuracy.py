@@ -4,6 +4,7 @@ from __future__ import print_function
 import numpy as np
 import glob,sys,os,argparse,subprocess
 import myutils as my
+print('imported all ...')
 
 def help(p = None):
     string = ''' helptext '''
@@ -32,6 +33,7 @@ if args.verbose:
 #for i in ru:
 #    print(i)
 #sys.exit()
+print('fo ...')
 fo=sorted(glob.glob(os.getcwd()+"/*/learning-curve.out"))
 if verbose:
     print('----- currently considered pathes -----')
@@ -50,6 +52,8 @@ checkpath_que = []
 subfolderbase = "/scratch/glensk/"
 subfolder = "n2p2_24_24/"
 subfolder_len = len(subfolderbase+subfolder)
+
+print('gc ...')
 for idx,i in enumerate(path):
     #print('i',i)
     #print(i.split("/scratch/glensk/n2p2_jobs"))
@@ -96,6 +100,23 @@ if args.from_que == True:
 allfolder = []
 drawn1 = False
 drawn2 = False
+print('c ...')
+
+
+def foldername_search_restartname(folder):
+    iteration = folder.split("_")[-1] # 1 2 tmp
+    preiteration = "_".join(folder.split("_")[:-1]) # 1 2 tmp
+    #print('i       ',i)              # runner_4998_21_3/log.fit
+    #print('folder  ',folder)         # runner_4998_21_3
+    #print('iteration',iteration)      # 1 2 tmp
+    #print('preiteration',preiteration)      # 1 2 tmp
+    try:
+        search = preiteration+"_"+str(int(iteration)+1)
+        #print('search',search)
+    except ValueError:
+        return False
+    return search
+
 for c in subfolder:    # from the ones in the que
     #fo=glob.glob("tf_*_"+c+"_cores*/learning-curve.out")
     fm1 = ""
@@ -141,19 +162,7 @@ for c in subfolder:    # from the ones in the que
         #print(os.getcwd())
         #sys.exit()
 
-        def foldername_search_restartname(folder):
-            iteration = folder.split("_")[-1] # 1 2 tmp
-            preiteration = "_".join(folder.split("_")[:-1]) # 1 2 tmp
-            #print('i       ',i)              # runner_4998_21_3/log.fit
-            #print('folder  ',folder)         # runner_4998_21_3
-            #print('iteration',iteration)      # 1 2 tmp
-            #print('preiteration',preiteration)      # 1 2 tmp
-            try:
-                search = preiteration+"_"+str(int(iteration)+1)
-                #print('search',search)
-            except ValueError:
-                return False
-            return search
+
 
         foldern = foldername_search_restartname(folder)
 
@@ -165,6 +174,8 @@ for c in subfolder:    # from the ones in the que
         #print()
         #sys.exit()
         inputnn     =i.replace(basename, 'input.nn')
+        inputdata   =i.replace(basename, 'input.data')
+        input_structures = my.inputdata_get_nuber_of_structures(inputdata)
         kmcstdfile  =i.replace(basename, 'kmc57/ene_std.npy')
         elastic     =i.replace(basename, 'elastic.dat')
         elastic_ene =i.replace(basename, 'elastic_ene.dat')
@@ -229,69 +240,75 @@ for c in subfolder:    # from the ones in the que
         #print('len',len(lc),epochs_)
         #print()
 
-        trainmin                = lc[:,1].min()                      # best train RMSE
-        trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]  # best train index
-        testmin                 = lc[:,2].min()                      # best test RMSE
-        testmin_idx             = np.where(testmin==lc[:,2])[0][0]   # best test index
+        for bl in [ 'best','last']:
+            if bl == 'best':
+                trainmin                = lc[:,1].min()                      # best train RMSE
+                trainmin_idx            = np.where(trainmin==lc[:,1])[0][0]  # best train index
+                testmin                 = lc[:,2].min()                      # best test RMSE
+                testmin_idx             = np.where(testmin==lc[:,2])[0][0]   # best test index
+                #print('potnum',potnum)
+                #print('trainmin_idx',trainmin_idx)
+                if potnum != False:
+                    trainmin_idx        = potnum
+                    testmin_idx         = potnum
+            elif bl == 'last':
+                trainmin_idx = testmin_idx = len(lc)-1
+                #print('lc',lc)
+                #print(lc[:,1][trainmin_idx])
+                #print(inputnn)
+                #sys.exit()
+            #print('potnum',potnum)
+            #print('trainmin_idx',trainmin_idx)
+            #sys.exit()
+            trainmin                = lc[:,1][trainmin_idx]
+            testrmse_at_trainmin    = lc[:,2][trainmin_idx]              # test RMSE @ train index
 
-        #print('potnum',potnum)
-        #print('trainmin_idx',trainmin_idx)
+            testmin                 = lc[:,2][testmin_idx]                      # best test RMSE
+            trainrmse_at_testmin    = lc[:,1][testmin_idx]               # train RMSE @ test index
 
-        if potnum != False:
-            trainmin_idx        = potnum
-            testmin_idx         = potnum
+            trainminf_at_testmin    = lc[:,3][testmin_idx]
+            testminf_at_testmin     = lc[:,4][testmin_idx]
 
-        #print('potnum',potnum)
-        #print('trainmin_idx',trainmin_idx)
-        #sys.exit()
-        trainmin                = lc[:,1][trainmin_idx]
-        testrmse_at_trainmin    = lc[:,2][trainmin_idx]              # test RMSE @ train index
+            path__ = i.replace(os.getcwd()+'/',"")
 
-        testmin                 = lc[:,2][testmin_idx]                      # best test RMSE
-        trainrmse_at_testmin    = lc[:,1][testmin_idx]               # train RMSE @ test index
+            trainmin = al
+            testrmse_at_trainmin = mg
+            trainmin_idx = si
 
-        trainminf_at_testmin    = lc[:,3][testmin_idx]
-        testminf_at_testmin     = lc[:,4][testmin_idx]
+            #print('bbb:',i)
+            out2.append([
+                round(train_fraction,2),                            # j[0]
 
-        path__ = i.replace(os.getcwd()+'/',"")
+                #round(testmin*1000.*27.211384,2),                  # j[1]
+                round(testmin,2),                                   # j[1]
 
-        trainmin = al
-        testrmse_at_trainmin = mg
-        trainmin_idx = si
+                #round(trainrmse_at_testmin*1000.*27.211384,2),     # j[2]
+                round(trainrmse_at_testmin,2),                      # j[2]
+                testmin_idx,                                        # j[3]
 
-        #print('bbb:',i)
-        out2.append([
-            round(train_fraction,2),                            # j[0]
+                #round(trainmin*1000.*27.211384,2),                 # j[4]
+                round(trainmin,2),                                  # j[4]
+                #round(testrmse_at_trainmin*1000.*27.211384,2),     # j[5]
+                round(testrmse_at_trainmin,2),                      # j[5]
+                trainmin_idx,                                       # j[6]
 
-            #round(testmin*1000.*27.211384,2),                  # j[1]
-            round(testmin,2),                                   # j[1]
+                #round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
+                #round(testminf_at_testmin*51.422063*1000,2),       # j[8]
+                round(trainminf_at_testmin,2),                      # j[7]
+                round(testminf_at_testmin,2),                       # j[8]
+                testmin_idx,                                        # j[9]
 
-            #round(trainrmse_at_testmin*1000.*27.211384,2),     # j[2]
-            round(trainrmse_at_testmin,2),                      # j[2]
-            testmin_idx,                                        # j[3]
-
-            #round(trainmin*1000.*27.211384,2),                 # j[4]
-            round(trainmin,2),                                  # j[4]
-            #round(testrmse_at_trainmin*1000.*27.211384,2),     # j[5]
-            round(testrmse_at_trainmin,2),                      # j[5]
-            trainmin_idx,                                       # j[6]
-
-            #round(trainminf_at_testmin*51.422063*1000,2),      # j[7]
-            #round(testminf_at_testmin*51.422063*1000,2),       # j[8]
-            round(trainminf_at_testmin,2),                      # j[7]
-            round(testminf_at_testmin,2),                       # j[8]
-            testmin_idx,                                        # j[9]
-
-            random_seed,                                        # j[10]
-            runner_n2p2,                                        # j[1]
-            foldern,                                            # j[1] path_
-            nn,                                                 # j[1]
-            kmcstd,                                             # j[1]
-            epochs_,                                            # j[1] epochs_
-            c44,                                                # j[1] c44_
-            c44e,                                               # j[1] c44_
-            folder                                              # j[1] path_
-            ])
+                input_structures,
+                random_seed,                                        # j[10]
+                runner_n2p2,                                        # j[1]
+                foldern,                                            # j[1] path_
+                nn,                                                 # j[1]
+                kmcstd,                                             # j[1]
+                epochs_,                                            # j[1] epochs_
+                c44,                                                # j[1] c44_
+                c44e,                                               # j[1] c44_
+                folder                                              # j[1] path_
+                ])
 
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
@@ -304,8 +321,9 @@ for c in subfolder:    # from the ones in the que
     if args.sort_by_trainfraction:
         out2=sorted(out2,key=lambda x: x[0])
 
-    out2=sorted(out2,key=lambda x: x[2])  # das ist nach dem train ergebnis
-    out2=sorted(out2,key=lambda x: x[len(out2[0])-3])  # das ist nach dem train ergebnis
+    #out2=sorted(out2,key=lambda x: x[2])               # das ist nach dem train ergebnis
+    #out2=sorted(out2,key=lambda x: x[len(out2[0])-3])  # das ist nach dem train ergebnis
+
     #for exec_conv_unconv in [ ["n2p2","conv"],[ "n2p2", "unconv"], ['runner','conv'],['runner','unconv']]:
     #for exec_conv_unconv in [ ["n2p2","green"],[ "n2p2", "white"], ['n2p2','red'],['n2p2','blue'],["runner","green"],[ "runner", "white"], ['runner','red'],['runner','blue']]:
     for exec_conv_unconv_a in ["n2p2","runner"]:
@@ -321,6 +339,7 @@ for c in subfolder:    # from the ones in the que
                 run = "    "
                 NJC = "    "
                 que = "    "
+                input_structures = len(j) - 10
                 random_seed =len(j) - 9
                 runner_n2p2 =len(j) - 8
                 foldern =len(j) - 7
@@ -399,11 +418,14 @@ for c in subfolder:    # from the ones in the que
 
                 if args.verbose > 3:
                     print('DD')
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f MC %2.0f || [%4.0f] | %s | %s"
-                elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
+                #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f || %4.1f MC %2.0f || [%4.0f] | %s | %s"
+                #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[path_])
 
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f |C %2.0f |M %2.0f || [%4.0f] | %s | %8.0f | %s"
-                elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[random_seed],j[path_])
+                #stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f |C %2.0f |M %2.0f || [%4.0f] | %s | %8.0f | %s"
+                #elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8], j[c44_], j[kmcstd], j[epochs_], j[nn],j[random_seed],j[path_])
+
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %2.0f %2.0f %2.0f || %5.1f /%5.1f |C %2.0f |M %2.0f |S %4.0f  || [%4.0f] | %s | %8.0f | %s"
+                elementout = (        j[0] ,  j[1],  j[2],   j[3],    j[4], j[5],  j[6],      j[7],  j[8],j[c44_],j[kmcstd], j[input_structures] , j[epochs_], j[nn],j[random_seed],j[path_])
 
                 conv_unconv = "unconv"
                 ## erstmak die komischen aussortieren
