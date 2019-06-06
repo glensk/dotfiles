@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import argparse
 import re
 import subprocess,os
@@ -13,9 +14,9 @@ from curlib import *
 from sflib import *
 
 def SymSelect(datafile, deffile, nsymsel = 20, prefix="cursel", nlandmarks=0, verbose=False,  allel=False, scalemode="none", density=0.0, nsvd=0):
-    
+
     t1=time.time()
-    
+
     nlandmarks = int(nlandmarks)
     # Read Definitions from log files
     asdef = ReadLOG(deffile)
@@ -40,13 +41,13 @@ def SymSelect(datafile, deffile, nsymsel = 20, prefix="cursel", nlandmarks=0, ve
                 SF_int[element] = SF_integrate(asdef[element], rho)
                 np.savetxt(prefix+"_"+element+".sfintegral", SF_int[element])
     print "Number of symmetry functions for each element: {}".format(nsyms.items())
-    
+
     sel1 = {}
     errcur = {}
     if allel:
         xmats = {}
         costs = {}
-        
+
         for element in nsyms:
             xmats[element] = ReadFuncdata(datafile, element, verbose)
             if scalemode == "full":
@@ -54,16 +55,16 @@ def SymSelect(datafile, deffile, nsymsel = 20, prefix="cursel", nlandmarks=0, ve
                 print "Scaling by full integral"
             elif scalemode == "sqrt":
                 print "Scaling by sqrt integral"
-                xmats[element] *= np.sqrt(1.0/SF_int[element])            
+                xmats[element] *= np.sqrt(1.0/SF_int[element])
             costs[element] = GetCosts(asdef[element], rho)
-            
+
         sel1 = CURSelSVDColsAll(xmats, nsymsel*len(nsyms), costs)
         if verbose:
             for element in sel1:
-                curx = DoCUR(xmats[element], sel1[element], np.asarray(range(len(xmats[element])),int) )            
+                curx = DoCUR(xmats[element], sel1[element], np.asarray(range(len(xmats[element])),int) )
                 errcur[element] = np.sqrt(np.sum((curx-xmats[element])**2)/np.sum(xmats[element]**2))
                 print "CUR error: ", element,  errcur[element]
-    else:        
+    else:
         for element in nsyms:
             xmat = ReadFuncdata(datafile, element)
             if scalemode == "full":
@@ -71,11 +72,11 @@ def SymSelect(datafile, deffile, nsymsel = 20, prefix="cursel", nlandmarks=0, ve
             elif scalemode == "sqrt":
                 print "Scaling by sqrt integral"
                 xmat *= np.sqrt(1.0/SF_int[element])
-            xmat/=np.max(np.abs(xmat)) #normalizes xmat to avoid very large or very small values 
-            
+            xmat/=np.max(np.abs(xmat)) #normalizes xmat to avoid very large or very small values
+
             # compute cost and select the symmetry functions
             costs = GetCosts(asdef[element], rho)
-            
+
             # speeds up things by removing SF that are effectively zero
             tot = np.sum(xmat**2,axis=0)
             gthanzero = np.where(tot>1e-12)[0]
@@ -85,10 +86,10 @@ def SymSelect(datafile, deffile, nsymsel = 20, prefix="cursel", nlandmarks=0, ve
             if verbose:
                 np.savetxt(element+'.costs', costs)
                 print "Computing CUR error"
-                curx = DoCUR(xmat, sel1[element], np.asarray(range(len(xmat)),int))            
+                curx = DoCUR(xmat, sel1[element], np.asarray(range(len(xmat)),int))
                 errcur[element] = np.sqrt(np.sum((curx-xmat)**2)/np.sum(xmat**2))
                 print "CUR error: ",  errcur[element]
-    
+
     fout = open(prefix+".def","w")
     if verbose:
         fout.write("# Command line: %s\n" % (" ".join(sys.argv[:]) ) )
@@ -98,7 +99,7 @@ def SymSelect(datafile, deffile, nsymsel = 20, prefix="cursel", nlandmarks=0, ve
         WriteDEF([asdef[element][i] for i in sel1[element]], fout)
 
     # if required compute landmarks based on the selected symmetry functions
-    if nlandmarks > 0 : 
+    if nlandmarks > 0 :
         sel_landmarks = GetLandmarks(datafile, nsyms, nat_per_frame, nlandmarks)
         np.savetxt(prefix+'.landmarks', sel_landmarks, fmt='%d')
     t2=time.time()
@@ -120,6 +121,6 @@ if __name__ == '__main__':
     parser.add_argument("--rho", type=float,default=0.0,help="Approximate density of the reference gas (to normalize 2 and 3-body functions) in bohr**-3")
     parser.add_argument("--scale", type=str, default="none", help="Scaling of the SF based on the integral value. Permissible values are [none, sqrt, full]")
     args = parser.parse_args()
-    SymSelect(args.datafile, args.deffile, nsymsel=args.n, prefix=args.prefix, 
-           nlandmarks=args.landmarks, verbose=args.v, allel = args.allelements, scalemode=args.scale, 
+    SymSelect(args.datafile, args.deffile, nsymsel=args.n, prefix=args.prefix,
+           nlandmarks=args.landmarks, verbose=args.v, allel = args.allelements, scalemode=args.scale,
            density=args.rho, nsvd=args.nsvd)

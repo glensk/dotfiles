@@ -157,41 +157,114 @@ def create_READMEtxt(directory=False,add=False):
     print()
     return
 
-def n2p2_get_scaling_and_function_data(submitdebug=True):
+def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True):
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
-    submitfile = scripts()+"/n2p2/submit_scaling_debug.sh"
-    if not os.path.isfile(submitfile):
-        sys.exit("Need "+submitfile+" file!")
+
+    #submitfile = scripts()+"/n2p2/submit_scaling_debug.sh"
+    #if not os.path.isfile(submitfile):
+    #    sys.exit("Need "+submitfile+" file!")
 
     folder="get_scaling"
     if os.path.isdir(folder):
         sys.exit(folder+" already exists!")
+
 
     mkdir(folder)
     create_READMEtxt()
     os.chdir(folder)
     cp("../input.data")
     cp("../input.nn")
-    cp(submitfile)
+    #cp(submitfile)
+    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,debugque=submitdebug,job="scaling")
 
-    submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript="submit_scaling_debug.sh")
+    command = ["sbatch"]
+    if submitdebug == True:
+        command = command + ["-p","debug","-t","01:00:00"]
+    command = command + [submitskript]
+    call(["sbatch",submitskript])
+    #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
     create_READMEtxt(add="submitdebug = "+str(submitdebug))
     return
 
+def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job=False):
+    ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
+    if job not in ["scaling","train"]:
+        sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
+    hostname = gethostname()
+    known_hosts =  ['fidis','helvetios']
+    if hostname in known_hosts:
+        pass
+    else:
+        print("known hosts:",known_hosts)
+        sys.exi(hostname+" is not in the list of known hosts!")
 
-def n2p2_make_training():
+    if directory == False:
+        directory = os.getcwd()
+
+    # name of file
+    filepath = directory+'/submit_n2p2_'+job+'.sh'
+
+    # write file
+    with open(filepath, "w") as text_file:
+        text_file.write("#!/bin/bash\n")
+        text_file.write("#SBATCH --job-name=NNP-mpi\n")
+        text_file.write("#SBATCH --output=_scheduler-stdout.txt\n")
+        text_file.write("#SBATCH --error=_scheduler-stderr.txt\n")
+        text_file.write("#SBATCH --nodes="+str(nodes)+"\n")
+        text_file.write("#SBATCH --ntasks 28\n")
+        if debugque == True:
+            text_file.write("#SBATCH --time=00-01:00:00\n")
+        else:
+            text_file.write("#SBATCH --time=00-72:00:00\n")
+        if hostname == 'fidis':
+            text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
+            # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
+        if hostname == 'helvetios':
+            print('you can use up to --mem=183G or more')
+        text_file.write("#SBATCH --mem=100G\n")
+        text_file.write("\n")
+        text_file.write("set +e\n")
+        text_file.write("# it is necessary to have all the modules which are used when compiling\n")
+        text_file.write('export LD_LIBRARY_PATH=""\n')
+        text_file.write("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen\n")
+        text_file.write("export LD_LIBRARY_PATH=$HOME/sources/n2p2/lib:${LD_LIBRARY_PATH}\n")
+        text_file.write("#echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH\n")
+        text_file.write("\n")
+        text_file.write("touch time.out\n")
+        text_file.write("date +%s >> time.out\n")
+        text_file.write("\n")
+        if job == 'scaling':
+            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-scaling 1\n")
+        elif job == 'train':
+            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train\n")
+        text_file.write("date +%s >> time.out\n")
+        text_file.write("cat time.out | xargs | awk '{print $2-$1-10}' > time.sec\n")
+        text_file.write("$dotfiles/scripts/n2p2/n2p2_tarfolder_for_scale_train.sh\n")
+        if job == 'scaling':
+            text_file.write('[ "`pwd | grep -o "/get_scaling$"`" == \'/get_scaling\' ] && echo creating link && ln -s `pwd`/function.data ../function.data')
+        text_file.write("\n")
+        text_file.write("exit 0\n")
+
+    print()
+    print('written ',filepath)
+    print()
+    return filepath
+
+
+def n2p2_make_training(cores=21,debugque=False):
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
     if not os.path.isfile("function.data"):
         sys.exit("Need function.data file")
-    submitfile = scripts()+"/n2p2/submit_training.sh"
-    if not os.path.isfile(submitfile):
-        sys.exit("Need "+submitfile+" file!")
+
+    #submitfile = scripts()+"/n2p2/submit_training.sh"
+    #if not os.path.isfile(submitfile):
+    #    sys.exit("Need "+submitfile+" file!")
 
     if not os.path.isfile("scaling.data"):
         if not os.path.isfile("get_scaling/scaling.data"):
@@ -199,25 +272,34 @@ def n2p2_make_training():
         else:
             cp("get_scaling/scaling.data","scaling.data")
 
-    cp(submitfile)
+    #cp(submitfile)
+    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,debugque=debugque,job="train")
+    command = ["sbatch"]
+    if debugque == True:
+        command = command + ["-p","debug","-t","01:00:00"]
+    command = command + [submitskript]
+    call(["sbatch",submitskript])
+    #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
 
-    submitjob(submitdebug=False,submit=True,jobdir=os.getcwd(),submitskript="submit_training.sh")
+    #submitjob(submitdebug=False,submit=True,jobdir=os.getcwd(),submitskript="submit_training.sh",cores=cores)
     create_READMEtxt()
     return
 
-def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False):
-    if jobdir == False:
-        jobdir = os.getcwd()
-    if submit is True or submitdebug is True:
-        check_isdir_or_isdirs(jobdir)
-        cwd = os.getcwd()
-        os.chdir(jobdir)
-        if submitdebug is True:  # this works on fidis even with 2 nodes!
-            call(["sbatch","-p","debug","-t","01:00:00",submitskript])
-        if submit is True:
-            call(["sbatch",submitskript])
-        os.chdir(cwd)
-        return
+#def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False,cores=21):
+#    if jobdir == False:
+#        jobdir = os.getcwd()
+#    if submit is True or submitdebug is True:
+#        check_isdir_or_isdirs(jobdir)
+#        cwd = os.getcwd()
+#        os.chdir(jobdir)
+#        if submitdebug is True:  # this works on fidis even with 2 nodes!
+#            sed(submitskript,"srun -n.*","srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train")
+#            call(["sbatch","-p","debug","-t","01:00:00",submitskript])
+#        if submit is True:
+#            sed(submitskript,"srun -n.*","srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train")
+#            call(["sbatch",submitskript])
+#        os.chdir(cwd)
+#        return
 
 def sed(file,str_find,str_replace):
     # from scripts folder
@@ -3397,6 +3479,25 @@ def inputnn_runner_or_n2p2(file):
         return "n2p2"
     else:
         return "runner"
+
+def inputdata_get_nuber_of_structures(inputdata):
+    #print('inputdata',inputdata)
+    inputdatanr = inputdata.replace("input.data","input.data_nr")
+    #print('inputdatanr',inputdatanr)
+    if os.path.isfile(inputdatanr):
+        nr = np.loadtxt(inputdatanr)
+        nr = int(nr)
+        #print('from loaded file',nr)
+        return nr
+    else:
+        if os.path.isfile(inputdata):
+            nr = check_output(["grep","-c","begin",inputdata]).decode('utf-8')
+            nr = int(nr)
+            #print('from grep nr',nr,type(nr),int(nr))
+            np.savetxt(inputdatanr,np.array([nr]))
+        else:
+            nr = 0
+    return nr
 
 def inputnn_get_potential_number_from_weightsfile(inputnn):
     weights = inputnn.replace('input.nn', 'weights.013.*.out')
