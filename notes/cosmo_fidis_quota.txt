@@ -1,0 +1,3 @@
+fsu -q /home     # to get user quota and file system usage
+
+fsu /scratch     # to show scratch quota
