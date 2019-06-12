@@ -232,6 +232,16 @@ for c in subfolder:    # from the ones in the que
         epochs_ = len(lc[:,1])
         #print('len',len(lc),epochs_)
         #print()
+        def get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=False):
+            file = folder+"/kmc/ene_std_epoch_"+str(index)+".dat"
+            if not os.path.isfile(file):
+                return kmcstd
+            else:
+                kmcstd_all = np.loadtxt(file)
+                kmcstd = kmcstd_all[-1]
+                return kmcstd
+            return
+
         def get_try_get_c44_from_elastic_all(c44,elastic_all,index=False):
             if not os.path.isfile(elastic_all):
                 #print('is not')
@@ -260,11 +270,12 @@ for c in subfolder:    # from the ones in the que
                 #print(inputnn)
                 #sys.exit()
             #sys.exit()
-            print()
-            print('c44 in',c44)
+            # #print()
+            #print('c44 in',c44)
             c44 = get_try_get_c44_from_elastic_all(c44,elastic_all,index=testmin_idx)
-            print('c44 ou',c44)
-            print()
+            kmcstd = get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=testmin_idx)
+            #print('c44 ou',c44)
+            #print()
 
             test     = lc[:,2][testmin_idx]                      # best test RMSE
             train    = lc[:,1][testmin_idx]               # train RMSE @ test index
@@ -415,7 +426,7 @@ for c in subfolder:    # from the ones in the que
                     e3 = ''.ljust(2)
                     path = ''.ljust(2)
 
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |M %2.0f |S %4.0f  || [%4.0f] | %s | %8.0f | %s"
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |M %3.1f |S %4.0f  || [%4.0f] | %s | %8.0f | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],    c44,  kmc,     ist ,     epochs,   nn,  rnd,   path)
 
                 conv_unconv = "unconv"
