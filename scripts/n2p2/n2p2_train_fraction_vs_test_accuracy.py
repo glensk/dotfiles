@@ -426,7 +426,7 @@ for c in subfolder:    # from the ones in the que
                     e3 = ''.ljust(2)
                     path = ''.ljust(2)
 
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |M %2.0f |S %4.0f  || [%4.0f] | %s | %8.0f | %s"
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |M %3.1f |S %4.0f  || [%4.0f] | %s | %8.0f | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],    c44,  kmc,     ist ,     epochs,   nn,  rnd,   path)
 
                 conv_unconv = "unconv"
