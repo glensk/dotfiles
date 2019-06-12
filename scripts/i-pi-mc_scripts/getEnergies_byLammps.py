@@ -172,10 +172,6 @@ def get_energies(args):
 
         sys.exit()
 
-    if args.testkmc:
-        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
-        units = "meV_pa"
-        verbose = True
 
     if args.pick_c44:
         args.units = "meV_pa"
@@ -221,7 +217,25 @@ def get_energies(args):
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
-    sys.exit()
+
+
+    if args.testkmc:
+        if ace.pot.use_epoch == False:
+            sys.exit('Error: need to specify a particular epoch for kmctest')
+        kmc_folder = ace.pot.potpath+"/kmc"
+        kmc_file = kmc_folder+"/ene_std_epoch"+str(ace.pot.use_epoch)+".dat"
+        if os.path.isfile(kmc_file):
+            sys.exit(kmc_file+" does already exist!")
+        if not os.path.isdir(kmc_folder):
+            my.mkdir(kmc_folder)
+        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
+        units = "meV_pa"
+        verbose = True
+
+
+
+
+
     ### when want to assess some formation energies
     if args.test_formation_energies:
         test_formation_energies(ace)
@@ -765,11 +779,12 @@ def get_energies(args):
 
         #print("in",what.shape,"out",whatout.shape,name)
         return whatout
+
     if os.path.isfile('log.lammps'):
         os.remove('log.lammps')
 
     if args.testkmc:
-        ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
+        ene_std         = mysavetxt(ene_std,kmc_file,units,save=True)
 
     if args.write_analysis:
         ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
