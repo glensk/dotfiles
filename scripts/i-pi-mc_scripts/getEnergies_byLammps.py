@@ -16,18 +16,19 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
-    p.add_argument('-p' ,'--pot', required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot())
-    p.add_argument('--potpath','-pp',type=str,required=False,default=False,help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
+    p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot())
+    p.add_argument('--potpath','-pp',   required=False, type=str, default=False, help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
     p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--geopt','-g'    ,action='store_true',help='make a geometry optimization of the atoms.')
     p.add_argument('--elastic','-e'  ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
+    p.add_argument('--elastic_all','-ea'  ,action='store_true',help='calculate elastic constants for every epoch for Al (externally by lammps).')
+    p.add_argument('--elastic_from_ene','-ee'  ,action='store_true',help='calculate elastic constants for Al from energies (inernally by ase).')
     p.add_argument('--ase'    ,'-a'  ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
     p.add_argument('--lmp'    ,'-lmp',action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
     p.add_argument('--ipi'    ,'-ipi',action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
-    p.add_argument('--teste'  ,'-te', action='store_true',help='Assess elastic constants.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
 
@@ -74,26 +75,9 @@ def get_energies(args):
     verbose = args.verbose
 
     geopt = args.geopt
-    elastic = args.elastic
     ase = args.ase
     lmp = args.lmp
     ipi = args.ipi
-
-    teste = args.teste
-    test3 = args.test3
-    testkmc = args.testkmc
-    pick_concentration_al = args.pick_concentration_al
-    pick_atoms_al = args.pick_atoms_al
-    pick_number_of_atoms = args.pick_number_of_atoms
-    pick_forcesmax = args.pick_forcesmax
-    pick_cellshape = args.pick_cellshape
-    pick_c44 = args.pick_c44
-    pick_amount_1NN = args.pick_amount_1NN
-
-    write_runner = args.write_runner
-    write_forces = args.write_forces
-    write_forcesx = args.write_forcesx
-    write_analysis = args.write_analysis
 
     if args.analyze_kmc_number_1NN_2NN_ipi:
         ''' -akmc_ipi '''
@@ -213,18 +197,22 @@ def get_energies(args):
     print('LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
     lammps()
+    os.remove("log.lammps")
+
+
+
 
     ### get ace object for the chosen potential
-    if args.test_formation_energies or teste: units='eV'
+    if args.test_formation_energies or args.elastic: units='eV'
     ace = ase_calculate_ene(pot=pot,
             potpath=potpath,
+            use_epoch=False,
             units=units,
             geopt=geopt,
-            elastic=elastic,
+            elastic=args.elastic,
             verbose=verbose)
-
     ### get the potential
-    ace.pot_to_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
+    ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
@@ -234,17 +222,67 @@ def get_energies(args):
         my.create_READMEtxt(os.getcwd())
         sys.exit('test_formation_energies done! Exit')
 
-    if teste or elastic:
-        print('>> elastic')
-        ace.elastic = True
-        test2_elastic(ace)
-        my.create_READMEtxt(os.getcwd())
-        sys.exit('teste done! Exit')
+    if args.elastic:
+        get_elastic_constants_al_ext(ace)
+        sys.exit('get_elastic_constants_al_ext done! Exit')
 
-    if test3:
-        print('>> test3')
+    if args.elastic_all:  # this does not need to initialize potential
+
+        file_elastic_c44_all = ace.pot.potpath+"/elastic_c44_all.dat"
+        if os.path.isfile(file_elastic_c44_all):
+            elastic_all = np.loadtxt(file_elastic_c44_all)
+            goover = ace.pot.potepoch_all
+        else:
+            elastic_all = np.empty((0,2), float)
+            goover = ace.pot.potepoch_all
+
+        writeanew = False
+        for epoch in ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
+            if epoch in elastic_all[:,0]:
+                print('epoch',str(epoch).ljust(5),'from file')
+            else:
+                print('epoch',epoch,'not already in')
+                ace = ase_calculate_ene(pot=pot,
+                        potpath=potpath,
+                        use_epoch=epoch,
+                        units=units,
+                        geopt=geopt,
+                        elastic=args.elastic,
+                        verbose=verbose)
+                print('now getting the lmp cmd')
+                ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
+                c44 = get_elastic_constants_al_ext(ace)
+                writeanew = True
+                #elastic_all.append([epoch,np.float(c44)])
+                print('epoch',str(epoch).ljust(5),c44)
+                elastic_all= np.append(elastic_all, np.array([[epoch,np.float(c44)]]), axis=0)
+
+        if writeanew:
+            print('saving')
+            print('--1')
+            print(elastic_all)
+            arr = elastic_all
+            arr = arr[arr[:,0].argsort()]
+            #elastic_all = np.sort(np.asarray(elastic_all),axis=0)
+            print('--2')
+            print(elastic_all)
+            np.savetxt(file_elastic_c44_all,elastic_all)
+            # 1.000000000000000000e+00 3.561243753878879659e+01
+            # 5.000000000000000000e+01 3.971162323190060306e+01
+            # 1.000000000000000000e+02 3.929582509907439913e+01
+            # 2.000000000000000000e+00 3.801339103638130013e+01
+            # 3.000000000000000000e+00 3.864317643769499711e+01
+
+        sys.exit('done! Exit')
+
+    if args.elastic_from_ene:
+        get_elastic_constants_al_from_ene(ace)
+        sys.exit('get_elastic_constants_al_from_ene done! Exit')
+
+    if args.test3:
+        print('>> args.test3')
         test3_do(ace)
-        sys.exit('test3 done! Exit')
+        sys.exit('args.test3 done! Exit')
 
 
     ### check args.inputfile
@@ -405,18 +443,17 @@ def get_energies(args):
                 #if ana_atoms_ == 4
                 #if pos[0,0] == pos[0,1] == pos[
         ### when check for particular picks
-        if pick_number_of_atoms >= 0 and ana_atoms_ != pick_number_of_atoms:
+        if args.pick_number_of_atoms >= 0 and ana_atoms_ != args.pick_number_of_atoms:
             continue
-        if pick_concentration_al >= 0 and d["Al"] != pick_concentration_al:
+        if args.pick_concentration_al >= 0 and d["Al"] != args.pick_concentration_al:
             continue
-        if pick_atoms_al >= 0 and n["Al"] != pick_atoms_al:
+        if args.pick_atoms_al >= 0 and n["Al"] != args.pick_atoms_al:
             continue
-        if pick_forcesmax >=0 and for_DFTmax_ > pick_forcesmax:
+        if args.pick_forcesmax >=0 and for_DFTmax_ > args.pick_forcesmax:
             continue
-        #if pick_cellshape >= 0 and cellshape not in ["Q", "?"]:
-        if pick_cellshape >= 0 and cellshape not in ["Q"]:
+        if args.pick_cellshape >= 0 and cellshape not in ["Q"]:
             continue
-        if pick_c44 == True:
+        if args.pick_c44 == True:
             if n["Al"] != 4:
                 continue
             if n["Mg"] > 0:
@@ -430,7 +467,7 @@ def get_energies(args):
             #continue
         #print('idx',idx,'n_al',n["Al"],"c_al",d["Al"],'consider_atoms_al cnat_al',consider_atoms_al,'cnat consider_number_of_atoms',consider_number_of_atoms)
         #print('idx',idx,'wow')
-        if pick_c44 or debug: #cellshape == "?":
+        if args.pick_c44 or debug: #cellshape == "?":
             #print('XX frames[i].cell')
             #print(frames[i].cell)
             strain = frames[i].cell[0,1]/frames[i].cell[0,0]
@@ -510,16 +547,16 @@ def get_energies(args):
             if ace.geopt == False:
                 if debug:
                     print("AAA")
-                ace.pot_to_ase_lmp_cmd()
+                ace.pot_get_and_ase_lmp_cmd()
                 if debug:
                     print("BBB before: ene_pot_ase")
                     #kk = atoms_tmp.get_potential_energy()
                     #print('kk',kk)
                 ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=debug)
-                if write_forces or write_forcesx:
-                    if write_forcesx:
+                if args.write_forces or args.write_forcesx:
+                    if args.write_forcesx:
                         np.savetxt("forcesx.dat",atoms_tmp.get_forces()[:,0])
-                    if write_forces:
+                    if args.write_forces:
                         np.savetxt("forces.dat",atoms_tmp.get_forces())
                     #ase_write("POSCAR_out",atoms_tmp,format="vasp")
                     #ase_write("POSCAR_out40.runner",atoms_tmp,format="runner")
@@ -581,13 +618,13 @@ def get_energies(args):
 
             elif ace.geopt == True:
                 ace.geopt = False
-                ace.pot_to_ase_lmp_cmd()
+                ace.pot_get_and_ase_lmp_cmd()
                 ene_pot_ase[idx] = ace.ene(atoms_tmp)
                 #print('b',atoms_tmp.get_positions()[:3])
                 #print('ene',ene_pot_ase[idx])
 
                 ace.geopt = True
-                ace.pot_to_ase_lmp_cmd()
+                ace.pot_get_and_ase_lmp_cmd()
                 ene_pot_ase_geop[idx] = ace.ene(atoms_tmp)
                 #print('a',atoms_tmp.get_positions()[:3])
                 #print('ene',ene_pot_ase_geop[idx])
@@ -625,11 +662,11 @@ def get_energies(args):
             ene_pot[idx] = ene_pot_lmp[idx]
 
         ### write runner output
-        if write_runner:
+        if args.write_runner:
             ase_write("out.runner",frames[i],format='runner',append=True)
 
         ### write runner output
-        if write_runner:
+        if args.write_runner:
             nat = frames[i].get_number_of_atoms()
             listrepeat = [ [2,3,4], [4,10,3], [11,40,2] ]
             listrepeat = [ [2,4,2] ]          # memorize_symfunc_results on
@@ -713,10 +750,10 @@ def get_energies(args):
         if verbose > 0 and printed == False:
             printhere()
 
-    if write_analysis:
+    if args.write_analysis:
         np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
-    if write_runner:
+    if args.write_runner:
         print('out.runner written')
 
     def mysavetxt(what,name,units,save=False):
@@ -732,7 +769,7 @@ def get_energies(args):
     if args.testkmc:
         ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
 
-    if write_analysis:
+    if args.write_analysis:
         ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
         ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
         ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
@@ -1557,22 +1594,28 @@ def test_formation_energies(ace):
 
 
 
-def test2_elastic(ace):
+def get_elastic_constants_al_ext(ace):
+    ace.elastic = True
     #get_basic_NN_energies_ace(ace)
     #get_al_fcc_equilibrium(ace)
+    if ace.pot.c44_al:
+        print('ace.c44:',ace.pot.c44_al,type(ace.pot.c44_al))
+    else:
+        ace.elastic_relax = True
+        frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
+        ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
+        print('ace.c44:',ace.c44,type(ace.c44))
+        filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
+        if not os.path.isfile(filename):
+            np.savetxt(filename,np.array([np.float(ace.c44)]))
+            my.create_READMEtxt(os.getcwd())
+    return ace.c44
+
+def get_elastic_constants_al_from_ene(ace):
     ace.elastic_relax = True
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
-    ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
-    print('ace.c44:',ace.c44,type(ace.c44))
-    #print('aa',ace.pot.potpath)
-    np.savetxt(ace.pot.potpath+"/elastic.dat",np.array([np.float(ace.c44)]))
-    #print('ace.elastic_constants:',ace.elastic_constants)
-    #print('cc')
-    #print()
-    #print(frame_al.get_cell())
-    #stress = ace.stress(frame_al)
-    #print('stress',stress)
     ace.get_elastic(frame_al,verbose=ace.verbose)
+    my.create_READMEtxt(os.getcwd())
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'
@@ -1613,4 +1656,8 @@ if __name__ == "__main__":
     p = help()
     args = p.parse_args()
     my.print_args(args)
+    if args.elastic_all:  # this does not need to initialize potential
+        print('yes')
+    else:
+        print('no')
     get_energies(args)
