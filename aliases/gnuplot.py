@@ -145,7 +145,7 @@ def gnuplot_defaults(args):
     global c
     c = "gnuplot --persist << EOF\n"
 
-    ca("set mouse")
+    ca("set macros")
     if True:
         if False:
             ca("set macros")
@@ -316,16 +316,16 @@ def column_scale_y(column_index,gocolumns,args):
 
 def string_to_using__columns(i,verbose=False):
     if args.verbose:
-        print('## string_to_using__columns: &&i',i)
+        print('&& string_to_using__columns: && i',i)
     if is_int(i):
-        return str(i)
+        return "1:"+str(i)
     # first check if there is an ":" if it is, number before is the x achsis
     #print('yes')
     #print('yes',int(i))
 
     ba = i.split(":")
     if args.verbose:
-        print('## string_to_using__columns: &&ba',ba,len(ba))
+        print('&& string_to_using__columns: && ba',ba,len(ba))
 
     ## split x and y columns
     if len(ba) == 2:
@@ -334,15 +334,23 @@ def string_to_using__columns(i,verbose=False):
     else:
         x = "1"
         y = ba[0]
-    print('&&x',x)
-    print('&&y',y)
-    bb = bb = x+":("+y+")"
-    print('&&bb',bb)
+    print('&& string_to_using__columns: && x',x)
+    print('&& string_to_using__columns: && y',y)
+    bb = x+":("+y+")"
+    if is_int(y):
+        bb = x+":($"+y+")"
+    print('&& string_to_using__columns: && bb',bb)
 
     ## make $ to \$
-    l = bb.split("$")
-    print('&&l',l)
-    using = "\$".join(l)
+    c = bb.split("$")
+    print('&& string_to_using__columns: && c',c)
+    using = d = "\$".join(c)
+    print('&& string_to_using__columns: && d',d)
+    # works:
+    #   -c '1:$2'
+    #
+    # does not work:
+    #   -c '1:2'
     #sys.exit()
     return using
 
@@ -370,7 +378,7 @@ def gnuplot_plot(args):
         #input = np.loadtxt(inputfile)
         from numpy import genfromtxt
         input = genfromtxt(inputfile,filling_values=99)
-        #print('input',input)
+        print('input',input)
         if args.verbose > verbosity_level+1:
             print('input',input)
         if args.verbose > verbosity_level:
@@ -419,7 +427,7 @@ def gnuplot_plot(args):
             for idxc,i in enumerate(gocolumns): # gocolumns [2, 3, 4, 5]
                 ###############################################
                 # go over all columns,
-                # take column 0 as x-column
+                # take first column as x-column
                 ###############################################
                 if args.verbose > verbosity_level:
                     print("## @@@@@@@@@@@@@@@@@ TWO columns (begin) @@@@@@@@@@@@@@@@@@@@@")
@@ -432,7 +440,7 @@ def gnuplot_plot(args):
 
                 using = string_to_using__columns(i,verbose=args.verbose)
                 if args.verbose > verbosity_level:
-                    print('## using (1):',using)
+                    print('## && using result (1):',using)
 
                 #using = "1:($"+str(i)+")"
                 #using = "1:"+str(i)
@@ -443,7 +451,6 @@ def gnuplot_plot(args):
 
                 if args.verbose > verbosity_level:
                     print('## using (2):',using)
-                    sys.exit()
 
                 if args.verbose > verbosity_level+1:
                     print('## input column:',input[:,i-1])

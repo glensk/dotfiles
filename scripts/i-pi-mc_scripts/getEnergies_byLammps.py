@@ -237,11 +237,13 @@ def get_energies(args):
             goover = ace.pot.potepoch_all
 
         writeanew = False
-        for epoch in ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
+        count = 0
+        for epoch in np.arange(1,660): #ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
             if epoch in elastic_all[:,0]:
                 print('epoch',str(epoch).ljust(5),'from file')
             else:
-                print('epoch',epoch,'not already in')
+                count += 1
+                print('epoch',str(epoch).ljust(5),'not already in')
                 ace = ase_calculate_ene(pot=pot,
                         potpath=potpath,
                         use_epoch=epoch,
@@ -249,30 +251,24 @@ def get_energies(args):
                         geopt=geopt,
                         elastic=args.elastic,
                         verbose=verbose)
-                print('now getting the lmp cmd')
+                #print('now getting the lmp cmd')
                 ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
                 c44 = get_elastic_constants_al_ext(ace)
                 writeanew = True
                 #elastic_all.append([epoch,np.float(c44)])
-                print('epoch',str(epoch).ljust(5),c44)
+                #print('epoch',str(epoch).ljust(5),c44)
                 elastic_all= np.append(elastic_all, np.array([[epoch,np.float(c44)]]), axis=0)
+            if count == 20:
+                print()
+                print('saving ...')
+                print()
+                elastic_all = elastic_all[elastic_all[:,0].argsort()]
+                np.savetxt(file_elastic_c44_all,elastic_all)
+                count = 0
 
-        if writeanew:
-            print('saving')
-            print('--1')
-            print(elastic_all)
-            arr = elastic_all
-            arr = arr[arr[:,0].argsort()]
-            #elastic_all = np.sort(np.asarray(elastic_all),axis=0)
-            print('--2')
-            print(elastic_all)
+        if True: #writeanew:
+            elastic_all = elastic_all[elastic_all[:,0].argsort()]
             np.savetxt(file_elastic_c44_all,elastic_all)
-            # 1.000000000000000000e+00 3.561243753878879659e+01
-            # 5.000000000000000000e+01 3.971162323190060306e+01
-            # 1.000000000000000000e+02 3.929582509907439913e+01
-            # 2.000000000000000000e+00 3.801339103638130013e+01
-            # 3.000000000000000000e+00 3.864317643769499711e+01
-
         sys.exit('done! Exit')
 
     if args.elastic_from_ene:

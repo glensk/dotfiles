@@ -227,6 +227,7 @@ for c in subfolder:    # from the ones in the que
         #    print('---')
         #    print(lc)
         #    print('---')
+        #print('lc',lc.shape)
         epochs_ = len(lc[:,1])
         #print('len',len(lc),epochs_)
         #print()
