@@ -18,15 +18,16 @@ def help(p = None):
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot())
     p.add_argument('--potpath','-pp',   required=False, type=str, default=False, help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
+    p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
     p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
-    p.add_argument('--geopt','-g'    ,action='store_true',help='make a geometry optimization of the atoms.')
-    p.add_argument('--elastic','-e'  ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
-    p.add_argument('--elastic_all','-ea'  ,action='store_true',help='calculate elastic constants for every epoch for Al (externally by lammps).')
-    p.add_argument('--elastic_from_ene','-ee'  ,action='store_true',help='calculate elastic constants for Al from energies (inernally by ase).')
-    p.add_argument('--ase'    ,'-a'  ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
-    p.add_argument('--lmp'    ,'-lmp',action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
-    p.add_argument('--ipi'    ,'-ipi',action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
+    p.add_argument('--geopt','-g'               ,action='store_true',help='make a geometry optimization of the atoms.')
+    p.add_argument('--elastic','-e'             ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
+    p.add_argument('--elastic_all',     '-ea'   ,action='store_true',help='calculate elastic constants for every epoch for Al (externally by lammps).')
+    p.add_argument('--elastic_from_ene','-ee'   ,action='store_true',help='calculate elastic constants for Al from energies (inernally by ase).')
+    p.add_argument('--ase'    ,'-a'             ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
+    p.add_argument('--lmp'    ,'-lmp'           ,action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
+    p.add_argument('--ipi'    ,'-ipi'           ,action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
@@ -187,11 +188,15 @@ def get_energies(args):
 
     print('args.inputfile               :',args.inputfile)
 
+    ##############################################################
     ### check if ase runner/quippy/lammpps-data formats are known
+    ##############################################################
     ase_formats = my.ase_get_known_formats_class(verbose=verbose)
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
 
+    ##############################################################
     ### check if lammps is working with ase
+    ##############################################################
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
     print('LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
@@ -199,14 +204,15 @@ def get_energies(args):
     lammps()
     os.remove("log.lammps")
 
-
-
-
+    ##############################################################
     ### get ace object for the chosen potential
+    ##############################################################
     if args.test_formation_energies or args.elastic: units='eV'
+    print('potepoch',args.potepoch)
+    sys.exit()
     ace = ase_calculate_ene(pot=pot,
             potpath=potpath,
-            use_epoch=False,
+            use_epoch=potepoch,
             units=units,
             geopt=geopt,
             elastic=args.elastic,
