@@ -43,6 +43,15 @@ def help(p = None):
     p.add_argument('-ls','--line_style', choices=["lines","points","linespoints"], default="line", help='plot lines as')
     return p
 
+def is_int(x):
+    try:
+        a = float(x)
+        b = int(a)
+    except ValueError:
+        return False
+    else:
+        return b==a
+
 def get_default_y_label(args,inputfile,column):
     basename = os.path.basename(inputfile)
     print('bn',basename)
@@ -62,14 +71,6 @@ def get_default_y_label(args,inputfile,column):
     #sys.exit()
     return
 
-def is_int(x):
-    try:
-        a = float(x)
-        b = int(a)
-    except ValueError:
-        return False
-    else:
-        return b==a
 
 def set_args_defaults(args,inputfile):
     basename = os.path.basename(inputfile)
@@ -84,11 +85,12 @@ def set_args_defaults(args,inputfile):
         args.log_log = True
         args.max_columns = 2
         args.columns = [2,3,4,5]
+        args.line_style = "linespoints"
         #args.scale = True
         args.xlabel = "epochs"
         args.ylabel = "RMSE (meV/at)"
     if basename == "learning-curve.out":
-        args.scale_y = 27211.386   # hartree to meV
+        args.scale_y = [27211.386,27211.386,51422.063,51422.063]   # hartree to meV , here, as many as columns
     if basename == "KMC_analyze":
         args.xlabel = "step"
         pass
@@ -143,6 +145,7 @@ def gnuplot_defaults(args):
     global c
     c = "gnuplot --persist << EOF\n"
 
+    ca("set mouse")
     if True:
         if False:
             ca("set macros")
@@ -295,6 +298,56 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1):
         print('--> xx pl (out)       ',pl)
     return pl
 
+def column_scale_y(column_index,gocolumns,args):
+    if args.verbose:
+        print("## column_scale_y: column_index:",column_index)
+        print("## column_scale_y: gocolumns   :",gocolumns,type(gocolumns))
+        print("## column_scale_y: args.scale_y:",args.scale_y,type(args.scale_y))
+    if isinstance(args.scale_y, (int, long, float, complex)):
+        return args.scale_y
+    elif type(args.scale_y) == list:
+        return args.scale_y[column_index]
+    else:
+        print("## column_scale_y: column_index:",column_index,type(column_index))
+        print("## column_scale_y: gocolumns   :",gocolumns,type(gocolumns))
+        print("## column_scale_y: args.scale_y:",args.scale_y,type(args.scale_y))
+        sys.exit('type of args.scale_y not known')
+    return
+
+def string_to_using__columns(i,verbose=False):
+    if args.verbose:
+        print('## string_to_using__columns: &&i',i)
+    if is_int(i):
+        return str(i)
+    # first check if there is an ":" if it is, number before is the x achsis
+    #print('yes')
+    #print('yes',int(i))
+
+    ba = i.split(":")
+    if args.verbose:
+        print('## string_to_using__columns: &&ba',ba,len(ba))
+
+    ## split x and y columns
+    if len(ba) == 2:
+        x = ba[0]
+        y = ba[1]
+    else:
+        x = "1"
+        y = ba[0]
+    print('&&x',x)
+    print('&&y',y)
+    bb = bb = x+":("+y+")"
+    print('&&bb',bb)
+
+    ## make $ to \$
+    l = bb.split("$")
+    print('&&l',l)
+    using = "\$".join(l)
+    #sys.exit()
+    return using
+
+
+
 def gnuplot_plot(args):
     global c
     ################################################
@@ -317,7 +370,7 @@ def gnuplot_plot(args):
         #input = np.loadtxt(inputfile)
         from numpy import genfromtxt
         input = genfromtxt(inputfile,filling_values=99)
-        print('input',input)
+        #print('input',input)
         if args.verbose > verbosity_level+1:
             print('input',input)
         if args.verbose > verbosity_level:
@@ -359,11 +412,11 @@ def gnuplot_plot(args):
                 columns = 1
             gocolumns = np.arange(columns)+2
             if args.columns:
-                gocolumns = args.columns
+                gocolumns = np.array(args.columns)
             if args.verbose > verbosity_level:
                 print('%% columns  ',columns)
                 print('%% gocolumns',gocolumns)
-            for idxc,i in enumerate(gocolumns):
+            for idxc,i in enumerate(gocolumns): # gocolumns [2, 3, 4, 5]
                 ###############################################
                 # go over all columns,
                 # take column 0 as x-column
@@ -377,45 +430,20 @@ def gnuplot_plot(args):
                 else:
                     print('## --> adding   column',i,type(i),'since in args.columns',args.columns)
 
-                def string_to_using__columns(i):
-                    # first check if there is an ":" if it is, number before is the x achsis
-                    #print('yes')
-                    #print('yes',int(i))
-                    if is_int(i):
-                        return str(i)
-
-                    print('&&i ',i)
-                    ba = i.split(":")
-                    print('&&ba',ba,len(ba))
-
-                    ## split x and y columns
-                    if len(ba) == 2:
-                        x = ba[0]
-                        y = ba[1]
-                    else:
-                        x = "1"
-                        y = ba[0]
-                    print('&&x',x)
-                    print('&&y',y)
-                    bb = bb = x+":("+y+")"
-                    print('&&bb',bb)
-
-                    ## make $ to \$
-                    l = bb.split("$")
-                    print('&&l',l)
-                    using = "\$".join(l)
-                    #sys.exit()
-                    return using
-                using = string_to_using__columns(i)
+                using = string_to_using__columns(i,verbose=args.verbose)
+                if args.verbose > verbosity_level:
+                    print('## using (1):',using)
 
                 #using = "1:($"+str(i)+")"
                 #using = "1:"+str(i)
                 #using = str(i)
-                if args.scale_y != 1.0:
-                    using = "1:(\$"+str(i)+"*"+str(args.scale_y)+")" # has to be a default
+                scale_y = column_scale_y(idxc,gocolumns,args)
+                if scale_y != 1.0:
+                    using = "1:(\$"+str(i)+"*"+str(scale_y)+")" # has to be a default
 
                 if args.verbose > verbosity_level:
-                    print('## using    :',using)
+                    print('## using (2):',using)
+                    sys.exit()
 
                 if args.verbose > verbosity_level+1:
                     print('## input column:',input[:,i-1])

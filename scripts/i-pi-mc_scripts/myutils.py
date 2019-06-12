@@ -1034,16 +1034,29 @@ def get_click_defaults():
 
 class mypot( object ):
     ''' return a list of available potentials '''
-    def __init__(self,pot=False,potpath=False,verbose=False):
-        self.pot        = pot         # n2p2_v1ag
-        self.potpath_in = potpath
-        self.potpath    = False
-        self.pottype    = False       # n2p2/runner
-        self.potDONE    = False         # n2p2_v1ag
-        self.potlib     = False         # n2p2_v1ag
-        self.potcutoff  = False         # n2p2_v1ag
+    def __init__(self,pot=False,potpath=False,use_epoch=False,verbose=False):
+        self.pot                = pot         # n2p2_v1ag
+        self.potpath_in         = potpath
+        self.use_epoch          = use_epoch
 
-        self.pot_all    = False   # n2p2_v1ag
+        self.potpath            = False        # this is the source where the potential recides
+        self.potpath_work       = False        # this is ususally the self.potpath but for cases where different epoch is used ->
+        self.pottype            = False        # n2p2/runner
+        self.potepoch_all       = False
+        self.potepoch_bestteste = False
+        self.c44_al_file        = False
+        self.c44_al             = False
+        self.potDONE            = False         # n2p2_v1ag
+        self.potlib             = False         # n2p2_v1ag
+        self.potcutoff          = False         # n2p2_v1ag
+        self.learning_curve_file = False
+        self.lammps_tmpdir      = os.environ['HOME']+"/._tmp_lammps/"
+        self.pot_tmpdir         = os.environ['HOME']+"/._tmp_pot/"
+
+        self.inputnn            = False         # path to input.nn
+        self.inputdata          = False         # path to input.data
+
+        self.pot_all            = False   # n2p2_v1ag
 
         self.trigger_set_path_manual = ["setpath","potpath","pp", ".", "..", "../" ]
         self.verbose    = verbose
@@ -1088,24 +1101,38 @@ class mypot( object ):
                 inputnn = self.potpath+"/input.nn"
 
             if os.path.isfile(inputnn):
-                self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy(inputnn)
+                self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn)
 
         return
 
     def print_variables_mypot(self,text="",print_nontheless=False):
         if self.verbose > 1 or print_nontheless:
-            #print("calss mypot      ",text)
-            print(text,"self.pot         ",self.pot)
-            print(text,"self.potpath     ",self.potpath)
-            print(text,"self.potpath_in  ",self.potpath_in)
-            print(text,"self.potlib      ",self.potlib)
-            print(text,"self.potcutoff   ",self.potcutoff)
-            print(text,"self.elements    ",self.elements)
-            print(text,"self.atom_energy ",self.atom_energy)
-            print(text,"self.pottype     ",self.pottype)
-            print(text,"self.potDONE     ",self.potDONE)
-            print(text,"self.verbose     ",self.verbose)
-            print(text,"self.pot_all     ",self.pot_all)
+            print(text,"self.pot                    ",self.pot)
+            print(text,"self.potpath (source = src) ",self.potpath)
+            print(text,"self.potpath_work (typ src) ",self.potpath_work)
+            print(text,"self.potpath_in             ",self.potpath_in)
+            print(text,"self.inputnn                ",self.inputnn)
+            print(text,"self.inputdata              ",self.inputdata)
+            print(text,"self.learning_curve_file    ",self.learning_curve_file)
+            print(text,"self.potepoch_all           ",self.potepoch_all)
+            print(text,"self.use_epoch              ",self.use_epoch)
+            print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste)
+            print(text,"self.c44_al_file            ",self.c44_al_file)
+            if type(self.c44_al) != bool:
+                print(text,"self.c44_al                 ",np.round(self.c44_al,2),"GPa")
+            else:
+                print(text,"self.c44_al                 ",self.c44_al)
+
+            print(text,"self.pot_tmpdir             ",self.pot_tmpdir)
+            print(text,"self.lammps_tmpdir          ",self.lammps_tmpdir)
+            print(text,"self.potlib                 ",self.potlib)
+            print(text,"self.potcutoff              ",self.potcutoff)
+            print(text,"self.elements               ",self.elements)
+            print(text,"self.atom_energy            ",self.atom_energy)
+            print(text,"self.pottype                ",self.pottype)
+            print(text,"self.potDONE                ",self.potDONE)
+            print(text,"self.verbose                ",self.verbose)
+            print(text,"self.pot_all                ",self.pot_all)
             print()
 
     def get(self):
@@ -1118,9 +1145,6 @@ class mypot( object ):
             self.potpath_in = os.path.abspath(self.pot)
 
         if self.potpath_in != False and self.potpath == False:
-            #print('ka')
-            #if self.potpath_in == ".":
-            #    self.potpath_in =
             if not os.path.isdir(self.potpath_in):
                 sys.exit(self.potpath_in+" does not exist! (1)")
             checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
@@ -1131,15 +1155,33 @@ class mypot( object ):
                 #    print(self.potpath_in+"/"+i)
             #if self.verbose: print('aa',self.potpath_in)
             self.potpath = os.path.abspath(self.potpath_in)
+            self.inputnn = self.potpath_in+"/input.nn"
+            if not os.path.isfile(self.inputnn):
+                sys.exit(self.inputnn+" does not exist!")
+            self.scalingdata = self.potpath_in+"/scaling.data"
+            if not os.path.isfile(self.scalingdata):
+                sys.exit(self.scalingdata+" does not exist!")
 
-            with open(self.potpath_in+"/input.nn") as fp:
-                for i, line in enumerate(fp):
-                    if "NNP" in line:
-                        self.pottype = 'n2p2'
-                    if "RuNNer" in line:
-                        self.pottype = 'runner'
-                    elif i > 3:
-                        break
+            self.inputdata = self.potpath_in+"/input.data"
+            self.pottype = inputnn_runner_or_n2p2(self.inputnn)
+            self.learning_curve_file = n2p2_runner_get_learning_curve_filename(self.inputnn)
+            try:
+                self.potepoch_all = inputnn_get_potential_number_from_all_weightsfiles(self.inputnn)
+            except NameError:
+                self.potepoch_all = []
+            self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
+            #if os.path.isfile(
+            #inputnn_weightsfile_link_to_bestteste
+            #print('kk',os.readlink(self.potpath+"/weights.013.data"))
+
+            #c44file = False
+            #if os.path.isfile(self.potpath+'/best_testsete'):
+            #    self.potepoch_bestteste = int(np.loadtxt(self.potpath+'/best_testsete'))
+            #    print('self.potepoch_bestteste',self.potepoch_bestteste)
+            #    c44file = self.potpath+"/elastic_"+str(self.potepoch_bestteste)+".dat"
+            #if type(c44file) is not bool and os.path.isfile(c44file):
+            #    self.c44_al_file = c44file
+            #    self.c44_al = np.loadtxt(self.c44_al_file)
             self.pot = self.pottype+"_frompath"
         else:
             ##########################################
@@ -1147,7 +1189,6 @@ class mypot( object ):
             ##########################################
             self.get_potpath()
         self.get_elements_and_atomic_energies()
-        self.print_variables_mypot('get potential: out')
 
 
         ### check if self.pottype can be computed on this host!
@@ -1157,11 +1198,45 @@ class mypot( object ):
             self.potcutoff = 14.937658735
         if self.pottype == "n2p2":
             self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
-            self.potcutoff = 11.0
+            #self.potcutoff = 11.0
+            self.potcutoff = 17.0
 
         if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
             sys.exit("ERROR: "+self.potlib+" not found!"+add)
+
+        if self.use_epoch == False:
+            self.potpath_work = self.potpath
+            #print('se false')
+        else:
+            if self.verbose:
+                print("PP copy files ...")
+            #print('se true')
+            self.potpath_work = self.pot_tmpdir
+            #print('self.potpath_work (1)',self.potpath_work)
+            epstr = str(self.use_epoch).zfill(6)
+            if not os.path.isdir(self.pot_tmpdir):
+                mkdir(self.pot_tmpdir)
+            f12 = self.potpath+"/weights.012."+epstr+".out"
+            f13 = self.potpath+"/weights.013."+epstr+".out"
+            f14 = self.potpath+"/weights.014."+epstr+".out"
+            f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
+            f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
+            f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
+            if not os.path.isfile(f12): f12 = f12a
+            if not os.path.isfile(f13): f13 = f13a
+            if not os.path.isfile(f14): f14 = f14a
+            for ff in [f12,f13,f14]:
+                if not os.path.isfile(ff):
+                    sys.exit(ff+" does not exist!")
+            my.cp(f12,self.pot_tmpdir+"/weights.012.data")
+            my.cp(f13,self.pot_tmpdir+"/weights.013.data")
+            my.cp(f14,self.pot_tmpdir+"/weights.014.data")
+            my.cp(self.scalingdata,self.pot_tmpdir)
+            my.cp(self.inputnn,self.pot_tmpdir)
+            #print('self.potpath_work (2)',self.potpath_work)
         self.potDONE = True
+        #print('self.potpath_work (3)',self.potpath_work)
+        self.print_variables_mypot('get potential: out')
         return
 
 def pot_all():
@@ -1322,6 +1397,7 @@ class ase_calculate_ene( object ):
     def __init__(self,
             pot,
             potpath,
+            use_epoch=False,
             units=False,
             geopt=False,
             kmc=False,
@@ -1340,7 +1416,8 @@ class ase_calculate_ene( object ):
         self.nsteps = 0
         self.verbose = verbose
         self.atoms = False          # ase atoms object (frame)
-        self.pot = mypot(pot,self.potpath,verbose=self.verbose)
+        print('initializing mypot .... to self.pot')
+        self.pot = mypot(pot,self.potpath,use_epoch=use_epoch,verbose=self.verbose)
 
         #####################
         # for the calculator
@@ -1379,12 +1456,12 @@ class ase_calculate_ene( object ):
     def lammps_command_potential_n2p2(self):
         #units_giulio_ene = "0.0367493254"
         ase_units_ene    = "0.03674932247495664" # 1./ase.units.Hartree
-
         #units_giulio_bohr = "1.8897261328"
         ase_units_bohr    = "1.8897261258369282" # 1./ase.units.Bohr
+
         command = [
         # showewsum 1 showew yes resetew no maxew 1000000
-        'variable nnpDir string \"'+self.pot.potpath+'\"',
+        'variable nnpDir string \"'+self.pot.potpath_work+'\"',
         "pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength "+ase_units_bohr+" cfenergy "+ase_units_ene,
         "pair_coeff * * "+str(self.pot.potcutoff),
         #"#write_data ./pos.data # would this be the final struct?"
@@ -1395,7 +1472,7 @@ class ase_calculate_ene( object ):
         command = [
         # comment
         #"# thermo 1 # for geopt",
-        'variable nnpDir string \"'+self.pot.potpath+'\"',
+        'variable nnpDir string \"'+self.pot.potpath_work+'\"',
         "pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000",
         #"# pair_coeff * * 7.937658735",
         #"pair_coeff * *  14.937658735"
@@ -1411,12 +1488,16 @@ class ase_calculate_ene( object ):
                 ]
         return command
 
-    def pot_to_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False):
+    def pot_get_and_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
         '''
+        if self.verbose:
+            print('PP potDONE:',self.pot.potDONE)
         if self.pot.potDONE == False:
+            if self.verbose:
+                print("PP self.pot.get()")
             self.pot.get()
 
         self.kmc = kmc
@@ -1430,10 +1511,11 @@ class ase_calculate_ene( object ):
 
 
         if self.verbose > 2:
-            tt = 'pot_to_ase_lmp_cmd_A '
-            print(tt+'pot.pot    :',self.pot.pot)        # : n2p2_v2ag
-            print(tt+'pot.potpath:',self.pot.potpath)   # :
-            print(tt+'pot.pottype:',self.pot.pottype)   # :
+            tt = 'pot_get_and_ase_lmp_cmd_A '
+            print(tt+'pot.pot           :',self.pot.pot)
+            print(tt+'pot.potpath       :',self.pot.potpath)
+            print(tt+'pot.potpath_work  :',self.pot.potpath_work)
+            print(tt+'pot.pottype       :',self.pot.pottype)
             print()
 
         #sys.exit()
@@ -1472,7 +1554,7 @@ class ase_calculate_ene( object ):
         self.lmpcmd = self.lmpcmd + [ "########## lmpcmd.end  #############" ]
         if self.verbose > 1:
             print('HERE THE lmpcmd I got',self.lmpcmd)
-        self.print_variables_ase("pot_to_ase_lmp_cmd_FIN")
+        self.print_variables_ase("pot_get_and_ase_lmp_cmd_FIN")
         return
 
     def define_wrapped_self_atoms(self,atoms=False):
@@ -1937,25 +2019,6 @@ class ase_calculate_ene( object ):
     def get_elastic_external(self,atomsin=False,verbose=False,text=False,get_all_constants=False):
         ''' the function will never change the atomsobject '''
         print('######## get_elastic_external #############')
-        #print('HOME             :',os.environ['HOME'])
-        #print('LD_LIBRARY_PATH  :',os.environ['LD_LIBRARY_PATH'])
-        #print('hier1')
-        #print(os.environ['HOME'])
-        #print('hier2')
-        #print(os.environ['LD_LIBRARY_PATH'])
-        #print('hier2.2')
-        #print(os.environ['PYTHONPATH'])
-        #from lammps import lammps
-        #print('hier3')
-        #lmp = lammps()
-        #print('hier4')
-        #sys.exit('hier')
-        #print("LMP",LAMMPS_COMMAND)
-
-        #print('1')
-        #if self.elastic != True:
-        #    return
-        #print('2')
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         frame = atomsin.copy()
@@ -1972,12 +2035,13 @@ class ase_calculate_ene( object ):
             print('verbose   ::',verbose)
         if self.elastic_relax == True:
             self.ase_relax_cellshape_and_volume_only(frame,verbose=verbose)
-        print('stress relaxed frame :',frame.get_stress())
-        print('volume relaxed frame :',frame.get_volume())
-        print('ene    relaxed frame :',frame.get_potential_energy())
-        print('frame cell',frame.get_cell())
+        #print('stress !relaxed! frame :',frame.get_stress())
+        #print('volume !relaxed! frame :',frame.get_volume())
+        #print('ene    !relaxed! frame :',frame.get_potential_energy())
+        print('!RELAXED! stress(max),vol,ene',abs(frame.get_stress()).max(),frame.get_volume(),frame.get_potential_energy())
+        #print('frame cell',frame.get_cell())
         #ase_write('pos.runner',frame,format='runner')
-        print('-------------- lammps_ext_calc -----------')
+        #print('-------------- lammps_ext_calc -----------')
         ene_pot_lmp = lammps_ext_calc(frame,self,get_elastic_constants=get_all_constants)
         #print('ene_pot_lmp...kk',ene_pot_lmp)
         #sys.exit('88')
@@ -2980,15 +3044,16 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     #sys.exit()
 
     ###############################################################
-    # make tmpdir (/home/glensk/._tmp_lammps/)
+    # make ace.pot.lammps_tmpdir (/home/glensk/._tmp_lammps/)
     ###############################################################
-    tmpdir = os.environ['HOME']+"/._tmp_lammps/"
-    mkdir(tmpdir)
-    folder = tmpdir
+    #ace.pot.lammps_tmpdir = os.environ['HOME']+"/._tmp_lammps/"
+    if not os.path.isdir(ace.pot.lammps_tmpdir):
+        mkdir(ace.pot.lammps_tmpdir)
+    #folder = tmpdir
 
-    # delete all previous file in folder
-    for the_file in os.listdir(folder):
-        file_path = os.path.join(folder, the_file)
+    # delete all previous file in ace.pot.lammps_tmpdir
+    for the_file in os.listdir(ace.pot.lammps_tmpdir):
+        file_path = os.path.join(ace.pot.lammps_tmpdir, the_file)
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
@@ -2996,7 +3061,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         except Exception as e:
             print(e)
 
-    print('doing the calculation in lammps, externally, in folder',tmpdir)
+    print('doing the calculation in lammps, externally, in ace.pot.lammps_tmpdir',ace.pot.lammps_tmpdir)
 
     ###############################################################
     # write input structure (pos.lmp)
@@ -3004,25 +3069,25 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.set_calculator(None)
-    atoms.write(tmpdir+'pos.lmp',format='lammps-runner')
+    atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner')
     if ace.verbose:
-        print('written ',tmpdir+'/pos.lmp')
+        print('written ',ace.pot.lammps_tmpdir+'/pos.lmp')
 
     ###############################################################
     # write in.lmp (for mormal energy calculation)
     ###############################################################
     if not get_elastic_constants:
         execute_file = 'in.lmp'
-        lammps_write_inputfile(folder=tmpdir,filename=execute_file,positions='pos.lmp',ace=ace)
+        lammps_write_inputfile(folder=ace.pot.lammps_tmpdir,filename=execute_file,positions='pos.lmp',ace=ace)
         if ace.verbose:
-            print('written ',tmpdir+'/'+execute_file)
+            print('written ',ace.pot.lammps_tmpdir+'/'+execute_file)
     if ace.verbose > 1:
-        print("written lammsp inputfile to ",tmpdir)
+        print("written lammsp inputfile to ",ace.pot.lammps_tmpdir)
 
     ### calculate with lammps (trigger externally)
     ene = False
-    if os.path.isfile(tmpdir+'log.lammps'):
-        os.remove(tmpdir+"log.lammps")
+    if os.path.isfile(ace.pot.lammps_tmpdir+'log.lammps'):
+        os.remove(ace.pot.lammps_tmpdir+"log.lammps")
 
 
     ###############################################################
@@ -3031,18 +3096,18 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     if get_elastic_constants:
         execute_file = 'in.elastic'
         if ace.verbose:
-            print('written ',tmpdir+'/potential.mod')
-        lammps_write_inputfile_from_command(folder=tmpdir,filename='potential.mod',command=lammps_ext_elastic_potential_mod(ace))
-        my.cp(scripts()+'/lammps_scripts/elastic/in.elastic',tmpdir+'/in.elastic')
-        my.cp(scripts()+'/lammps_scripts/elastic/displace.mod',tmpdir+'/displace.mod')
-        lammps_write_inputfile_from_command(folder=tmpdir,filename='init.mod',command=lammps_ext_elastic_init_mod(ace,positions='pos.lmp'))
+            print('written ',ace.pot.lammps_tmpdir+'/potential.mod')
+        lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='potential.mod',command=lammps_ext_elastic_potential_mod(ace))
+        my.cp(scripts()+'/lammps_scripts/elastic/in.elastic',ace.pot.lammps_tmpdir+'/in.elastic')
+        my.cp(scripts()+'/lammps_scripts/elastic/displace.mod',ace.pot.lammps_tmpdir+'/displace.mod')
+        lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='init.mod',command=lammps_ext_elastic_init_mod(ace,positions='pos.lmp'))
         if ace.verbose:
-            print('written ',tmpdir+'/'+execute_file)
+            print('written ',ace.pot.lammps_tmpdir+'/'+execute_file)
 
     ###############################################################
     # cd to folder and run lammps
     ###############################################################
-    with cd(tmpdir):  # this cd's savely into folder
+    with cd(ace.pot.lammps_tmpdir):  # this cd's savely into folder
         # RUN LAMMPS
         # without SHELL no LD LIBRARY PATH
         #print('pwd',os.getcwd())
@@ -3364,124 +3429,26 @@ def convert_cell(cell,pos):
         return cell, pos
 
 
-#def ase_get_known_formats(show=False, add_missing_formats=False, copy_formats=False, verbose=False,show_formatspy=False):
-#    ''' adds formats runner and lammps-runner to ase '''
-#
-#    ### get the known formats
-#    known_formats = []
-#    x = ase.io.formats.all_formats
-#    for i in x:
-#        known_formats.append(i)
-#
-#    ### show the known formats
-#    if show_known_formats:
-#        import pprint
-#        pp = pprint.PrettyPrinter(indent=4)
-#        pp.pprint(x)
-#
-#    ### get formatspy
-#    formatspy = os.path.dirname(ase.io.__file__)+"/formats.py"
-#    if verbose or show_formatspy:
-#        print('>> formatspy        :',formatspy)
-#
-#    ### check if formats are known by ase
-#    missing = [ "runner.py","lammpsrunner.py", "lammpsdata.py", "ipi.py", "quippy.py" ]
-#    def checkformats(typ,verbose):
-#        if typ in known_formats:
-#            if verbose: print(">> formats.py knows", typ)
-#            return True
-#        else:
-#            if verbose: print(">> ERROR, formats.py does not know",typ)
-#            return False
-#
-#    for i in [ 'runner', 'lammps-runner', 'lammps-data' ]:
-#        formats_known = checkformats(i,verbose)
-#        if formats_known == False: add_missing_formats = True
-#
-#
-#    ### copies the missing format files
-#    if copy_formats or add_missing_formats:
-#        if verbose:
-#            print('cc',ase.io.__file__)
-#        scripts = my.scripts()
-#        from_ = scripts+"/runner_scripts/ase_fileformat_for_"
-#        to = os.path.dirname(ase.io.__file__)+"/"
-#        for ff in missing:
-#            #print('copying ',from_+ff,'to',to+ff)
-#            if verbose: print('copying ',ff,'to',to+ff)
-#            shutil.copyfile(from_+ff,to+ff)
-#
-#
-#    ### check if necessary files for formats are known
-#    if add_missing_formats:  # copies the missing format files
-#        if verbose:
-#            print('adapting ase formats.py .... ')
-#
-#
-#        if not os.path.isfile(formatspy):
-#            print('formatspy',formatspy)
-#            sys.exit('did not find '+str(formatspy))
-#
-#
-#        f = open(formatspy, "r")
-#        contents = f.readlines()
-#        f.close()
-#        insert=0
-#        insert2=0
-#        for idx,i in enumerate(contents):
-#            #print('i',idx,i)
-#            #print("|"+i[:20]+"|")
-#            if i[:20] == "    'abinit': ('ABIN":
-#                insert = idx
-#            if i[:30] == "    'lammps-data': 'lammpsdata":
-#                insert2 = idx
-#
-#        writeformatspy = False
-#        if 'runner' in x:
-#            if verbose:
-#                print('runner        format are already added in formats.py (of ase).')
-#        else:
-#            contents.insert(insert, "    'runner': ('Runner input file', '+F'),\n")
-#            writeformatspy = True
-#
-#        if 'ipi' in x:
-#            if verbose:
-#                print('ipi           format are already added in formats.py (of ase).')
-#        else:
-#            contents.insert(insert, "    'ipi': ('ipi input file', '+F'),\n")
-#            writeformatspy = True
-#
-#        if 'lammps-runner' in x:
-#            if verbose:
-#                print('lammps-runner format are already added in formats.py (of ase).')
-#        else:
-#            contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
-#            contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
-#            writeformatspy = True
-#
-#        if writeformatspy == True:
-#            print('now changing formatspy')
-#            print('insert',insert)
-#
-#            f = open(formatspy, "w")
-#            contents = "".join(contents)
-#            f.write(contents)
-#            f.close()
-#        else:
-#            if verbose:
-#                print('everything was already in formats.py')
-#
-#    return known_formats
 def inputnn_runner_or_n2p2(file):
-    rn = grep(file,"runner_mode")
-    #print('type)',type(rn),rn)
-    if type(rn) == list and len(rn) == 0:
-        return "n2p2"
-    else:
-        return "runner"
+    with open(file) as fp:
+        for i, line in enumerate(fp):
+            if "NNP" in line:
+                return 'n2p2'
+            if "RuNNer" in line:
+                return 'runner'
+            elif i > 3:
+                break
+
+    ## old way
+    # rn = grep(file,"runner_mode")
+    # #print('type)',type(rn),rn)
+    # if type(rn) == list and len(rn) == 0:
+    #     return "n2p2"
+    # else:
+    #     return "runner"
+    return False
 
 def inputdata_get_nuber_of_structures(inputdata):
-    #print('inputdata',inputdata)
     inputdatanr = inputdata.replace("input.data","input.data_nr")
     #print('inputdatanr',inputdatanr)
     if os.path.isfile(inputdatanr):
@@ -3499,19 +3466,35 @@ def inputdata_get_nuber_of_structures(inputdata):
             nr = 0
     return nr
 
-def inputnn_get_potential_number_from_weightsfile(inputnn):
+def inputnn_get_potential_number_from_all_weightsfiles(inputnn):
     weights = inputnn.replace('input.nn', 'weights.013.*.out')
-    print('weights',weights)
+    #print('weights',weights)
     f = glob.glob(weights)
-    print('f',f)
+    #print('f',f)
+    #sys.exit()
     if len(f) == 1:
         taken = f[0].split("weights.013.")[1].split(".out")[0]
-        print('t',taken)
+        #print('t',taken)
         leading_removed = [s.lstrip("0") for s in [taken]][0]
         # Remove leading
-        print('lr',leading_removed)
-        return int(leading_removed)
-    return False
+        if leading_removed == "":
+            leading_removed = 0
+        #print('lr',leading_removed)
+        return [int(leading_removed)]
+    elif len(f) > 1:
+        all = []
+        for idx in np.arange(len(f)):
+            taken = f[idx].split("weights.013.")[1].split(".out")[0]
+            #print('t',taken)
+            leading_removed = [s.lstrip("0") for s in [taken]][0]
+            # Remove leading
+            if leading_removed == "":
+                leading_removed = 0
+            all.append(int(leading_removed))
+        return np.sort(np.asarray(all))
+    else: # len(f) == 0:
+        raise NameError('no weights files found')
+    return
 
 def inputnn_get_testfraction(file):
     test_fraction = np.float(grep(file,"test_fraction")[0].split()[1])
@@ -3541,7 +3524,7 @@ def inputnn_get_trainfraction(file):
     test_fraction = inputnn_get_testfraction(file)
     return test_fraction - 1.
 
-def inputnn_get_atomic_symbols_and_atom_energy(inputnn,verbose=False):
+def inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn,verbose=False):
     elements = []
     if os.path.isfile(inputnn):
         ##### get elements
@@ -3602,48 +3585,87 @@ def inputnn_get_atomic_symbols_and_atom_energy(inputnn,verbose=False):
             print("atom_energy",atom_energy)
         return elements, atom_energy
 
-def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=False):
-    ''' filename is path to log.fit (runner) or learning-curve.out '''
-    if verbose:
-        print()
-        print('filename in:',filename)
-    basename = os.path.basename(filename)  # "learning-curve.out"
-    folder = os.path.abspath(filename.replace(basename,''))
-    type = inputnn_runner_or_n2p2(folder+'/input.nn')
-    tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
-    changefilename = False
+def inputnn_get_atomic_symbols_and_atom_energy_list(inputnn,verbose=False):
+    pot_elements, pot_atom_energy = my.inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn)
+    try:
+        mg = pot_atom_energy["Mg"]*-1
+    except KeyError:
+        mg = 0
+    try:
+        al = pot_atom_energy["Al"]*-1
+    except KeyError:
+        al = 0
+    try:
+        si = pot_atom_energy["Si"]*-1
+    except KeyError:
+        si = 0
 
-    if verbose:
-        print('filename mid',filename)
-        print('basename mid',basename)
-        print('type     mid',type)
+    return ["Al","Mg","Si"], [al,mg,si]
 
-    if os.path.isfile(folder+'/optweights.012.out'): # and basename == "learning-curve.out":
-        changefilename = True
-    if os.path.isfile(folder+'/tmpweights.012.out'): # and basename == "learning-curve.out":
-        changefilename = True
-    if verbose:
-        print('changefilename',changefilename)
-
-    if changefilename == True:
+def n2p2_runner_get_learning_curve_filename(inputnn):
+    runner_n2p2 = inputnn_runner_or_n2p2(inputnn)
+    folder = os.path.abspath(inputnn.replace('input.nn',''))
+    if runner_n2p2 == 'n2p2':
+        return folder+'/learning-curve.out'
+    elif runner_n2p2 == 'runner':
+        tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
         for i in tryname:
             filename = folder+"/"+i
             if os.path.isfile(filename):
-                type = 'runner'
-                break
+                return filename
+    return False
+
+
+def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False):
+    ''' filename is path to log.fit (runner) or learning-curve.out '''
+    filename = n2p2_runner_get_learning_curve_filename(inputnn)
+    if verbose:
+        print('learning_curve_filename:',filename)
+    basename = os.path.basename(filename)  # "learning-curve.out"
+    if True: #verbose:
+        print('learning_curve basename:',basename)
+    folder = os.path.abspath(filename.replace(basename,''))
+    type = inputnn_runner_or_n2p2(folder+'/input.nn')
+    #tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
+    #changefilename = False
+
+    #if verbose:
+    #    print('filename mid',filename)
+    #    print('basename mid',basename)
+    #    print('type     mid',type)
+
+    #if os.path.isfile(folder+'/optweights.012.out'): # and basename == "learning-curve.out":
+    #    changefilename = True
+    #if os.path.isfile(folder+'/tmpweights.012.out'): # and basename == "learning-curve.out":
+    #    changefilename = True
+    #if verbose:
+    #    print('changefilename',changefilename)
+
+    #if changefilename == True:
+    #    for i in tryname:
+    #        filename = folder+"/"+i
+    #        if os.path.isfile(filename):
+    #            type = 'runner'
+    #            break
     if not os.path.isfile(filename):
         sys.exit(filename+" does not exist!")
 
-    basename = os.path.basename(filename)
-    if verbose:
-        print('filename out',filename)
-        print('basename out',basename)
-        print('type     out',type)
-    if only_get_filename == True:
-        return filename
+    #basename = os.path.basename(filename)
+    #if verbose:
+    #    print('filename out',filename)
+    #    print('basename out',basename)
+    #    print('type     out',type)
+    #if only_get_filename == True:
+    #    return filename
 
     if basename == "learning-curve.out": # n2p2
         lc = np.loadtxt(filename) #+'/learning-curve.out')
+        #print('lc')
+        #print(lc)
+        #print(lc.shape)
+        #print(len(lc.shape))
+        if len(lc.shape) == 1:
+            lc = np.array([lc])
         lc[:,1] = lc[:,1]*1000.*27.211384
         lc[:,2] = lc[:,2]*1000.*27.211384
         lc[:,3] = lc[:,3]*1000.*51.422063
@@ -3695,6 +3717,24 @@ def n2p2_runner_get_learning_curve(filename,only_get_filename=False,verbose=Fals
     #print(lc)
     #sys.exit()
     return lc
+
+def n2p2_runner_get_bestteste_idx(inputnn):
+    #print('inputnn',inputnn)
+    best_testsete_file = inputnn.replace('input.nn', 'best_testsete')
+    #print('best_testsete_file',best_testsete_file)
+    if os.path.isfile(best_testsete_file):
+        best_testsete = int(np.loadtxt(best_testsete_file))
+        #print('from best_testsete_file',best_testsete_file)
+        return best_testsete
+    else:
+        #print('from lc')
+        learning_curve = lc = n2p2_runner_get_learning_curve(inputnn)
+        best_testsete = np.argmin(lc[:,2])
+        #print(lc)
+        #print('mmm',best_testsete)
+        return best_testsete
+        #save best_sestset_file
+    return False
 
 
 #######################################################################################
