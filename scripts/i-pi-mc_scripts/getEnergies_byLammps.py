@@ -227,7 +227,7 @@ def get_energies(args):
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
         kmc_folder = ace.pot.potpath+"/kmc"
-        kmc_file = kmc_folder+"/ene_std_epoch"+str(ace.pot.use_epoch)+".dat"
+        kmc_file = kmc_folder+"/ene_std_epoch_"+str(ace.pot.use_epoch)+".dat"
         if os.path.isfile(kmc_file):
             sys.exit(kmc_file+" does already exist!")
         if not os.path.isdir(kmc_folder):
