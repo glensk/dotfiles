@@ -1050,8 +1050,8 @@ class mypot( object ):
         self.potlib             = False         # n2p2_v1ag
         self.potcutoff          = False         # n2p2_v1ag
         self.learning_curve_file = False
-        self.lammps_tmpdir      = os.environ['HOME']+"/._tmp_lammps/"
-        self.pot_tmpdir         = os.environ['HOME']+"/._tmp_pot/"
+        self.lammps_tmpdir      = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/"
+        self.pot_tmpdir         = os.environ['HOME']+"/._tmp_pot_"+str(gethostname())+"/"
 
         self.inputnn            = False         # path to input.nn
         self.inputdata          = False         # path to input.data
@@ -1501,7 +1501,7 @@ class ase_calculate_ene( object ):
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
         '''
-        if self.verbose:
+        if self.verbose > 1:
             print('PP potDONE:',self.pot.potDONE)
         if self.pot.potDONE == False:
             if self.verbose:

@@ -411,7 +411,8 @@ for c in subfolder:    # from the ones in the que
 
                 #print('c44a',c44)
                 if type(c44) != str:
-                    c44=str(int(np.round(c44,0))).ljust(3)
+                    #c44=str(int(np.round(c44,0))).ljust(3)
+                    c44=str(round(c44,1)).ljust(4)
                 #print('c44b',c44)
 
                 if args.verbose > 3:
@@ -428,7 +429,7 @@ for c in subfolder:    # from the ones in the que
                 kmc = str(round(kmc,1)).ljust(4)
 
                 stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |M %s |S %4.0f || [%4.0f] | %s | %8.0f | %s"
-                elementout = (        j[0] ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],    c44,  kmc,     ist ,     epochs,   nn,  rnd,   path)
+                elementout = (        j[0] ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],   c44,  kmc,    ist ,    epochs,   nn,  rnd,   path)
 
                 conv_unconv = "unconv"
                 ## erstmak die komischen aussortieren

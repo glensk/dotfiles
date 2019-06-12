@@ -32,6 +32,8 @@ def help(p = None):
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
+    p.add_argument('--testkmc_b','-kmcb',action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')
+    p.add_argument('--testkmc_l','-kmcl',action='store_true',help='test accuracy of kmc structures for last epoch')
 
     p.add_argument('--analyze_kmc_number_1NN_2NN_ext','-akmc_ext',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
     p.add_argument('--analyze_kmc_number_1NN_2NN_ipi','-akmc_ipi',action='store_true',help='make analysis from KMC_analyze')
@@ -203,7 +205,8 @@ def get_energies(args):
     ##############################################################
     ### get ace object for the chosen potential
     ##############################################################
-    if args.testkmc:
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
+        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
         units = "meV_pa"
         verbose = True
 
@@ -223,7 +226,12 @@ def get_energies(args):
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
 
-    if args.testkmc:
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
+        if args.testkmc_b:
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_bestteste
+        if args.testkmc_l:
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
+
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
         kmc_folder = ace.pot.potpath+"/kmc"
@@ -232,7 +240,6 @@ def get_energies(args):
             sys.exit(kmc_file+" does already exist!")
         if not os.path.isdir(kmc_folder):
             my.mkdir(kmc_folder)
-        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
 
 
 
@@ -787,7 +794,7 @@ def get_energies(args):
     if os.path.isfile('log.lammps'):
         os.remove('log.lammps')
 
-    if args.testkmc:
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
         ene_std         = mysavetxt(ene_std,kmc_file,units,save=True)
 
     if args.write_analysis:
