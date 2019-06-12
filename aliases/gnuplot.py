@@ -83,12 +83,12 @@ def set_args_defaults(args,inputfile):
     if basename in ["learning-curve.out", 'learning-curve-runner.out']:
         args.log_log = True
         args.max_columns = 2
-        args.columns = [2,3]
+        args.columns = [2,3,4,5]
         #args.scale = True
         args.xlabel = "epochs"
         args.ylabel = "RMSE (meV/at)"
     if basename == "learning-curve.out":
-        args.scale_y = 27211.386
+        args.scale_y = 27211.386   # hartree to meV
     if basename == "KMC_analyze":
         args.xlabel = "step"
         pass
