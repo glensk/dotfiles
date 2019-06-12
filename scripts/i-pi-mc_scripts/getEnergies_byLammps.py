@@ -253,19 +253,21 @@ def get_energies(args):
         file_elastic_c44_all = ace.pot.potpath+"/elastic_c44_all.dat"
         if os.path.isfile(file_elastic_c44_all):
             elastic_all = np.loadtxt(file_elastic_c44_all)
-            goover = ace.pot.potepoch_all
         else:
             elastic_all = np.empty((0,2), float)
-            goover = ace.pot.potepoch_all
 
         writeanew = False
+        goover = ace.pot.potepoch_all
+        goover = np.arange(1,goover[-1]+1)
+        print('goover',goover)
         count = 0
-        for epoch in np.arange(1,660): #ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
+        for epoch in goover: #ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
+            print()
             if epoch in elastic_all[:,0]:
                 print('epoch',str(epoch).ljust(5),'from file')
             else:
                 count += 1
-                print('epoch',str(epoch).ljust(5),'not already in')
+                print('epoch',str(epoch).ljust(5),'not already in, count('+str(count)+")")
                 ace = ase_calculate_ene(pot=pot,
                         potpath=potpath,
                         use_epoch=epoch,
