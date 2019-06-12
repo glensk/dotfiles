@@ -203,6 +203,10 @@ def get_energies(args):
     ##############################################################
     ### get ace object for the chosen potential
     ##############################################################
+    if args.testkmc:
+        units = "meV_pa"
+        verbose = True
+
     if args.test_formation_energies or args.elastic: units='eV'
     print('II potepoch',args.potepoch)
     ace = ase_calculate_ene(pot=pot,
@@ -220,7 +224,7 @@ def get_energies(args):
 
 
     if args.testkmc:
-        if ace.pot.use_epoch == False:
+        if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
         kmc_folder = ace.pot.potpath+"/kmc"
         kmc_file = kmc_folder+"/ene_std_epoch"+str(ace.pot.use_epoch)+".dat"
@@ -229,8 +233,6 @@ def get_energies(args):
         if not os.path.isdir(kmc_folder):
             my.mkdir(kmc_folder)
         args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
-        units = "meV_pa"
-        verbose = True
 
 
 
