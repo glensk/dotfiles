@@ -199,7 +199,7 @@ def get_energies(args):
     ##############################################################
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
-    print('LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
+    print('II LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
     lammps()
     os.remove("log.lammps")
@@ -208,20 +208,20 @@ def get_energies(args):
     ### get ace object for the chosen potential
     ##############################################################
     if args.test_formation_energies or args.elastic: units='eV'
-    print('potepoch',args.potepoch)
-    sys.exit()
+    print('II potepoch',args.potepoch)
     ace = ase_calculate_ene(pot=pot,
             potpath=potpath,
-            use_epoch=potepoch,
+            use_epoch=args.potepoch,
             units=units,
             geopt=geopt,
             elastic=args.elastic,
             verbose=verbose)
     ### get the potential
+    print('II ace.pot_get_and_ase_lmp_cmd()')
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
-
+    sys.exit()
     ### when want to assess some formation energies
     if args.test_formation_energies:
         test_formation_energies(ace)
@@ -1657,9 +1657,6 @@ def test3_do(ace):
 if __name__ == "__main__":
     p = help()
     args = p.parse_args()
-    my.print_args(args)
-    if args.elastic_all:  # this does not need to initialize potential
-        print('yes')
-    else:
-        print('no')
+    if args.verbose:
+        my.print_args(args)
     get_energies(args)
