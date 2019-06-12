@@ -1222,9 +1222,15 @@ class mypot( object ):
             f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
             f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
             f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
+            f12b = self.potpath+"/../weights.012."+epstr+".out"
+            f13b = self.potpath+"/../weights.013."+epstr+".out"
+            f14b = self.potpath+"/../weights.014."+epstr+".out"
             if not os.path.isfile(f12): f12 = f12a
             if not os.path.isfile(f13): f13 = f13a
             if not os.path.isfile(f14): f14 = f14a
+            if not os.path.isfile(f12): f12 = f12b
+            if not os.path.isfile(f13): f13 = f13b
+            if not os.path.isfile(f14): f14 = f14b
             for ff in [f12,f13,f14]:
                 if not os.path.isfile(ff):
                     sys.exit(ff+" does not exist!")
@@ -1416,7 +1422,8 @@ class ase_calculate_ene( object ):
         self.nsteps = 0
         self.verbose = verbose
         self.atoms = False          # ase atoms object (frame)
-        print('initializing mypot .... to self.pot')
+        if self.verbose:
+            print('initializing mypot .... to self.pot')
         self.pot = mypot(pot,self.potpath,use_epoch=use_epoch,verbose=self.verbose)
 
         #####################
@@ -3622,10 +3629,13 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     if verbose:
         print('learning_curve_filename:',filename)
     basename = os.path.basename(filename)  # "learning-curve.out"
-    if True: #verbose:
-        print('learning_curve basename:',basename)
     folder = os.path.abspath(filename.replace(basename,''))
-    type = inputnn_runner_or_n2p2(folder+'/input.nn')
+    if False: #verbose:
+        print('learning_curve folder  :',folder)
+        print('learning_curve basename:',basename)
+    n2p2_runner = type = inputnn_runner_or_n2p2(folder+'/input.nn')
+    if False: #verbose:
+        print('nn',n2p2_runner)
     #tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
     #changefilename = False
 
@@ -3658,7 +3668,8 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     #if only_get_filename == True:
     #    return filename
 
-    if basename == "learning-curve.out": # n2p2
+    finished = False
+    if n2p2_runner == "n2p2": # basename == "learning-curve.out": # n2p2
         lc = np.loadtxt(filename) #+'/learning-curve.out')
         #print('lc')
         #print(lc)
@@ -3670,52 +3681,66 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
         lc[:,2] = lc[:,2]*1000.*27.211384
         lc[:,3] = lc[:,3]*1000.*51.422063
         lc[:,4] = lc[:,4]*1000.*51.422063
-    elif basename in tryname:          # runner
-        f = open(filename, "r")
-        contents = f.readlines()
-        f.close()
-        ene = []
-        force = []
-        all = []
-        for idx,ii in enumerate(contents):
-            if ii[:7] == " ENERGY":
-                lst = ii.split()[1:4]
-                #print('lst',lst)
-                if lst[2] == 'NaN':
-                    lst = [ '0','0','0']
-                eneone = [float(iii) for iii in lst]
-                ene.append(eneone)
-                allone = [0,0,0,0,0]
-                allone[0] = eneone[0]
-                allone[1] = eneone[1]*1000.
-                allone[2] = eneone[2]*1000.
-            if ii[:7] == " FORCES":
-                lst = ii.split()[1:4]
-                forceone = [float(iii) for iii in lst]
-                force.append(forceone)
-                allone[3] = forceone[1]*1000.
-                allone[4] = forceone[2]*1000.
-                all.append(allone)
-        ene = np.asarray(ene)
-        force = np.asarray(force)
-        all = np.asarray(all)
-        lc = all
-        #print(ene[:3])
-        #print(force[:3])
-        #print(all[:3])
-        #print('lc',lc)
-        #sys.exit()
+    elif n2p2_runner == 'runner': #basename in tryname:          # runner
+        runner_lc = folder+"/learning-curve-runner.out"
+        if os.path.isfile(runner_lc):
+            lc = np.loadtxt(runner_lc)
+        else: # make runner_lc
+            f = open(filename, "r")
+            contents = f.readlines()
+            f.close()
+            ene = []
+            force = []
+            all = []
+            for idx,ii in enumerate(contents):
+                if ii[:7] == " ENERGY":
+                    lst = ii.split()[1:4]
+                    #print('lst',lst)
+                    if lst[2] == 'NaN':
+                        lst = [ '0','0','0']
+                    eneone = [float(iii) for iii in lst]
+                    ene.append(eneone)
+                    allone = [0,0,0,0,0]
+                    allone[0] = eneone[0]
+                    allone[1] = eneone[1]*1000.
+                    allone[2] = eneone[2]*1000.
+                if ii[:7] == " FORCES":
+                    lst = ii.split()[1:4]
+                    forceone = [float(iii) for iii in lst]
+                    force.append(forceone)
+                    allone[3] = forceone[1]*1000.
+                    allone[4] = forceone[2]*1000.
+                    all.append(allone)
+                if ii[:48] == " Best short range fit has been obtained in epoch":
+                    finished = True
+            ene = np.asarray(ene)
+            force = np.asarray(force)
+            all = np.asarray(all)
+            lc = all
+            #print(ene[:3])
+            #print(force[:3])
+            #print(all[:3])
+            #print('lc',lc)
+            #sys.exit()
 
-        if len(lc.shape) == 1:
-            lc = np.array([lc])
+            if len(lc.shape) == 1:
+                lc = np.array([lc])
 
+    #print('aa',lc.shape,len(lc.shape))
+    if len(lc.shape) == 1:
+        #print('bb',lc)
+        lc = np.array([lc])
     if lc.shape == (1,0):
         lc = np.zeros((1,5))
-    if type == 'runner':
-        np.savetxt("learning-curve-runner.out",lc)
+    if n2p2_runner == 'runner' and finished:
+        np.savetxt(folder+"/learning-curve-runner.out",lc)
+    #else:
+    #    #os.remove(folder+"/learning-curve-runner.out")
+    #    print('finished?',finished,folder+'/learning-curve-runner.out')
     #print('lc')
     #print(lc)
     #sys.exit()
+    #print('ll',lc.shape,len(lc.shape))
     return lc
 
 def n2p2_runner_get_bestteste_idx(inputnn):

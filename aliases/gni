@@ -6,4 +6,5 @@
 cp $1/input.* .
 cp $1/scaling.data .
 cp $1/submit_training_debug.sh .
+cp $1/function.data .
 

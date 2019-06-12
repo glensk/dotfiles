@@ -27,7 +27,7 @@ def n2p2_get_best_test_nr_from_learning_curve(args):
     print('folder',folder)
     print('get_last_epoch',args.get_last_epoch)
     n2p2_or_runner = my.inputnn_runner_or_n2p2(folder+'/input.nn')
-    learning_curve_file = n2p2_runner_get_learning_curve_filename(folder+"/input.nn")
+    learning_curve_file = my.n2p2_runner_get_learning_curve_filename(folder+"/input.nn")
 
     if not os.path.isfile(learning_curve_file):
         sys.exit(learning_curve_file+" does not exist!")
