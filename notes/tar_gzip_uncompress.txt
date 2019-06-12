@@ -20,3 +20,4 @@ gzip file --> file.gz
 1.2G  POSITIONs_save.zpaqm1
 717M  POSITIONs_save.zpaqm5
 
+zpaq x OUTCAR.zpaq # to extract zpaq file
