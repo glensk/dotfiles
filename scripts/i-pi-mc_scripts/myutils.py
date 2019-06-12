@@ -609,7 +609,7 @@ def print_args(args):
     values = args.__dict__.values()
     print('########################################## argparse values (begin) #########')
     for idx,i in enumerate(keys):
-        print("#",str(keys[idx]).ljust(25),str(values[idx]).ljust(30),str(type(values[idx])).ljust(15),"#")
+        print("#",str(keys[idx]).ljust(35),str(values[idx]).ljust(20),str(type(values[idx])).ljust(15),"#")
     print('########################################## argparse values (end  ) #########')
     return
 
@@ -1202,7 +1202,8 @@ class mypot( object ):
             self.potcutoff = 17.0
 
         if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
-            sys.exit("ERROR: "+self.potlib+" not found!"+add)
+            #sys.exit("ERROR: "+self.potlib+" not found!"+add)
+            print("ERROR: "+self.potlib+" not found!"+add)
 
         if self.use_epoch == False:
             self.potpath_work = self.potpath
@@ -1518,7 +1519,7 @@ class ase_calculate_ene( object ):
 
 
         if self.verbose > 2:
-            tt = 'pot_get_and_ase_lmp_cmd_A '
+            tt = 'PP pot_get_and_ase_lmp_cmd_A '
             print(tt+'pot.pot           :',self.pot.pot)
             print(tt+'pot.potpath       :',self.pot.potpath)
             print(tt+'pot.potpath_work  :',self.pot.potpath_work)
