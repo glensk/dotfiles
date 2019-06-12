@@ -171,10 +171,17 @@ if __name__ == '__main__':
     print('args.nr',args.nr)
     print('args.get_best_epoch',args.get_best_epoch)
     folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
-    sys.exit()
-    # we are already in potential folder
-    print('getEnergies_byLammps.py -p . -e # to get c44')
-    import subprocess
-    subprocess.call("getEnergies_byLammps.py -p . -e",shell=True)
+    print('folder',folder)
+    with my.cd(folder)
+        print('getEnergies_byLammps.py -p . -ea # to get all the c44')
+        import subprocess
+        subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)
+        print()
+        print()
+        print()
+        print('getEnergies_byLammps.py -p . --testkmc_b # to get all the c44')
+        subprocess.call("getEnergies_byLammps.py -p . --testkmc_b",shell=True)
+        print('getEnergies_byLammps.py -p . --testkmc_l # to get all the c44')
+        subprocess.call("getEnergies_byLammps.py -p . --testkmc_l",shell=True)
 
 

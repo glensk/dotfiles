@@ -1,7 +1,7 @@
 # using https://github.com/glensk/dotfiles/trunk/scripts
 # to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: a1d490ac954e954f110c388c3345a4425514cec9
-# execution time: 0.794956922531 seconds.
+# used sha: a0ee6209511b63515bf85ca4442010132e97ffcb
+# execution time: 0.893443107605 seconds.
 # pwd: /scratch/glensk/TEST_RUNNER_VS_n2p2_for_c44/5000new_wide_range_c44_elastic_all/potential
 
 n2p2_get_potential_folder_from_nr.py 
