@@ -243,6 +243,7 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
         text_file.write("date +%s >> time.out\n")
         text_file.write("cat time.out | xargs | awk '{print $2-$1-10}' > time.sec\n")
         text_file.write("$dotfiles/scripts/n2p2/n2p2_tarfolder_for_scale_train.sh\n")
+        text_file.write("$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")  # makes the potential folder
         if job == 'scaling':
             text_file.write('[ "`pwd | grep -o "/get_scaling$"`" == \'/get_scaling\' ] && echo creating link && ln -s `pwd`/function.data ../function.data')
         text_file.write("\n")
