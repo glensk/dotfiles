@@ -161,7 +161,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
                 my.cp(weights,folder+'/optweights.'+i+'.out')
     os.chdir(folder)
     my.create_READMEtxt(directory=os.getcwd(),add="# pwd: "+os.getcwd())
-    return folder
+    return os.getcwd()
 
 if __name__ == '__main__':
     p = help()
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     print('args.get_best_epoch',args.get_best_epoch)
     folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
     print('folder',folder)
-    with my.cd(folder)
+    with my.cd(folder):
         print('getEnergies_byLammps.py -p . -ea # to get all the c44')
         import subprocess
         subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)

@@ -10,13 +10,14 @@ def help(p = None):
     string = ''' helptext '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
-    p.add_argument('-sbtrain','--sort_by_trainfraction'      , help='sort output by trainfractino'      , action='count', default=False)
-    p.add_argument('-s','--from_subfolder', help='from_subfolder', action='count', default=True)
-    p.add_argument('-o','--only_best_converged', help='show only best converged job when several restarts', action='count', default=True)
-    p.add_argument('-q','--from_que'      , help='from_que'      , action='count', default=False)
-    p.add_argument('-p','--potential'     , help='potential is in "potential" subfolder'      , action='count', default=False)
-    p.add_argument('-c44','--getc44'     , help='get c44 in potential folder'      , action='count', default=False)
-    p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    p.add_argument('-sbtrain','--sort_by_trainfraction', action='count',default=False, help='sort output by trainfractino')
+    p.add_argument('-s'  ,'--from_subfolder'     , action='count',      default=True,  help='from_subfolder')
+    p.add_argument('-o'  ,'--only_best_converged', action='count',      default=True,  help='show only best converged job when several restarts')
+    p.add_argument('-q'  ,'--from_que'           , action='count',      default=False, help='from_que')
+    p.add_argument('-p'  ,'--potential'          , action='count',      default=False, help='potential is in "potential" subfolder')
+    p.add_argument('-c44','--getc44'             , action='count',      default=False, help='get c44 in potential folder')
+    p.add_argument('-v'  ,'--verbose'            , action='count',      default=False, help='verbose')
+    p.add_argument('-b'  ,'--both'               , action='store_true', default=False, help='evaluate for runner & n2p2 (instad of only n2p2)')
     return p
 
 p = help()
@@ -35,7 +36,9 @@ if args.verbose:
 #sys.exit()
 if args.verbose:
     print('fo ...')
+
 fo=sorted(glob.glob(os.getcwd()+"/*/learning-curve.out"))
+
 if verbose:
     print('----- currently considered pathes -----')
     for i in fo:
@@ -57,9 +60,6 @@ subfolder_len = len(subfolderbase+subfolder)
 if args.verbose:
     print('gc ...')
 for idx,i in enumerate(path):
-    #print('i',i)
-    #print(i.split("/scratch/glensk/n2p2_jobs"))
-    #print('j',i.split("/"))
     for g in fo:
         gc = g.split("/learning-curve.out")[0]
         #print('gc',gc)
@@ -120,27 +120,62 @@ def foldername_search_restartname(folder):
         return False
     return search
 
+def get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=False):
+    file = folder+"/kmc/ene_std_epoch_"+str(index)+".dat"
+    if not os.path.isfile(file):
+        return kmcstd
+    else:
+        kmcstd_all = np.loadtxt(file)
+        kmcstd = kmcstd_all[-1]
+        return kmcstd
+    return
+
+def get_try_get_c44_from_elastic_all(c44,elastic_all,index=False):
+    if not os.path.isfile(elastic_all):
+        #print('is not')
+        return c44
+    else:
+        #print('y1')
+        c44_try = np.loadtxt(elastic_all)
+        #print(c44_try)
+        takeline = np.where(c44_try[:,0]==index)[0][0]
+        try:
+            c44out = c44_try[takeline][1]
+        except IndexError:
+            c44out = c44
+        #print('y2',takeline,c44out)
+        return c44out
+
+    return c44
+
+###################################################################
+# from here on search all the learning curve files
+###################################################################
 for c in subfolder:    # from the ones in the que
     fm1 = ""
     if args.potential:
         fm1 = "/potential"
     if verbose > 3:
         print('lookfor',c+fm1+"/learning-curve.out")
-    fn=sorted(glob.glob(c+fm1+"/learning-curve.out"))
+    ##########################
+    ## search for n2p2 jobs
+    ##########################
+    all_learning_curve_files = fn =sorted(glob.glob(c+fm1+"/learning-curve.out"))
     if verbose > 3:
         print('fn',fn)
-    #ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
-    ru=sorted(glob.glob(c+fm1+"/log.fit"))
-    all_learning_curve_files = fn+ru
+    ##########################
+    ## search for n2p2 jobs
+    ##########################
+    if args.both:
+        ru=sorted(glob.glob(c+fm1+"/log.fit"))
+        all_learning_curve_files = fn+ru
+
     out2=[]
-    out_runner_conv = []
-    out_runner_unconv = []
-    out_n2p2_conv = []
-    out_n2p2_unconv = []
-    out_conv = []
-    out_unconv = []
     if args.verbose:
         print("for every fo")
+    ##########################################
+    # go over all all_learning_curve_files
+    ##########################################
     for i in all_learning_curve_files:
         if verbose > 0:
             print('learning_curve_file == i:',i)
@@ -166,6 +201,7 @@ for c in subfolder:    # from the ones in the que
             print('foldern ',foldern)
         inputnn     =i.replace(basename, 'input.nn')
         inputdata   =i.replace(basename, 'input.data')
+
         input_structures = my.inputdata_get_nuber_of_structures(inputdata)
         kmcstdfile  =i.replace(basename, 'kmc57/ene_std.npy')
         elastic     =i.replace(basename, 'elastic.dat')
@@ -224,48 +260,21 @@ for c in subfolder:    # from the ones in the que
             print(lc)
             sys.exit()
 
-        #if len(lc) == 1:
-        #    print('---')
-        #    print(lc)
-        #    print('---')
-        #print('lc',lc.shape)
         epochs_ = len(lc[:,1])
-        #print('len',len(lc),epochs_)
-        #print()
-        def get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=False):
-            file = folder+"/kmc/ene_std_epoch_"+str(index)+".dat"
-            if not os.path.isfile(file):
-                return kmcstd
-            else:
-                kmcstd_all = np.loadtxt(file)
-                kmcstd = kmcstd_all[-1]
-                return kmcstd
-            return
 
-        def get_try_get_c44_from_elastic_all(c44,elastic_all,index=False):
-            if not os.path.isfile(elastic_all):
-                #print('is not')
-                return c44
-            else:
-                #print('y1')
-                c44_try = np.loadtxt(elastic_all)
-                #print(c44_try)
-                takeline = np.where(c44_try[:,0]==index)[0][0]
-                try:
-                    c44out = c44_try[takeline][1]
-                except IndexError:
-                    c44out = c44
-                #print('y2',takeline,c44out)
-                return c44out
-
-            return c44
-
-        for bl in [ 'best','last']:
+        for bl in [ 'best','last', 'additional']:
             if bl == 'best':
                 test             = lc[:,2].min()                      # best test RMSE
                 testmin_idx      = np.where(test==lc[:,2])[0][0]   # best test index
             elif bl == 'last':
                 testmin_idx = len(lc)-1
+            elif bl == 'additional':
+                if os.path.isfile(folder+"/include_epoch"):
+                    testmin_idx = int(np.loadtxt(folder+"/include_epoch"))
+                    print('!!!!!!!!!!!!!!!!!1',testmin_idx,folder)
+                else:
+                    print('!!!!!!!!!!!!!!!!!0')
+                    continue
                 #print('lc',lc)
                 #print(inputnn)
                 #sys.exit()
@@ -315,27 +324,18 @@ for c in subfolder:    # from the ones in the que
 
     np.set_printoptions(precision=2)
     np.set_printoptions(suppress=True)
-    #print('oo',len(out2))
-    #print('oo',len(out2[0]))
-    #print('oo',len(out2[0])-3)
-    #sys.exit()
-    #for i in out2:
-    #    print(i[15])
     if args.sort_by_trainfraction:
         out2=sorted(out2,key=lambda x: x[0])
 
     #out2=sorted(out2,key=lambda x: x[2])               # das ist nach dem train ergebnis
     #out2=sorted(out2,key=lambda x: x[len(out2[0])-3])  # das ist nach dem train ergebnis
 
-    #for exec_conv_unconv in [ ["n2p2","conv"],[ "n2p2", "unconv"], ['runner','conv'],['runner','unconv']]:
-    #for exec_conv_unconv in [ ["n2p2","green"],[ "n2p2", "white"], ['n2p2','red'],['n2p2','blue'],["runner","green"],[ "runner", "white"], ['runner','red'],['runner','blue']]:
-    for exec_conv_unconv_a in ["n2p2","runner"]:
+    for n2p2_or_runner_loop in ["n2p2","runner"]:
         if args.verbose > 3:
-            print('AA',exec_conv_unconv_a)
-        for exec_conv_unconv_b in ["orange","green","white",'red','blue']:
-            if args.verbose > 3:
-                print('BB',exec_conv_unconv_b)
-            exec_conv_unconv = [exec_conv_unconv_a,exec_conv_unconv_b]
+            print('AA',n2p2_or_runner_loop)
+        if True:
+        #for exec_conv_unconv_b in ["orange","green","white",'red','blue']:
+        #    exec_conv_unconv = [n2p2_or_runner_loop,exec_conv_unconv_b]
             for idj,j in enumerate(out2): # for every line
                 if args.verbose > 3:
                     print('CC',j)
@@ -357,11 +357,6 @@ for c in subfolder:    # from the ones in the que
                 c44         = j[len(j) - 3]
                 c44e_unused = j[len(j) - 2]
                 path        = j[len(j) - 1]
-                #print('-->',nn,foldern)
-                #print('a',path_,j,'--->',j[11])
-                #sys.exit()
-                #print('kk',j[path_].split("/learning-curve.out"))
-                #print('0path',path)
                 path_before_learningcurve = path.split("/learning-curve.out")[0]  # random_seed_2234125
                 #print('1path',path)
                 path_before_learningcurve = os.getcwd()+"/"+path_before_learningcurve
@@ -428,7 +423,7 @@ for c in subfolder:    # from the ones in the que
                     path = ''.ljust(2)
                 kmc = str(round(kmc,1)).ljust(4)
 
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |M %s |S %4.0f || [%4.0f] | %s | %8.0f | %s"
+                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |K %s |n %4.0f || [%4.0f] | %s | %8.0f | %s"
                 elementout = (        j[0] ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],   c44,  kmc,    ist ,    epochs,   nn,  rnd,   path)
 
                 conv_unconv = "unconv"
@@ -447,14 +442,13 @@ for c in subfolder:    # from the ones in the que
                 else:
                     takecolor = "white"
 
-                if drawn1 == False and exec_conv_unconv[0] == 'runner':
+                if drawn1 == False and n2p2_or_runner_loop == 'runner':
                     print('------------------------------------------------------------------'*2)
                     drawn1 = True
-                #if exec_conv_unconv[0] == runner_n2p2 and exec_conv_unconv[1] == conv_unconv:
                 if args.verbose > 3:
-                    print('EE',exec_conv_unconv[0],runner_n2p2)
-                    print('FF',exec_conv_unconv[1],takecolor)
-                if exec_conv_unconv[0] == runner_n2p2 and exec_conv_unconv[1] == takecolor:
+                    print('EE',n2p2_or_runner_loop,runner_n2p2)
+                    #print('FF',exec_conv_unconv[1],takecolor)
+                if n2p2_or_runner_loop == runner_n2p2: # and exec_conv_unconv[1] == takecolor:
                     if takecolor == "orange":
                         print(my.printorange(stringout)%elementout)
                     if takecolor == "green":
