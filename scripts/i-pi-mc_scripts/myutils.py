@@ -62,6 +62,14 @@ def printoutcolor(red,var,ENDC):
     else:
         return red + str(var) + ENDC
 
+def is_int(x):
+    try:
+        a = float(x)
+        b = int(a)
+    except ValueError:
+        return False
+    else:
+        return a == b
 
 
 def printred(*var):
@@ -197,9 +205,11 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
     known_hosts =  ['fidis','helvetios']
     if hostname in known_hosts:
         pass
+    elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
+        pass
     else:
         print("known hosts:",known_hosts)
-        sys.exi(hostname+" is not in the list of known hosts!")
+        sys.exit(hostname+" is not in the list of known hosts!")
 
     if directory == False:
         directory = os.getcwd()
@@ -260,8 +270,9 @@ def n2p2_make_training(cores=21,debugque=False):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
-    if not os.path.isfile("function.data"):
-        sys.exit("Need function.data file")
+    # do I really need the function.data for training?
+    #if not os.path.isfile("function.data"):
+    #    sys.exit("Need function.data file")
 
     #submitfile = scripts()+"/n2p2/submit_training.sh"
     #if not os.path.isfile(submitfile):
@@ -998,6 +1009,7 @@ def test_and_return_environment_var_path(var,path=False,exit=True):
         if not os.path.isfile(variable):
             message='The variable '+str(var)+' is not defined or is not an existing file'
             if exit == True:
+                message = "ERROR "+message
                 sys.exit(message)
             else:
                 print(message)
@@ -1005,6 +1017,7 @@ def test_and_return_environment_var_path(var,path=False,exit=True):
         if not os.path.isdir(variable):
             message = 'directory '+str(var)+' is not defined or does not exist'
             if exit == True:
+                message = "ERROR "+message
                 sys.exit(message)
             else:
                 print(message)
@@ -1171,18 +1184,6 @@ class mypot( object ):
             except NameError:
                 self.potepoch_all = []
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
-            #if os.path.isfile(
-            #inputnn_weightsfile_link_to_bestteste
-            #print('kk',os.readlink(self.potpath+"/weights.013.data"))
-
-            #c44file = False
-            #if os.path.isfile(self.potpath+'/best_testsete'):
-            #    self.potepoch_bestteste = int(np.loadtxt(self.potpath+'/best_testsete'))
-            #    print('self.potepoch_bestteste',self.potepoch_bestteste)
-            #    c44file = self.potpath+"/elastic_"+str(self.potepoch_bestteste)+".dat"
-            #if type(c44file) is not bool and os.path.isfile(c44file):
-            #    self.c44_al_file = c44file
-            #    self.c44_al = np.loadtxt(self.c44_al_file)
             self.pot = self.pottype+"_frompath"
         else:
             ##########################################
@@ -1241,6 +1242,7 @@ class mypot( object ):
             my.cp(f14,self.pot_tmpdir+"/weights.014.data")
             my.cp(self.scalingdata,self.pot_tmpdir)
             my.cp(self.inputnn,self.pot_tmpdir)
+            print('... copying potential',epstr,'to',self.pot_tmpdir)
             #print('self.potpath_work (2)',self.potpath_work)
         self.potDONE = True
         #print('self.potpath_work (3)',self.potpath_work)
@@ -1289,7 +1291,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
             sys.exit()
 
     IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
-    LAMMPS_COMMAND = test_and_return_environment_var_path('LAMMPS_COMMAND')
+    LAMMPS_COMMAND = get_LAMMPS_executable(exit=True)
     N2P2_PATH = test_and_return_environment_var_path('N2P2_PATH',path=True)
 
     check(IPI_COMMAND,"IPI_COMMAND",str)
@@ -1415,6 +1417,7 @@ class ase_calculate_ene( object ):
             ):
 
         #self.pot = pot
+        self.LAMMPS_COMMAND = False
         self.potpath = potpath
         self.mypot = False
         self.units = units.lower()
@@ -1458,6 +1461,7 @@ class ase_calculate_ene( object ):
             print(text,tt+'kmc          (1) :',self.kmc)        # : False
             print(text,tt+'temp         (1) :',self.temp)       # : False
             print(text,tt+'verbose      (1) :',self.verbose)       # : False
+            print(text,tt+'LAMMPS_COMMAND1) :',self.LAMMPS_COMMAND)    # : n2p2_v2ag
             print()
         return
 
@@ -1564,6 +1568,7 @@ class ase_calculate_ene( object ):
         if self.verbose > 1:
             print('HERE THE lmpcmd I got',self.lmpcmd)
         self.print_variables_ase("pot_get_and_ase_lmp_cmd_FIN")
+        self.LAMMPS_COMMAND = get_LAMMPS_executable(exit=True) #,verbose=self.verbose)
         return
 
     def define_wrapped_self_atoms(self,atoms=False):
@@ -3033,24 +3038,36 @@ def lammps_ext_elastic_potential_mod(ace):
     ]
     return command
 
+def get_LAMMPS_executable(exit=True,verbose=False):
+    SCR = os.environ["scripts"]
+    onhost = gethostname()
+    if verbose:
+        print('SCR',SCR)
+        print('onhost', onhost)
+    LAMMPS_COMMAND = SCR+"/executables/lmp_"+onhost
+    if verbose:
+        print("LAMMPS_COMMAND",LAMMPS_COMMAND)
+    if os.path.isfile(LAMMPS_COMMAND):
+        return LAMMPS_COMMAND
+    else:
+        if onhost[0] in ['f','g','h']:
+            if verbose:
+                print('onhost[0]',onhost[0])
+            checkint = onhost[1:]
+            if is_int(checkint):
+                return  SCR+"/executables/lmp_fidis"  # fidis and helvetios have
+    if exit == True:
+        sys.exit("ERROR: could not fine LAMMPS_executable")
+    return
+
 def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
 
     ###############################################################
     # find LAMMPS executable
     ###############################################################
-    #if ace.pot.pottype == "runner":
-    #    LAMMPS_COMMAND = my.scripts()+'/executables/lmp_fidis_par_runner'
-    #    #print("LAMMPS_COMMAND 1",LAMMPS_COMMAND)
-    #else:
-    #    #print("LAMMPS_COMMAND 2",LAMMPS_COMMAND)
     if ace.verbose:
         print("get_elastic_constants",get_elastic_constants)
-
-    LAMMPS_COMMAND = os.environ['LAMMPS_COMMAND']
-    if ace.verbose:
-        print("LAMMPS_COMMAND",LAMMPS_COMMAND)
-    #sys.exit()
 
     ###############################################################
     # make ace.pot.lammps_tmpdir (/home/glensk/._tmp_lammps/)
@@ -3121,8 +3138,8 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         # without SHELL no LD LIBRARY PATH
         #print('pwd',os.getcwd())
         if ace.verbose:
-            print(LAMMPS_COMMAND+" < "+execute_file+" > /dev/null")
-        call([LAMMPS_COMMAND+" < "+execute_file+" > /dev/null"],shell=True)
+            print(ace.LAMMPS_COMMAND+" < "+execute_file+" > /dev/null")
+        call([ace.LAMMPS_COMMAND+" < "+execute_file+" > /dev/null"],shell=True)
 
         ###############################################################
         # extract energy and forces
@@ -3638,37 +3655,8 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     n2p2_runner = type = inputnn_runner_or_n2p2(folder+'/input.nn')
     if False: #verbose:
         print('nn',n2p2_runner)
-    #tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
-    #changefilename = False
-
-    #if verbose:
-    #    print('filename mid',filename)
-    #    print('basename mid',basename)
-    #    print('type     mid',type)
-
-    #if os.path.isfile(folder+'/optweights.012.out'): # and basename == "learning-curve.out":
-    #    changefilename = True
-    #if os.path.isfile(folder+'/tmpweights.012.out'): # and basename == "learning-curve.out":
-    #    changefilename = True
-    #if verbose:
-    #    print('changefilename',changefilename)
-
-    #if changefilename == True:
-    #    for i in tryname:
-    #        filename = folder+"/"+i
-    #        if os.path.isfile(filename):
-    #            type = 'runner'
-    #            break
     if not os.path.isfile(filename):
         sys.exit(filename+" does not exist!")
-
-    #basename = os.path.basename(filename)
-    #if verbose:
-    #    print('filename out',filename)
-    #    print('basename out',basename)
-    #    print('type     out',type)
-    #if only_get_filename == True:
-    #    return filename
 
     finished = False
     if n2p2_runner == "n2p2": # basename == "learning-curve.out": # n2p2

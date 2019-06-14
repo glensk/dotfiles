@@ -120,14 +120,14 @@ def foldername_search_restartname(folder):
         return False
     return search
 
-def get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=False):
+def get_try_get_kmcstd_from_kmc_epoch_xx(kmc,folder,index=False):
     file = folder+"/kmc/ene_std_epoch_"+str(index)+".dat"
     if not os.path.isfile(file):
-        return kmcstd
+        return kmc
     else:
-        kmcstd_all = np.loadtxt(file)
-        kmcstd = kmcstd_all[-1]
-        return kmcstd
+        kmc = np.loadtxt(file)
+        kmc = kmc[-1]
+        return kmc
     return
 
 def get_try_get_c44_from_elastic_all(c44,elastic_all,index=False):
@@ -221,6 +221,8 @@ for c in subfolder:    # from the ones in the que
         nodes_short = my.inputnn_get_nodes_short(inputnn,as_string=True)
         activation_short = my.inputnn_get_activation_short(inputnn)
         nn = nodes_short+"__"+activation_short
+        if os.path.isdir(folder+"/kmc"):
+            nn = nodes_short+"**"+activation_short
 
         #print('nodes_short',nodes_short)
         #print('activation_short',activation_short)
@@ -271,9 +273,9 @@ for c in subfolder:    # from the ones in the que
             elif bl == 'additional':
                 if os.path.isfile(folder+"/include_epoch"):
                     testmin_idx = int(np.loadtxt(folder+"/include_epoch"))
-                    print('!!!!!!!!!!!!!!!!!1',testmin_idx,folder)
+                    #print('!!!!!!!!!!!!!!!!!1',testmin_idx,folder)
                 else:
-                    print('!!!!!!!!!!!!!!!!!0')
+                    #print('!!!!!!!!!!!!!!!!!0')
                     continue
                 #print('lc',lc)
                 #print(inputnn)

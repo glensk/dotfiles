@@ -378,7 +378,10 @@ def gnuplot_plot(args):
         #input = np.loadtxt(inputfile)
         from numpy import genfromtxt
         input = genfromtxt(inputfile,filling_values=99)
-        print('input',input)
+        if len(input) > 10:
+            print('input:')
+            print(input[:2])
+            print(input[-2:])
         if args.verbose > verbosity_level+1:
             print('input',input)
         if args.verbose > verbosity_level:
