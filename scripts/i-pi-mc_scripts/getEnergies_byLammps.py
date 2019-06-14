@@ -203,7 +203,7 @@ def get_energies(args):
     os.remove("log.lammps")
 
     ##############################################################
-    ### get ace object for the chosen potential
+    ### get ace object for the chosen potential (first general)
     ##############################################################
     if args.testkmc or args.testkmc_b or args.testkmc_l:
         args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
@@ -224,32 +224,31 @@ def get_energies(args):
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
+    sys.exit('88')
 
 
+    ############
+    ### testkmc
+    ############
     if args.testkmc or args.testkmc_b or args.testkmc_l:
         if args.testkmc_b:
             args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_bestteste
-<<<<<<< HEAD
             print('args.potepoch',args.potepoch)
             print('ace.pot.use_epoch',ace.pot.use_epoch)
         if args.testkmc_l:
             args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
             print('args.potepoch',args.potepoch)
             print('ace.pot.use_epoch',ace.pot.use_epoch)
-=======
-        if args.testkmc_l:
-            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
 
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
+
         kmc_folder = ace.pot.potpath+"/kmc"
         kmc_file = kmc_folder+"/ene_std_epoch_"+str(ace.pot.use_epoch)+".dat"
         if os.path.isfile(kmc_file):
             sys.exit(kmc_file+" does already exist!")
         if not os.path.isdir(kmc_folder):
             my.mkdir(kmc_folder)
-<<<<<<< HEAD
         ## define the actual pot
         ace = ase_calculate_ene(pot=pot,
                         potpath=potpath,
@@ -260,19 +259,18 @@ def get_energies(args):
                         verbose=args.verbose)
         ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
         #sys.exit('kkb')
-=======
 
-
-
-
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
-
-    ### when want to assess some formation energies
+    ############
+    ### formation energies
+    ############
     if args.test_formation_energies:
         test_formation_energies(ace)
         my.create_READMEtxt(os.getcwd())
         sys.exit('test_formation_energies done! Exit')
 
+    ############
+    ### elastic / elastic_all
+    ############
     if args.elastic:
         get_elastic_constants_al_ext(ace)
         sys.exit('get_elastic_constants_al_ext done! Exit')
@@ -322,7 +320,7 @@ def get_energies(args):
         if True: #writeanew:
             elastic_all = elastic_all[elastic_all[:,0].argsort()]
             np.savetxt(file_elastic_c44_all,elastic_all)
-        sys.exit('done! Exit')
+        sys.exit('elastic_all done! Exit')
 
     if args.elastic_from_ene:
         get_elastic_constants_al_from_ene(ace)
@@ -337,6 +335,10 @@ def get_energies(args):
     ### check args.inputfile
     if not args.inputfile:
         sys.exit("Error: Missing option \"--infile\" / \"-i\".")
+
+    #####################################################################################
+    # go over every chosen potential
+    #####################################################################################
 
     ### read in the structures
     print('reading args.inputfile ...',args.inputfile)
