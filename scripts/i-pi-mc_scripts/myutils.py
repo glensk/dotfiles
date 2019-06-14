@@ -205,24 +205,17 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
     known_hosts =  ['fidis','helvetios']
     if hostname in known_hosts:
         pass
-<<<<<<< HEAD
     elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
         pass
     else:
         print("known hosts:",known_hosts)
         sys.exit(hostname+" is not in the list of known hosts!")
-=======
-    else:
-        print("known hosts:",known_hosts)
-        sys.exi(hostname+" is not in the list of known hosts!")
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
 
     if directory == False:
         directory = os.getcwd()
 
     # name of file
     filepath = directory+'/submit_n2p2_'+job+'.sh'
-<<<<<<< HEAD
 
     # write file
     with open(filepath, "w") as text_file:
@@ -266,50 +259,6 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
         text_file.write("\n")
         text_file.write("exit 0\n")
 
-=======
-
-    # write file
-    with open(filepath, "w") as text_file:
-        text_file.write("#!/bin/bash\n")
-        text_file.write("#SBATCH --job-name=NNP-mpi\n")
-        text_file.write("#SBATCH --output=_scheduler-stdout.txt\n")
-        text_file.write("#SBATCH --error=_scheduler-stderr.txt\n")
-        text_file.write("#SBATCH --nodes="+str(nodes)+"\n")
-        text_file.write("#SBATCH --ntasks 28\n")
-        if debugque == True:
-            text_file.write("#SBATCH --time=00-01:00:00\n")
-        else:
-            text_file.write("#SBATCH --time=00-72:00:00\n")
-        if hostname == 'fidis':
-            text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
-            # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
-        if hostname == 'helvetios':
-            print('you can use up to --mem=183G or more')
-        text_file.write("#SBATCH --mem=100G\n")
-        text_file.write("\n")
-        text_file.write("set +e\n")
-        text_file.write("# it is necessary to have all the modules which are used when compiling\n")
-        text_file.write('export LD_LIBRARY_PATH=""\n')
-        text_file.write("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen\n")
-        text_file.write("export LD_LIBRARY_PATH=$HOME/sources/n2p2/lib:${LD_LIBRARY_PATH}\n")
-        text_file.write("#echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH\n")
-        text_file.write("\n")
-        text_file.write("touch time.out\n")
-        text_file.write("date +%s >> time.out\n")
-        text_file.write("\n")
-        if job == 'scaling':
-            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-scaling 1\n")
-        elif job == 'train':
-            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train\n")
-        text_file.write("date +%s >> time.out\n")
-        text_file.write("cat time.out | xargs | awk '{print $2-$1-10}' > time.sec\n")
-        text_file.write("$dotfiles/scripts/n2p2/n2p2_tarfolder_for_scale_train.sh\n")
-        if job == 'scaling':
-            text_file.write('[ "`pwd | grep -o "/get_scaling$"`" == \'/get_scaling\' ] && echo creating link && ln -s `pwd`/function.data ../function.data')
-        text_file.write("\n")
-        text_file.write("exit 0\n")
-
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
     print()
     print('written ',filepath)
     print()
@@ -321,18 +270,14 @@ def n2p2_make_training(cores=21,debugque=False):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
-<<<<<<< HEAD
-    # do I really need the function.data for training?
-    #if not os.path.isfile("function.data"):
-    #    sys.exit("Need function.data file")
-=======
-    if not os.path.isfile("function.data"):
-        sys.exit("Need function.data file")
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
 
-    #submitfile = scripts()+"/n2p2/submit_training.sh"
-    #if not os.path.isfile(submitfile):
-    #    sys.exit("Need "+submitfile+" file!")
+        # do I really need the function.data for training?
+        #if not os.path.isfile("function.data"):
+        #    sys.exit("Need function.data file")
+
+        #submitfile = scripts()+"/n2p2/submit_training.sh"
+        #if not os.path.isfile(submitfile):
+        #    sys.exit("Need "+submitfile+" file!")
 
     if not os.path.isfile("scaling.data"):
         if not os.path.isfile("get_scaling/scaling.data"):
@@ -725,7 +670,6 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
     print()
     print('filename_analyze_all',filename_analyze_all)
     print()
-<<<<<<< HEAD
 
     def test_anz_nn(al_mg_si_all,vac_nr,step,exit=False):
         #if al_mg_si_all[vac_nr][step][0] == 0:
@@ -800,8 +744,6 @@ def count_amount_1NN_around_vacancies(filename,cutoffa=3.,cutoffb=4.5,skin=0.1,f
     np.savetxt(filename_analyze_all[vac_nr],al_mg_si_all[vac_nr],fmt='%i')
     print('saving (very end)',os.path.abspath(filename_analyze_all[vac_nr]),'at step',step)
     return
-=======
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
 
     def test_anz_nn(al_mg_si_all,vac_nr,step,exit=False):
         #if al_mg_si_all[vac_nr][step][0] == 0:
@@ -1323,21 +1265,7 @@ class mypot( object ):
             except NameError:
                 self.potepoch_all = []
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
-<<<<<<< HEAD
-=======
-            #if os.path.isfile(
-            #inputnn_weightsfile_link_to_bestteste
-            #print('kk',os.readlink(self.potpath+"/weights.013.data"))
-
-            #c44file = False
-            #if os.path.isfile(self.potpath+'/best_testsete'):
-            #    self.potepoch_bestteste = int(np.loadtxt(self.potpath+'/best_testsete'))
-            #    print('self.potepoch_bestteste',self.potepoch_bestteste)
-            #    c44file = self.potpath+"/elastic_"+str(self.potepoch_bestteste)+".dat"
-            #if type(c44file) is not bool and os.path.isfile(c44file):
-            #    self.c44_al_file = c44file
-            #    self.c44_al = np.loadtxt(self.c44_al_file)
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
+            #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
             self.pot = self.pottype+"_frompath"
         else:
             ##########################################
@@ -1396,10 +1324,7 @@ class mypot( object ):
             my.cp(f14,self.pot_tmpdir+"/weights.014.data")
             my.cp(self.scalingdata,self.pot_tmpdir)
             my.cp(self.inputnn,self.pot_tmpdir)
-<<<<<<< HEAD
             print('... copying potential',epstr,'to',self.pot_tmpdir)
-=======
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
             #print('self.potpath_work (2)',self.potpath_work)
         self.potDONE = True
         #print('self.potpath_work (3)',self.potpath_work)
@@ -1725,10 +1650,7 @@ class ase_calculate_ene( object ):
         if self.verbose > 1:
             print('HERE THE lmpcmd I got',self.lmpcmd)
         self.print_variables_ase("pot_get_and_ase_lmp_cmd_FIN")
-<<<<<<< HEAD
         self.LAMMPS_COMMAND = get_LAMMPS_executable(exit=True) #,verbose=self.verbose)
-=======
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         return
 
     def define_wrapped_self_atoms(self,atoms=False):
@@ -3744,21 +3666,12 @@ def inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn,verbose=False):
         if verbose:
             print('1 ele_final:',ele_list,len(ele_list))
             print('1 ene_final',ene_list,len(ene_list))
-<<<<<<< HEAD
 
         if len(ele_list) == len(ene_list) == 0:
             ele_list = elements
         else:
             elements = ele_list
 
-=======
-
-        if len(ele_list) == len(ene_list) == 0:
-            ele_list = elements
-        else:
-            elements = ele_list
-
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         if verbose:
             print('2 ele_final:',ele_list)
             print('2 ene_final',ene_list)
@@ -3824,44 +3737,9 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     n2p2_runner = type = inputnn_runner_or_n2p2(folder+'/input.nn')
     if False: #verbose:
         print('nn',n2p2_runner)
-<<<<<<< HEAD
     if not os.path.isfile(filename):
         sys.exit(filename+" does not exist!")
 
-=======
-    #tryname = [ "logfiele_mode2", "log.fit", "logfile_mode2" ]
-    #changefilename = False
-
-    #if verbose:
-    #    print('filename mid',filename)
-    #    print('basename mid',basename)
-    #    print('type     mid',type)
-
-    #if os.path.isfile(folder+'/optweights.012.out'): # and basename == "learning-curve.out":
-    #    changefilename = True
-    #if os.path.isfile(folder+'/tmpweights.012.out'): # and basename == "learning-curve.out":
-    #    changefilename = True
-    #if verbose:
-    #    print('changefilename',changefilename)
-
-    #if changefilename == True:
-    #    for i in tryname:
-    #        filename = folder+"/"+i
-    #        if os.path.isfile(filename):
-    #            type = 'runner'
-    #            break
-    if not os.path.isfile(filename):
-        sys.exit(filename+" does not exist!")
-
-    #basename = os.path.basename(filename)
-    #if verbose:
-    #    print('filename out',filename)
-    #    print('basename out',basename)
-    #    print('type     out',type)
-    #if only_get_filename == True:
-    #    return filename
-
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
     finished = False
     if n2p2_runner == "n2p2": # basename == "learning-curve.out": # n2p2
         lc = np.loadtxt(filename) #+'/learning-curve.out')
