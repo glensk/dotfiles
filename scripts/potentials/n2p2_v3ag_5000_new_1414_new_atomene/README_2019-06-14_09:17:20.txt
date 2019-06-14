@@ -1,0 +1,7 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 01ee2e772d60928094ec59ee0d3c715f3e76ea22
+# execution time: 0.907617092133 seconds.
+# pwd: /scratch/glensk/TEST_RUNNER_VS_n2p2/n2p2_v3ag_5000_new_1414_new_atomene/potential
+
+n2p2_get_potential_folder_from_nr.py 

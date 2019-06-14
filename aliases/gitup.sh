@@ -37,6 +37,21 @@ fi
 
 if [ "$1" != "-oo" ];then
 echo "#######################################"
+echo "#### check for files > 100MB ##########"
+echo "#######################################"
+ff=`find . -path ./git -type f -size +100000k -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'`
+if [ "$ff" != "" ];then
+    echo "ff:$ff:"
+    if [ "`echo "$ff" | wc -l`" > "0" ];then
+        echo "files larger than 100MB!!"
+        echo "$ff"
+        echo "---"
+        echo ":$ff:"
+        echo "Error Exit!"
+        exit
+    fi
+fi
+echo "#######################################"
 echo "#### git add -A -v ####################"
 echo "#######################################"
 echo;git add -A -v;echo;
