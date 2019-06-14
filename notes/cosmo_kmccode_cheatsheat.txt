@@ -12,15 +12,12 @@ self.sites:   # (undisturbed lattice sites) ---> those NEVER change during simul
  [29.81614973 17.21436208  8.85264884]
  [32.5267088  18.77930408 13.27897326]]
 
-self.state: 
-['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A' 'A' 'A' ....'V' 'A' 'A' ]
+self.state:  ['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A' 'A' 'A' ....'V' 'A' 'A' ]
+ostr = "".join(self.state): e.g. AAAAAAAMAAASAAAAMAAAAAAAAAAASASAAMAAAAVA...
+nstr =                      e.g. AAAAAAAMAAASAAAAMAAAAAAAAAAASASAAMAAAAVA...
+nstate = self.state.copy()  : ['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A' 'A' 'A' ....'V' 'A' 'A' ]
+nstate[svac], nstate[sneigh] = self.state[sneigh], self.state[svac]   : ['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A' 'A' 'A' ....'V' 'A' 'A' ]
 
-ostr:
-ostr = "".join(self.state)  = e.g. AAAAAAAMAAASAAAAMAAAAAAAAAAASASAAMAAAAVA...
-
-# how to make a new state && new sites:
-nstate = self.state.copy()
-nstate[svac], nstate[sneigh] = self.state[sneigh], self.state[svac]
 self.sites[self.unique_idx(nstate)]
 self.sites[self.unique_idx(self.state)]
 print(self.sites[self.unique_idx(self.state)])
