@@ -352,6 +352,8 @@ def get_energies(args):
                 if os.path.isfile(kmc_file):
                     print(kmc_file+" does already exist!")
                     print()*2
+                    sys.exit('better continue')
+                    continue
 
         ### read in the structures
         print('reading args.inputfile ...',args.inputfile)

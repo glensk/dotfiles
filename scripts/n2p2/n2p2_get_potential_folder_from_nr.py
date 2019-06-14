@@ -112,8 +112,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
         folder = "potential_tmp/"
     if args.get_last_epoch:
         folder = "potential_last/"
-    if os.path.isdir(folder):
-        sys.exit(folder+' does already exist!')
+    #if os.path.isdir(folder):
+    #    sys.exit(folder+' does already exist!')
 
     my.mkdir(folder)
     print('cp scaling.dat')
@@ -157,6 +157,8 @@ def n2p2_make_potential_folder_from_nr(argsnr):
                     print('dest',dest)
                     pwd = os.getcwd()
                     os.chdir(folder)
+                    if os.path.islink(dest):
+                        os.unlink(dest)
                     os.symlink(src, dest)
                     os.chdir(pwd)
             elif typ == 'runner':
