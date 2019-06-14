@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 import os,sys,re
+import filecmp
 import click
 import numpy as np
 import glob #,pathlib
@@ -1129,35 +1131,36 @@ def get_click_defaults():
 
 class mypot( object ):
     ''' return a list of available potentials '''
-    def __init__(self,pot=False,potpath=False,use_epoch=False,verbose=False):
-        self.pot                = pot         # n2p2_v1ag
-        self.potpath_in         = potpath
-        self.use_epoch          = use_epoch
+    def __init__(self,pot=False,potpath=False,use_different_epoch=False,verbose=False):
+        self.pot                    = pot         # n2p2_v1ag
+        self.potpath_in             = potpath
+        self.use_different_epoch    = use_different_epoch
 
-        self.potpath            = False        # this is the source where the potential recides
-        self.potpath_work       = False        # this is ususally the self.potpath but for cases where different epoch is used ->
-        self.pottype            = False        # n2p2/runner
-        self.potepoch_all       = False
-        self.potepoch_bestteste = False
-        self.c44_al_file        = False
-        self.c44_al             = False
-        self.potDONE            = False         # n2p2_v1ag
-        self.potlib             = False         # n2p2_v1ag
-        self.potcutoff          = False         # n2p2_v1ag
-        self.learning_curve_file = False
-        self.lammps_tmpdir      = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/"
-        self.pot_tmpdir         = os.environ['HOME']+"/._tmp_pot_"+str(gethostname())+"/"
+        self.potpath                = False        # this is the source where the potential recides
+        self.potpath_work           = False        # this is ususally the self.potpath but for cases where different epoch is used ->
+        self.pottype                = False        # n2p2/runner
+        self.potepoch_all           = False
+        self.potepoch_bestteste     = False
+        self.potepoch_bestteste_checked = False
+        self.c44_al_file            = False
+        self.c44_al                 = False
+        self.potDONE                = False         # n2p2_v1ag
+        self.potlib                 = False         # n2p2_v1ag
+        self.potcutoff              = False         # n2p2_v1ag
+        self.learning_curve_file    = False
+        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/"
+        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"+str(gethostname())+"/"
 
-        self.inputnn            = False         # path to input.nn
-        self.inputdata          = False         # path to input.data
+        self.inputnn                = False         # path to input.nn
+        self.inputdata              = False         # path to input.data
 
-        self.pot_all            = False   # n2p2_v1ag
+        self.pot_all                = False   # n2p2_v1ag
 
         self.trigger_set_path_manual = ["setpath","potpath","pp", ".", "..", "../" ]
-        self.verbose    = verbose
+        self.verbose                = verbose
 
-        self.elements    = False  # list e.g. ['Al', 'Mg', 'Si']
-        self.atom_energy = False
+        self.elements               = False  # list e.g. ['Al', 'Mg', 'Si']
+        self.atom_energy            = False
         return
 
 
@@ -1210,8 +1213,9 @@ class mypot( object ):
             print(text,"self.inputdata              ",self.inputdata)
             print(text,"self.learning_curve_file    ",self.learning_curve_file)
             print(text,"self.potepoch_all           ",self.potepoch_all)
-            print(text,"self.use_epoch              ",self.use_epoch)
-            print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste)
+            print(text,"self.use_different_epoch    ",self.use_different_epoch)
+            print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste,"(It was checked that this is the linked potential)")
+            print(text,"self.potepoch_bestteste_chk?",self.potepoch_bestteste_checked)
             print(text,"self.c44_al_file            ",self.c44_al_file)
             if type(self.c44_al) != bool:
                 print(text,"self.c44_al                 ",np.round(self.c44_al,2),"GPa")
@@ -1231,6 +1235,7 @@ class mypot( object ):
             print()
 
     def get(self):
+        self.potepoch_bestteste_checked = False
         self.print_variables_mypot('get potential: in')
 
         ##########################################
@@ -1265,7 +1270,16 @@ class mypot( object ):
             except NameError:
                 self.potepoch_all = []
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
+
             #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
+            file1 = self.potpath_in+"/weights.012.data"
+            epstr = str(self.potepoch_bestteste).zfill(6)
+            file2 = self.potpath_in+"/weights.012."+epstr+".out"
+            if not filecmp.cmp(file1, file1):
+                sys.exit("File "+file1+" is not "+file2)
+            else:
+                self.potepoch_bestteste_checked = True
+
             self.pot = self.pottype+"_frompath"
         else:
             ##########################################
@@ -1289,7 +1303,7 @@ class mypot( object ):
             #sys.exit("ERROR: "+self.potlib+" not found!"+add)
             print("ERROR: "+self.potlib+" not found!"+add)
 
-        if self.use_epoch == False:
+        if self.use_different_epoch == False:
             self.potpath_work = self.potpath
             #print('se false')
         else:
@@ -1298,7 +1312,7 @@ class mypot( object ):
             #print('se true')
             self.potpath_work = self.pot_tmpdir
             #print('self.potpath_work (1)',self.potpath_work)
-            epstr = str(self.use_epoch).zfill(6)
+            epstr = str(self.use_different_epoch).zfill(6)
             if not os.path.isdir(self.pot_tmpdir):
                 mkdir(self.pot_tmpdir)
             f12 = self.potpath+"/weights.012."+epstr+".out"
@@ -1489,7 +1503,7 @@ class ase_calculate_ene( object ):
     def __init__(self,
             pot,
             potpath,
-            use_epoch=False,
+            use_different_epoch=False,
             units=False,
             geopt=False,
             kmc=False,
@@ -1511,7 +1525,7 @@ class ase_calculate_ene( object ):
         self.atoms = False          # ase atoms object (frame)
         if self.verbose:
             print('initializing mypot .... to self.pot')
-        self.pot = mypot(pot,self.potpath,use_epoch=use_epoch,verbose=self.verbose)
+        self.pot = mypot(pot,self.potpath,use_different_epoch=use_different_epoch,verbose=self.verbose)
 
         #####################
         # for the calculator
@@ -3815,8 +3829,23 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     #print('ll',lc.shape,len(lc.shape))
     return lc
 
+def n2p2_runner_job_finished(inputnn):
+    #print('inputnn',inputnn)
+    pp = os.environ["potentials"]
+    #print('pp',pp,len(pp))
+    if inputnn[:len(pp)] == pp:
+        # job is already in potentials folder
+        return True
+        #print('same')
+    else:
+        #print('ns',pp)
+        #print('ns',inputnn[:len(pp)])
+        return False
+    return False
+
 def n2p2_runner_get_bestteste_idx(inputnn):
     #print('inputnn',inputnn)
+    job_finished = n2p2_runner_job_finished(inputnn)
     best_testsete_file = inputnn.replace('input.nn', 'best_testsete')
     #print('best_testsete_file',best_testsete_file)
     if os.path.isfile(best_testsete_file):
@@ -3827,6 +3856,9 @@ def n2p2_runner_get_bestteste_idx(inputnn):
         #print('from lc')
         learning_curve = lc = n2p2_runner_get_learning_curve(inputnn)
         best_testsete = np.argmin(lc[:,2])
+        if job_finished:
+            np.savetxt(best_testsete_file,aa)
+            np.savetxt(best_testsete_file,np.array([int(best_testsete)]),fmt='%i')
         #print(lc)
         #print('mmm',best_testsete)
         return best_testsete

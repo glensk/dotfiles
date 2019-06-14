@@ -1,5 +1,5 @@
 #!/usr/bin/env python
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 import numpy as np
 import os,sys,argparse
@@ -122,6 +122,9 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     my.cp('input.data',folder+'/input.data')
     print('cp input.nn')
     my.cp('input.nn',folder+'/input.nn')
+    if os.path.isfile('submit_n2p2_train.sh'):
+        print('cp submitfile')
+        my.cp('submit_n2p2_train.sh',folder+'/submit_n2p2_train.sh')
     if typ == "n2p2" and os.path.isfile('learning-curve.out'):
         print('cp learning-curve.out')
         my.cp('learning-curve.out',folder+'/learning-curve.out')
@@ -161,11 +164,7 @@ def n2p2_make_potential_folder_from_nr(argsnr):
                 my.cp(weights,folder+'/optweights.'+i+'.out')
     os.chdir(folder)
     my.create_READMEtxt(directory=os.getcwd(),add="# pwd: "+os.getcwd())
-<<<<<<< HEAD
     return os.getcwd()
-=======
-    return folder
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
 
 if __name__ == '__main__':
     p = help()
@@ -176,11 +175,7 @@ if __name__ == '__main__':
     print('args.get_best_epoch',args.get_best_epoch)
     folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
     print('folder',folder)
-<<<<<<< HEAD
     with my.cd(folder):
-=======
-    with my.cd(folder)
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         print('getEnergies_byLammps.py -p . -ea # to get all the c44')
         import subprocess
         subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)

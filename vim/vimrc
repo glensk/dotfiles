@@ -12,6 +12,15 @@ source ~/.vim/startup/vundle_supertab.vim      " tab completion for vim OK
 "@source ~/.vim/startup/vundle_syntastic.vim   " syntax checking  (currently slow on cmmc !!!!
 "Plugin 'DamienCassou/textlint' 			   " Style checker for .tex (<leader>tl) !quite big!
 Plugin 'tpope/vim-surround.git'	               " delete:ds( create:ysiw] change:cst(
+Plugin 'Yggdroot/indentLine'
+"let g:indentLine_color_term = 239
+"let g:indentLine_setColors = 0
+let g:indentLine_char = '┆'
+let g:indentLine_char = '⎸'
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+" none X terminal
+let g:indentLine_color_tty_light = 7 " (default: 4)
+let g:indentLine_color_dark = 1 " (default: 2)
 "Plugin 'https://github.com/yegappan/mru.git'  " open last opend files
 "Plugin 'https://github.com/tomtom/tcomment_vim.git'         " comment out/in ctrl+/  but breaks gcW (capitalize word)
 Plugin 'AndrewRadev/switch.vim' |  nnoremap - :Switch<cr>   " False->True  (press einfach minus)

@@ -58,6 +58,7 @@ toggletruefalse = "https://github.com/AndrewRadev/switch.vim.git"
 searchcounter = "https://github.com/henrik/vim-indexed-search.git"
 easymotion = "https://github.com/easymotion/vim-easymotion.git"
 vimlatex = "https://github.com/jcf/vim-latex.git"
+indentline = "https://github.com/Yggdroot/indentLine"
 #vimlatex = "https://github.com/vim-latex/vim-latex.git"  # had problems
 checkit(vundle)          # necessary
 checkit(vimsignature)    # necessary  set a mark (prss m c in normal mode)
@@ -66,5 +67,6 @@ checkit(tabcompletion)   # necesary comletes words when <TAB>
 checkit(searchcounter)   # necesary counts the instances of the search
 checkit(easymotion)      # necesary counts the instances of the search
 checkit(vimlatex)        # necesary counts the instances of the search
+checkit(indentline)
 
 #checkit()
