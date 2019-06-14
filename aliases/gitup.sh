@@ -40,8 +40,8 @@ echo "#######################################"
 echo "#### check for files > 100MB ##########"
 echo "#######################################"
 ff=`find . -path ./git -type f -size +100000k -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'`
-echo "ff:$ff:"
 if [ "$ff" != "" ];then
+    echo "ff:$ff:"
     if [ "`echo "$ff" | wc -l`" > "0" ];then
         echo "files larger than 100MB!!"
         echo "$ff"
