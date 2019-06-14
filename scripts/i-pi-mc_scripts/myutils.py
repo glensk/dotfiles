@@ -1271,6 +1271,7 @@ class mypot( object ):
                 self.potepoch_all = []
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
             file1 = self.potpath_in+"/weights.012.data"
@@ -1281,6 +1282,9 @@ class mypot( object ):
             else:
                 self.potepoch_bestteste_checked = True
 
+=======
+            #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 =======
             #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
 >>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81

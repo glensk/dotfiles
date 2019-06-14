@@ -286,8 +286,14 @@ for c in subfolder:    # from the ones in the que
         inputnn     =i.replace(basename, 'input.nn')
         inputdata   =i.replace(basename, 'input.data')
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+
+=======
+>>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
+=======
 
 =======
 >>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
@@ -312,9 +318,12 @@ for c in subfolder:    # from the ones in the que
         activation_short = my.inputnn_get_activation_short(inputnn)
         nn = nodes_short+"__"+activation_short
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 <<<<<<< HEAD
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
+=======
 >>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
         if os.path.isdir(folder+"/kmc"):
             nn = nodes_short+"**"+activation_short
@@ -509,6 +518,89 @@ for c in subfolder:    # from the ones in the que
                 round(train,2),                      # j[2]
                 testmin_idx,                                        # j[3]
 
+<<<<<<< HEAD
+=======
+=======
+        train_fraction=1.-testf
+        train_fraction=1.-testf
+
+        learning_curve = lc = my.n2p2_runner_get_learning_curve(inputnn)
+        if False:
+            print('i',i)
+            print('len',len(lc),lc.shape)
+            print('lc')
+            print(lc)
+            sys.exit()
+
+        #if len(lc) == 1:
+        #    print('---')
+        #    print(lc)
+        #    print('---')
+        #print('lc',lc.shape)
+        epochs_ = len(lc[:,1])
+        #print('len',len(lc),epochs_)
+        #print()
+        def get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=False):
+            file = folder+"/kmc/ene_std_epoch_"+str(index)+".dat"
+            if not os.path.isfile(file):
+                return kmcstd
+            else:
+                kmcstd_all = np.loadtxt(file)
+                kmcstd = kmcstd_all[-1]
+                return kmcstd
+            return
+
+        def get_try_get_c44_from_elastic_all(c44,elastic_all,index=False):
+            if not os.path.isfile(elastic_all):
+                #print('is not')
+                return c44
+            else:
+                #print('y1')
+                c44_try = np.loadtxt(elastic_all)
+                #print(c44_try)
+                takeline = np.where(c44_try[:,0]==index)[0][0]
+                try:
+                    c44out = c44_try[takeline][1]
+                except IndexError:
+                    c44out = c44
+                #print('y2',takeline,c44out)
+                return c44out
+
+            return c44
+
+        for bl in [ 'best','last']:
+            if bl == 'best':
+                test             = lc[:,2].min()                      # best test RMSE
+                testmin_idx      = np.where(test==lc[:,2])[0][0]   # best test index
+            elif bl == 'last':
+                testmin_idx = len(lc)-1
+                #print('lc',lc)
+                #print(inputnn)
+                #sys.exit()
+            #sys.exit()
+            # #print()
+            #print('c44 in',c44)
+            c44 = get_try_get_c44_from_elastic_all(c44,elastic_all,index=testmin_idx)
+            kmcstd = get_try_get_kmcstd_from_kmc_epoch_xx(kmcstd,folder,index=testmin_idx)
+            #print('c44 ou',c44)
+            #print()
+
+            test     = lc[:,2][testmin_idx]                      # best test RMSE
+            train    = lc[:,1][testmin_idx]               # train RMSE @ test index
+
+            trainminf_at_testmin    = lc[:,3][testmin_idx]
+            testminf_at_testmin     = lc[:,4][testmin_idx]
+
+            path__ = i.replace(os.getcwd()+'/',"")
+
+            out2.append([
+                round(train_fraction,2),                            # j[0]
+
+                round(test,2),                                   # j[1]
+                round(train,2),                      # j[2]
+                testmin_idx,                                        # j[3]
+
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 >>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
                 round(al,2),                                       # j[4]
                 round(mg,2),                                       # j[5]

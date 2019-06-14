@@ -230,6 +230,9 @@ def get_energies(args):
 =======
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
     sys.exit('88')
+<<<<<<< HEAD
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
+=======
 >>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 
 
@@ -237,8 +240,11 @@ def get_energies(args):
     ### testkmc
     ############
 <<<<<<< HEAD
+<<<<<<< HEAD
     if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
 =======
+=======
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
     if args.testkmc or args.testkmc_b or args.testkmc_l:
 >>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
         if args.testkmc_b:
@@ -257,6 +263,9 @@ def get_energies(args):
             print('ace.pot.use_different_epoch',ace.pot.use_different_epoch)
 =======
             print('ace.pot.use_epoch',ace.pot.use_epoch)
+<<<<<<< HEAD
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
+=======
 >>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 
         if args.potepoch == False:
@@ -345,6 +354,7 @@ def get_energies(args):
     # go over every chosen potential
     #####################################################################################
 <<<<<<< HEAD
+<<<<<<< HEAD
     for use_epoch in allepochs:
         if use_epoch == False:
             pass
@@ -383,6 +393,8 @@ def get_energies(args):
         else:
             structures_to_calc = 1
 =======
+=======
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 
     ### read in the structures
     print('reading args.inputfile ...',args.inputfile)
