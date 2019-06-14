@@ -229,12 +229,18 @@ def get_energies(args):
     if args.testkmc or args.testkmc_b or args.testkmc_l:
         if args.testkmc_b:
             args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_bestteste
+<<<<<<< HEAD
             print('args.potepoch',args.potepoch)
             print('ace.pot.use_epoch',ace.pot.use_epoch)
         if args.testkmc_l:
             args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
             print('args.potepoch',args.potepoch)
             print('ace.pot.use_epoch',ace.pot.use_epoch)
+=======
+        if args.testkmc_l:
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
+
+>>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
         kmc_folder = ace.pot.potpath+"/kmc"
@@ -243,6 +249,7 @@ def get_energies(args):
             sys.exit(kmc_file+" does already exist!")
         if not os.path.isdir(kmc_folder):
             my.mkdir(kmc_folder)
+<<<<<<< HEAD
         ## define the actual pot
         ace = ase_calculate_ene(pot=pot,
                         potpath=potpath,
@@ -253,6 +260,12 @@ def get_energies(args):
                         verbose=args.verbose)
         ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
         #sys.exit('kkb')
+=======
+
+
+
+
+>>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
 
     ### when want to assess some formation energies
     if args.test_formation_energies:
