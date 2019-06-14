@@ -32,6 +32,8 @@ def help(p = None):
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--testkmc','-kmc',action='store_true',help='test accuracy of kmc structures')
+    p.add_argument('--testkmc_b','-kmcb',action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')
+    p.add_argument('--testkmc_l','-kmcl',action='store_true',help='test accuracy of kmc structures for last epoch')
 
     p.add_argument('--analyze_kmc_number_1NN_2NN_ext','-akmc_ext',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
     p.add_argument('--analyze_kmc_number_1NN_2NN_ipi','-akmc_ipi',action='store_true',help='make analysis from KMC_analyze')
@@ -203,7 +205,8 @@ def get_energies(args):
     ##############################################################
     ### get ace object for the chosen potential
     ##############################################################
-    if args.testkmc:
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
+        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
         units = "meV_pa"
         verbose = True
 
@@ -223,7 +226,21 @@ def get_energies(args):
     ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
 
 
-    if args.testkmc:
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
+        if args.testkmc_b:
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_bestteste
+<<<<<<< HEAD
+            print('args.potepoch',args.potepoch)
+            print('ace.pot.use_epoch',ace.pot.use_epoch)
+        if args.testkmc_l:
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
+            print('args.potepoch',args.potepoch)
+            print('ace.pot.use_epoch',ace.pot.use_epoch)
+=======
+        if args.testkmc_l:
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
+
+>>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
         kmc_folder = ace.pot.potpath+"/kmc"
@@ -232,11 +249,23 @@ def get_energies(args):
             sys.exit(kmc_file+" does already exist!")
         if not os.path.isdir(kmc_folder):
             my.mkdir(kmc_folder)
-        args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
+<<<<<<< HEAD
+        ## define the actual pot
+        ace = ase_calculate_ene(pot=pot,
+                        potpath=potpath,
+                        use_epoch=ace.pot.use_epoch,
+                        units=units,
+                        geopt=geopt,
+                        elastic=args.elastic,
+                        verbose=args.verbose)
+        ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
+        #sys.exit('kkb')
+=======
 
 
 
 
+>>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
 
     ### when want to assess some formation energies
     if args.test_formation_energies:
@@ -787,7 +816,7 @@ def get_energies(args):
     if os.path.isfile('log.lammps'):
         os.remove('log.lammps')
 
-    if args.testkmc:
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
         ene_std         = mysavetxt(ene_std,kmc_file,units,save=True)
 
     if args.write_analysis:
@@ -1626,10 +1655,10 @@ def get_elastic_constants_al_ext(ace):
         frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
         ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
         print('ace.c44:',ace.c44,type(ace.c44))
-        filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
-        if not os.path.isfile(filename):
-            np.savetxt(filename,np.array([np.float(ace.c44)]))
-            my.create_READMEtxt(os.getcwd())
+        #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
+        #if not os.path.isfile(filename):
+        #    np.savetxt(filename,np.array([np.float(ace.c44)]))
+        #    my.create_READMEtxt(os.getcwd())
     return ace.c44
 
 def get_elastic_constants_al_from_ene(ace):
