@@ -87,13 +87,15 @@ def set_args_defaults(args,inputfile):
         args.columns = [2,3,4,5]
         args.line_style = "linespoints"
         #args.scale = True
-        args.xlabel = "epochs"
+        args.xlabel = "epoch"
         args.ylabel = "RMSE (meV/at)"
     if basename == "learning-curve.out":
         args.scale_y = [27211.386,27211.386,51422.063,51422.063]   # hartree to meV , here, as many as columns
     if basename == "KMC_analyze":
         args.xlabel = "step"
-        pass
+    if basename == "elastic_c44_all.dat":
+        args.xlabel = "epoch"
+        args.ylabel = "C44 (Gpa)"
     if socket.gethostname() == "mac":
         args.x11 = True  # since aquaterm does open figurs in the background (but the first one)
     if args.verbose:
@@ -378,14 +380,10 @@ def gnuplot_plot(args):
         #input = np.loadtxt(inputfile)
         from numpy import genfromtxt
         input = genfromtxt(inputfile,filling_values=99)
-<<<<<<< HEAD
         if len(input) > 10:
             print('input:')
             print(input[:2])
             print(input[-2:])
-=======
-        print('input',input)
->>>>>>> 1d634a66223c61d8fe8a4fbee536b2246c2fe485
         if args.verbose > verbosity_level+1:
             print('input',input)
         if args.verbose > verbosity_level:
