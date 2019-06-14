@@ -225,13 +225,22 @@ def get_energies(args):
     print('getEne(p2) ace.pot_get_and_ase_lmp_cmd()')
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
+<<<<<<< HEAD
     ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(P):")
+=======
+    ace.pot.print_variables_mypot(print_nontheless=True,text=">>")
+    sys.exit('88')
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 
 
     ############
     ### testkmc
     ############
+<<<<<<< HEAD
     if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
+=======
+    if args.testkmc or args.testkmc_b or args.testkmc_l:
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
         if args.testkmc_b:
             allepochs = args.potepoch = ace.pot.use_different_epoch = [ace.pot.potepoch_bestteste]
             print('args.potepoch',args.potepoch)
@@ -244,7 +253,11 @@ def get_energies(args):
             args.potepoch = ace.pot.use_different_epoch = ace.pot.potepoch_all[-1]
             allepochs = ace.pot.potepoch_all
             print('args.potepoch',args.potepoch)
+<<<<<<< HEAD
             print('ace.pot.use_different_epoch',ace.pot.use_different_epoch)
+=======
+            print('ace.pot.use_epoch',ace.pot.use_epoch)
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
@@ -331,6 +344,7 @@ def get_energies(args):
     #####################################################################################
     # go over every chosen potential
     #####################################################################################
+<<<<<<< HEAD
     for use_epoch in allepochs:
         if use_epoch == False:
             pass
@@ -368,6 +382,15 @@ def get_energies(args):
             structures_to_calc = len(frames)
         else:
             structures_to_calc = 1
+=======
+
+    ### read in the structures
+    print('reading args.inputfile ...',args.inputfile)
+    if args.inputfile == 'POSCAR': args.format_in = "vasp"
+
+    my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
+    frames = ase_read(args.inputfile,index=structures_idx,format=args.format_in)
+>>>>>>> 4722b253ead2222ce05c75ca05186b81113e5f81
 
         print('structures_to_calc           :',structures_to_calc)
         if structures_to_calc == 0:
