@@ -8,7 +8,7 @@ import subprocess
 import myutils
 
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools" ]
+known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -42,6 +42,9 @@ address["cosmo_tools"]   = "https://github.com/cosmo-epfl/cosmo-tools.git"
 branch["cosmo_tools"]    = False
 address["cosmo-tools"]   = address["cosmo_tools"]
 branch["cosmo-tools"]    = branch["cosmo_tools"]
+
+address["mlip"]         = "http://gitlab.skoltech.ru/shapeev/mlip.git"
+branch["mlip"]          = False
 
 def help(p = None ,known=known):
     string='''e.g. install_git.py -i atomsk'''
@@ -97,15 +100,13 @@ def install_(args,known):
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
         if args.install in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
-        elif args.install in ['ipi_cosmo']        : git_clone(args)
-        elif args.install in ['aiida-alloy']      : git_clone(args)
         elif args.install in ['atomsk']           : install_atomsk(args)
         elif args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         elif args.install in ['n2p2']             : install_n2p2(args)
         elif args.install in ['vmd']              : install_vmd(args)
         elif args.install in ['units']            : install_units(args)
         elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
-        else: git_clone(args)
+        else: git_clone(args)  # ipi_cosmo, aiia-alloy, mlip, ....
 
         # not working yet
         if args.install == 'xmgrace': install_xmgrace(args)
