@@ -2128,7 +2128,7 @@ class ase_calculate_ene( object ):
 
     def get_elastic_external(self,atomsin=False,verbose=False,text=False,get_all_constants=False):
         ''' the function will never change the atomsobject '''
-        print('######## get_elastic_external #############')
+        #print('######## get_elastic_external #############')
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         frame = atomsin.copy()
@@ -2148,7 +2148,7 @@ class ase_calculate_ene( object ):
         #print('stress !relaxed! frame :',frame.get_stress())
         #print('volume !relaxed! frame :',frame.get_volume())
         #print('ene    !relaxed! frame :',frame.get_potential_energy())
-        print('!RELAXED! stress(max),vol,ene',abs(frame.get_stress()).max(),frame.get_volume(),frame.get_potential_energy())
+        print('### get_elastic_external: !RELAXED! stress(max),vol,ene',abs(frame.get_stress()).max(),frame.get_volume(),frame.get_potential_energy())
         #print('frame cell',frame.get_cell())
         #ase_write('pos.runner',frame,format='runner')
         #print('-------------- lammps_ext_calc -----------')

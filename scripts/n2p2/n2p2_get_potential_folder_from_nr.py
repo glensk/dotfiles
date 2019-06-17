@@ -24,40 +24,40 @@ def n2p2_get_best_test_nr_from_learning_curve(args):
     if not os.path.isdir(folder):
         sys.exit(folder+' does not exist! (7)')
     folder = os.path.abspath(folder)
-    print('folder',folder)
-    print('get_last_epoch',args.get_last_epoch)
+    #print('folder',folder)
+    #print('get_last_epoch',args.get_last_epoch)
     n2p2_or_runner = my.inputnn_runner_or_n2p2(folder+'/input.nn')
     learning_curve_file = my.n2p2_runner_get_learning_curve_filename(folder+"/input.nn")
 
     if not os.path.isfile(learning_curve_file):
         sys.exit(learning_curve_file+" does not exist!")
 
-    print('learning_curve_file',learning_curve_file)
+    #print('learning_curve_file',learning_curve_file)
 
     learning_curve = lc = my.n2p2_runner_get_learning_curve(folder+'/input.nn')
     #print(lc)
     length = len(lc)-1
     number_of_points_to_save = 20
     geomspace = np.geomspace(1,length,num=number_of_points_to_save,endpoint=True,dtype=int)  # in geomspace this does not make sure the endpoint is really there
-    print('g1',geomspace)
+    #print('g1',geomspace)
     geomspace = np.append(geomspace, length)
-    print('g2',geomspace)
-    print('folder',folder)
+    #print('g2',geomspace)
+    #print('folder',folder)
     best_testset = np.argmin(lc[:,2])
     args.get_best_epoch = args.best_testsete = best_testset
 
     # include best teststet
     geomspace = np.append(geomspace, best_testset)
-    print('g3',geomspace)
+    #print('g3',geomspace)
     geomspace = np.unique(geomspace)
-    print('g4',geomspace)
+    #print('g4',geomspace)
     #sys.exit()
 
     if args.get_last_epoch:
         last_epoch = len(learning_curve) - 1
         #print('lenxx',last_epoch)
         #print(lc[last_epoch])
-        print('last epoch:',last_epoch)
+        #print('last epoch:',last_epoch)
         return [last_epoch]
     #print('learning_curve')
     #print(learning_curve)
@@ -173,8 +173,8 @@ if __name__ == '__main__':
     args = p.parse_args()
     if args.nr == False or args.get_best_epoch == False:
         args.nr = n2p2_get_best_test_nr_from_learning_curve(args)
-    print('args.nr',args.nr)
-    print('args.get_best_epoch',args.get_best_epoch)
+    print('##gp: n2p2_get_best_test_nr_from_learning_curve (or args.nr):',args.nr)
+    print('##gp: args.get_best_epoch',args.get_best_epoch)
     folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
     print('folder',folder)
     with my.cd(folder):
