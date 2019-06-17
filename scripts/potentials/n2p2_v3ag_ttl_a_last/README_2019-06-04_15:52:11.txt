@@ -1,7 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: 35034bf1ce02d791652224e34c92673224da8143
-# execution time: 0.211253881454 seconds.
-# pwd: /scratch/glensk/TEST_RUNNER_VS_n2p2/n2p2_v2ag_5000m2_24_24_adapted_atomic_energies_t_t_l_selection_mode2_1/potential_last
-
-n2p2_get_potential_folder_from_nr.py -l
