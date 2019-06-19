@@ -1296,8 +1296,10 @@ class mypot( object ):
             self.potcutoff = 14.937658735
         if self.pottype == "n2p2":
             self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
-            #self.potcutoff = 11.0
-            self.potcutoff = 17.0
+            self.potcutoff = 11.0  # 11.0 was the smallest one one could do
+            self.potcutoff = 15.0
+            self.potcutoff = 11.0
+            #self.potcutoff = 17.0
 
         if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
             #sys.exit("ERROR: "+self.potlib+" not found!"+add)

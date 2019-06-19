@@ -31,6 +31,7 @@ def help(p = None):
 
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
+    p.add_argument('--assess_input_data'  ,'-aid', action='store_true',help='test accuracy of input.data structures used')
     p.add_argument('--testkmc'  ,'-kmc', action='store_true',help='test accuracy of kmc structures')
     p.add_argument('--testkmc_b','-kmcb',action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')
     p.add_argument('--testkmc_l','-kmcl',action='store_true',help='test accuracy of kmc structures for last epoch')
@@ -323,6 +324,13 @@ def get_energies(args):
         test3_do(ace)
         sys.exit('args.test3 done! Exit')
 
+    if args.assess_input_data:
+        units = ace.units = "meV_pa"
+        if args.inputfile == False:
+            ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(assess_input_data):")
+            print('kk',ace.pot.inputdata)
+            args.inputfile = ace.pot.inputdata
+
 
     ### check args.inputfile
     if not args.inputfile:
@@ -351,11 +359,12 @@ def get_energies(args):
                 kmc_file = kmc_folder+"/ene_std_epoch_"+str(use_epoch)+".dat"
                 if os.path.isfile(kmc_file):
                     print(kmc_file+" does already exist!")
-                    print()*2
-                    sys.exit('better continue')
+                    print('I will continue with other epoch...')
                     continue
 
-        ### read in the structures
+        #################################################################################
+        ### read in the structures / input.data
+        #################################################################################
         print('reading args.inputfile ...',args.inputfile)
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
 
@@ -447,14 +456,14 @@ def get_energies(args):
         ##############################################
         # get atomic energies to substract from total energies
         ##############################################
-        if ace.units.split("_")[0] == 'hartree':
+        if ace.units.split("_")[0].lower() == 'hartree':
             conv = 1.
-        elif ace.units.split("_")[0] == 'ev':
+        elif ace.units.split("_")[0].lower() == 'ev':
             conv = aseunits.Hartree #27.211384    # hartree to ev
-        elif ace.units.split("_")[0] == 'mev':
+        elif ace.units.split("_")[0].lower() == 'mev':
             conv = aseunits.Hartree*1000. #27211.384    # hartree to ev
         else:
-            print('ace units',ace.units.split("_"))
+            print('ace units',ace.units.split("_"),ace.units.split("_")[0].lower())
             sys.exit('ace units not known')
         atom_energy_Mg = ace.pot.atom_energy["Mg"]*conv
         atom_energy_Si = ace.pot.atom_energy["Si"]*conv
@@ -488,9 +497,10 @@ def get_energies(args):
             if verbose > 2:
                 print('i',i,'ana_atoms',ana_atoms_)
             try:
-                for_DFTmax_ = np.abs(frames[i].get_forces()).max()
+                DFT_forces = frames[i].get_forces()
+                for_DFTmax_ = np.abs(DFT_forces).max()
             except RuntimeError:
-                for_DFTmax_ = 0
+                for_DFTmax_ = -99999999999999.0
             if debug:
                 print('kk',for_DFTmax_)
             d = my.ase_get_chemical_symbols_to_conz(frames[i])
@@ -779,6 +789,14 @@ def get_energies(args):
             ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
             ene_mean[idx] = ene_diff[:idx+1].mean()
 
+            NN_forces = frames[i].get_forces()
+            forces_diff = DFT_forces - NN_forces
+            #print('nnn88')
+            #print(DFT_forces[:5])
+            #print()
+            #print(NN_forces[:5])
+            #sys.exit()
+
             if idx == 0:
                 ene_std[idx] = 0.
                 ene_ste[idx] = 0.
@@ -802,6 +820,7 @@ def get_energies(args):
                 fmt_one = '%10.'+str(show)+'f'
                 fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
                 ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
+
                 print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],frames[i].get_number_of_atoms(),n["Si"],n["Mg"],n["Al"],ene_DFT[idx],ene_pot[idx],ene_pot_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
                 return
 
