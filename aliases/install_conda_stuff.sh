@@ -44,6 +44,7 @@ echo
 echo "${RED}now conda add chennels intel${NC}"
 # actually, my mac/cosmopc and all the clusters are intel based (clusters are all Xeon, cosmopc is i5)
 conda config --add channels intel    
+conda install numpy
 
 echo
 echo "${RED}now conda activate${NC}"

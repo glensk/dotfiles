@@ -22,7 +22,13 @@ self.sites[self.unique_idx(nstate)]
 self.sites[self.unique_idx(self.state)]
 print(self.sites[self.unique_idx(self.state)])
 
-
+self.ecache_file -> contains nevent[2]
+self.qcache_file -> contains nevent[3]
+nevent = [svac, sneigh, 0.0              , 0.0              , 0.0]  # initialization
+nevent = [svac, sneigh, self.ecache[nstr], self.qcache[nstr], 0.0]
+nevent[-1] = self.state[sneigh]  # this is just an "A" or an "S" or an "M"
+nevent[2] = self.ecache[nstr] : energy of the corresponding structure?
+nevent[2] = self.qcache[nstr] : positions of the corresponding strucure?
 
 ivac (constant): if 64 atoms sits & 1vac -> ivac = [63]
 ivac (constant): if 64 atoms sits & 2vac -> ivac = [63 ,62]
@@ -30,6 +36,9 @@ ivac (constant): is always the index lattice site associated the vacancy (e.g. 6
 
 svac = self.idx[ivac] # lattice !site! associated with this vacancy; ivac is fixed but self.idx array changes with every swap.
 svac: index of the current vacancy position which changes with every KMC step
+
+nvac: index of a partiuclar neighbor of the vacancy
+
 
 self.neigh  # list of nearest neighbors; if 64 atoms in the system (4x4x4sc) this is an array of 12 elements in 64 rows. 
             # self.neigh is a fixed list and never changes
