@@ -30,14 +30,16 @@ def help(p = None):
     p.add_argument('--lmp'    ,'-lmp'           ,action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
     p.add_argument('--ipi'    ,'-ipi'           ,action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
-    p.add_argument('--test_this_script','-t',  action='store_true',help='check if getEnergies_byLammps.py is working correctly.')
+    p.add_argument('--test_this_script','-t'    ,action='store_true',help='check if getEnergies_byLammps.py is working correctly.')
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
-    p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
-    p.add_argument('--assess_input_data'  ,'-aid', action='store_true',help='test accuracy of input.data structures used')
-    p.add_argument('--testkmc'  ,'-kmc', action='store_true',help='test accuracy of kmc structures')
-    p.add_argument('--testkmc_b','-kmcb',action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')
-    p.add_argument('--testkmc_l','-kmcl',action='store_true',help='test accuracy of kmc structures for last epoch')
-    p.add_argument('--testkmc_a','-kmca',action='store_true',help='test accuracy of kmc structures for all epochs')
+    p.add_argument('--test3'  ,'-t3'            ,action='store_true',help='test3')
+    p.add_argument('--testkmc'  ,'-kmc'         ,action='store_true',help='test accuracy of kmc structures')
+    p.add_argument('--testkmc_b','-kmcb'        ,action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')
+    p.add_argument('--testkmc_l','-kmcl'        ,action='store_true',help='test accuracy of kmc structures for last epoch')
+    p.add_argument('--testkmc_a','-kmca'        ,action='store_true',help='test accuracy of kmc structures for all epochs')
+    p.add_argument('--check_testdata','-ctest'  ,action='store_true',help='test accuracy of test.data')
+    p.add_argument('--check_traindata','-ctrain',action='store_true',help='test accuracy of train.data')
+    p.add_argument('--check_inputdata','-cid'   ,action='store_true',help='test accuracy of input.data structures used')
 
     p.add_argument('--analyze_kmc_number_1NN_2NN_ext','-akmc_ext',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
     p.add_argument('--analyze_kmc_number_1NN_2NN_ipi','-akmc_ipi',action='store_true',help='make analysis from KMC_analyze')
@@ -55,6 +57,7 @@ def help(p = None):
     p.add_argument('--write_forces','-wf',  action='store_true',help='write forces.out of particular strucuture')
     p.add_argument('--write_forcesx','-wfx',action='store_true',help='write forcesx.out of particular strucuture')
     p.add_argument('--write_analysis','-wa',action='store_true',help='write ene_{DFT,pot}... default: False')
+    p.add_argument('--write_analysis_full','-waf',action='store_true',help='write ene_{DFT,pot}... default: False')
     p.add_argument('-d','--debug',   help='verbose', action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
@@ -334,22 +337,62 @@ def get_energies(args):
         test3_do(ace)
         sys.exit('args.test3 done! Exit')
 
-    if args.assess_input_data:
+    if args.check_inputdata or args.check_traindata or args.check_testdata:
         units = ace.units = "meV_pa"
-        if args.inputfile == False:
-            ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(assess_input_data):")
-            print('kk',ace.pot.inputdata)
+        args.write_analysis = True
+        if args.inputfile == False and args.check_inputdata:
             args.inputfile = ace.pot.inputdata
+            ext = "input"
+        if args.inputfile == False and args.check_traindata:
+            args.inputfile = ace.pot.traindata
+            ext = "train"
+        if args.inputfile == False and args.check_testdata:
+            args.inputfile = ace.pot.testdata
+            ext = "test"
+        allepochs = [ace.pot.potepoch_bestteste,ace.pot.potepoch_all[-1]]
 
 
+    ###############################
     ### check args.inputfile
+    ###############################
     if not args.inputfile:
         sys.exit("Error: Missing option \"--infile\" / \"-i\".")
+    if args.inputfile == 'POSCAR': args.format_in = "vasp"
+    my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
 
     #####################################################################################
     # go over every chosen potential
     #####################################################################################
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    print('@@  allepochs:',allepochs)
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
     for use_epoch in allepochs:
+        print()
+        print()
+        print("Epoch:",use_epoch)
+
+        #################################################################################
+        ### read in the structures / input.data
+        #################################################################################
+        print('getEne (23): reading args.inputfile ...  :',args.inputfile)
+        if args.inputfile[-6:] == 'extxyz': args.format_in = "extxyz"
+        if args.inputfile[-6:] == 'gz': sys.exit("this need to be unzipped first, otherwise takes too long with ase")
+        print('getEne (23): args.format_in ...          :',args.format_in)
+        print('getEne (23): args.structures_idx ...     :',args.structures_idx)
+        frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
+
+        if type(frames) == list: structures_to_calc = len(frames)
+        else: structures_to_calc = 1
+        print('getEne (24): structures_to_calc          :',structures_to_calc)
+
+        if structures_to_calc == 0: sys.exit('ERROR! 0 strucutres to calculate? Something \
+                went wrong when importing the args.inputfile \"'+args.inputfile+'\" (mayby \
+                you need to change the \"args.format_in\" of the file? \
+                currently \"'+args.format_in+'\"')
+
+        #################################################################################
+        ### set the corresponding potential
+        #################################################################################
         if use_epoch == False:
             pass
         else:
@@ -372,29 +415,20 @@ def get_energies(args):
                     print('I will continue with other epoch...')
                     continue
 
-        #################################################################################
-        ### read in the structures / input.data
-        #################################################################################
-        print('reading args.inputfile ...',args.inputfile)
-        if args.inputfile == 'POSCAR': args.format_in = "vasp"
+            if args.check_inputdata or args.check_traindata or args.check_testdata:
+                folder = ace.pot.potpath+"/assess_"+ext+"_"+str(use_epoch)
+                print('folder',folder)
+                if os.path.isdir(folder):
+                    print("Exit, folder "+folder+" does already exist!")
+                    continue
+                else:
+                    my.mkdir(folder)
+                    os.chdir(folder)
+                ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(check_xxxdata):")
 
-        my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
-        frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
 
-        ### print stuff to screen
-        print('structures_idx               :',args.structures_idx)
 
-        #structures_to_calc = my.string_to_index_an_array(range(len(frames)),args.structures_idx)
-        if type(frames) == list:
-            structures_to_calc = len(frames)
-        else:
-            structures_to_calc = 1
 
-        print('structures_to_calc           :',structures_to_calc)
-        if structures_to_calc == 0:
-            print()
-            print("ERROR!")
-            sys.exit('0 strucutres to calculate? Something went wrong when importing the args.inputfile \"'+args.inputfile+'\" (mayby you need to change the \"args.format_in\" of the file? currently \"'+args.format_in+'\"')
 
         # show positions of first structure?
         show_positions = False
@@ -842,7 +876,7 @@ def get_energies(args):
             if verbose > 0 and printed == False:
                 printhere()
 
-        if args.write_analysis:
+        if args.write_analysis_full:
             np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
         if args.write_runner:
@@ -862,73 +896,81 @@ def get_energies(args):
         if args.testkmc or args.testkmc_b or args.testkmc_l:
             ene_std         = mysavetxt(ene_std,kmc_file,units,save=True)
 
-        if args.write_analysis:
-            ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
-            ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
+        if args.check_inputdata or args.check_traindata or args.check_testdata:
+            my.create_READMEtxt(os.getcwd())
+
+        if args.write_analysis_full or args.write_analysis:
             ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
             ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
             ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
-
             ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
             ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
-            for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
-            ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
-            ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
-            ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
-            ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
-            ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
-            ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
-            ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
-            ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
-            if len(ene_pot) != 0:
-                np.savetxt("ene_DFT.npy",ene_DFT,header=units)
-                np.savetxt("ene_pot.npy",ene_pot,header=units)
-                np.savetxt("ene_diff.npy",ene_diff,header=units)
-                np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
-                np.savetxt("ene_std.npy",ene_std,header=units)
 
-                ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
-                ### write analyze.csv
-                try:
-                    np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
-                except IndexError:
-                    print('len',len(ene_DFT))
-                    print(ene_DFT.shape)
-                    print(ene_diff_abs.shape)
-                    print(ene_DFT_wo_atomic.shape)
-                    print(ene_pot_wo_atomic.shape)
-                    print(for_DFTmax.shape)
-                    print(ana_mg_conz.shape)
-                    print(ana_si_conz.shape)
-                    print(ana_al_conz.shape)
-                    print(ana_atoms.shape)
-                    print(ana_vol.shape)
-                    print(ana_vol_pa.shape)
-                    print(ana_dist_min.shape)
-                    print('cant save ene_all.npy')
+            if args.write_analysis_full:
+                ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
+                ene_pot         = mysavetxt(ene_pot,"ene_pot.npy",units,save=True)
 
-                analyze = np.transpose([
-                    np.arange(len(ene_DFT)),   # i
-                    ene_diff_abs,          # diff
-                    ene_DFT_wo_atomic,     # E_wo
-                    for_DFTmax,            # for
-                    ana_mg_conz,
-                    ana_si_conz,
-                    ana_al_conz,
-                    ana_atoms,
-                    ana_vol,
-                    ana_vol_pa,
-                    ana_dist_min,
-                    ana_VOL_diff_norm])
-                #print('a',analyze.shape)
-                #print('a',analyze.shape[0])
-                #analyze_len = analyze.shape[1] - 1
-                analyze_len = analyze.shape[0] - 1
-                #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
-                np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+                for_DFTmax      = mysavetxt(for_DFTmax,"for_DFTmax",units)
+                ana_mg_conz     = mysavetxt(ana_mg_conz,"ana_mg_conz",units)
+                ana_si_conz     = mysavetxt(ana_si_conz,"ana_si_conz",units)
+                ana_al_conz     = mysavetxt(ana_al_conz,"ana_al_conz",units)
+                ana_atoms       = mysavetxt(ana_atoms,"ana_atoms",units)
+                ana_vol         = mysavetxt(ana_vol ,"ana_vol",units)
+                ana_vol_pa      = mysavetxt(ana_vol_pa ,"ana_vol_pa",units)
+                ana_VOL_diff_norm = mysavetxt(ana_VOL_diff_norm,"ana_VOL_diff_norm",units)
+                ana_dist_min    = mysavetxt(ana_dist_min,"ana_dist_min",units)
+                if len(ene_pot) != 0:
+                    np.savetxt("ene_DFT.npy",ene_DFT,header=units)
+                    np.savetxt("ene_pot.npy",ene_pot,header=units)
+                    np.savetxt("ene_diff.npy",ene_diff,header=units)
+                    np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
+                    np.savetxt("ene_std.npy",ene_std,header=units)
+
+                    ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
+                    ### write analyze.csv
+                    try:
+                        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+                    except IndexError:
+                        print('len',len(ene_DFT))
+                        print(ene_DFT.shape)
+                        print(ene_diff_abs.shape)
+                        print(ene_DFT_wo_atomic.shape)
+                        print(ene_pot_wo_atomic.shape)
+                        print(for_DFTmax.shape)
+                        print(ana_mg_conz.shape)
+                        print(ana_si_conz.shape)
+                        print(ana_al_conz.shape)
+                        print(ana_atoms.shape)
+                        print(ana_vol.shape)
+                        print(ana_vol_pa.shape)
+                        print(ana_dist_min.shape)
+                        print('cant save ene_all.npy')
+
+                    analyze = np.transpose([
+                        np.arange(len(ene_DFT)),   # i
+                        ene_diff_abs,          # diff
+                        ene_DFT_wo_atomic,     # E_wo
+                        for_DFTmax,            # for
+                        ana_mg_conz,
+                        ana_si_conz,
+                        ana_al_conz,
+                        ana_atoms,
+                        ana_vol,
+                        ana_vol_pa,
+                        ana_dist_min,
+                        ana_VOL_diff_norm])
+                    #print('a',analyze.shape)
+                    #print('a',analyze.shape[0])
+                    #analyze_len = analyze.shape[1] - 1
+                    analyze_len = analyze.shape[0] - 1
+                    #np.savetxt("analyze.csv",analyze ,delimiter=',',header=" i   diff  E_wo    for_max  Mg_c   Si_c   Al_c  atoms   vol  vol_pa dist_min") # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
+                    np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
-    my.create_READMEtxt(os.getcwd())
+    if args.check_inputdata or args.check_traindata or args.check_testdata:
+        pass
+    else:
+        my.create_READMEtxt(os.getcwd())
     return
 
 

@@ -2,9 +2,11 @@
 
 from __future__ import print_function
 import numpy as np
-import glob,sys,os,argparse,subprocess
+import glob,sys,os,argparse,subprocess,time
 import myutils as my
+from myutils import ase_calculate_ene
 #print('imported all ...')
+start_time = time.time()
 
 def help(p = None):
     string = ''' helptext '''
@@ -18,6 +20,7 @@ def help(p = None):
     p.add_argument('-c44','--getc44'             , action='count',      default=False, help='get c44 in potential folder')
     p.add_argument('-v'  ,'--verbose'            , action='count',      default=False, help='verbose')
     p.add_argument('-b'  ,'--both'               , action='store_true', default=False, help='evaluate for runner & n2p2 (instad of only n2p2)')
+    p.add_argument('-e'  ,'--execute'            , action='store_true', default=False, help='execute part')
     return p
 
 p = help()
@@ -162,7 +165,7 @@ for c in subfolder:    # from the ones in the que
     ##########################
     all_learning_curve_files = fn =sorted(glob.glob(c+fm1+"/learning-curve.out"))
     if verbose > 3:
-        print('fn',fn)
+        print('fn n2p2 jobs',fn)
     ##########################
     ## search for n2p2 jobs
     ##########################
@@ -185,8 +188,18 @@ for c in subfolder:    # from the ones in the que
         basename = os.path.basename(i)
         folder = i.replace(basename, '')[:-1]
         allfolder.append(folder)
-        if verbose:
-            print('learning_curve_file folder',folder)
+        #if verbose:
+        #################################################################
+        # in case there is something to do in n2p2/runner folder
+        #################################################################
+        if args.execute == True:
+            print('learning_curve_file folder:',folder.ljust(40),os.getcwd())
+            hier = os.getcwd()
+            os.chdir(folder)
+            subprocess.call(["getEnergies_byLammps.py -p . -ctrain"],shell=True)
+            subprocess.call(["getEnergies_byLammps.py -p . -ctest"],shell=True)
+            os.chdir(hier)
+
         if args.getc44:
             with my.cd(folder):
                 if verbose:
@@ -214,6 +227,12 @@ for c in subfolder:    # from the ones in the que
             print('input_structures :',input_structures)
             print('runner_n2p2      :',runner_n2p2)
         #pot_epoch = my.inputnn_get_potential_number_from_weightsfile(inputnn)
+        if True:
+            ace = ase_calculate_ene(pot=False,
+                    potpath=folder,
+                    use_different_epoch=False,
+                    units="meV_pa",
+                    verbose=args.verbose)
 
         #print(inputnn,'runner_n2p2',runner_n2p2)
         testf       = my.inputnn_get_testfraction(inputnn)
@@ -275,7 +294,7 @@ for c in subfolder:    # from the ones in the que
             if not os.path.isfile(file):
                 return kmcstd
             else:
-                print('loading',file)
+                #print('loading',file)
                 kmcstd_all = np.loadtxt(file)
                 kmcstd = kmcstd_all[-1]
                 return kmcstd
@@ -381,12 +400,64 @@ for c in subfolder:    # from the ones in the que
                     if args.verbose > 3:
                         print('DD is in --> continue',foldern)
                     continue
-                nn          = j[len(j) - 6]
-                kmc         = j[len(j) - 5]
-                epochs      = j[len(j) - 4]
-                c44         = j[len(j) - 3]
-                c44e_unused = j[len(j) - 2]
-                path        = j[len(j) - 1]
+                nn              = j[len(j) - 6]
+                kmc             = j[len(j) - 5]
+                epochs          = j[len(j) - 4]
+                c44             = j[len(j) - 3]
+                c44e_unused     = j[len(j) - 2]
+                path = folder   =  j[len(j) - 1]
+
+                if True:
+                    pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
+                    pot.get()
+                    epoch_best = pot.potepoch_bestteste
+                    #print(folder,pot.potepoch_all,epoch_best)
+                    if len(pot.potepoch_all) > 0:
+                        epoch_last = pot.potepoch_all[-1]
+                    else:
+                        epoch_last = False
+                    ab_test  = folder+"/assess_test_"+str(pot.potepoch_bestteste)
+                    al_test  = folder+"/assess_test_"+str(epoch_last)
+                    ab_train = folder+"/assess_train_"+str(pot.potepoch_bestteste)
+                    al_train = folder+"/assess_train_"+str(epoch_last)
+
+                    def read_lastline(file):
+                        with open(file, 'rb') as f:
+                            f.seek(-2, os.SEEK_END)
+                            while f.read(1) != b'\n':
+                                f.seek(-2, os.SEEK_CUR)
+                            return f.readline().decode()
+
+                    agree="?"
+                    if bl == 'best':
+                        if os.path.isfile(ab_test+'/ene_std.npy') and os.path.isfile(ab_train+'/ene_std.npy'):
+                            agree = "-"
+                            ab_test_ = float(read_lastline(ab_test+'/ene_std.npy'))
+                            ab_train_ = float(read_lastline(ab_train+'/ene_std.npy'))
+                            #agree=[ab_test_,ab_train_]
+                            if np.abs(ab_test_  - j[1]) < 0.1 and np.abs(ab_train_ - j[2]) < 0.1: agree = "|"
+
+                    if bl == 'last':
+                        #if folder == "n2p2_v3ag_4998_new":
+                        #    print(al_test+'/ene_std.npy')
+                        #    print(al_train+'/ene_std.npy')
+                        if os.path.isfile(al_test+'/ene_std.npy') and os.path.isfile(al_train+'/ene_std.npy'):
+                            agree = "-"
+                            al_test_ = float(read_lastline(al_test+'/ene_std.npy'))
+                            al_train_ = float(read_lastline(al_train+'/ene_std.npy'))
+                            #agree=[al_test_,al_train_]
+                            if np.abs(al_test_  - j[1]) < 0.1 and np.abs(al_train_ - j[2]) < 0.1: agree = "|"
+
+                            #print('diff',np.abs(al_test_  - j[1]))
+                            #print('diff',np.abs(al_train_ - j[2]))
+                    if False:
+                        if bl == 'best':
+                            print('best                         ',pot.potepoch_bestteste,agree,j[1],j[2],folder)
+                        if bl == 'last':
+                            print('last                         ',epoch_last,agree,j[1],j[2],folder)
+                        if folder == "n2p2_v3ag_5000":sys.exit('33')
+
+
                 path_before_learningcurve = path.split("/learning-curve.out")[0]  # random_seed_2234125
                 #print('1path',path)
                 path_before_learningcurve = os.getcwd()+"/"+path_before_learningcurve
@@ -453,8 +524,8 @@ for c in subfolder:    # from the ones in the que
                     path = ''.ljust(2)
                 kmc = str(round(kmc,1)).ljust(4)
 
-                stringout = run+NJC+"%0.1f ||%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |K %s |n %4.0f || [%4.0f] | %s | %8.0f | %s"
-                elementout = (        j[0] ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],   c44,  kmc,    ist ,    epochs,   nn,  rnd,   path)
+                stringout = run+NJC+"%0.1f |"+agree+"%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |K %s |n %4.0f || [%4.0f] | %s | %8.0f | %s"
+                elementout = (        j[0]          ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],   c44,  kmc,    ist ,    epochs,   nn,  rnd,   path)
 
                 conv_unconv = "unconv"
                 ## erstmak die komischen aussortieren
@@ -490,3 +561,5 @@ for c in subfolder:    # from the ones in the que
                     if takecolor == "white":
                         print(stringout%elementout)
 #print('aall',allfolder)
+end_time = time.time()
+print("TIME:",end_time - start_time)

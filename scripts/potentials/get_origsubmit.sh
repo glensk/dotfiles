@@ -6,8 +6,15 @@ for f in $ff;do
     cd $hier
     cd $f
     file="train.data"
+    file="test.data"
     #[ -e "$file" ] && echo "YES $f; $file exists" && continue
     [ -e "$file" ] && continue #echo "YES $f; $file exists" && continue
+    [ -L "$file" ] && continue #echo "Yzy $f" && continue #echo "YES $f; $file exists" && continue
+    #[ "$file" = "train.data" ] && [ -e "train.data.extxyz" ] && echo "Yxy $f" && continue
+    [ -L "$file.extxyz" ]    && continue #cho "Yxy $f" && exit && continue
+    [ -e "$file.extxyz" ]    && continue #cho "Yzy $f" && exit && continue
+    [ -L "$file.extxyz.gz" ] && continue #cho "Yxy $f" && exit && continue
+    [ -e "$file.extxyz.gz" ] && continue #cho "Yzy $f" && exit && continue
     
     ################################################
     # get the original folder (original_folder)
@@ -24,7 +31,7 @@ for f in $ff;do
     [ ! -d "$original_folder" ] && echo "NFF $f; NO original_folder: $original_folder :" && continue
 
     # copy the file
-    [ -e "$original_folder/$file" ] && cp $original_folder/$file $file
+    [ -e "$original_folder/$file" ] && echo "YES $f" && cp $original_folder/$file $file
     [ ! -e "$original_folder/$file" ] && echo "NOF $f; NO original_folder/file: $original_folder/$file :" && continue
     
     [ "$file" = "submit_n2p2_train.sh" ] && [ -e "$original_folder/submit_training.sh" ] && cp $original_folder/submit_training.sh $file

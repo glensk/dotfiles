@@ -76,6 +76,21 @@ def is_int(x):
     else:
         return a == b
 
+def isfiledir(file,exit=False,check_extension=False):
+    if os.path.isfile(file):
+        return file
+    if check_extension != False:
+        if type(check_extension) == str:
+            check_extension = [check_extension]
+        for ext in check_extension:
+            if os.path.isfile(file+ext):
+                return file+ext
+            if os.path.isfile(file+"."+ext):
+                return file+"."+ext
+
+    if exit == True:
+        sys.exit(file+" does not exist! (97)")
+    return False
 
 def printred(*var):
     red = '\033[31m'
@@ -937,7 +952,6 @@ def ase_get_chemical_symbols_to_number_of_species(atoms):
             #print(element+" exists")
             pass
         else:
-            #print(element+" does not exist")
             d[element] = 0
 
     dcheck("Mg")
@@ -964,7 +978,6 @@ def ase_get_chemical_symbols_to_conz(atoms):
             #print(element+" exists")
             pass
         else:
-            #print(element+" does not exist")
             d[element] = 0.0
     #print('dd',d)
     dcheck("Mg")
@@ -1239,7 +1252,7 @@ class mypot( object ):
 
     def get(self):
         self.potepoch_bestteste_checked = False
-        self.print_variables_mypot('get potential: in')
+        self.print_variables_mypot('PP get potential: in')
 
         ##########################################
         # get potential from path
@@ -1250,22 +1263,30 @@ class mypot( object ):
         if self.potpath_in != False and self.potpath == False:
             if not os.path.isdir(self.potpath_in):
                 sys.exit(self.potpath_in+" does not exist! (1)")
+
+            if not os.path.isfile(self.potpath_in+"/input.nn"):
+                print("PP could not find "+self.potpath_in+"/input.nn")
+                self.potpath_in = "/".join(self.potpath_in.split("/")[:-1])
+                if not os.path.isfile(self.potpath_in+"/input.nn"):
+                    print("PP could not find "+self.potpath_in+"/input.nn")
+                    self.potpath_in = "/".join(self.potpath_in.split("/")[:-1])
+                    if not os.path.isfile(self.potpath_in+"/input.nn"):
+                        sys.exit("PP could not find "+self.potpath_in+"/input.nn")
+
             checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
             for i in checkfiles:
                 if not os.path.isfile(self.potpath_in+"/"+i):
                     sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
-                #else:
-                #    print(self.potpath_in+"/"+i)
-            #if self.verbose: print('aa',self.potpath_in)
-            self.potpath = os.path.abspath(self.potpath_in)
-            self.inputnn = self.potpath_in+"/input.nn"
-            if not os.path.isfile(self.inputnn):
-                sys.exit(self.inputnn+" does not exist!")
-            self.scalingdata = self.potpath_in+"/scaling.data"
-            if not os.path.isfile(self.scalingdata):
-                sys.exit(self.scalingdata+" does not exist!")
 
-            self.inputdata = self.potpath_in+"/input.data"
+            self.potpath = os.path.abspath(self.potpath_in)
+            self.inputnn     = isfiledir(self.potpath_in+"/input.nn",exit=True)
+            self.scalingdata = isfiledir(self.potpath_in+"/scaling.data",exit=True)
+
+            self.inputdata = isfiledir(self.potpath_in+"/input.data",check_extension=[".extxyz"])
+            self.testdata  = isfiledir(self.potpath_in+"/test.data",check_extension=[".extxyz"])
+            self.traindata = isfiledir(self.potpath_in+"/train.data",check_extension=[".extxyz"])
+
+
             self.pottype = inputnn_runner_or_n2p2(self.inputnn)
             self.learning_curve_file = n2p2_runner_get_learning_curve_filename(self.inputnn)
             try:
@@ -1279,7 +1300,7 @@ class mypot( object ):
             epstr = str(self.potepoch_bestteste).zfill(6)
             file2 = self.potpath_in+"/weights.012."+epstr+".out"
             if not filecmp.cmp(file1, file1):
-                sys.exit("File "+file1+" is not "+file2)
+                sys.exit("PP File "+file1+" is not "+file2)
             else:
                 self.potepoch_bestteste_checked = True
 
@@ -1293,7 +1314,7 @@ class mypot( object ):
 
 
         ### check if self.pottype can be computed on this host!
-        add = ' Your lammps version does not seem to work with '+self.pottype+"!"
+        add = 'PP Your lammps version does not seem to work with '+self.pottype+"!"
         if self.pottype == "runner":
             self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
             self.potcutoff = 14.937658735
@@ -1309,7 +1330,9 @@ class mypot( object ):
         if self.use_different_epoch == False:
             self.potpath_work = self.potpath
             #print('se false')
-        else:
+        elif int(self.use_different_epoch) == self.potepoch_bestteste:
+            self.potpath_work = self.potpath
+        else:  # use_different_epoch
             if self.verbose:
                 print("PP copy files ...")
             #print('se true')
@@ -1527,7 +1550,7 @@ class ase_calculate_ene( object ):
         self.verbose = verbose
         self.atoms = False          # ase atoms object (frame)
         if self.verbose:
-            print('initializing mypot .... to self.pot')
+            print('>> ase_calculate_ene: initializing mypot .... to self.pot')
         self.pot = mypot(pot,self.potpath,use_different_epoch=use_different_epoch,verbose=self.verbose)
 
         #####################
