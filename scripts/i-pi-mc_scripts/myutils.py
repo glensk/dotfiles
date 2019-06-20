@@ -3,10 +3,13 @@
 from __future__ import print_function
 import os,sys,re
 import filecmp
-import click
+#import click
 import numpy as np
 import glob #,pathlib
-from tqdm import tqdm_notebook, tnrange
+try:
+    from tqdm import tqdm_notebook, tnrange
+except ImportError:
+    pass
 from copy import deepcopy
 from socket import gethostname
 import shutil
@@ -1118,15 +1121,15 @@ def hostname():
     hostname = gethostname()
     return hostname
 
-def get_click_defaults():
-    # show default values in click
-    orig_init = click.core.Option.__init__
-    def new_init(self, *args, **kwargs):
-        orig_init(self, *args, **kwargs)
-        self.show_default = True
-    click.core.Option.__init__ = new_init
-    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
-    return CONTEXT_SETTINGS
+#def get_click_defaults():
+#    # show default values in click
+#    orig_init = click.core.Option.__init__
+#    def new_init(self, *args, **kwargs):
+#        orig_init(self, *args, **kwargs)
+#        self.show_default = True
+#    click.core.Option.__init__ = new_init
+#    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
+#    return CONTEXT_SETTINGS
 
 
 class mypot( object ):
@@ -1296,10 +1299,8 @@ class mypot( object ):
             self.potcutoff = 14.937658735
         if self.pottype == "n2p2":
             self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
-            self.potcutoff = 11.0  # 11.0 was the smallest one one could do
-            self.potcutoff = 15.0
-            self.potcutoff = 11.0
-            #self.potcutoff = 17.0
+            self.potcutoff = 10.6  # the minimum cutoff of the SF was 20bohrradius = 10.58Angstrom
+
 
         if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
             #sys.exit("ERROR: "+self.potlib+" not found!"+add)
@@ -3859,7 +3860,7 @@ def n2p2_runner_get_bestteste_idx(inputnn):
         learning_curve = lc = n2p2_runner_get_learning_curve(inputnn)
         best_testsete = np.argmin(lc[:,2])
         if job_finished:
-            np.savetxt(best_testsete_file,aa)
+            # np.savetxt(best_testsete_file,aa)
             np.savetxt(best_testsete_file,np.array([int(best_testsete)]),fmt='%i')
         #print(lc)
         #print('mmm',best_testsete)

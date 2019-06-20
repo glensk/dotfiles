@@ -81,6 +81,7 @@ export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
 export N2P2_PATH="$HOME/sources/n2p2/"
 export scripts=$SCR
 export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
+export OMP_NUM_THREADS=1
 
 # for vmd (seems ok to define this on mac with downloaded/installed vmd)
 export VMDINSTALLNAME="vmd"

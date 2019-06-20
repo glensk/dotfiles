@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import sys,os,copy,argparse
-import click
+#import click
 import numpy as np
 import myutils as my
 from myutils import ase_calculate_ene #as ace
@@ -20,7 +20,8 @@ def help(p = None):
     p.add_argument('--potpath','-pp',   required=False, type=str, default=False, help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
-    p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
+    #p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
+    p.add_argument('--units','-u',choices = ['eV','meV_pa','eV_pa','hartree','hartree_pa'],default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--geopt','-g'               ,action='store_true',help='make a geometry optimization of the atoms.')
     p.add_argument('--elastic','-e'             ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
     p.add_argument('--elastic_all',     '-ea'   ,action='store_true',help='calculate elastic constants for every epoch for Al (externally by lammps).')
@@ -29,6 +30,7 @@ def help(p = None):
     p.add_argument('--lmp'    ,'-lmp'           ,action='store_true',help='Do the calculations externally by lammps and not through ase interface.')
     p.add_argument('--ipi'    ,'-ipi'           ,action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
+    p.add_argument('--test_this_script','-t',  action='store_true',help='check if getEnergies_byLammps.py is working correctly.')
     p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--test3'  ,'-t3', action='store_true',help='test3')
     p.add_argument('--assess_input_data'  ,'-aid', action='store_true',help='test accuracy of input.data structures used')
@@ -74,7 +76,6 @@ def get_energies(args):
     format_in = args.format_in
     pot = args.pot
     potpath = args.potpath
-    structures_idx = args.structures_idx
 
     units = args.units
     debug = args.debug
@@ -187,10 +188,11 @@ def get_energies(args):
     if lmp == True:
         ase = False
 
-    print('args.inputfile               :',args.inputfile)
+    print('getEne(0) args.inputfile             :',args.inputfile)
 
     ##############################################################
     ### check if ase runner/quippy/lammpps-data formats are known
+    ### use -v (verbose) option to see known formats
     ##############################################################
     ase_formats = my.ase_get_known_formats_class(verbose=verbose)
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
@@ -200,7 +202,7 @@ def get_energies(args):
     ##############################################################
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
-    print('II LD_LIBRARY_PATH      :',os.environ['LD_LIBRARY_PATH'])
+    print('getEne(0) LD_LIBRARY_PATH           :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
     lammps()
     os.remove("log.lammps")
@@ -208,10 +210,12 @@ def get_energies(args):
     ##############################################################
     ### get ace object for the chosen potential (first general)
     ##############################################################
-    if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
+    if args.test_this_script or args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
         args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
         units = "meV_pa"
         verbose = True
+        if args.test_this_script:
+            args.structures_idx = ":3"
 
     if args.test_formation_energies or args.elastic: units='eV'
     print('getEne(p1) args.potepoch:',args.potepoch)
@@ -227,6 +231,12 @@ def get_energies(args):
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(P):")
+
+    ##############################################################
+    ### again show args
+    ##############################################################
+    if args.verbose:
+        my.print_args(args)
 
 
     ############
@@ -369,12 +379,12 @@ def get_energies(args):
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
 
         my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
-        frames = ase_read(args.inputfile,index=structures_idx,format=args.format_in)
+        frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
 
         ### print stuff to screen
-        print('structures_idx               :',structures_idx)
+        print('structures_idx               :',args.structures_idx)
 
-        #structures_to_calc = my.string_to_index_an_array(range(len(frames)),structures_idx)
+        #structures_to_calc = my.string_to_index_an_array(range(len(frames)),args.structures_idx)
         if type(frames) == list:
             structures_to_calc = len(frames)
         else:
