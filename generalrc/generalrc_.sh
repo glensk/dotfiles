@@ -8,7 +8,7 @@
 ##################################################################################
 
 ##################################################################################
-# this has to be the first line  (loads senenv for zsh/bash); defines: tab-color; module; mkalias
+# this has to be the first line  (loads senenv for zsh/bash); defines: tab-color; mkalias
 ##################################################################################
 
 ##################################################################################
@@ -82,6 +82,8 @@ case $onhost in
     mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     fidis)     source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     helvetios) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    # on fidis/helvetios:
+    # pip install --upgrade --user ase  ## this however made problems 
 esac
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 

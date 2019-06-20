@@ -3495,6 +3495,7 @@ class ase_get_known_formats_class():
             contents = "".join(contents)
             f.write(contents)
             f.close()
+            sys.exit('! since adapting formatspy need to exit here!')
         else:
             if self.verbose:
                 print('everything was already in',self.formatspy)

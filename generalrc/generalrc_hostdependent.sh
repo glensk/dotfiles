@@ -86,7 +86,7 @@ helvetios)
     setenv myprompthostuser yellow;
     setenv mypromptpath yellow;
 	setenv SCRATCH /scratch/glensk;
-    module load git;  # to get git 2.17 (instad of 1.8)
+    module load git; # intel python/2.7.14;  # to get git 2.17 (instad of 1.8)
   ;;
 *)
 	setenv onhost UNKNOWN;
