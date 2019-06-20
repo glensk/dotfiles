@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import os
 import glob
-import pylab
+#import pylab
 import argparse   # vasp 2.6.6 would be too old
 import filecmp
 
@@ -292,7 +292,8 @@ class eos(object):
 
             self.folder = os.path.split(os.path.realpath(self.inputfile))[0]
 
-            data = pylab.loadtxt(self.inputfile)
+            #data = pylab.loadtxt(self.inputfile)
+            data = np.loadtxt(self.inputfile)
         else:
             data = data
         self.data = data[data[:, 0].argsort()]
@@ -379,7 +380,8 @@ class eos(object):
 
         #_printgreen("importing "+filename+" ..............................................")
         self.inputfile_parameters = filename
-        parameters = pylab.loadtxt(filename)
+        #parameters = pylab.loadtxt(filename)
+        parameters = np.loadtxt(filename)
         self._outfile = filename
         self.e0 = parameters[0]
         self.v0 = parameters[1]

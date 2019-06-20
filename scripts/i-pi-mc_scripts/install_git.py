@@ -5,14 +5,14 @@ import argparse
 import sys,os,socket
 import myutils as my
 import subprocess
-import myutils
 
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip' ]
+known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
 address = {};branch={}
+
 address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
 branch['ipi_old']       = "kmc-al6xxx"
 
@@ -79,9 +79,14 @@ def install_(args,known):
     if args.install not in known:
         sys.exit("Not known how to install "+args.install+"; Exit!")
 
+
     # get the address
-    args.git = address[install]
-    args.branch = branch[install]
+    try:
+        args.git = address[install]
+        args.branch = branch[install]
+    except KeyError:
+        args.git = False
+        args.branch = False
 
     # mkdir the install folder
     if not os.path.isdir(args.sources_folder):
@@ -101,6 +106,7 @@ def install_(args,known):
     with my.cd(args.sources_folder):
         if args.install in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
         elif args.install in ['atomsk']           : install_atomsk(args)
+        elif args.install in ['miniconda','miniconda2']       : install_miniconda(args)
         elif args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         elif args.install in ['n2p2']             : install_n2p2(args)
         elif args.install in ['vmd']              : install_vmd(args)
@@ -430,6 +436,36 @@ def install_xmgrace(args):
     with my.cd(args.install_folder):
         subprocess.call(["./configure"])  # this once complains about missing: configure: error: M*tif has not been found
 
+def install_miniconda(args):
+    with my.cd(os.environ['HOME']):
+        #if os.path.isdir(args.install):
+        #    sys.exit(args.install+" does already exist!")
+        #print('-----------')
+        #print(os.getcwd())
+        #print()
+        #print()
+        #print('1. donwload miniconda')
+        #print('------------------------------')
+        #if args.install == "miniconda2":
+        #    version = "2"
+        #elif args.install == "miniconda3":
+        #    version = "3"
+        #else:
+        #    sys.exit('either miniconda2 or miniconda3')
+
+        #subprocess.call(["wget https://repo.anaconda.com/miniconda/Miniconda"+version+"-latest-Linux-x86_64.sh -O ~/miniconda"+version+".sh"],shell=True)
+
+        #print('2. install it (in silent mode)')
+        #print('------------------------------')
+        #subprocess.call(["bash ~/miniconda"+version+".sh -b -p"],shell=True)
+
+        print('3. install modules')
+        print('------------------------------')
+        subprocess.call(["conda config --add channels intel"],shell=True)
+        subprocess.call(["conda install -c -y conda-forge ase"],shell=True)
+    sys.exit()
+
+
 def install_atomsk(args):
     print("atoms was in the end installed with conda!")
     print("by: conda install -y -c conda-forge atomsk")
@@ -460,7 +496,7 @@ def install_vmd(args):
     vmd = home+"/Dropbox/Albert/scripts/dotfiles/sources/"+vmdfolder+".tar.bzip2"
     if not os.path.exists(vmd):
         sys.exit("vmd is not saved @ "+vmd)
-    myutils.cp(vmd,".")
+    my.cp(vmd,".")
 
     print("### untar")
     import tarfile
