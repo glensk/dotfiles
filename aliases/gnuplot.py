@@ -81,7 +81,9 @@ def set_args_defaults(args,inputfile):
         print('args.verbose         ',args.verbose)
         print('args.log_log     (in)',args.log_log)
         print('args.max_columns (in)',args.max_columns)
-    if basename in ["learning-curve.out", 'learning-curve-runner.out']:
+    #print('bn',basename[:13])
+    #sys.exit()
+    if basename[:14] in ["learning-curve"]:
         args.log_log = True
         args.max_columns = 2
         args.columns = [2,3,4,5]
