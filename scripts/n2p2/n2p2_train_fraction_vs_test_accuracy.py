@@ -276,6 +276,15 @@ for c in subfolder:    # from the ones in the que
         train_fraction=1.-testf
 
         learning_curve = lc = my.n2p2_runner_get_learning_curve(inputnn)
+        #print(lc)
+        #print()
+        #print(lc[:,[0,2]])
+        #print('folder',folder)
+        np.savetxt(folder+"/learning-curve.e.train.out",lc[:,[0,1]])
+        np.savetxt(folder+"/learning-curve.e.test.out",lc[:,[0,2]])
+        np.savetxt(folder+"/learning-curve.f.train.out",lc[:,[0,3]])
+        np.savetxt(folder+"/learning-curve.f.test.out",lc[:,[0,4]])
+        #sys.exit()
         if False:
             print('i',i)
             print('len',len(lc),lc.shape)
@@ -381,7 +390,9 @@ for c in subfolder:    # from the ones in the que
     #out2=sorted(out2,key=lambda x: x[2])               # das ist nach dem train ergebnis
     #out2=sorted(out2,key=lambda x: x[len(out2[0])-3])  # das ist nach dem train ergebnis
 
-    for n2p2_or_runner_loop in ["n2p2","runner"]:
+    if args.both: n2p2_or_runner_loop_ = ["n2p2","runner"]
+    else: n2p2_or_runner_loop_ = ["n2p2"]
+    for n2p2_or_runner_loop in n2p2_or_runner_loop_:
         if args.verbose > 3:
             print('AA',n2p2_or_runner_loop)
         if True:
