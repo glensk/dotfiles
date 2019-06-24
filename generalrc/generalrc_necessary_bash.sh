@@ -16,6 +16,7 @@
 #    $date +%s%N
 #}
 
+# setenv wird nur von der tcsh benutzt
 setenv () {
       export $1=$2
 }
@@ -160,3 +161,8 @@ open_notebook_from_fidis () {
     open http://localhost:8889
 }
 
+# was before in aliases.sh function
+mcd () { 
+    mkdir -p $1 
+    cd $1 
+}

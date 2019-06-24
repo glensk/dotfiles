@@ -122,9 +122,13 @@ def n2p2_make_potential_folder_from_nr(argsnr):
     my.cp('input.data',folder+'/input.data')
     print('cp input.nn')
     my.cp('input.nn',folder+'/input.nn')
-    if os.path.isfile('submit_n2p2_train.sh'):
-        print('cp submitfile')
-        my.cp('submit_n2p2_train.sh',folder+'/submit_n2p2_train.sh')
+
+    cpfiles = [ 'submit_n2p2_train.sh', 'train.data', 'test.data' ]
+    for cpf in cpfiles:
+        if os.path.isfile(cpf):
+            print('cp',cpf)
+            my.cp(cpf,folder+'/'+cpf)
+
     if typ == "n2p2" and os.path.isfile('learning-curve.out'):
         print('cp learning-curve.out')
         my.cp('learning-curve.out',folder+'/learning-curve.out')
@@ -183,10 +187,25 @@ if __name__ == '__main__':
         subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)
         print()
         print()
-        print()
-        print('getEnergies_byLammps.py -p . --testkmc_b # to get all the c44')
-        subprocess.call("getEnergies_byLammps.py -p . --testkmc_b",shell=True)
-        print('getEnergies_byLammps.py -p . --testkmc_l # to get all the c44')
-        subprocess.call("getEnergies_byLammps.py -p . --testkmc_l",shell=True)
+        print('**********************************')
+        print('getEnergies_byLammps.py -p . -ckmc')
+        print('**********************************')
+        subprocess.call("getEnergies_byLammps.py -p . -ckmc",shell=True)
+        print('***********************************')
+        print('getEnergies_byLammps.py -p . -ctest')
+        print('***********************************')
+        subprocess.call("getEnergies_byLammps.py -p . -ctest",shell=True)
+        print('************************************')
+        print('getEnergies_byLammps.py -p . -ctrain')
+        print('************************************')
+        subprocess.call("getEnergies_byLammps.py -p . -ctrain",shell=True)
+        print('************************************')
+        print('getEnergies_byLammps.py -p . -cinput')
+        print('************************************')
+        subprocess.call("getEnergies_byLammps.py -p . -cinput",shell=True)
+        #print('getEnergies_byLammps.py -p . --testkmc_b # to get all the c44')
+        #subprocess.call("getEnergies_byLammps.py -p . --testkmc_b",shell=True)
+        #print('getEnergies_byLammps.py -p . --testkmc_l # to get all the c44')
+        #subprocess.call("getEnergies_byLammps.py -p . --testkmc_l",shell=True)
 
 

@@ -39,7 +39,9 @@ def help(p = None):
     p.add_argument('--testkmc_a','-kmca'        ,action='store_true',help='test accuracy of kmc structures for all epochs')
     p.add_argument('--check_testdata','-ctest'  ,action='store_true',help='test accuracy of test.data')
     p.add_argument('--check_traindata','-ctrain',action='store_true',help='test accuracy of train.data')
-    p.add_argument('--check_inputdata','-cid'   ,action='store_true',help='test accuracy of input.data structures used')
+    p.add_argument('--check_inputdata','-cinput',action='store_true',help='test accuracy of input.data structures used')
+    p.add_argument('--check_kmc57data','-ckmc'  ,action='store_true',help='test accuracy of kmc57.data')
+    p.add_argument('--check_outliers','-co'     ,action='store_true',help='test for outliers')
 
     p.add_argument('--analyze_kmc_number_1NN_2NN_ext','-akmc_ext',action='store_true',help='make simulation.pos_0.xyz.1NN.al_mg_si_vac_0.dat files')
     p.add_argument('--analyze_kmc_number_1NN_2NN_ipi','-akmc_ipi',action='store_true',help='make analysis from KMC_analyze')
@@ -50,8 +52,9 @@ def help(p = None):
     p.add_argument('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
     p.add_argument('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
     p.add_argument('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
-    p.add_argument('--pick_c44','-pc44',action='store_true',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
+    p.add_argument('--pick_c44','-pc44'         ,action='store_true',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
     p.add_argument('--pick_amount_1NN','-pa_1NN',action='store_true',default=False,required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
+    p.add_argument('--pick_uuid','-pa_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
 
     p.add_argument('--write_runner','-wr',  action='store_true',help='default: runner.out')
     p.add_argument('--write_forces','-wf',  action='store_true',help='write forces.out of particular strucuture')
@@ -74,6 +77,7 @@ def get_energies(args):
     getEnergies_byLammps.py -p . -e
 
     '''
+    hier = os.path.abspath(os.getcwd())
     allepochs = [False]
     inputfile = infile = args.inputfile
     format_in = args.format_in
@@ -337,7 +341,7 @@ def get_energies(args):
         test3_do(ace)
         sys.exit('args.test3 done! Exit')
 
-    if args.check_inputdata or args.check_traindata or args.check_testdata:
+    if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
         units = ace.units = "meV_pa"
         args.write_analysis = True
         if args.inputfile == False and args.check_inputdata:
@@ -349,6 +353,9 @@ def get_energies(args):
         if args.inputfile == False and args.check_testdata:
             args.inputfile = ace.pot.testdata
             ext = "test"
+        if args.inputfile == False and args.check_kmc57data:
+            args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
+            ext = "kmc57"
         allepochs = [ace.pot.potepoch_bestteste,ace.pot.potepoch_all[-1]]
 
 
@@ -367,6 +374,7 @@ def get_energies(args):
     print('@@  allepochs:',allepochs)
     print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
     for use_epoch in allepochs:
+        os.chdir(hier)
         print()
         print()
         print("Epoch:",use_epoch)
@@ -415,7 +423,7 @@ def get_energies(args):
                     print('I will continue with other epoch...')
                     continue
 
-            if args.check_inputdata or args.check_traindata or args.check_testdata:
+            if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
                 folder = ace.pot.potpath+"/assess_"+ext+"_"+str(use_epoch)
                 print('folder',folder)
                 if os.path.isdir(folder):
@@ -485,6 +493,7 @@ def get_energies(args):
         ene_mean         = np.empty(structures_to_calc);ene_mean[:] = np.nan
         ene_diff_lam_ase = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
         for_DFTmax       = np.empty(structures_to_calc);for_DFTmax[:]  = np.nan
+        uuids            = np.empty(structures_to_calc,dtype='|S1');uuids[:]  = ''
         #sys.exit('get uuid of structure and save structure energy somewhere (cache)')
         #sys.exit('find out weather particular structure in test or trainset')
         # make this parallel at some point
@@ -533,6 +542,16 @@ def get_energies(args):
         min_at_id = 0
         min_at_orig = 0
         for idx,i in enumerate(range(structures_to_calc)):
+            all_comment = frames[i].info['comment']
+            all_comment_split = all_comment.split()
+            all_comment_split.remove('comment')
+            all_comment_split.remove('uuid:')
+            if len(all_comment_split) == 1:
+                uuid = all_comment_split[0]
+            else:
+                print('776 Exit',all_comment)
+                print('776 Exit',all_comment_split)
+                sys.exit()
             if debug:
                 print('iii',i)
             ana_atoms_ = frames[i].get_number_of_atoms()
@@ -566,6 +585,8 @@ def get_energies(args):
             if args.pick_number_of_atoms >= 0 and ana_atoms_ != args.pick_number_of_atoms:
                 continue
             if args.pick_concentration_al >= 0 and d["Al"] != args.pick_concentration_al:
+                continue
+            if type(args.pick_uuid) == list and uuid not in args.pick_uuid:
                 continue
             if args.pick_atoms_al >= 0 and n["Al"] != args.pick_atoms_al:
                 continue
@@ -896,7 +917,7 @@ def get_energies(args):
         if args.testkmc or args.testkmc_b or args.testkmc_l:
             ene_std         = mysavetxt(ene_std,kmc_file,units,save=True)
 
-        if args.check_inputdata or args.check_traindata or args.check_testdata:
+        if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
             my.create_READMEtxt(os.getcwd())
 
         if args.write_analysis_full or args.write_analysis:
@@ -967,7 +988,7 @@ def get_energies(args):
                     np.savetxt("analyze.csv",analyze ,delimiter=',') # ,fmt=' '.join(['%4.0f'] +['%6.2f']*analyze_len))
 
 
-    if args.check_inputdata or args.check_traindata or args.check_testdata:
+    if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
         pass
     else:
         my.create_READMEtxt(os.getcwd())

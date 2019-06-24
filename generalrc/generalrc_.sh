@@ -15,8 +15,9 @@
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ##################################################################################
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
-[ "$BASH_VERSION" != "" ] && currentshell="bash"
-[ "$ZSH_VERSION" != "" ] && currentshell="zsh"
+myprompttime="black"
+[ "$BASH_VERSION" != "" ] && currentshell="bash" && myprompttime="red"
+[ "$ZSH_VERSION" != "" ]  && currentshell="zsh"  && myprompttime="magenta"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
@@ -101,13 +102,15 @@ fi
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett thermodynamics"
 
 ##############################################
-# completion goo for commands
+# completion goo for commands  -> this needs to go to zshrc! (autoload/compdef)
 ##############################################
+if [ "$currentshell" = "zsh" ];then
 fpath=($dotfiles/completions_fpath $fpath)
 function goo() { $dotfiles/aliases/goo "$1" 
 }  # this nees to be a in second line
 autoload _goo    # do not forget BEFORE the next cmd! 
 compdef _goo goo # binds the completion function to a command
+fi
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett goo"
 

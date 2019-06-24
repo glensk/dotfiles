@@ -3,3 +3,35 @@ All of this has used the aiida_export_group_to_runner.py which considers the
 conversion_aiida_ase_forces = 1.0000000908541917
 conversion_aiida_ase_energy = 1.0000000945842116
 cat aiida_exported_group_v1ag_fps3134_first20_calc__all_steps.input.data aiida_exported_group_kmc_1000K_4_calc__all_steps.input.data aiida_exported_group_from_KMC3_remaining21.data.group_calc__all_steps.input.data > aiida_exported_group_KMC57.data
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
+
+OUTLIERS! file /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_repeated_1616_28cores/assess_test_6/ene_diff_abs.npy
+cc > 60 [282 397] [ 76.91 306.85]
+frame 282 comment uuid: a8ed0448-d650-4489-b45d-2a8e03409904
+frame 282 nat 264
+now check also in original input.data if this struct is there
+frame 397 comment uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c
+frame 397 nat 264
+now check also in original input.data if this struct is there
+OUTLIERS! file /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_repeated_1616_28cores/assess_test_6/ene_diff_abs.npy
+cc > 60 [282 397] [ 76.91 306.85]
+frame 282 comment uuid: a8ed0448-d650-4489-b45d-2a8e03409904
+frame 282 nat 264
+now check also in original input.data if this struct is there
+frame 397 comment uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c
+frame 397 nat 264
+now check also in original input.data if this struct is there
+
+
+in aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2.input.data I excluded:
+uuid: a8ed0448-d650-4489-b45d-2a8e03409904
+uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c
+both had high jumps for in the repeated structures inuput.data  .... these uuids were only in the testset of n2p2_v3ag_repeated_1616_28cores.
+                                                                .... questin is also if those were repeated correctly!
+        repeated structure have both 264 atoms
+        original uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c 
+        and original uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c
+        have both 33 Al atoms (some Al interstitial) and are repeated 2x2x2
+        -> check if other Al interstitial jobs are in the input.data

@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: ba14cc179b56665571aea3b2f10754ddd588b6d5
+# execution time: 3.33262515068 seconds.
+
+getEnergies_byLammps.py --pick_atoms_al 33 -i ../input_5000.data -v -u meV_pa --pick_uuid a8ed0448-d650-4489-b45d-2a8e03409904 fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c

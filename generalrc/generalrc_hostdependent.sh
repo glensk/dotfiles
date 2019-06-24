@@ -21,21 +21,18 @@ setenv myhome_cosmopc /home/glensk;
 
 case $onhost in
 mac)
-    setenv myprompttime magenta;
     setenv myprompthostuser magenta;
     setenv mypromptpath magenta;
     setenv lmp_exec $scripts/executables/lmp_mac_serial_runner_2018_10_30;
     # conda it seems can not be loaded here
   ;;
 cosmopc)
-    setenv myprompttime green ;
     setenv myprompthostuser green;
     setenv mypromptpath green;
 	setenv SCRATCH /local/scratch/glensk;
 	complete -d cd;
   ;;
 fidis)
-    setenv myprompttime cyan;
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	setenv SCRATCH /scratch/glensk;
@@ -57,13 +54,11 @@ fidis)
     #module load python/2.7.14;  # conflicts with miniconda
   ;;
 daint)
-    setenv myprompttime blue;
     setenv myprompthostuser blue;
     setenv mypromptpath blue;
 	#setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
   ;;
 cmpc)
-    setenv myprompttime red;
     setenv myprompthostuser red;
     setenv mypromptpath red;
    	module load mathematica1002/10.0.2;
@@ -73,7 +68,6 @@ cmpc)
    	# christoph changed in /etc/profile.d/gxhivemgr.sh: if test x"$PS1" = x || echo
   ;;
 cmmc)
-    setenv myprompttime cyan;
     setenv myprompthostuser cyan;
     setenv mypromptpath cyan;
 	module load git intel impi mkl grace mathematica/10.3.1 lammps vasp/5.3.5 anaconda;
@@ -82,7 +76,6 @@ cmmc)
 	echo "setenv vaspq /u/aglen/vasp/vasp_4.6_lj_morse_alles_copied_FFTWPLANS_works/vasp.v1;"
   ;;
 helvetios)
-    setenv myprompttime yellow;
     setenv myprompthostuser yellow;
     setenv mypromptpath yellow;
 	setenv SCRATCH /scratch/glensk;

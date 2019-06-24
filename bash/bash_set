@@ -60,7 +60,6 @@ shopt -s histreedit     # If set, and readline is being used, a user is given th
 # Disable options:
 shopt -u mailwarn
 unset MAILCHECK        # Don't want my shell to warn me of incoming mail.
-
 #Setup history searches
 #bind '&quot;\e[A&quot;:history-search-backward'                      # makes error message
 #bind '&quot;\e[B&quot;:history-search-forward'                     # makes error message

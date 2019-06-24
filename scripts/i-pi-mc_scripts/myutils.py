@@ -92,6 +92,14 @@ def isfiledir(file,exit=False,check_extension=False):
         sys.exit(file+" does not exist! (97)")
     return False
 
+def read_lastline(file):
+    with open(file, 'rb') as f:
+        f.seek(-2, os.SEEK_END)
+        while f.read(1) != b'\n':
+            f.seek(-2, os.SEEK_CUR)
+        return f.readline().decode()
+
+
 def printred(*var):
     red = '\033[31m'
     ENDC = '\033[0m'
@@ -269,7 +277,8 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
         if job == 'scaling':
             text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-scaling 1\n")
         elif job == 'train':
-            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train\n")
+            text_file.write("partA_ID=$(srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train)\n")
+            text_file.write("strigger --set --jobid=$partA_ID --time --offset=-1200 --program=$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")
         text_file.write("date +%s >> time.out\n")
         text_file.write("cat time.out | xargs | awk '{print $2-$1-10}' > time.sec\n")
         text_file.write("$dotfiles/scripts/n2p2/n2p2_tarfolder_for_scale_train.sh\n")
@@ -1249,6 +1258,54 @@ class mypot( object ):
             print(text,"self.verbose                ",self.verbose)
             print(text,"self.pot_all                ",self.pot_all)
             print()
+
+    def get_my_assessments(self,get_outliers=False):
+        self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
+        if len(self.potepoch_all) == 0:
+            return
+        #print('folder',self.potpath)
+        #print('all',self.potepoch_all)
+        epoch_last = self.potepoch_all[-1]
+        #print('epoch_last',epoch_last)
+        #print('epoch_best',self.potepoch_bestteste)
+
+        ext_ = [ 'test', 'train', 'kmc57' ]
+        # it may be that best == last or that only one epoch was shown in which case also
+        # best == last
+        epochs_ = [ str(self.potepoch_bestteste), str(epoch_last) ]
+
+        #print('epochs_',epochs_)
+        self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
+        for ext in ext_:
+            for eidx, epoch in enumerate(epochs_):
+                #print('ext',ext,eidx,epoch)
+                file = self.potpath+"/assess_"+ext+"_"+epoch+'/ene_std.npy'
+                if os.path.isfile(file):
+                    if ext == 'test' and eidx == 0: self.test_b = float(my.read_lastline(file))
+                    if ext == 'test' and eidx == 1: self.test_l = float(my.read_lastline(file))
+                    if ext == 'train' and eidx == 0: self.train_b = float(my.read_lastline(file))
+                    if ext == 'train' and eidx == 1: self.train_l = float(my.read_lastline(file))
+                    if ext == 'kmc57' and eidx == 0: self.kmc57_b = float(my.read_lastline(file))
+                    if ext == 'kmc57' and eidx == 1: self.kmc57_l = float(my.read_lastline(file))
+                file = self.potpath+"/assess_"+ext+"_"+epoch+'/ene_diff_abs.npy'
+                if get_outliers == True and os.path.isfile(file):
+                    out = 60 # meV/atom
+                    if ext == 'test' and eidx == 0:
+                        structures_file = self.testdata
+                        c = np.loadtxt(file)
+                        #print(c)
+                        cc = np.where(c > out)[0]
+                        if len(cc) > 0:
+                            print('OUTLIERS! file',file)
+                            print('cc >',out,cc,c[cc])
+                            for gf in cc:
+                                frame = ase_read(structures_file,index=gf,format='runner')
+                                print('frame',gf,frame.info['comment'])
+                                print('frame',gf,'nat',frame.get_number_of_atoms())
+                                print('now check also in original input.data if this struct is there')
+                            #sys.exit()
+        #print('...',self.test_b,self.test_l,self.train_b,self.train_l,self.kmc57_b,self.kmc57_l)
+        return
 
     def get(self):
         self.potepoch_bestteste_checked = False

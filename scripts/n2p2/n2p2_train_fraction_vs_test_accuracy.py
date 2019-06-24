@@ -198,6 +198,8 @@ for c in subfolder:    # from the ones in the que
             os.chdir(folder)
             subprocess.call(["getEnergies_byLammps.py -p . -ctrain"],shell=True)
             subprocess.call(["getEnergies_byLammps.py -p . -ctest"],shell=True)
+            subprocess.call(["getEnergies_byLammps.py -p . -ckmc"],shell=True)
+            subprocess.call(["getEnergies_byLammps.py -p . -cinput"],shell=True)
             os.chdir(hier)
 
         if args.getc44:
@@ -410,6 +412,7 @@ for c in subfolder:    # from the ones in the que
                 if True:
                     pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
                     pot.get()
+                    pot.get_my_assessments(get_outliers=True)
                     epoch_best = pot.potepoch_bestteste
                     #print(folder,pot.potepoch_all,epoch_best)
                     if len(pot.potepoch_all) > 0:
@@ -421,30 +424,25 @@ for c in subfolder:    # from the ones in the que
                     ab_train = folder+"/assess_train_"+str(pot.potepoch_bestteste)
                     al_train = folder+"/assess_train_"+str(epoch_last)
 
-                    def read_lastline(file):
-                        with open(file, 'rb') as f:
-                            f.seek(-2, os.SEEK_END)
-                            while f.read(1) != b'\n':
-                                f.seek(-2, os.SEEK_CUR)
-                            return f.readline().decode()
-
                     agree="?"
                     if bl == 'best':
+                        kmcbl = pot.kmc57_b
                         if os.path.isfile(ab_test+'/ene_std.npy') and os.path.isfile(ab_train+'/ene_std.npy'):
                             agree = "-"
-                            ab_test_ = float(read_lastline(ab_test+'/ene_std.npy'))
-                            ab_train_ = float(read_lastline(ab_train+'/ene_std.npy'))
+                            ab_test_ = float(my.read_lastline(ab_test+'/ene_std.npy'))
+                            ab_train_ = float(my.read_lastline(ab_train+'/ene_std.npy'))
                             #agree=[ab_test_,ab_train_]
                             if np.abs(ab_test_  - j[1]) < 0.1 and np.abs(ab_train_ - j[2]) < 0.1: agree = "|"
 
                     if bl == 'last':
+                        kmcbl = pot.kmc57_l
                         #if folder == "n2p2_v3ag_4998_new":
                         #    print(al_test+'/ene_std.npy')
                         #    print(al_train+'/ene_std.npy')
                         if os.path.isfile(al_test+'/ene_std.npy') and os.path.isfile(al_train+'/ene_std.npy'):
                             agree = "-"
-                            al_test_ = float(read_lastline(al_test+'/ene_std.npy'))
-                            al_train_ = float(read_lastline(al_train+'/ene_std.npy'))
+                            al_test_ = float(my.read_lastline(al_test+'/ene_std.npy'))
+                            al_train_ = float(my.read_lastline(al_train+'/ene_std.npy'))
                             #agree=[al_test_,al_train_]
                             if np.abs(al_test_  - j[1]) < 0.1 and np.abs(al_train_ - j[2]) < 0.1: agree = "|"
 
@@ -522,10 +520,11 @@ for c in subfolder:    # from the ones in the que
                     e2 = ''.ljust(2)
                     e3 = ''.ljust(2)
                     path = ''.ljust(2)
-                kmc = str(round(kmc,1)).ljust(4)
+                #kmc = str(round(kmc,1)).ljust(4)
+                kmcbl = str(round(kmcbl,1)).ljust(4)
 
                 stringout = run+NJC+"%0.1f |"+agree+"%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %s |K %s |n %4.0f || [%4.0f] | %s | %8.0f | %s"
-                elementout = (        j[0]          ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],   c44,  kmc,    ist ,    epochs,   nn,  rnd,   path)
+                elementout = (        j[0]          ,  j[1],  j[2],   j[3],    e1,e2,e3,   j[7],  j[8],  c44, kmcbl,   ist ,    epochs,   nn,  rnd,   path)
 
                 conv_unconv = "unconv"
                 ## erstmak die komischen aussortieren

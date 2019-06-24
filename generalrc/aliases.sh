@@ -1,6 +1,6 @@
 #!/bin/sh
 
-function mcd () { mkdir -p $1 && cd $1 }
+#function mcd () { mkdir -p $1 && cd $1 }  # does not work properly for bash
 
 ####################################################################
 ## ls alias
