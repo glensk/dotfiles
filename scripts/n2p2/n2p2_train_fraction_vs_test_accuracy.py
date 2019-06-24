@@ -280,10 +280,11 @@ for c in subfolder:    # from the ones in the que
         #print()
         #print(lc[:,[0,2]])
         #print('folder',folder)
-        np.savetxt(folder+"/learning-curve.e.train.out",lc[:,[0,1]])
-        np.savetxt(folder+"/learning-curve.e.test.out",lc[:,[0,2]])
-        np.savetxt(folder+"/learning-curve.f.train.out",lc[:,[0,3]])
-        np.savetxt(folder+"/learning-curve.f.test.out",lc[:,[0,4]])
+        if False:
+            np.savetxt(folder+"/learning-curve.e.train.out",lc[:,[0,1]])
+            np.savetxt(folder+"/learning-curve.e.test.out",lc[:,[0,2]])
+            np.savetxt(folder+"/learning-curve.f.train.out",lc[:,[0,3]])
+            np.savetxt(folder+"/learning-curve.f.test.out",lc[:,[0,4]])
         #sys.exit()
         if False:
             print('i',i)

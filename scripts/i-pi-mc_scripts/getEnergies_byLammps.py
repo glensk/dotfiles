@@ -57,6 +57,7 @@ def help(p = None):
     p.add_argument('--pick_uuid','-pa_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
 
     p.add_argument('--write_runner','-wr',  action='store_true',help='default: runner.out')
+    p.add_argument('--write_runner_repeated','-wrr',  action='store_true',help='default: runner_repeated.out')
     p.add_argument('--write_forces','-wf',  action='store_true',help='write forces.out of particular strucuture')
     p.add_argument('--write_forcesx','-wfx',action='store_true',help='write forcesx.out of particular strucuture')
     p.add_argument('--write_analysis','-wa',action='store_true',help='write ene_{DFT,pot}... default: False')
@@ -462,6 +463,7 @@ def get_energies(args):
         if args.write_runner:
             args.write_runner = 'runner.out'
         print('write_runner                 :',args.write_runner)
+        print('write_runner_repeated        :',args.write_runner_repeated)
         print('--pick_concentration_al      :',args.pick_concentration_al)
         print('--pick_atoms_al              :',args.pick_atoms_al)
         print('--pick_number_of_atoms       :',args.pick_number_of_atoms)
@@ -806,7 +808,7 @@ def get_energies(args):
                 ase_write("out.runner",frames[i],format='runner',append=True)
 
             ### write runner output
-            if args.write_runner:
+            if args.write_runner_repeated:
                 nat = frames[i].get_number_of_atoms()
                 listrepeat = [ [2,3,4], [4,10,3], [11,40,2] ]
                 listrepeat = [ [2,4,2] ]          # memorize_symfunc_results on
@@ -830,7 +832,7 @@ def get_energies(args):
                     atoms_sc = copy.deepcopy(frames[i])
                     forces_sc = atoms_sc.get_forces()
                     ene_sc_ev = my.convert_energy(ene_DFT[idx],ace.units,"ev",frames[i])
-                ase_write("out_runner_repeated.runner",atoms_sc,format='runner',append=True,setforces_ase_units=forces_sc,setenergy_eV=ene_sc_ev)
+                ase_write(args.inputfile+".repeated",atoms_sc,format='runner',append=True,setforces_ase_units=forces_sc,setenergy_eV=ene_sc_ev)
 
                 # statistics
                 nat_new = atoms_sc.get_number_of_atoms()
@@ -842,7 +844,7 @@ def get_energies(args):
                     min_at = nat_new
                     min_at_orig = nat
                     min_at_id = idx
-                    print(my.printred("min_at "+str(min_at)+" min_at_orig "+str(min_at_orig)+' (min id '+str(min_at_id)))
+                    print(my.printred("min_at "+str(min_at)+" min_at_orig "+str(min_at_orig)+' (min id '+str(min_at_id)),"this is just an output")
 
                     # id: 4, 27,161, 188, 243,267,326,362,414,441,468,534,537 (atoms 58)
                 print('nat',nat,'(repeat '+str(repeat)+') -> nat',nat*(3**repeat),"min_at",min_at,"min_at_orig",min_at_orig,'(min id '+str(min_at_id)+") max_at",max_at,"max_at_orig",max_at_orig,'(max id'+str(max_at_id)+")")

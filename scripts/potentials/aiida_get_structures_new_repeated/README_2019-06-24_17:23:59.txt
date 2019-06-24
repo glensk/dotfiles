@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: afa70c6eedbaeb039d58dee1db124702de6683a6
+# execution time: 274.835626125 seconds.
+
+getEnergies_byLammps.py -wrr -i aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain.input.data

@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: 0e23e544670808fd78c8a4887020d115af336679
-# execution time: 0.931128978729 seconds.
-
-getEnergies_byLammps.py -i aiida_exported_group_elastic_all_runner.data_calc__all_steps.input.data -p runner_v3ag_5000 -pnat 4 -paal 4 -pfm 0.0001 -v -u meV_pa -pc44
