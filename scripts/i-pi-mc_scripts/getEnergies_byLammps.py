@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import sys,os,copy,argparse
+import sys,os,copy,argparse,shutil
 #import click
 import numpy as np
 import myutils as my
@@ -407,6 +407,7 @@ def get_energies(args):
             ###############################
             ## define the actual pot
             ###############################
+            # the ase_calculate_ene(...) changes the used epoch since mypot(...) is called
             ace = ase_calculate_ene(pot=pot,
                             potpath=potpath,
                             use_different_epoch=use_epoch,
@@ -414,6 +415,7 @@ def get_energies(args):
                             geopt=geopt,
                             elastic=args.elastic,
                             verbose=args.verbose)
+            # ace.pot = my.mypot(pot,self.potpath,use_different_epoch=use_different_epoch,verbose=self.verbose)
             ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
 
             if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
@@ -989,7 +991,7 @@ def get_energies(args):
 
 
     if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
-        pass
+        shutil.rmtree(ace.pot.pot_tmpdir)
     else:
         my.create_READMEtxt(os.getcwd())
     return

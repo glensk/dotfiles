@@ -1173,8 +1173,9 @@ class mypot( object ):
         self.potlib                 = False         # n2p2_v1ag
         self.potcutoff              = False         # n2p2_v1ag
         self.learning_curve_file    = False
-        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/"
-        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"+str(gethostname())+"/"
+        timestr = str(int(time.time()))
+        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"_"+timestr+"/"
+        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"_"+timestr+"/"
 
         self.inputnn                = False         # path to input.nn
         self.inputdata              = False         # path to input.data
