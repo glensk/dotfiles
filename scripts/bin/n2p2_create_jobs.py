@@ -22,7 +22,7 @@ def todo(args):
         sys.exit("inputfile input.nn does not exist")
     for s in args.seeds:
         #for pl in ["p","t"]:
-        for pl in ["p"]:
+        for pl in ["t"]:
             for c in [21]:
                 os.chdir(hier)
                 folder=str(s)+"_"+pl+pl+"l_"+str(c)+"cores_repeated"
@@ -39,15 +39,24 @@ def todo(args):
                 with my.cd(folder):
                     folder=os.getcwd()
                     my.mkdir(folder)
-                    print('strat scaling.data')
-                    my.n2p2_get_scaling_and_function_data(cores=c,submitdebug=True,submit_to_que=False,submitmin=2,interactive=True)
-                    print('pwd',os.getcwd())
-                    os.chdir("get_scaling")
-                    subprocess.call(["./submit_n2p2_scaling.sh"],shell=True)
-                    print('pwd',os.getcwd())
+                    os.chdir(folder)
+
+                    need_scaling_data = False
+                    link_scaling_and_function_data = True
+                    if need_scaling_data:
+                        print('strat scaling.data')
+                        my.n2p2_get_scaling_and_function_data(cores=c,submitdebug=True,submit_to_que=False,submitmin=2,interactive=True)
+                        print('pwd',os.getcwd())
+                        os.chdir("get_scaling")
+                        subprocess.call(["./submit_n2p2_scaling.sh"],shell=True)
+                        print('pwd',os.getcwd())
+                    if link_scaling_and_function_data:
+                        reffolder = "/scratch/glensk/TEST_RUNNER_VS_n2p2_for_c44_v4ag_rep/"+str(pl)+str(pl)+"l/"
+                        my.cp(reffolder+"get_scaling/scaling.data",folder+"/scaling.data")
+                        os.symlink(reffolder+"get_scaling/function.data", folder+'/function.data')
+
                     os.chdir(folder) # necessary since n2p2_get_scaling_and_function_data changed the folder, now hopefully not anymore
                     my.n2p2_make_training(cores=c,debugque=False)
-                sys.exit()
 
     my.create_READMEtxt(os.getcwd())
     return
