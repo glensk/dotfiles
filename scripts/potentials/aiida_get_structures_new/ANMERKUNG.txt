@@ -26,8 +26,12 @@ now check also in original input.data if this struct is there
 
 
 in aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2.input.data I excluded:
-uuid: a8ed0448-d650-4489-b45d-2a8e03409904
-uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c
+uuid: a8ed0448-d650-4489-b45d-2a8e03409904 (ene -651.400290255000073)
+uuid: fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c (ene -651.051341205000313)
+    Those are exact the energies which where outliers between old input.data (giulio/daniele) and the current one. This means those calcs are defective in aiida (bzw. have not been REcalculated properly)
+    in the recalculation those have a different uuid:
+    uuid 105807ba-21f3-4c2d-bd7d-0ba884730f1b (ene -651.051341210000260)
+    uuid 472642aa-bd00-4d02-9677-90c5977169be (ene -651.400290260000133)
 both had high jumps for in the repeated structures inuput.data  .... these uuids were only in the testset of n2p2_v3ag_repeated_1616_28cores.
                                                                 .... questin is also if those were repeated correctly!
         repeated structure have both 264 atoms

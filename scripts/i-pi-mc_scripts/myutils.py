@@ -193,39 +193,43 @@ def create_READMEtxt(directory=False,add=False):
     print()
     return
 
-def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True):
+def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True,days=0,hours=0,minutes=3,submit_to_que=True,interactive=False):
+    ''' interactive == False -> que
+        interactive == True  -> execture directly
+    '''
+    if submit_to_que == interactive:
+        sys.exit('either submit_to_que or interacive')
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
 
-    #submitfile = scripts()+"/n2p2/submit_scaling_debug.sh"
-    #if not os.path.isfile(submitfile):
-    #    sys.exit("Need "+submitfile+" file!")
-
     folder="get_scaling"
     if os.path.isdir(folder):
         sys.exit(folder+" already exists!")
 
-
     mkdir(folder)
+    hier=os.getcwd()
     create_READMEtxt()
     os.chdir(folder)
     cp("../input.data")
     cp("../input.nn")
     #cp(submitfile)
-    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,debugque=submitdebug,job="scaling")
-
-    command = ["sbatch"]
-    if submitdebug == True:
-        command = command + ["-p","debug","-t","01:00:00"]
-    command = command + [submitskript]
-    call(["sbatch",submitskript])
+    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minues=minutes,interactive=interactive)
+    if submit_to_que:
+        command = ["sbatch"]
+        if debugque == True:
+            command = command + ["-p","debug","-t","01:00:00"]
+        command = command + [submitskript]
+        call(["sbatch",submitskript])
     #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
+
+
     create_READMEtxt(add="submitdebug = "+str(submitdebug))
+    os.chdir(hier)
     return
 
-def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job=False):
+def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interactive=False,days=0,hours=72,minutes=0,seconds=0):
     ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
     if job not in ["scaling","train"]:
         sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
@@ -248,26 +252,34 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
     # write file
     with open(filepath, "w") as text_file:
         text_file.write("#!/bin/bash\n")
-        text_file.write("#SBATCH --job-name=NNP-mpi\n")
-        text_file.write("#SBATCH --output=_scheduler-stdout.txt\n")
-        text_file.write("#SBATCH --error=_scheduler-stderr.txt\n")
-        text_file.write("#SBATCH --nodes="+str(nodes)+"\n")
-        text_file.write("#SBATCH --ntasks 28\n")
-        if debugque == True:
-            text_file.write("#SBATCH --time=00-01:00:00\n")
-        else:
-            text_file.write("#SBATCH --time=00-72:00:00\n")
-        if hostname == 'fidis':
-            text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
-            # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
-        if hostname == 'helvetios':
-            print('you can use up to --mem=183G or more')
-        text_file.write("#SBATCH --mem=100G\n")
+
+        if interactive == False:
+            text_file.write("#SBATCH --job-name=NNP-mpi\n")
+            text_file.write("#SBATCH --output=_scheduler-stdout.txt\n")
+            text_file.write("#SBATCH --error=_scheduler-stderr.txt\n")
+            text_file.write("#SBATCH --nodes="+str(nodes)+"\n")
+            text_file.write("#SBATCH --ntasks 28\n")
+            days_   = str(days).zfill(2)
+            hours_  = str(hours).zfill(2)
+            min_    = str(minutes).zfill(2)
+            sec_    = str(seconds).zfill(2)
+            text_file.write("#SBATCH --time="+str(days_)+"-"+str(hours_)+":"+str(min_)+":00\n")
+            if hostname == 'fidis':
+                text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
+                # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
+            if hostname == 'helvetios':
+                print('you can use up to --mem=183G or more')
+            text_file.write("#SBATCH --mem=100G\n")
+
+
         text_file.write("\n")
         text_file.write("set +e\n")
         text_file.write("# it is necessary to have all the modules which are used when compiling\n")
         text_file.write('export LD_LIBRARY_PATH=""\n')
-        text_file.write("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen\n")
+        if job == 'scaling':
+            text_file.write("module load intel intel-mpi intel-mkl fftw gsl eigen\n")
+        else:
+            text_file.write("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen\n")
         text_file.write("export LD_LIBRARY_PATH=$HOME/sources/n2p2/lib:${LD_LIBRARY_PATH}\n")
         text_file.write("#echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH\n")
         text_file.write("\n")
@@ -275,26 +287,31 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,debugque=False,job
         text_file.write("date +%s >> time.out\n")
         text_file.write("\n")
         if job == 'scaling':
-            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-scaling 1\n")
+            if interactive == False:
+                text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-scaling 1\n")
+            else:
+                text_file.write("$HOME/sources/n2p2/bin/nnp-scaling 1\n")
         elif job == 'train':
-            text_file.write("partA_ID=$(srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train)\n")
-            text_file.write("strigger --set --jobid=$partA_ID --time --offset=-1200 --program=$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")
+            #text_file.write("partA_ID=$(srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train)\n")
+            text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train\n")
+            #text_file.write("strigger --set --jobid=$partA_ID --time --offset=-1200 --program=$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")
+            #text_file.write("strigger --set --jobid=$partA_ID --time --offset=-1200 --program=$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")
         text_file.write("date +%s >> time.out\n")
         text_file.write("cat time.out | xargs | awk '{print $2-$1-10}' > time.sec\n")
         text_file.write("$dotfiles/scripts/n2p2/n2p2_tarfolder_for_scale_train.sh\n")
-        text_file.write("$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")  # makes the potential folder
+        if job == 'train':
+            text_file.write("$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")  # makes the potential folder
         if job == 'scaling':
             text_file.write('[ "`pwd | grep -o "/get_scaling$"`" == \'/get_scaling\' ] && echo creating link && ln -s `pwd`/function.data ../function.data')
         text_file.write("\n")
         text_file.write("exit 0\n")
 
-    print()
-    print('written ',filepath)
-    print()
+    print('written (39)',filepath)
+    call(["chmod u+x "+filepath],shell=True)
     return filepath
 
 
-def n2p2_make_training(cores=21,debugque=False):
+def n2p2_make_training(cores=21,debugque=False,days=7,hours=0,minutes=0,submit_to_que=True):
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
@@ -315,12 +332,13 @@ def n2p2_make_training(cores=21,debugque=False):
             cp("get_scaling/scaling.data","scaling.data")
 
     #cp(submitfile)
-    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,debugque=debugque,job="train")
-    command = ["sbatch"]
-    if debugque == True:
-        command = command + ["-p","debug","-t","01:00:00"]
-    command = command + [submitskript]
-    call(["sbatch",submitskript])
+    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,days=days,hours=hours,minutes=minutes,job="train")
+    if submit_to_que:
+        command = ["sbatch"]
+        if debugque == True:
+            command = command + ["-p","debug","-t","01:00:00"]
+        command = command + [submitskript]
+        call(["sbatch",submitskript])
     #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
 
     #submitjob(submitdebug=False,submit=True,jobdir=os.getcwd(),submitskript="submit_training.sh",cores=cores)

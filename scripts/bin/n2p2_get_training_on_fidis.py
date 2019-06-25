@@ -18,7 +18,7 @@ def help(p = None):
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
-    my.n2p2_make_training(cores=args.cores,debugque=args.debugque)
+    my.n2p2_make_training(cores=args.cores)
     my.create_READMEtxt(os.getcwd())
 
 
