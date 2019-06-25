@@ -218,24 +218,13 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
     os.chdir(folder)
     cp("../input.data")
     cp("../input.nn")
-    #cp(submitfile)
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minutes=minutes,interactive=interactive)
-    if submit_to_que or submit_to_debug_que:
-        command = ["sbatch"]
-        if submit_to_debug_que == True:
-            command = command + ["-p","debug","-t","01:00:00"]
-        command = command + [submitskript]
-        call(["sbatch",submitskript])
-
-
+    submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
     create_READMEtxt(add="submit_to_debug_que= "+str(submit_to_debug_que))
     os.chdir(hier)
     return
 
-def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interactive=False,days=0,hours=72,minutes=0,seconds=0):
-    ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
-    if job not in ["scaling","train"]:
-        sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
+def check_for_known_hosts():
     hostname = gethostname()
     known_hosts =  ['fidis','helvetios']
     if hostname in known_hosts:
@@ -245,6 +234,12 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
     else:
         print("known hosts:",known_hosts)
         sys.exit(hostname+" is not in the list of known hosts!")
+
+def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interactive=False,days=0,hours=72,minutes=0,seconds=0):
+    ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
+    if job not in ["scaling","train"]:
+        sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
+    check_for_known_hosts()
 
     if directory == False:
         directory = os.getcwd()
@@ -267,6 +262,7 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
             min_    = str(minutes).zfill(2)
             sec_    = str(seconds).zfill(2)
             text_file.write("#SBATCH --time="+str(days_)+"-"+str(hours_)+":"+str(min_)+":00\n")
+            hostname = gethostname()
             if hostname == 'fidis':
                 text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
                 # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
@@ -314,20 +310,12 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
     return filepath
 
 
-def n2p2_make_training(cores=21,debugque=False,days=7,hours=0,minutes=0,submit_to_que=True):
+def n2p2_make_training(cores=21,days=7,hours=0,minutes=0,submit_to_que=True,submit_to_debug_que=False):
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
     n2p2_check_SF_inputnn("input.nn")
-
-        # do I really need the function.data for training?
-        #if not os.path.isfile("function.data"):
-        #    sys.exit("Need function.data file")
-
-        #submitfile = scripts()+"/n2p2/submit_training.sh"
-        #if not os.path.isfile(submitfile):
-        #    sys.exit("Need "+submitfile+" file!")
 
     if not os.path.isfile("scaling.data"):
         if not os.path.isfile("get_scaling/scaling.data"):
@@ -335,35 +323,31 @@ def n2p2_make_training(cores=21,debugque=False,days=7,hours=0,minutes=0,submit_t
         else:
             cp("get_scaling/scaling.data","scaling.data")
 
-    #cp(submitfile)
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,days=days,hours=hours,minutes=minutes,job="train")
-    if submit_to_que:
-        command = ["sbatch"]
-        if debugque == True:
-            command = command + ["-p","debug","-t","01:00:00"]
-        command = command + [submitskript]
-        call(["sbatch",submitskript])
-    #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
-
-    #submitjob(submitdebug=False,submit=True,jobdir=os.getcwd(),submitskript="submit_training.sh",cores=cores)
+    submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
     create_READMEtxt()
     return
 
-#def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False,cores=21):
-#    if jobdir == False:
-#        jobdir = os.getcwd()
-#    if submit is True or submitdebug is True:
-#        check_isdir_or_isdirs(jobdir)
-#        cwd = os.getcwd()
-#        os.chdir(jobdir)
-#        if submitdebug is True:  # this works on fidis even with 2 nodes!
-#            sed(submitskript,"srun -n.*","srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train")
-#            call(["sbatch","-p","debug","-t","01:00:00",submitskript])
-#        if submit is True:
-#            sed(submitskript,"srun -n.*","srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train")
-#            call(["sbatch",submitskript])
-#        os.chdir(cwd)
-#        return
+def submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitskript=False):
+    #def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False,cores=21):
+    if jobdir == False:
+        jobdir = os.getcwd()
+    hier = os.getcwd()
+
+    if submit_to_que or submit_to_debug_que:
+        if submitskript == False:
+            sys.exit("Error. please provite the submitskript")
+        os.chdir(jobdir)
+        command = ["sbatch"]
+        if submit_to_debug_que == True:
+            command = command + ["-p","debug","-t","01:00:00"]
+        command = command + [submitskript]
+        print('sbatch '+submitskript)
+        call(["sbatch",submitskript])
+
+    os.chdir(hier)
+    return
+
 
 def sed(file,str_find,str_replace):
     # from scripts folder
@@ -1330,7 +1314,8 @@ class mypot( object ):
         #print('...',self.test_b,self.test_l,self.train_b,self.train_l,self.kmc57_b,self.kmc57_l)
         return
 
-    def get(self):
+    def get(self,exit=True):
+        ''' exit is True if for instance weithts files do not exist '''
         self.potepoch_bestteste_checked = False
         self.print_variables_mypot('PP get potential: in')
 
@@ -1353,10 +1338,11 @@ class mypot( object ):
                     if not os.path.isfile(self.potpath_in+"/input.nn"):
                         sys.exit("PP could not find "+self.potpath_in+"/input.nn")
 
-            checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
-            for i in checkfiles:
-                if not os.path.isfile(self.potpath_in+"/"+i):
-                    sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
+            if exit == True:
+                checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
+                for i in checkfiles:
+                    if not os.path.isfile(self.potpath_in+"/"+i):
+                        sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
 
             self.potpath = os.path.abspath(self.potpath_in)
             self.inputnn     = isfiledir(self.potpath_in+"/input.nn",exit=True)
@@ -1376,13 +1362,14 @@ class mypot( object ):
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
 
             #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
-            file1 = self.potpath_in+"/weights.012.data"
-            epstr = str(self.potepoch_bestteste).zfill(6)
-            file2 = self.potpath_in+"/weights.012."+epstr+".out"
-            if not filecmp.cmp(file1, file1):
-                sys.exit("PP File "+file1+" is not "+file2)
-            else:
-                self.potepoch_bestteste_checked = True
+            if exit == True:
+                file1 = self.potpath_in+"/weights.012.data"
+                epstr = str(self.potepoch_bestteste).zfill(6)
+                file2 = self.potpath_in+"/weights.012."+epstr+".out"
+                if not filecmp.cmp(file1, file1):
+                    sys.exit("PP File "+file1+" is not "+file2)
+                else:
+                    self.potepoch_bestteste_checked = True
 
             self.pot = self.pottype+"_frompath"
         else:
@@ -1492,7 +1479,8 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
             print("PROBLEM variable name:",command_name_str,"=",variable,"type(variable)",type(variable),"but should be",str(typehere))
             sys.exit()
 
-    IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
+    #IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
+    IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND_PLAY')
     LAMMPS_COMMAND = get_LAMMPS_executable(exit=True)
     N2P2_PATH = test_and_return_environment_var_path('N2P2_PATH',path=True)
 
@@ -1516,9 +1504,13 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     "#SBATCH --error=_scheduler-stderr.txt",
     "#SBATCH --nodes="+str(nodes),
     "#SBATCH --ntasks "+str(ntasks),
-    "#SBATCH --time=00-"+str(submittime_hours)+":00:00",
-    "#SBATCH --constraint=E5v4",
-    ""]
+    "#SBATCH --time=00-"+str(submittime_hours)+":00:00"]
+
+    hostname = gethostname()
+    if hostname == 'fidis' or hostname[0] == 'f':
+        text2 = text2 + ["#SBATCH --constraint=E5v4"]
+
+    text2 = text2 + [""]
 
     text3 = [
     "set +e",
@@ -1534,7 +1526,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     'date +%s >> time.out',
     "",
     "# sets up the internet/unix socket for connections both for i-PI and on the lammps side",
-    'seed=`grep seed input-runner.xml | awk \'{print $3}\'`',
+    'seed=`grep "<seed>" input-runner.xml | awk \'{print $3}\'`',
     'hostname=`hostname`',
     'seed_hostname=$hostname\_$seed',
     'sed -i \'s/<ffsocket.*/<ffsocket name="lmpserial" mode="'+ffsocket+'">/\' input-runner.xml',
@@ -3745,8 +3737,16 @@ def inputnn_get_nodes_short(file,as_string=False):
 
 def inputnn_get_activation_short(file):
     nn = (grep(file,"global_activation_short")[0]).split()
-    nna = nn[1:nn.index("#")]
+    #print('nn',nn)
+    nni = nn[1:]
+    #print('nni',nni)
+    try:
+        nna = nni[1:nni.index("#")]
+    except ValueError:
+        nna = nni
+    #print('nna',nna)
     nnb = "_".join(nna)
+    #print('nnb',nnb)
     return nnb
 
 def inputnn_get_trainfraction(file):
@@ -4106,4 +4106,4 @@ def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,
 
 if __name__ == "__main__":
     pass
-    #n2p2_check_SF_inputnn(inputnn=0)
+    #n2p2_check_SF_inputnn(inputnn="cursel_64.def")

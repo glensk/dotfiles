@@ -182,11 +182,11 @@ if __name__ == '__main__':
     folder = n2p2_make_potential_folder_from_nr(argsnr=args.nr)
     print('folder',folder)
     with my.cd(folder):
-        print('getEnergies_byLammps.py -p . -ea # to get all the c44')
         import subprocess
+        print('*****************************************************')
+        print('getEnergies_byLammps.py -p . -ea # to get all the c44')
+        print('*****************************************************')
         subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)
-        print()
-        print()
         print('**********************************')
         print('getEnergies_byLammps.py -p . -ckmc')
         print('**********************************')

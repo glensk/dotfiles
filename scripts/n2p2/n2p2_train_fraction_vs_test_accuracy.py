@@ -196,10 +196,11 @@ for c in subfolder:    # from the ones in the que
             print('learning_curve_file folder:',folder.ljust(40),os.getcwd())
             hier = os.getcwd()
             os.chdir(folder)
-            subprocess.call(["getEnergies_byLammps.py -p . -ctrain"],shell=True)
-            subprocess.call(["getEnergies_byLammps.py -p . -ctest"],shell=True)
-            subprocess.call(["getEnergies_byLammps.py -p . -ckmc"],shell=True)
-            subprocess.call(["getEnergies_byLammps.py -p . -cinput"],shell=True)
+            subprocess.call(["n2p2_get_potential_folder_from_nr.py"],shell=True)
+            #subprocess.call(["getEnergies_byLammps.py -p . -ctrain"],shell=True)
+            #subprocess.call(["getEnergies_byLammps.py -p . -ctest"],shell=True)
+            #subprocess.call(["getEnergies_byLammps.py -p . -ckmc"],shell=True)
+            #subprocess.call(["getEnergies_byLammps.py -p . -cinput"],shell=True)
             os.chdir(hier)
 
         if args.getc44:
@@ -390,6 +391,8 @@ for c in subfolder:    # from the ones in the que
 
     #out2=sorted(out2,key=lambda x: x[2])               # das ist nach dem train ergebnis
     #out2=sorted(out2,key=lambda x: x[len(out2[0])-3])  # das ist nach dem train ergebnis
+    if args.verbose:
+        print('++++++++++++++++++++++++++++++')
 
     if args.both: n2p2_or_runner_loop_ = ["n2p2","runner"]
     else: n2p2_or_runner_loop_ = ["n2p2"]
@@ -423,7 +426,7 @@ for c in subfolder:    # from the ones in the que
 
                 if True:
                     pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
-                    pot.get()
+                    pot.get(exit=False)
                     pot.get_my_assessments(get_outliers=True)
                     epoch_best = pot.potepoch_bestteste
                     #print(folder,pot.potepoch_all,epoch_best)

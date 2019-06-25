@@ -18,7 +18,8 @@ def help(p = None):
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
-    my.n2p2_make_training(cores=args.cores)
+    my.n2p2_make_training(cores=args.cores,days=7,hours=0,minutes=0,submit_to_que=True,submit_to_debug_que=False)
+    #my.n2p2_make_training(cores=args.cores,days=0,hours=0,minutes=60,submit_to_que=False,submit_to_debug_que=True)
     my.create_READMEtxt(os.getcwd())
 
 
