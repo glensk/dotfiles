@@ -198,14 +198,15 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
         interactive == True  -> execture directly
         3 minutes is not enough for repeated structures (input.data ~ 130MB) but 4 minutes is enough
     '''
-    hier=os.getcwd()
-    if interactive == submit_to_que == True or interactive == submit_to_debug_que == True:
-        sys.exit('either submit_to_{debug}_que or interacive')
-
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
+    n2p2_check_SF_inputnn("input.nn")
+
+    hier=os.getcwd()
+    if interactive == submit_to_que == True or interactive == submit_to_debug_que == True:
+        sys.exit('either submit_to_{debug}_que or interacive')
 
     folder="get_scaling"
     if os.path.isdir(folder):
@@ -318,6 +319,7 @@ def n2p2_make_training(cores=21,debugque=False,days=7,hours=0,minutes=0,submit_t
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
+    n2p2_check_SF_inputnn("input.nn")
 
         # do I really need the function.data for training?
         #if not os.path.isfile("function.data"):
@@ -3842,6 +3844,16 @@ def n2p2_runner_get_learning_curve_filename(inputnn):
                 return filename
     return False
 
+def n2p2_check_SF_inputnn(inputnn):
+    ''' inputnn can also be a file containing the symmetry functions only'''
+    #inputnn = "../n2p2_v3ag_5000_new_2424_new_atomene_new_SF/get_scaling/cursel_64.def"
+    out = grep(inputnn,"symfunction_short.*Si.*3.*Al.*Si") # echo $out | tail -1 | wc -w
+    for line in out:
+        if len(line.split()) != 9:
+            print(line.split())
+            print(len(line.split()))
+            sys.exit("ERROR "+inputnn+" has 10 entries in a 3body line, should have 9! Exit!")
+    return
 
 def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False):
     ''' filename is path to log.fit (runner) or learning-curve.out '''
@@ -4094,3 +4106,4 @@ def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,
 
 if __name__ == "__main__":
     pass
+    #n2p2_check_SF_inputnn(inputnn=0)
