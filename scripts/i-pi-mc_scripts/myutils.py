@@ -193,12 +193,15 @@ def create_READMEtxt(directory=False,add=False):
     print()
     return
 
-def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True,days=0,hours=0,minutes=3,submit_to_que=True,interactive=False):
+def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_to_que=False,submit_to_debug_que=True,interactive=False):
     ''' interactive == False -> que
         interactive == True  -> execture directly
+        3 minutes is not enough for repeated structures (input.data ~ 130MB) but 4 minutes is enough
     '''
-    if submit_to_que == interactive:
-        sys.exit('either submit_to_que or interacive')
+    hier=os.getcwd()
+    if interactive == submit_to_que == True or interactive == submit_to_debug_que == True:
+        sys.exit('either submit_to_{debug}_que or interacive')
+
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
@@ -215,17 +218,16 @@ def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True,days
     cp("../input.data")
     cp("../input.nn")
     #cp(submitfile)
-    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minues=minutes,interactive=interactive)
-    if submit_to_que:
+    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minutes=minutes,interactive=interactive)
+    if submit_to_que or submit_to_debug_que:
         command = ["sbatch"]
-        if debugque == True:
+        if submit_to_debug_que == True:
             command = command + ["-p","debug","-t","01:00:00"]
         command = command + [submitskript]
         call(["sbatch",submitskript])
-    #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
 
 
-    create_READMEtxt(add="submitdebug = "+str(submitdebug))
+    create_READMEtxt(add="submit_to_debug_que= "+str(submit_to_debug_que))
     os.chdir(hier)
     return
 

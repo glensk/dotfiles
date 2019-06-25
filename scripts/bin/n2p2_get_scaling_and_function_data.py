@@ -21,8 +21,8 @@ if __name__ == '__main__':
     p = help()
     args = p.parse_args()
     my.print_args(args)
-    print('debug?',not args.normalque)
-    my.n2p2_get_scaling_and_function_data(cores=args.cores,debug=(not args.normalque))
+    print('submit_to_debug_que',not args.normalque)
+    my.n2p2_get_scaling_and_function_data(cores=args.cores,submit_to_debug_que=(not args.normalque))
     my.create_READMEtxt(os.getcwd())
 
 
