@@ -16,6 +16,10 @@ def help(p = None):
     p.add_argument('-b','--get_best_epoch', help='get potential with lowest testerror', action='count', default=False)
     p.add_argument('-tmp','--tmp', help='make potential_tmp instead of potential', action='count', default=False)
     p.add_argument('--best_testsete',default=False,help=argparse.SUPPRESS, type=int)
+    p.add_argument('-ex_c44'    ,'--ex_c44'            , action='store_true', default=False, help='execute part c44')
+    p.add_argument('-ex_kmc57'  ,'--ex_kmc57'            , action='store_true', default=False, help='execute part kmc57')
+    p.add_argument('-ex_test'  ,'--ex_test'            , action='store_true', default=False, help='execute part test')
+    p.add_argument('-ex_train'  ,'--ex_train'            , action='store_true', default=False, help='execute part train')
     return p
 
 def n2p2_get_best_test_nr_from_learning_curve(args):
@@ -175,6 +179,11 @@ def n2p2_make_potential_folder_from_nr(argsnr):
 if __name__ == '__main__':
     p = help()
     args = p.parse_args()
+    print(os.getcwd())
+    print(os.getcwd()[-10:])
+    if os.getcwd()[-10:] == '/potential':
+        sys.exit("I am already in a potential folder and would create a /potential/potential folder which is wired! Exit")
+
     if args.nr == False or args.get_best_epoch == False:
         args.nr = n2p2_get_best_test_nr_from_learning_curve(args)
     print('##gp: n2p2_get_best_test_nr_from_learning_curve (or args.nr):',args.nr)
@@ -183,29 +192,32 @@ if __name__ == '__main__':
     print('folder',folder)
     with my.cd(folder):
         import subprocess
-        print('*****************************************************')
-        print('getEnergies_byLammps.py -p . -ea # to get all the c44')
-        print('*****************************************************')
-        subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)
-        print('**********************************')
-        print('getEnergies_byLammps.py -p . -ckmc')
-        print('**********************************')
-        subprocess.call("getEnergies_byLammps.py -p . -ckmc",shell=True)
-        print('***********************************')
-        print('getEnergies_byLammps.py -p . -ctest')
-        print('***********************************')
-        subprocess.call("getEnergies_byLammps.py -p . -ctest",shell=True)
-        print('************************************')
-        print('getEnergies_byLammps.py -p . -ctrain')
-        print('************************************')
-        subprocess.call("getEnergies_byLammps.py -p . -ctrain",shell=True)
-        print('************************************')
-        print('getEnergies_byLammps.py -p . -cinput')
-        print('************************************')
-        subprocess.call("getEnergies_byLammps.py -p . -cinput",shell=True)
-        #print('getEnergies_byLammps.py -p . --testkmc_b # to get all the c44')
-        #subprocess.call("getEnergies_byLammps.py -p . --testkmc_b",shell=True)
-        #print('getEnergies_byLammps.py -p . --testkmc_l # to get all the c44')
-        #subprocess.call("getEnergies_byLammps.py -p . --testkmc_l",shell=True)
+        if args.ex_c44:
+            print('*****************************************************')
+            print('getEnergies_byLammps.py -p . -ea # to get all the c44')
+            print('*****************************************************')
+            subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)
 
+        if args.ex_ckmc57:
+            print('**********************************')
+            print('getEnergies_byLammps.py -p . -ckmc')
+            print('**********************************')
+            subprocess.call("getEnergies_byLammps.py -p . -ckmc",shell=True)
 
+        if args.ex_test:
+            print('***********************************')
+            print('getEnergies_byLammps.py -p . -ctest')
+            print('***********************************')
+            subprocess.call("getEnergies_byLammps.py -p . -ctest",shell=True)
+
+        if args.ex_train:
+            print('************************************')
+            print('getEnergies_byLammps.py -p . -ctrain')
+            print('************************************')
+            subprocess.call("getEnergies_byLammps.py -p . -ctrain",shell=True)
+
+        if False:
+            print('************************************')
+            print('getEnergies_byLammps.py -p . -cinput')
+            print('************************************')
+            subprocess.call("getEnergies_byLammps.py -p . -cinput",shell=True)

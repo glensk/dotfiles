@@ -9,13 +9,18 @@ def help(p = None):
     string = '''
     gnuplot.py KMC_analyze -c 7 8 9
     gnuplot.py KMC_analyze -c 2
+    g KMC_analyze -c '1:($9+$10)'
+    g KMC_analyze -c '1:($9+$10)' '1:9'
+    g KMC_analyze -c '1:($9+$10)' '1:($4*10000000-3)' -v
+    g KMC_analyze -c '1:($9+$10+$12+$13)' '1:($4*10000000-3)' -v
+
     '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument("inputfile",nargs='+') #,help"name of the inputfile(s)")
     p.add_argument('-mc','--max_columns',required=False, type=int,default=False, help="plot maximally first x columns")
     p.add_argument('-ps','--pointsize',required=False, type=float,default=1., help="pointsize")
-    p.add_argument('-c','--columns',required=False, action='append',nargs='+', type=str, help="which columns to plot")
+    p.add_argument('-c','--columns',required=False, action='append',nargs='*', type=str, help="which columns to plot")
     p.add_argument('-ll', '--log_log', action='store_true', default=False,help='make a x and y logarithmic (log log plot).')
     p.add_argument('-lx', '--log_x', action='store_true', default=False,help='make x axis logarithmic')
     p.add_argument('-ly', '--log_y', action='store_true', default=False,help='make y axis logarithmic')
@@ -357,7 +362,6 @@ def string_to_using__columns(i,verbose=False):
     #   -c '1:2'
     #sys.exit()
     return using
-
 
 
 def gnuplot_plot(args):

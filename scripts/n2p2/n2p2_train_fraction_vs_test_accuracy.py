@@ -33,12 +33,8 @@ if args.verbose:
     print('args.from_que      ',args.from_que)
     print('args.verbose       ',args.verbose)
 
-#ru=sorted(glob.glob(os.getcwd()+"/*/log.fit"))
-#for i in ru:
-#    print(i)
-#sys.exit()
 if args.verbose:
-    print('fo ...')
+    print('begin (1) ...')
 
 fo=sorted(glob.glob(os.getcwd()+"/*/learning-curve.out"))
 
@@ -47,12 +43,14 @@ if verbose:
     for i in fo:
         print(i)
     print()
-id,stat,path = my.q()
+
 if verbose:
     print('----- currently in the que -----')
+id,stat,path = my.q()
+if verbose:
     for idx,i in enumerate(id):
         print(idx,id[idx],stat[idx],path[idx])
-    print()
+    print('----- que done ------')
 
 checkpath_run = []
 checkpath_que = []
@@ -273,8 +271,7 @@ for c in subfolder:    # from the ones in the que
             c44e = 0
 
         #print('c44',int(c44),int(c44e),folder)
-        train_fraction=1.-testf
-        train_fraction=1.-testf
+        train_fraction =1.-testf
 
         learning_curve = lc = my.n2p2_runner_get_learning_curve(inputnn)
         #print(lc)
@@ -423,12 +420,14 @@ for c in subfolder:    # from the ones in the que
                 c44             = j[len(j) - 3]
                 c44e_unused     = j[len(j) - 2]
                 path = folder   =  j[len(j) - 1]
+                print('pathx',path)
+                sys.exit()
 
                 if True:
                     pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
                     pot.get(exit=False)
                     pot.get_my_assessments(get_outliers=True)
-                    epoch_best = pot.potepoch_bestteste
+                    #epoch_best = pot.potepoch_bestteste
                     #print(folder,pot.potepoch_all,epoch_best)
                     if len(pot.potepoch_all) > 0:
                         epoch_last = pot.potepoch_all[-1]
@@ -438,6 +437,12 @@ for c in subfolder:    # from the ones in the que
                     al_test  = folder+"/assess_test_"+str(epoch_last)
                     ab_train = folder+"/assess_train_"+str(pot.potepoch_bestteste)
                     al_train = folder+"/assess_train_"+str(epoch_last)
+                    # first, check if still running;
+                    if os.path.isfile(pot.potpath+'/elastic_c44_all.dat'):
+                        elastic_c44_all = np.loadtxt(pot.potpath+'/elastic_c44_all.dat')
+                        print(len(elastic_c44_all),'potpath',pot.potpath)
+                        if len(elastic_c44_all) > 300:
+                            pass
 
                     agree="?"
                     if bl == 'best':

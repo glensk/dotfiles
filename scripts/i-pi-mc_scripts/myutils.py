@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import os,sys,re
+import os,sys,re,fnmatch
 import filecmp
 #import click
 import numpy as np
@@ -224,22 +224,26 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
     os.chdir(hier)
     return
 
-def check_for_known_hosts():
+def check_for_known_hosts(exit=False):
     hostname = gethostname()
     known_hosts =  ['fidis','helvetios']
     if hostname in known_hosts:
-        pass
+        return True
     elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
-        pass
+        return True
     else:
-        print("known hosts:",known_hosts)
-        sys.exit(hostname+" is not in the list of known hosts!")
+        if exit == True:
+            print("known hosts:",known_hosts)
+            sys.exit(hostname+" is not in the list of known hosts!")
+        else:
+            return False
 
 def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interactive=False,days=0,hours=72,minutes=0,seconds=0):
     ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
     if job not in ["scaling","train"]:
         sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
-    check_for_known_hosts()
+    check_for_known_hosts(exit=True)
+
 
     if directory == False:
         directory = os.getcwd()
@@ -591,12 +595,21 @@ def get_prompt_irrespective_of_python_version(text):
 
 
 def get_from_prompt_Yy_orexit(text):
-    getfromprompt = get_prompt_irrespective_of_python_version(text)
+    getfromprompt = get_prompt_irrespective_of_python_version(text+" ")
     if getfromprompt == "":
         sys.exit()
     if getfromprompt[0] not in [ 'Y', 'y' ]:
         sys.exit('Exist since not Y or y as first letter!')
     return
+
+def get_from_prompt_True_or_False(text):
+    getfromprompt = get_prompt_irrespective_of_python_version(text+" ")
+    #print('getfromprompt',getfromprompt,getfromprompt[0])
+    if getfromprompt == "":
+        return False
+    if getfromprompt[0] in [ 'Y', 'y' ]:
+        return True
+    return False
 
 
 def findfiles(directory=False,begin="",contains="",extension_or_filename=""):
@@ -1171,6 +1184,12 @@ class mypot( object ):
         self.potpath_work           = False        # this is ususally the self.potpath but for cases where different epoch is used ->
         self.pottype                = False        # n2p2/runner
         self.potepoch_all           = False
+        self.assessed_epochs        = []
+        self.assessed_test          = []
+        self.assessed_train         = []
+        self.assessed_kmc57         = []
+        self.assessed_c44           = []
+        self.assessed_input         = []
         self.potepoch_bestteste     = False
         self.potepoch_bestteste_checked = False
         self.c44_al_file            = False
@@ -1180,8 +1199,10 @@ class mypot( object ):
         self.potcutoff              = False         # n2p2_v1ag
         self.learning_curve_file    = False
         timestr = str(int(time.time()))
-        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"_"+timestr+"/"
-        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"_"+timestr+"/"
+        #self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"_"+timestr+"/"
+        #self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"_"+timestr+"/"
+        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/" #+timestr+"/"
+        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"/" #+timestr+"/"
 
         self.inputnn                = False         # path to input.nn
         self.inputdata              = False         # path to input.data
@@ -1245,6 +1266,11 @@ class mypot( object ):
             print(text,"self.inputdata              ",self.inputdata)
             print(text,"self.learning_curve_file    ",self.learning_curve_file)
             print(text,"self.potepoch_all           ",self.potepoch_all)
+            print(text,"self.assessed_epochs        ",self.assessed_epochs)
+            print(text,"self.assessed_test          ",self.assessed_test)
+            print(text,"self.assessed_train         ",self.assessed_train)
+            print(text,"self.assessed_kmc57         ",self.assessed_kmc57)
+            print(text,"self.assessed_c44           ",self.assessed_c44)
             print(text,"self.use_different_epoch    ",self.use_different_epoch)
             print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste,"(It was checked that this is the linked potential)")
             print(text,"self.potepoch_bestteste_chk?",self.potepoch_bestteste_checked)
@@ -1257,7 +1283,7 @@ class mypot( object ):
             print(text,"self.pot_tmpdir             ",self.pot_tmpdir)
             print(text,"self.lammps_tmpdir          ",self.lammps_tmpdir)
             print(text,"self.potlib                 ",self.potlib)
-            print(text,"self.potcutoff              ",self.potcutoff)
+            print(text,"self.potcutoff (Angstrom)   ",self.potcutoff)
             print(text,"self.elements               ",self.elements)
             print(text,"self.atom_energy            ",self.atom_energy)
             print(text,"self.pottype                ",self.pottype)
@@ -1266,7 +1292,7 @@ class mypot( object ):
             print(text,"self.pot_all                ",self.pot_all)
             print()
 
-    def get_my_assessments(self,get_outliers=False):
+    def get_my_assessments(self):
         self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
         if len(self.potepoch_all) == 0:
             return
@@ -1274,45 +1300,116 @@ class mypot( object ):
         #print('all',self.potepoch_all)
         epoch_last = self.potepoch_all[-1]
         #print('epoch_last',epoch_last)
+        #self.print_variables_mypot('ka',print_nontheless=True)
         #print('epoch_best',self.potepoch_bestteste)
 
-        ext_ = [ 'test', 'train', 'kmc57' ]
+        ext_ = [ 'test', 'train', 'kmc57', 'input' ]
         # it may be that best == last or that only one epoch was shown in which case also
         # best == last
         epochs_ = [ str(self.potepoch_bestteste), str(epoch_last) ]
 
         #print('epochs_',epochs_)
         self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
+        allepochs = []
         for ext in ext_:
-            for eidx, epoch in enumerate(epochs_):
+            filex = glob.glob(self.potpath+"/assess_"+ext+"_*")
+            for i in filex:
+                #print('i99',i)
+                idx = i.replace(self.potpath+"/assess_"+ext+"_","")
+                allepochs.append(int(idx))
+        self.assessed_epochs = np.sort(list(set(allepochs)))
+        self.assessed_test  = [None] * len(self.assessed_epochs)
+        self.assessed_train = [None] * len(self.assessed_epochs)
+        self.assessed_kmc57 = [None] * len(self.assessed_epochs)
+        self.assessed_input = [None] * len(self.assessed_epochs)
+        self.assessed_c44   = [None] * len(self.assessed_epochs)
+        self.assessed_test_b  = "-"
+        self.assessed_train_b = "-"
+        self.assessed_kmc57_b = "-"
+        self.assessed_input_b = "-"
+        self.assessed_test_l  = "-"
+        self.assessed_train_l = "-"
+        self.assessed_kmc57_l = "-"
+        self.assessed_input_l = "-"
+        #print('allep',self.assessed_epochs)
+        for ext in ext_:
+            for eidx, epoch in enumerate(self.assessed_epochs):
                 #print('ext',ext,eidx,epoch)
-                file = self.potpath+"/assess_"+ext+"_"+epoch+'/ene_std.npy'
+                file = self.potpath+"/assess_"+ext+"_"+str(epoch)+'/ene_std.npy'
+                if ext == 'test':
+                    if os.path.isfile(file): self.assessed_test[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_test[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_test_b = self.assessed_test[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_test_l = self.assessed_test[eidx]
+                if ext == 'train':
+                    if os.path.isfile(file): self.assessed_train[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_train[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_train_b = self.assessed_train[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_train_l = self.assessed_train[eidx]
+                if ext == 'kmc57':
+                    if os.path.isfile(file): self.assessed_kmc57[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_kmc57[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_kmc57_b = self.assessed_kmc57[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_kmc57_l = self.assessed_kmc57[eidx]
+                if ext == 'input':
+                    if os.path.isfile(file): self.assessed_input[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_input[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_input_b = self.assessed_input[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_input_l = self.assessed_input[eidx]
+
+        if os.path.isfile(self.potpath+"/elastic_c44_all.dat"):
+            elastic_c44_all = np.loadtxt(self.potpath+"/elastic_c44_all.dat")
+            #print(elastic_c44_all)
+            #print(len(elastic_c44_all))
+            for eidx, epoch in enumerate(self.assessed_epochs):
+                if len(elastic_c44_all) >= epoch:
+                    #print(eidx,epoch,elastic_c44_all[epoch-1])
+                    self.assessed_c44[eidx] = elastic_c44_all[epoch-1][1]
+                else:
+                    self.assessed_c44[eidx] = -1
+            #sys.exit()
+        #print('self.assessed_test',self.assessed_test)
+        #print('self.assessed_train',self.assessed_train)
+        #sys.exit()
+                    #if ext == 'test' and eidx == 0: self.test_b = float(my.read_lastline(file))
+                    #if ext == 'test' and eidx == 1: self.test_l = float(my.read_lastline(file))
+                    #if ext == 'train' and eidx == 0: self.train_b = float(my.read_lastline(file))
+                    #if ext == 'train' and eidx == 1: self.train_l = float(my.read_lastline(file))
+                    #if ext == 'kmc57' and eidx == 0: self.kmc57_b = float(my.read_lastline(file))
+                    #if ext == 'kmc57' and eidx == 1: self.kmc57_l = float(my.read_lastline(file))
+        return
+
+
+    def get_my_assessments_check_outliers(self,greater = 60,verbose=False):
+        ''' greater 60 sets outlier when diff (NN-DFT) > 60meV/atom '''
+        has_outliers = False
+        epochs = []
+        diffs = []
+        for ext in [ 'test' ]:
+            #for eidx, epoch in enumerate(epochs_):
+            for eidx, epoch in enumerate(self.assessed_epochs):
+                file = self.potpath+"/assess_"+ext+"_"+str(epoch)+'/ene_diff_abs.npy'
                 if os.path.isfile(file):
-                    if ext == 'test' and eidx == 0: self.test_b = float(my.read_lastline(file))
-                    if ext == 'test' and eidx == 1: self.test_l = float(my.read_lastline(file))
-                    if ext == 'train' and eidx == 0: self.train_b = float(my.read_lastline(file))
-                    if ext == 'train' and eidx == 1: self.train_l = float(my.read_lastline(file))
-                    if ext == 'kmc57' and eidx == 0: self.kmc57_b = float(my.read_lastline(file))
-                    if ext == 'kmc57' and eidx == 1: self.kmc57_l = float(my.read_lastline(file))
-                file = self.potpath+"/assess_"+ext+"_"+epoch+'/ene_diff_abs.npy'
-                if get_outliers == True and os.path.isfile(file):
-                    out = 60 # meV/atom
-                    if ext == 'test' and eidx == 0:
-                        structures_file = self.testdata
+                    greater = 60 # meV/atom
+                    #print('OUTLIERS ext',ext,'eidx',eidx,file)
+                    if ext == 'test': # and eidx == 0:
+                        #print('file',file)
                         c = np.loadtxt(file)
                         #print(c)
-                        cc = np.where(c > out)[0]
-                        if len(cc) > 0:
-                            print('OUTLIERS! file',file)
-                            print('cc >',out,cc,c[cc])
-                            for gf in cc:
-                                frame = ase_read(structures_file,index=gf,format='runner')
-                                print('frame',gf,frame.info['comment'])
-                                print('frame',gf,'nat',frame.get_number_of_atoms())
-                                print('now check also in original input.data if this struct is there')
+                        epochs = np.where(c > greater)[0]
+                        if len(epochs) > 0:
+                            has_outliers = True
+                            diffs = np.round(np.array(c[epochs]),1)
+                            if verbose:
+                                print('OUT! diff greater >',greater,'| epochs:',epochs,'| diff',diffs,'file',file)
+                            for gf in epochs:
+                                frame = ase_read(self.testdata,index=gf,format='runner')
+                                if verbose:
+                                    print('frame',gf,frame.info['comment'],'number_of_atoms:',frame.get_number_of_atoms())
+                                #print('now check also in original input.data if this struct is there')
                             #sys.exit()
         #print('...',self.test_b,self.test_l,self.train_b,self.train_l,self.kmc57_b,self.kmc57_l)
-        return
+        return has_outliers,epochs,diffs
 
     def get(self,exit=True):
         ''' exit is True if for instance weithts files do not exist '''
@@ -2994,19 +3091,19 @@ def string_to_index_an_array(array,string):
         return False
 
 
-def q():
-    host = hostname()
-    #print('host',host)
-    if host != 'fidis':
-        return [],[],[]
-    out=check_output(['q'])
-    debug=False
-    out2=out.split('\n')
+def q(verbose=False):
     id=[]
     stat=[]
     cores=[]
     runtime=[]
     path=[]
+
+    host = check_for_known_hosts(exit=False)
+    if host == False:
+        return id,stat,path
+    out=check_output(['q'])
+    debug=False
+    out2=out.split('\n')
     for idx,i in enumerate(out2):
         #if debug:
         #    print('i.split:',i.split(" "))
@@ -3023,7 +3120,38 @@ def q():
             runtime.append(str_list[3])
             path.append(str_list[4])
 
+    if verbose:
+        print('----- currently in the que ----------------------')
+        for idx,i in enumerate(id):
+            print(idx,id[idx],stat[idx],path[idx])
+        print('----- currently in the que done -----------------')
     return id,stat,path
+
+def find_files(folder,searchpattern,maxdepth=False):
+    #import subprocess
+    #files = check_output(["find "+folder+" -name \""+searchpattern+"\""],shell=True, stderr=subprocess.STDOUT)
+    import utils_rename
+    if maxdepth == False:
+        files = utils_rename.run2(command='find '+folder+' -name "'+searchpattern+'"').split()
+    else:
+        files = utils_rename.run2(command='find '+folder+' -maxdepth '+str(maxdepth)+' -name "'+searchpattern+'"').split()
+    #print('--------1',type(files))
+    #for i in files:
+    #    print(i)
+    #print('--------1')
+    #sys.exit()
+    return files
+
+def glob_recursively(folder,searchpattern):
+    ''' searchpater e.g. "*.c"  '''
+    matches = []
+    for root, dirnames, filenames in os.walk(folder):
+        #print('root',root)
+        #print('dirnames',dirnames)
+        #print('filenames',filenames)
+        for filename in fnmatch.filter(filenames, searchpattern):
+            matches.append(os.path.join(root, filename))
+    return matches
 
 def lammps_write_inputfile_from_command(folder,filename='in.lmp',command=False):
     ''' command is holding the lammps commands '''

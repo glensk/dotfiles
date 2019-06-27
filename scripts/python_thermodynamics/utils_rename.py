@@ -1165,8 +1165,8 @@ def run2(command=None, dont_raise_exceptino = False):
 
     # Poll process for new output until finished
     for line in iter(process.stdout.readline, ""):
-        if line != "" or line != " ":
-            print line,
+        #if line != "" or line != " ":
+        #    print line,
         output += line
     process.wait()
     exitCode = process.returncode
