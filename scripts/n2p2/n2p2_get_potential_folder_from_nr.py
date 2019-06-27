@@ -18,7 +18,7 @@ def help(p = None):
     p.add_argument('--best_testsete',default=False,help=argparse.SUPPRESS, type=int)
     p.add_argument('-ex_c44'    ,'--ex_c44'            , action='store_true', default=False, help='execute part c44')
     p.add_argument('-ex_kmc57'  ,'--ex_kmc57'            , action='store_true', default=False, help='execute part kmc57')
-    p.add_argument('-ex_test'  ,'--ex_test'            , action='store_true', default=False, help='execute part test')
+    p.add_argument('-ex_test'   ,'--ex_test'            , action='store_true', default=False, help='execute part test')
     p.add_argument('-ex_train'  ,'--ex_train'            , action='store_true', default=False, help='execute part train')
     return p
 
@@ -198,7 +198,7 @@ if __name__ == '__main__':
             print('*****************************************************')
             subprocess.call("getEnergies_byLammps.py -p . -ea",shell=True)
 
-        if args.ex_ckmc57:
+        if args.ex_kmc57:
             print('**********************************')
             print('getEnergies_byLammps.py -p . -ckmc')
             print('**********************************')

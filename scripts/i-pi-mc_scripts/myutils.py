@@ -99,6 +99,9 @@ def read_lastline(file):
             f.seek(-2, os.SEEK_CUR)
         return f.readline().decode()
 
+def printnormal(*var):
+    ENDC = '\033[0m'
+    return printoutcolor(ENDC,var,ENDC)
 
 def printred(*var):
     red = '\033[31m'
@@ -1142,7 +1145,7 @@ def test_and_return_environment_var_path(var,path=False,exit=True):
                 print(message)
     else:
         if not os.path.isdir(variable):
-            message = 'directory '+str(var)+' is not defined or does not exist'
+            message = 'directory '+str(var)+' is not defined or does not exist (21)'
             if exit == True:
                 message = "ERROR "+message
                 sys.exit(message)
@@ -1380,36 +1383,47 @@ class mypot( object ):
         return
 
 
-    def get_my_assessments_check_outliers(self,greater = 60,verbose=False):
+    def get_my_assessments_check_outliers(self,specific_epoch = False,greater = 60,verbose=False):
         ''' greater 60 sets outlier when diff (NN-DFT) > 60meV/atom '''
         has_outliers = False
-        epochs = []
+        has_outliers_ = "  "
+        struct_idx = []
         diffs = []
+        file = False
+        checked_epochs = []
         for ext in [ 'test' ]:
-            #for eidx, epoch in enumerate(epochs_):
-            for eidx, epoch in enumerate(self.assessed_epochs):
+            checked_epochs  = self.assessed_epochs
+            if specific_epoch != False:
+                checked_epochs  = [specific_epoch]
+            for epoch in checked_epochs :
                 file = self.potpath+"/assess_"+ext+"_"+str(epoch)+'/ene_diff_abs.npy'
-                if os.path.isfile(file):
+                if not os.path.isfile(file):
+                    has_outliers = True
+                    has_outliers_ = "??O"
+                    # getEnergies_byLammps.py -p . -ctest -pe 1244
+                    # getEnergies_byLammps.py -p . -ctest -pe epoch
+                    return has_outliers,has_outliers_,checked_epochs,struct_idx,diffs
+                else:
                     greater = 60 # meV/atom
-                    #print('OUTLIERS ext',ext,'eidx',eidx,file)
-                    if ext == 'test': # and eidx == 0:
-                        #print('file',file)
+                    if ext == 'test':
                         c = np.loadtxt(file)
                         #print(c)
-                        epochs = np.where(c > greater)[0]
-                        if len(epochs) > 0:
+                        struct_idx = np.where(c > greater)[0]
+                        if len(struct_idx) > 0:
                             has_outliers = True
-                            diffs = np.round(np.array(c[epochs]),1)
+                            has_outliers_ = "!!O"
+                            diffs = np.round(np.array(c[struct_idx]),1)
                             if verbose:
-                                print('OUT! diff greater >',greater,'| epochs:',epochs,'| diff',diffs,'file',file)
-                            for gf in epochs:
+                                print('vOv diff greater >',greater,'in epoch',epoch,'| struct_idx:',struct_idx,'| diff',diffs,'file',file)
+                            for gf in struct_idx:
                                 frame = ase_read(self.testdata,index=gf,format='runner')
                                 if verbose:
                                     print('frame',gf,frame.info['comment'],'number_of_atoms:',frame.get_number_of_atoms())
                                 #print('now check also in original input.data if this struct is there')
                             #sys.exit()
         #print('...',self.test_b,self.test_l,self.train_b,self.train_l,self.kmc57_b,self.kmc57_l)
-        return has_outliers,epochs,diffs
+        #return has_outliers,checked_epochs,struct_idx,diffs
+        return has_outliers,has_outliers_,checked_epochs,struct_idx,np.clip(diffs,0,999.9)
 
     def get(self,exit=True):
         ''' exit is True if for instance weithts files do not exist '''
@@ -1508,13 +1522,17 @@ class mypot( object ):
             f12 = self.potpath+"/weights.012."+epstr+".out"
             f13 = self.potpath+"/weights.013."+epstr+".out"
             f14 = self.potpath+"/weights.014."+epstr+".out"
+
             f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
             f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
             f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
             f12b = self.potpath+"/../weights.012."+epstr+".out"
             f13b = self.potpath+"/../weights.013."+epstr+".out"
             f14b = self.potpath+"/../weights.014."+epstr+".out"
-            if not os.path.isfile(f12): f12 = f12a
+            if not os.path.isfile(f12):
+                #print("f12 dne",f12)
+                f12 = f12a
+                #print("f12 new",f12)
             if not os.path.isfile(f13): f13 = f13a
             if not os.path.isfile(f14): f14 = f14a
             if not os.path.isfile(f12): f12 = f12b
@@ -1522,7 +1540,7 @@ class mypot( object ):
             if not os.path.isfile(f14): f14 = f14b
             for ff in [f12,f13,f14]:
                 if not os.path.isfile(ff):
-                    sys.exit(ff+" does not exist!")
+                    sys.exit(ff+" does not exist! (65)")
             my.cp(f12,self.pot_tmpdir+"/weights.012.data")
             my.cp(f13,self.pot_tmpdir+"/weights.013.data")
             my.cp(f14,self.pot_tmpdir+"/weights.014.data")
@@ -3851,7 +3869,7 @@ def inputnn_get_testfraction(file):
 
 def inputnn_get_random_seed(file):
     random_seed = np.float(grep(file,"random_seed")[0].split()[1])
-    return random_seed
+    return int(random_seed)
 
 def inputnn_get_nodes_short(file,as_string=False):
     nn = (grep(file,"global_nodes_short")[0]).split()
@@ -3997,7 +4015,7 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     if False: #verbose:
         print('nn',n2p2_runner)
     if not os.path.isfile(filename):
-        sys.exit(filename+" does not exist!")
+        sys.exit(filename+" does not exist! (32)")
 
     finished = False
     if n2p2_runner == "n2p2": # basename == "learning-curve.out": # n2p2

@@ -5,6 +5,7 @@ import numpy as np
 import glob,sys,os,argparse,subprocess,time
 import myutils as my
 from myutils import ase_calculate_ene
+from filecmp import cmp
 
 start_time = time.time()
 
@@ -26,6 +27,25 @@ def help(p = None):
     p.add_argument('-ex_test'  ,'--ex_test'            , action='store_true', default=False, help='execute part test')
     p.add_argument('-ex_train'  ,'--ex_train'            , action='store_true', default=False, help='execute part train')
     return p
+
+def gettesttrain(test,ljust_=4,greater=3.0,round_=1):
+    #print('test',test)
+    if type(test) == str:
+        return test.ljust(ljust_)
+    if test is None:
+        return "-".ljust(ljust_)
+    test_ = round(test,round_)
+    test_ = str(test_).ljust(ljust_)
+    if test > greater: test_ = my.printred(test_)
+    else: test_ = my.printnormal(test_)
+    return test_
+
+def getf1f2(f1,greater=55,ljust_=5):
+    f1_ = str(f1).ljust(ljust_)
+    if f1 > greater: f1_ = my.printred(f1_)
+    elif 35.0 < f1 < greater: f1_ = my.printorange(f1_)
+    else: f1_ = my.printnormal(f1_)
+    return f1_
 
 p = help()
 args = p.parse_args()
@@ -56,6 +76,10 @@ que_id_all,que_stat_all,que_folder_all= my.q(args.verbose)
 ##########################################################################################
 print('>> (4) go over all learning curve_files ....')
 ##########################################################################################
+print("#         ||    ENERGY (RMSE)    ||          || FORCES (RMSE)|| C44  || KMC  || [stes]")
+print("#train    || test / train (@step)||          || train/ test  || C44  || std  || [total]")
+print("#frac     ||      /       (@step)||          || min  /       || C44  ||      ||   path")
+
 for i in all_learning_curve_files:
     learning_curve_filename = os.path.basename(i)             # 'learning-curve.out'
     folder = i.replace(learning_curve_filename, '')[:-1]
@@ -80,7 +104,6 @@ for i in all_learning_curve_files:
     pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
     pot.get(exit=False)
     pot.get_my_assessments()  # gets kmc57_{b,l}, train_{b,l}, test_{b,l}
-    has_outliers, outliers_epochs, outliers_diff = pot.get_my_assessments_check_outliers(verbose=args.verbose)
     if len(pot.potepoch_all) > 0:
         epoch_last = pot.potepoch_all[-1]
     else:
@@ -97,15 +120,18 @@ for i in all_learning_curve_files:
     if que_status == "R" and que_id != False and os.path.isfile(pot.potpath+'/elastic_c44_all.dat'):
         elastic_c44_all = np.loadtxt(pot.potpath+'/elastic_c44_all.dat')
         #print(len(elastic_c44_all),'potpath',pot.potpath)
-        ask = False
+        qel = False
         if len(elastic_c44_all) > 500:
             if elastic_c44_all[300][1] > 40 and elastic_c44_all[500][1] > 39.9:
-                ask = True
-                print('ask1',elastic_c44_all[300][1],elastic_c44_all[500][1])
+                qel = "qdel1"
+                print('qdel1',elastic_c44_all[300][1],elastic_c44_all[500][1])
         if len(elastic_c44_all) > 600 and elastic_c44_all[600][1] > 39.65:
-            print('ask2',elastic_c44_all[600][1])
-            aks = True
-        if ask == True:
+            print('qdel2',elastic_c44_all[600][1])
+            qel = "qdel2"
+        if len(elastic_c44_all) > 1000 and elastic_c44_all[1000][1] > 38.5:
+            print('qdel3',elastic_c44_all[1000][1],folder)
+            qel = "qdel3"
+        if qel:
             #print(">300",elastic_c44_all[300])
             print('killing id ',que_id,que_status,que_folder)
             print()
@@ -119,7 +145,7 @@ for i in all_learning_curve_files:
     # print to screen
     #################################################################
     path                = folder.replace(os.getcwd()+'/',"")
-    rnd                 = my.inputnn_get_random_seed(pot.inputnn)
+    rnd                 = str(my.inputnn_get_random_seed(pot.inputnn)).ljust(8)
     testf               = round(my.inputnn_get_testfraction(pot.inputnn),2)
     train_fraction      = round(1.-testf,2)
     nodes_short         = my.inputnn_get_nodes_short(pot.inputnn,as_string=True)
@@ -128,25 +154,32 @@ for i in all_learning_curve_files:
     if os.path.isdir(folder+"/kmc"):
         nn = nodes_short+"**"+activation_short
     pot_elements, [al,mg,si]= my.inputnn_get_atomic_symbols_and_atom_energy_list(pot.inputnn)
-    al                  = round(int(al),2)
-    mg                  = round(int(mg),2)
-    si                  = round(int(si),2)
-    lc                  = my.n2p2_runner_get_learning_curve(pot.inputnn)
+    al                  = int(al)
+    mg                  = int(mg)
+    si                  = int(si)
+
+    inputnn = pot.inputnn
+    if args.potential:
+        folder_up = folder.split("/")[:-1]
+        inputnn_up = "/".join(folder_up)+"/input.nn"
+        same = cmp(pot.inputnn, inputnn_up)
+        if same: inputnn = inputnn_up
+    lc                  = my.n2p2_runner_get_learning_curve(inputnn)
+
     if args.verbose > 1:
         print('---lc---')
         print(lc)
     epochs_max          = len(lc[:,1])-1
     agree               = "?"
     ol                  = ""
-    if has_outliers == True:
-        ol = "! OUTL ! "
 
     if args.execute or args.ex_c44 or args.ex_kmc57 or args.ex_test or args.ex_train:
         print('learning_curve_file folder:',folder.ljust(40),os.getcwd())
         hier = os.getcwd()
         os.chdir(folder)
         add = ""
-        if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
+        #if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
+        if args.execute: args.ex_c44 = args.ex_kmc57 = True
         if args.ex_c44: add = add + ' -ex_c44 '
         if args.ex_kmc57: add = add + ' -ex_kmc57 '
         if args.ex_test: add = add + ' -ex_test '
@@ -171,64 +204,53 @@ for i in all_learning_curve_files:
         go_through = np.append(go_through,len(lc)-1)
     #print('go_through (3)',go_through)
 
+
+    ###########################################################################
+    # check epochs to go trough
+    ###########################################################################
     for eidx, epoch in enumerate(go_through):
         if epoch in pot.assessed_epochs:
-            test    = round(pot.assessed_test[eidx],2)
-            train   = round(pot.assessed_train[eidx],2)
-            kmcbl   = round(pot.assessed_kmc57[eidx],2)
-            c44     = round(pot.assessed_c44[eidx],1)
+            #test    = round(pot.assessed_test[eidx],2)
+            #train   = round(pot.assessed_train[eidx],2)
+            kmcbl   = pot.assessed_kmc57[eidx]
+            c44     = pot.assessed_c44[eidx]
         else:
-            test    = round(lc[:,2][epoch],2)
-            train   = round(lc[:,1][epoch],2)
             kmcbl   = '-'
             c44     = '-'
 
-        f1 = trainminf_at_testmin    = round(lc[:,3][epoch],2)
-        f2 = testminf_at_testmin     = round(lc[:,4][epoch],2)
+        has_outliers,has_outliers_, outliers_epochs, outliers_idx,outliers_diff = pot.get_my_assessments_check_outliers(specific_epoch=epoch,verbose=args.verbose)
+        if has_outliers and has_outliers_ == "!!O":
+            #print(has_outliers,has_outliers_,outliers_diff,type(outliers_diff))
+            #print(outliers_diff.max())
+            #diffint(np.max(outliers_diff))
+            has_outliers_ = has_outliers_+"_"+str(int(outliers_diff.max()))
 
-        #print('kmcbl',kmcbl,'epoch',epoch,'epochs_max',epochs_max)
-        #if kmcbl == '-':
-        #    pot.print_variables_mypot(text=">> (4)",print_nontheless=True)
-        if type(kmcbl) != str:
-            #kmcbl = str(round(kmcbl,1)).ljust(4)
-            kmcbl = str(round(kmcbl,1))
-        stringout = str(ol)+str(que_status)+" %0.1f |"+agree+"%5.1f /%5.1f  (%4.0f) || %s %s %s || %5.1f /%5.1f |C %4s |K %3s |n %4.0f || [%4.0f] | %s | %8.0f | %s"
-        #elementout = (    train_fraction     ,        test, train, epoch,      al,mg,si,   f1,     f2,    c44, kmcbl,   ist ,    epochs_max,   nn,  rnd,   path)
-        elementout = (    train_fraction     ,          test, train, epoch ,    al,mg,si,   f1,     f2,    c44, kmcbl,   0 ,    epochs_max,   nn,  rnd,   path)
-
-        ##################################
-        # get right color
-        ##################################
-        conv_unconv = "unconv"
-        ## erstmak die komischen aussortieren
-        if (test+train)/2. < 0.1 or al == 0.0:
-            takecolor = "blue"  # wiered
-        #elif c44 < 10:
-        #    takecolor = "blue"  # wiered
-        elif al < 3:  # old
-            takecolor = 'orange'
-        elif (test+train)/2. > 4. or (f1+f2)/2. >= 35.:
-            takecolor = "red"
-        elif (test+train)/2. < 4.0 and (f1+f2)/2. < 35.:
-            takecolor = "green"
-            conv_unconv = "conv"
-        else:
-            takecolor = "white"
-
-        if takecolor == "orange":
-            print(my.printorange(stringout)%elementout)
-        if takecolor == "green":
-            print(my.printgreen(stringout)%elementout)
-        if takecolor == "blue":
-            print(my.printblue(stringout)%elementout)
-        if takecolor == "red":
-            print(my.printred(stringout)%elementout)
-        if takecolor == "white":
-            print(stringout%elementout)
+        test    = round(lc[:,2][epoch],1)
+        train   = round(lc[:,1][epoch],1)
+        f1 = trainminf_at_testmin    = round(lc[:,3][epoch],1)
+        f2 = testminf_at_testmin     = round(lc[:,4][epoch],1)
 
 
+        ####################################################
+        # format output
+        ####################################################
+        kmcbl_ = gettesttrain(kmcbl,ljust_=4,greater=3.0)
+        test_ = gettesttrain(test,ljust_=4,greater=3.0)
+        train_ = gettesttrain(train,ljust_=4,greater=3.0)
+        c44_ = gettesttrain(c44,ljust_=4,greater=37)
+        f1_ = getf1f2(f1)
+        f2_ = getf1f2(f2)
+        fstr = (str(que_status)+" "+str(has_outliers_)).ljust(9)
+        epoch = "("+(str(epoch).ljust(4))+") ||"
+        epochs_max_ = "["+(str(epochs_max).ljust(4))+"] |"
+        if eidx == 0: path_ = path
+        else: path_ = ""
 
-        #print(stringout%elementout)
+        ####################################################
+        # print output
+        ####################################################
+        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   0 ,     epochs_max_,nn,"|",  rnd,"|",   path_)
+
 end_time = time.time()
 print("TIME:",end_time - start_time)
 
