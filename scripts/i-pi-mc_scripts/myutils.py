@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import os,sys,re
+import os,sys,re,fnmatch
 import filecmp
 #import click
 import numpy as np
@@ -99,6 +99,9 @@ def read_lastline(file):
             f.seek(-2, os.SEEK_CUR)
         return f.readline().decode()
 
+def printnormal(*var):
+    ENDC = '\033[0m'
+    return printoutcolor(ENDC,var,ENDC)
 
 def printred(*var):
     red = '\033[31m'
@@ -193,16 +196,20 @@ def create_READMEtxt(directory=False,add=False):
     print()
     return
 
-def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True,days=0,hours=0,minutes=3,submit_to_que=True,interactive=False):
+def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_to_que=False,submit_to_debug_que=True,interactive=False):
     ''' interactive == False -> que
         interactive == True  -> execture directly
+        3 minutes is not enough for repeated structures (input.data ~ 130MB) but 4 minutes is enough
     '''
-    if submit_to_que == interactive:
-        sys.exit('either submit_to_que or interacive')
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
+    n2p2_check_SF_inputnn("input.nn")
+
+    hier=os.getcwd()
+    if interactive == submit_to_que == True or interactive == submit_to_debug_que == True:
+        sys.exit('either submit_to_{debug}_que or interacive')
 
     folder="get_scaling"
     if os.path.isdir(folder):
@@ -214,34 +221,32 @@ def n2p2_get_scaling_and_function_data(submitdebug=True,cores=21,debug=True,days
     os.chdir(folder)
     cp("../input.data")
     cp("../input.nn")
-    #cp(submitfile)
-    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minues=minutes,interactive=interactive)
-    if submit_to_que:
-        command = ["sbatch"]
-        if debugque == True:
-            command = command + ["-p","debug","-t","01:00:00"]
-        command = command + [submitskript]
-        call(["sbatch",submitskript])
-    #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
-
-
-    create_READMEtxt(add="submitdebug = "+str(submitdebug))
+    submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minutes=minutes,interactive=interactive)
+    submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
+    create_READMEtxt(add="submit_to_debug_que= "+str(submit_to_debug_que))
     os.chdir(hier)
     return
+
+def check_for_known_hosts(exit=False):
+    hostname = gethostname()
+    known_hosts =  ['fidis','helvetios']
+    if hostname in known_hosts:
+        return True
+    elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
+        return True
+    else:
+        if exit == True:
+            print("known hosts:",known_hosts)
+            sys.exit(hostname+" is not in the list of known hosts!")
+        else:
+            return False
 
 def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interactive=False,days=0,hours=72,minutes=0,seconds=0):
     ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
     if job not in ["scaling","train"]:
         sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
-    hostname = gethostname()
-    known_hosts =  ['fidis','helvetios']
-    if hostname in known_hosts:
-        pass
-    elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
-        pass
-    else:
-        print("known hosts:",known_hosts)
-        sys.exit(hostname+" is not in the list of known hosts!")
+    check_for_known_hosts(exit=True)
+
 
     if directory == False:
         directory = os.getcwd()
@@ -264,6 +269,7 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
             min_    = str(minutes).zfill(2)
             sec_    = str(seconds).zfill(2)
             text_file.write("#SBATCH --time="+str(days_)+"-"+str(hours_)+":"+str(min_)+":00\n")
+            hostname = gethostname()
             if hostname == 'fidis':
                 text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
                 # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
@@ -311,19 +317,12 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
     return filepath
 
 
-def n2p2_make_training(cores=21,debugque=False,days=7,hours=0,minutes=0,submit_to_que=True):
+def n2p2_make_training(cores=21,days=7,hours=0,minutes=0,submit_to_que=True,submit_to_debug_que=False):
     if not os.path.isfile("input.data"):
         sys.exit("Need input.data file")
     if not os.path.isfile("input.nn"):
         sys.exit("Need input.nn file")
-
-        # do I really need the function.data for training?
-        #if not os.path.isfile("function.data"):
-        #    sys.exit("Need function.data file")
-
-        #submitfile = scripts()+"/n2p2/submit_training.sh"
-        #if not os.path.isfile(submitfile):
-        #    sys.exit("Need "+submitfile+" file!")
+    n2p2_check_SF_inputnn("input.nn")
 
     if not os.path.isfile("scaling.data"):
         if not os.path.isfile("get_scaling/scaling.data"):
@@ -331,35 +330,31 @@ def n2p2_make_training(cores=21,debugque=False,days=7,hours=0,minutes=0,submit_t
         else:
             cp("get_scaling/scaling.data","scaling.data")
 
-    #cp(submitfile)
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,days=days,hours=hours,minutes=minutes,job="train")
-    if submit_to_que:
-        command = ["sbatch"]
-        if debugque == True:
-            command = command + ["-p","debug","-t","01:00:00"]
-        command = command + [submitskript]
-        call(["sbatch",submitskript])
-    #submitjob(submitdebug=submitdebug,jobdir=os.getcwd(),submitskript=submitskript,cores=cores)
-
-    #submitjob(submitdebug=False,submit=True,jobdir=os.getcwd(),submitskript="submit_training.sh",cores=cores)
+    submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
     create_READMEtxt()
     return
 
-#def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False,cores=21):
-#    if jobdir == False:
-#        jobdir = os.getcwd()
-#    if submit is True or submitdebug is True:
-#        check_isdir_or_isdirs(jobdir)
-#        cwd = os.getcwd()
-#        os.chdir(jobdir)
-#        if submitdebug is True:  # this works on fidis even with 2 nodes!
-#            sed(submitskript,"srun -n.*","srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train")
-#            call(["sbatch","-p","debug","-t","01:00:00",submitskript])
-#        if submit is True:
-#            sed(submitskript,"srun -n.*","srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train")
-#            call(["sbatch",submitskript])
-#        os.chdir(cwd)
-#        return
+def submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitskript=False):
+    #def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False,cores=21):
+    if jobdir == False:
+        jobdir = os.getcwd()
+    hier = os.getcwd()
+
+    if submit_to_que or submit_to_debug_que:
+        if submitskript == False:
+            sys.exit("Error. please provite the submitskript")
+        os.chdir(jobdir)
+        command = ["sbatch"]
+        if submit_to_debug_que == True:
+            command = command + ["-p","debug","-t","01:00:00"]
+        command = command + [submitskript]
+        print('sbatch '+submitskript)
+        call(["sbatch",submitskript])
+
+    os.chdir(hier)
+    return
+
 
 def sed(file,str_find,str_replace):
     # from scripts folder
@@ -603,12 +598,21 @@ def get_prompt_irrespective_of_python_version(text):
 
 
 def get_from_prompt_Yy_orexit(text):
-    getfromprompt = get_prompt_irrespective_of_python_version(text)
+    getfromprompt = get_prompt_irrespective_of_python_version(text+" ")
     if getfromprompt == "":
         sys.exit()
     if getfromprompt[0] not in [ 'Y', 'y' ]:
         sys.exit('Exist since not Y or y as first letter!')
     return
+
+def get_from_prompt_True_or_False(text):
+    getfromprompt = get_prompt_irrespective_of_python_version(text+" ")
+    #print('getfromprompt',getfromprompt,getfromprompt[0])
+    if getfromprompt == "":
+        return False
+    if getfromprompt[0] in [ 'Y', 'y' ]:
+        return True
+    return False
 
 
 def findfiles(directory=False,begin="",contains="",extension_or_filename=""):
@@ -1141,7 +1145,7 @@ def test_and_return_environment_var_path(var,path=False,exit=True):
                 print(message)
     else:
         if not os.path.isdir(variable):
-            message = 'directory '+str(var)+' is not defined or does not exist'
+            message = 'directory '+str(var)+' is not defined or does not exist (21)'
             if exit == True:
                 message = "ERROR "+message
                 sys.exit(message)
@@ -1183,6 +1187,12 @@ class mypot( object ):
         self.potpath_work           = False        # this is ususally the self.potpath but for cases where different epoch is used ->
         self.pottype                = False        # n2p2/runner
         self.potepoch_all           = False
+        self.assessed_epochs        = []
+        self.assessed_test          = []
+        self.assessed_train         = []
+        self.assessed_kmc57         = []
+        self.assessed_c44           = []
+        self.assessed_input         = []
         self.potepoch_bestteste     = False
         self.potepoch_bestteste_checked = False
         self.c44_al_file            = False
@@ -1192,8 +1202,10 @@ class mypot( object ):
         self.potcutoff              = False         # n2p2_v1ag
         self.learning_curve_file    = False
         timestr = str(int(time.time()))
-        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"_"+timestr+"/"
-        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"_"+timestr+"/"
+        #self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"_"+timestr+"/"
+        #self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"_"+timestr+"/"
+        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/" #+timestr+"/"
+        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"/" #+timestr+"/"
 
         self.inputnn                = False         # path to input.nn
         self.inputdata              = False         # path to input.data
@@ -1257,6 +1269,11 @@ class mypot( object ):
             print(text,"self.inputdata              ",self.inputdata)
             print(text,"self.learning_curve_file    ",self.learning_curve_file)
             print(text,"self.potepoch_all           ",self.potepoch_all)
+            print(text,"self.assessed_epochs        ",self.assessed_epochs)
+            print(text,"self.assessed_test          ",self.assessed_test)
+            print(text,"self.assessed_train         ",self.assessed_train)
+            print(text,"self.assessed_kmc57         ",self.assessed_kmc57)
+            print(text,"self.assessed_c44           ",self.assessed_c44)
             print(text,"self.use_different_epoch    ",self.use_different_epoch)
             print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste,"(It was checked that this is the linked potential)")
             print(text,"self.potepoch_bestteste_chk?",self.potepoch_bestteste_checked)
@@ -1269,7 +1286,7 @@ class mypot( object ):
             print(text,"self.pot_tmpdir             ",self.pot_tmpdir)
             print(text,"self.lammps_tmpdir          ",self.lammps_tmpdir)
             print(text,"self.potlib                 ",self.potlib)
-            print(text,"self.potcutoff              ",self.potcutoff)
+            print(text,"self.potcutoff (Angstrom)   ",self.potcutoff)
             print(text,"self.elements               ",self.elements)
             print(text,"self.atom_energy            ",self.atom_energy)
             print(text,"self.pottype                ",self.pottype)
@@ -1278,7 +1295,7 @@ class mypot( object ):
             print(text,"self.pot_all                ",self.pot_all)
             print()
 
-    def get_my_assessments(self,get_outliers=False):
+    def get_my_assessments(self):
         self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
         if len(self.potepoch_all) == 0:
             return
@@ -1286,47 +1303,130 @@ class mypot( object ):
         #print('all',self.potepoch_all)
         epoch_last = self.potepoch_all[-1]
         #print('epoch_last',epoch_last)
+        #self.print_variables_mypot('ka',print_nontheless=True)
         #print('epoch_best',self.potepoch_bestteste)
 
-        ext_ = [ 'test', 'train', 'kmc57' ]
+        ext_ = [ 'test', 'train', 'kmc57', 'input' ]
         # it may be that best == last or that only one epoch was shown in which case also
         # best == last
         epochs_ = [ str(self.potepoch_bestteste), str(epoch_last) ]
 
         #print('epochs_',epochs_)
         self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
+        allepochs = []
         for ext in ext_:
-            for eidx, epoch in enumerate(epochs_):
+            filex = glob.glob(self.potpath+"/assess_"+ext+"_*")
+            for i in filex:
+                #print('i99',i)
+                idx = i.replace(self.potpath+"/assess_"+ext+"_","")
+                allepochs.append(int(idx))
+        self.assessed_epochs = np.sort(list(set(allepochs)))
+        self.assessed_test  = [None] * len(self.assessed_epochs)
+        self.assessed_train = [None] * len(self.assessed_epochs)
+        self.assessed_kmc57 = [None] * len(self.assessed_epochs)
+        self.assessed_input = [None] * len(self.assessed_epochs)
+        self.assessed_c44   = [None] * len(self.assessed_epochs)
+        self.assessed_test_b  = "-"
+        self.assessed_train_b = "-"
+        self.assessed_kmc57_b = "-"
+        self.assessed_input_b = "-"
+        self.assessed_test_l  = "-"
+        self.assessed_train_l = "-"
+        self.assessed_kmc57_l = "-"
+        self.assessed_input_l = "-"
+        #print('allep',self.assessed_epochs)
+        for ext in ext_:
+            for eidx, epoch in enumerate(self.assessed_epochs):
                 #print('ext',ext,eidx,epoch)
-                file = self.potpath+"/assess_"+ext+"_"+epoch+'/ene_std.npy'
-                if os.path.isfile(file):
-                    if ext == 'test' and eidx == 0: self.test_b = float(my.read_lastline(file))
-                    if ext == 'test' and eidx == 1: self.test_l = float(my.read_lastline(file))
-                    if ext == 'train' and eidx == 0: self.train_b = float(my.read_lastline(file))
-                    if ext == 'train' and eidx == 1: self.train_l = float(my.read_lastline(file))
-                    if ext == 'kmc57' and eidx == 0: self.kmc57_b = float(my.read_lastline(file))
-                    if ext == 'kmc57' and eidx == 1: self.kmc57_l = float(my.read_lastline(file))
-                file = self.potpath+"/assess_"+ext+"_"+epoch+'/ene_diff_abs.npy'
-                if get_outliers == True and os.path.isfile(file):
-                    out = 60 # meV/atom
-                    if ext == 'test' and eidx == 0:
-                        structures_file = self.testdata
-                        c = np.loadtxt(file)
-                        #print(c)
-                        cc = np.where(c > out)[0]
-                        if len(cc) > 0:
-                            print('OUTLIERS! file',file)
-                            print('cc >',out,cc,c[cc])
-                            for gf in cc:
-                                frame = ase_read(structures_file,index=gf,format='runner')
-                                print('frame',gf,frame.info['comment'])
-                                print('frame',gf,'nat',frame.get_number_of_atoms())
-                                print('now check also in original input.data if this struct is there')
-                            #sys.exit()
-        #print('...',self.test_b,self.test_l,self.train_b,self.train_l,self.kmc57_b,self.kmc57_l)
+                file = self.potpath+"/assess_"+ext+"_"+str(epoch)+'/ene_std.npy'
+                if ext == 'test':
+                    if os.path.isfile(file): self.assessed_test[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_test[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_test_b = self.assessed_test[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_test_l = self.assessed_test[eidx]
+                if ext == 'train':
+                    if os.path.isfile(file): self.assessed_train[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_train[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_train_b = self.assessed_train[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_train_l = self.assessed_train[eidx]
+                if ext == 'kmc57':
+                    if os.path.isfile(file): self.assessed_kmc57[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_kmc57[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_kmc57_b = self.assessed_kmc57[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_kmc57_l = self.assessed_kmc57[eidx]
+                if ext == 'input':
+                    if os.path.isfile(file): self.assessed_input[eidx] = float(my.read_lastline(file))
+                    else: self.assessed_input[eidx] = "-"
+                    if epoch == self.potepoch_bestteste: self.assessed_input_b = self.assessed_input[eidx]
+                    if epoch == self.assessed_epochs[-1]: self.assessed_input_l = self.assessed_input[eidx]
+
+        if os.path.isfile(self.potpath+"/elastic_c44_all.dat"):
+            elastic_c44_all = np.loadtxt(self.potpath+"/elastic_c44_all.dat")
+            #print(elastic_c44_all)
+            #print(len(elastic_c44_all))
+            for eidx, epoch in enumerate(self.assessed_epochs):
+                if len(elastic_c44_all) >= epoch:
+                    #print(eidx,epoch,elastic_c44_all[epoch-1])
+                    self.assessed_c44[eidx] = elastic_c44_all[epoch-1][1]
+                else:
+                    self.assessed_c44[eidx] = -1
+            #sys.exit()
+        #print('self.assessed_test',self.assessed_test)
+        #print('self.assessed_train',self.assessed_train)
+        #sys.exit()
+                    #if ext == 'test' and eidx == 0: self.test_b = float(my.read_lastline(file))
+                    #if ext == 'test' and eidx == 1: self.test_l = float(my.read_lastline(file))
+                    #if ext == 'train' and eidx == 0: self.train_b = float(my.read_lastline(file))
+                    #if ext == 'train' and eidx == 1: self.train_l = float(my.read_lastline(file))
+                    #if ext == 'kmc57' and eidx == 0: self.kmc57_b = float(my.read_lastline(file))
+                    #if ext == 'kmc57' and eidx == 1: self.kmc57_l = float(my.read_lastline(file))
         return
 
-    def get(self):
+
+    def get_my_assessments_check_outliers(self,specific_epoch = False,greater = 60,verbose=False):
+        ''' greater 60 sets outlier when diff (NN-DFT) > 60meV/atom '''
+        has_outliers = False
+        has_outliers_ = "  "
+        struct_idx = []
+        diffs = []
+        file = False
+        checked_epochs = []
+        for ext in [ 'test' ]:
+            checked_epochs  = self.assessed_epochs
+            if specific_epoch != False:
+                checked_epochs  = [specific_epoch]
+            for epoch in checked_epochs :
+                file = self.potpath+"/assess_"+ext+"_"+str(epoch)+'/ene_diff_abs.npy'
+                if not os.path.isfile(file):
+                    has_outliers = True
+                    has_outliers_ = "??O"
+                    # getEnergies_byLammps.py -p . -ctest -pe 1244
+                    # getEnergies_byLammps.py -p . -ctest -pe epoch
+                    return has_outliers,has_outliers_,checked_epochs,struct_idx,diffs
+                else:
+                    greater = 60 # meV/atom
+                    if ext == 'test':
+                        c = np.loadtxt(file)
+                        #print(c)
+                        struct_idx = np.where(c > greater)[0]
+                        if len(struct_idx) > 0:
+                            has_outliers = True
+                            has_outliers_ = "!!O"
+                            diffs = np.round(np.array(c[struct_idx]),1)
+                            if verbose:
+                                print('vOv diff greater >',greater,'in epoch',epoch,'| struct_idx:',struct_idx,'| diff',diffs,'file',file)
+                            for gf in struct_idx:
+                                frame = ase_read(self.testdata,index=gf,format='runner')
+                                if verbose:
+                                    print('frame',gf,frame.info['comment'],'number_of_atoms:',frame.get_number_of_atoms())
+                                #print('now check also in original input.data if this struct is there')
+                            #sys.exit()
+        #print('...',self.test_b,self.test_l,self.train_b,self.train_l,self.kmc57_b,self.kmc57_l)
+        #return has_outliers,checked_epochs,struct_idx,diffs
+        return has_outliers,has_outliers_,checked_epochs,struct_idx,np.clip(diffs,0,999.9)
+
+    def get(self,exit=True):
+        ''' exit is True if for instance weithts files do not exist '''
         self.potepoch_bestteste_checked = False
         self.print_variables_mypot('PP get potential: in')
 
@@ -1349,10 +1449,11 @@ class mypot( object ):
                     if not os.path.isfile(self.potpath_in+"/input.nn"):
                         sys.exit("PP could not find "+self.potpath_in+"/input.nn")
 
-            checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
-            for i in checkfiles:
-                if not os.path.isfile(self.potpath_in+"/"+i):
-                    sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
+            if exit == True:
+                checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
+                for i in checkfiles:
+                    if not os.path.isfile(self.potpath_in+"/"+i):
+                        sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
 
             self.potpath = os.path.abspath(self.potpath_in)
             self.inputnn     = isfiledir(self.potpath_in+"/input.nn",exit=True)
@@ -1372,13 +1473,14 @@ class mypot( object ):
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
 
             #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
-            file1 = self.potpath_in+"/weights.012.data"
-            epstr = str(self.potepoch_bestteste).zfill(6)
-            file2 = self.potpath_in+"/weights.012."+epstr+".out"
-            if not filecmp.cmp(file1, file1):
-                sys.exit("PP File "+file1+" is not "+file2)
-            else:
-                self.potepoch_bestteste_checked = True
+            if exit == True:
+                file1 = self.potpath_in+"/weights.012.data"
+                epstr = str(self.potepoch_bestteste).zfill(6)
+                file2 = self.potpath_in+"/weights.012."+epstr+".out"
+                if not filecmp.cmp(file1, file1):
+                    sys.exit("PP File "+file1+" is not "+file2)
+                else:
+                    self.potepoch_bestteste_checked = True
 
             self.pot = self.pottype+"_frompath"
         else:
@@ -1420,13 +1522,17 @@ class mypot( object ):
             f12 = self.potpath+"/weights.012."+epstr+".out"
             f13 = self.potpath+"/weights.013."+epstr+".out"
             f14 = self.potpath+"/weights.014."+epstr+".out"
+
             f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
             f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
             f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
             f12b = self.potpath+"/../weights.012."+epstr+".out"
             f13b = self.potpath+"/../weights.013."+epstr+".out"
             f14b = self.potpath+"/../weights.014."+epstr+".out"
-            if not os.path.isfile(f12): f12 = f12a
+            if not os.path.isfile(f12):
+                #print("f12 dne",f12)
+                f12 = f12a
+                #print("f12 new",f12)
             if not os.path.isfile(f13): f13 = f13a
             if not os.path.isfile(f14): f14 = f14a
             if not os.path.isfile(f12): f12 = f12b
@@ -1434,7 +1540,7 @@ class mypot( object ):
             if not os.path.isfile(f14): f14 = f14b
             for ff in [f12,f13,f14]:
                 if not os.path.isfile(ff):
-                    sys.exit(ff+" does not exist!")
+                    sys.exit(ff+" does not exist! (65)")
             my.cp(f12,self.pot_tmpdir+"/weights.012.data")
             my.cp(f13,self.pot_tmpdir+"/weights.013.data")
             my.cp(f14,self.pot_tmpdir+"/weights.014.data")
@@ -1488,7 +1594,8 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
             print("PROBLEM variable name:",command_name_str,"=",variable,"type(variable)",type(variable),"but should be",str(typehere))
             sys.exit()
 
-    IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
+    #IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
+    IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND_PLAY')
     LAMMPS_COMMAND = get_LAMMPS_executable(exit=True)
     N2P2_PATH = test_and_return_environment_var_path('N2P2_PATH',path=True)
 
@@ -1512,9 +1619,13 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     "#SBATCH --error=_scheduler-stderr.txt",
     "#SBATCH --nodes="+str(nodes),
     "#SBATCH --ntasks "+str(ntasks),
-    "#SBATCH --time=00-"+str(submittime_hours)+":00:00",
-    "#SBATCH --constraint=E5v4",
-    ""]
+    "#SBATCH --time=00-"+str(submittime_hours)+":00:00"]
+
+    hostname = gethostname()
+    if hostname == 'fidis' or hostname[0] == 'f':
+        text2 = text2 + ["#SBATCH --constraint=E5v4"]
+
+    text2 = text2 + [""]
 
     text3 = [
     "set +e",
@@ -1530,7 +1641,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     'date +%s >> time.out',
     "",
     "# sets up the internet/unix socket for connections both for i-PI and on the lammps side",
-    'seed=`grep seed input-runner.xml | awk \'{print $3}\'`',
+    'seed=`grep "<seed>" input-runner.xml | awk \'{print $3}\'`',
     'hostname=`hostname`',
     'seed_hostname=$hostname\_$seed',
     'sed -i \'s/<ffsocket.*/<ffsocket name="lmpserial" mode="'+ffsocket+'">/\' input-runner.xml',
@@ -2998,19 +3109,19 @@ def string_to_index_an_array(array,string):
         return False
 
 
-def q():
-    host = hostname()
-    #print('host',host)
-    if host != 'fidis':
-        return [],[],[]
-    out=check_output(['q'])
-    debug=False
-    out2=out.split('\n')
+def q(verbose=False):
     id=[]
     stat=[]
     cores=[]
     runtime=[]
     path=[]
+
+    host = check_for_known_hosts(exit=False)
+    if host == False:
+        return id,stat,path
+    out=check_output(['q'])
+    debug=False
+    out2=out.split('\n')
     for idx,i in enumerate(out2):
         #if debug:
         #    print('i.split:',i.split(" "))
@@ -3027,7 +3138,38 @@ def q():
             runtime.append(str_list[3])
             path.append(str_list[4])
 
+    if verbose:
+        print('----- currently in the que ----------------------')
+        for idx,i in enumerate(id):
+            print(idx,id[idx],stat[idx],path[idx])
+        print('----- currently in the que done -----------------')
     return id,stat,path
+
+def find_files(folder,searchpattern,maxdepth=False):
+    #import subprocess
+    #files = check_output(["find "+folder+" -name \""+searchpattern+"\""],shell=True, stderr=subprocess.STDOUT)
+    import utils_rename
+    if maxdepth == False:
+        files = utils_rename.run2(command='find '+folder+' -name "'+searchpattern+'"').split()
+    else:
+        files = utils_rename.run2(command='find '+folder+' -maxdepth '+str(maxdepth)+' -name "'+searchpattern+'"').split()
+    #print('--------1',type(files))
+    #for i in files:
+    #    print(i)
+    #print('--------1')
+    #sys.exit()
+    return files
+
+def glob_recursively(folder,searchpattern):
+    ''' searchpater e.g. "*.c"  '''
+    matches = []
+    for root, dirnames, filenames in os.walk(folder):
+        #print('root',root)
+        #print('dirnames',dirnames)
+        #print('filenames',filenames)
+        for filename in fnmatch.filter(filenames, searchpattern):
+            matches.append(os.path.join(root, filename))
+    return matches
 
 def lammps_write_inputfile_from_command(folder,filename='in.lmp',command=False):
     ''' command is holding the lammps commands '''
@@ -3727,7 +3869,7 @@ def inputnn_get_testfraction(file):
 
 def inputnn_get_random_seed(file):
     random_seed = np.float(grep(file,"random_seed")[0].split()[1])
-    return random_seed
+    return int(random_seed)
 
 def inputnn_get_nodes_short(file,as_string=False):
     nn = (grep(file,"global_nodes_short")[0]).split()
@@ -3741,8 +3883,16 @@ def inputnn_get_nodes_short(file,as_string=False):
 
 def inputnn_get_activation_short(file):
     nn = (grep(file,"global_activation_short")[0]).split()
-    nna = nn[1:nn.index("#")]
+    #print('nn',nn)
+    nni = nn[1:]
+    #print('nni',nni)
+    try:
+        nna = nni[1:nni.index("#")]
+    except ValueError:
+        nna = nni
+    #print('nna',nna)
     nnb = "_".join(nna)
+    #print('nnb',nnb)
     return nnb
 
 def inputnn_get_trainfraction(file):
@@ -3840,6 +3990,16 @@ def n2p2_runner_get_learning_curve_filename(inputnn):
                 return filename
     return False
 
+def n2p2_check_SF_inputnn(inputnn):
+    ''' inputnn can also be a file containing the symmetry functions only'''
+    #inputnn = "../n2p2_v3ag_5000_new_2424_new_atomene_new_SF/get_scaling/cursel_64.def"
+    out = grep(inputnn,"symfunction_short.*Si.*3.*Al.*Si") # echo $out | tail -1 | wc -w
+    for line in out:
+        if len(line.split()) != 9:
+            print(line.split())
+            print(len(line.split()))
+            sys.exit("ERROR "+inputnn+" has 10 entries in a 3body line, should have 9! Exit!")
+    return
 
 def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False):
     ''' filename is path to log.fit (runner) or learning-curve.out '''
@@ -3855,7 +4015,7 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     if False: #verbose:
         print('nn',n2p2_runner)
     if not os.path.isfile(filename):
-        sys.exit(filename+" does not exist!")
+        sys.exit(filename+" does not exist! (32)")
 
     finished = False
     if n2p2_runner == "n2p2": # basename == "learning-curve.out": # n2p2
@@ -4092,3 +4252,4 @@ def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,
 
 if __name__ == "__main__":
     pass
+    #n2p2_check_SF_inputnn(inputnn="cursel_64.def")

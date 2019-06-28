@@ -5,12 +5,23 @@ import socket
 import numpy as np
 from shutil import copyfile
 import click
+from myutils import ase_calculate_ene
 
 # from scripts folder
 import convert_fileformats
 import myutils as mu
 
-CONTEXT_SETTINGS = mu.get_click_defaults()
+def get_click_defaults():
+    # show default values in click
+    orig_init = click.core.Option.__init__
+    def new_init(self, *args, **kwargs):
+        orig_init(self, *args, **kwargs)
+        self.show_default = True
+    click.core.Option.__init__ = new_init
+    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
+    return CONTEXT_SETTINGS
+
+CONTEXT_SETTINGS = get_click_defaults()
 @click.command(context_settings=CONTEXT_SETTINGS)
 
 
@@ -104,10 +115,7 @@ def createjob(
     scripts = mu.scripts()
     mypot = mu.mypot(pot)
     if submit is True or submitdebug is True:
-        if socket.gethostname() != "fidis":    # use != and not: is not
-            print('you are NOT on fidis')
-            sys.exit('submit or submitdebug is True but you are no fidis! Exit.')
-
+        mu.check_for_known_hosts()
 
 
     ##### here only chck if the potential can be set up. (in.lmp)
@@ -115,7 +123,8 @@ def createjob(
     ace = mu.ase_calculate_ene(pot=pot,
             potpath=False,
             units='eV',geopt=False,kmc=True,verbose=verbose)
-    mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
+    #mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
+    ace.pot_get_and_ase_lmp_cmd(kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
     if test == True:
@@ -140,9 +149,15 @@ def createjob(
     if foldername_append != "":
         directory = directory+"_"+foldername_append
 
+    ###############################################
+    # make the structure
+    ###############################################
+    atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,create_fake_vacancy = True)
+    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
 
     # make the atomic structure
-    if True:
+    # this was to play ... not necessary now?
+    if False:
         nndist = a0/np.sqrt(2.)
 
         from ase.io import read as ase_read
@@ -369,7 +384,8 @@ def createjob(
                 units='eV',geopt=False,kmc=True,verbose=verbose)
         address = socket.gethostname()+"_"+os.path.basename(jobdir)
         print('address',address)
-        mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
+        #mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
+        ace.pot_get_and_ase_lmp_cmd(kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
         mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.runnerformat.lmp',ace=ace)
 
 
@@ -447,7 +463,9 @@ def createjob(
                 LOOPFOLDER=True)
 
         # submit the job (execute either this or submit-ipi-kmc.sh_all3, not both)
-        mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=directory,submitskript="submit-ipi-kmc.sh_all3")
+        #mu.submitjob(submit=submit,submitdebug=submitdebug,jobdir=directory,submitskript="submit-ipi-kmc.sh_all3")
+        if submit == True:
+            mu.submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=directory,submitskript="submit-ipi-kmc.sh_all3")
 
 
     print('done')
