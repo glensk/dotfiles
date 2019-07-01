@@ -10,7 +10,9 @@ from filecmp import cmp
 start_time = time.time()
 
 def help(p = None):
-    string = ''' helptext '''
+    string = '''
+    n2p2_train_fraction_vs_test_accuracy2.py -f v4ag ppl
+    '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-sbtrain','--sort_by_trainfraction', action='count',default=False, help='sort output by trainfractino')
@@ -26,6 +28,7 @@ def help(p = None):
     p.add_argument('-ex_kmc57'  ,'--ex_kmc57'            , action='store_true', default=False, help='execute part kmc57')
     p.add_argument('-ex_test'  ,'--ex_test'            , action='store_true', default=False, help='execute part test')
     p.add_argument('-ex_train'  ,'--ex_train'            , action='store_true', default=False, help='execute part train')
+    p.add_argument('-f'  ,'--find'               , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) pattern in foldername")
     return p
 
 def gettesttrain(test,ljust_=4,greater=3.0,round_=1):
@@ -68,8 +71,28 @@ if args.verbose:
         print('>> (1) i',i)
     print('>> (1) ################################## all_learning_curve_files ########')
     print()
+
 from utils_rename import list_sorted
 all_learning_curve_files = list_sorted(all_learning_curve_files)
+if args.find != -1:
+    all_learning_curve_files_ = []
+    for i in all_learning_curve_files:
+        #print()
+        use = True
+        for j in args.find:
+            #print(i,j in i)
+            if j not in i:
+                use = False
+                #print('cont')
+                continue
+        #print(">>",i,use)
+        if use == True:
+            all_learning_curve_files_.append(i)
+    all_learning_curve_files = all_learning_curve_files_
+    # for i in all_learning_curve_files:
+    #     print('i',i)
+    # sys.exit()
+
 
 print('>> (3) my.q() ....')
 que_id_all,que_stat_all,que_folder_all= my.q(args.verbose)

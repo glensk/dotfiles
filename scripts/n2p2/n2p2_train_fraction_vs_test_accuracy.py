@@ -21,6 +21,7 @@ def help(p = None):
     p.add_argument('-v'  ,'--verbose'            , action='count',      default=False, help='verbose')
     p.add_argument('-b'  ,'--both'               , action='store_true', default=False, help='evaluate for runner & n2p2 (instad of only n2p2)')
     p.add_argument('-e'  ,'--execute'            , action='store_true', default=False, help='execute part')
+    p.add_argument('-f'  ,'--find'               , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) pattern in foldername")
     return p
 
 p = help()
