@@ -178,8 +178,7 @@ for i in all_learning_curve_files:
         hier = os.getcwd()
         os.chdir(folder)
         add = ""
-        #if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
-        if args.execute: args.ex_c44 = args.ex_kmc57 = True
+        if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
         if args.ex_c44: add = add + ' -ex_c44 '
         if args.ex_kmc57: add = add + ' -ex_kmc57 '
         if args.ex_test: add = add + ' -ex_test '
