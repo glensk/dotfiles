@@ -11,6 +11,7 @@ def help(p = None):
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i','--inputfile', required=True, type=str,default=False, help="name of the inputfile inputfile")
     p.add_argument('-s','--seeds',default=[12345, 8765, 987654, 654911])
+    #p.add_argument('-s','--seeds',default=[12, 6765, 787654, 154911])
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
@@ -22,10 +23,11 @@ def todo(args):
         sys.exit("inputfile input.nn does not exist")
     for s in args.seeds:
         #for pl in ["p","t"]:
-        for pl in ["t"]:
+        for pl in ["p"]:
             for c in [21]:
                 os.chdir(hier)
-                folder=str(s)+"_"+pl+pl+"l_"+str(c)+"cores_repeated"
+                folder=str(s)+"_"+pl+pl+"l_"+str(c)
+                #folder=str(s)+"_"+pl+pl+"l_"+str(c)+"cores_repeated"
                 #print('s',s,pl,pl,"l",'cores',c)
                 print(folder)
                 if os.path.isdir(folder):
