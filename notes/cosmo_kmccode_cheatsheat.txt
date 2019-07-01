@@ -49,7 +49,7 @@ print('self.idx[5]',self.idx[5]  ,"self.state[self.idx[5]] == self.state[xx]:",s
 print('self.idx[63]',self.idx[63],"self.state[self.idx[63]]== self.state[35]:",self.state[self.idx[63]])
 
 print('this is how one can get the positions of the solutes')
-print('self.idx[0]',self.idx[0]  ," self.state[self.idx[0]] == self.state[7] :",self.state[self.idx[0]],'self.ridx[7] ',self.ridx[self.idx[0]])
+print('self.idx[0]',self.idx[0]  ,"self.state[self.idx[0]] == self.state[7] :",self.state[self.idx[0]],'self.ridx[7] ',self.ridx[self.idx[0]])
 print('self.idx[1]',self.idx[1]  ,"self.state[self.idx[1]] == self.state[25]:",self.state[self.idx[1]],'self.ridx[25]',self.ridx[self.idx[1]])
 print('self.idx[2]',self.idx[2]  ,"self.state[self.idx[2]] == self.state[53]:",self.state[self.idx[2]],'self.ridx[53]',self.ridx[self.idx[2]])
 print('self.idx[3]',self.idx[3]  ,"self.state[self.idx[3]] == self.state[40]:",self.state[self.idx[3]],'self.ridx[40]',self.ridx[self.idx[3]])
