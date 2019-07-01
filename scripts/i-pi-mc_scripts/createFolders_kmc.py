@@ -123,7 +123,6 @@ def createjob(
     ace = mu.ase_calculate_ene(pot=pot,
             potpath=False,
             units='eV',geopt=False,kmc=True,verbose=verbose)
-    #mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
     ace.pot_get_and_ase_lmp_cmd(kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket)
 
     ##### if test
@@ -378,7 +377,6 @@ def createjob(
             atomsc.write(jobdir+'/data.extxyz',format='extxyz')
             atomsc.write(jobdir+'/data.espresso-in',format='espresso-in')
 
-
         # create in.lmp
         ace = mu.ase_calculate_ene(pot=pot,potpath=mypot.potpath,
                 units='eV',geopt=False,kmc=True,verbose=verbose)
@@ -388,52 +386,10 @@ def createjob(
         ace.pot_get_and_ase_lmp_cmd(kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
         mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.runnerformat.lmp',ace=ace)
 
+        # create input-runner.xml (should be made without copying)
+        mu.create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml",nsteps=nsteps,stride=100,seed=seed,a0=a0,ncell=ncell,nsi=nsi,nmg=nmg,nvac=nvac,neval=neval,temp=temp,nodes=nodes,address=address,testrun=test)
 
-        # get input-runner.xml (should be made without copying)
-        stride = 100
-        verbosity = "low"
-        if test == True:
-            nsteps = 5
-            stride = 1
-            verbosity = "low"   # with high every socket connect is reported ... which is too much info
-
-        copyfile(file_ipi_input_runner, jobdir+"/input-runner.xml")
-        mu.sed(jobdir+"/input-runner.xml",'<total_steps>.*</total_steps>','<total_steps> '+str(nsteps)+' </total_steps>')
-        mu.sed(jobdir+"/input-runner.xml",'<simulation verbosity=.*','<simulation verbosity="'+verbosity+'">')
-        mu.sed(jobdir+"/input-runner.xml",'<trajectory filename.*','<trajectory filename="pos" stride="'+str(stride)+'" cell_units="angstrom" format="xyz" bead="0"> positions{angstrom} </trajectory>')
-        mu.sed(jobdir+"/input-runner.xml",'<seed>.*</seed>','<seed> '+str(seed)+' </seed>')
-        mu.sed(jobdir+"/input-runner.xml",'<a0 units="angstrom">.*</a0>','<a0 units="angstrom"> '+str(a0)+' </a0>')
-        mu.sed(jobdir+"/input-runner.xml",'<ncell>.*</ncell>','<ncell> '+str(ncell)+' </ncell>')
-        mu.sed(jobdir+"/input-runner.xml",'<nsi>.*</nsi>','<nsi> '+str(nsi)+' </nsi>')
-        mu.sed(jobdir+"/input-runner.xml",'<nmg>.*</nmg>','<nmg> '+str(nmg)+' </nmg>')
-        mu.sed(jobdir+"/input-runner.xml",'<nvac>.*</nvac>','<nvac> '+str(nvac)+' </nvac>')
-        mu.sed(jobdir+"/input-runner.xml",'<neval>.*</neval>','<neval> '+str(neval)+' </neval>')
-        mu.sed(jobdir+"/input-runner.xml",'<temperature units="kelvin">.*','<temperature units="kelvin">'+str(temp)+'</temperature>')
-
-
-        #mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
-        activelist = str(range(ncell**3 - nvac))
-        activelist = activelist.replace(" ", "")
-        mu.sed(jobdir+"/input-runner.xml",'<!-- <activelist> .*','<activelist> '+activelist+' </activelist>')
-        atom_x_list = []
-        for nvac_idx in range(ncell**3 - nvac,ncell**3):
-            atom_x_list.append('atom_x{angstrom}('+str(nvac_idx)+')')
-        insert = ", ".join(atom_x_list)
-        mu.sed(jobdir+"/input-runner.xml",'atom_x{.*',insert+" ] </properties>")
-
-
-        mu.sed(jobdir+"/input-runner.xml",'<file mode="xyz" units="angstrom">.*</file>','<file mode="xyz" units="angstrom"> data.ipi </file>')
-
-        mu.sed(jobdir+"/input-runner.xml",'<ffsocket.*','<ffsocket name="lmpserial" mode="'+str(ffsocket)+'">')
-        addressline = '<address> '+address+' </address>'
-        if ffsocket == "unix":
-            mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline+' <latency> 1e-3 </latency>')
-        if ffsocket == "inet":
-            mu.sed(jobdir+"/input-runner.xml",'<address.*',addressline+' <port> 12345 </port>')
-
-
-
-        # get submit-ipi-kmc.sh (should be made without copying)
+        # create submit-ipi-kmc.sh (should be made without copying)
         mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,
                 lmp_par=lmp_par,
                 ipi_inst=ipi_inst,
@@ -441,7 +397,7 @@ def createjob(
                 submittime_hours=submittime_hours,
                 SBATCH=True)
 
-        # get osubmit-ipi-kmc.sh (should be made without copying)
+        # create osubmit-ipi-kmc.sh (should be made without copying)
         mu.create_submitskript_ipi_kmc(jobdir+"/osubmit-ipi-kmc.sh",nodes,ntasks,
                 lmp_par=lmp_par,
                 ipi_inst=ipi_inst,

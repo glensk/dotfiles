@@ -1391,7 +1391,7 @@ class mypot( object ):
         diffs = []
         file = False
         checked_epochs = []
-        for ext in [ 'test' ]:
+        for ext in [ 'test' ]:  # only check for outliers in test!
             checked_epochs  = self.assessed_epochs
             if specific_epoch != False:
                 checked_epochs  = [specific_epoch]
@@ -1581,6 +1581,94 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print("#####################################################")
     print()
     return
+
+def create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml", nsteps=False,stride=100,seed=12345,a0=4.057,ncell=4,nsi=3,nmg=3,nvac=1,neval=8,temp=300,verbosity="low",checkpoint_restart_stride=10,nodes=1,address="hostname_jobdir",testrun=False):
+    '''
+        nodes is only necessary to define ffsockets
+        for calculations on one node, use ffsocket = "unix"; when > 1 noes: ffsocket = "inet"
+        for verbosity = "high" every socket connect is reported ... which seems too much info
+    '''
+    if testrun == True:
+        nsteps = 3
+        strie = 1
+        verbosity = 'low'
+
+    if nodes == 1:
+        ffsocket = "unix"
+        addressline = '        <address> '+str(address)+' </address> <latency> 1e-3 </latency>'
+    elif nodes > 1:
+        ffsocket = "inet"
+        addressline = '        <address> '+str(address)+' </address> <port> 12345 </port>'
+    else:
+        sys.exit("Number of nodes has to be positive!")
+
+    activelist = str(range(ncell**3 - nvac))
+    activelist = activelist.replace(" ", "")
+    atom_x_list = []
+    for nvac_idx in range(ncell**3 - nvac,ncell**3):
+        atom_x_list.append('atom_x{angstrom}('+str(nvac_idx)+')')
+    insert = ", ".join(atom_x_list)
+
+    ipi_cmd = [
+    '<simulation verbosity="'+str(verbosity)+'">',
+    '    <output prefix="simulation">',
+    '        <properties stride="1" filename="out"> [ step, time{picosecond}, potential] </properties>',
+    '        <properties stride="1" filename="vac"> [ step, time{picosecond}, '+str(insert)+' ] </properties>',
+    '        <trajectory filename="pos" stride="'+str(stride)+'" cell_units="angstrom" format="xyz" bead="0"> positions{angstrom} </trajectory>',
+    '        <checkpoint stride="'+str(checkpoint_restart_stride)+'" filename="checkpoint.restart"/>',
+    '    </output>',
+    '    <total_steps>'+str(nsteps)+'</total_steps>',
+    '    <prng> <seed>'+str(seed)+'</seed> </prng>',
+    '    <ffsocket name="lmpserial" mode="'+str(ffsocket)+'">',
+    addressline,
+    #'        <!-- <activelist> '+activelist+' </activelist> -->',
+    '        <activelist> '+activelist+' </activelist>',
+    '    </ffsocket>',
+    '    <total_time> 258800 </total_time>',
+    '    <system>',
+    '        <initialize nbeads="1">',
+    #'            <file mode="xyz" units="angstrom"> al10x10x10_alat4.057_988al_6si_5mg_1va_999atoms.ipi </file>',
+    '            <file mode="xyz" units="angstrom"> data.ipi </file>',
+    '            <velocities mode="thermal" units="kelvin"> 0 </velocities>',
+    '        </initialize>',
+    '        <forces>',
+    '            <force forcefield="lmpserial"> </force>',
+    '        </forces>',
+    '        <motion mode="al-kmc">',
+    '            <al6xxx_kmc>',
+    '               <geop mode="lbfgs">',
+    '                    <ls_options> <iter> 3 </iter> </ls_options>',
+    '               </geop>',
+    '               <a0 units="angstrom"> '+str(a0)+' </a0>',
+    '               <nstep> 5 </nstep>',
+    '               <ncell> '+str(ncell)+' </ncell>',
+    '               <nsi> '+str(nsi)+' </nsi>',
+    '               <nmg> '+str(nmg)+' </nmg>',
+    '               <nvac> '+str(nvac)+' </nvac>',
+    '               <neval> '+str(neval)+' </neval>',
+    '               <diffusion_barrier_al units="electronvolt"> 0.52  </diffusion_barrier_al>',
+    '               <diffusion_prefactor_al units="terahertz"> 16.6 </diffusion_prefactor_al>',
+    '                                                    <!-- from Mantina2009 dHm && v*  -->',
+    '               <ecache_file> KMC_ECACHE </ecache_file>',
+    '               <qcache_file> KMC_QCACHE </qcache_file>',
+    '            </al6xxx_kmc>',
+    '        </motion>',
+    '        <ensemble>',
+    '            <temperature units="kelvin">'+str(temp)+'</temperature>',
+    '        </ensemble>',
+    '    </system>',
+    '</simulation>'
+    ]
+
+    if not os.path.isdir(jobdir):
+        mkdir(jobdir)
+    f = open(jobdir+'/'+filename,'w')
+    for i in ipi_cmd:
+        f.write(i+"\n")
+    return
+    return
+
+
 
 def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True,LOOPFOLDER=False):
     ''' time is in min
@@ -3240,7 +3328,7 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
     f.write("run "+str(ace.nsteps)+"\n")
     return
 
-def ipi_write_inputfile(folder=False,filename='input.xml',positions='init.xyz',ace=False):
+def ipi_write_static_inputfile(folder=False,filename='input.xml',positions='init.xyz',ace=False):
     ipi_cmd =[
     "<simulation mode='static' verbosity='high'>",
     "  <output prefix='simulation'>",
@@ -3284,7 +3372,7 @@ def ipi_ext_calc(atoms,ace):
     ### mkdir tmpdir
     tmpdir = os.environ['HOME']+"/._tmp_ipi/"
     mkdir(tmpdir)
-    ipi_write_inputfile(folder=tmpdir,filename='input.xml',positions='init.xyz',ace=ace)
+    ipi_write_static_inputfile(folder=tmpdir,filename='input.xml',positions='init.xyz',ace=ace)
     ase_write(folder+'/init.xyz',atoms,format='ipi')
     return
 
@@ -3886,13 +3974,22 @@ def inputnn_get_activation_short(file):
     #print('nn',nn)
     nni = nn[1:]
     #print('nni',nni)
-    try:
-        nna = nni[1:nni.index("#")]
-    except ValueError:
-        nna = nni
+    nna = []
+    known = [ 't', 'p', 'l', 's']
+    for i in nni:
+        #print('i',i)
+        if i in known:
+            nna.append(i)
     #print('nna',nna)
+    #try:
+    #    nna = nni[nni.index("#")]
+    #except ValueError:
+    #    nna = nni
+    #print('nna',nna,len(nna))
     nnb = "_".join(nna)
-    #print('nnb',nnb)
+    #print('nnb',nnb,len(nnb))
+    if len(nnb) != 5:
+        sys.exit()
     return nnb
 
 def inputnn_get_trainfraction(file):

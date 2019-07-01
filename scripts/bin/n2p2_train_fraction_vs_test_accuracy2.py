@@ -68,6 +68,8 @@ if args.verbose:
         print('>> (1) i',i)
     print('>> (1) ################################## all_learning_curve_files ########')
     print()
+from utils_rename import list_sorted
+all_learning_curve_files = list_sorted(all_learning_curve_files)
 
 print('>> (3) my.q() ....')
 que_id_all,que_stat_all,que_folder_all= my.q(args.verbose)
@@ -150,9 +152,9 @@ for i in all_learning_curve_files:
     train_fraction      = round(1.-testf,2)
     nodes_short         = my.inputnn_get_nodes_short(pot.inputnn,as_string=True)
     activation_short    = my.inputnn_get_activation_short(pot.inputnn)
-    nn                  = nodes_short+"__"+activation_short
+    nn                  = str(nodes_short+"__"+activation_short).ljust(12)
     if os.path.isdir(folder+"/kmc"):
-        nn = nodes_short+"**"+activation_short
+        nn = str(nodes_short+"**"+activation_short).ljust(12)
     pot_elements, [al,mg,si]= my.inputnn_get_atomic_symbols_and_atom_energy_list(pot.inputnn)
     al                  = int(al)
     mg                  = int(mg)
@@ -178,11 +180,10 @@ for i in all_learning_curve_files:
         hier = os.getcwd()
         os.chdir(folder)
         add = ""
-        #if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
-        if args.execute: args.ex_c44 = args.ex_kmc57 = True
-        if args.ex_c44: add = add + ' -ex_c44 '
+        if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
+        if args.ex_c44: add   = add + ' -ex_c44 '
         if args.ex_kmc57: add = add + ' -ex_kmc57 '
-        if args.ex_test: add = add + ' -ex_test '
+        if args.ex_test: add  = add + ' -ex_test '
         if args.ex_train: add = add + ' -ex_train '
         print('add',add)
         #sys.exit()
@@ -224,6 +225,20 @@ for i in all_learning_curve_files:
             #print(outliers_diff.max())
             #diffint(np.max(outliers_diff))
             has_outliers_ = has_outliers_+"_"+str(int(outliers_diff.max()))
+
+        ##################################################################################
+        # calculate the "??O" folder
+        ##################################################################################
+        if has_outliers_ == "??O" and False:
+            hier = os.getcwd()
+            os.chdir(folder)
+            print('oe',outliers_epochs,folder)
+            for doepoch in outliers_epochs:
+                print('doepoch',doepoch)
+                #subprocess.call(["n2p2_get_potential_folder_from_nr.py -ex_test"+add],shell=True)
+                subprocess.call(["getEnergies_byLammps.py -p . -ctest -pe "+str(doepoch)],shell=True)
+            os.chdir(hier)
+
 
         test    = round(lc[:,2][epoch],1)
         train   = round(lc[:,1][epoch],1)
