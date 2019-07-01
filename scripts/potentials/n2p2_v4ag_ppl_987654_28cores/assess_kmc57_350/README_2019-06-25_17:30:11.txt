@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 1673dd54f5271251846f0c742bda28c95b63f523
+# execution time: 25.7008080482 seconds.
+
+getEnergies_byLammps.py -p . -ckmc

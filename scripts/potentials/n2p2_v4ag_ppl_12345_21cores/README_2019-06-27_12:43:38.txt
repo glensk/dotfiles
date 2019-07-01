@@ -1,0 +1,7 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: cebf791b4297b4645f82f0586f4dc31e54162694
+# execution time: 0.350652933121 seconds.
+# pwd: /scratch/glensk/TEST_RUNNER_VS_n2p2_for_c44_v4ag/12345_ppl_21cores/potential
+
+n2p2_get_potential_folder_from_nr.py -ex_c44

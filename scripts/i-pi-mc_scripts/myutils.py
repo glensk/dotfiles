@@ -1589,7 +1589,7 @@ def create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml", nsteps=False,st
         for verbosity = "high" every socket connect is reported ... which seems too much info
     '''
     if testrun == True:
-        nsteps = 5
+        nsteps = 3
         strie = 1
         verbosity = 'low'
 
@@ -1646,9 +1646,10 @@ def create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml", nsteps=False,st
     '               <nmg> '+str(nmg)+' </nmg>',
     '               <nvac> '+str(nvac)+' </nvac>',
     '               <neval> '+str(neval)+' </neval>',
-    '         <diffusion_barrier_al units="electronvolt"> 0.52  </diffusion_barrier_al> <!-- Mantina2009 dHm -->',
-    '         <diffusion_prefactor_al units="terahertz"> 16.6 </diffusion_prefactor_al> <!-- Mantina2009 v*  -->',
-    '         <ecache_file> KMC_ECACHE </ecache_file>',
+    '               <diffusion_barrier_al units="electronvolt"> 0.52  </diffusion_barrier_al>',
+    '               <diffusion_prefactor_al units="terahertz"> 16.6 </diffusion_prefactor_al>',
+    '                                                    <!-- from Mantina2009 dHm && v*  -->',
+    '               <ecache_file> KMC_ECACHE </ecache_file>',
     '               <qcache_file> KMC_QCACHE </qcache_file>',
     '            </al6xxx_kmc>',
     '        </motion>',
@@ -3973,13 +3974,22 @@ def inputnn_get_activation_short(file):
     #print('nn',nn)
     nni = nn[1:]
     #print('nni',nni)
-    try:
-        nna = nni[1:nni.index("#")]
-    except ValueError:
-        nna = nni
+    nna = []
+    known = [ 't', 'p', 'l', 's']
+    for i in nni:
+        #print('i',i)
+        if i in known:
+            nna.append(i)
     #print('nna',nna)
+    #try:
+    #    nna = nni[nni.index("#")]
+    #except ValueError:
+    #    nna = nni
+    #print('nna',nna,len(nna))
     nnb = "_".join(nna)
-    #print('nnb',nnb)
+    #print('nnb',nnb,len(nnb))
+    if len(nnb) != 5:
+        sys.exit()
     return nnb
 
 def inputnn_get_trainfraction(file):

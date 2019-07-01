@@ -68,6 +68,8 @@ if args.verbose:
         print('>> (1) i',i)
     print('>> (1) ################################## all_learning_curve_files ########')
     print()
+from utils_rename import list_sorted
+all_learning_curve_files = list_sorted(all_learning_curve_files)
 
 print('>> (3) my.q() ....')
 que_id_all,que_stat_all,que_folder_all= my.q(args.verbose)
@@ -150,9 +152,9 @@ for i in all_learning_curve_files:
     train_fraction      = round(1.-testf,2)
     nodes_short         = my.inputnn_get_nodes_short(pot.inputnn,as_string=True)
     activation_short    = my.inputnn_get_activation_short(pot.inputnn)
-    nn                  = nodes_short+"__"+activation_short
+    nn                  = str(nodes_short+"__"+activation_short).ljust(12)
     if os.path.isdir(folder+"/kmc"):
-        nn = nodes_short+"**"+activation_short
+        nn = str(nodes_short+"**"+activation_short).ljust(12)
     pot_elements, [al,mg,si]= my.inputnn_get_atomic_symbols_and_atom_energy_list(pot.inputnn)
     al                  = int(al)
     mg                  = int(mg)
