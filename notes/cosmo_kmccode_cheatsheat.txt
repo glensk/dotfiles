@@ -30,14 +30,33 @@ nevent[-1] = self.state[sneigh]  # this is just an "A" or an "S" or an "M"
 nevent[2] = self.ecache[nstr] : energy of the corresponding structure?
 nevent[2] = self.qcache[nstr] : positions of the corresponding strucure?
 
+ivac (constant): is always the index lattice site associated the vacancy (e.g. 63 when 64 sites)
 ivac (constant): if 64 atoms sits & 1vac -> ivac = [63]
 ivac (constant): if 64 atoms sits & 2vac -> ivac = [63 ,62]
-ivac (constant): is always the index lattice site associated the vacancy (e.g. 63 when 64 sites)
 
 svac = self.idx[ivac] # lattice !site! associated with this vacancy; ivac is fixed but self.idx array changes with every swap.
 svac: index of the current vacancy position which changes with every KMC step
 
 nvac: index of a partiuclar neighbor of the vacancy
+
+print('this is how one can get the positions of the solutes')
+print('self.idx[0]',self.idx[0]  ,"self.state[self.idx[0]] == self.state[7] :",self.state[self.idx[0]])
+print('self.idx[1]',self.idx[1]  ,"self.state[self.idx[1]] == self.state[25]:",self.state[self.idx[1]])
+print('self.idx[2]',self.idx[2]  ,"self.state[self.idx[2]] == self.state[53]:",self.state[self.idx[2]])
+print('self.idx[3]',self.idx[3]  ,"self.state[self.idx[3]] == self.state[40]:",self.state[self.idx[3]])
+print('self.idx[4]',self.idx[4]  ,"self.state[self.idx[4]] == self.state[xx]:",self.state[self.idx[4]])
+print('self.idx[5]',self.idx[5]  ,"self.state[self.idx[5]] == self.state[xx]:",self.state[self.idx[5]])
+print('self.idx[63]',self.idx[63],"self.state[self.idx[63]]== self.state[35]:",self.state[self.idx[63]])
+This is how one can get the positions of the solutes:
+('self.idx[0]', 7, 'self.state[self.idx[0]] == self.state[7] :', 'S')
+('self.idx[1]', 25, 'self.state[self.idx[1]] == self.state[25]:', 'S')
+('self.idx[2]', 53, 'self.state[self.idx[2]] == self.state[53]:', 'S')
+('self.idx[3]', 40, 'self.state[self.idx[3]] == self.state[40]:', 'M')
+('self.idx[4]', 22, 'self.state[self.idx[4]] == self.state[xx]:', 'M')
+('self.idx[5]', 33, 'self.state[self.idx[5]] == self.state[xx]:', 'M')
+('self.idx[63]', 35, 'self.state[self.idx[63]]== self.state[35]:', 'V')
+check: fidis: /home/glensk/kmc_ipi_play/4x4x4_n2p2_v2ag_300K_1Vac_3Mg_3Si__1.563pctVac_4.688pctMg_4.688pctSi_10.0rcut/seed985635
+
 
 
 self.neigh  # list of nearest neighbors; if 64 atoms in the system (4x4x4sc) this is an array of 12 elements in 64 rows. 
@@ -48,8 +67,12 @@ ridx: [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
  48 49 63 51 52 53 54 55 56 57 58 59 60 61 62 50]
 ridx: # reverse lookup index [i.e. ridx[i] gives the index of the atoms/vacancy at site i] (where the 'site' is the original site when the simulation started) 
 
-
 idx: connects the initial positions of the atoms 
+# atoms are ordered (at the beginning) by [ S,S,S,M,M,M,A,A,....,V]
+# atoms are ordered (at the beginning) by [ S1,S2,S3,M1,M2,M3,A,A,....,V]
+self.idx[0] says ALWAYS! where** S1 is now (where** = on which index = on which lattie site with respect to original lattice) 
+self.idx[1] says ALWAYS! where** S2 is now (where** = on which index = on which lattie site with respect to original lattice) 
+self.idx[3] says ALWAYS! where** M1 is now (where** = on which index = on which lattie site with respect to original lattice) 
 self.idx[atom] will give the index of the atom where atom is the index of the initial atom (as stored in the simulations_pos.out file)
 self.idx[ivac] : is sorted in such a way that last position gives alwasy the index 
 to the vacancy.

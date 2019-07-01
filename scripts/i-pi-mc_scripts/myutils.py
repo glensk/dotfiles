@@ -1391,7 +1391,7 @@ class mypot( object ):
         diffs = []
         file = False
         checked_epochs = []
-        for ext in [ 'test' ]:
+        for ext in [ 'test' ]:  # only check for outliers in test!
             checked_epochs  = self.assessed_epochs
             if specific_epoch != False:
                 checked_epochs  = [specific_epoch]

@@ -179,9 +179,9 @@ for i in all_learning_curve_files:
         os.chdir(folder)
         add = ""
         if args.execute: args.ex_c44 = args.ex_kmc57 = args.ex_test = args.ex_train = True
-        if args.ex_c44: add = add + ' -ex_c44 '
+        if args.ex_c44: add   = add + ' -ex_c44 '
         if args.ex_kmc57: add = add + ' -ex_kmc57 '
-        if args.ex_test: add = add + ' -ex_test '
+        if args.ex_test: add  = add + ' -ex_test '
         if args.ex_train: add = add + ' -ex_train '
         print('add',add)
         #sys.exit()
@@ -223,6 +223,20 @@ for i in all_learning_curve_files:
             #print(outliers_diff.max())
             #diffint(np.max(outliers_diff))
             has_outliers_ = has_outliers_+"_"+str(int(outliers_diff.max()))
+
+        ##################################################################################
+        # calculate the "??O" folder
+        ##################################################################################
+        if has_outliers_ == "??O" and False:
+            hier = os.getcwd()
+            os.chdir(folder)
+            print('oe',outliers_epochs,folder)
+            for doepoch in outliers_epochs:
+                print('doepoch',doepoch)
+                #subprocess.call(["n2p2_get_potential_folder_from_nr.py -ex_test"+add],shell=True)
+                subprocess.call(["getEnergies_byLammps.py -p . -ctest -pe "+str(doepoch)],shell=True)
+            os.chdir(hier)
+
 
         test    = round(lc[:,2][epoch],1)
         train   = round(lc[:,1][epoch],1)

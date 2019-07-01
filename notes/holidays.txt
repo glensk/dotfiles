@@ -10,7 +10,7 @@
 1   4.0     28.12.2018 Weih 
 0.5 3.5     31.12.2018 Weih
 ----------------------------------- uebertrag 3.5 + (14.5 days holidays for 2019) = 18 dyas
-Tage 
+TageRest
     18.0 
 1   17.0 1  03.01.2019 Weih                                                               
 1   16.0 2  04.01.2019 Weihnachten
@@ -23,10 +23,12 @@ Tage
 5    5.0 13 22.07.2019 Vivi/Geny Walchsee (bis 27.7.2019)       (eingetragen)
 3    2.0 16 29.07.2019 Vivi/Geny Walchsee (bis 31.7.2019)       (eingetragen)
 1    1.0    02.08.2019 nach Walchsee in deutschland             (eingetragen)
+1    0.0    23.08.2019 Katharina & Ben hochzeit                 (eingetragen)
 ----------------------------------- uebertrag xx + (10.5 days for 2019) = xx
 xx
 2-4         angfang august eva/marcel
 0.5         24.12.2019 Weihnachten
 4           27.-30     Weihnachten
 0.5         31.12.2019 Weihnachten
+1.5         Skifahren
 ----------------------------------- uebertrag xx + (14.5 days for 2020) = xx
