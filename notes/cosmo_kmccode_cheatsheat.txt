@@ -47,8 +47,19 @@ print('self.idx[3]',self.idx[3]  ,"self.state[self.idx[3]] == self.state[40]:",s
 print('self.idx[4]',self.idx[4]  ,"self.state[self.idx[4]] == self.state[xx]:",self.state[self.idx[4]])
 print('self.idx[5]',self.idx[5]  ,"self.state[self.idx[5]] == self.state[xx]:",self.state[self.idx[5]])
 print('self.idx[63]',self.idx[63],"self.state[self.idx[63]]== self.state[35]:",self.state[self.idx[63]])
+
+print('this is how one can get the positions of the solutes')
+print('self.idx[0]',self.idx[0]  ," self.state[self.idx[0]] == self.state[7] :",self.state[self.idx[0]],'self.ridx[7] ',self.ridx[self.idx[0]])
+print('self.idx[1]',self.idx[1]  ,"self.state[self.idx[1]] == self.state[25]:",self.state[self.idx[1]],'self.ridx[25]',self.ridx[self.idx[1]])
+print('self.idx[2]',self.idx[2]  ,"self.state[self.idx[2]] == self.state[53]:",self.state[self.idx[2]],'self.ridx[53]',self.ridx[self.idx[2]])
+print('self.idx[3]',self.idx[3]  ,"self.state[self.idx[3]] == self.state[40]:",self.state[self.idx[3]],'self.ridx[40]',self.ridx[self.idx[3]])
+print('self.idx[4]',self.idx[4]  ,"self.state[self.idx[4]] == self.state[22]:",self.state[self.idx[4]],'self.ridx[22]',self.ridx[self.idx[4]])
+print('self.idx[5]',self.idx[5]  ,"self.state[self.idx[5]] == self.state[33]:",self.state[self.idx[5]],'self.ridx[33]',self.ridx[self.idx[5]])
+
+
+
 This is how one can get the positions of the solutes:
-('self.idx[0]', 7, 'self.state[self.idx[0]] == self.state[7] :', 'S')
+('self.idx[0]', 7,  'self.state[self.idx[0]] == self.state[7] :', 'S')
 ('self.idx[1]', 25, 'self.state[self.idx[1]] == self.state[25]:', 'S')
 ('self.idx[2]', 53, 'self.state[self.idx[2]] == self.state[53]:', 'S')
 ('self.idx[3]', 40, 'self.state[self.idx[3]] == self.state[40]:', 'M')
@@ -138,4 +149,10 @@ self.ridx[54] = 63 -> current site 54 is originally from site 54
 self.ridx[svac]    -> always 63 (for every step)
 self.sites[54]     -> always gives array([24.3950316 ,  7.82471003,  8.85264884])
 				   -> for every step
+
+RESTART: works perfectly, can restart from step x and just continue by reading in the restart file.
+						
+		start by:   - adapt the RESTART file by changing <total_steps>20</total_steps> to desired value !!! NOT <step>20</step> !!
+					- python /home/glensk/sources/ipi_play/bin/i-pi RESTART
+					- I should write the RESTART file regularly. 
 
