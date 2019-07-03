@@ -50,7 +50,7 @@ source $generalrc/generalrc_path.sh $onhost
 ##############################################
 # ALIASES & PROMPT & tabcolor
 ##############################################
-source $generalrc/aliases.sh
+source $generalrc/aliases.sh   # shellscript containing aliases
 #source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
     
@@ -131,7 +131,8 @@ setenv BROWSER open # is necessary for opening jupyter notebook files
 setenv LC_ALL en_US.UTF-8
 setenv GREP_COLOR 31    # red; some greps have colorized ouput. enable...
 setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green
-setenv NOTES_DIRECTORY $dotfiles/notes
+setenv NOTES_DIRECTORY $dotfiles/notes  # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
+setenv NOTES_EXT "txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett setenv"
 
 ##############################################

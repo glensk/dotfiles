@@ -26,6 +26,7 @@ if [ "$loadzsh" = "true" ];then
 
 #[ "`hostname`" = "cmmc002" ] && eval `/afs/ipp/common/usr/modules.2014/amd64_sles11/Modules/$MODULE_VERSION/bin/modulecmd tcsh !*`  # for cmmc
 # in zsh first load compinit and bashcompinit (in first line)
+export NOTES_DIRECTORY="$dotfiles/notes"
 autoload -U colors && colors                    # necessary for prompt colors (0.00s)
 autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) 
 autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
@@ -66,6 +67,5 @@ source ~/.generalrc
 # 4) 3+ zsh_set                   : 0.06s (zsh_set  ) = 0.01s
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
 autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) repeat here to get completion for notes without restarting shell again
-#autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
 fi
 fi

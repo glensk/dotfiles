@@ -156,3 +156,9 @@ RESTART: works perfectly, can restart from step x and just continue by reading i
 					- python /home/glensk/sources/ipi_play/bin/i-pi RESTART
 					- I should write the RESTART file regularly. 
 
+to see how many structures were stored in KMC_{E,Q}CACHE:  
+        grep "S'[ASMV][ASMV][ASMV][ASMV]" KMC_ECACHE | wc -l
+        grep "S'[ASMV][ASMV][ASMV][ASMV]" KMC_QCACHE | wc -l
+    or better:
+        grep "^bs" KMC_QCACHE | wc -l
+        grep "^bs" KMC_ECACHE | wc -l

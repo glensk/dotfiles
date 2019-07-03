@@ -7,11 +7,13 @@ import myutils as my
 import subprocess
 
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3' ]
+known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
-address = {};branch={}
+address = {};branch={};install_folder_different={}
+
+install_folder_different["notes"] = True
 
 address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
 branch['ipi_old']       = "kmc-al6xxx"
@@ -58,16 +60,23 @@ def help(p = None ,known=known):
             help='The target directory for installation. Default: $HOME/sources/')
     p.add_argument('-if','--install_folder', type=str, default=False,
             help='The target foldername for installation. Default: if False: the --install name')
+    p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
 p = help()
 args = p.parse_args()
+args.verbose = True
 
 def install_(args,known):
-    install        = args.install
+    # make sources folder if it does not exist ($HOME/sources)
+    if not os.path.isdir(args.sources_folder):
+        my.mkdir(args.sources_folder)
 
-    with my.cd(os.environ.get('dotfiles')):
-        print('pwd (ssh key should was added: https://github.com/settings/keys)',os.getcwd())
+    install        = args.install
+    print('>> dotfiles folder',os.environ.get('dotfiles'))
+    #with my.cd(os.environ.get('dotfiles')):
+    #    print('>> pwd (ssh key should was added: https://github.com/settings/keys) so that it should not be necessary to use git passwords.')
+    if args.verbose: print(">> pwd:",os.getcwd())
 
         # git config --global credential.helper store   ; before git push makes it work without password
         #subprocess.call(["git","config","--global","credential.helper","store"])
@@ -78,6 +87,8 @@ def install_(args,known):
     # check if the program is known
     if args.install not in known:
         sys.exit("Not known how to install "+args.install+"; Exit!")
+    if args.verbose:
+        print('>> args.install              : \"'+args.install+'\" (is a known program)')
 
 
     # get the address
@@ -87,30 +98,48 @@ def install_(args,known):
     except KeyError:
         args.git = False
         args.branch = False
+    if args.verbose:
+        print(">> args.git (address)        :",args.git)
+        print(">> args.branch               :",args.branch)
 
-    # mkdir the install folder
-    if not os.path.isdir(args.sources_folder):
-        my.mkdir(args.sources_folder)
+    if args.verbose:
+        print(">> args.sources_folder       :",args.sources_folder)
+        print(">> args.install_folder (1)   :",args.install_folder)
+
+
+    # get the install folder
+    try:
+        args.install_folder = install_folder_different[install]
+    except KeyError:
+        args.install_folder = False
+    if args.verbose:
+        print(">> args.install_folder (2)   :",args.install_folder,type(args.install_folder))
 
     if args.install_folder == False:
         args.install_folder = args.sources_folder+args.install
+    if args.verbose:
+        print(">> args.install_folder (3)   :",args.install_folder)
+        print(">> args.install_folder==True :",args.install_folder==True)
+        print(">> args.install_folder==False:",args.install_folder==False)
 
-    print('args.install       :',args.install)
-    print('args.sources_folder:',args.sources_folder)
-    print('args.install_folder:',args.install_folder)
-    print()
-    if os.path.isdir(args.install_folder):
-        sys.exit('args.install_folder '+args.install_folder+' does already exist; Exit')
+    if args.install_folder == False:
+        sys.exit("args.install_folder == False")
+    elif args.install_folder == True:
+        pass
+    else:
+        if os.path.isdir(args.install_folder):
+            sys.exit('args.install_folder '+args.install_folder+' does already exist; Exit')
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-        if args.install in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
+        if args.install in ['ipi']                : git_clone(args,specify_depth = False,checkout="feat/kmc")
         elif args.install in ['atomsk']           : install_atomsk(args)
         elif args.install in ['miniconda','miniconda2']       : install_miniconda(args)
         elif args.install in ['lbzip','lbzip2']   : install_lbzip(args)
         elif args.install in ['n2p2']             : install_n2p2(args)
         elif args.install in ['vmd']              : install_vmd(args)
         elif args.install in ['units']            : install_units(args)
+        elif args.install in ['notes']            : install_notes(args)
         elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
         else: git_clone(args)  # ipi_cosmo, aiia-alloy, mlip, ....
 
@@ -150,6 +179,13 @@ def install_units(args):
         subprocess.call(['make'])
         print('make install ....')
         subprocess.call(['make','install'])
+    return
+
+def install_notes(args):
+    ''' raw file from https://github.com/pimterry/notes/blob/master/notes '''
+    # cd dotfiles/
+    os.chdir(os.environ["dotfiles"]+'/aliases')
+    subprocess.call(["wget https://raw.githubusercontent.com/pimterry/notes/master/notes && chmod +x notes && sed -i 's|^NOTES_EXT=.*|NOTES_EXT=\"txt\"|' notes"],shell=True)
     return
 
 def install_lbzip(args):

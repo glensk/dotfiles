@@ -77,7 +77,7 @@ set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl
 ""inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung, 
 
-hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (darkred)
+hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (red)
 "hi Comment  guifg=#80a0ff ctermfg=gray " Color for comments (darkred)
 "hi Comment  guifg=#80a0ff ctermfg=darkgray " Color for comments (darkred)
 "hi Comment  guifg=#80a0ff ctermfg=lightgray " Color for comments (darkred)

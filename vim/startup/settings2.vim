@@ -12,6 +12,8 @@ au! BufRead,BufNewFile .tcshrc call SetFileTypeSH("bash")
 au BufNewFile,BufRead *.F set filetype=fortran95
 autocmd BufRead *.htm,*.html set syntax=html
 autocmd BufNewFile *.htm,*.html set syntax=html
+"au BufNewFile,BufRead *.md,*.markdown,*.mdown,*.mkd,*.mkdn,README.md  setf markdown
+"hi def htmlItalic              term=italic cterm=italic gui=italic
 
 " }}}
 
