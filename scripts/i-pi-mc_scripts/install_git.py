@@ -382,7 +382,7 @@ def install_n2p2(args):
         COMP="intel"
         GSL_ROOT = "GSL_ROOT"
         PROJECT_CC = "icpc # or icc"
-        PROJECT_MPICC = "mpic++ # or mpiicpc"
+        PROJECT_MPICC = "mpiicpc # mpic++ does not work on fidis/helvetios"
         EIGENPATH = "${EIGEN_ROOT}/include/eigen3"
 
     elif myhostname == "daint":
