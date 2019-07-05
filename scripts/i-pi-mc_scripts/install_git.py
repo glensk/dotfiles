@@ -7,13 +7,15 @@ import myutils as my
 import subprocess
 
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes' ]
+known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
 address = {};branch={};install_folder_different={}
 
 install_folder_different["notes"] = True
+
+address["eigen"]        = "https://github.com/eigenteam/eigen-git-mirror.git"
 
 address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
 branch['ipi_old']       = "kmc-al6xxx"
@@ -94,10 +96,14 @@ def install_(args,known):
     # get the address
     try:
         args.git = address[install]
-        args.branch = branch[install]
     except KeyError:
         args.git = False
+    try:
+        args.branch = branch[install]
+    except KeyError:
         args.branch = False
+
+
     if args.verbose:
         print(">> args.git (address)        :",args.git)
         print(">> args.branch               :",args.branch)
@@ -132,14 +138,14 @@ def install_(args,known):
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-        if args.install   in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
-        elif args.install in ['atomsk']           : install_atomsk(args)
-        elif args.install in ['miniconda','miniconda2']       : install_miniconda(args)
-        elif args.install in ['lbzip','lbzip2']   : install_lbzip(args)
-        elif args.install in ['n2p2']             : install_n2p2(args)
-        elif args.install in ['vmd']              : install_vmd(args)
-        elif args.install in ['units']            : install_units(args)
-        elif args.install in ['notes']            : install_notes(args)
+        #if args.install   in ['ipi']                    : git_clone(args,specify_depth = False,checkout="feat/kmc")
+        if args.install   in ['atomsk']                 : install_atomsk(args)
+        elif args.install in ['miniconda','miniconda2'] : install_miniconda(args)
+        elif args.install in ['lbzip','lbzip2']         : install_lbzip(args)
+        elif args.install in ['n2p2']                   : install_n2p2(args)
+        elif args.install in ['vmd']                    : install_vmd(args)
+        elif args.install in ['units']                  : install_units(args)
+        elif args.install in ['notes']                  : install_notes(args)
         elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
         else: git_clone(args)  # ipi_cosmo, aiia-alloy, mlip, ....
 
@@ -377,6 +383,22 @@ def install_n2p2(args):
     hostname = socket.gethostname()
     # on fidis:  currently icpc && mpiicpc are used; icc should be equivalent to icpc
     COMP="intel"
+    GSL_ROOT = "GSL_ROOT"
+    PROJECT_CC = "icpc # or icc"
+    PROJECT_MPICC = "mpic++ # or mpiicpc"
+
+    if hostname == "daint":
+        GSL_ROOT = "EBROOTGSL"
+        PROJECT_CC = "CC"
+        PROJECT_MPICC = "CC"
+        #  module load daint-mc
+        #  module switch PrgEnv-cray PrgEnv-intel # $MKLROOT is set
+        #  module unload cray-libsci
+        #  module load GSL/2.5-CrayIntel-18.08  # $GSL_ROOT is here called $EBROOTGSL
+        #  module load cray-python/2.7.15.1
+        #  module load cray-fftw
+        #
+
 
     if hostname == 'mac':
         COMP = "intel"  # makes problems on mac
@@ -414,9 +436,13 @@ def install_n2p2(args):
     my.sed("makefile","^PROJECT_DIR.*","PROJECT_DIR=./")
     my.sed("makefile","^LIB=libnnp.so libnnpif.so libnnptrain.so pynnp.so","LIB=libnnp.so libnnpif.so libnnptrain.so") # remove pynnp.so
     # makefile.intel
-    my.sed("makefile.intel","^PROJECT_GSL=.*","PROJECT_GSL=${GSL_ROOT}/include")
+    my.sed("makefile.intel","^PROJECT_GSL=.*","PROJECT_GSL=${"+GSL_ROOT+"}/include")
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
-    my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${GSL_ROOT}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
+    my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${"+GSL_ROOT+"}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
+    my.sed("makefile.intel","^PROJECT_CC=.*","PROJECT_CC="+PROJECT_CC)
+    my.sed("makefile.intel","^PROJECT_MPICC=.*","PROJECT_MPICC="+PROJECT_MPICC)
+
+
     if hostname == 'mac':
         my.sed("makefile.gnu","-fopenmp","#-fopenmp")  # try also with the acutal paths
         # with this libnnp compiles, current probs with libnnpif
@@ -430,6 +456,10 @@ def install_n2p2(args):
         # on mac: conda install -c omnia eigen3
         # or
         # on mac: conda install -c conda-forge eigen
+
+    ##############################################################################
+    # do on every machine
+    ##############################################################################
     f = open("makefile.intel", "r");contents = f.readlines();f.close();insert=0
     for idx,i in enumerate(contents):
         if i[:14] == "PROJECT_EIGEN=": insert = idx
