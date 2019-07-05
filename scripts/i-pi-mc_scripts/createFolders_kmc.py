@@ -1,76 +1,58 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import os,sys,random
+import os,sys,random,argparse
 import socket
 import numpy as np
 from shutil import copyfile
-import click
+#import click
 from myutils import ase_calculate_ene
 
 # from scripts folder
 import convert_fileformats
 import myutils as mu
 
-def get_click_defaults():
-    # show default values in click
-    orig_init = click.core.Option.__init__
-    def new_init(self, *args, **kwargs):
-        orig_init(self, *args, **kwargs)
-        self.show_default = True
-    click.core.Option.__init__ = new_init
-    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
-    return CONTEXT_SETTINGS
+#def get_click_defaults():
+#    # show default values in click
+#    orig_init = click.core.Option.__init__
+#    def new_init(self, *args, **kwargs):
+#        orig_init(self, *args, **kwargs)
+#        self.show_default = True
+#    click.core.Option.__init__ = new_init
+#    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
+#    return CONTEXT_SETTINGS
 
-CONTEXT_SETTINGS = get_click_defaults()
-@click.command(context_settings=CONTEXT_SETTINGS)
+#CONTEXT_SETTINGS = get_click_defaults()
+#@click.command(context_settings=CONTEXT_SETTINGS)
 
-
-# input variables (get those with click)
+#nput variables
+#(get those with click)
 # setting KMC
-@click.option('-ncell',required=True, prompt=True, type=int,
-        help="supercell size of primitive cell")
-@click.option('-nsi'  ,required=True, prompt=True, type=int, help="number of Si atoms")
-@click.option('-nmg'  ,required=True, prompt=True, type=int, help="number of Mg atoms")
-@click.option('-nvac' ,required=True, prompt=True, type=int, help="number of vacancies")
-@click.option('-a0'   ,default = 4.057, type=float, help="fcc lattice constant for Al.")
-@click.option('-temp' ,default = 300, type=int, help="KMC temperature")
-@click.option('-nseeds',type=int, default=3, help="number of different seeds")
-@click.option('-seednumber',default=False,multiple=True, type=int,help="define seed number manually (otherwise a random number generator; can be used to define multiple seeds)")
-@click.option('-nsteps',type=int, default=50000, help="number of KMC steps to make")
-@click.option('-runnercutoff',type=float, default=10., help="runner cutoff distance ~10Angstrom")
-@click.option('-fa','--foldername_append',type=str, default="", help="append to foldername")
+def help(p = None):
+    string = ''' helptext '''
+    p = argparse.ArgumentParser(description=string,
+        formatter_class=argparse.RawTextHelpFormatter)
+    p.add_argument("--ncell",'-ncell'   ,required=True, type=int,help="supercell size of primitive cell")
+    p.add_argument("--nsi",'-nsi'       ,required=True, type=int, help="number of Si atoms")
+    p.add_argument("--nmg",'-nmg'       ,required=True, type=int, help="number of Mg atoms")
+    p.add_argument("--nvac",'-nvac'     ,required=True, type=int, help="number of vacancies")
+    p.add_argument("--a0",'-a0'         ,default = 4.057, type=float, help="fcc lattice constant for Al.")
+    p.add_argument("--temp",'-temp'     ,default = 300, type=int, help="KMC temperature")
+    p.add_argument("--nseeds",'-nseeds' ,type=int, default=3, help="number of different seeds")
+    p.add_argument("--seednumber",'-seednumber',default=False,nargs='*', type=int,help="define seed number manually (otherwise a random number generator; can be used to define multiple seeds)")
+    p.add_argument('-nsteps',type=int, default=50000, help="number of KMC steps to make")
+    p.add_argument('-fa','--foldername_append',type=str, default="", help="append to foldername")
+    p.add_argument('--pot','-p',       required=False, choices=mu.pot_all(), default=mu.get_latest_n2p2_pot())
+    p.add_argument('-submit', '--submit', action='store_true')
+    p.add_argument('-submitdebug','--submitdebug',action='store_true')
+    p.add_argument('-st','--submittime_hours', type=int,default=71,help="slurm time for the job")
+    p.add_argument('-n','--nodes', type=int,default=1,help="how many nodes to use?")
+    p.add_argument('-t','--test', action='store_true')
+    p.add_argument('-tf','--testfiles', action='store_true')
+    p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    return p
 
-# environment variables
-@click.option('--pot','-p',type=click.Choice(mu.pot_all()),required=True,default=mu.get_latest_n2p2_pot(),help="potential from $scripts/potentials folder.")
 
-@click.option('-submit/-no-submit', default=False)
-@click.option('-submitdebug/-no-submitdebug', default=False)
-@click.option('-st','--submittime_hours', type=int,default=71,help="slurm time for the job")
-@click.option('-n','--nodes', type=int,default=1,help="how many nodes to use?")
-@click.option('-t','--test/--no-test', default=False)
-@click.option('-tf','--testfiles/--no-testfiles', default=False)
-@click.option('--verbose','-v',count=True)
-
-def createjob(
-        ncell,
-        nmg,
-        nsi,
-        nvac,
-        a0,
-        temp,
-        nseeds,
-        seednumber,
-        nsteps,
-        runnercutoff,
-        foldername_append,
-        pot,
-        submit,
-        submitdebug,
-        submittime_hours,
-        test,
-        testfiles,
-        nodes,
-        verbose):
+def createjob(args):
     """
     This is an script to create KMC jobs quickly (and submits them if -submit/-submitdebug).
 
@@ -81,6 +63,25 @@ def createjob(
     to evaluate energies vs. realtime use:\n
             %kmc_show_time_xmgrace.sh seed*/KMC_AL6XXX
     """
+    ncell = args.ncell
+    nmg                 = args.nmg
+    nsi                 = args.nsi
+    nvac                = args.nvac
+    a0                  = args.a0
+    temp                = args.temp
+    nseeds              = args.nseeds
+    seednumber          = args.seednumber
+    nsteps              = args.nsteps
+    foldername_append   = args.foldername_append
+    pot                 = args.pot
+    submit              = args.submit
+    submitdebug         = args.submitdebug
+    submittime_hours    = args.submittime_hours
+    test                = args.test
+    testfiles           = args.testfiles
+    nodes               = args.nodes
+    verbose             = args.verbose
+
     ### check if ase runner/quippy/lammpps-data formats are known
     ase_formats = mu.ase_get_known_formats_class(verbose=True)
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
@@ -143,8 +144,7 @@ def createjob(
     directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+pot+"_"+\
                 str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
-                str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi_"+\
-                str(runnercutoff)+"rcut"
+                str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi"
     if foldername_append != "":
         directory = directory+"_"+foldername_append
 
@@ -429,4 +429,8 @@ def createjob(
 
 
 if __name__ == "__main__":
-    createjob()
+    p = help()
+    args = p.parse_args()
+    if args.verbose:
+        mu.print_args(args)
+    createjob(args)

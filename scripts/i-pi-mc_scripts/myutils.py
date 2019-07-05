@@ -1683,9 +1683,9 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
             sys.exit()
 
     #IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND')
-    IPI_COMMAND    = test_and_return_environment_var_path('IPI_COMMAND_PLAY')
-    LAMMPS_COMMAND = get_LAMMPS_executable(exit=True)
-    N2P2_PATH = test_and_return_environment_var_path('N2P2_PATH',path=True)
+    IPI_COMMAND     = test_and_return_environment_var_path('IPI_COMMAND_PLAY')
+    LAMMPS_COMMAND  = get_LAMMPS_executable(exit=True)
+    N2P2_PATH       = test_and_return_environment_var_path('N2P2_PATH',path=True)
 
     check(IPI_COMMAND,"IPI_COMMAND",str)
     check(LAMMPS_COMMAND,"LAMMPS_COMMAND",str)
@@ -1729,7 +1729,7 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     'date +%s >> time.out',
     "",
     "# sets up the internet/unix socket for connections both for i-PI and on the lammps side",
-    'seed=`grep "<seed>" input-runner.xml | awk \'{print $3}\'`',
+    'seed=`grep "<seed>" input-runner.xml | sed "s|.*<seed>||" | sed "s|</seed>.*||" | awk \'{print $1}\'`',
     'hostname=`hostname`',
     'seed_hostname=$hostname\_$seed',
     'sed -i \'s/<ffsocket.*/<ffsocket name="lmpserial" mode="'+ffsocket+'">/\' input-runner.xml',
@@ -1744,8 +1744,13 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     #'ssh $SLURM_JOB_NODELIST -C \" cd $SLURM_SUBMIT_DIR; nohup python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &\"',
     '',
     'python '+IPI_COMMAND+' input-runner.xml &> log.i-pi &',
-    #'',
-    'sleep 10',
+    '',
+    #'sleep 10',
+    '# depending on the size fo the cell, this is necessary to initialize ipi',
+    'for i in `seq 100`;do',
+    '   [ ! -e "KMC_AL6XXX" ] && echo $i sleep 10 && sleep 100',
+    '   [ -e "KMC_AL6XXX" ] && echo $i yes && break',
+    'done',
     '',
     'for i in `seq '+str(ipi_inst)+'`',
     'do',
@@ -1757,7 +1762,9 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     '      srun --exclusive --ntasks=1 --cpus-per-task='+str(lmp_par)+' --mem=4G '+LAMMPS_COMMAND+' < in.lmp > log.lmp$i  &',
     'done',
     '',
+    'echo "before wait text4" `pwd`',
     'wait',
+    'echo "after wait text4" `pwd`',
     'date +%s >> time.out',
     'cat time.out | xargs | awk \'{print $2-$1-10}\' > tmptime',
     'mv tmptime time.out',
@@ -1773,7 +1780,9 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     '    cd $folder',
     '    ./osubmit-ipi-kmc.sh &',
     'done',
+    'echo "before wait text4o" `pwd`',
     'wait'
+    'echo "after wait text4o" `pwd`',
     ]
 
     if LOOPFOLDER == True:
