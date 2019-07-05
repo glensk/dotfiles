@@ -378,7 +378,7 @@ def install_n2p2(args):
     #my.cp("makefile.intel","makefile.intel.back")
     #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
-    if myhostname == "fidis":
+    if myhostname in ["fidis", "helvetios"]:
         COMP="intel"
         GSL_ROOT = "GSL_ROOT"
         PROJECT_CC = "icpc # or icc"
@@ -475,7 +475,7 @@ def install_n2p2(args):
 
     # module load on fidis
     print("*****cc",os.getcwd())
-    if myhostname == 'fidis':
+    if myhostname in ['fidis',"helvetios"]:
         bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
     if myhostname == 'daint':
         bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
