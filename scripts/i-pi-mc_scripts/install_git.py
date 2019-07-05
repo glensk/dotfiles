@@ -384,13 +384,19 @@ def install_n2p2(args):
         PROJECT_CC = "icpc # or icc"
         PROJECT_MPICC = "mpiicpc # mpic++ does not work on fidis/helvetios"
         EIGENPATH = "${EIGEN_ROOT}/include/eigen3"
+        includelibs = "-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl"
 
     elif myhostname == "daint":
+        # edo actually excluded the ipo in makefie.intel
         COMP="intel"
         GSL_ROOT = "EBROOTGSL"
         PROJECT_CC = "CC"
         PROJECT_MPICC = "CC"
         EIGENPATH = "${EIGEN_ROOT}"
+        includelibs = "-mkl=parallel -liomp5 -lpthread -lm -ldl"
+        # cd $MKLROOT/tools
+        # ./mkl_link_tool -libs -opts -c intel_c
+        # ./mkl_link_tool -libs -opts -env -c intel_c --os=lnx -a intel64  -> shows that Compiler option: -mkl=parallel is necessary && Linking line:  -liomp5 -lpthread -lm -ldl
         # export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw
 
     elif myhostname == 'mac':
@@ -431,7 +437,7 @@ def install_n2p2(args):
     # makefile.intel
     my.sed("makefile.intel","^PROJECT_GSL=.*","PROJECT_GSL=${"+GSL_ROOT+"}/include")
     my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN="+EIGENPATH)
-    my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${"+GSL_ROOT+"}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
+    my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${"+GSL_ROOT+"}/lib "+includelibs)
     my.sed("makefile.intel","^PROJECT_CC=.*","PROJECT_CC="+PROJECT_CC)
     my.sed("makefile.intel","^PROJECT_MPICC=.*","PROJECT_MPICC="+PROJECT_MPICC)
 
