@@ -132,7 +132,7 @@ def install_(args,known):
 
     print("cd "+args.sources_folder)
     with my.cd(args.sources_folder):
-        if args.install in ['ipi']                : git_clone(args,specify_depth = False,checkout="feat/kmc")
+        if args.install   in ['ipi']              : git_clone(args,specify_depth = False,checkout="feat/kmc")
         elif args.install in ['atomsk']           : install_atomsk(args)
         elif args.install in ['miniconda','miniconda2']       : install_miniconda(args)
         elif args.install in ['lbzip','lbzip2']   : install_lbzip(args)

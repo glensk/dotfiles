@@ -22,10 +22,11 @@ case "$-" in
   # THIS LOOP IS ONLY ENTERED FOR INTERACTIVE LOGINS AND NOT OTHERWISE (ssh -C "command")
   # echo hostname `hostname`
   alias e='exit'
-  [ "`hostname`" = "daint" ] && unset FPATH && exec /bin/zsh -l
-  [ "`hostname`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
-  [ "`hostname`" = "helvetios" ] && /bin/zsh -l #exec /bin/bash
-  [ "`hostname | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
+  host=`hostname`
+  [ "`echo $host | grep -o "^daint"`" = "daint" ] && unset FPATH && exec /bin/zsh -l
+  [ "`echo $host`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+  [ "`echo $host`" = "helvetios" ] && /bin/zsh -l #exec /bin/bash
+  [ "`echo $host | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
    ;;
 esac
 
