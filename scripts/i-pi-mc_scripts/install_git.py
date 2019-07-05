@@ -6,6 +6,7 @@ import sys,os,socket
 import myutils as my
 import subprocess
 
+myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes' ]
 # git clone https://github.com/glensk/i-pi.git
@@ -72,7 +73,7 @@ args.verbose = True
 def install_(args,known):
     # make sources folder if it does not exist ($HOME/sources)
     if not os.path.isdir(args.sources_folder):
-        my.mkdir(args.sources_folder)
+        os.makedirs(args.sources_folder)
 
     install        = args.install
     print('>> dotfiles folder',os.environ.get('dotfiles'))
@@ -219,13 +220,10 @@ def install_lammps(args):
         mac     : works for runner
         cosmopc : works for runner
     '''
-    import socket
-    hostname = socket.gethostname()
-    print('hostname',hostname)
-    if hostname == 'fidis':
+    if myhostname == 'fidis':
         serialfidis = 'fidis'
         ser_or_par = "par"
-    elif hostname == 'mac':
+    elif myhostname == 'mac':
         serialfidis = 'serial'
         ser_or_par  = "ser"
     else:
@@ -380,27 +378,22 @@ def install_n2p2(args):
     #my.cp("makefile.intel","makefile.intel.back")
     #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
-    hostname = socket.gethostname()
-    # on fidis:  currently icpc && mpiicpc are used; icc should be equivalent to icpc
-    COMP="intel"
-    GSL_ROOT = "GSL_ROOT"
-    PROJECT_CC = "icpc # or icc"
-    PROJECT_MPICC = "mpic++ # or mpiicpc"
+    if myhostname == "fidis":
+        COMP="intel"
+        GSL_ROOT = "GSL_ROOT"
+        PROJECT_CC = "icpc # or icc"
+        PROJECT_MPICC = "mpic++ # or mpiicpc"
+        EIGENPATH = "${EIGEN_ROOT}/include/eigen3"
 
-    if hostname == "daint":
+    elif myhostname == "daint":
+        COMP="intel"
         GSL_ROOT = "EBROOTGSL"
         PROJECT_CC = "CC"
         PROJECT_MPICC = "CC"
-        #  module load daint-mc
-        #  module switch PrgEnv-cray PrgEnv-intel # $MKLROOT is set
-        #  module unload cray-libsci
-        #  module load GSL/2.5-CrayIntel-18.08  # $GSL_ROOT is here called $EBROOTGSL
-        #  module load cray-python/2.7.15.1
-        #  module load cray-fftw
-        #
+        EIGENPATH = "${EIGEN_ROOT}"
+        # export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw
 
-
-    if hostname == 'mac':
+    elif myhostname == 'mac':
         COMP = "intel"  # makes problems on mac
         COMP = "gnu"
         # on mac you can always try
@@ -437,13 +430,13 @@ def install_n2p2(args):
     my.sed("makefile","^LIB=libnnp.so libnnpif.so libnnptrain.so pynnp.so","LIB=libnnp.so libnnpif.so libnnptrain.so") # remove pynnp.so
     # makefile.intel
     my.sed("makefile.intel","^PROJECT_GSL=.*","PROJECT_GSL=${"+GSL_ROOT+"}/include")
-    my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN=${EIGEN_ROOT}/include/eigen3")
+    my.sed("makefile.intel","^PROJECT_EIGEN=.*","PROJECT_EIGEN="+EIGENPATH)
     my.sed("makefile.intel","^PROJECT_LDFLAGS_BLAS=.*","PROJECT_LDFLAGS_BLAS=-L${"+GSL_ROOT+"}/lib -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl")
     my.sed("makefile.intel","^PROJECT_CC=.*","PROJECT_CC="+PROJECT_CC)
     my.sed("makefile.intel","^PROJECT_MPICC=.*","PROJECT_MPICC="+PROJECT_MPICC)
 
 
-    if hostname == 'mac':
+    if myhostname == 'mac':
         my.sed("makefile.gnu","-fopenmp","#-fopenmp")  # try also with the acutal paths
         # with this libnnp compiles, current probs with libnnpif
         # if in makefiel PROJECT_OPTIONS+= -DNOMPI this defines weather wether to compie with/without MPI and used mpic++ (with) and g++ (without)
@@ -481,20 +474,11 @@ def install_n2p2(args):
         #my.sed(lib+"/makefile","^COMP=.*","COMP="+COMP)
 
     # module load on fidis
-    print("cc",os.getcwd())
-    # @fidis
-    if hostname == 'fidis':
+    print("*****cc",os.getcwd())
+    if myhostname == 'fidis':
         bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
-    # @daint
-    #bash_command("module load daint-mc intel craype cray-mpich intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
-
-    #subprocess.call(["module","load","intel"],shell=True)
-    #subprocess.call(["module","load","intel-mpi"],shell=True)
-    #subprocess.call(["module","load","intel-mkl"],shell=True)
-    #subprocess.call(["module","load","fftw"],shell=True)
-    #subprocess.call(["module","load","python/2.7.14"],shell=True)
-    #subprocess.call(["module","load","gsl"],shell=True)
-    #subprocess.call(["module","load","eigen"],shell=True)
+    if myhostname == 'daint':
+        bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
     return
 
 def install_xmgrace(args):

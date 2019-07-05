@@ -227,19 +227,37 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
     os.chdir(hier)
     return
 
+#def check_for_fidis_helvetios_daint(exit=False):
 def check_for_known_hosts(exit=False):
-    hostname = gethostname()
-    known_hosts =  ['fidis','helvetios']
-    if hostname in known_hosts:
-        return True
-    elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
-        return True
+    hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
+    known_hosts =  ['fidis','helvetios', "daint" ]
+    for i in known_hosts:
+        if i in hostname: return i
+    if hostname[0] == 'h' and is_int(hostname[1:]) == True:
+        return 'helvetios'
+    if hostname[0] in ['g','f'] and is_int(hostname[1:]) == True:
+        return 'fidis'
+
+    # if not known host
+    if exit == True:
+        print("known hosts:",known_hosts)
+        sys.exit(hostname+" is not in the list of known hosts!")
     else:
-        if exit == True:
-            print("known hosts:",known_hosts)
-            sys.exit(hostname+" is not in the list of known hosts!")
-        else:
-            return False
+        return False
+
+#def check_for_known_hosts(exit=False):
+#    hostname = gethostname()
+#    known_hosts =  ['fidis','helvetios']
+#    if hostname in known_hosts:
+#        return True
+#    elif hostname[0] in ['f','g','h']:  # one of fidis,helvetios subnodes
+#        return True
+#    else:
+#        if exit == True:
+#            print("known hosts:",known_hosts)
+#            sys.exit(hostname+" is not in the list of known hosts!")
+#        else:
+#            return False
 
 def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interactive=False,days=0,hours=72,minutes=0,seconds=0):
     ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
