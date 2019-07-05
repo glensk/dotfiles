@@ -375,10 +375,10 @@ def install_n2p2(args):
     #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
     hostname = socket.gethostname()
+    # on fidis:  currently icpc && mpiicpc are used; icc should be equivalent to icpc
+    COMP="intel"
 
-    if hostname == 'fidis':
-        COMP="intel"   # currently icpc && mpiicpc are used; icc should be equivalent to icpc
-    elif hostname == 'mac':
+    if hostname == 'mac':
         COMP = "intel"  # makes problems on mac
         COMP = "gnu"
         # on mac you can always try
