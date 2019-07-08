@@ -8,7 +8,7 @@ import subprocess
 
 myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes' ]
+known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -148,6 +148,7 @@ def install_(args,known):
         elif args.install in ['units']                  : install_units(args)
         elif args.install in ['notes']                  : install_notes(args)
         elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
+        elif args.install in ['ncdu']: install_ncdu(args)
         else: git_clone(args)  # ipi_cosmo, aiia-alloy, mlip, ....
 
         # not working yet
@@ -173,15 +174,19 @@ def git_clone(args,specify_depth = True,checkout=False):
         subprocess.call(["git","checkout",checkout])
     return
 
+def install_ncdu(args):
+    subprocess.call(["wget https://dev.yorhel.nl/download/ncdu-linux-i486-1.14.tar.gz && untargz ncdu-linux-i486-1.14.tar.gz"],shell=True)
+    print('ka')
+    return
+
 def install_units(args):
     print('pwd',os.getcwd())
     subprocess.call(["wget","http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"])
     subprocess.call(["tar","-xvf","units-2.18.tar.gz"])
-    home = os.environ["HOME"]
     print('HOME:',home)
     with my.cd("units-2.18"):
         print('configure ....')
-        subprocess.call(['./configure','--prefix='+home+'/.local'])
+        subprocess.call(['./configure','--prefix='+os.environ["HOME"]+'/.local'])
         print('make ....')
         subprocess.call(['make'])
         print('make install ....')
