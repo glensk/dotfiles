@@ -9,7 +9,7 @@ else
     SCR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 fi
 #echo SCR:$SCR
-myhost=`$dotfiles/generalrc/myhost.py`
+myhost=`$dotfiles/aliases/myhost.py`
 #echo myhost:$xxhost:
 # define the folders which are given in this git repo 
 #_ipi="$SCR/i-pi-mc_scripts"

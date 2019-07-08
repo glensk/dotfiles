@@ -8,7 +8,7 @@ hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
 
 def check_for_known_hosts(exit=False):
     hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
-    known_hosts =  ['fidis','helvetios', "daint", "mac", "cmmd" ]
+    known_hosts =  ['fidis','helvetios', "daint", "mac", "cmmd", 'cosmopc' ]
     for i in known_hosts:  # also works with daint102, helvetios101, ...
         if i in hostname: return i
 
@@ -24,18 +24,6 @@ def check_for_known_hosts(exit=False):
     else:
         return False
 
-
-#print('hostname  :',hostname)
-hostknown = check_for_known_hosts(exit=False)
-#print('hostknown :',hostknown)
-print(hostknown)
-
-#try:
-#    print(os.environ['ZSH_VERSION'])
-#except:
-#    pass
-#try:
-#    print(os.environ['BASH_VERSION'])
-#except:
-#    pass
-##print('zsh',zsh)
+if __name__ == '__main__':
+    hostknown = check_for_known_hosts(exit=False)
+    print(hostknown)
