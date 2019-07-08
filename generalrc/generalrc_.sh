@@ -123,7 +123,8 @@ setenv EDITOR vim
 setenv SVN_EDITOR vim        # for svn (Thermodynamics folder)
 setenv LESS "-R"
 setenv LC_ALL C   # necessary for perl git svn
-setenv LANG C     # necessary for perl
+#setenv LANG C     # necessary for perl
+setenv LANG en_US.UTF-8     # necessary for powerline in zsh
 setenv GIT_EDITOR vim
 setenv PAGER less 
 setenv BROWSER chrome

@@ -31,6 +31,7 @@ alias c='j'    # for autojump
 
 alias aliases='cd $dotfiles/aliases'
 alias dl='cd $HOME/Downloads'
+alias down='cd $HOME/Downloads'
 alias scripts='cd $HOME/Dropbox/Albert/scripts'
 alias dot='cd $dotfiles'
 alias pot='cd $dotfiles/scripts/potentials'

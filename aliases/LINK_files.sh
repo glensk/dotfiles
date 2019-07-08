@@ -305,7 +305,16 @@ if [ ! -e "$dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ];
 fi
 
 echo
-echo "# make git not upload *.pyc files #########################################################"
+echo "# zsh-autosuggestions #############################################################"
+if [ ! -e "$dotfiles/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ];then
+    echo installing zsh-autosuggestions since it is not available
+    cd $dotfiles/zsh
+    rm -rf zsh-autosuggestions
+    git clone https://github.com/zsh-users/zsh-autosuggestions  
+fi
+
+echo
+echo "# make git not upload *.pyc files #################################################"
 cd $dotfiles
 git rm --cached *.pyc
 find . -name '*.pyc' | xargs -n 1 git rm --cached
