@@ -1,6 +1,6 @@
-echo '!!!! zsh in 1'
 if [[ $- == *i* ]];then  # only in interactive shell
-#echo "load zsh"
+echo '... zsh start'
+
 gettime="false"
 #gettime="true"
 loadzsh="true"          # shuts all zst settings on/off
@@ -69,4 +69,5 @@ source ~/.generalrc
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
 autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) repeat here to get completion for notes without restarting shell again
 fi
+echo '... zsh loaded'
 fi
