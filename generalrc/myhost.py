@@ -8,7 +8,7 @@ hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
 
 def check_for_known_hosts(exit=False):
     hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
-    known_hosts =  ['fidis','helvetios', "daint" ]
+    known_hosts =  ['fidis','helvetios', "daint", "mac", "cmmd" ]
     for i in known_hosts:  # also works with daint102, helvetios101, ...
         if i in hostname: return i
 
