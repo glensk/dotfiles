@@ -82,3 +82,6 @@
 [submodule "autojump"]
 	path = autojump
 	url = git://github.com/joelthelion/autojump.git
+[submodule "zsh/zsh-autosuggestions"]
+	path = zsh/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions
