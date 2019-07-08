@@ -57,6 +57,7 @@ daint)
     setenv myprompthostuser blue;
     setenv mypromptpath blue;
 	#setenv SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS
+	module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw
   ;;
 cmpc)
     setenv myprompthostuser red;
