@@ -215,3 +215,32 @@ mv ~/mux-positions.py tools/py/mux-positions.py
 git commit -a "Fixing mux-positions"
 git push
 
+
+#######################################
+#### git add -A -v ####################
+#######################################
+
+add 'aliases/LINK_files.sh'
+add 'generalrc/aliases.sh'
+add 'generalrc/generalrc_.sh'
+add 'vim/startup/vundle_colors-solarized.vim'
+add 'zsh/zsh-history-substring-search'
+add 'zsh/zsh_set'
+warning: adding embedded git repository: zsh/powerlevel10k
+hint: You've added another git repository inside your current repository.
+hint: Clones of the outer repository will not contain the contents of
+hint: the embedded repository and will not know how to obtain it.
+hint: If you meant to add a submodule, use:
+hint:
+hint: 	git submodule add <url> zsh/powerlevel10k
+hint:
+hint: If you added this path by mistake, you can remove it from the
+hint: index with:
+hint:
+hint: 	git rm --cached zsh/powerlevel10k
+hint:
+hint: See "git help submodule" for more information.
+add 'zsh/powerlevel10k/'
+warning: adding embedded git repository: zsh/zsh-autosuggestions
+add 'zsh/zsh-autosuggestions/'
+
