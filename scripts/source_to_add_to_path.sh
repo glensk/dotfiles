@@ -70,7 +70,7 @@ if [ "$myhost" = "mac" ];then
 fi
 
 if [ "$myhost" = "daint" ];then
-    export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH:$HOME/sources/eigen"
+    export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH:$HOME/sources/eigen/cmake"
 fi
 
 #export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
