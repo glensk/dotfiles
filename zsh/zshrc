@@ -1,3 +1,4 @@
+echo '!!!! zsh in 1'
 if [[ $- == *i* ]];then  # only in interactive shell
 #echo "load zsh"
 gettime="false"

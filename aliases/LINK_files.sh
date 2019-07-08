@@ -163,14 +163,14 @@ unlinkzsh
 
 echo
 echo "# link tcsh,bash,zsh,generalrc ####################################################"
-file=$HOME/.tcshrc
-[ -h "$file" ] && unlink $file
-[ -f "$file" ] && echo $file rm && rm -rf $file
-[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc $file
-file=$HOME/.bashrc
-[ -h "$file" ] && unlink $file
-[ -f "$file" ] && echo $file rm && rm -rf $file
-[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bashrc $file
+#file=$HOME/.tcshrc
+#[ -h "$file" ] && unlink $file
+#[ -f "$file" ] && echo $file rm && rm -rf $file
+#[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/tcsh/tcshrc $file
+#file=$HOME/.bashrc
+#[ -h "$file" ] && unlink $file
+#[ -f "$file" ] && echo $file rm && rm -rf $file
+#[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/bash/bashrc $file
 file=$HOME/.bash_profile
 [ -h "$file" ] && unlink $file
 [ -f "$file" ] && echo mv $file $file.save && mv $file $file.save

@@ -8,7 +8,9 @@ else
     #echo bash
     SCR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 fi
-
+#echo SCR:$SCR
+myhost=`$dotfiles/generalrc/myhost.py`
+#echo myhost:$xxhost:
 # define the folders which are given in this git repo 
 #_ipi="$SCR/i-pi-mc_scripts"
 #_runner="$SCR/runner_scripts"
@@ -59,12 +61,16 @@ export PYTHONPATH="$PYTHONPATH:$LAMMPSPATH/python"  # lammps with python
 
 
 
-if [ "`hostname`" = "mac" ];then
+if [ "$myhost" = "mac" ];then
     _n2p2_mac_predict="$HOME/miniconda2/lib"
     #export PATH="$PATH:$HOME/local/bin"    # add mpic++ (MPI) which is necessary to compile n2p2 ... but does not work for compilation of n2p2
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$_n2p2_mac_predict"
     export GSL_ROOT="/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005" # conda install -c conda-forge gsl
     export EIGEN_ROOT="/Users/glensk/miniconda2/" # conda install -c conda-forge gsl
+fi
+
+if [ "$myhost" = "daint" ];then
+    export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH:$HOME/sources/eigen"
 fi
 
 #export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
