@@ -15,27 +15,43 @@ from socket import gethostname
 import shutil
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
-import ase
-from ase.build import bulk as ase_build_bulk
-from ase.constraints import StrainFilter
-from ase.neighborlist import NeighborList, neighbor_list, NewPrimitiveNeighborList
+try:
+    import ase
+    from ase.build import bulk as ase_build_bulk
+    from ase.constraints import StrainFilter
+    from ase.neighborlist import NeighborList, neighbor_list, NewPrimitiveNeighborList
+    from ase.constraints import ExpCellFilter
+    from ase.spacegroup import crystal
+    from ase.constraints import StrainFilter
+    from ase.io import read as ase_read
+    from ase.io import write as ase_write
+    from ase.optimize import BFGS
+    from ase.optimize import LBFGS
+    from ase.optimize import FIRE
+    from ase.optimize import GPMin
+    from ase.optimize.basin import BasinHopping
+    from ase.optimize.minimahopping import MinimaHopping
+    from ase import units as aseunits
+except ImportError:
+    pass
+
 import hesse
 try:
     import quippy
 except ImportError:
     pass
 
-try:  # not in aiida ase
-    from ase.constraints import ExpCellFilter
-except ImportError:
-    pass
+#try:  # not in aiida ase
+#    from ase.constraints import ExpCellFilter
+#except ImportError:
+#    pass
 
-from ase.spacegroup import crystal
-from ase.constraints import StrainFilter
-try:
-    from ase.constraints import ExpCellFilter
-except ImportError:
-    pass
+#from ase.spacegroup import crystal
+#from ase.constraints import StrainFilter
+#try:
+#    from ase.constraints import ExpCellFilter
+#except ImportError:
+#    pass
 
 try:
     from ase.calculators.lammpslib import LAMMPSlib
@@ -43,21 +59,13 @@ except ImportError:
     print("ERROR when importing LAMMPSlib ... possibly you have to change your (conda/aiida) environment")
 
 from feos import eos
-from ase.io import read as ase_read
-from ase.io import write as ase_write
-from ase.optimize import BFGS
-from ase.optimize import LBFGS
-from ase.optimize import FIRE
 import my_atom
-try:
-    from ase.optimize import GPMin
-except ImportError:
-    pass
-from ase.optimize.basin import BasinHopping
-from ase.optimize.minimahopping import MinimaHopping
+#try:
+#    from ase.optimize import GPMin
+#except ImportError:
+#    pass
 import time
 import myutils as my
-from ase import units as aseunits
 
 start_time = time.time()
 
