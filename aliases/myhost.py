@@ -3,7 +3,7 @@
 from __future__ import print_function
 from socket import gethostname
 import os
-hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
+#hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
 
 
 def check_for_known_hosts(exit=False):

@@ -230,7 +230,8 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
     cp("../input.data")
     cp("../input.nn")
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minutes=minutes,interactive=interactive)
-    submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
+    submitjob(submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
+    #submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
     create_READMEtxt(add="submit_to_debug_que= "+str(submit_to_debug_que))
     os.chdir(hier)
     return
@@ -271,7 +272,12 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
     ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
     if job not in ["scaling","train"]:
         sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
-    check_for_known_hosts(exit=True)
+    myhost = check_for_known_hosts(exit=True)
+    cores_per_node = 28
+    if myhost in [ "fidis", "helvetios"]:
+        cores_per_node = 28
+    elif myhost == 'daint':
+        cores_per_node = 36
 
 
     if directory == False:
@@ -289,18 +295,19 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
             text_file.write("#SBATCH --output=_scheduler-stdout.txt\n")
             text_file.write("#SBATCH --error=_scheduler-stderr.txt\n")
             text_file.write("#SBATCH --nodes="+str(nodes)+"\n")
-            text_file.write("#SBATCH --ntasks 28\n")
+            text_file.write("#SBATCH --ntasks "+str(cores_per_node*nodes)+"\n")
             days_   = str(days).zfill(2)
             hours_  = str(hours).zfill(2)
             min_    = str(minutes).zfill(2)
             sec_    = str(seconds).zfill(2)
             text_file.write("#SBATCH --time="+str(days_)+"-"+str(hours_)+":"+str(min_)+":00\n")
-            hostname = gethostname()
-            if hostname == 'fidis':
+            if myhost == 'fidis':
                 text_file.write("#SBATCH --constraint=E5v4\n")  # means to only use the fidis nodes
                 # to use the Gacrux/Skylake nodes: #SBATCH --constraint=s6g1
-            if hostname == 'helvetios':
+            if myhost == 'helvetios':
                 print('you can use up to --mem=183G or more')
+            if myhost == 'daint':
+                text_file.write("#SBATCH --constraint=mc\n")
             text_file.write("#SBATCH --mem=100G\n")
 
 
@@ -308,10 +315,15 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
         text_file.write("set +e\n")
         text_file.write("# it is necessary to have all the modules which are used when compiling\n")
         text_file.write('export LD_LIBRARY_PATH=""\n')
-        if job == 'scaling':
-            text_file.write("module load intel intel-mpi intel-mkl fftw gsl eigen\n")
-        else:
-            text_file.write("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen\n")
+        if myhost in ["helvetios", "fidis"]:
+            if job == 'scaling':
+                text_file.write("module load intel intel-mpi intel-mkl fftw gsl eigen\n")
+            else:
+                text_file.write("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen\n")
+        if myhost == "daint":
+            text_file.write("module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw")
+
+        text_file.write("module list")
         text_file.write("export LD_LIBRARY_PATH=$HOME/sources/n2p2/lib:${LD_LIBRARY_PATH}\n")
         text_file.write("#echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH\n")
         text_file.write("\n")
@@ -324,7 +336,6 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
             else:
                 text_file.write("$HOME/sources/n2p2/bin/nnp-scaling 1\n")
         elif job == 'train':
-            #text_file.write("partA_ID=$(srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train)\n")
             text_file.write("srun -n "+str(cores)+" $HOME/sources/n2p2/bin/nnp-train\n")
             #text_file.write("strigger --set --jobid=$partA_ID --time --offset=-1200 --program=$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")
             #text_file.write("strigger --set --jobid=$partA_ID --time --offset=-1200 --program=$dotfiles/scripts/bin/n2p2_get_potential_folder_from_nr.py\n")
@@ -357,12 +368,11 @@ def n2p2_make_training(cores=21,days=7,hours=0,minutes=0,submit_to_que=True,subm
             cp("get_scaling/scaling.data","scaling.data")
 
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,days=days,hours=hours,minutes=minutes,job="train")
-    submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
+    submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitskript=submitskript)
     create_READMEtxt()
     return
 
 def submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitskript=False):
-    #def submitjob(submit=False,submitdebug=False,jobdir=False,submitskript=False,cores=21):
     if jobdir == False:
         jobdir = os.getcwd()
     hier = os.getcwd()
