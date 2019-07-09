@@ -6,6 +6,7 @@ import sys,os,socket
 import myutils as my
 import subprocess
 
+
 myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo' ]
@@ -177,11 +178,11 @@ def git_clone(args,specify_depth = True,checkout=False):
     return
 
 def install_eigen(args):
-    git_clone(args.specify_depth = True)
+    git_clone(args,specify_depth = True)
     os.chdir(args.install_folder)
-    os.mkdirs("build_dir")
+    os.makedirs("build_dir")
     os.chdir("build_dir")
-    subprocess.call(["cmake . -DCMAKE_INSTALL_PREFIX=$HOME/sources/eigen/"],shell=True)
+    subprocess.call(["cmake $HOME/sources/eigen -DCMAKE_INSTALL_PREFIX=$HOME/sources/eigen/"],shell=True)
     subprocess.call(["make install"],shell=True)
     return
 
