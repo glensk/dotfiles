@@ -1451,10 +1451,10 @@ class mypot( object ):
         #return has_outliers,checked_epochs,struct_idx,diffs
         return has_outliers,has_outliers_,checked_epochs,struct_idx,np.clip(diffs,0,999.9)
 
-    def get(self,exit=True):
+    def get(self,exit=True,showerrors=True):
         ''' exit is True if for instance weithts files do not exist '''
         self.potepoch_bestteste_checked = False
-        self.print_variables_mypot('PP get potential: in')
+        self.print_variables_mypot('PPk get potential: in')
 
         ##########################################
         # get potential from path
@@ -1467,13 +1467,13 @@ class mypot( object ):
                 sys.exit(self.potpath_in+" does not exist! (1)")
 
             if not os.path.isfile(self.potpath_in+"/input.nn"):
-                print("PP could not find "+self.potpath_in+"/input.nn")
+                print("PPa could not find "+self.potpath_in+"/input.nn")
                 self.potpath_in = "/".join(self.potpath_in.split("/")[:-1])
                 if not os.path.isfile(self.potpath_in+"/input.nn"):
-                    print("PP could not find "+self.potpath_in+"/input.nn")
+                    print("PPb could not find "+self.potpath_in+"/input.nn")
                     self.potpath_in = "/".join(self.potpath_in.split("/")[:-1])
                     if not os.path.isfile(self.potpath_in+"/input.nn"):
-                        sys.exit("PP could not find "+self.potpath_in+"/input.nn")
+                        sys.exit("PPc could not find "+self.potpath_in+"/input.nn")
 
             if exit == True:
                 checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
@@ -1504,7 +1504,7 @@ class mypot( object ):
                 epstr = str(self.potepoch_bestteste).zfill(6)
                 file2 = self.potpath_in+"/weights.012."+epstr+".out"
                 if not filecmp.cmp(file1, file1):
-                    sys.exit("PP File "+file1+" is not "+file2)
+                    sys.exit("PPd File "+file1+" is not "+file2)
                 else:
                     self.potepoch_bestteste_checked = True
 
@@ -1518,7 +1518,7 @@ class mypot( object ):
 
 
         ### check if self.pottype can be computed on this host!
-        add = 'PP Your lammps version does not seem to work with '+self.pottype+"!"
+        add = 'PPe Your lammps version does not seem to work with '+self.pottype+"!"
         if self.pottype == "runner":
             self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
             self.potcutoff = 14.937658735
@@ -1527,7 +1527,7 @@ class mypot( object ):
             self.potcutoff = 10.6  # the minimum cutoff of the SF was 20bohrradius = 10.58Angstrom
 
 
-        if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False:
+        if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False and showerrors == True:
             #sys.exit("ERROR: "+self.potlib+" not found!"+add)
             print("ERROR: "+self.potlib+" not found!"+add)
 
@@ -1538,7 +1538,7 @@ class mypot( object ):
             self.potpath_work = self.potpath
         else:  # use_different_epoch
             if self.verbose:
-                print("PP copy files ...")
+                print("PPf copy files ...")
             #print('se true')
             self.potpath_work = self.pot_tmpdir
             #print('self.potpath_work (1)',self.potpath_work)
@@ -1939,10 +1939,10 @@ class ase_calculate_ene( object ):
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
         '''
         if self.verbose > 1:
-            print('PP potDONE:',self.pot.potDONE)
+            print('PPh potDONE:',self.pot.potDONE)
         if self.pot.potDONE == False:
             if self.verbose:
-                print("PP self.pot.get()")
+                print("PPi self.pot.get()")
             self.pot.get()
 
         self.kmc = kmc
@@ -1956,7 +1956,7 @@ class ase_calculate_ene( object ):
 
 
         if self.verbose > 2:
-            tt = 'PP pot_get_and_ase_lmp_cmd_A '
+            tt = 'PPj pot_get_and_ase_lmp_cmd_A '
             print(tt+'pot.pot           :',self.pot.pot)
             print(tt+'pot.potpath       :',self.pot.potpath)
             print(tt+'pot.potpath_work  :',self.pot.potpath_work)
@@ -3938,8 +3938,9 @@ def inputnn_runner_or_n2p2(file):
     #     return "runner"
     return False
 
-def inputdata_get_nuber_of_structures(inputdata):
-    inputdatanr = inputdata.replace("input.data","input.data_nr")
+def inputdata_get_nuber_of_structures(inputnn):
+    inputdatanr = inputnn.replace("input.nn","input.data_nr")
+    inputdata   = inputnn.replace("input.nn","input.data")
     #print('inputdatanr',inputdatanr)
     if os.path.isfile(inputdatanr):
         nr = np.loadtxt(inputdatanr)
