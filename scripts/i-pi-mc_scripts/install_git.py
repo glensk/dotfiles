@@ -19,6 +19,9 @@ install_folder_different["notes"] = True
 
 address["eigen"]        = "https://github.com/eigenteam/eigen-git-mirror.git"
 
+address["n2p2_edo"]     = "https://github.com/edoardob90/n2p2.git"
+branch["n2p2_edo"]      = "cmake"
+
 address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
 branch['ipi_old']       = "kmc-al6xxx"
 
@@ -182,8 +185,20 @@ def install_eigen(args):
     os.chdir(args.install_folder)
     os.makedirs("build_dir")
     os.chdir("build_dir")
-    subprocess.call(["cmake $HOME/sources/eigen -DCMAKE_INSTALL_PREFIX=$HOME/sources/eigen/"],shell=True)
-    subprocess.call(["make install"],shell=True)
+    print()
+    print()
+    print('os.getcwd():',os.getcwd())
+    module_load = ""
+    if myhostname == "daint":
+        module_load = "module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && "
+    print()
+    print()
+    subprocess.call([module_load+"cmake $HOME/sources/eigen -DCMAKE_INSTALL_PREFIX=$HOME/sources/eigen/"],shell=True)
+    print()
+    print()
+    print('os.getcwd():',os.getcwd())
+    print('now make install ....')
+    subprocess.call([module_load+"make install"],shell=True)
     return
 
 def install_ncdu(args):
@@ -383,7 +398,13 @@ def install_lammps(args):
     return
 
 def install_n2p2_edo(args):
-    # git clone --depth 1 --branch cmake https://github.com/edoardob90/n2p2.git n2p2_edo
+    git_clone(args,specify_depth = True)
+    os.chdir(args.install_folder)
+    os.makedirs("build")
+    os.chdir("build")
+    print()
+    print()
+    # cmake -DCMAKE_PREFIX_PATH=$HOME/sources/eigen -DGSL_ROOT_DIR=$EBROOTGSL --USE_MKL=ON ..
     return
 
 def install_n2p2(args):
