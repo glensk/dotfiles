@@ -127,7 +127,7 @@ for i in all_learning_curve_files:
     # get the potential
     #################################################################
     pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
-    pot.get(exit=False)
+    pot.get(exit=False,showerrors=False)
     pot.get_my_assessments()  # gets kmc57_{b,l}, train_{b,l}, test_{b,l}
     if len(pot.potepoch_all) > 0:
         epoch_last = pot.potepoch_all[-1]
@@ -182,6 +182,8 @@ for i in all_learning_curve_files:
     al                  = int(al)
     mg                  = int(mg)
     si                  = int(si)
+    input_structures    = str(my.inputdata_get_nuber_of_structures(pot.inputnn)).ljust(6)
+
 
     inputnn = pot.inputnn
     if args.potential:
@@ -287,7 +289,7 @@ for i in all_learning_curve_files:
         ####################################################
         # print output
         ####################################################
-        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   0 ,     epochs_max_,nn,"|",  rnd,"|",   path_)
+        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   input_structures ,     epochs_max_,nn,"|",  rnd,"|",   path_)
 
 end_time = time.time()
 print("TIME:",end_time - start_time)
