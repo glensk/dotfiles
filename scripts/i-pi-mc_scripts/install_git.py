@@ -150,6 +150,7 @@ def install_(args,known):
         elif args.install in ['notes']                  : install_notes(args)
         elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
         elif args.install in ['ncdu']: install_ncdu(args)
+        elif args.install in ['eigen']: install_eigen(args)
         else: git_clone(args)  # ipi_cosmo, aiia-alloy, mlip, ....
 
         # not working yet
@@ -173,6 +174,15 @@ def git_clone(args,specify_depth = True,checkout=False):
     subprocess.call(["git","branch"])
     if checkout != False:
         subprocess.call(["git","checkout",checkout])
+    return
+
+def install_eigen(args):
+    git_clone(args.specify_depth = True)
+    os.chdir(args.install_folder)
+    os.mkdirs("build_dir")
+    os.chdir("build_dir")
+    subprocess.call(["cmake . -DCMAKE_INSTALL_PREFIX=$HOME/sources/eigen/"],shell=True)
+    subprocess.call(["make install"],shell=True)
     return
 
 def install_ncdu(args):
