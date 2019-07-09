@@ -402,7 +402,8 @@ def install_n2p2(args):
         GSL_ROOT = "EBROOTGSL"
         PROJECT_CC = "CC"
         PROJECT_MPICC = "CC"
-        EIGENPATH = "${EIGEN_ROOT}"
+        #EIGENPATH = "${EIGEN_ROOT}"
+        EIGENPATH = "${EIGEN_ROOT}/include/eigen3"
         includelibs = "-mkl=parallel -liomp5 -lpthread -lm -ldl"
         # cd $MKLROOT/tools
         # ./mkl_link_tool -libs -opts -c intel_c
