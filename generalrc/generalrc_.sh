@@ -29,18 +29,19 @@ setenv onhost $onhost;
 
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 setenv potentials "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time setenv diverses (change setenv to export)"
 
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
 ##################################################################################
 source $dotfiles/scripts/source_to_add_to_path.sh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time s1"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time source_to_add_to_path.sh"
 
 ##################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...);  PATH due to module load
 ##################################################################################
 source $generalrc/generalrc_hostdependent.sh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time s3"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time generalrc_hostdependent"
 
 ##################################################################################
 # PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH (PYTHONPATH should not be set)

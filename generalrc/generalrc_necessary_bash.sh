@@ -166,3 +166,12 @@ mcd () {
     mkdir -p $1 
     cd $1 
 }
+
+daint_modules () {
+    module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw
+    module list
+}
+
+mld () {
+    daint_modules
+}
