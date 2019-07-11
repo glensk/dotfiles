@@ -206,9 +206,11 @@ def install_nvim(args):
     if os.path.isdir(args.sources_folder+"/nvim"):
         sys.exit(args.sources_folder+"/nvim does already exist!")
     my.mkdir(args.sources_folder+"/nvim")
-
+    subprocess.call(["curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"],shell=True)
     subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/"+dl],shell=True)
     subprocess.call(["tar xvzf "+dl+" -C "+args.sources_folder+"/nvim --strip-components 1" ],shell=True)
+    subprocess.call(["mkdir $HOME/.config/nvim/"],shell=True)
+    subprocess.call(["ln -s $dotfiles/nvim/init.vim $HOME/.config/nvim/init.vim"],shell=True)
 
     return
 
