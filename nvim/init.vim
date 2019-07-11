@@ -1,18 +1,24 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 " get/install all plugins if some/all do not exist
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
-if empty(glob('$HOME/sources/nvim/autoload/plug.vim'))
-  silent !curl -fLo $HOME/sources/nvim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+"if empty(glob('$HOME/sources/nvim/autoload/plug.vim'))
+"  silent !curl -fLo $HOME/sources/nvim/autoload/plug.vim --create-dirs
+"    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+"  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+"endif
+
+if empty(glob('$HOME/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-function! PlugLoaded(name)
-    return (
-        \ has_key(g:plugs, a:name) &&
-        \ isdirectory(g:plugs[a:name].dir) &&
-        \ stridx(&rtp, g:plugs[a:name].dir) >= 0)
-endfunction
+
+"function! PlugLoaded(name)
+"    return (
+"        \ has_key(g:plugs, a:name) &&
+"        \ isdirectory(g:plugs[a:name].dir) &&
+"        \ stridx(&rtp, g:plugs[a:name].dir) >= 0)
+"endfunction
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim cheatsheat 
