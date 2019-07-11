@@ -33,6 +33,7 @@ Plug 'Yggdroot/indentLine'                      " shows ['|', '¦', '┆', '┊'
 Plug 'iCyMind/NeoSolarized'                     " color scheme
 Plug 'majutsushi/tagbar'                        " show functions in current file: <leader>t
 Plug 'ervandew/supertab'                        " tab completion for vim
+Plug 'tomtom/tcomment_vim'                      " use gcc to un/comment line
 Plug 'AndrewRadev/switch.vim'                   "  True -> False (simply press minus)
 Plug 'jcf/vim-latex'                            " ,ll and ,ls in latex to compie stuff and open the pdf
 Plug 'kshenoy/vim-signature'                    " set markers m[a-zA-Z]; delall marks :m<Space>
@@ -47,6 +48,7 @@ call plug#end()
 """"""""""""""""""""""""""""""""""""""""""
 " settings      
 """"""""""""""""""""""""""""""""""""""""""
+source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now tab)
 source ~/.vim/startup/settings_plugins.vim   	" settings related to plugins
 source ~/.vim/startup/keybindings.vim 	" keybindings for: navigation, folding, paste
 source ~/.vim/startup/settings1.vim   	" memorize folding, wrapping of lines, persistent undo
