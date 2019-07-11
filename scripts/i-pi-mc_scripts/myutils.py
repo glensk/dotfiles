@@ -239,7 +239,7 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
 #def check_for_fidis_helvetios_daint(exit=False):
 def check_for_known_hosts(exit=False):
     hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
-    known_hosts =  ['fidis','helvetios', "daint" ]
+    known_hosts =  ['fidis','helvetios', "daint", 'mac', 'cosmopc' ]
     for i in known_hosts:
         if i in hostname: return i
     if hostname[0] == 'h' and is_int(hostname[1:]) == True:

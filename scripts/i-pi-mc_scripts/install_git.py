@@ -194,10 +194,22 @@ def git_clone(args,specify_depth = True,checkout=False):
 
 def install_nvim(args):
     os.chdir(args.sources_folder)
-    if os.path.isfile(args.sources_folder+'/nvim-macos.tar.gz'):
-        os.remove(args.sources_folder+'/nvim-macos.tar.gz')
-    subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/nvim-macos.tar.gz"],shell=True)
-    subprocess.call(["tar xzf nvim-macos.tar.gz"],shell=True)
+    print('myhostname',myhostname)
+    if myhostname == "mac":
+        dl_add='macos'
+    else:
+        dl_add='linux64'
+
+    dl = 'nvim-'+dl_add+'.tar.gz'
+    if os.path.isfile(args.sources_folder+'/'+dl):
+        os.remove(args.sources_folder+'/'+dl)
+    if os.path.isdir(args.sources_folder+"/nvim"):
+        sys.exit(args.sources_folder+"/nvim does already exist!")
+    my.mkdir(args.sources_folder+"/nvim")
+
+    subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/"+dl],shell=True)
+    subprocess.call(["tar xvzf "+dl+" -C "+args.sources_folder+"/nvim --strip-components 1" ],shell=True)
+
     return
 
 def install_eigen(args):

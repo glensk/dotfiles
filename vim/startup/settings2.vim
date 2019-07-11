@@ -82,6 +82,7 @@ else
     " puts linenumber on left sinde
     set number
 endif
+set relativenumber   " try now with neovim
 " }}}
 " necessary to handle correctly tex files
 "set nolist wrap linebreak "breakat

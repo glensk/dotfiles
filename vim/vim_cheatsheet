@@ -1,3 +1,14 @@
+""""""""""""""""""""""""""""""""""""""""""
+" clipboard
+""""""""""""""""""""""""""""""""""""""""""
+" to copy out of nvim: use ,yy
+" to copy out of nvim: select with mouse and press y 
+" to compy into nvim: cmd+v (in inster mode)
+
+
+""""""""""""""""""""""""""""""""""""""""""
+" navigation 
+""""""""""""""""""""""""""""""""""""""""""
 % Once on ( to go closing ) or {}[] 
 gf open file under cursor
 gb go back to file where you came from
@@ -10,6 +21,9 @@ gd goto definition (to its local declaration.)
 {  Move to start of last paragraph (as delimited by a blank line)
 Shift + J Joint current line with next line
 
+""""""""""""""""""""""""""""""""""""""""""
+" change words quickly 
+""""""""""""""""""""""""""""""""""""""""""
 guw - lowercase current word
 gUw - uppercase current word
 gU$ - uppercase to end of line
@@ -20,6 +34,9 @@ v$~ - swapcase to end of line (if notildeop is set)
 dt. delete up to next . but without .
 df. delete up to next . including  .
 
+""""""""""""""""""""""""""""""""""""""""""
+" navigation inline 
+""""""""""""""""""""""""""""""""""""""""""
 f  [char]Jump to next occurrence of [char].
 3f [char]Jump to third occurrence of [char].
 F  [char]Jump to previous occurrence of [char].
@@ -31,7 +48,9 @@ T  [char]Jump to one character after the previous occurrence of [char].
 
 <leader>pp chane past options
 
-# Search and replace
+""""""""""""""""""""""""""""""""""""""""""
+" Search and replace
+""""""""""""""""""""""""""""""""""""""""""
 :%s/foo/bar/g
 Find each occurrence of 'foo' (in all lines), and replace it with 'bar'.
 :s/foo/bar/g
@@ -55,10 +74,9 @@ indent (when not wording in python): :set foldmethod=indent
 
 
 
-
+"""""""""""""""""""""""""""""""""""""""""""""'
 # vim copy paste colun block
-# vim copy paste colun block
-# vim copy paste colun block
+"""""""""""""""""""""""""""""""""""""""""""""'
 
 go to column one of row one.
 press CTRL + V (block select) 
