@@ -239,7 +239,7 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
 #def check_for_fidis_helvetios_daint(exit=False):
 def check_for_known_hosts(exit=False):
     hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
-    known_hosts =  ['fidis','helvetios', "daint" ]
+    known_hosts =  ['fidis','helvetios', "daint", 'mac', 'cosmopc' ]
     for i in known_hosts:
         if i in hostname: return i
     if hostname[0] == 'h' and is_int(hostname[1:]) == True:
@@ -1215,44 +1215,37 @@ def hostname():
 class mypot( object ):
     ''' return a list of available potentials '''
     def __init__(self,pot=False,potpath=False,use_different_epoch=False,verbose=False):
-        self.pot                    = pot         # n2p2_v1ag
-        self.potpath_in             = potpath
-        self.use_different_epoch    = use_different_epoch
-
-        self.potpath                = False        # this is the source where the potential recides
-        self.potpath_work           = False        # this is ususally the self.potpath but for cases where different epoch is used ->
-        self.pottype                = False        # n2p2/runner
-        self.potepoch_all           = False
-        self.assessed_epochs        = []
-        self.assessed_test          = []
-        self.assessed_train         = []
-        self.assessed_kmc57         = []
-        self.assessed_c44           = []
-        self.assessed_input         = []
-        self.potepoch_bestteste     = False
+        self.pot                        = pot         # n2p2_v1ag
+        self.potpath_in                 = potpath
+        self.use_different_epoch        = use_different_epoch
+        self.potpath                    = False        # this is the source where the potential recides
+        self.potpath_work               = False        # this is ususally the self.potpath but for cases where different epoch is used ->
+        self.pottype                    = False        # n2p2/runner
+        self.potepoch_all               = False
+        self.assessed_epochs            = []
+        self.assessed_test              = []
+        self.assessed_train             = []
+        self.assessed_kmc57             = []
+        self.assessed_c44               = []
+        self.assessed_input             = []
+        self.potepoch_bestteste         = False
         self.potepoch_bestteste_checked = False
-        self.c44_al_file            = False
-        self.c44_al                 = False
-        self.potDONE                = False         # n2p2_v1ag
-        self.potlib                 = False         # n2p2_v1ag
-        self.potcutoff              = False         # n2p2_v1ag
-        self.learning_curve_file    = False
-        timestr = str(int(time.time()))
-        #self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"_"+timestr+"/"
-        #self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"_"+timestr+"/"
-        self.lammps_tmpdir          = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/" #+timestr+"/"
-        self.pot_tmpdir             = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"/" #+timestr+"/"
-
-        self.inputnn                = False         # path to input.nn
-        self.inputdata              = False         # path to input.data
-
-        self.pot_all                = False   # n2p2_v1ag
-
-        self.trigger_set_path_manual = ["setpath","potpath","pp", ".", "..", "../" ]
-        self.verbose                = verbose
-
-        self.elements               = False  # list e.g. ['Al', 'Mg', 'Si']
-        self.atom_energy            = False
+        self.c44_al_file                = False
+        self.c44_al                     = False
+        self.potDONE                    = False         # n2p2_v1ag
+        self.potlib                     = False         # n2p2_v1ag
+        self.potcutoff                  = False         # n2p2_v1ag
+        self.learning_curve_file        = False
+        timestr                         = str(int(time.time()))
+        self.lammps_tmpdir              = os.environ['HOME']+"/._tmp_lammps_"+str(gethostname())+"/" #+timestr+"/"
+        self.pot_tmpdir                 = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"/" #+timestr+"/"
+        self.inputnn                    = False         # path to input.nn
+        self.inputdata                  = False         # path to input.data
+        self.pot_all                    = False   # n2p2_v1ag
+        self.trigger_set_path_manual    = ["setpath","potpath","pp", ".", "..", "../" ]
+        self.verbose                    = verbose
+        self.elements                   = False  # list e.g. ['Al', 'Mg', 'Si']
+        self.atom_energy                = False
         return
 
 
@@ -1860,18 +1853,18 @@ class ase_calculate_ene( object ):
 
         #self.pot = pot
         self.LAMMPS_COMMAND = False
-        self.potpath = potpath
-        self.mypot = False
-        self.units = units.lower()
-        self.geopt = geopt          # so far only for ene object.
-        self.elastic = elastic
-        self.elastic_relax = True
-        self.nsteps = 0
-        self.verbose = verbose
-        self.atoms = False          # ase atoms object (frame)
+        self.potpath        = potpath
+        self.mypot          = False
+        self.units          = units.lower()
+        self.geopt          = geopt          # so far only for ene object.
+        self.elastic        = elastic
+        self.elastic_relax  = True
+        self.nsteps         = 0
+        self.verbose        = verbose
+        self.atoms          = False          # ase atoms object (frame)
         if self.verbose:
             print('>> ase_calculate_ene: initializing mypot .... to self.pot')
-        self.pot = mypot(pot,self.potpath,use_different_epoch=use_different_epoch,verbose=self.verbose)
+        self.pot            = mypot(pot,self.potpath,use_different_epoch = use_different_epoch,verbose = self.verbose)
 
         #####################
         # for the calculator
@@ -1883,7 +1876,7 @@ class ase_calculate_ene( object ):
 
         #print('init')
         # case of MD or KMC
-        self.kmc = kmc
+        self.kmc  = kmc
         self.temp = temp
 
         #self.eos = [ False, False, False, False] # e0_meV/pa, v0_ang^3/pa, B0, B0der]
@@ -3421,8 +3414,6 @@ def ipi_ext_calc(atoms,ace):
     ase_write(folder+'/init.xyz',atoms,format='ipi')
     return
 
-
-
 def lammps_ext_elastic_init_mod(ace,positions='pos.lmp'):
     command = [
     "# NOTE: This script can be modified for different atomic structures,",
@@ -3786,7 +3777,7 @@ class ase_get_known_formats_class():
     """
     helptext
     """
-    def __init__(self,verbose=False):
+    def __init__(self,verbose = False):
         self.formatspy              = os.path.dirname(ase.io.__file__)+"/formats.py"
         self.all_known_formats      = []
         self.all_known_formats_ase  = False

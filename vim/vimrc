@@ -11,7 +11,7 @@ source ~/.vim/startup/vundle_colors-solarized.vim " MacVim:
 source ~/.vim/startup/vundle_supertab.vim      " tab completion for vim OK
 "@source ~/.vim/startup/vundle_syntastic.vim   " syntax checking  (currently slow on cmmc !!!!
 "Plugin 'DamienCassou/textlint' 			   " Style checker for .tex (<leader>tl) !quite big!
-Plugin 'tpope/vim-surround.git'	               " delete:ds( create:ysiw] change:cst(
+Plugin 'tpope/vim-surround'	               " delete:ds( create:ysiw] change:cst(
 Plugin 'Yggdroot/indentLine'
 "let g:indentLine_color_term = 239
 "let g:indentLine_setColors = 0

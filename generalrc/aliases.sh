@@ -48,12 +48,16 @@ alias prl='cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.02_PRL_origin_a
 alias diss='cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.12_Dissertation'
 alias ptmp='cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes'
 
+
 alias vimrc='vi $HOME/.vimrc'
+alias nvimrc='vi $dotfiles/nvim/init.vim'
 alias vip='vi $HOME/.ipython/profile_default/ipython_config.py'
 alias virc='vi $HOME/.`echo $currentshell`rc'
 #alias virca='vi $dotfiles/generalrc/generalrc_alias_.sh'
 alias virca='vi $dotfiles/generalrc/aliases.sh'
 alias vircg='vi $dotfiles/generalrc/generalrc_.sh'
+alias vim='$MYVIM'
+alias vi='$MYVIM'
 
 alias -- -='cd -'
 alias cd..='cd ..'
