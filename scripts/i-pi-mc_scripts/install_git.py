@@ -199,6 +199,7 @@ def install_nvim(args):
         dl_add='macos'
     else:
         dl_add='linux64'
+        subprocess.call(["$dotfiles/aliases/xclip_local_install.sh"],shell=True)  # to be able to copy/paste seamlessly
 
     dl = 'nvim-'+dl_add+'.tar.gz'
     if os.path.isfile(args.sources_folder+'/'+dl):
