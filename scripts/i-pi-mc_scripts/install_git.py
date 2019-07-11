@@ -9,50 +9,51 @@ import subprocess
 
 myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo' ]
+known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
-address = {};branch={};install_folder_different={}
+git_address = {};branch={};install_folder_different={}
 
 install_folder_different["notes"] = True
 
-address["eigen"]        = "https://github.com/eigenteam/eigen-git-mirror.git"
+git_address["eigen"]        = "https://github.com/eigenteam/eigen-git-mirror.git"
 
-address["n2p2_edo"]     = "https://github.com/edoardob90/n2p2.git"
+git_address["n2p2_edo"]     = "https://github.com/edoardob90/n2p2.git"
 branch["n2p2_edo"]      = "cmake"
 
-address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
+git_address["ipi_old"]      = "https://github.com/ceriottm/i-pi-mc"
 branch['ipi_old']       = "kmc-al6xxx"
 
-address["ipi_cosmo"]    = "https://github.com/cosmo-epfl/i-pi.git";
+git_address["ipi_cosmo"]    = "https://github.com/cosmo-epfl/i-pi.git";
 branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
 
-address["ipi"]          = "https://github.com/glensk/i-pi.git";
+git_address["ipi"]          = "https://github.com/glensk/i-pi.git";
 branch['ipi']           = "feat/kmc"
 branch['ipi']           = False # get all the branches and not just feat/kmc
 
-address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
+git_address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False
 
-address["lammps"]        = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False   # this is the preferred way
-address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]   = False
-#address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
-#address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
-address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
+git_address["lammps"]        = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False   # this is the preferred way
+git_address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]   = False
+#git_address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
+#git_address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
+git_address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
 
-address["n2p2"]          = "https://github.com/CompPhysVienna/n2p2.git";
+git_address["n2p2"]          = "https://github.com/CompPhysVienna/n2p2.git";
 branch['n2p2']           = 'develop' # this branch is necessary to get scaling.data (or function.data... one of both)
 
-address["units"]         = "http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"
+git_address["units"]         = "http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"
 branch["units"]          = False
 
-address["cosmo_tools"]   = "https://github.com/cosmo-epfl/cosmo-tools.git"
+git_address["cosmo_tools"]   = "https://github.com/cosmo-epfl/cosmo-tools.git"
 branch["cosmo_tools"]    = False
-address["cosmo-tools"]   = address["cosmo_tools"]
+
+git_address["cosmo-tools"]   = git_address["cosmo_tools"]
 branch["cosmo-tools"]    = branch["cosmo_tools"]
 
-address["mlip"]         = "http://gitlab.skoltech.ru/shapeev/mlip.git"
+git_address["mlip"]         = "http://gitlab.skoltech.ru/shapeev/mlip.git"
 branch["mlip"]          = False
 
 def help(p = None ,known=known):
@@ -87,9 +88,9 @@ def install_(args,known):
 
         # git config --global credential.helper store   ; before git push makes it work without password
         #subprocess.call(["git","config","--global","credential.helper","store"])
-        #get_my_address = "https://github.com/glensk/dotfiles.git"  # git config --get remote.origin.url
+        #get_my_git_address = "https://github.com/glensk/dotfiles.git"  # git config --get remote.origin.url
         #subprocess.call(["git","pull"],shell=True)
-        #subprocess.call(["git","push",get_my_address],shell=True)
+        #subprocess.call(["git","push",get_my_git_address],shell=True)
 
     # check if the program is known
     if args.install not in known:
@@ -100,9 +101,9 @@ def install_(args,known):
 
     # get the address
     try:
-        args.git = address[install]
+        args.git_address = git_address[install]
     except KeyError:
-        args.git = False
+        args.git_address = False
     try:
         args.branch = branch[install]
     except KeyError:
@@ -110,7 +111,7 @@ def install_(args,known):
 
 
     if args.verbose:
-        print(">> args.git (address)        :",args.git)
+        print(">> args.git_address          :",args.git_address)
         print(">> args.branch               :",args.branch)
 
     if args.verbose:
@@ -142,10 +143,16 @@ def install_(args,known):
             sys.exit('args.install_folder '+args.install_folder+' does already exist; Exit')
 
     print("cd "+args.sources_folder)
+
+    if os.path.isdir(args.install_folder):
+        print('args.install_folder',args.install_folder)
+
+        sys.exit("args.install_folder does already exist (77)")
     with my.cd(args.sources_folder):
         #if args.install   in ['ipi']                    : git_clone(args,specify_depth = False,checkout="feat/kmc")
         if args.install   in ['atomsk']                 : install_atomsk(args)
         elif args.install in ['miniconda','miniconda2'] : install_miniconda(args)
+        elif args.install in ['nvim']                   : install_nvim(args)
         elif args.install in ['lbzip','lbzip2']         : install_lbzip(args)
         elif args.install in ['n2p2']                   : install_n2p2(args)
         elif args.install in ['n2p2_edo']               : install_n2p2_edo(args)
@@ -170,7 +177,12 @@ def git_clone(args,specify_depth = True,checkout=False):
         do = do + ["--depth","1"]
     if args.branch != False:
         do = do + ["-b",args.branch]
-    do = do + [args.git,args.install_folder]
+    print('do so far:',do)
+    print('args.git_address',args.git_address)
+    print('args.install_folder',args.install_folder)
+    if args.git_address == False:
+        sys.exit('no git_address for ...')
+    do = do + [args.git_address,args.install_folder]
     print('do: ',do)
     subprocess.call(do)
     os.chdir(args.install_folder)
@@ -178,6 +190,14 @@ def git_clone(args,specify_depth = True,checkout=False):
     subprocess.call(["git","branch"])
     if checkout != False:
         subprocess.call(["git","checkout",checkout])
+    return
+
+def install_nvim(args):
+    os.chdir(args.sources_folder)
+    if os.path.isfile(args.sources_folder+'/nvim-macos.tar.gz'):
+        os.remove(args.sources_folder+'/nvim-macos.tar.gz')
+    subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/nvim-macos.tar.gz"],shell=True)
+    subprocess.call(["tar xzf nvim-macos.tar.gz"],shell=True)
     return
 
 def install_eigen(args):

@@ -27,7 +27,7 @@ set hidden
 " Enhance command-line completion / Better? completion on command line
 set wildmenu
 
-set esckeys   " use arrows in insertmode (for Blazej)
+"set esckeys   " use arrows in insertmode (for Blazej)  # works with neovim anyhow
 
 " ================ source vimrc directly:    :so after changing .vimrc {{{
 autocmd! bufwritepost $HOME/.vimrc source %

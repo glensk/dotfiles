@@ -56,11 +56,11 @@ set pastetoggle=<F2>
 "syntax on       " syntax highlighting dont do this here, breakes colorescheme
 
 
-
-if filereadable($HOME.'/.vim/syntax/syntax.vim')
-    "echo "SpecificFile exists"
-    so ${HOME}/.vim/syntax/syntax.vim
-endif
+"" This currently makes not so nice colors in python comments, --> comment in!
+"if filereadable($HOME.'/.vim/syntax/syntax.vim')
+"    "echo "SpecificFile exists"
+"    so ${HOME}/.vim/syntax/syntax.vim
+"endif
 
 " try to detect filetypes
 filetype on         " try to detect filetypes

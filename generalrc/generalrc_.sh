@@ -29,6 +29,7 @@ setenv onhost $onhost;
 
 setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
 setenv potentials "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
+export XDG_CONFIG_HOME="$dotfiles"
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time setenv diverses (change setenv to export)"
 
 ##################################################################################
