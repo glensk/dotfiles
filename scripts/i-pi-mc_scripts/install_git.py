@@ -564,6 +564,10 @@ def install_n2p2(args):
         bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
     if myhostname == 'daint':
         bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
+        # with cray:
+	#
+        # module load daint-mc && module unload cray-libsci && module load GSL/2.5-CrayCCE-18.08 cray-python/2.7.15.1 cray-fftw
+	# On the Cray system you can use Intel's Math Kernel Library (MKL) as an alternative to Cray's LibSci by unloading the cray-libsci module and adding the compiler option -mkl.
     return
 
 def install_xmgrace(args):

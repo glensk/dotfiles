@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 import numpy as np
-import glob,sys,os,argparse,subprocess,time
+import glob,sys,os,argparse,subprocess,time,copy
 import myutils as my
 from myutils import ase_calculate_ene
 from filecmp import cmp
@@ -31,6 +31,9 @@ def help(p = None):
     p.add_argument('-f'  ,'--find'               , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) pattern in foldername")
     p.add_argument('-pnn'  ,'--pick_nn'          , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) pattern in nn as 24_24__t_t_l")
     p.add_argument('-pas'  , '--pick_amount_sructures'   , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) potentials with certain number of structures")
+    p.add_argument('-pks'  , '--pick_kmc_smaller'   , default=-1.,type=float, required=False, help="find (& restrict selectiion to) potentials with kmc std < x")
+    p.add_argument('-pts'  , '--pick_test_smaller'   ,default=-1.,type=float, required=False, help="find (& restrict selectiion to) potentials with test std < x")
+    p.add_argument('-pfs'  , '--pick_testforces_smaller' ,default=-1.,type=float, required=False, help="find (& restrict selectiion to) potentials with testforces std < x")
 
     return p
 
@@ -110,6 +113,7 @@ print("#         ||    ENERGY (RMSE)    ||          || FORCES (RMSE)|| C44  || K
 print("#train    || test / train (@step)||          || train/ test  || C44  || std  || [total]")
 print("#frac     ||      /       (@step)||          || min  /       || C44  ||      ||   path")
 
+lastpath = ""
 for nnidx,i in enumerate(all_learning_curve_files):
     learning_curve_filename = os.path.basename(i)             # 'learning-curve.out'
     folder = i.replace(learning_curve_filename, '')[:-1]
@@ -137,14 +141,12 @@ for nnidx,i in enumerate(all_learning_curve_files):
 
     nodes_short         = my.inputnn_get_nodes_short(pot.inputnn,as_string=True)
     activation_short    = my.inputnn_get_activation_short(pot.inputnn)
-    if type(args.pick_nn) == list and nodes_short+"__"+activation_short not in args.pick_nn:
-        continue
+    if type(args.pick_nn) == list and nodes_short+"__"+activation_short not in args.pick_nn: continue
     nn                  = str(nodes_short+"__"+activation_short).ljust(12)
     if os.path.isdir(folder+"/kmc"):
         nn = str(nodes_short+"**"+activation_short)
     input_structures    = str(my.inputdata_get_nuber_of_structures(pot.inputnn))
-    if type(args.pick_amount_sructures) == list and str(input_structures) not in args.pick_amount_sructures:
-        continue
+    if type(args.pick_amount_sructures) == list and str(input_structures) not in args.pick_amount_sructures: continue
     input_structures    = str(my.inputdata_get_nuber_of_structures(pot.inputnn)).ljust(6)
 
     if len(pot.potepoch_all) > 0:
@@ -230,7 +232,6 @@ for nnidx,i in enumerate(all_learning_curve_files):
         #sys.exit()
 
 
-    print()
     go_through = pot.assessed_epochs
     #print('go_through (0)','len(lc)-1             ',len(lc)-1)
     #print('go_through (0)','pot.potepoch_bestteste',pot.potepoch_bestteste)
@@ -255,7 +256,7 @@ for nnidx,i in enumerate(all_learning_curve_files):
         else:
             kmcbl   = '-'
             c44     = '-'
-
+        if args.pick_kmc_smaller > 0 and kmcbl > args.pick_kmc_smaller: continue
         has_outliers,has_outliers_, outliers_epochs, outliers_idx,outliers_diff = pot.get_my_assessments_check_outliers(specific_epoch=epoch,verbose=args.verbose)
         if has_outliers and has_outliers_ == "!!O":
             #print(has_outliers,has_outliers_,outliers_diff,type(outliers_diff))
@@ -281,6 +282,7 @@ for nnidx,i in enumerate(all_learning_curve_files):
         train   = round(lc[:,1][epoch],1)
         f1 = trainminf_at_testmin    = round(lc[:,3][epoch],1)
         f2 = testminf_at_testmin     = round(lc[:,4][epoch],1)
+        if args.pick_test_smaller > 0 and test > args.pick_test_smaller: continue
 
 
         ####################################################
@@ -301,7 +303,11 @@ for nnidx,i in enumerate(all_learning_curve_files):
         ####################################################
         # print output
         ####################################################
-        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   input_structures ,     epochs_max_,nn,"|",  rnd,"|",   path_, nnidx)
+        if path != lastpath:
+            print() #'now',path,'before',lastpath)
+        lastpath = copy.deepcopy(path)
+        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   input_structures ,     epochs_max_,nn,"|",  rnd,"|",   path_) #, nnidx)
+
 
 end_time = time.time()
 print("TIME:",end_time - start_time)
