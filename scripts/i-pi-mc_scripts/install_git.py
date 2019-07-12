@@ -155,7 +155,7 @@ def install_(args,known):
         elif args.install in ['nvim']                   : install_nvim(args)
         elif args.install in ['lbzip','lbzip2']         : install_lbzip(args)
         elif args.install in ['n2p2']                   : install_n2p2(args)
-        elif args.install in ['n2p2_edo']               : install_n2p2_edo(args)
+        elif args.install in ['n2p2_edo']               : install_n2p2_edo_easybuild(args)
         elif args.install in ['vmd']                    : install_vmd(args)
         elif args.install in ['units']                  : install_units(args)
         elif args.install in ['notes']                  : install_notes(args)
@@ -432,7 +432,7 @@ def install_lammps(args):
     print('copied ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
     return
 
-def install_n2p2_edo(args):
+def install_n2p2_edo_easybuild(args):
     git_clone(args,specify_depth = True)
     os.chdir(args.install_folder)
     os.makedirs("build")
@@ -479,6 +479,7 @@ def install_n2p2(args):
 
     elif myhostname == 'mac':
         COMP = "intel"  # makes problems on mac
+        # now tried : conda install -c intel mkl
         COMP = "gnu"
         # on mac you can always try
         # cd /Users/glensk/sources/n2p2/src/libnnp
@@ -504,9 +505,9 @@ def install_n2p2(args):
         # in makefile gnu can try CFLAGS=-m64 CXXFLAGS=-m64 FFLAGS=-m64 FCFLAGS=-m64
     else:
         COMP="gnu" # cosmopc15
-        # on mac now EIGEN_ROOT and GSL_ROOT are defined in $scripts/dotfiles/scripts/source_to_add_to_path.sh
-        #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"
-        #EIGEN = /Users/glensk/miniconda2/
+        # on mac now EIGEN_ROOT and GSL_ROOT are defined in $scripts/source_to_add_to_path.sh by miniconda
+        #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"   # miniconda
+        #EIGEN = /Users/glensk/miniconda2/   # miniconda
 
     # makefile
     my.sed("makefile","^COMP=.*","COMP="+COMP)
