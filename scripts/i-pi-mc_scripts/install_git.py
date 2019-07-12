@@ -9,7 +9,7 @@ import subprocess
 
 myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim' ]
+known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ]
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -154,7 +154,7 @@ def install_(args,known):
         elif args.install in ['miniconda','miniconda2'] : install_miniconda(args)
         elif args.install in ['nvim']                   : install_nvim(args)
         elif args.install in ['lbzip','lbzip2']         : install_lbzip(args)
-        elif args.install in ['n2p2']                   : install_n2p2(args)
+        elif args.install in ['n2p2','n2p2_cray']       : install_n2p2(args)
         elif args.install in ['n2p2_edo']               : install_n2p2_edo_easybuild(args)
         elif args.install in ['vmd']                    : install_vmd(args)
         elif args.install in ['units']                  : install_units(args)

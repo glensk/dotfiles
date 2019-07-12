@@ -10,8 +10,8 @@ set -e
 XCLIP_VERSION=0.12
  
 # create our directories
-mkdir -p $HOME/.local $HOME/xclip_tmp
-cd $HOME/xclip_tmp
+mkdir -p $HOME/.local $HOME/sources/xclip_tmp
+cd $HOME/sources/xclip_tmp
  
 # download source files for XClip
 wget http://kent.dl.sourceforge.net/project/xclip/xclip/${XCLIP_VERSION}/xclip-${XCLIP_VERSION}.tar.gz

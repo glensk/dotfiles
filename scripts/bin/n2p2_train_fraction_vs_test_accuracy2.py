@@ -29,6 +29,9 @@ def help(p = None):
     p.add_argument('-ex_test'  ,'--ex_test'            , action='store_true', default=False, help='execute part test')
     p.add_argument('-ex_train'  ,'--ex_train'            , action='store_true', default=False, help='execute part train')
     p.add_argument('-f'  ,'--find'               , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) pattern in foldername")
+    p.add_argument('-pnn'  ,'--pick_nn'          , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) pattern in nn as 24_24__t_t_l")
+    p.add_argument('-pas'  , '--pick_amount_sructures'   , default=-1.,type=str, nargs='*',required=False, help="find (& restrict selectiion to) potentials with certain number of structures")
+
     return p
 
 def gettesttrain(test,ljust_=4,greater=3.0,round_=1):
@@ -52,6 +55,8 @@ def getf1f2(f1,greater=55,ljust_=5):
 
 p = help()
 args = p.parse_args()
+if args.verbose:
+    my.print_args(args)
 if args.from_que == True: args.from_subfolder = False
 
 ##########################################################################################
@@ -105,7 +110,7 @@ print("#         ||    ENERGY (RMSE)    ||          || FORCES (RMSE)|| C44  || K
 print("#train    || test / train (@step)||          || train/ test  || C44  || std  || [total]")
 print("#frac     ||      /       (@step)||          || min  /       || C44  ||      ||   path")
 
-for i in all_learning_curve_files:
+for nnidx,i in enumerate(all_learning_curve_files):
     learning_curve_filename = os.path.basename(i)             # 'learning-curve.out'
     folder = i.replace(learning_curve_filename, '')[:-1]
 
@@ -129,6 +134,19 @@ for i in all_learning_curve_files:
     pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
     pot.get(exit=False,showerrors=False)
     pot.get_my_assessments()  # gets kmc57_{b,l}, train_{b,l}, test_{b,l}
+
+    nodes_short         = my.inputnn_get_nodes_short(pot.inputnn,as_string=True)
+    activation_short    = my.inputnn_get_activation_short(pot.inputnn)
+    if type(args.pick_nn) == list and nodes_short+"__"+activation_short not in args.pick_nn:
+        continue
+    nn                  = str(nodes_short+"__"+activation_short).ljust(12)
+    if os.path.isdir(folder+"/kmc"):
+        nn = str(nodes_short+"**"+activation_short)
+    input_structures    = str(my.inputdata_get_nuber_of_structures(pot.inputnn))
+    if type(args.pick_amount_sructures) == list and str(input_structures) not in args.pick_amount_sructures:
+        continue
+    input_structures    = str(my.inputdata_get_nuber_of_structures(pot.inputnn)).ljust(6)
+
     if len(pot.potepoch_all) > 0:
         epoch_last = pot.potepoch_all[-1]
     else:
@@ -173,16 +191,10 @@ for i in all_learning_curve_files:
     rnd                 = str(my.inputnn_get_random_seed(pot.inputnn)).ljust(8)
     testf               = round(my.inputnn_get_testfraction(pot.inputnn),2)
     train_fraction      = round(1.-testf,2)
-    nodes_short         = my.inputnn_get_nodes_short(pot.inputnn,as_string=True)
-    activation_short    = my.inputnn_get_activation_short(pot.inputnn)
-    nn                  = str(nodes_short+"__"+activation_short).ljust(12)
-    if os.path.isdir(folder+"/kmc"):
-        nn = str(nodes_short+"**"+activation_short).ljust(12)
     pot_elements, [al,mg,si]= my.inputnn_get_atomic_symbols_and_atom_energy_list(pot.inputnn)
     al                  = int(al)
     mg                  = int(mg)
     si                  = int(si)
-    input_structures    = str(my.inputdata_get_nuber_of_structures(pot.inputnn)).ljust(6)
 
 
     inputnn = pot.inputnn
@@ -289,7 +301,7 @@ for i in all_learning_curve_files:
         ####################################################
         # print output
         ####################################################
-        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   input_structures ,     epochs_max_,nn,"|",  rnd,"|",   path_)
+        print(fstr, train_fraction,"|",test_,"/", train_,  epoch ,   al,mg,si,"||",   f1_,"/",f2_,"|C",    c44_,"|K",  kmcbl_,"|n",   input_structures ,     epochs_max_,nn,"|",  rnd,"|",   path_, nnidx)
 
 end_time = time.time()
 print("TIME:",end_time - start_time)
