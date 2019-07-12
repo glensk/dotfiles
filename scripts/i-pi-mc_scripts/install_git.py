@@ -439,7 +439,12 @@ def install_n2p2_edo_easybuild(args):
     os.chdir("build")
     print()
     print()
+    # export EIGEN_ROOT="/users/aglensk/sources/eigen/"
     # cmake -DCMAKE_PREFIX_PATH=$HOME/sources/eigen -DGSL_ROOT_DIR=$EBROOTGSL --USE_MKL=ON ..
+
+
+        # module load daint-mc && module unload cray-libsci && module load GSL/2.5-CrayCCE-18.08 cray-python/2.7.15.1 cray-fftw
+	# On the Cray system you can use Intel's Math Kernel Library (MKL) as an alternative to Cray's LibSci by unloading the cray-libsci module and adding the compiler option -mkl.
     return
 
 def install_n2p2(args):
