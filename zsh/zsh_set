@@ -8,7 +8,6 @@ DISABLE_UPDATE_PROMPT=true  # autoupdate zsh without asking
 # COMPLETION_WAITING_DOTS="true"  # display red dots whilst waiting for completion.
 DISABLE_UNTRACKED_FILES_DIRTY="true"  # disable marking untracked files under VCS as dirty. This makes repository status check for large repositories much, much faster.
 
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 

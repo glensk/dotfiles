@@ -9,18 +9,7 @@ else
     SCR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 fi
 #echo SCR:$SCR
-myhost=`$dotfiles/aliases/myhost.py`
-#echo myhost:$xxhost:
-# define the folders which are given in this git repo 
-#_ipi="$SCR/i-pi-mc_scripts"
-#_runner="$SCR/runner_scripts"
-#_n2p2="$SCR/n2p2"
-#_aiida="$HOME/sources/aiida-alloy/"
-#_aiida_o="$SCR/qe-aiida/"
-#_aiida_s="$SCR/qe-aiida/aiida_solutejobs_scripts/"
-#_aiida_a="$SCR/qe-aiida/aiida_analyze/"
-#_aiida_b="$SCR/qe-aiida/aiida_submitskripts/"
-#_lammps_scripts="$SCR/lammps_scripts"
+#myhost=`$dotfiles/aliases/myhost.py`  # takes too long!
 _python_thermodynamics="$SCR/python_thermodynamics/"
 #_ase_lammps="$HOME/sources/lammps_source_cosmo" # not necessary when added the _lammps_source/src to $LD_LIBRARY_PATH
 _n2p2_lib="$HOME/sources/n2p2/lib"
@@ -28,9 +17,6 @@ _ipi_source="$HOME/sources/ipi/"
 export LAMMPSPATH="$HOME/sources/lammps"
 _bin="$SCR/bin"
 _bin2="$SCR/../aliases"
-#addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ase_lammps/python:$_ipi_source"
-#addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ipi_source"
-#addeverywhere="$_bin:$_aiida:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
 addeverywhere="$_bin:$_bin2:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
 
 #####################

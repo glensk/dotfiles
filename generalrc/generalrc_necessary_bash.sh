@@ -17,9 +17,9 @@
 #}
 
 # setenv wird nur von der tcsh benutzt
-setenv () {
-      export $1=$2
-}
+#setenv () {
+#      export $1=$2
+#}
 
 function iterm_title {
         echo -ne "\033]0;"$*"\007"
@@ -68,14 +68,14 @@ function iterm_title {
 #	#fi
 #}
 
-aliastcshtobash () {
-		echo alias ${1}=\'`echo "${2}" | sed "s:':'\\\\\\\\'':"`\'
-}
+#aliastcshtobash () {
+#		echo alias ${1}=\'`echo "${2}" | sed "s:':'\\\\\\\\'':"`\'
+#}
 
-mkalias () {
-    # for bash $2 need to be in ""
-    eval `aliastcshtobash $1 "$2"`
-}
+#mkalias () {
+#    # for bash $2 need to be in ""
+#    eval `aliastcshtobash $1 "$2"`
+#}
 
 # THis was ment only for garching
 # if [ "$ZSH_VERSION" = "5.0.5" ];then
@@ -112,6 +112,32 @@ load_local_anaconda() {
     source activate /u/aglen/conda-envs/my_root
 }
 
+myhost() {
+    # shouls recognise: mac, helvetios, fidis, cmmd, cosmopc, f209, g308, h211
+    host=`hostname`
+    case $host in
+        "mac") echo "mac" && return;;
+        "helvetios") echo "helvetios" && return;;
+        "fidis") echo "fidis" && return;;
+        "cmmd") echo "cmmd" && return;;
+        "cosmopc") echo "cosmopc" && return;;
+    esac
+    firstletter="${host:0:1}"
+    remain="${host:1:999}"
+    re='^[0-9]+$'
+    #echo firstletter $firstletter
+    #echo remain $remain
+    if [[ $remain =~ $re ]];then # remaining is an integer
+        case $firstletter in
+            "h") echo "helvetios" && return;;
+            "f") echo "fidis" && return;;
+            "g") echo "fidis" && return;;
+        esac
+    fi
+    echo UNKNOWN 
+    
+}
+
 conda_activate() {
     if [ "`hostname`" = "fidis" ];then
         echo "module purge"
@@ -126,6 +152,10 @@ conda_activate() {
         source $HOME/miniconda3/etc/profile.d/conda.sh
         conda activate
     fi
+}
+
+ca() {
+    conda_activate
 }
 
 virtualenv_activate () {
