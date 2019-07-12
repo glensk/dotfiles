@@ -122,13 +122,13 @@ fi
 # general variables
 ##############################################
 #setenv PAGER most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
-setenv EDITOR vim   
-setenv SVN_EDITOR vim        # for svn (Thermodynamics folder)
+setenv EDITOR $MYVIM   
+setenv SVN_EDITOR $MYVIM        # for svn (Thermodynamics folder)
+setenv GIT_EDITOR $MYVIM 
 setenv LESS "-R"
 setenv LC_ALL C   # necessary for perl git svn
 #setenv LANG C     # necessary for perl
 setenv LANG en_US.UTF-8     # necessary for powerline in zsh
-setenv GIT_EDITOR vim
 setenv PAGER less 
 setenv BROWSER chrome
 setenv BROWSER open # is necessary for opening jupyter notebook files
