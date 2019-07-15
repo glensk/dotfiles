@@ -42,11 +42,11 @@ source ~/.vim/startup/keybindings.vim 	" keybindings for: navigation, folding, p
 source ~/.vim/startup/settings1.vim   	" memorize folding, wrapping of lines, persistent undo
 source ~/.vim/startup/settings0.vim   	" general sets, remove trailing whitespaces, currently breaks yanking on mac!
 source ~/.vim/startup/settings2.vim     " syntax! highlighting, templates, look-and-feel, this changes color of comments
-source ~/.vim/startup/settings3.vim   " Folding, Search, Tab-behavior, indentation
+source ~/.vim/startup/settings3.vim   " Folding, Search, Tab-behavior, indentation, mouse
 set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl t in insert mode
 """inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung,
 
 set clipboard=unnamed           " to send copied stuff to system clipboard ( needs to set in ierm: keyboard shortcut: "cmd+c" -> Action: "send escape sequence" Esc+: "y"
-set mouse=a                     " get scrolling inside nvim using mouse
+" executed in iterm2: defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true to get mouse scrolling
 " hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (red) " I like the actual gray better

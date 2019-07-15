@@ -143,9 +143,9 @@ set nostartofline
 " Enable mouse in all modes  # I DONT WANT THIS ... WITHOUT mouse=a EVERYTHING {{{
 " CAN BE COPIED :) ... but mouse=r or mouse=v might also work (better!?)
 " it seems that everything can be compied also with mouse=a
-if has("mouse")
-set mouse=a
-endif
+"@if has("mouse")
+"@set mouse=a
+"@endif
 
 " Use UTF-8 without BOM
 set encoding=utf-8 nobomb

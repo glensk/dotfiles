@@ -139,10 +139,11 @@ myhost() {
 }
 
 conda_activate() {
-    if [ "`hostname`" = "fidis" ];then
+    if [ "`myhost`" = "fidis" ];then
         echo "module purge"
         module purge
     fi
+    
     if [ -e "$HOME/miniconda2" ];then
         echo "$HOME/miniconda2"
         source $HOME/miniconda2/etc/profile.d/conda.sh
@@ -150,6 +151,14 @@ conda_activate() {
     elif [ -e "$HOME/miniconda3" ];then
         echo "$HOME/miniconda3"
         source $HOME/miniconda3/etc/profile.d/conda.sh
+        conda activate
+    elif [ -e "$SCRATCH/miniconda2" ];then
+        echo "$SCRATCH/miniconda2"
+        source $SCRATCH/miniconda2/etc/profile.d/conda.sh
+        conda activate
+    elif [ -e "$SCRATCH/miniconda3" ];then
+        echo "$SCRATCH/miniconda3"
+        source $SCRATCH/miniconda3/etc/profile.d/conda.sh
         conda activate
     fi
 }
