@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 
 
-myhostname = my.check_for_known_hosts()
+myhost = myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ]
 # git clone https://github.com/glensk/i-pi.git
@@ -68,6 +68,7 @@ def help(p = None ,known=known):
             help='The target directory for installation. Default: $HOME/sources/')
     p.add_argument('-if','--install_folder', type=str, default=False,
             help='The target foldername for installation. Default: if False: the --install name')
+    p.add_argument('-pwd','--pwd', type=str, default=False, help='pwd')
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
@@ -76,15 +77,16 @@ args = p.parse_args()
 args.verbose = True
 
 def install_(args,known):
+    args.pwd = os.getcwd()
     # make sources folder if it does not exist ($HOME/sources)
     if not os.path.isdir(args.sources_folder):
         os.makedirs(args.sources_folder)
 
     install        = args.install
-    print('>> dotfiles folder',os.environ.get('dotfiles'))
+    print('>> args.pwd                  :',args.pwd)
+    print('>> dotfiles folder           :',os.environ.get('dotfiles'))
     #with my.cd(os.environ.get('dotfiles')):
     #    print('>> pwd (ssh key should was added: https://github.com/settings/keys) so that it should not be necessary to use git passwords.')
-    if args.verbose: print(">> pwd:",os.getcwd())
 
         # git config --global credential.helper store   ; before git push makes it work without password
         #subprocess.call(["git","config","--global","credential.helper","store"])
@@ -151,7 +153,7 @@ def install_(args,known):
     with my.cd(args.sources_folder):
         #if args.install   in ['ipi']                    : git_clone(args,specify_depth = False,checkout="feat/kmc")
         if args.install   in ['atomsk']                 : install_atomsk(args)
-        elif args.install in ['miniconda','miniconda2'] : install_miniconda(args)
+        elif args.install in ['miniconda','miniconda2','miniconda3'] : install_miniconda(args)
         elif args.install in ['nvim']                   : install_nvim(args)
         elif args.install in ['lbzip','lbzip2']         : install_lbzip(args)
         elif args.install in ['n2p2','n2p2_cray']       : install_n2p2(args)
@@ -581,33 +583,38 @@ def install_xmgrace(args):
         subprocess.call(["./configure"])  # this once complains about missing: configure: error: M*tif has not been found
 
 def install_miniconda(args):
-    with my.cd(os.environ['HOME']):
+    #with my.cd(os.environ['HOME']):
+    with my.cd(args.pwd):
         #if os.path.isdir(args.install):
         #    sys.exit(args.install+" does already exist!")
-        #print('-----------')
-        #print(os.getcwd())
-        #print()
-        #print()
-        #print('1. donwload miniconda')
-        #print('------------------------------')
-        #if args.install == "miniconda2":
-        #    version = "2"
-        #elif args.install == "miniconda3":
-        #    version = "3"
-        #else:
-        #    sys.exit('either miniconda2 or miniconda3')
+        print('-----------')
+        print(os.getcwd())
+        print()
+        print()
+        print('1. donwload miniconda')
+        print('------------------------------')
+        if args.install == "miniconda2":
+            version = "2"
+        elif args.install == "miniconda3":
+            version = "3"
+        else:
+            sys.exit('either miniconda2 or miniconda3')
 
-        #subprocess.call(["wget https://repo.anaconda.com/miniconda/Miniconda"+version+"-latest-Linux-x86_64.sh -O ~/miniconda"+version+".sh"],shell=True)
+        install_destination = ""
+        if myhost == 'daint':
+            install_destination = "/store/marvel/mr23/aglensk/"+args.install
 
-        #print('2. install it (in silent mode)')
-        #print('------------------------------')
-        #subprocess.call(["bash ~/miniconda"+version+".sh -b -p"],shell=True)
+        subprocess.call(["wget https://repo.anaconda.com/miniconda/Miniconda"+version+"-latest-Linux-x86_64.sh -O miniconda"+version+".sh"],shell=True)
+
+        print('2. install it (in silent mode)')
+        print('------------------------------')
+        subprocess.call(["bash miniconda"+version+".sh -b -p "+install_destination],shell=True)
 
         print('3. install modules')
         print('------------------------------')
         subprocess.call(["conda config --add channels intel"],shell=True)
         subprocess.call(["conda install -c -y conda-forge ase"],shell=True)
-    sys.exit()
+    sys.exit('done')
 
 
 def install_atomsk(args):

@@ -117,11 +117,24 @@ myhost() {
     host=`hostname`
     case $host in
         "mac") echo "mac" && return;;
+        "daint") echo "daint" && return;;
         "helvetios") echo "helvetios" && return;;
         "fidis") echo "fidis" && return;;
         "cmmd") echo "cmmd" && return;;
         "cosmopc") echo "cosmopc" && return;;
     esac
+    daint_fidis="${host:0:5}"
+    #echo daint_fidis: $daint_fidis
+    case $daint_fidis in
+        "daint") echo "daint" && return;;
+        "fidis") echo "fidis" && return;;
+    esac
+    
+    cosmopc_="${host:0:7}"
+    case $cosmopc_ in
+        "cosmopc") echo "cosmopc" && return;;
+    esac
+
     firstletter="${host:0:1}"
     remain="${host:1:999}"
     re='^[0-9]+$'
@@ -139,26 +152,40 @@ myhost() {
 }
 
 conda_activate() {
+    echo myhost `myhost`
     if [ "`myhost`" = "fidis" ];then
         echo "module purge"
         module purge
+    elif [ "`myhost`" = "daint" ];then
+        echo 00
+        echo "/store/marvel/mr23/aglensk/miniconda3"
+        source /store/marvel/mr23/aglensk/miniconda3/etc/profile.d/conda.sh
+        conda activate
     fi
     
     if [ -e "$HOME/miniconda2" ];then
+        echo 11
         echo "$HOME/miniconda2"
         source $HOME/miniconda2/etc/profile.d/conda.sh
         conda activate
     elif [ -e "$HOME/miniconda3" ];then
+        echo 22
         echo "$HOME/miniconda3"
         source $HOME/miniconda3/etc/profile.d/conda.sh
         conda activate
     elif [ -e "$SCRATCH/miniconda2" ];then
+        echo 33
         echo "$SCRATCH/miniconda2"
         source $SCRATCH/miniconda2/etc/profile.d/conda.sh
         conda activate
     elif [ -e "$SCRATCH/miniconda3" ];then
+        echo 44
         echo "$SCRATCH/miniconda3"
+        echo 55
+        echo $SCRATCH
+        echo 66
         source $SCRATCH/miniconda3/etc/profile.d/conda.sh
+        echo 77
         conda activate
     fi
 }
