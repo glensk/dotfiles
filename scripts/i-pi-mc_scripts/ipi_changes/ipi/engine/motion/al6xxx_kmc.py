@@ -132,6 +132,9 @@ class AlKMC(Motion):
         # 2. by a list of the lattice sites in 3D space, in 1-1 mapping with the letters
         # 3. by a list of the atoms, whose lattice position is indicated by an integer
 
+        conventional = False
+        if conventional:
+            ncell = 2
 
         self.nstep = nstep
         self.ncell = ncell
@@ -139,8 +142,13 @@ class AlKMC(Motion):
         self.nsi = nsi
         self.nmg = nmg
         self.nsites = self.ncell**3
+        if conventional:
+            self.nsites = 4*self.nsites
         self.natoms = self.nsites - self.nvac
         self.neval = neval
+        print('>> (0) ncell ',self.ncell)
+        print('>> (0) nsites',self.nsites)
+        print('>> (0) natoms',self.natoms)
         self.diffusion_barrier_al = diffusion_barrier_al
         self.diffusion_prefactor_al = diffusion_prefactor_al
         if diffusion_barrier_mg > 0:
@@ -171,6 +179,11 @@ class AlKMC(Motion):
         cell[0]=[0.7071067811865475, 0.35355339059327373, 0.35355339059327373]
         cell[1]=[0.,0.6123724356957945, 0.20412414523193154]
         cell[2]=[0.,0.,0.5773502691896258]
+
+        if conventional:
+            cell[0] = [1,0,0]
+            cell[1] = [0,1,0]
+            cell[2] = [0,0,1]
         self.scell=self.a0*cell
         self.dcell = Cell()
         self.dcell.h = self.scell*self.ncell
@@ -183,8 +196,16 @@ class AlKMC(Motion):
         print(self.dcell.h)
         # this is the list of lattice sites, in 3D coordinates
         ix,iy,iz = np.meshgrid(range(self.ncell), range(self.ncell), range(self.ncell), indexing='ij')
+        #print('ix',ix)
+        #print('iy',iy)
+        #print(np.asarray([ix.flatten(),iy.flatten(),iz.flatten()]))
         self.sites = np.dot(np.asarray([ix.flatten(),iy.flatten(),iz.flatten()]).T, self.scell.T)
+        if conventional:
+            fcc2 = "/Users/glensk/Thermodynamics/utilities/fcc/EqCoords_direct_fcc_2x2x2sc"
+            self.sites = np.loadtxt(fcc2)
+            pass
         print(">> (2) self.sites, self.nsites",len(self.sites), self.nsites, "###")
+        print(self.sites)
         # now we build list of nearest neighbors (fcc-lattice hardcoded!)
         self.neigh  = np.zeros((self.nsites,12),int)
         self.neigh2 = np.zeros((self.nsites,6),int)

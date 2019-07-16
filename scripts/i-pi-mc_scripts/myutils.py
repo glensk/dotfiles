@@ -69,6 +69,10 @@ import myutils as my
 
 start_time = time.time()
 
+def ptest():
+    print("yes works 1")
+    return
+
 def printoutcolor(red,var,ENDC):
     if len(var) == 1:
         return red + str(var[0]) + ENDC
@@ -4289,13 +4293,20 @@ def get_rawsoap(at, gs=0.3, co=3.0, cotw=0.5, nmax=9, lmax=6, cw=1.0, nrm=True, 
     at.calc_connect();
     return zlist, desc.calc(at)["descriptor"]
 
-def get_soap2_vec(rawsoap, zlist, zglobal=None,nmax=False,lmax=False):
+def get_soap2_vec(rawsoap, zlist, zglobal=None,nmax=None,lmax=None):
+    if nmax is None:
+        sys.exit('Please provide nmax!')
+    if lmax is None:
+        sys.exit('Please provide lmax!')
     isoap = 0
     isqrttwo = 1.0/np.sqrt(2.0)
     njsoap = {}; ipair = {}
 
+    #print('zglobal:',zglobal)
+    #print('zlist  :',zlist,'ka')
     if zglobal is None:
         zglobal = zlist
+    #print('len(zglobal)',len(zglobal),nmax,len(zglobal),lmax)
     njsoap = np.zeros((len(zglobal),nmax,len(zglobal),nmax,lmax+1))
     zmap = np.zeros(len(zlist),int)
     for s in xrange(len(zlist)):
@@ -4331,12 +4342,12 @@ def do_fps(x, d=0):
         dl = np.minimum(dl, nd)
     return iy, lmin
 
-def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,13,14], central_z=23,verbose=False,showtdqm=True ):
+def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,13,14], central_z=23,verbose=False,showtdqm=True,nrm=True ):
     rsoap = []
     #nmax = 8   # 12
     #lmax = 6  # 9
     #co = 4  # cutoff radius, 3.0  ## is this in angstrom?
-    gs = 0.5 # gaussian width, 0.3
+    #gs = 0.5 # gaussian width, 0.3
     cotw = gs
     det = "c"+str(co)+"-g"+str(gs)+"-nrm-cw"
     #zlist = [12,13,14]  # why is this working, even without specifying the vacancy/Vanadium ....? [12,13,14,23]
@@ -4354,7 +4365,7 @@ def get_soaps(kmcxyz = False, nmax = 8, lmax = 6, co = 4, gs = 0.5, zlist = [12,
         #progress(i,len(kmcxyz))
         # andrea used a zentral_z=0
         # the next line could be potentially done parallel...
-        zliat, soaps = get_rawsoap(at, nmax=nmax, lmax=lmax, co=co, gs=gs, cotw=cotw, nrm=False, cw=1, zlist=zlist, central_z=central_z,
+        zliat, soaps = get_rawsoap(at, nmax=nmax, lmax=lmax, co=co, gs=gs, cotw=cotw, nrm=nrm, cw=1, zlist=zlist, central_z=central_z,
                                    x_cmd="cutoff_dexp=2 cutoff_scale=3.0 cutoff_rate=2.0")
         rsoap.append((zliat, soaps))
     if verbose:
