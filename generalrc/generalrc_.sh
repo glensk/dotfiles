@@ -55,7 +55,6 @@ source $generalrc/generalrc_path.sh $onhost
 # ALIASES & PROMPT & tabcolor
 ##############################################
 source $generalrc/aliases.sh   # shellscript containing aliases
-#source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
     
 #limit coredumpsize 0    # Disable core dumps # limit command is not know in bash
@@ -84,7 +83,15 @@ tab-color $mypromptpath
 # conda is necessary for python lammps, for jupyter (mac) ... better load it.
 case $onhost in
     #cosmopc) source $HOME/aiida/bin/activate; ;;
-    #mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    # on mac: 
+    # pip install --upgrade --user ase
+    # pip install --upgrade --user lmfit
+    # pip install --upgrade --user intel-numpy    # to make numpy faster
+    # pip install --upgrade --user tqdm
+    # pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
+    # pip install --upgrade --user sklearn  # necessary for andreas soap stuff
+
     fidis)     source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     helvetios) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     # on fidis/helvetios:
@@ -105,15 +112,18 @@ esac
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett thermodynamics"
 
 ##############################################
-# completion goo for commands  -> this needs to go to zshrc! (autoload/compdef)
-# I currently dont use it
+# completion for {notes} commands  -> this needs to go to zshrc! (autoload/compdef)
+##############################################
+fpath=($dotfiles/completions_fpath $fpath)
+
+##############################################
+# other completitions 
 ##############################################
 #if [ "$currentshell" = "zsh" ];then
-#fpath=($dotfiles/completions_fpath $fpath)
-#function goo() { $dotfiles/aliases/goo "$1" 
-#}  # this nees to be a in second line
-#autoload _goo    # do not forget BEFORE the next cmd! 
-#compdef _goo goo # binds the completion function to a command
+##function goo() { $dotfiles/aliases/goo "$1" 
+##}  # this nees to be a in second line
+##autoload _goo    # do not forget BEFORE the next cmd! 
+##compdef _goo goo # binds the completion function to a command
 #fi
 
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett goo"

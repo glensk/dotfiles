@@ -38,7 +38,7 @@ def help(p = None):
     p.add_argument("--a0",'-a0'         ,default = 4.057, type=float, help="fcc lattice constant for Al.")
     p.add_argument("--temp",'-temp'     ,default = 300, type=int, help="KMC temperature")
     p.add_argument("--nseeds",'-nseeds' ,type=int, default=3, help="number of different seeds")
-    p.add_argument("--seednumber",'-seednumber',default=False,nargs='*', type=int,help="define seed number manually (otherwise a random number generator; can be used to define multiple seeds)")
+    p.add_argument("--seeds",'-seeds',default=False,nargs='*', type=int,help="define seed(s) manually (otherwise a random number generator; can be used to define multiple seeds)")
     p.add_argument('-nsteps',type=int, default=50000, help="number of KMC steps to make")
     p.add_argument('-fa','--foldername_append',type=str, default="", help="append to foldername")
     p.add_argument('--pot','-p',       required=False, choices=mu.pot_all(), default=mu.get_latest_n2p2_pot())
@@ -70,7 +70,7 @@ def createjob(args):
     a0                  = args.a0
     temp                = args.temp
     nseeds              = args.nseeds
-    seednumber          = args.seednumber
+    seeds          = args.seeds
     nsteps              = args.nsteps
     foldername_append   = args.foldername_append
     pot                 = args.pot
@@ -81,6 +81,7 @@ def createjob(args):
     testfiles           = args.testfiles
     nodes               = args.nodes
     verbose             = args.verbose
+
 
     ### check if ase runner/quippy/lammpps-data formats are known
     ase_formats = mu.ase_get_known_formats_class(verbose=True)
@@ -102,15 +103,14 @@ def createjob(args):
     neval  = ipi_inst*2  # was alwasy better, for ompi and impi
 
     ##### get the seed(s).
-    seeds = random.sample(range(1, 999999), nseeds)
+    if type(seeds) == bool:
+        seeds = random.sample(range(1, 999999), nseeds)
+    print('seeds',seeds)
     if test == True:
         nseeds = 1
         seeds = [1]
-        print()
-    seednumber = list(seednumber)
-    if len(seednumber) is not 0:
-        seeds = seednumber
-        nseeds = len(seednumber)
+        print('seeds',seeds)
+    nseeds = len(seeds)
 
     ##### a few checks
     scripts = mu.scripts()
@@ -319,8 +319,7 @@ def createjob(args):
 
     # show the input variables
     print('--------------------------- check the input --------------------------------')
-    #print('seednumber   ',seednumber,type(seednumber))
-    print('JOBS (nseeds) ',nseeds,'(defined by -nseeds / or -seednumber)')
+    print('JOBS (nseeds) ',nseeds,'(defined by -nseeds / or -seeds)')
     print('seeds         ',seeds)
     print('nsteps        ',nsteps)
     print()

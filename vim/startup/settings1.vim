@@ -12,14 +12,17 @@ set nolist wrap linebreak   " necessary to handle correctly tex files; excluded 
 if !isdirectory($HOME."/.vimviewdir")
     call mkdir($HOME."/.vimviewdir", "p")
 endif
-set viewdir=$HOME/.vimviewdir   " DESTROYS WRAPS ON TEX FILES
 
+" DESTROYS WRAPS ON TEX FILES
+set viewdir=$HOME/.vimviewdir
+"au BufWinLeave * silent! mkview
+"au BufWinEnter * silent! loadview
 " THIS DOES NOT DESTROYS WRAP on yy! so we can savely use it
 "au BufWinLeave *.tex mkview  " DO NOT USE DESTROYS WRAPS
 "au VimEnter *.tex loadview   " DO NOT USE DESTROYS WRAPS
 
-au BufWinLeave * mkview  " DO NOT USE DESTROYS WRAPS
-au VimEnter * loadview   " DO NOT USE DESTROYS WRAPS
+"au BufWinLeave * mkview  " DO NOT USE DESTROYS WRAPS
+"au VimEnter * loadview   " DO NOT USE DESTROYS WRAPS
 
 " ================ Persistent Undo across sessions ================== {{{
 " Starting from vim 7.3 undo can be persisted across sessions

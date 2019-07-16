@@ -1,4 +1,4 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+."""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " get/install all plugins if some/all do not exist
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('$HOME/sources/nvim/autoload/plug.vim'))
@@ -29,6 +29,8 @@ Plug 'easymotion/vim-easymotion'                " <Leader><Leader>{w,b}  :hi sho
 Plug 'henrik/vim-indexed-search'                " results counter
 "Plug 'scrooloose/nerdtree'                      " I dont use it
 Plug 'junegunn/vim-easy-align'                  " use in a line gaip= to allign all next lines on =
+"Plug 'farmergreg/vim-lastplace'                 " saves the exact position where file was opened last time
+Plug 'vim-scripts/restore_view.vim'             " saves exact position and folds
 "Plug 'tpope/vim-commentary'                    " Comments
 "source ~/.vim/startup/vundle_neocomplete.vim   " breaks spell correction
 call plug#end()
@@ -42,7 +44,7 @@ source ~/.vim/startup/keybindings.vim 	" keybindings for: navigation, folding, p
 source ~/.vim/startup/settings1.vim   	" memorize folding, wrapping of lines, persistent undo
 source ~/.vim/startup/settings0.vim   	" general sets, remove trailing whitespaces, currently breaks yanking on mac!
 source ~/.vim/startup/settings2.vim     " syntax! highlighting, templates, look-and-feel, this changes color of comments
-source ~/.vim/startup/settings3.vim   " Folding, Search, Tab-behavior, indentation, mouse
+source ~/.vim/startup/settings3.vim     " Folding, Search, Tab-behavior, indentation, mouse
 set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl t in insert mode
 """inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung,
@@ -50,3 +52,9 @@ source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung,
 set clipboard=unnamed           " to send copied stuff to system clipboard ( needs to set in ierm: keyboard shortcut: "cmd+c" -> Action: "send escape sequence" Esc+: "y"
 " executed in iterm2: defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true to get mouse scrolling
 " hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (red) " I like the actual gray better
+
+" Uncomment the following to have Vim jump to the last position when reopening
+" a file (only line, not exact position) 
+"if has("autocmd")
+"  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+"endif

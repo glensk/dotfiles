@@ -2,8 +2,8 @@
 
 " ================ Foldind (best without plugins) / Remember FOLDS & VIEW DEFINE AFTER SYNTAX ON ! (LOOK AND FEEL) ================== {{{
 " to remember folds (next 2 lines)
-autocmd BufWinLeave *.* mkview
-autocmd BufWinEnter *.* silent loadview
+"autocmd BufWinLeave *.* mkview
+"autocmd BufWinEnter *.* silent loadview   " DONT USE BRINGS ERROR IN NEOVIM
 " suggested by restore_view.vim plugin
 set viewoptions=cursor,folds,slash,unix
 set foldmethod=indent   " foldmethod=marker   
@@ -146,6 +146,9 @@ set nostartofline
 "@if has("mouse")
 "@set mouse=a
 "@endif
+if has("gui_running")
+set mouse=a
+endif
 
 " Use UTF-8 without BOM
 set encoding=utf-8 nobomb

@@ -70,7 +70,7 @@ check: fidis: /home/glensk/kmc_ipi_play/4x4x4_n2p2_v2ag_300K_1Vac_3Mg_3Si__1.563
 
 
 
-self.neigh  # list of nearest neighbors; if 64 atoms in the system (4x4x4sc) this is an array of 12 elements in 64 rows. 
+self.neigh  # && self.neigh2: list of nearest neighbors; if 64 atoms in the system (4x4x4sc) this is an array of 12 elements in 64 rows. 
             # self.neigh is a fixed list and never changes
 
 ridx: [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23

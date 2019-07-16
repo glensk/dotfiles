@@ -60,7 +60,7 @@ def load_cache_file(ecache_file):
         print(ecache_file,"does not exist! ")
         return {}
 
-    print('----------- loading',ecache_file,"ECACHE/QCACHE ~10/80sec for 0.2GB/9GB file")
+    print('>> (7) loading',ecache_file,"ECACHE/QCACHE ~10/80sec for 0.2GB/9GB file")
     f = open(ecache_file, "rb")
     start_time = time.time()
     x = pickle.load(f)
@@ -82,9 +82,7 @@ def load_cache_file(ecache_file):
     #out = lst[:len(lst)]
     #print('loaded FIN[0]:',out)
     #print('x',x)
-    print('----------- loading',ecache_file,'done. In',time.time() - start_time,'seconds, containing',len(x),'structures')
-    #print('----------- loading ----- done',ecache_file)
-    #print()
+    print('>> (7) loading',ecache_file,'done. In',time.time() - start_time,'seconds, containing',len(x),'structures')
     return x
 
 
@@ -177,7 +175,12 @@ class AlKMC(Motion):
         self.dcell = Cell()
         self.dcell.h = self.scell*self.ncell
 
-        print(">> (1) LATTICE PARAM ", self.a0,"(bohrradius) == ",self.a0*0.52917721,"(Angstrom)")
+        print(">> (1) LATTICE PARAM self.a0:", self.a0,"(bohrradius) == ",self.a0*0.52917721,"(Angstrom)")
+        print('>> (1.1) self.scell')
+        print(self.scell)
+        print('>> (1.2) self.ncell',self.ncell)
+        print('>> (1.3) self.dcell.h (later on only self.dcell is used)')
+        print(self.dcell.h)
         # this is the list of lattice sites, in 3D coordinates
         ix,iy,iz = np.meshgrid(range(self.ncell), range(self.ncell), range(self.ncell), indexing='ij')
         self.sites = np.dot(np.asarray([ix.flatten(),iy.flatten(),iz.flatten()]).T, self.scell.T)
@@ -229,7 +232,12 @@ class AlKMC(Motion):
                     nneigh2[i]+=1
                     nneigh2[j]+=1
         print(">> (5) 2NNs (of atom at idx=0):",self.neigh2[0])
-        #print(nneigh2)
+        #print(self.neigh2)
+        for idxi,i in enumerate(self.neigh):
+            for idxj,j in enumerate(i):
+                print(i,idxi,self.sites[idxi],j,self.sites[j],self.sites[j]*0.52917721)
+            sys.exit()
+        sys.exit()
 
         self.idx = idx
 
@@ -350,7 +358,7 @@ class AlKMC(Motion):
         '''
         #all_solute_idx = np.zeros(nsi+self.nmg)
         #print('>> step',step) #,"step 1813 makes problems")
-        allpairs = np.empty(((self.nsi+self.nmg)*12,2))
+        allpairs = np.empty(((self.nsi+self.nmg+self.nvac)*12,2))
         allpairs[:] = np.nan
         running_idx = 0
         for solute in range(self.nsi + self.nmg): # is already the index
@@ -358,10 +366,10 @@ class AlKMC(Motion):
             #all_solute_idx[solute] = sidx
             for sneigh in self.neigh[sidx]:
                 running_idx += 1
+                #print('running_idx',running_idx,self.state[sneigh])
                 if self.state[sneigh] != 'A':
-                    #print(">>++",self.state[sidx],'solute:',solute,'now sidx',sidx,'neighbor:',self.state[sneigh],'sneigh',sneigh,'ridx',self.ridx[sneigh])
+                    #print(">>++",self.state[sidx],'solute:',solute,'(out of',self.nsi+self.nmg,') now sidx',sidx,'neighbor:',self.state[sneigh],'sneigh',sneigh,'ridx',self.ridx[sneigh],'running_idx',running_idx)
                     allpairs[running_idx] = [sidx,sneigh]
-                    #print('running_idx',running_idx,[sidx,sneigh])
 
         allpairs = allpairs[~np.isnan(allpairs[:,0])].astype(int)  # get rid of nans
         #print('allpairs rid of nans')
@@ -409,6 +417,13 @@ class AlKMC(Motion):
 
         # save the stuff to file
         if step is not None:  # only than we want to write
+            if step == 0:
+                f = "KMC_cluster_"
+                for i in [ "sizes", "mg", "si", "vac" ]:
+                    if os.path.isfile(f+i): os.remove(f+i)
+                    print('removed',f+i)
+
+
             # this need to be separated from step==0 for RESTART's
             if not hasattr(self, 'file_KMC_cluster_sizes'):
                 self.file_KMC_cluster_sizes = open("KMC_cluster_sizes","a+")
@@ -416,22 +431,6 @@ class AlKMC(Motion):
                 self.file_KMC_cluster_si = open("KMC_cluster_si","a+")
                 self.file_KMC_cluster_vac = open("KMC_cluster_vac","a+")
 
-            if step == 0:
-                if os.path.isfile(file_KMC_cluster_sizes): os.remove(file_KMC_cluster_sizes)
-                if os.path.isfile(file_KMC_cluster_mg): os.remove(file_KMC_cluster_mg)
-                if os.path.isfile(file_KMC_cluster_si): os.remove(file_KMC_cluster_si)
-                if os.path.isfile(file_KMC_cluster_vac): os.remove(file_KMC_cluster_vac)
-                self.file_KMC_cluster_sizes.write("# column   1     --> step\n")
-                self.file_KMC_cluster_sizes.write("# column   2 ... --> cluster sizes\n")
-
-                self.file_KMC_cluster_mg.write("# column   1     --> step\n")
-                self.file_KMC_cluster_mg.write("# column   2 ... --> amount Mg atoms in cluster \n")
-
-                self.file_KMC_cluster_si.write("# column   1     --> step\n")
-                self.file_KMC_cluster_si.write("# column   2 ... --> amount Si atoms in cluster \n")
-
-                self.file_KMC_cluster_vac.write("# column   1     --> step\n")
-                self.file_KMC_cluster_vac.write("# column   2 ... --> amount Vacancies in cluster \n")
 
             self.file_KMC_cluster_sizes.write("%12.0f "% (step))
             for i in range(len(cluster_sizes)):
@@ -991,7 +990,7 @@ class AlKMC(Motion):
             print('cdf                            :',cdf)
             print('ecurr                          :',ecurr)
             print('nrand2                         :',nrand2)
-        print('>> step:',step,"computed:",not_in_cache,'from cache:',in_cache,"clusters_sizes:",self.cluster_sizes,"events: ", len(levents), " possible reactions. Cache len ", len(self.ecache))
+        print('>> step:',step,"computed:",str(not_in_cache).ljust(3),'from cache:',str(in_cache).ljust(3),"clusters_sizes:",self.cluster_sizes,"events: ", len(levents), " possible reactions. Cache len:",len(self.ecache),"new cache len:",len(self.ecache_n))
         #print('ivac',ivac,'svac = self.idx[ivac]',self.idx[ivac])
 
 

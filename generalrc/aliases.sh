@@ -110,7 +110,7 @@ alias grep='grep --color=auto -d skip'    # skips directories
 alias bc='bc -l'
 #alias cp='cp -a'  # this one did not copy symliks as files but as symlinks -> remove -a
 alias xmgrace='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
-alias x='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+#alias      x='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 alias xll="DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par"
 alias g='gnuplot.py'
 alias gp='gnuplot.py'
