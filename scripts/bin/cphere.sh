@@ -6,7 +6,8 @@ for f in $ff;do
     lk=`ls -l $f | awk '{print $NF}'`
     [ "$lk" = "$f" ] && echo "---> " $lk && continue
     echo $lk $f
-    #unlink 
+    unlink $f
+    mv $lk .
     cd $hier
 done
 

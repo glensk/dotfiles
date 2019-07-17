@@ -15,8 +15,7 @@ _python_thermodynamics="$SCR/python_thermodynamics/"
 _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
 export LAMMPSPATH="$HOME/sources/lammps"
-_bin="$SCR/bin"
-addeverywhere="$_bin:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
+addeverywhere="$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
 
 #####################
 ##### PATH

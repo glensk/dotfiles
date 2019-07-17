@@ -1,1 +1,1 @@
-../i-pi-mc_scripts/kmc_submit_inputdata_to_aiida.sh
+../n2p2/n2p2_submit_inputdata_to_aiida.sh

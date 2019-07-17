@@ -1,1 +1,0 @@
-../qe-aiida/aiida_export_group_to_runner_testscript.py

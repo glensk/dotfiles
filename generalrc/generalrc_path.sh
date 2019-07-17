@@ -14,7 +14,6 @@
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  
                             # (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"  # lets try without homebrew stuff
-b1="/usr/bin"                  # on mac it is there anyhow.
 aliases_="$dotfiles/aliases"  
 local_bin="$HOME/.local/bin"    # needs to be there for lbzip2,units 
                                 # (this should be placed to beginning of PATH! 
@@ -30,11 +29,12 @@ export PATH="$aliases_:$local_bin:$local_mybin:$PATH"  # no, put local_bin and a
 #########################################################################
 if [ "$onhost" = "mac" ];then
     # $PATH (on mac)
-    sed="/usr/local/opt/gnu-sed/libexec/gnubin"
+    #sed="/usr/local/opt/gnu-sed/libexec/gnubin"  # is already in /usr/local/bin/sed
     
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
-    brew="/usr/local/opt/coreutils/libexec/gnubin"   # without brew ls options -- are not working
-    phonopy="$HOME/scripts/phonons/phonopy_at_$host"
+    brew="/usr/local/opt/coreutils/libexec/gnubin"   # gnu ls, wc, cp, ...
+                                                # ls needs options --  from gnubin
+    #phonopy="$HOME/scripts/phonons/phonopy_at_$host" is already in ~/.local/bin
     f2py="$HOME/Library/Python/2.7/bin" # f2py -c --help-fcompiler to check compiler options
     #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     #phonopybin="$phonopy/bin"
@@ -60,7 +60,7 @@ if [ "$onhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
-    export PATH="$f2py:$sed:$brew:$phonopy:$PATH"   # brew necessary to load coreutils
+    export PATH="$f2py:$brew:$PATH"   # brew necessary to load coreutils
     #export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH" # lets try without ... dont know for which progs I used those
     #export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"  # lets try without
 fi

@@ -1,1 +1,1 @@
-../i-pi-mc_scripts/kmc_createFolders.py
+createFolders_kmc.py

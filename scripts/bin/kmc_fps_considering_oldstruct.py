@@ -1,1 +1,1 @@
-../i-pi-mc_scripts/kmc_fps_considering_oldstruct.py
+fps_considering_oldstruct.py

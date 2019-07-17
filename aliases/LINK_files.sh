@@ -70,6 +70,10 @@ dotfiles=$DROPBOXMESCRIPTS/dotfiles
 [ ! -e "$dotfiles" ] && echo "dotfiles folder $dotfiles does not exist" && exit
 echo "dotfiles are in $dotfiles"
 
+[ ! -e "$HOME/.local" ] && mkdir $HOME/.local
+[ ! -e "$HOME/.local/mybin" ] && ln -s $dotfiles/scripts/bin $HOME/.local/mybin
+[ ! -e "$HOME/.local/mybin_sys" ] && ln -s $dotfiles/aliases $HOME/.local/mybin_sys
+
 ####################################################################
 # checking Dropbox folder
 ####################################################################

@@ -32,6 +32,9 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
 export potentials="$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
 export MYVIMRC="$dotfiles/nvim/init.vim"
 export MYVIM="$HOME/sources/nvim/bin/nvim"
+[ ! -e "$HOME/.local/mybin" ] && $dotfiles/aliases/LINK_files.sh
+[ ! -e "$HOME/.local/mybin_sys" ] && $dotfiles/aliases/LINK_files.sh
+
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time setenv diverses (change setenv to export)"
 
 ##################################################################################
