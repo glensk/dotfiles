@@ -4072,6 +4072,7 @@ class ase_calculate_ene( object ):
             return_frame_with_volume_per_atom=False,
             atomrelax=False,
             write_energies=False,
+            write_Fqh_files=False,
             get_to_minvol_first=True):
         ''' the murn will never change the atomsobject
         return_frame_with_volume_per_atom : volume can be specified and he frame scaled
@@ -4150,7 +4151,8 @@ class ase_calculate_ene( object ):
                 print('333 ene',ene) #,ene2)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
-            self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
+            if write_Fqh_files:
+                self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
             if verbose > 2:
                 print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
             if verbose:
@@ -4404,12 +4406,12 @@ def get_evinet(ace):
     print()
     print(atoms.positions)
     print()
-    vinet = ace.get_murn(atoms,verbose=True,return_minimum_volume_frame=True,write_energies=True)
+    vinet = ace.get_murn(atoms,verbose=True,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=True)
 
-    print('vinet',vinet)
-    print('-------------------------- get_fh ----------------------------------------')
-    print('atoms vol',atoms.get_volume())
-    ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
+    #print('vinet',vinet)
+    #print('-------------------------- get_fh ----------------------------------------')
+    #print('atoms vol',atoms.get_volume())
+    #ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
     return
 
 
