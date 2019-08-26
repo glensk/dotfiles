@@ -4,29 +4,11 @@ import os,sys,random,argparse
 import socket
 import numpy as np
 from shutil import copyfile
-#import click
-from myutils import ase_calculate_ene
 
 # from scripts folder
 import convert_fileformats
 import myutils as mu
 
-#def get_click_defaults():
-#    # show default values in click
-#    orig_init = click.core.Option.__init__
-#    def new_init(self, *args, **kwargs):
-#        orig_init(self, *args, **kwargs)
-#        self.show_default = True
-#    click.core.Option.__init__ = new_init
-#    CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'],token_normalize_func=str.lower)
-#    return CONTEXT_SETTINGS
-
-#CONTEXT_SETTINGS = get_click_defaults()
-#@click.command(context_settings=CONTEXT_SETTINGS)
-
-#nput variables
-#(get those with click)
-# setting KMC
 def help(p = None):
     string = ''' helptext '''
     p = argparse.ArgumentParser(description=string,
@@ -42,6 +24,7 @@ def help(p = None):
     p.add_argument('-nsteps',type=int, default=50000, help="number of KMC steps to make")
     p.add_argument('-fa','--foldername_append',type=str, default="", help="append to foldername")
     p.add_argument('--pot','-p',       required=False, choices=mu.pot_all(), default=mu.get_latest_n2p2_pot())
+    p.add_argument('-cubic', '--cubic', action='store_true',default=False,help="Use cubic(==cconventional) fcc cell instead of primitive one")
     p.add_argument('-submit', '--submit', action='store_true')
     p.add_argument('-submitdebug','--submitdebug',action='store_true')
     p.add_argument('-st','--submittime_hours', type=int,default=71,help="slurm time for the job")
@@ -151,8 +134,8 @@ def createjob(args):
     ###############################################
     # make the structure
     ###############################################
-    atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,create_fake_vacancy = True)
-    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0)
+    atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,create_fake_vacancy = True,cubic=args.cubic)
+    atomsc = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,cubic=args.cubic)
 
     # make the atomic structure
     # this was to play ... not necessary now?
@@ -194,7 +177,7 @@ def createjob(args):
         mu.count_amount_1NN_around_vacancies(filename,cutoffa=nndist,cutoffb=a0,skin=0.1,format='ipi')
         sys.exit()
 
-        def mysave(atomsc_fakevac,text=False):
+        def mysave_quippy_xyz(atomsc_fakevac,text=False):
             if type(text) == bool:
                 sys.exit('define text')
             atomsc_fakevac.write('data.quippy.xyz',format='quippy',append=True)
@@ -203,6 +186,7 @@ def createjob(args):
             #atomsc_fakevac.write('data'+text+'.xyz',format="extxyz",append=True)
             return
 
+        # create Al with single vacancy
         atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
         NN_1_indices, NN_2_indices = mu.ase_get_neighborlist_1NN_2NN(atomsc_fakevac,atomnr=0,cutoffa=nndist,cutoffb=a0,skin=0.1)
         #print('from ....',(atomsc_fakevac.positions)[0])
@@ -273,37 +257,37 @@ def createjob(args):
         # fill only 1NN (with one species)
         for i in [ 'Mg', 'Si' ]:
             atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
-            mysave(atomsc_fakevac,text="1NN")
+            mysave_quippy_xyz(atomsc_fakevac,text="1NN")
             for ii in NN_1_indices:
                 atomsc_fakevac[ii].symbol = i
-                mysave(atomsc_fakevac,text="1NN")
+                mysave_quippy_xyz(atomsc_fakevac,text="1NN")
 
         # fill only 2NN (with one species)
         for i in [ 'Mg', 'Si' ]:
             atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
-            mysave(atomsc_fakevac,text="2NN")
+            mysave_quippy_xyz(atomsc_fakevac,text="2NN")
             for ii in NN_2_indices:
                 atomsc_fakevac[ii].symbol = i
-                mysave(atomsc_fakevac,text="2NN")
+                mysave_quippy_xyz(atomsc_fakevac,text="2NN")
 
         # fill 1NN and 2NN (with one species)
         for i in [ 'Mg', 'Si' ]:
             atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
-            mysave(atomsc_fakevac,text="1and2NN")
+            mysave_quippy_xyz(atomsc_fakevac,text="1and2NN")
             for ii in NN_1_2_indices:
                 atomsc_fakevac[ii].symbol = i
-                mysave(atomsc_fakevac,text="1and2NN")
+                mysave_quippy_xyz(atomsc_fakevac,text="1and2NN")
 
         # dif compositions in 1NN shell
         filling = [ 2,4,6,8,10]
         for fi in filling:
             atomsc_fakevac = mu.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=5,nsi=0,nmg=0,nvac=1,a0=a0,cubic=False,create_fake_vacancy = True,normal_ordering="XX_0")
-            mysave(atomsc_fakevac,text="1NN_diffcomp")
+            mysave_quippy_xyz(atomsc_fakevac,text="1NN_diffcomp")
             for idx,ii in enumerate(NN_1_indices):
                 if idx < fi: ch = "Mg"
                 else: ch = "Si"
                 atomsc_fakevac[ii].symbol = ch
-            mysave(atomsc_fakevac,text="1NN_diffcomp")
+            mysave_quippy_xyz(atomsc_fakevac,text="1NN_diffcomp")
 
 
         sys.exit()
@@ -367,6 +351,7 @@ def createjob(args):
         # get data.lmp and data.ipi
         atomsc.write(jobdir+'/data.runnerformat.lmp',format='lammps-runner')
         atomsc_fakevac.write(jobdir+'/data.ipi',format='ipi')
+        atomsc_fakevac.write(jobdir+'/data.extxyz',format='extxyz')
         #atomsc_fakevac.write(jobdir+'/data_fakevac.ipi',format='ipi')
 
         if testfiles == True:
@@ -381,12 +366,11 @@ def createjob(args):
                 units='eV',geopt=False,kmc=True,verbose=verbose)
         address = socket.gethostname()+"_"+os.path.basename(jobdir)
         print('address',address)
-        #mu.ase_calculate_ene.pot_to_ase_lmp_cmd(ace,kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
         ace.pot_get_and_ase_lmp_cmd(kmc=True,temp=temp,nsteps=nsteps,ffsocket=ffsocket,address=address)
         mu.lammps_write_inputfile(folder=jobdir,filename='in.lmp',positions='data.runnerformat.lmp',ace=ace)
 
         # create input-runner.xml (should be made without copying)
-        mu.create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml",nsteps=nsteps,stride=100,seed=seed,a0=a0,ncell=ncell,nsi=nsi,nmg=nmg,nvac=nvac,neval=neval,temp=temp,nodes=nodes,address=address,testrun=test)
+        mu.create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml",nsteps=nsteps,stride=100,seed=seed,a0=a0,ncell=ncell,nsi=nsi,nmg=nmg,nvac=nvac,neval=neval,temp=temp,nodes=nodes,address=address,testrun=test,cubic=args.cubic)
 
         # create submit-ipi-kmc.sh (should be made without copying)
         mu.create_submitskript_ipi_kmc(jobdir+"/submit-ipi-kmc.sh",nodes,ntasks,

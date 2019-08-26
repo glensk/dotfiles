@@ -1,8 +1,36 @@
+simulations.pos_0.xyz   								-> all atoms are relaxed, not mapped into original cell.
+p3 = np.reshape(self.beads.q[0,:],(-1,3))*0.52917721; 	-> all atoms are relaxed, not mapped into original cell.
+
+self.sites[self.idx][:6]*0.52917721  --> also this are the positions saved in simulation.pos_0.xyz (also the ordering is correct, however equilibrium positions)
+
+if started with now cache files: 
+    to get this in ipi code:
+    ------------------------
+    print(self.sites[self.idx][:6]*0.52917721)  --> also this are the positions saved in simulation.pos_0.xyz (also the ordering is correct, however equilibrium positions)
+    ------------------------------------
+    self.sites[svac]*0.52917721 --> this gives the position of the vacancy, however not mapped back into the cell; since from self.sites --> original equililibrium position)
+
+    --------DONT USE dbeads which are not updated when structure has been taken from cache ----------------------------
+    self.dbeads[0].q[0,:])  # --> actual positions (in bohrradius) (mapped back into cell)
+    self.beads.q[0,:])      # --> actual positions (in bohrradius) (not mapped back into cell)
+    
+    p1 = self.dbeads[0].q[0,:][:6*3]*0.52917721
+    print(np.reshape(p1,(-1,3)))
+
+    pos_tmp = self.dbeads[0].q[0,:]
+    pos_tmp.shape = (self.nsites,3)
+    pos_tmp = pos_tmp*0.52917721  
+    print(pos_tmp)   # --> this are the positions saved in simulation.pos_0.xyz (also the ordering is correct) ( is the relaxation so small?? not visible??)
+    --------------or--------------------
+    ------------------------------------
+        
+    for i in range(6):
+        print('ppa i:',i,'self.idx[i]:',self.idx[i],'self.ridx[self.idx[i]]:',self.ridx[self.idx[i]],'pos_tmp[i]',pos_tmp[i])
+
 self.nsites = 64  # for a 4^3 supercell
 self.nvac = 1 # or 2; the number of vacancies in the system
 self.natoms = self.nsites - self.nvac
 
-self.dbeads[0].q[0,:]): --> actual positions (in bohrradius)
 self.sites[self.unique_idx(self.state)].copy()*bohr_to_ang
 
 self.sites:   # (undisturbed lattice sites) ---> those NEVER change during simulation
@@ -33,6 +61,12 @@ nevent[2] = self.qcache[nstr] : positions of the corresponding strucure?
 ivac (constant): is always the index lattice site associated the vacancy (e.g. 63 when 64 sites)
 ivac (constant): if 64 atoms sits & 1vac -> ivac = [63]
 ivac (constant): if 64 atoms sits & 2vac -> ivac = [63 ,62]
+
+self.idx[0]    will always give the current lattice site of the atom    which was in the beginning on lattice site 0
+self.idx[1]    will always give the current lattice site of the atom    which was in the beginning on lattice site 1
+self.idx[last] will always give the current lattice site of the vacancy which was in the beginning on last lattice site
+self.sites[0] will alwasy be [0, 0, 0]
+self.sites[self.idx[0]] will alyas give the current position of the Si atom wich was in the beginning on lattice site 0
 
 svac = self.idx[ivac] # lattice !site! associated with this vacancy; ivac is fixed but self.idx array changes with every swap.
 svac: index of the current vacancy position which changes with every KMC step
@@ -162,3 +196,7 @@ to see how many structures were stored in KMC_{E,Q}CACHE:
     or better:
         grep "^bs" KMC_QCACHE | wc -l
         grep "^bs" KMC_ECACHE | wc -l
+
+
+Anmerkungen during development:
+    - compare structures between ipi and ase: fmax of 0.06 is much closer (and fmax -= 0.09 closest) to what ipi calculats for the energies then fmax = 0.03 wich finds sometimes minima which have mooved very far.

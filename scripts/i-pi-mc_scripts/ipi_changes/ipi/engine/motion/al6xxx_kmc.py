@@ -27,6 +27,7 @@ from ipi.engine.normalmodes import NormalModes
 from ipi.engine.barostats import Barostat
 from ipi.utils.units import Constants
 import ipi.utils.io as io
+from ase.io import write as ase_write
 
 def get_cliques(pairs):
     ''' Build a graph using the pairs '''
@@ -125,14 +126,28 @@ class AlKMC(Motion):
             fixcom: An optional boolean which decides whether the centre of mass
                 motion will be constrained or not. Defaults to False.
         """
+        if False:
+            from mysoap import checksoap
+            checksoap()
 
+
+        def set_up_ase_structure(self)
+            from ase.build import bulk as ase_build_bulk
+            atom = ase_build_bulk("Al",crystalstructure='fcc',a=a0,cubic=False)
+            self.atomsc = atom.repeat(self.ncell)
+            for i in np.arange(self.nsi):  self.atomsc[i].symbol = 'Si'
+            for i in np.arange(self.nsi,self.nmg+self.nsi):
+                self.atomsc[i].symbol = 'Mg'
+            for i in np.arange(1,self.nvac+1)*-1:    self.atomsc[i].symbol = 'V'
+            return
 
         # This will generate a lattice model based on a primitive FCC cell. the lattice is represented in three ways:
-        # 1. as a string in which each lattice site is identified by a letter
-        # 2. by a list of the lattice sites in 3D space, in 1-1 mapping with the letters
-        # 3. by a list of the atoms, whose lattice position is indicated by an integer
+        # 1. as a string in which each lattice site is identified by a letter (self.state), ostr, nstr, nstate
+        # 2. by a list of the lattice sites in 3D space, in 1-1 mapping with the letters (self.sites)
+        # 3. by a list of the atoms, whose lattice position is indicated by an integer (self.idx)
 
-        conventional = False
+        conventional = False  # use conventional cell or primitive cell, default = False
+        self.conventional = False
         if conventional:
             ncell = 2
 
@@ -146,9 +161,10 @@ class AlKMC(Motion):
             self.nsites = 4*self.nsites
         self.natoms = self.nsites - self.nvac
         self.neval = neval
+        self.set_up_ase_structure()
         print('>> (0) ncell ',self.ncell)
-        print('>> (0) nsites',self.nsites)
-        print('>> (0) natoms',self.natoms)
+        print('>> (1) nsites',self.nsites)
+        print('>> (2) natoms',self.natoms)
         self.diffusion_barrier_al = diffusion_barrier_al
         self.diffusion_prefactor_al = diffusion_prefactor_al
         if diffusion_barrier_mg > 0:
@@ -189,11 +205,18 @@ class AlKMC(Motion):
         self.dcell.h = self.scell*self.ncell
 
         print(">> (1) LATTICE PARAM self.a0:", self.a0,"(bohrradius) == ",self.a0*0.52917721,"(Angstrom)")
-        print('>> (1.1) self.scell')
-        print(self.scell)
-        print('>> (1.2) self.ncell',self.ncell)
-        print('>> (1.3) self.dcell.h (later on only self.dcell is used)')
-        print(self.dcell.h)
+        print('>> (1.1) self.scell*0.52917721')
+        print(self.scell*0.52917721)
+        print('>> (1.2) self.ncell')
+        print(self.ncell)
+        print('>> (1.3) self.dcell.h*0.52917721 (later on only self.dcell is used)')
+        print(self.dcell.h*0.52917721)
+        print('>> (1.4) ase cell')
+        self.atomsc.set_cell(self.dcell.h) #*0.52917721)
+        self.atomsc.set_cell(self.dcell.h.T*0.52917721)
+        print(self.atomsc.cell)
+        print('pbc?',self.atomsc.pbc)
+        print(self.atomsc.positions[1])
         # this is the list of lattice sites, in 3D coordinates
         ix,iy,iz = np.meshgrid(range(self.ncell), range(self.ncell), range(self.ncell), indexing='ij')
         #print('ix',ix)
@@ -202,65 +225,50 @@ class AlKMC(Motion):
         self.sites = np.dot(np.asarray([ix.flatten(),iy.flatten(),iz.flatten()]).T, self.scell.T)
         if conventional:
             fcc2 = "/Users/glensk/Thermodynamics/utilities/fcc/EqCoords_direct_fcc_2x2x2sc"
-            self.sites = np.loadtxt(fcc2)
+            self.sites = np.loadtxt(fcc2)*(self.a0*0.52917721*ncell)/0.52917721
             pass
         print(">> (2) self.sites, self.nsites",len(self.sites), self.nsites, "###")
-        print(self.sites)
+        print(self.sites*0.52917721)
+        print()
+        #self.atomsc.set_positions(self.sites) #*0.52917721)
+        self.atomsc.set_positions(self.sites*0.52917721)
+        for idy,i in enumerate(self.atomsc.positions):
+            print('ase atom*0.52917721:',idy,i*0.52917721)
+        #print
+        #print('ase cell:')
+        #print(self.atomsc.cell)
+        #print
+        #print(self.atomsc.positions[1])
+        #print()
         # now we build list of nearest neighbors (fcc-lattice hardcoded!)
-        self.neigh  = np.zeros((self.nsites,12),int)
-        self.neigh2 = np.zeros((self.nsites,6),int)
-        nneigh  = np.zeros(self.nsites,int)
-        nneigh2 = np.zeros(self.nsites,int)
+        #self.neigh  = np.zeros((self.nsites,12),int)
+        #self.neigh2 = np.zeros((self.nsites,6),int)
+        #nneigh  = np.zeros(self.nsites,int)
+        #nneigh2 = np.zeros(self.nsites,int)
         # could be done in a more analytic way but whatever, I'm too lazy
-        a02 = 1.01*0.5*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
-        a022 = 1.01*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
+        #a02  = 1.01*0.5*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
+        #a022 = 1.01*1.0*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
         #print('a02',a02)
 
-        print(">> (3) determines the connectivity of the lattice ...")
-        #print("1NNs",self.neigh[0])
-        #print(nneigh)
-        for i in xrange(self.nsites): # determines the connectivity of the lattice
-            #print('i',i)
-            rij = self.sites.copy().flatten()
-            for j in xrange(self.nsites):
-                rij[3*j:3*j+3] -= self.sites[i]
-            self.dcell.array_pbc(rij)
-            rij.shape = (self.nsites,3)
-            for j in xrange(i):
-                if np.dot(rij[j],rij[j]) < a02: # found nearest neighbor
-                    #print(i,'j',j,np.dot(rij[j],rij[j]))
-                    self.neigh[i,nneigh[i]] = j
-                    self.neigh[j,nneigh[j]] = i
-                    nneigh[i]+=1
-                    nneigh[j]+=1
-        print(">> (4) 1NNs (of atom at idx=0):",self.neigh[0])
-        #print(nneigh)
 
-        print(">> (4) determines the connectivity of the lattice (for 2NN) ...")
-        #print("2NNs",self.neigh2[0])
-        #print(nneigh2)
-        for i in xrange(self.nsites): # determines the connectivity of the lattice
-            rij = self.sites.copy().flatten()
-            for j in xrange(self.nsites):
-                rij[3*j:3*j+3] -= self.sites[i]
-            self.dcell.array_pbc(rij)
-            rij.shape = (self.nsites,3)
-            for j in xrange(i):
-                dist = np.dot(rij[j],rij[j])
-                if dist > a02 and dist < a022: # found second nearest neighbor
-                    self.neigh2[i,nneigh2[i]] = j
-                    self.neigh2[j,nneigh2[j]] = i
-                    nneigh2[i]+=1
-                    nneigh2[j]+=1
-        print(">> (5) 2NNs (of atom at idx=0):",self.neigh2[0])
-        #print(self.neigh2)
-        for idxi,i in enumerate(self.neigh):
-            for idxj,j in enumerate(i):
-                print(i,idxi,self.sites[idxi],j,self.sites[j],self.sites[j]*0.52917721)
-            sys.exit()
-        sys.exit()
+        #print('self.neigh:',self.neigh.shape)
+        #sys.exit()
+        #print(self.neigh)
+        print('cutoff/self.a0',(self.a0/2.)/self.a0)
+        #sys.exit()
+        self.neigh  = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0/2.)
+        print('self.neigh[0]',self.neigh[0])
+        print('self.neigh[1]',self.neigh[1])
+        self.neigh2 = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0 ,mindist=self.a0/2.)
+        print('self.neigh2[0]',self.neigh2[0])
+        print('self.neigh2[1]',self.neigh2[1])
+        self.neighcutoff = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*1.5)
+        print('self.neighcutoff[0]',self.neighcutoff[0])
+        print('self.neighcutoff[1]',self.neighcutoff[1])
 
         self.idx = idx
+
+
 
         # the KMC step is variable and so it cannot be stored as proper timing
         dd(self).dt = depend_value(name="dt", value = 0.0)
@@ -305,6 +313,63 @@ class AlKMC(Motion):
         #self.kmcfile_rates= open("KMC_rates","w+")
         #self.kmcfile_barriers = open("KMC_barriers","w+")
         self.tottime = tottime
+        print('>> (9) __init__ done ...')
+
+    def print_pos_ipi(self,text="",first=None):
+        pos_tmp = self.dbeads[0].q[0,:]
+        pos_tmp.shape = (self.nsites,3)
+        pos_tmp = pos_tmp*0.52917721
+        for idx,i in enumerate(pos_tmp[:first]):
+            print(text,idx,pos_tmp[idx])
+        return
+
+    def ipi_to_ase_structure(self):
+        self.atomsc.set_positions(self.sites) #*0.52917721)
+        return
+
+    def print_pos_ase(self,text="",first=None):
+        for idx,i in enumerate(self.atomsc.positions[:first]):
+            print(text,idx,self.atomsc.positions[idx]*0.52917721)
+        return
+
+    def determing_connectivity_of_the_fcc_lattice(self,cutoff,mindist=0.,verbose=False):
+        ''' cutoff is the cutoff like self.a0 (which would include 2NN in a conventional fcc
+        unit cell
+        '''
+        if verbose:
+            print(">> (3) determines the connectivity of the lattice ...")
+        maxatoms = 999999
+        selfneigh  = np.ones((self.nsites,maxatoms),int)*-1
+        nneigh  = np.zeros(self.nsites,int)
+        cutoff_ = 1.01*(cutoff/self.a0)*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
+        mindist_ = 1.01*(mindist/self.a0)*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
+        #a02     = 1.01*(0.5)*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
+        #print("1NNs",selfneigh[0])
+        #print(nneigh)
+        for i in xrange(self.nsites): # determines the connectivity of the lattice
+            neighline = []
+            #print('i',i)
+            rij = self.sites.copy().flatten()
+            for j in xrange(self.nsites):
+                rij[3*j:3*j+3] -= self.sites[i]
+            self.dcell.array_pbc(rij)
+            rij.shape = (self.nsites,3)
+            for j in xrange(i):
+                #print('i',i,'j',j)
+                dist = np.dot(rij[j],rij[j])
+                #if dist < a02: #cutoff_: # found nearest neighbor
+                if dist > mindist_ and dist < cutoff_: #a02: #cutoff_: # found nearest neighbor
+                    #print(i,'j',j,np.dot(rij[j],rij[j]))
+                    selfneigh[i,nneigh[i]] = j
+                    selfneigh[j,nneigh[j]] = i
+                    nneigh[i]+=1
+                    nneigh[j]+=1
+                    neighline.append(j)
+        if verbose:
+            print(">> (4) 1NNs (of atom at idx=0):",selfneigh[0])
+            print('>> (4) nneigh',nneigh)
+        amount_neighbors_max = np.where(selfneigh[0] > 0)[0].max()+1
+        return selfneigh[:,:amount_neighbors_max]
 
     def barriers_energies_analysis(self,step,ecurr,levents,rates):
         if step is not None:  # only than we want to write
@@ -332,10 +397,14 @@ class AlKMC(Motion):
     def vacancy_neighborhood_analysis(self,step,dt,ecurr,cdf,nrand2):
         if step is not None:  # only than we want to write
             # this need to be separated from step==0 for RESTART's
-            if not hasattr(self, 'file_KMC_vacancyneigh'):
-                self.file_KMC_vacancyneigh = open("KMC_vacancyneigh","a+")
+            #if not hasattr(self, 'file_KMC_vacancyneigh'):
+            #    self.file_KMC_vacancyneigh = open("KMC_vacancyneigh","a+")
 
             if step == 0:
+                if os.path.isfile("KMC_vacancyneigh"): os.remove("KMC_vacancyneigh")
+                if not hasattr(self, 'file_KMC_vacancyneigh'):
+                    self.file_KMC_vacancyneigh = open("KMC_vacancyneigh","a+")
+
                 self.file_KMC_vacancyneigh.write("# column   1     --> step\n")
                 self.file_KMC_vacancyneigh.write("# column   2     --> time{picosecond} : The elapsed simulation time.\n")
                 self.file_KMC_vacancyneigh.write("# column   3     --> time{picosecond} : The time of the current timestep.\n")
@@ -356,7 +425,7 @@ class AlKMC(Motion):
             self.file_KMC_vacancyneigh.write("%12.0f  %12.4e  %12.4e  %12.4e  %18.11e %12.4e  %8.5f "% (step, self.tottime*2.418884326509e-17, dt*2.418884326509e-17, dtr*2.418884326509e-17, ecurr, cdf, nrand2))
             #,NN1.count("A"),NN1.count("M"),NN1.count("S"),NN2.count("A"),NN2.count("M"),NN2.count("S")) )
 
-            # loops over the vacancy
+            # loops over the vacancies
             for ivac in xrange(self.natoms, self.natoms + self.nvac):
                 NN1 = []
                 NN2 = []
@@ -601,6 +670,9 @@ class AlKMC(Motion):
         os.rename(file+'_tmp',file)
         return
 
+
+
+
     def bind(self, ens, beads, nm, cell, bforce, prng):
         """Binds ensemble beads, cell, bforce, and prng to the dynamics.
 
@@ -620,8 +692,7 @@ class AlKMC(Motion):
             prng: The random number generator object which controls random number
                 generation.
         """
-
-
+        print(' >> bind (0) conventional?',self.conventional)
         self.prng = prng
         self.beads = beads
         self.cell = cell
@@ -631,10 +702,15 @@ class AlKMC(Motion):
         # this is the index for the atoms, self.idx[i] indicates the lattice site of atom i.
         # atoms are in the order Si1 Si2 ... Mg1 Mg2 .... Al1 Al2 .... Vac1 Vac2 ...
         f_restart = True
+        print(' >> bind (0) self.idx',self.idx)
         if self.idx is None or len(self.idx)==0:
             f_restart = False
             idx =np.asarray(range(self.ncell**3), int) # initialize random distribution of atoms
+            print('idx (00)',idx)
+            if self.conventional:
+                idx =np.asarray(range(4*self.ncell**3), int) # initialize random distribution of atoms
             self.prng.rng.shuffle(idx)
+            print('idx (01)',idx)
             self.idx = idx
 
 
@@ -644,15 +720,12 @@ class AlKMC(Motion):
         # create a random string
         names = np.asarray(list("S" * self.nsi + "M" * self.nmg + (self.natoms - self.nsi - self.nmg) * "A" +  "V" * self.nvac))
         state = names.copy()
-        #print('names',names)
-        #print('self.idx',self.idx)
-        #print('state (0)',state)
-        #print('state[7] (0)',state[7])
-        #print('state[25] (0)',state[25])
-        #print('state[48] (0)',state[48])
+        print('>> bind (1) state (1)',state,'len(state)',len(state))
+        print('>> bind (1) self.idx (idx is randomly distributed)',self.idx,'len(self.idx)',len(self.idx))
 
         # this maps the string to random sites
         state[self.idx] = names  #backshuffle!
+        print('>> bind (2) state (2)',state)
         #print('state (1)',state)
         state = "".join(state)
         #print('state (1)',state)
@@ -661,20 +734,34 @@ class AlKMC(Motion):
         self.ridx = np.zeros(self.nsites,int)
         self.ridx[self.idx] = range(self.nsites)
 
+
         self.state = np.asarray(list(state))
-        print('>>     ',"".join(self.state))
-        print('>>     ','this is how one can get the positions of the solutes')
-        print('>>     ','self.idx[0]',self.idx[0]  ," self.state[self.idx[0]] == self.state[7] :",self.state[self.idx[0]],'self.ridx[7] ',self.ridx[self.idx[0]])
-        print('>>     ','self.idx[1]',self.idx[1]  ,"self.state[self.idx[1]] == self.state[25]:",self.state[self.idx[1]],'self.ridx[25]',self.ridx[self.idx[1]])
-        print('>>     ','self.idx[2]',self.idx[2]  ,"self.state[self.idx[2]] == self.state[53]:",self.state[self.idx[2]],'self.ridx[53]',self.ridx[self.idx[2]])
-        print('>>     ','self.idx[3]',self.idx[3]  ,"self.state[self.idx[3]] == self.state[40]:",self.state[self.idx[3]],'self.ridx[40]',self.ridx[self.idx[3]])
-        print('>>     ','self.idx[4]',self.idx[4]  ,"self.state[self.idx[4]] == self.state[22]:",self.state[self.idx[4]],'self.ridx[22]',self.ridx[self.idx[4]])
-        print('>>     ','self.idx[5]',self.idx[5]  ,"self.state[self.idx[5]] == self.state[33]:",self.state[self.idx[5]],'self.ridx[33]',self.ridx[self.idx[5]])
+        print('>> bind (3) ',"".join(self.state))
+        i0 = self.idx[0]
+        i1 = self.idx[1]
+        i2 = self.idx[2]
+        i3 = self.idx[3]
+        i4 = self.idx[4]
+        i5 = self.idx[5]
+
+        si0 = str(self.idx[0])
+        si1 = str(self.idx[1])
+        si2 = str(self.idx[2])
+        si3 = str(self.idx[3])
+        si4 = str(self.idx[4])
+        si5 = str(self.idx[5])
+        print('>> bind (4)','this is how one can get the positions of the solutes')
+        print('>> bind (4)','self.idx[0]',i0 ,"self.state[self.idx[0]] == self.state["+si0+"]>",self.state[i0],'self.ridx['+si0+']',self.ridx[i0])
+        print('>> bind (4)','self.idx[1]',i1 ,"self.state[self.idx[1]] == self.state["+si1+"]>",self.state[i1],'self.ridx['+si1+']',self.ridx[i1])
+        print('>> bind (4)','self.idx[2]',i2 ,"self.state[self.idx[2]] == self.state["+si2+"]>",self.state[i2],'self.ridx['+si2+']',self.ridx[i2])
+        print('>> bind (4)','self.idx[3]',i3 ,"self.state[self.idx[3]] == self.state["+si3+"]>",self.state[i3],'self.ridx['+si3+']',self.ridx[i3])
+        print('>> bind (4)','self.idx[4]',i4 ,"self.state[self.idx[4]] == self.state["+si4+"]>",self.state[i4],'self.ridx['+si4+']',self.ridx[i4])
+        print('>> bind (4)','self.idx[5]',i5 ,"self.state[self.idx[5]] == self.state["+si5+"]>",self.state[i5],'self.ridx['+si5+']',self.ridx[i5])
 
 
         self.KMC_cluster_analysis()
 
-        print(">>      CHECKING INITIAL ASSIGNMENTS (this is already randomized)")
+        print(">> bind (5)     CHECKING INITIAL ASSIGNMENTS (this is already randomized)")
         for i in xrange(self.nsites):
             if self.ridx[i]<self.natoms:
                 #if i < 4 or i > self.nsites-4 or self.state[i] in ['M','S']:
@@ -685,6 +772,9 @@ class AlKMC(Motion):
             if self.idx[self.ridx[i]] != i:
                 print("inconsistent site string for atom ",i, " and site ", self.ridx[i])
 
+        print(' >> bind (6) len(self.idx)',len(self.idx))
+        print(' >> bind (6) len(self.sites)',len(self.sites))
+        print(' >> bind (6) len(self.beads.q[0,:])',len(self.beads.q[0,:]))
         if not f_restart:
             self.beads.q[0,:] = self.sites[self.idx].flatten() # also sets global q so we can use it further down
 
@@ -704,6 +794,8 @@ class AlKMC(Motion):
             self.geop[i].bind(self.dens[i], self.dbeads[i], self.dnm[i], self.dcell, self.dforces[i], prng)
         self.feval = np.ones(self.neval,int)
         self._threadlock = threading.Lock()
+        print(' >> bind (7) fin')
+
 
     # threaded geometry optimization
     def geop_thread(self, ieval, nstr, nevent, ostr=None):
@@ -858,29 +950,14 @@ class AlKMC(Motion):
         iu12[i1vac2] = i2vac1
         return iu12
 
-
-    def step(self, step=None):
-        kT = Constants.kb  * self.ens.temp
-        # computes current energy (if not already stored)
-        ostr = "".join(self.state)  # this is a unique id string that charactrizes the current state
-        #print('step',step,ostr)
-        self.tscache[ostr] = {}
-        #print('step',step,self.state)
-        self.KMC_cluster_analysis(step=step)
-
-        if not ostr in self.ecache:
-            self.dbeads[0].q[0,:] = self.sites[self.unique_idx(self.state)].flatten()
-            rv = [0, 0, 0, 0, 0]
-            self.geop_thread(0, ostr, rv)
-            #self.beads.q[0,:] = self.dbeads[0].q[0,:] # also updates current position
-            # self.forces.transfer_forces(self.dforces[0]) # forces have already been computed here...
-
-        ecurr = self.ecache[ostr]
-
+    def enumerate_possible_reaction_events(self,ostr):
+        '''
+        one particular nevent = [svac, sneigh, self.ecache[nstr], self.qcache[nstr], 0.0]
+        '''
         # enumerates possible reactive events (vacancy swaps)
         levents = []
-        in_cache = 0
-        not_in_cache = 0
+        self.in_cache = 0
+        self.not_in_cache = 0
         ethreads = [None] * self.neval
         # loops over the vacancy
         for ivac in xrange(self.natoms, self.natoms + self.nvac):
@@ -898,7 +975,7 @@ class AlKMC(Motion):
                 nstate[svac], nstate[sneigh] = self.state[sneigh], self.state[svac]
                 nstr = "".join(nstate) # this is the string that corresponds to the new state
                 if not nstr in self.ecache:
-                    not_in_cache += 1
+                    self.not_in_cache += 1
                     # new state, must compute!
                     # creates a swapped index
                     nidx = self.idx.copy()
@@ -922,7 +999,7 @@ class AlKMC(Motion):
                     st.start()
                     ethreads[ieval] = st
                 else:
-                    in_cache += 1
+                    self.in_cache += 1
                     #print "Found state ", nstr, " retrieving cached energy ", self.ecache[nstr]
 
                     # fetch energy from previous calculation
@@ -946,6 +1023,141 @@ class AlKMC(Motion):
         for st in ethreads:
             while not st is None and st.isAlive():
                 st.join(2)
+        return levents
+
+    def step(self, step=None):
+        print()
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        print('>>>>>>>>>>>>>>>>>>>>step',step,len(self.sites),len(self.idx))
+        print('>>>>>>>>>>',self.idx)
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        print('>> step X  self.dcell.h*0.52917721 (later on only self.dcell is used)')
+        print(self.dcell.h*0.52917721)
+        print('>> step X ase cell: self.atomsc.cell*0.52917721')
+        print(self.atomsc.cell*0.52917721)
+        print('>> step X pbc?',self.atomsc.pbc)
+        print(self.atomsc.positions[1])
+
+        #print('>> step X positions in angstrom: self.sites[self.idx][:6]*0.52917721')
+        #print(self.sites[self.idx][:6]*0.52917721)
+        #print('>> step X positions in angstrom: self.dbeads[0].q[0,:][:6*3]*0.52917721')
+        p1 = self.dbeads[0].q[0,:][:6*3]
+        p2 = np.reshape(self.dbeads[0].q[0,:],(-1,3))
+
+        print('self.dbeads  sites[self.idx]')
+        for i in np.arange(9):
+            print(p2[i]*0.52917721,(self.sites[self.idx])[i]*0.52917721)
+
+
+        #print('>> step X self.sites[59]')
+        #print(self.sites[59]*0.52917721)
+        #p1 = self.dbeads[0].q[0,:][58*3:60*3+3]*0.52917721
+        #print(np.reshape(p1,(-1,3)))
+
+        #self.ipi_to_ase_structure()
+        #self.atomsc.set_positions(p2) #*0.52917721)
+        #self.atomsc.set_positions(p2*0.52917721)
+        self.atomsc.set_positions(self.sites[self.idx]*0.52917721)
+        np.savetxt("pos_dbeads_"+str(step)  ,p2*0.52917721)
+        np.savetxt("pos_sitesidx_"+str(step),self.sites[self.idx]*0.52917721)
+        print()
+        print('--> self.atomsc.positions[:9]*0.52917721')
+        print(self.atomsc.positions[:9]*0.52917721)
+        print('--> done')
+        print('--> vacancy:',step,self.atomsc.positions[-1]) #*0.52917721)
+        self.print_pos_ipi("XX ipi pos",first=9)
+        self.print_pos_ase("XX ase pos",first=9)
+        #if step == 0:
+        #    os.remove("simulation.pos_0.my.extxyz")
+        ase_write("simulation.pos_0.my.extxyz",self.atomsc,format="extxyz",append=True)
+
+
+        #print(self.sites[self.][:6]*0.52917721)
+        kT = Constants.kb  * self.ens.temp
+        # computes current energy (if not already stored)
+        ostr = "".join(self.state)  # this is a unique id string that charactrizes the current state
+        #print('step',step,ostr)
+        self.tscache[ostr] = {}
+        #print('step',step,self.state)
+        self.KMC_cluster_analysis(step=step)
+        print('>> step X self.state:',self.state)
+        print('>> step X self.idx  :',self.idx)
+        print('>> step X self.unique_idx(self.state)',self.unique_idx(self.state))
+        #print(self.sites[self.unique_idx(self.state)])
+        #print(self.dbeads[0].q[0,:])
+        print('>> setp X self.natoms',self.natoms)
+        print('>> setp X self.nvac',self.nvac)
+
+        for ivac in xrange(self.natoms, self.natoms + self.nvac):
+            svac = self.idx[ivac]
+            print('ivac',ivac,'svac',svac,'vac pos:',self.sites[svac]*0.52917721)
+            print('neighbor positions ov svac: (self.sites[self.neigh[svac]]*0.52917721)')
+            for sneigh in self.neigh[svac]:
+                print('sneigh',sneigh,'position:',self.sites[sneigh]*0.52917721)
+
+        print('>> step X self.idx[ivac]',ivac,self.idx[ivac])
+        svac = self.idx[ivac]
+        print('>> step X svac',svac,'self.state[svac]',self.state[svac])
+        print('>> step X self.sites[svac]',self.sites[svac]*0.52917721)
+        pos_tmp = self.dbeads[0].q[0,:]
+        pos_tmp.shape = (self.nsites,3)
+        pos_tmp = pos_tmp*0.52917721
+        #print('--pos_tmp')
+        #print(pos_tmp[:6])
+        #print('--self.sites[self.idx]')
+        #print(self.sites[self.idx][:6]*0.52917721)
+        #print('---self.sphere around vacancy')
+        svac = self.idx[ivac] # lattice !site! associated with this vacancy;
+        print('>> step X self.neigh[svac] :',svac,self.neigh[svac])
+        print('>> step X ***self.neigh2[svac]:',self.neigh2[svac])
+        NN1_NN2 = np.concatenate((self.neigh[svac], self.neigh2[svac]), axis=None)
+        print('>> step X ***NN1_NN2',NN1_NN2)
+        NN1_NN2_vac = np.concatenate(([svac], NN1_NN2), axis=None)
+        print('>> step X ***NN1_NN2_vac',NN1_NN2_vac)
+        #print(self.sites[NN1_NN2_vac]*0.52917721)
+
+        ### check if the particular surrounding (of every vacancy) is already known
+
+        #print('--self.sites[self.unique_idx]')
+        #uuidx = self.unique_idx(self.state)
+        #print(self.sites[uuidx][:6]*0.52917721)
+        #print(self.sites[self.unique_idx][:6]*0.52917721)
+        #for i in range(6):
+        #    print('ppa i:',i,'self.idx[i]:',self.idx[i],'self.ridx[self.idx[i]]:',self.ridx[self.idx[i]],'pos_tmp[i]',pos_tmp[i],self.sites[self.idx[i]]*0.52917721)
+        #for i in range(6):
+        #    print('ppa i:',i,self.sites[self.idx[i]]*0.52917721)
+        ##for ppa,ppb in enumerate(pos_tmp):
+        ##    print('ppa',ppa,pos_tmp[ppa])
+        #print('-->',len(pos_tmp))
+        ###############
+        for ivac in xrange(self.natoms, self.natoms + self.nvac):
+            NN1 = []
+            NN2 = []
+            svac = self.idx[ivac] # lattice site associated with this vacancy
+            print('>> step X self.neigh[svac] :',self.neigh[svac])
+            print('>> step X self.neigh2[svac]:',self.neigh2[svac])
+            for sneigh in self.neigh2[svac]:
+                NN2.append(self.state[sneigh]) # this is just an "A" or an "S" or an "M"
+            for sneigh in self.neigh[svac]:
+                NN1.append(self.state[sneigh]) # this is just an "A" or an "S" or an "M"
+        ##############
+
+        print(">> step X ostr (1) ",ostr)
+        if not ostr in self.ecache:
+            self.print_pos_ipi(text=">> step X "+str(step)+" in (1)",fist=9)
+            self.dbeads[0].q[0,:] = self.sites[self.unique_idx(self.state)].flatten()
+            self.print_pos_ipi(text=">> step X "+str(step)+" in (2)",first=9)
+            #sys.exit('---000--')
+            rv = [0, 0, 0, 0, 0]
+            self.geop_thread(0, ostr, rv)
+            self.print_pos_ipi(text=">> step X "+str(step)+" out (3) after geop",first=9)
+            #self.beads.q[0,:] = self.dbeads[0].q[0,:] # also updates current position
+            # self.forces.transfer_forces(self.dforces[0]) # forces have already been computed here...
+        print(">> step X ostr (2) ",ostr)
+
+        ecurr = self.ecache[ostr]   # energy of current state
+
+        levents = self.enumerate_possible_reaction_events(ostr)
 
         #print("Computed ", len(levents), " possible reactions. Cache len ", len(self.ecache))
 
@@ -990,11 +1202,14 @@ class AlKMC(Motion):
 
 
         ###################################################################
-        # create new state
+        # create new state,
+        #       isel selects from the 12 possible jumps
+        #       iev is a particular levent
         ###################################################################
         iev = levents[isel] # levents[self.prng.randint(len(levents))]
         svac, sneigh = iev[0], iev[1]
         ivac, ineigh = self.ridx[svac], self.ridx[sneigh]
+        #print('isel',isel,'iev',iev)
 
         # does the swap (never reject, for the moment)
         self.state[svac], self.state[sneigh] = self.state[sneigh], self.state[svac]
@@ -1011,7 +1226,7 @@ class AlKMC(Motion):
             print('cdf                            :',cdf)
             print('ecurr                          :',ecurr)
             print('nrand2                         :',nrand2)
-        print('>> step:',step,"computed:",str(not_in_cache).ljust(3),'from cache:',str(in_cache).ljust(3),"clusters_sizes:",self.cluster_sizes,"events: ", len(levents), " possible reactions. Cache len:",len(self.ecache),"new cache len:",len(self.ecache_n))
+        print('>> step:',step,"computed:",str(self.not_in_cache).ljust(3),'from cache:',str(self.in_cache).ljust(3),"clusters_sizes:",self.cluster_sizes,"events: ", len(levents), " possible reactions. Cache len:",len(self.ecache),"new cache len:",len(self.ecache_n))
         #print('ivac',ivac,'svac = self.idx[ivac]',self.idx[ivac])
 
 

@@ -210,14 +210,15 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
     known_formats = ase_get_known_formats()
 
     if len(frame_or_frames) > 1:
-        my.get_from_prompt_Yy_orexit("Do you want to write "+str(len(frame_or_frames))+" structures to drive? [Yy]")
+        my.get_from_prompt_Yy_orexit("Do you want to write "+str(len(frame_or_frames))+" files/structures to drive? [Yy]")
 
     for idx,frameone in enumerate(frame_or_frames):
 
         if len(frame_or_frames) == 1:
             idx = ""
         #print('idx:',idx,type(idx))
-        outfilename = get_outfilename(args,idx)
+        #outfilename = get_outfilename(args,idx)
+        outfilename = get_outfilename(args)
         if formatout in known_formats:
             print('formatout        :',formatout,"known by default")
             save_ase_object_in_ase_format(frameone,outfilename,formatout)
@@ -229,7 +230,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
 
 
 def save_ase_object_in_ase_format(ase_object,outfilename,formatout):
-    ase.io.write(outfilename,ase_object,format=formatout)
+    ase.io.write(outfilename,ase_object,format=formatout,append=True)
     if formatout == 'espresso-in':
         f = open(outfilename,"r")
         lines = f.readlines()

@@ -30,7 +30,7 @@ branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
 
 git_address["ipi"]          = "https://github.com/glensk/i-pi.git";
 branch['ipi']           = "feat/kmc"
-branch['ipi']           = False # get all the branches and not just feat/kmc
+#branch['ipi']           = False # get all the branches and not just feat/kmc
 
 git_address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
 branch['aiida-alloy']   = False

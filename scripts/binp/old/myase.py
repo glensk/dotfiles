@@ -2,7 +2,8 @@
  # -*- coding: utf-8 -*-
 from __future__ import print_function
 import numpy as np
-import os,sys
+import os,sys,shutil
+from socket import gethostname
 
 ## import ase stuff
 import ase
@@ -21,6 +22,8 @@ from ase.optimize import GPMin
 from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
 from ase import units as aseunits
+
+from myutils import mypot,pot_all
 
 try:
     from ase.calculators.lammpslib import LAMMPSlib
@@ -1903,7 +1906,7 @@ class ase_get_known_formats_class():
             return False
 
     def copy(self):
-        scripts = my.scripts()
+        scripts = os.environ['scripts']
         from_ = scripts+"/runner_scripts/ase_fileformat_for_"
         to = os.path.dirname(ase.io.__file__)+"/"
         for ff in self.my_formats_filenames:

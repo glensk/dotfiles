@@ -71,8 +71,8 @@ dotfiles=$DROPBOXMESCRIPTS/dotfiles
 echo "dotfiles are in $dotfiles"
 
 [ ! -e "$HOME/.local" ] && mkdir $HOME/.local
-[ ! -e "$HOME/.local/mybin" ] && ln -s $dotfiles/scripts/bin $HOME/.local/mybin
-[ ! -e "$HOME/.local/mybin_sys" ] && ln -s $dotfiles/aliases $HOME/.local/mybin_sys
+[ ! -e "$HOME/.local/binp" ] && ln -s $dotfiles/scripts/binp $HOME/.local/binp
+[ ! -e "$HOME/.local/bins" ] && ln -s $dotfiles/bins $HOME/.local/bins
 
 ####################################################################
 # checking Dropbox folder
@@ -190,21 +190,21 @@ file=$HOME/.generalrc
 
 if [ "$host" = "$mylaptop" ];then 
 echo
-echo "# on mylaptop (local) #############################################################"
-    file=$HOME/.gvimrc
-    [ -h "$file" ] && unlink $file 
-    [ -f "$file" ] && echo $file rm && rm -rf $file 
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/vim/startup/gvimrc $file
-    
-    file=$HOME/.ideavimrc
-    [ -h "$file" ] && unlink $file 
-    [ -f "$file" ] && echo $file rm && rm -rf $file 
-    [ ! -e "$file" ] && echo $file link && ln -s $dotfiles/pycharm/ideavimrc $file
-fi
-
-echo
-echo "# vim/bundle #################################################################"
-$dotfiles/vim/vim_install_plugins.py
+#echo "# on mylaptop (local) #############################################################"
+#    #file=$HOME/.gvimrc
+#    #[ -h "$file" ] && unlink $file 
+#    #[ -f "$file" ] && echo $file rm && rm -rf $file 
+#    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/vim/startup/gvimrc $file
+#    
+#    #file=$HOME/.ideavimrc
+#    #[ -h "$file" ] && unlink $file 
+#    #[ -f "$file" ] && echo $file rm && rm -rf $file 
+#    #[ ! -e "$file" ] && echo $file link && ln -s $dotfiles/pycharm/ideavimrc $file
+#fi
+#
+#echo
+#echo "# vim/bundle #################################################################"
+#$dotfiles/vim/vim_install_plugins.py
 
 echo
 echo "# LINK EVERYTHING #################################################################"

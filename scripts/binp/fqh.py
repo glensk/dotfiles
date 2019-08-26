@@ -425,8 +425,9 @@ class qh(object):
             #    pass
             #    #self._datain.append(data)
 
-            # self._temperaturesin
-            if self._temperaturesin == None:
+            #print('self._temperaturesin:', self._temperaturesin)
+            #print('tempin              :', tempin)
+            if self._temperaturesin is None:
                 self._temperaturesin = np.unique(tempin)
             self._temperaturesin = np.intersect1d(self._temperaturesin,tempin)
 
@@ -438,8 +439,9 @@ class qh(object):
         self.temperatures = np.arange(temp_min, temp_max + 1.)
 
         # self.data
-        #print "len:",len(self.files)
-        self.data = np.empty((len(self.files),temp_max + 1))
+        #print("len self.files:",len(self.files))
+        #print("temp_max",temp_max)
+        self.data = np.empty((len(self.files),int(temp_max) + 1))
         #print "dim:",self.data.shape
         self.data[:] = np.NAN
 
@@ -470,7 +472,10 @@ class qh(object):
             #print "datain[:,0,-2]:",self._datain[volindex][:,0][-2]
             #print "datain[:,1,-1]:",self._datain[volindex][:,1][-1]
             #print "datain[:,1,-2]:",self._datain[volindex][:,1][-2]
-            self.data[volindex,[tempin]] = enein
+            #print('enein',enein)
+            #print('tempin',tempin)
+            #print('tempin',tempin.astype(int))
+            self.data[volindex,[tempin.astype(int)]] = enein
 
             # fill T = 0K (make equal to T = 1K or T = 2 K)
             if np.isnan(self.data[volindex,0]):
@@ -1050,6 +1055,8 @@ if __name__ == '__main__':
         qh.import_fqh_files()   #(files="Fqh_fromExact[Ff]reqs_[0-9.]*")
         qh.fit_surface()
 
+    import myutils
+    myutils.create_READMEtxt()
     if args.ov != False or args.ofcca != False:
         qh.helmholtz_free_energy(v = args.ov, fccalat=args.ofcca, save = args.ob)
 

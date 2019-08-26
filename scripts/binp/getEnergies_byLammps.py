@@ -11,12 +11,27 @@ from ase.io import write as ase_write
 from ase import units as aseunits
 
 def help(p = None):
-    string = ''' helptext '''
+    string = '''
+    Examples for using this script:
+    -------------------------------
+    % getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
+    % getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
+    % getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
+    % getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pfm 0.0001 -pc44
+    % getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pc44
+    % getEnergies_byLammps.py -p . -e
+    % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.ipi -fi ipi -ru
+    % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammps-runner
+
+
+    '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
-    p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot())
+    p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
+    p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot(),metavar="",help="potential from $potentials folder e.g. n2p2_v2ag; can also usse . or .. ")
+    p.add_argument('--show_availabel_pots','-sp',action='store_true',help='show available potentials from $potentials')
     p.add_argument('--potpath','-pp',   required=False, type=str, default=False, help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
@@ -24,6 +39,7 @@ def help(p = None):
     p.add_argument('--units','-u',choices = ['eV','meV_pa','eV_pa','hartree','hartree_pa'],default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--geopt','-g'               ,action='store_true',help='make a geometry optimization of the atoms.')
     p.add_argument('--elastic','-e'             ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
+    p.add_argument('--thermo','-thermo'             ,action='store_true',help='calculate free energy surface.')
     p.add_argument('--elastic_all',     '-ea'   ,action='store_true',help='calculate elastic constants for every epoch for Al (externally by lammps).')
     p.add_argument('--elastic_from_ene','-ee'   ,action='store_true',help='calculate elastic constants for Al from energies (inernally by ase).')
     p.add_argument('--ase'    ,'-a'             ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
@@ -37,6 +53,7 @@ def help(p = None):
     p.add_argument('--testkmc_b','-kmcb'        ,action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')
     p.add_argument('--testkmc_l','-kmcl'        ,action='store_true',help='test accuracy of kmc structures for last epoch')
     p.add_argument('--testkmc_a','-kmca'        ,action='store_true',help='test accuracy of kmc structures for all epochs')
+    p.add_argument('--testaccuracy_kmc_approx','-kaka'        ,action='store_true',help='test accuracy of fomation energy in kmc wehn substituting outer shells by Al')
     p.add_argument('--check_testdata','-ctest'  ,action='store_true',help='test accuracy of test.data')
     p.add_argument('--check_traindata','-ctrain',action='store_true',help='test accuracy of train.data')
     p.add_argument('--check_inputdata','-cinput',action='store_true',help='test accuracy of input.data structures used')
@@ -70,14 +87,13 @@ def help(p = None):
 def get_energies(args):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
-    getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
-    getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
-    getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
-    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pfm 0.0001 -pc44
-    getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pc44
-    getEnergies_byLammps.py -p . -e
 
     '''
+    if args.show_availabel_pots:
+        print(my.pot_all())
+        sys.exit()
+
+
     hier = os.path.abspath(os.getcwd())
     allepochs = [False]
     inputfile = infile = args.inputfile
@@ -216,7 +232,9 @@ def get_energies(args):
     os.remove("log.lammps")
 
     ##############################################################
+    ### POTENTIAL
     ### get ace object for the chosen potential (first general)
+    ### just to check if the elements (structure vs pot) are the right ones
     ##############################################################
     if args.test_this_script or args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
         args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
@@ -239,12 +257,23 @@ def get_energies(args):
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(P):")
-
     ##############################################################
     ### again show args
     ##############################################################
     if args.verbose:
         my.print_args(args)
+
+
+    ###################################################################
+    ### test accuracy formation energy when substituting Atoms with Al
+    ###################################################################
+    if args.testaccuracy_kmc_approx:
+        my.analyze_accuracy_of_filling_cell_with_Al(ace)
+        sys.exit("kaka done")
+
+    if args.thermo:
+        my.get_evinet(ace)
+        sys.exit("kaka done")
 
 
     ############
@@ -368,29 +397,39 @@ def get_energies(args):
     if args.inputfile == 'POSCAR': args.format_in = "vasp"
     my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
 
-    #####################################################################################
+    ##################################################################################
     # go over every chosen potential
-    #####################################################################################
+    ##################################################################################
     if args.potepoch != False:
         allepochs = [args.potepoch]
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
     print('@@  allepochs:',allepochs)
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
     for use_epoch in allepochs:
         os.chdir(hier)
         print()
         print()
         print("Epoch:",use_epoch)
 
-        #################################################################################
+        #######################################################################
         ### read in the structures / input.data
-        #################################################################################
+        #######################################################################
         print('getEne (23): reading args.inputfile ...  :',args.inputfile)
         if args.inputfile[-6:] == 'extxyz': args.format_in = "extxyz"
         if args.inputfile[-6:] == 'gz': sys.exit("this need to be unzipped first, otherwise takes too long with ase")
         print('getEne (23): args.format_in ...          :',args.format_in)
         print('getEne (23): args.structures_idx ...     :',args.structures_idx)
         frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
+
+
+        #print('frames',frames
+        #print('rid')
+        #ase_write('lammps-data-out',frames,format='lammps-data')
+        #print('rid2')
+        #frames = ase_read('lammps-data-out',index=args.structures_idx,format='lammps-data') #,style='atomic')  # otherwise it woll not work without style
+        #print('rid3')
+        ##ase_write('lammps-runner-out-',frames,format='lammps-runner')
+        #sys.exit('a;sdjf')
 
         if type(frames) == list: structures_to_calc = len(frames)
         else: structures_to_calc = 1
@@ -446,9 +485,11 @@ def get_energies(args):
         # show positions of first structure?
         show_positions = False
         if show_positions:
-            print(frames[0].positions)
+            for _idx,_ppb in enumerate(frames[0].positions):
+                print(_idx,frames[0].get_chemical_symbols()[_idx],frames[0].positions[_idx])
             print()
             print(frames[0].cell)
+            sys.exit('Exit when show_ositions of first structure')
 
         print()
         print('pot                          :',args.pot)
@@ -548,16 +589,19 @@ def get_energies(args):
         min_at_id = 0
         min_at_orig = 0
         for idx,i in enumerate(range(structures_to_calc)):
-            all_comment = frames[i].info['comment']
-            all_comment_split = all_comment.split()
-            all_comment_split.remove('comment')
-            all_comment_split.remove('uuid:')
-            if len(all_comment_split) == 1:
-                uuid = all_comment_split[0]
-            else:
-                print('776 Exit',all_comment)
-                print('776 Exit',all_comment_split)
-                sys.exit()
+            try:
+                all_comment = frames[i].info['comment']
+                all_comment_split = all_comment.split()
+                all_comment_split.remove('comment')
+                all_comment_split.remove('uuid:')
+                if len(all_comment_split) == 1:
+                    uuid = all_comment_split[0]
+                else:
+                    print('776 Exit',all_comment)
+                    print('776 Exit',all_comment_split)
+                    sys.exit()
+            except:
+                all_comment = ""
             if debug:
                 print('iii',i)
             ana_atoms_ = frames[i].get_number_of_atoms()
@@ -569,7 +613,7 @@ def get_energies(args):
                 DFT_forces = frames[i].get_forces()
                 for_DFTmax_ = np.abs(DFT_forces).max()
             except RuntimeError:
-                for_DFTmax_ = -99999999999999.0
+                for_DFTmax_ = -9999
             if debug:
                 print('kk',for_DFTmax_)
             d = my.ase_get_chemical_symbols_to_conz(frames[i])
@@ -629,7 +673,10 @@ def get_energies(args):
                 ana_vol[idx] = frames[i].get_volume()
                 ana_vol_pa[idx] = frames[i].get_volume()/frames[i].get_number_of_atoms()
                 VOL_norm = n["Al"]*16.5+n["Mg"]*22.85+n["Si"]*20.5
+                print('ana_vol',ana_vol[idx])
+                print('VOL_norm',VOL_norm)
                 VOL_diff = ana_vol[idx] - VOL_norm
+                print('VOL_diff',VOL_diff)
                 ana_VOL_diff_norm[idx] = VOL_diff/VOL_norm
                 #print('ana',ana_atoms_)
                 #print('ka',frames[i].get_all_distances(mic=True))
@@ -696,7 +743,16 @@ def get_energies(args):
                         print("BBB before: ene_pot_ase")
                         #kk = atoms_tmp.get_potential_energy()
                         #print('kk',kk)
+                    # check if elements in the structrues are know by the pot
+                    if args.remove_unknown_elements_from_structures:
+                        my.ase_remove_unknown_species_from_structure(atoms_tmp,ace)
+                    my.ase_check_chemical_symbols_agree(atoms_tmp,ace)
+                    #print('--3')
+                    #for idy,cs in enumerate(atoms_tmp.get_chemical_symbols()):
+                    #    print('idy',idy,atoms_tmp.get_chemical_symbols()[idy])
+                    #print('--4')
                     ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=debug)
+                    #print('ae',ene_pot_ase[idx])
                     if args.write_forces or args.write_forcesx:
                         if args.write_forcesx:
                             np.savetxt("forcesx.dat",atoms_tmp.get_forces()[:,0])
@@ -852,16 +908,17 @@ def get_energies(args):
                 print('nat',nat,'(repeat '+str(repeat)+') -> nat',nat*(3**repeat),"min_at",min_at,"min_at_orig",min_at_orig,'(min id '+str(min_at_id)+") max_at",max_at,"max_at_orig",max_at_orig,'(max id'+str(max_at_id)+")")
 
             ene_pot_wo_atomic[idx] = ene_pot[idx] - ene_DFT_atomic[idx]
-            #print('ene_potxx',ene_pot)
-            #print('ene_DFT_atomicxx',ene_DFT_atomic)
-            #print('ene_pot_wo_atomicxx',ene_pot_wo_atomic)
+            if False: #args.verbose > 1:
+                print('9q3nav ene_potxx',ene_pot)
+                print('9q3nav ene_DFT_atomicxx',ene_DFT_atomic)
+                print('9q3nav ene_pot_wo_atomicxx',ene_pot_wo_atomic)
 
             ene_diff[idx] = ene_DFT[idx]-ene_pot[idx]
             ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
             ene_mean[idx] = ene_diff[:idx+1].mean()
 
-            NN_forces = frames[i].get_forces()
-            forces_diff = DFT_forces - NN_forces
+            #NN_forces = frames[i].get_forces()
+            #forces_diff = DFT_forces - NN_forces
             #print('nnn88')
             #print(DFT_forces[:5])
             #print()
@@ -1217,6 +1274,8 @@ def get_dilute_formation_energy(text="dilute formation energy supercell",sc="all
     #    print('dilute formation energy supercell (vol def = relaxed)',sc,dilute_formation, dilute_formation - e_si_diamond_pa)
     #return frame_bulk, frame_al_xx
     return
+
+
 
 def get_al_fcc_equilibrium(ace):
     filename_frame = ace.savefolder+"frame_al_fcc.runner"

@@ -217,7 +217,7 @@ for c in subfolder:    # from the ones in the que
         inputnn     =i.replace(basename, 'input.nn')
         inputdata   =i.replace(basename, 'input.data')
 
-        input_structures = my.inputdata_get_nuber_of_structures(inputdata)
+        input_structures = my.inputdata_get_nuber_of_structures(inputnn)
         kmcstdfile  =i.replace(basename, 'kmc57/ene_std.npy')
         elastic     =i.replace(basename, 'elastic.dat')
         elastic_ene =i.replace(basename, 'elastic_ene.dat')

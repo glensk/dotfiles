@@ -1,4 +1,4 @@
-."""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " get/install all plugins if some/all do not exist
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('$HOME/sources/nvim/autoload/plug.vim'))
@@ -31,13 +31,37 @@ Plug 'henrik/vim-indexed-search'                " results counter
 Plug 'junegunn/vim-easy-align'                  " use in a line gaip= to allign all next lines on =
 "Plug 'farmergreg/vim-lastplace'                 " saves the exact position where file was opened last time
 Plug 'vim-scripts/restore_view.vim'             " saves exact position and folds
+Plug 'rickhowe/diffchar.vim'                    " show diffs (vim -d) for words and not for lines
 "Plug 'tpope/vim-commentary'                    " Comments
 "source ~/.vim/startup/vundle_neocomplete.vim   " breaks spell correction
 call plug#end()
 
 """"""""""""""""""""""""""""""""""""""""""
+" update plug every week
+""""""""""""""""""""""""""""""""""""""""""
+function! OnVimEnter() abort
+  " Run PlugUpdate every week automatically when entering Vim.
+  if exists('g:plug_home')
+    let l:filename = printf('%s/.vim_plug_update', g:plug_home)
+    if filereadable(l:filename) == 0
+      call writefile([], l:filename)
+    endif
+
+    let l:this_week = strftime('%Y_%V')
+    let l:contents = readfile(l:filename)
+    if index(l:contents, l:this_week) < 0
+      call execute('PlugUpdate')
+      call writefile([l:this_week], l:filename, 'a')
+    endif
+  endif
+endfunction
+autocmd VimEnter * call OnVimEnter()
+
+""""""""""""""""""""""""""""""""""""""""""
 " settings      
 """"""""""""""""""""""""""""""""""""""""""
+"let g:DiffUnit="Word1" " for diffchar.Vim
+"let g:DiffUnit="Char" " for diffchar.Vim
 source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now tab)
 source ~/.vim/startup/settings_plugins.vim   	" settings related to plugins
 source ~/.vim/startup/keybindings.vim 	" keybindings for: navigation, folding, paste
@@ -49,7 +73,12 @@ set thesaurus+=$HOME/scripts/dotfiles/vim/thesaurus/mthesaur.txt  "Ctrl x + Ctrl
 """inoremap <expr><Tab>  pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung,
 
-set clipboard=unnamed           " to send copied stuff to system clipboard ( needs to set in ierm: keyboard shortcut: "cmd+c" -> Action: "send escape sequence" Esc+: "y"
+" as it currently is (on mac) is best since can copy stuff in vim without the
+" cursor changing (have removed the "Send escape sequence" Esc+: "y" in iterm key
+" settings. set clipboard=unnamed is enabled. Scrolling works fine with the iterm
+" command used: defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true
+" copy works (on mac) just by selecting the text (so cmd+c) can be pressed as well.
+set clipboard=unnamed           " to send copied stuff to system clipboard ( needs to set in ierm: keyboard shortcut: "cmd+c" -> Action: "Send escape sequence" Esc+: "y"
 " executed in iterm2: defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true to get mouse scrolling
 " hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (red) " I like the actual gray better
 

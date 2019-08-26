@@ -7,6 +7,7 @@ import glob
 #import pylab
 import argparse   # vasp 2.6.6 would be too old
 import filecmp
+import myutils
 
 np.set_printoptions(suppress=True)   # display arrays withou 000001
 np.set_printoptions(precision=6)    # print only 6 digist after .
@@ -456,6 +457,7 @@ class eos(object):
             else:
                 datax = self.data[:,0]
                 datay = self.data[:,1]
+
         if type(datax) != bool and type(datay) != bool:
             data = np.transpose([datax,datay])
             self.import_energy_vs_volume_data(data=data)
@@ -465,8 +467,8 @@ class eos(object):
         self.datax = datax
         self.datay = datay
         if self._verbose:
-            print("datax:",datax)
-            print("datay:",datay)
+            print("datax (in Angstrom^3/atom):",datax)
+            print("datay (in meV/atom)       :",datay)
 
         if len(datax) is not len(datay):
             sys.exit("volumes_per_atom have different lenght than energies_per_atom")
@@ -617,6 +619,8 @@ class eos(object):
             print("add:",add)
 
         # get filename if different fome (energy)_b_32(.dat)
+        print("os.path.basename(self.inputfile)[:6]",os.path.basename(self.inputfile)[:6])
+        add_check = False
         if os.path.basename(self.inputfile)[:6] == "energy":
             if os.path.basename(self.inputfile)[-4:] == ".dat":
                 add_check = os.path.basename(self.inputfile)[6:-4]
@@ -772,3 +776,4 @@ if __name__ == '__main__':
         _printgreen("DONE!")
         print("")
     #eos.plot()
+    myutils.create_READMEtxt()

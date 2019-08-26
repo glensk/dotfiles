@@ -14,13 +14,12 @@
 svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  
                             # (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"  # lets try without homebrew stuff
-aliases_="$dotfiles/aliases"  
 local_bin="$HOME/.local/bin"    # needs to be there for lbzip2,units 
                                 # (this should be placed to beginning of PATH! 
                                 # (to overload defaults)
-local_mybin="$HOME/.local/mybin"   
+bin_systm="$HOME/.local/bins"  
 
-export PATH="$aliases_:$local_bin:$local_mybin:$PATH"  # no, put local_bin and aliases at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
+export PATH="$bin_systm:$local_bin:$PATH"  # no, put local_bin and aliases at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 

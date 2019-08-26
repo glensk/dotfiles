@@ -112,6 +112,7 @@ alias bc='bc -l'
 alias xmgrace='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 #alias      x='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 alias xll="DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par"
+alias xx="xmgrace"
 alias g='gnuplot.py'
 alias gp='gnuplot.py'
 alias untargz='tar -xvf'
@@ -143,6 +144,8 @@ alias pingmit='ping 18.62.0.96'				# this can be directly opened without DNS in 
 alias memHogsTop='top -l 1 -o rsize | head -20'
 alias memHogsPs='ps wwaxm -o pid,stat,vsize,rss,time,command | head -10'
 alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
+
+alias ipi_clean='rm \#simulation.*'
 
 
 ##############################
