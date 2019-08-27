@@ -11,22 +11,15 @@
 #########################################################################
 #anacondaold="/usr/local/bin"   # use this to install macvim @mac otherwise interference with homebrew python
 #anaconda="$HOME/anaconda/bin"  # don't load anaconda on cmmc since the module is available
-svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  (ifort = /opt/intel/bin/ifort)  # on mac is there anyhow
+svnctags="/usr/local/bin"   # svn / ctags / ifort / icc  
+                            # (ifort = /opt/intel/bin/ifort)
 homebrew="/usr/local/sbin"  # lets try without homebrew stuff
-b1="/usr/bin"                  # on mac it is there anyhow.
+local_bin="$HOME/.local/bin"    # needs to be there for lbzip2,units 
+                                # (this should be placed to beginning of PATH! 
+                                # (to overload defaults)
+bin_systm="$HOME/.local/bins"  
 
-# stuff which should always be added
-#bin0="$dotfiles/bin"       # Dropbox binaries  -> now in aliases
-#bin1="$dotfiles/sources_bin"  # folder does not exist
-#bin2="$dotfiles/bin/stefan"
-#bin3="$dotfiles/bin/phonon_lifetimes" # not necessary
-bin4="$dotfiles/aliases"  
-bin5="$HOME/.local/bin"      # needs to be there for lbzip2,units (this should be placed to beginning of PATH! (to overload defaults)
-
-#export PATH="$PATH:$svnctags:$homebrew:$b1:$bin0:$bin1:$bin2:$bin3:$bin4:$bin5:$bin6"
-#export PATH="$PATH:$svnctags:$homebrew:$b1:$bin4:$bin5"
-#export PATH="$PATH:$bin4:$bin5"  # no, put bin5 and bin4 at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
-export PATH="$bin4:$bin5:$PATH"  # no, put bin5 and bin4 at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
+export PATH="$bin_systm:$local_bin:$PATH"  # no, put local_bin and aliases at the beginning of path to overload defaults (on mac I want to use my units instead of systemwide)
 # ifrot / icc / mpif90 / mpicc / (mpirun) are installed both in /usr/local/bin and ~/local/bin !
 
 
@@ -35,15 +28,15 @@ export PATH="$bin4:$bin5:$PATH"  # no, put bin5 and bin4 at the beginning of pat
 #########################################################################
 if [ "$onhost" = "mac" ];then
     # $PATH (on mac)
-    sed="/usr/local/opt/gnu-sed/libexec/gnubin"
+    #sed="/usr/local/opt/gnu-sed/libexec/gnubin"  # is already in /usr/local/bin/sed
     
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
-    brew="/usr/local/opt/coreutils/libexec/gnubin"   # without brew ls options -- are not working
-    phonopy="$HOME/scripts/phonons/phonopy_at_$host"
+    brew="/usr/local/opt/coreutils/libexec/gnubin"   # gnu ls, wc, cp, ...
+                                                # ls needs options --  from gnubin
+    #phonopy="$HOME/scripts/phonons/phonopy_at_$host" is already in ~/.local/bin
+    f2py="$HOME/Library/Python/2.7/bin" # f2py -c --help-fcompiler to check compiler options
     #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     #phonopybin="$phonopy/bin"
-    #phonopybin="$HOME/.local/bin"
-    #phonopybin2="$HOME/.miniconda2/bin"
     #phonopybin2=""
     #vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
@@ -66,7 +59,7 @@ if [ "$onhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
-    export PATH="$sed:$brew:$phonopy:$PATH"   # brew necessary to load coreutils
+    export PATH="$f2py:$brew:$PATH"   # brew necessary to load coreutils
     #export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH" # lets try without ... dont know for which progs I used those
     #export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"  # lets try without
 fi

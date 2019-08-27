@@ -14,6 +14,7 @@
 
 #echo "in .bash_profile, `hostname | grep -o fidis`"
 
+echo '... .bash_profile start'
 case "$-" in
   # only for interactive shell login on fidis or daint or cosmopc --> load zsh
   # for interactive shell login on fidis or daint --> load zsh
@@ -23,8 +24,13 @@ case "$-" in
   # echo hostname `hostname`
   alias e='exit'
   host=`hostname`
+  #echo 1
+  #echo 1 ZSH:$ZSH_VERSION:
+  #echo 1 myh:$myhost:
   [ "`echo $host | grep -o "^daint"`" = "daint" ] && unset FPATH && exec /bin/zsh -l
-  [ "`echo $host`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+  #echo 2
+  #echo 2 ZSH:$ZSH_VERSION:
+  [ "`echo $host | grep -o "^fidis"`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
   [ "`echo $host`" = "helvetios" ] && /bin/zsh -l #exec /bin/bash
   [ "`echo $host | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
    ;;

@@ -1,4 +1,6 @@
+
 if [[ $- == *i* ]];then  # only in interactive shell
+echo "... bash start"
 
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
@@ -61,4 +63,5 @@ source ~/.generalrc
 
 # added by Miniconda3 installer
 #export PATH="/users/aglensk/miniconda3/bin:$PATH"
+echo "... bash loaded"
 fi

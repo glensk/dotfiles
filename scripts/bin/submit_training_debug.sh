@@ -1,1 +1,0 @@
-../n2p2/submit_training_debug.sh

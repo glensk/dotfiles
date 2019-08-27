@@ -8,7 +8,6 @@ DISABLE_UPDATE_PROMPT=true  # autoupdate zsh without asking
 # COMPLETION_WAITING_DOTS="true"  # display red dots whilst waiting for completion.
 DISABLE_UNTRACKED_FILES_DIRTY="true"  # disable marking untracked files under VCS as dirty. This makes repository status check for large repositories much, much faster.
 
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -128,7 +127,13 @@ setopt ALWAYS_TO_END            # Move to the end on complete completion
 ############## zsh-syntax-highlighting ###################################### 0.02s
 ############## zsh-history-substring-search ################################# 0.01s
 #if [ ${ZSH_VERSION//\./} -ge 430 ]; then   ## takes 0.02 sec to load .... too long!
-#source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $dotfiles/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+#export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'   # https://coderwall.com/p/pb1uzq/z-shell-colors or 
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=239'   # https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
+#source $dotfiles/zsh/powerlevel10k/powerlevel10k.zsh-theme
+#POWERLEVEL10K_MODE="awesome-patched"
+
 #fi
 #[[ $(zsh --version | awk '{print $2}') > 4.3.17 ]] && source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # make commands colorfull (works with zsh > 4.3.17 )

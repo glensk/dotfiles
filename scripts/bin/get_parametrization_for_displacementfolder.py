@@ -1,1 +1,0 @@
-../python_thermodynamics/get_parametrization_for_displacementfolder.py

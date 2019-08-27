@@ -1,7 +1,7 @@
 if [[ $- == *i* ]];then  # only in interactive shell
-#echo "load zsh"
+echo '... zsh start'
+
 gettime="false"
-#gettime="true"
 loadzsh="true"          # shuts all zst settings on/off
 
 if [ "$loadzsh" = "true" ];then
@@ -51,9 +51,9 @@ autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
 #################################################################
 # read in general variables on{mac,cmmc,cmmd},printloadstat
 #################################################################
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "PHYTHONPATH : $gett https://carlosbecker.com/posts/speeding-up-zsh/"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.zshrc: $gett before generalrc " # (https://carlosbecker.com/posts/speeding-up-zsh/)"
 source ~/.generalrc
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.generalrc: $gett generalrc" # (https://carlosbecker.com/posts/speeding-up-zsh/)"
+[ "$gettime" = "true" ] && gett=`gt $gett` && echo "~/.zshrc: $gett after  generalrc" # (https://carlosbecker.com/posts/speeding-up-zsh/)"
 
 #source $MODULESHOME/init/bash    # necessary for zsh or other init shells
 #source $MODULESHOME/init/bash    # necessary for zsh or other init shells
@@ -68,4 +68,5 @@ source ~/.generalrc
 # 5) 4+ z                         : 0.08s (z        ) = 0.012s (from bashrc)
 autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) repeat here to get completion for notes without restarting shell again
 fi
+echo '... zsh loaded'
 fi

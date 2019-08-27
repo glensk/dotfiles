@@ -23,8 +23,10 @@ syntax enable
 
 " works for solarized dark perfectly
 set background=dark
-let g:solarized_termtrans = 1 " This gets rid of the grey background
+"let g:solarized_termtrans = 1 " This gets rid of the grey background
 colorscheme solarized
+"let g:solarized_contrast="high"
+"let g:solarized_visibility="high"
 
 
 " }}}

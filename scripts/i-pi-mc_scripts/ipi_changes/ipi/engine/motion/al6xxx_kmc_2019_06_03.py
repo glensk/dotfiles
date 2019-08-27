@@ -55,6 +55,39 @@ def get_cliques(pairs):
     return groups
 
 
+def load_cache_file(ecache_file):
+    if not os.path.isfile(ecache_file):
+        print(ecache_file,"does not exist! ")
+        return {}
+
+    print('----------- loading',ecache_file,"ECACHE/QCACHE ~10/80sec for 0.2GB/9GB file")
+    f = open(ecache_file, "rb")
+    start_time = time.time()
+    x = pickle.load(f)
+    #z = x.copy()
+    #z = x
+    #print('loaded IN :',x)
+    #lst = []
+    while 1:
+        try:
+            y = pickle.load(f)
+            x.update(y)
+            #lst.append(y)
+            #print('loaded in :',y)
+        except EOFError:
+            #f.close()
+            break
+    #print('loaded len   :',len(lst),lst)
+    #print('loaded FIN[:]:',lst[:])
+    #out = lst[:len(lst)]
+    #print('loaded FIN[0]:',out)
+    #print('x',x)
+    print('----------- loading',ecache_file,'done. In',time.time() - start_time,'seconds, containing',len(x),'structures')
+    #print('----------- loading ----- done',ecache_file)
+    #print()
+    return x
+
+
 class AlKMC(Motion):
     """Stepper for a KMC for Al-6xxx alloys.
 
@@ -222,13 +255,15 @@ class AlKMC(Motion):
         self.ecache_file = ecache_file
         self.qcache_file = qcache_file
 
-        self.try_load_ECACHE_QCACHE_files()
+        #self.try_load_ECACHE_QCACHE_files()
+        self.ecache = load_cache_file(ecache_file)
+        self.qcache = load_cache_file(qcache_file)
+        self.ecache_n = {}
+        self.qcache_n = {}
+
         self.ncache = len(self.ecache)
         self.ncache_stored = self.ncache
 
-        #if len(self.ecache) < 100:
-        #    print('>>      ecache')
-        #    print('>>     ',self.ecache)
 
         # no TS evaluation implemented yet
         self.tscache = {}
@@ -446,10 +481,11 @@ class AlKMC(Motion):
             try:
                 print()
                 print('>>     pickle.load(ecache_file) [ca 10 sec for 200MB file]',self.ecache_file)
-                start_time = time.time()
-                ff = open(self.ecache_file, "rb")
-                self.ecache = pickle.load(ff)
-                ff.close()
+                self.ecache = load_cache_file(ecache_file)
+                #start_time = time.time()
+                #ff = open(self.ecache_file, "rb")
+                #self.ecache = pickle.load(ff)
+                #ff.close()
                 print('>>     pickle.load(ecache_file) done.')
                 print(">>     in --- %s seconds ---" % (time.time() - start_time))
                 print(">>     Loaded %d cached energies" % (len(self.ecache)))
@@ -672,6 +708,8 @@ class AlKMC(Motion):
         with self._threadlock:
             self.ecache[nstr] = newpot
             self.qcache[nstr] = newq
+            self.ecache_n[nstr] = newpot
+            self.qcache_n[nstr] = newq
             #self.newcache[nstr] = [newpot,newq]
             self.ncache += 1
             nevent[2] = self.ecache[nstr]

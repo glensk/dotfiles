@@ -1,0 +1,10 @@
+#!/bin/sh
+[ "$1" = "" ] && echo "please provide valid path to kmc job" && exit
+
+[ ! -e "$1" ] && echo "$1 does not exist" && exit
+
+cp $1/in.* .
+cp $1/input* .
+cp $1/data* .
+cp $1/submit-ipi-kmc.sh .
+

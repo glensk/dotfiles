@@ -31,6 +31,7 @@ alias c='j'    # for autojump
 
 alias aliases='cd $dotfiles/aliases'
 alias dl='cd $HOME/Downloads'
+alias down='cd $HOME/Downloads'
 alias scripts='cd $HOME/Dropbox/Albert/scripts'
 alias dot='cd $dotfiles'
 alias pot='cd $dotfiles/scripts/potentials'
@@ -47,12 +48,16 @@ alias prl='cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.02_PRL_origin_a
 alias diss='cd $HOME/Dropbox/Albert/proj/0000_paper_antraege/2015.12_Dissertation'
 alias ptmp='cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes'
 
+
 alias vimrc='vi $HOME/.vimrc'
+alias nvimrc='vi $dotfiles/nvim/init.vim'
 alias vip='vi $HOME/.ipython/profile_default/ipython_config.py'
 alias virc='vi $HOME/.`echo $currentshell`rc'
 #alias virca='vi $dotfiles/generalrc/generalrc_alias_.sh'
 alias virca='vi $dotfiles/generalrc/aliases.sh'
 alias vircg='vi $dotfiles/generalrc/generalrc_.sh'
+alias vim='$MYVIM'
+alias vi='$MYVIM'
 
 alias -- -='cd -'
 alias cd..='cd ..'
@@ -105,8 +110,9 @@ alias grep='grep --color=auto -d skip'    # skips directories
 alias bc='bc -l'
 #alias cp='cp -a'  # this one did not copy symliks as files but as symlinks -> remove -a
 alias xmgrace='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
-alias x='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
+#alias      x='DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param ~/.xmgracerc'
 alias xll="DISPLAY=:0.0 xmgrace -maxpath 1000000 -geom 1100x860 -nosigcatch -param $dotfiles/xmgrace/tpl_log_log.par"
+alias xx="xmgrace"
 alias g='gnuplot.py'
 alias gp='gnuplot.py'
 alias untargz='tar -xvf'
@@ -138,6 +144,8 @@ alias pingmit='ping 18.62.0.96'				# this can be directly opened without DNS in 
 alias memHogsTop='top -l 1 -o rsize | head -20'
 alias memHogsPs='ps wwaxm -o pid,stat,vsize,rss,time,command | head -10'
 alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
+
+alias ipi_clean='rm \#simulation.*'
 
 
 ##############################

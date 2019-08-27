@@ -1,3 +1,4 @@
+echo '... tcsh start'
 #################################################################
 # declare/initialize PYTHONPATH; has to be before first PYTHONPATH variable
 #################################################################
@@ -47,3 +48,4 @@ gplot () {
     local plotexpr=$(printf '%b' "plot ${fileexpr} $*")
     gnuplot -persist -raise -e "$plotexpr"
 }
+echo '... tcsh loaded'

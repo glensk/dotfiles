@@ -1,1 +1,0 @@
-../i-pi-mc_scripts/kmc_submit_inputdata_to_aiida.sh

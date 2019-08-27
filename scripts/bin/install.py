@@ -1,1 +1,0 @@
-../i-pi-mc_scripts/install_git.py

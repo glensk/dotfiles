@@ -8,28 +8,15 @@ else
     #echo bash
     SCR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 fi
-
-# define the folders which are given in this git repo 
-#_ipi="$SCR/i-pi-mc_scripts"
-#_runner="$SCR/runner_scripts"
-#_n2p2="$SCR/n2p2"
-#_aiida="$HOME/sources/aiida-alloy/"
-#_aiida_o="$SCR/qe-aiida/"
-#_aiida_s="$SCR/qe-aiida/aiida_solutejobs_scripts/"
-#_aiida_a="$SCR/qe-aiida/aiida_analyze/"
-#_aiida_b="$SCR/qe-aiida/aiida_submitskripts/"
-#_lammps_scripts="$SCR/lammps_scripts"
+#echo SCR:$SCR
+#myhost=`$dotfiles/aliases/myhost.py`  # takes too long!
 _python_thermodynamics="$SCR/python_thermodynamics/"
 #_ase_lammps="$HOME/sources/lammps_source_cosmo" # not necessary when added the _lammps_source/src to $LD_LIBRARY_PATH
 _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
 export LAMMPSPATH="$HOME/sources/lammps"
-_bin="$SCR/bin"
-_bin2="$SCR/../aliases"
-#addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ase_lammps/python:$_ipi_source"
-#addeverywhere="$_python_thermodynamics:$_ipi:$_n2p2:$_runner:$_aiida:$_aiida_o:$_aiida_s:$_aiida_a:$_aiida_b:$_lammps_exec:$_lammps_scripts:$_ipi_source"
-#addeverywhere="$_bin:$_aiida:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
-addeverywhere="$_bin:$_bin2:$_ipi_source"  # add aiida only in aiases, since I have changed my own stuff.
+bin_physics="$HOME/.local/binp"  # this is a link o the pinp folder 
+addeverywhere="$_ipi_source:$bin_physics"  # add aiida only in aiases, since I have changed my own stuff.
 
 #####################
 ##### PATH
@@ -59,12 +46,17 @@ export PYTHONPATH="$PYTHONPATH:$LAMMPSPATH/python"  # lammps with python
 
 
 
-if [ "`hostname`" = "mac" ];then
+if [ "$myhost" = "mac" ];then
     _n2p2_mac_predict="$HOME/miniconda2/lib"
     #export PATH="$PATH:$HOME/local/bin"    # add mpic++ (MPI) which is necessary to compile n2p2 ... but does not work for compilation of n2p2
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$_n2p2_mac_predict"
     export GSL_ROOT="/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005" # conda install -c conda-forge gsl
     export EIGEN_ROOT="/Users/glensk/miniconda2/" # conda install -c conda-forge gsl
+fi
+
+if [ "$myhost" = "daint" ];then
+    #export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH:$HOME/sources/eigen/cmake"
+    export EIGEN_ROOT="$HOME/sources/eigen/"
 fi
 
 #export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"

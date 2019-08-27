@@ -17,9 +17,9 @@
 #}
 
 # setenv wird nur von der tcsh benutzt
-setenv () {
-      export $1=$2
-}
+#setenv () {
+#      export $1=$2
+#}
 
 function iterm_title {
         echo -ne "\033]0;"$*"\007"
@@ -68,14 +68,14 @@ function iterm_title {
 #	#fi
 #}
 
-aliastcshtobash () {
-		echo alias ${1}=\'`echo "${2}" | sed "s:':'\\\\\\\\'':"`\'
-}
+#aliastcshtobash () {
+#		echo alias ${1}=\'`echo "${2}" | sed "s:':'\\\\\\\\'':"`\'
+#}
 
-mkalias () {
-    # for bash $2 need to be in ""
-    eval `aliastcshtobash $1 "$2"`
-}
+#mkalias () {
+#    # for bash $2 need to be in ""
+#    eval `aliastcshtobash $1 "$2"`
+#}
 
 # THis was ment only for garching
 # if [ "$ZSH_VERSION" = "5.0.5" ];then
@@ -112,20 +112,86 @@ load_local_anaconda() {
     source activate /u/aglen/conda-envs/my_root
 }
 
+myhost() {
+    # shouls recognise: mac, helvetios, fidis, cmmd, cosmopc, f209, g308, h211
+    host=`hostname`
+    case $host in
+        "mac") echo "mac" && return;;
+        "daint") echo "daint" && return;;
+        "helvetios") echo "helvetios" && return;;
+        "fidis") echo "fidis" && return;;
+        "cmmd") echo "cmmd" && return;;
+        "cosmopc") echo "cosmopc" && return;;
+    esac
+    daint_fidis="${host:0:5}"
+    #echo daint_fidis: $daint_fidis
+    case $daint_fidis in
+        "daint") echo "daint" && return;;
+        "fidis") echo "fidis" && return;;
+    esac
+    
+    cosmopc_="${host:0:7}"
+    case $cosmopc_ in
+        "cosmopc") echo "cosmopc" && return;;
+    esac
+
+    firstletter="${host:0:1}"
+    remain="${host:1:999}"
+    re='^[0-9]+$'
+    #echo firstletter $firstletter
+    #echo remain $remain
+    if [[ $remain =~ $re ]];then # remaining is an integer
+        case $firstletter in
+            "h") echo "helvetios" && return;;
+            "f") echo "fidis" && return;;
+            "g") echo "fidis" && return;;
+        esac
+    fi
+    echo UNKNOWN 
+    
+}
+
 conda_activate() {
-    if [ "`hostname`" = "fidis" ];then
+    echo myhost `myhost`
+    if [ "`myhost`" = "fidis" ];then
         echo "module purge"
         module purge
+    elif [ "`myhost`" = "daint" ];then
+        echo 00
+        echo "/store/marvel/mr23/aglensk/miniconda3"
+        source /store/marvel/mr23/aglensk/miniconda3/etc/profile.d/conda.sh
+        conda activate
     fi
+    
     if [ -e "$HOME/miniconda2" ];then
+        echo 11
         echo "$HOME/miniconda2"
         source $HOME/miniconda2/etc/profile.d/conda.sh
         conda activate
     elif [ -e "$HOME/miniconda3" ];then
+        echo 22
         echo "$HOME/miniconda3"
         source $HOME/miniconda3/etc/profile.d/conda.sh
         conda activate
+    elif [ -e "$SCRATCH/miniconda2" ];then
+        echo 33
+        echo "$SCRATCH/miniconda2"
+        source $SCRATCH/miniconda2/etc/profile.d/conda.sh
+        conda activate
+    elif [ -e "$SCRATCH/miniconda3" ];then
+        echo 44
+        echo "$SCRATCH/miniconda3"
+        echo 55
+        echo $SCRATCH
+        echo 66
+        source $SCRATCH/miniconda3/etc/profile.d/conda.sh
+        echo 77
+        conda activate
     fi
+}
+
+ca() {
+    conda_activate
 }
 
 virtualenv_activate () {
@@ -165,4 +231,13 @@ open_notebook_from_fidis () {
 mcd () { 
     mkdir -p $1 
     cd $1 
+}
+
+daint_modules () {
+    module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw
+    module list
+}
+
+mld () {
+    daint_modules
 }

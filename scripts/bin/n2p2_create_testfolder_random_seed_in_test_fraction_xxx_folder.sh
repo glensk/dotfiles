@@ -1,1 +1,0 @@
-../n2p2/n2p2_create_testfolder_random_seed_in_test_fraction_xxx_folder.sh

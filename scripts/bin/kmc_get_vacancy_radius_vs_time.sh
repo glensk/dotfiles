@@ -1,1 +1,0 @@
-../i-pi-mc_scripts/kmc_get_vacancy_radius_vs_time.sh

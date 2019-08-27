@@ -185,3 +185,5 @@ endfunction
 noremap <PageUp> :call MyPageUp()<CR>
 noremap <Space> :call MyPageDown()<CR>
 
+map gb :e#<cr>   " to go to file type gf   to go back type gb
+

@@ -1,7 +1,7 @@
 #!/bin/sh
 ##################################################################################
 # this script defines environment variables independent of the used shell
-# (tcsh;bash;zsh). Although it uses "setenv" which is usually used in the tcsh 
+# (tcsh;bash;zsh). Although it uses "setenv" (not any more) which is usually used in the tcsh 
 # shell, all set variables will be loaded by either shell (bash or tcsh or zsh) 
 # since the setenv function is defined for the bash shell in the first loaded 
 # $generalrc/generalrc_necessary_bash.sh script.
@@ -14,33 +14,40 @@
 ##################################################################################
 # set global variables: currentshell, host, onhost, scripts, dotfiles
 ##################################################################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 myprompttime="black"
 [ "$BASH_VERSION" != "" ] && currentshell="bash" && myprompttime="red"
 [ "$ZSH_VERSION" != "" ]  && currentshell="zsh"  && myprompttime="magenta"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
-source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
+source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
+myhost=`myhost`
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
 
 host=`hostname`   # 0.001s
 onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
-setenv host $host;
-setenv onhost $onhost;
+export host=$host
+export onhost=$onhost
 
-setenv dotfiles "$HOME/Dropbox/Albert/scripts/dotfiles/";
-setenv potentials "$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
+export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
+export potentials="$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
+export MYVIMRC="$dotfiles/nvim/init.vim"
+export MYVIM="$HOME/sources/nvim/bin/nvim"
+[ ! -e "$HOME/.local/binp" ] && $dotfiles/bins/LINK_files.sh
+[ ! -e "$HOME/.local/bins" ] && $dotfiles/bins/LINK_files.sh
+
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time setenv diverses (change setenv to export)"
 
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
 ##################################################################################
 source $dotfiles/scripts/source_to_add_to_path.sh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time s1"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time source_to_add_to_path.sh"
 
 ##################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...);  PATH due to module load
 ##################################################################################
 source $generalrc/generalrc_hostdependent.sh
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time s3"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time generalrc_hostdependent"
 
 ##################################################################################
 # PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH (PYTHONPATH should not be set)
@@ -51,7 +58,6 @@ source $generalrc/generalrc_path.sh $onhost
 # ALIASES & PROMPT & tabcolor
 ##############################################
 source $generalrc/aliases.sh   # shellscript containing aliases
-#source $generalrc/generalrc_alias_$currentshell.sh
 source $generalrc/generalrc_prompt_$currentshell.sh
     
 #limit coredumpsize 0    # Disable core dumps # limit command is not know in bash
@@ -64,7 +70,7 @@ tab-color $mypromptpath
 ##############################################
 # conda anaconda virtualenv (takes most of the time when loading)
 ##############################################
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (4) : $gett before conda/aiida activate"
 
 # on mac currently base, aiida, intelpy, python2 (12GB) (anaconda 2GB)
 # the conda activate step takes all the time (not the source)
@@ -80,69 +86,84 @@ tab-color $mypromptpath
 # conda is necessary for python lammps, for jupyter (mac) ... better load it.
 case $onhost in
     #cosmopc) source $HOME/aiida/bin/activate; ;;
-    mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+    # on mac: 
+    # pip install --upgrade --user ase
+    # pip install --upgrade --user lmfit
+    # pip install --upgrade --user intel-numpy    # to make numpy faster
+    # pip install --upgrade --user tqdm
+    # pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
+    # pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
+    # pip install --upgrade --user sklearn  # necessary for andreas soap stuff
+    # pip install --upgrade --user plotly_express # to make nice scatterplots
+
     fidis)     source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     helvetios) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     # on fidis/helvetios:
     # pip install --upgrade --user ase  ## this however made problems 
 esac
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################
 # set Thermodynamics stuff
+# I currently dont use the Thermodynamics scritps
 ##############################################
-setenv thermodynamics "$HOME/Thermodynamics"
-setenv userme "glensk"
-setenv convcrit 0.5
-if [ -e "$thermodynamics/utilities/" ];then
-#[ "$currentshell" = "tcsh" ]  && source $thermodynamics/utilities/tcshrc_add
-#[ "$currentshell" != "tcsh" ] && source $thermodynamics/utilities/bashrc_add
-source $thermodynamics/utilities/bashrc_add
-fi
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett thermodynamics"
+#export thermodynamics="$HOME/Thermodynamics"
+#export userme="glensk"
+#export convcrit=0.5
+#if [ -e "$thermodynamics/utilities/" ];then
+#source $thermodynamics/utilities/bashrc_add
+#fi
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett thermodynamics"
 
 ##############################################
-# completion goo for commands  -> this needs to go to zshrc! (autoload/compdef)
+# completion for {notes} commands  -> this needs to go to zshrc! (autoload/compdef)
 ##############################################
-if [ "$currentshell" = "zsh" ];then
 fpath=($dotfiles/completions_fpath $fpath)
-function goo() { $dotfiles/aliases/goo "$1" 
-}  # this nees to be a in second line
-autoload _goo    # do not forget BEFORE the next cmd! 
-compdef _goo goo # binds the completion function to a command
-fi
 
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett goo"
+##############################################
+# other completitions 
+##############################################
+#if [ "$currentshell" = "zsh" ];then
+##function goo() { $dotfiles/aliases/goo "$1" 
+##}  # this nees to be a in second line
+##autoload _goo    # do not forget BEFORE the next cmd! 
+##compdef _goo goo # binds the completion function to a command
+#fi
+
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett goo"
 
 
 ##############################################
 # general variables
 ##############################################
-#setenv PAGER most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
-setenv EDITOR vim   
-setenv SVN_EDITOR vim        # for svn (Thermodynamics folder)
-setenv LESS "-R"
-setenv LC_ALL C   # necessary for perl git svn
-setenv LANG C     # necessary for perl
-setenv GIT_EDITOR vim
-setenv PAGER less 
-setenv BROWSER chrome
-setenv BROWSER open # is necessary for opening jupyter notebook files
-setenv LC_ALL en_US.UTF-8
-setenv GREP_COLOR 31    # red; some greps have colorized ouput. enable...
-setenv GREPCOLOR 31     # dito here GREP_COLOR=1;32  # green
-setenv NOTES_DIRECTORY $dotfiles/notes  # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
-setenv NOTES_EXT "txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
+#export PAGER=most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
+export EDITOR=$MYVIM   
+export SVN_EDITOR=$MYVIM        # for svn (Thermodynamics folder)
+export GIT_EDITOR=$MYVIM 
+export LESS="-R"
+#export LC_ALL=C   # necessary for perl git svn
+#export LANG C     # necessary for perl
+export LANG=en_US.UTF-8     # necessary for powerline in zsh
+export LC_ALL=en_US.UTF-8
+export PAGER=less 
+export BROWSER=chrome
+export BROWSER=open # is necessary for opening jupyter notebook files
+export GREP_COLOR=31    # red; some greps have colorized ouput. enable...
+export GREPCOLOR=31     # dito here GREP_COLOR=1;32  # green
+export NOTES_DIRECTORY=$dotfiles/notes  # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
+export NOTES_EXT="txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett setenv"
 
 ##############################################
 # autojump 
+# takes a bit too long to laod ... and i dont use it
 ##############################################
-case "$currentshell" in 
-    zsh) source ~/.autojump/share/autojump/autojump.zsh;;
-    bash) [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh;;
-esac
-[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett autojump"
+#case "$currentshell" in 
+#    zsh) source ~/.autojump/share/autojump/autojump.zsh;;
+#    bash) [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh;;
+#esac
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett autojump"
 
 ##############################################
 # shell dependent settings; 

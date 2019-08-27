@@ -1,1 +1,0 @@
-../python_thermodynamics/pot_info_startjob.py

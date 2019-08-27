@@ -1,5 +1,5 @@
 " expand tab        (Makes tab exansion possible, supertab) {{{
-Bundle 'ervandew/supertab'
+Plug 'ervandew/supertab'
 " NEVER SET: let g:SuperTabDefaultCompletionType = "context"  --> this destroys
 " tabcompletion for class variables
 "

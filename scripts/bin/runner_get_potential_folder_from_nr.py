@@ -1,1 +1,0 @@
-../runner_scripts/runner_get_potential_folder_from_nr.py

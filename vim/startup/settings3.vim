@@ -2,8 +2,8 @@
 
 " ================ Foldind (best without plugins) / Remember FOLDS & VIEW DEFINE AFTER SYNTAX ON ! (LOOK AND FEEL) ================== {{{
 " to remember folds (next 2 lines)
-autocmd BufWinLeave *.* mkview
-autocmd BufWinEnter *.* silent loadview
+"autocmd BufWinLeave *.* mkview
+"autocmd BufWinEnter *.* silent loadview   " DONT USE BRINGS ERROR IN NEOVIM
 " suggested by restore_view.vim plugin
 set viewoptions=cursor,folds,slash,unix
 set foldmethod=indent   " foldmethod=marker   
@@ -143,7 +143,10 @@ set nostartofline
 " Enable mouse in all modes  # I DONT WANT THIS ... WITHOUT mouse=a EVERYTHING {{{
 " CAN BE COPIED :) ... but mouse=r or mouse=v might also work (better!?)
 " it seems that everything can be compied also with mouse=a
-if has("mouse")
+"@if has("mouse")
+"@set mouse=a
+"@endif
+if has("gui_running")
 set mouse=a
 endif
 

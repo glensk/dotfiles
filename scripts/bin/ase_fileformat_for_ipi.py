@@ -1,1 +1,0 @@
-../runner_scripts/ase_fileformat_for_ipi.py
