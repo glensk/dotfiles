@@ -13,7 +13,7 @@ appropriate conserved energy quantity for the ensemble of choice.
 
 from __future__ import print_function
 from ase.build import bulk as ase_build_bulk
-import time,os,sys
+import time,os,sys,re
 from ase.io import write as ase_write
 from collections import defaultdict
 import pickle
@@ -42,16 +42,45 @@ def get_new_state(state,svac,sneigh):
         nstr = "".join(nstate) # this is the string that corresponds to the new state
         return nstate,nstr
 
+def get_path_to_potential(infile="in.lmp"):
+    if not os.path.isfile(infile):
+       sys.exit(infile+" does not exist!")
 
-def ase_minimize(atomsc_in=False,minimizer="LBFGS"):
+    def grep(filepath,string):
+        out = []
+        file = open(filepath, "r")
+
+        for line in file:
+             if re.search(string, line):
+                line_ = line.rstrip()
+                #print('found:'+line_+":",type(line_))
+                out.append(line_)
+                #print("foundo",out)
+        #print("out",out)
+        return out
+
+    out = grep(infile,"variable nnpDir string")
+    if len(out) != 1:
+        sys.exit('len out != 1')
+    out2 = out[0].split()[3]
+    out3 = out2.replace('"',"")
+    #print('out2',str(out2))
+    #print('out3',str(out3))
+    return out3
+
+
+def  ase_minimize(atomsc_in=False,minimizer="LBFGS",potpath=False):
     ''' minimizer: LBFGS,GPmin
         currently: expects positions in angstrom, returns positions in bohrradius
     '''
+    #print('in ase_minimize')
     if minimizer.lower() not in ["lbfgs", "gpmin"]:
         sys.exit("minimizer not known")
     #print('ASE -1',atomsc_in.positions.shape)
     #print('ASE -2',len(atomsc_in.positions))
     atomsc = atomsc_in.copy()
+    #print('set up atomsc')
+    #print(atomsc.positions[:2])
     if False:
         for idx,i in enumerate(atomsc.positions):
             if idx < 8:
@@ -60,7 +89,7 @@ def ase_minimize(atomsc_in=False,minimizer="LBFGS"):
     del atomsc[-1]  # delete the V(acancy)
     # get calculator
     atom_types = {'Mg':1,'Al':2,'Si':3}
-    lmpcmd = ['mass 1 24.305', 'mass 2 26.9815385', 'mass 3 28.0855', 'variable nnpDir string "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/runner_v3ag_5000_46489_2"', 'pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000', 'pair_coeff * * 14.937658735']
+    lmpcmd = ['mass 1 24.305', 'mass 2 26.9815385', 'mass 3 28.0855', 'variable nnpDir string "'+potpath+'"', 'pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000', 'pair_coeff * * 14.937658735']
     asecalcLAMMPS = LAMMPSlib(lmpcmds=lmpcmd, atom_types=atom_types,keep_alive=True)
     atomsc.set_calculator(asecalcLAMMPS)
     #ene = atomsc.get_potential_energy()
@@ -233,19 +262,27 @@ class AlKMC(Motion):
         self.filled         = True  # use evaalutation of energy where beyond cutoff only Al
         self.conventional   = False  # use qubic supercell?
         self.parallel       = True  # run with threading
-        self.write_pos      = True   # wrte in_pos_ && out_pos
+        self.write_pos      = False   # wrte in_pos_ && out_pos
         self.write_strings  = False  # write AASMAAAAVAASAAA ....
         self.step_isel      = False #[ 1,10,6,8,2,7,4,3,9,5,11 ] # or False
-        self.cutoff_filled  = 1.1  # 1.1 == 1NN +2NN = 18 atoms
-        self.cutoff_filled  = 1.5  # 1.5 == 34 atoms  (??? in 7x7x7) (54 in 5x5x5)
-        self.cutoff_filled  = 2.0  # 1.5 == 52 atoms  (140 in 7x7x7) (98 in 5x5x5)
+        self.cutoff_filled  = 1.1   # 1.1 == 1NN +2NN = 18 atoms
+        self.cutoff_filled  = 1.5   # 1.5 == 34 atoms (??? in 7x7x7) (54 in 5x5x5)
+        self.cutoff_filled  = 2.0   # 2.0 ==  xx atoms in 4x4x4
+                                    # 2.0 ==  98 atoms in 5x5x5
+                                    # 2.0 ==  xx atoms in 6x6x6
+                                    # 2.0 == 140 atoms in 7x7x7
+                                    # 2.0 == 140 atoms in 8x8x8
+        if self.ase == False:
+            if self.ase == False and self.filled == True:
+                sys.exit("if you want self.filled you need to ues ase!")
+            self.filled = False
+        if self.ase == True:
+            self.potpath = get_path_to_potential()
         self.diff_mev_normal = []
         self.diff_mev_filled = []
         self.diff_diff_abs_mev_filled = []
         self.ediff_vs_solutes = []
 
-        if self.ase == False and self.filled == True:
-            sys.exit("if you want self.filled you need to ues ase!")
 
         if self.conventional:
             self.ncell = 2
@@ -420,7 +457,7 @@ class AlKMC(Motion):
 
         atomsc.set_cell(self.dcell.h.T*0.52917721)
         atomsc.set_positions(self.sites*0.52917721)
-        print('numat',atomsc.get_number_of_atoms())
+        #print('numat',atomsc.get_number_of_atoms())
         if atoms != False:
             while atomsc.get_number_of_atoms() > atoms:
                 del atomsc[-1]
@@ -430,10 +467,11 @@ class AlKMC(Motion):
             #        print('atoms',atoms,'deleting atom ',i)
             #        del atomsc[-1]
             #        print('remaining',atomsc.get_number_of_atoms())
-            print()
-            for idx,i in enumerate(np.arange(atomsc.get_number_of_atoms())):
-                print('idx',idx,i,atomsc.positions[idx])
-            print()
+            if False:
+                print()
+                for idx,i in enumerate(np.arange(atomsc.get_number_of_atoms())):
+                    print('idx',idx,i,atomsc.positions[idx])
+                print()
         return atomsc
 
         def get_dbeads_names(self,ieval,state,filled = False,state_filled=False):
@@ -591,7 +629,7 @@ class AlKMC(Motion):
 
 
                 if not nstr in self.ecache:
-                    print('calc not in cache')
+                    #print('calc not in cache')
                     if filled == True:
                         self.not_in_cache_filled += 1
                     else:
@@ -622,7 +660,7 @@ class AlKMC(Motion):
                             self.dbeads[ieval].names = dbead_names_filled
                             ostr = ostr_filled
                             nstr = ostr_filled
-                            print('fill ref ...')
+                            #print('fill ref ...')
 
 
                     # nevent = [svac, sneigh, ene, pos, 0.0]
@@ -642,8 +680,8 @@ class AlKMC(Motion):
                     else:
                         #logging.info("Main    : create and start thread %d.", indexlog)
                         #indexlog+=1
-                        if step == 1 and sneigh == 20:
-                            print('praallel nstr', nstr)
+                        #if step == 1 and sneigh == 20:
+                        #    print('praallel nstr', nstr)
                         st = threading.Thread(target=self.geop_thread, name=str(ieval), kwargs={"ieval":ieval, "nstr":nstr, "nevent" : nevent, "ostr": ostr, "savename": savename})
                         #print('starting thread',sneigh)
                         st.daemon = True
@@ -1149,7 +1187,7 @@ class AlKMC(Motion):
                 self.NN1 = self.state[NN1]
                 print('self.NN1 = self.state[NN1]',self.NN1)
                 self.NN1idx = self.idx[NN1]
-                print('self.NN1idx',self.NN1idx,type(self.NN1idx))
+                #print('self.NN1idx',self.NN1idx,type(self.NN1idx))
         #sys.exit()
 
         self.dbeads = [None] * self.neval
@@ -1176,8 +1214,8 @@ class AlKMC(Motion):
         self.feval = np.ones(self.neval,int)
         self._threadlock = threading.Lock()
         self.dbeads_names = self.dbeads[0].names.copy()
-        print('sdn',self.dbeads[0].names)
-        print('sdn',self.dbeads_names)
+        #print('sdn',self.dbeads[0].names)
+        #print('sdn',self.dbeads_names)
         #sys.exit()
 
     # threaded geometry optimization
@@ -1203,7 +1241,7 @@ class AlKMC(Motion):
             #if type(savename) == str and self.write_pos == True:
             #    ase_write("in_"+savename+".extxyz",atomsc,format="extxyz",append=False)
 
-            newpot,newq,atomsc = ase_minimize(atomsc_in=atomsc,minimizer="gpmin") #lbfgs")
+            newpot,newq,atomsc = ase_minimize(atomsc_in=atomsc,minimizer="gpmin",potpath=self.potpath) #lbfgs")
             #if type(savename) == str and self.write_pos == True:
             #    ase_write("out_"+savename+".extxyz",atomsc,format="extxyz",append=False)
             self.dbeads[ieval].q[0] = newq
@@ -1231,6 +1269,8 @@ class AlKMC(Motion):
             #print('save gope nstr',nstr)
             self.ecache[nstr] = newpot
             self.qcache[nstr] = newq
+            self.ecache_n[nstr] = newpot
+            self.qcache_n[nstr] = newq
             self.ncache += 1
             nevent[2] = newpot # self.ecache[nstr]
             nevent[3] = newq #self.qcache[nstr]
@@ -1407,8 +1447,8 @@ class AlKMC(Motion):
             nstr_solutes = nstr.count('M')+nstr.count('S')
             if ostr_solutes != nstr_solutes:
                 softexit.trigger("Error: ostr_solutes != nstr_solutes. Exit")
-            print('ostr_solutes',ostr_solutes)
-            print('nstr_solutes',nstr_solutes)
+            #print('ostr_solutes',ostr_solutes)
+            #print('nstr_solutes',nstr_solutes)
             ene_ref = self.ecache[ostr]
             ene_fin2 = self.ecache[nstr]
             #print('ostr',ostr,'ene_ref',ene_ref)
@@ -1465,9 +1505,13 @@ class AlKMC(Motion):
 
             cdf += rates[i]
             crates[i] = cdf
-            print('ets',ets,'rates[i]    :',rates[i])
-            print('ets',ets,'rates[i]_new:',rates_new[i])
-
+            if rates[i] != rates_new[i]:
+                print('ets',ets,'rates[i]    :',rates[i])
+                print('ets',ets,'rates[i]_new:',rates_new[i])
+                print('it seems that ets is not etsnew!!')
+                print('ets   :',ets)
+                print('etsnew:',etsnew)
+                softexit.trigger("Error: rates[i] != rates_new[i]. Exit")
             #diff_mev[i][0] = step*12+i
             #diff_mev[i][0] = step+(i/len(levents))
             #diff_mev[i][1] = ene_diff_mev
@@ -1567,7 +1611,7 @@ class AlKMC(Motion):
             if True:
                 self.atomsc.set_positions(p2*0.52917721)
                 ase_write("simulation.pos_0.dbeads.extxyz",self.atomsc,format="extxyz",append=True)
-                ene,positions,atomsc = ase_minimize(atomsc_in=self.atomsc,minimizer="gpmin") #lbfgs")
+                ene,positions,atomsc = ase_minimize(atomsc_in=self.atomsc,minimizer="gpmin",potpath=self.potpath) #lbfgs")
 
 
         #print('p3',p3.shape)

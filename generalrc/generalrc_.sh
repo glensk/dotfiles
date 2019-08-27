@@ -32,8 +32,11 @@ export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
 export potentials="$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
 export MYVIMRC="$dotfiles/nvim/init.vim"
 export MYVIM="$HOME/sources/nvim/bin/nvim"
+#jecho "copy1:$copy1:"
+#echo "copy2:$copy2:"
 [ ! -e "$HOME/.local/binp" ] && $dotfiles/bins/LINK_files.sh
 [ ! -e "$HOME/.local/bins" ] && $dotfiles/bins/LINK_files.sh
+
 
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time setenv diverses (change setenv to export)"
 
@@ -180,3 +183,14 @@ source $dotfiles/$currentshell/$currentshell\_set
 [ "$printloadstat" = "true" ] && echo " onhost $onhost"
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"
+
+
+copy1=`command -v pbcopy`
+copy2=`command -v xclip`
+if [ "$copy1" = "" ] && [ "$copy2" = "" ]; then 
+    echo "######################################################"
+    echo "no local clipboard pbcopy (mac) / xclip (linux) / xsel" 
+    echo "######################################################"
+    xclip_local_install.sh
+fi
+

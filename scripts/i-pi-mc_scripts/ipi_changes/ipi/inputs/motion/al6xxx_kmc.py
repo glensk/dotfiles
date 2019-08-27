@@ -157,16 +157,17 @@ class InputAlKMC(InputDictionary):
         # only stores cache after a decent amount of new structures have been found
         # storing the whole cachees become unpractical for large systems.
         # incremental append of cached structures becomes necessary.
-        if kmc.ncache_stored*self.STORE_STRIDE<kmc.ncache:
+        #if kmc.ncache_stored*self.STORE_STRIDE<kmc.ncache:
+        if kmc.ncache_stored<kmc.ncache:
             if kmc.ecache_file != "":
-                #print "Storing ECACHE in ", kmc.ecache_file
+                print("ADDING new structures to ECACHE in ", kmc.ecache_file,"now in ecache:",len(kmc.ecache))
                 save_and_add_to_ecache(kmc.ecache_file,kmc.ecache_n)
                 #ff = open(kmc.ecache_file, "wb")
                 #pickle.dump(kmc.ecache, ff)
                 #ff.close()
                 kmc.ecache_n = {}
             if kmc.qcache_file != "":
-                #print "Storing QCACHE in ", kmc.qcache_file
+                print("ADDING new structures to QCACHE in ", kmc.qcache_file,"now in qcache:",len(kmc.qcache))
                 save_and_add_to_ecache(kmc.qcache_file,kmc.qcache_n)
                 #ff = open(kmc.qcache_file, "wb")
                 #pickle.dump(kmc.qcache, ff)

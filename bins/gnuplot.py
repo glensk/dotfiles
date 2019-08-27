@@ -4,6 +4,7 @@ from __future__ import print_function
 import numpy as np
 import os,sys,argparse,re,socket
 from subprocess import call
+from myutils import check_for_known_hosts
 
 def help(p = None):
     string = '''
@@ -192,7 +193,16 @@ def gnuplot_defaults(args):
         #ca("set terminal enhanced font \'Verdana,10\'")
         #ca('set term x11 font "sans,12"')
         #ca('set term x11 font "Times-New-Roman,12"')
-        ca('set term qt font "Times-New-Roman,12"')
+        #hostname = os.environ['myhost']
+        #print('hostname',hostname)
+        myhost = check_for_known_hosts(exit=False)
+        #print('my',myhost)
+        #sys.exit()
+        if myhost == "helvetios":
+            term="x11"
+        elif myhost == "qt":
+            term="x11"
+        ca('set term '+term+' font "Times-New-Roman,12"')
         #ca('set term aqua font "Times-New-Roman,12"')
         #ca("set terminal x11 font \'Verdana,10\'")
         #ca("set key font \",10\"")

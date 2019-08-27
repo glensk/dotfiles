@@ -79,6 +79,7 @@ source ~/.vim/startup/spellcorrection.vim  " Rechtschreibung,
 " command used: defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true
 " copy works (on mac) just by selecting the text (so cmd+c) can be pressed as well.
 set clipboard=unnamed           " to send copied stuff to system clipboard ( needs to set in ierm: keyboard shortcut: "cmd+c" -> Action: "Send escape sequence" Esc+: "y"
+" the clipboard on mac: pbcopy; on linux systems xlicp can be installed: daint/fidis: xclip_local_install.sh
 " executed in iterm2: defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true to get mouse scrolling
 " hi Comment  guifg=#80a0ff ctermfg=darkred           " Color for comments (red) " I like the actual gray better
 
