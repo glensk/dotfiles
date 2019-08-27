@@ -605,10 +605,27 @@ class qh(object):
             self.surface[i] = np.append(self.surf_coefs[i],[t])[::-1]
             self.surf_function.append(np.poly1d(self.surf_coefs[i]))
 
+
+            #bounds = [10, 12]
+            #crit_points = bounds + [x for x in p.deriv().r if x.imag == 0 and bounds[0] < x.real < bounds[1]]
+
+            #crit = c.deriv().r
+            #r_crit = crit[crit.imag==0].real
+            #test = c.deriv(2)(r_crit)
+            #x_min = r_crit[test>0]
+            #print('i',i,crit_points)
+
             if self.data.shape[0] > 3:
                 self.surf_coefs_3rd[i] = np.polyfit(self.volumes, energies, 3)
                 self.surf_out_3rd[i] = np.append(self.surf_coefs_3rd[i],[t])[::-1]
                 self.surf_function_3rd.append(np.poly1d(self.surf_coefs_3rd[i]))
+
+                #fit_fn = np.poly1d(self.surf_coefs_3rd)
+                #ymin = sp.optimize.minimize(fit_fn,11)
+                #c = np.poly1d(self.surf_coefs_3rd[i])
+                #crit = c.deriv().r
+                #v_ = crit[0]
+                #print('i',i,ymin)
 
             #polycoefs: [  -252.00857010244    2576.739955929857  -9185.475148705054
             #         11059.807076691339]

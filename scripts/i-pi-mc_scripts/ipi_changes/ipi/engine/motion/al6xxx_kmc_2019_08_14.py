@@ -20,6 +20,7 @@ import pickle
 import threading
 #import logging
 import numpy as np
+from ipi.utils.softexit import softexit
 from ase.calculators.lammpslib import LAMMPSlib
 from ase.optimize import LBFGS
 from ase.optimize import GPMin
@@ -227,15 +228,21 @@ class AlKMC(Motion):
         self.nmg = nmg
         self.nsites = self.ncell**3
 
-        self.ase            = False  # ase yes? ase_yes_no
+        self.ase            = True  # ase yes? ase_yes_no
         self.normal         = True  # use normal evaluation of energy
-        self.filled         = False  # use evaalutation of energy where beyond cutoff only Al
+        self.filled         = True  # use evaalutation of energy where beyond cutoff only Al
         self.conventional   = False  # use qubic supercell?
         self.parallel       = True  # run with threading
         self.write_pos      = True   # wrte in_pos_ && out_pos
         self.write_strings  = False  # write AASMAAAAVAASAAA ....
-        self.step_isel      = [ 1,10,6,8,2,7 ] # or False
-        self.cutoff_filled  = 1.1  # == 1NN +2NN = 18 atoms
+        self.step_isel      = False #[ 1,10,6,8,2,7,4,3,9,5,11 ] # or False
+        self.cutoff_filled  = 1.1  # 1.1 == 1NN +2NN = 18 atoms
+        self.cutoff_filled  = 1.5  # 1.5 == 34 atoms  (??? in 7x7x7) (54 in 5x5x5)
+        self.cutoff_filled  = 2.0  # 1.5 == 52 atoms  (140 in 7x7x7) (98 in 5x5x5)
+        self.diff_mev_normal = []
+        self.diff_mev_filled = []
+        self.diff_diff_abs_mev_filled = []
+        self.ediff_vs_solutes = []
 
         if self.ase == False and self.filled == True:
             sys.exit("if you want self.filled you need to ues ase!")
@@ -475,7 +482,7 @@ class AlKMC(Motion):
 
     def fill_state_with_Al(self,idx1,idx2,state,svac_idx):
         ''' idx1: has to be idx1 (a vacancy)
-            state: can be self.state or nstte or another state
+            state: can be self.state or nstate or another state
         '''
         NNcidx_v    = self.neighc[idx1]                              # atoms in the sphere
         NNcidx_n    = self.neighc[idx2]                              # atoms in the sphere
@@ -494,7 +501,7 @@ class AlKMC(Motion):
 
 
 
-    def enumerate_possible_reaction_events(self,ostr,step=False,filled=False,verbose=False):
+    def enumerate_possible_reaction_events(self,ostr,step=False,filled=False,filled_ref=False,verbose=False):
         '''
         one particular nevent = [svac, sneigh, self.ecache[nstr], self.qcache[nstr], 0.0]
         one particular nevent = [svac, sneigh, self.ecache[nstr], self.qcache[nstr], ostr, nstr, 0.0]
@@ -509,7 +516,7 @@ class AlKMC(Motion):
         self.not_in_cache = 0
         self.in_cache_filled = 0
         self.not_in_cache_filled = 0
-        ethreads = [None] * self.neval
+        ethreads = [None] * self.neval  # defined in input.nn (posible parallel events)
         # loops over the vacancy
         #print('maxdiff+-:',0.95*self.a0*self.ncell*0.52917721)
         for ivac in xrange(self.natoms, self.natoms + self.nvac):
@@ -529,16 +536,16 @@ class AlKMC(Motion):
 
 
             for isel_sidxx,sneigh in enumerate(self.neigh[svac]):
-                #print('isel_sidxx',isel_sidxx,'svac',svac,'sneigh',sneigh)
+                print('isel_sidxx',isel_sidxx,'svac',svac,'sneigh',sneigh)
                 # if the neighbor is a vacancy, move on. does not make sense to swap two vacancies!
                 if self.state[sneigh] == "V" : continue
 
+                # a) swop state (normal)
                 nstate,nstr = get_new_state(self.state,svac,sneigh)  # is necessary in any case
                 nstate_ref = nstate.copy()  # this is necessary to set later on the swaped positions in dbeads
 
-                ecurr_filled_orig = "UNKNOWN"
 
-                if filled == True:
+                if filled == True or filled_ref == True:
                     ## this loop needs also to be parallel
                     #######################################################################
                     # creates nstate, nstr for filled state
@@ -547,33 +554,44 @@ class AlKMC(Motion):
                     # but, only the dbead_names need to be chagned, not the positions
                     #######################################################################
                     state_filled, ostr_filled,dbead_names_filled = self.fill_state_with_Al(svac,sneigh,self.state,svac)
+                    # this is the reference
+                    #nstate, ostr_filled,dbead_names_filled = self.fill_state_with_Al(svac,sneigh,self.state,svac)
                     ostr = ostr_filled
-                    if not ostr_filled in self.ecache:
-                        self.not_in_cache_filled += 1
-                        #print('ostr_filled (ref) NOPE')
-                        ieval = 0
-                        self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(self.state)].flatten()
-                        self.dbeads[ieval].names = dbead_names_filled
-                        rv = [0, 0, 0, 0, 0]
-                        savename = "pos_step_"+str(step)+"_filled_"+str(svac)+"_"+str(sneigh)+"_normal"
-                        self.geop_thread(ieval, ostr_filled, rv, None,savename=savename)
-                    else:
-                        self.in_cache_filled += 1
+                    nstr = ostr_filled
 
-                    ecurr_filled_orig = self.ecache[ostr_filled]
+                    # This needs to be done in a separate loop of "enumerate_possible_reaction_events(...)"
+                    if filled == True:
+                        # check if referece is available
+                        if not ostr_filled in self.ecache:
+                            softexit.trigger("Error: not calculated reference ...! Exit.")
+
+                        #if False:
+                        #    # make sure to calculate this only when filled_ref == True
+                        #    if not ostr_filled in self.ecache:
+                        #        self.not_in_cache_filled += 1
+                        #        # self.state is the unswapped state
+                        #        # nstate bzw. nstate_ref are the swapped state
+                        #        self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(self.state)].flatten()
+                        #        #self.dbeads[ieval].names = dbead_names_filled
+                        #        rv = [0, 0, 0, 0, 0]
+                        #        savename = "pos_step_"+str(step)+"_filled_"+str(svac)+"_"+str(sneigh)+"_normal"
+                        #        # nope, calculate this further down!
+                        #        #self.geop_thread(ieval, ostr_filled, rv, None,savename=savename)
+                        #    else:
+                        #        self.in_cache_filled += 1
+
 
 
                     #######################################################################
                     ## creates (filled) swapped sate
                     #######################################################################
-                    nstate, nstr,dbead_names_filled = self.fill_state_with_Al(svac,sneigh,nstate,sneigh)
-                if self.write_strings:
-                    print('ecurr filled st: svac',svac,'sneigh',sneigh,ecurr_filled_orig,'ostr',ostr,'nstr',nstr)
-                    #print('state_filled (orig)',state_filled)
-                    #print('state_filled (swap)',nstate_filled)
+                    if filled == True:
+                        nstate, nstr, dbead_names_filled = self.fill_state_with_Al(svac,sneigh,nstate,sneigh)
+
 
 
                 if not nstr in self.ecache:
+                    print('calc not in cache')
                     if filled == True:
                         self.not_in_cache_filled += 1
                     else:
@@ -587,14 +605,24 @@ class AlKMC(Motion):
                     ###################################
                     ieval = self.find_eval(ethreads)
 
+                    if filled == False and filled_ref == False: # normal case
+                        self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(nstate_ref)].flatten()
+                        #self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(nstate)].flatten()
+                        self.dbeads[ieval].names = self.dbeads_names
 
-                    self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(nstate_ref)].flatten()
-                    self.dbeads[ieval].names = self.dbeads_names
-
-                    if filled == True:
-                        # here, the positions are the same as in nstate (no need to change dbeads.q
-                        # and only the atom names change
-                        self.dbeads[ieval].names = dbead_names_filled
+                    # filled case
+                    if filled == True or filled_ref == True:
+                        if filled == True:  # swapped pos
+                            # here, the positions are the same as in nstate (no need to change dbeads.q
+                            # and only the atom names change
+                            self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(nstate_ref)].flatten()
+                            self.dbeads[ieval].names = dbead_names_filled
+                        elif filled_ref == True:
+                            self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(self.state)].flatten()
+                            self.dbeads[ieval].names = dbead_names_filled
+                            ostr = ostr_filled
+                            nstr = ostr_filled
+                            print('fill ref ...')
 
 
                     # nevent = [svac, sneigh, ene, pos, 0.0]
@@ -603,17 +631,14 @@ class AlKMC(Motion):
 
                     # runs a geometry optimization
                     savename = "pos_step_"+str(step)+"_swap_"+str(svac)+"_"+str(sneigh)+"_normal"
+
                     if filled == True:
                         savename = "pos_step_"+str(step)+"_filled_"+str(svac)+"_"+str(sneigh)+"_swap"
+                    if filled_ref == True:
+                        savename = "pos_step_"+str(step)+"_filled_"+str(svac)+"_"+str(sneigh)+"_normal"
 
                     if self.parallel != True:
                         self.geop_thread(ieval=ieval, nstr=nstr, nevent=nevent,ostr=None,savename=savename)
-                        #if filled == True:
-                        #    ecurr_filled_swap = self.ecache[nstr]
-                        #    corr = ecurr_filled_swap-ecurr_filled_orig
-                        #    print('corr      ',corr)
-                        #    ### !!! nope!!!
-                        #    nevent[2] = self.ecurr + corr
                     else:
                         #logging.info("Main    : create and start thread %d.", indexlog)
                         #indexlog+=1
@@ -1369,7 +1394,7 @@ class AlKMC(Motion):
             return (ka.format(text)).rjust(l1+1)
 
         hartree_to_mev = 27211.386
-        diff_mev = np.zeros((12,2))
+        #diff_mev = np.zeros((12,2))
 
         for i in xrange(len(levents)):
             svac    = levents[i][0]
@@ -1377,10 +1402,19 @@ class AlKMC(Motion):
             ene_fin = levents[i][2]   # == same as self.ecache[nstr]
             #pos = levents[i][3]
             ostr    = levents[i][4]
-            #nstr    = levents[i][5]
+            nstr    = levents[i][5]
+            ostr_solutes = ostr.count('M')+ostr.count('S')
+            nstr_solutes = nstr.count('M')+nstr.count('S')
+            if ostr_solutes != nstr_solutes:
+                softexit.trigger("Error: ostr_solutes != nstr_solutes. Exit")
+            print('ostr_solutes',ostr_solutes)
+            print('nstr_solutes',nstr_solutes)
             ene_ref = self.ecache[ostr]
-            #ene_fin = self.ecache[nstr]
+            ene_fin2 = self.ecache[nstr]
+            #print('ostr',ostr,'ene_ref',ene_ref)
+            #print('nstr',nstr,'ene_fin',ene_fin,ene_fin2)
             ene_base = self.ecurr
+            #print('ene_base',ene_base)
             diff_to_base = ene_ref - ene_base
             diff_to_base_meV = diff_to_base*hartree_to_mev
             #print('ene_base',ene_base,'ene_ref',ene_ref,'diff_to_base',diff_to_base,'mev',diff_to_base_meV)
@@ -1422,21 +1456,61 @@ class AlKMC(Motion):
                         kac(ene_diff),
                         '== meV/def:',
                         kac(ene_diff_mev,7,2)) #,etsp)
-
+            if np.abs(ene_diff_mev) > 10000:
+                softexit.trigger("Error: ene diff too high. Exit")
+                #print("Error: ene diff too high. Exit")
             rates[i] = self.prefactors[levents[i][-1]] * np.exp(-(ets-ene_ref)/kT)
             rates_new[i] = self.prefactors[levents[i][-1]] * np.exp(-(etsnew-ene_ref)/kT)
 
+
             cdf += rates[i]
             crates[i] = cdf
-            print('ets',ets,'rates[i]',rates[i])
+            print('ets',ets,'rates[i]    :',rates[i])
+            print('ets',ets,'rates[i]_new:',rates_new[i])
 
-            diff_mev[i][0] = step*12+i
-            diff_mev[i][1] = ene_diff_mev
+            #diff_mev[i][0] = step*12+i
+            #diff_mev[i][0] = step+(i/len(levents))
+            #diff_mev[i][1] = ene_diff_mev
 
-        np.savetxt("rates_step_"+str(step)+"_"+filled,diff_mev)
-        np.savetxt("ratOR_step_"+str(step)+"_"+filled,rates)
-        np.savetxt("ratON_step_"+str(step)+"_"+filled,rates_new)
-        if True:
+            x = step+((i*1.0)/len(levents))
+            #print('i',i,'x',x)
+            y = ene_diff_mev
+
+
+            if filled == "filled":
+                self.diff_mev_filled.append([x,y])
+                ya = np.abs(y-self.diff_mev_normal_thisstep[i][1])
+                self.diff_diff_abs_mev_filled.append([x,ya])
+
+                solutes_diff = (self.nsi+self.nmg) - ostr_solutes
+                self.ediff_vs_solutes.append([solutes_diff,ya])
+            elif filled == "normal":
+                self.diff_mev_normal.append([x,y])
+                self.diff_mev_normal_thisstep.append([x,y])
+
+        if filled == "filled":
+            np.savetxt("nnrates_diff_filled_"+str(self.cutoff_filled),self.diff_mev_filled)
+            np.savetxt("nnrates_diff_filledabs_"+str(self.cutoff_filled),self.diff_diff_abs_mev_filled)
+            np.savetxt("nnrates_solutes_vs_energy_diff_"+str(self.cutoff_filled),self.ediff_vs_solutes)
+            kk = self.diff_mev_normal
+            kk = np.array([self.diff_mev_normal,self.diff_mev_filled])
+            #print('kk')
+            #print(kk)
+            kkx = kk[0][:,1]
+            kky = kk[1][:,1]
+            kk = np.array([kkx,kky]).T
+            #print('kk out')
+            #print(kk)
+
+            np.savetxt("nnrates__diff_"+str(self.cutoff_filled),kk)
+            #if step == 1:
+            #    softexit.trigger("Error: kk. Exit.")
+        elif filled == "normal":
+            np.savetxt("nnrates_diff_normal",self.diff_mev_normal)
+
+        #np.savetxt("rates_ORIG_step_"+str(step)+"_"+filled,rates)
+        #np.savetxt("rates_NEW_step_"+str(step)+"_"+filled,rates_new)
+        if False:
             out = np.zeros(len(levents)+1)
             out[0] = self.ecurr
             #print(kaa(self.ecurr))
@@ -1456,28 +1530,31 @@ class AlKMC(Motion):
         print()
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         print('>> step',step)
-        self.atomsc.set_positions(self.sites[self.idx]*0.52917721)
-        ase_write("simulation.pos_0.sitesidx.extxyz",self.atomsc,format="extxyz",append=True)
+        if False:
+            self.atomsc.set_positions(self.sites[self.idx]*0.52917721)
+            ase_write("simulation.pos_0.sitesidx.extxyz",self.atomsc,format="extxyz",append=True)
 
-        self.atomsc.set_positions(self.sites[self.unique_idx(self.state.copy())]*0.52917721)
-        ase_write("simulation.pos_0.sitesidxunique.extxyz",self.atomsc,format="extxyz",append=True)
+            self.atomsc.set_positions(self.sites[self.unique_idx(self.state.copy())]*0.52917721)
+            ase_write("simulation.pos_0.sitesidxunique.extxyz",self.atomsc,format="extxyz",append=True)
 
 
         #### neighborhood sphere
+        print(">> step",step,'vacancy_neighborhood_analysis()')
         self.vacancy_neighborhood_analysis()
 
-        self.atomsc_neigh.set_positions(self.sites[self.NN1idx]*0.52917721)
-        self.atomsc_neigh.set_chemical_symbols(str_to_symbols(self.NN1))
-        ase_write("simulation.pos_0.sphere1.extxyz",self.atomsc_neigh,format="extxyz",append=True)
+        if False:
+            self.atomsc_neigh.set_positions(self.sites[self.NN1idx]*0.52917721)
+            self.atomsc_neigh.set_chemical_symbols(str_to_symbols(self.NN1))
+            ase_write("simulation.pos_0.sphere1.extxyz",self.atomsc_neigh,format="extxyz",append=True)
 
-        self.atomsc_neigh2.set_positions(self.sites[self.NN2idx]*0.52917721)
-        self.atomsc_neigh2.set_chemical_symbols(str_to_symbols(self.NN2))
-        ase_write("simulation.pos_0.sphere2.extxyz",self.atomsc_neigh2,format="extxyz",append=True)
+            self.atomsc_neigh2.set_positions(self.sites[self.NN2idx]*0.52917721)
+            self.atomsc_neigh2.set_chemical_symbols(str_to_symbols(self.NN2))
+            ase_write("simulation.pos_0.sphere2.extxyz",self.atomsc_neigh2,format="extxyz",append=True)
 
 
-        self.atomsc_neighc.set_positions(self.sites[self.NNcidx]*0.52917721)
-        self.atomsc_neighc.set_chemical_symbols(str_to_symbols(self.NNc))
-        ase_write("simulation.pos_0.spherec.extxyz",self.atomsc_neighc,format="extxyz",append=True)
+            self.atomsc_neighc.set_positions(self.sites[self.NNcidx]*0.52917721)
+            self.atomsc_neighc.set_chemical_symbols(str_to_symbols(self.NNc))
+            ase_write("simulation.pos_0.spherec.extxyz",self.atomsc_neighc,format="extxyz",append=True)
 
         if False:
             self.atomsc_filled.set_chemical_symbols("Al")
@@ -1485,7 +1562,7 @@ class AlKMC(Motion):
             self.atomsc_filled.set_positions(p3)
 
 
-        if True:
+        if False:
             p2 = np.reshape(self.dbeads[0].q[0,:],(-1,3))
             if True:
                 self.atomsc.set_positions(p2*0.52917721)
@@ -1493,10 +1570,10 @@ class AlKMC(Motion):
                 ene,positions,atomsc = ase_minimize(atomsc_in=self.atomsc,minimizer="gpmin") #lbfgs")
 
 
-        p3 = np.reshape(self.beads.q[0,:],(-1,3))
         #print('p3',p3.shape)
         #np.savetxt("pos_beads_"+str(step)  ,p3*0.52917721)
         if True:
+            p3 = np.reshape(self.beads.q[0,:],(-1,3))
             self.atomsc.set_positions(p3*0.52917721)
             ase_write("simulation.pos_0.beads.extxyz",self.atomsc,format="extxyz",append=True)
 
@@ -1508,7 +1585,7 @@ class AlKMC(Motion):
                 self.atomsc.set_positions(p4*0.52917721)
                 ase_write("simulation.pos_0.beadsds.extxyz",self.atomsc,format="extxyz",append=True)
 
-
+        print(">> step",step,'self.KMC_cluster_analysis(step=step)')
         self.KMC_cluster_analysis(step=step)
 
         kT = Constants.kb  * self.ens.temp
@@ -1518,6 +1595,7 @@ class AlKMC(Motion):
         ##############################################################
         ostr = "".join(self.state)  # this is a unique id string that charactrizes the current state
         self.tscache[ostr] = {}
+        print('>> step',step,"calc ostr")
         if not ostr in self.ecache:
             ieval = 0
             #self.get_dbeads_names(ieval,self.state,filled = False,nstate_filled=False)
@@ -1529,6 +1607,7 @@ class AlKMC(Motion):
             savename = "pos_step_"+str(step)+"_normal"
             self.geop_thread(ieval, ostr, rv, None,savename)
         self.ecurr = self.ecache[ostr]
+        print('>> step',step,"calc ostr done")
 
         ##############################################################
         # enumerates possible reactive events (vacancy swaps)
@@ -1537,6 +1616,8 @@ class AlKMC(Motion):
             starttime = time.time()
             levents        = self.enumerate_possible_reaction_events(ostr,step=step,filled=False)
             endtime = time.time()
+            self.diff_mev_normal_thisstep = []
+            self.solutes_thisstep = []
             rates,crates,cdf = self.get_list_of_rates(step,levents,kT,filled="normal")
             print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++',endtime-starttime)
             #print('serial   6 steps: 11:08:02 to 11:13:20 == 5 min 18 sec')
@@ -1553,6 +1634,14 @@ class AlKMC(Motion):
             #print('time parallel step 0: 17.2')
 
         if self.filled == True:
+            print('calculaeting filled reference ..............')
+            levents_filled = self.enumerate_possible_reaction_events(ostr,step=step,filled=False,filled_ref=True)
+            print('calculaeted filled reference .............. done')
+            print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+            print()
+            print('calculaeting filled structures ..............')
+
+
             levents_filled = self.enumerate_possible_reaction_events(ostr,step=step,filled=True)
             #for i in levents_filled:
             #    print('old',i[4],'new',i[5])
@@ -1573,7 +1662,7 @@ class AlKMC(Motion):
             pass
         else:
             isel = self.step_isel[step]
-        print(">> step::",step,"Selected event ", isel, " with ene",levents[isel][2]) #rate ", rates[isel], " / ", cdf)
+        print(">> step:",step,"Selected event ", isel, " with ene",levents[isel][2]) #rate ", rates[isel], " / ", cdf)
 
         iev = levents[isel] # levents[self.prng.randint(len(levents))]
         svac, sneigh = iev[0], iev[1]
@@ -1636,7 +1725,7 @@ class AlKMC(Motion):
         #print('newqbefore changeing')
         #print(newq[:7])
         newq-=oldq
-        if True:
+        if False:
             p5 = np.reshape(newq,(-1,3))
             self.atomsc.set_positions(p5*0.52917721)
             ase_write("simulation.pos_0.newqq.extxyz",self.atomsc,format="extxyz",append=True)
