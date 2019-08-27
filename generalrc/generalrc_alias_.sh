@@ -180,7 +180,7 @@ $1 qstatn 'qstatn -d'
 ##############################
 # on mac
 ##############################
-[ "$onhost" = "mac" ] && \
+[ "$myhost" = "mac" ] && \
     $1 math '/Applications/Mathematica.app/Contents/MacOS/MathKernel' && \
     $1 mathematica   '/Applications/Mathematica.app/Contents/MacOS/Mathematica' && \
     #$1 xmgrace '$HOME/scripts/mac_tools/apps/xmgrace/grace-5.1.23_bigbuf/src/xmgrace' && \
@@ -199,7 +199,7 @@ $1 qstatn 'qstatn -d'
     #alias mvim='open /Applications/MacVim.app'
     #alias cat 'colorize'  # colorize seems to have sometimes problems
 
-[ "$onhost" = "cmmc" ] && \
+[ "$myhost" = "cmmc" ] && \
     $1 garblazej 'ssh bzg@cmmc001.bc.rzg.mpg.de' && \
     $1 scpfromcmmc 'scp -r aglen@cmmc001.bc.rzg.mpg.de:\!:1 \!:2' && \
     $1 scptocmmc 'scp -r \!:1 aglen@cmmc001.bc.rzg.mpg.de:\!:2' && \
@@ -215,7 +215,7 @@ $1 qstatn 'qstatn -d'
 #$1 vi 'gvim -v' && \
 #$1 vim 'gvim -v' && \
 
-[ "$onhost" = "cmpc" ] && \
+[ "$myhost" = "cmpc" ] && \
     $1 tmux '/home/glensk/local/bin/tmux'
 
 #$1 vi 'gvim -v' && \

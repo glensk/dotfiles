@@ -20,7 +20,8 @@ export myhome_daint="/users/aglensk";
 export myhome_fidis="/home/glensk";
 export myhome_cosmopc="/home/glensk";
 
-case $onhost in
+#case $onhost in
+case $myhost in
 mac)
     export myprompthostuser="magenta";
     export mypromptpath="magenta";
@@ -86,7 +87,7 @@ helvetios)
     module load git; # intel python/2.7.14;  # to get git 2.17 (instad of 1.8)
   ;;
 *)
-	export onhost="UNKNOWN";
+	: # export onhost="UNKNOWN";  : is the bash equivalent for pass in python
   ;;
 esac
 

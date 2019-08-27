@@ -24,15 +24,29 @@ case "$-" in
   # echo hostname `hostname`
   alias e='exit'
   host=`hostname`
+  #echo "host:$host:"
+
+  export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
+  source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
+  myhost=`myhost_get`
+  export myhost=$myhost
+  #echo "myhost:$myhost:"
   #echo 1
   #echo 1 ZSH:$ZSH_VERSION:
   #echo 1 myh:$myhost:
-  [ "`echo $host | grep -o "^daint"`" = "daint" ] && unset FPATH && exec /bin/zsh -l
+  #[ "`echo $host | grep -o "^daint"`" = "daint" ] && unset FPATH && exec /bin/zsh -l
+  [ "$myhost" = "daint" ] && unset FPATH && exec /bin/zsh -l
   #echo 2
   #echo 2 ZSH:$ZSH_VERSION:
-  [ "`echo $host | grep -o "^fidis"`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
-  [ "`echo $host`" = "helvetios" ] && /bin/zsh -l #exec /bin/bash
-  [ "`echo $host | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
+  #[ "`echo $host | grep -o "^fidis"`" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+#[ "$myhost" = "fidis" ] && /bin/zsh -l #exec /bin/bash
+  [ "$myhost" = "fidis" ] && exec /bin/zsh -l #exec /bin/bash
+  #[ "`echo $host`" = "helvetios" ] && /bin/zsh -l #exec /bin/bash
+#[ "$myhost" = "helvetios" ] && /bin/zsh -l #exec /bin/bash
+  [ "$myhost" = "helvetios" ] && exec /bin/zsh -l #exec /bin/bash
+  #[ "`echo $host | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
+#[ "$myhost" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
+  [ "$myhost" = "cosmopc15" ] && exec /bin/zsh -l #exec /bin/bash
    ;;
 esac
 

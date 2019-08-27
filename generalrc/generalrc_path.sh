@@ -26,7 +26,7 @@ export PATH="$bin_systm:$local_bin:$PATH"  # no, put local_bin and aliases at th
 #########################################################################
 # on mac: ( $PATH / $PYTHONPATH / $LD_LIBRARY_PATH / ... )
 #########################################################################
-if [ "$onhost" = "mac" ];then
+if [ "$myhost" = "mac" ];then
     # $PATH (on mac)
     #sed="/usr/local/opt/gnu-sed/libexec/gnubin"  # is already in /usr/local/bin/sed
     

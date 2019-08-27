@@ -12,7 +12,7 @@
 ##################################################################################
 
 ##################################################################################
-# set global variables: currentshell, host, onhost, scripts, dotfiles
+# set global variables: currentshell, host, scripts, dotfiles
 ##################################################################################
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 myprompttime="black"
@@ -20,13 +20,21 @@ myprompttime="black"
 [ "$ZSH_VERSION" != "" ]  && currentshell="zsh"  && myprompttime="magenta"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
-myhost=`myhost`
+#myhost=`myhost`
+#export myhost=$myhost
+#echo "myhost:$myhost:"
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
 
 host=`hostname`   # 0.001s
-onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
 export host=$host
-export onhost=$onhost
+#onhost=`echo $host | sed 's/\..*$//' | sed -r 's/[0-9]{1,10}$//'` # mac, cmpc, cosmopc, cmmc, daint, fidis
+# currenly hostname:h258 myhost: helvetios onhost:UNKNOWN
+#echo "myhost:$myhost"
+##echo "onhost:$onhost"
+#[ "$myhost" != "UNKNOWN" ] && [ "$onhost" = "UNKNOWN" ] && onhost=$myhost
+#export onhost=$onhost
+#echo "22myhost:$myhost"
+#echo "22onhost:$onhost"
 
 export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
 export potentials="$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
@@ -55,7 +63,7 @@ source $generalrc/generalrc_hostdependent.sh
 ##################################################################################
 # PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH (PYTHONPATH should not be set)
 ##################################################################################
-source $generalrc/generalrc_path.sh $onhost
+source $generalrc/generalrc_path.sh $myhost
 
 ##############################################
 # ALIASES & PROMPT & tabcolor
@@ -87,7 +95,7 @@ tab-color $mypromptpath
 # s1 CONDA autojump AFTER_CONDA
 # s1 thermodynamics autojump generalrc
 # conda is necessary for python lammps, for jupyter (mac) ... better load it.
-case $onhost in
+case $myhost in
     #cosmopc) source $HOME/aiida/bin/activate; ;;
     # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     # on mac: 
@@ -180,7 +188,7 @@ source $dotfiles/$currentshell/$currentshell\_set
 ##############################################
 # set host variables  
 ##############################################
-[ "$printloadstat" = "true" ] && echo " onhost $onhost"
+[ "$printloadstat" = "true" ] && echo " myhost $myhost"
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"
 

@@ -112,7 +112,7 @@ load_local_anaconda() {
     source activate /u/aglen/conda-envs/my_root
 }
 
-myhost() {
+myhost_get() {
     # shouls recognise: mac, helvetios, fidis, cmmd, cosmopc, f209, g308, h211
     host=`hostname`
     case $host in
