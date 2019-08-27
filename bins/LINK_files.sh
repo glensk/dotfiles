@@ -94,7 +94,7 @@ fi
 echo "                                 ... successfull"
 cd $dotfiles
 chmod u+x $dotfiles/generalrc/*
-chmod u+x $dotfiles/aliases/*
+#chmod u+x $dotfiles/aliases/*
 chmod u+x $dotfiles/scripts/lammps_scripts/*
 
 
@@ -205,6 +205,7 @@ echo
 #echo
 #echo "# vim/bundle #################################################################"
 #$dotfiles/vim/vim_install_plugins.py
+fi
 
 echo
 echo "# LINK EVERYTHING #################################################################"

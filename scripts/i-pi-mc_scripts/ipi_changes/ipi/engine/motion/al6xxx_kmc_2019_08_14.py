@@ -536,7 +536,7 @@ class AlKMC(Motion):
 
 
             for isel_sidxx,sneigh in enumerate(self.neigh[svac]):
-                print('isel_sidxx',isel_sidxx,'svac',svac,'sneigh',sneigh)
+                #print('isel_sidxx',isel_sidxx,'svac',svac,'sneigh',sneigh)
                 # if the neighbor is a vacancy, move on. does not make sense to swap two vacancies!
                 if self.state[sneigh] == "V" : continue
 
