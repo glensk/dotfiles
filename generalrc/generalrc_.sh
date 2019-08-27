@@ -44,6 +44,7 @@ export MYVIM="$HOME/sources/nvim/bin/nvim"
 #echo "copy2:$copy2:"
 [ ! -e "$HOME/.local/binp" ] && $dotfiles/bins/LINK_files.sh
 [ ! -e "$HOME/.local/bins" ] && $dotfiles/bins/LINK_files.sh
+[ ! -d "$HOME/sources" ] && mkdir $HOME/sources 
 
 
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time setenv diverses (change setenv to export)"
@@ -192,7 +193,10 @@ source $dotfiles/$currentshell/$currentshell\_set
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"
 
+########################## make sure that nvim is istalled
+[ ! -e "$MYVIM" ] && install_git.py -i nvim
 
+########################## make sure that nvim has xclip/pbcopy
 copy1=`command -v pbcopy`
 copy2=`command -v xclip`
 if [ "$copy1" = "" ] && [ "$copy2" = "" ]; then 
