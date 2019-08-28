@@ -30,7 +30,7 @@ case "$-" in
   source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
   myhost=`myhost_get`
   export myhost=$myhost
-  #echo "myhost:$myhost:"
+  #echo "myhost .bash_profile:$myhost:"
   #echo 1
   #echo 1 ZSH:$ZSH_VERSION:
   #echo 1 myh:$myhost:

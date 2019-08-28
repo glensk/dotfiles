@@ -20,9 +20,14 @@ myprompttime="black"
 [ "$ZSH_VERSION" != "" ]  && currentshell="zsh"  && myprompttime="magenta"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
-#myhost=`myhost`
-#export myhost=$myhost
-#echo "myhost:$myhost:"
+
+echo "myhost generalrc_.sh in1:$myhost:"
+#######################
+# this is crucial, even if it is loaded a second time!
+#######################
+myhost=`myhost_get`
+export myhost=$myhost
+echo "myhost generalrc_.sh in2:$myhost:"
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
 
 host=`hostname`   # 0.001s
