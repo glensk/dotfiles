@@ -24,7 +24,7 @@ export color_fidis=""
 
 color-host() {
     [ "$1" = "mac" ]        && hascolor="magenta" 
-    [ "$1" = "helvetios" ]  && hascolor="orange"
+    [ "$1" = "helvetios" ]  && hascolor="yellow" # "orange" does not work for zsh prompt
     [ "$1" = "cosmopc" ]    && hascolor="green"
     [ "$1" = "fidis" ]      && hascolor="cyan"
     [ "$1" = "daint" ]      && hascolor="blue"
