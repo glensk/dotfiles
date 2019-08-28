@@ -90,10 +90,12 @@ function iterm_title {
 # fi
 
 tab-color() {
-    [ "$1" = "red" ] && a=255 b=0 c=0               # works
-    [ "$1" = "green" ] && a=0 b=255 c=0             # works
-    [ "$1" = "blue" ] && a=0 b=0 c=255              # works
-    [ "$1" = "cyan" ] && a=64 b=244 c=208           # works
+    [ "$1" = "red" ]     && a=255 b=0 c=0               # works
+    [ "$1" = "orange" ]  && a=255 b=165 c=0           # works
+    [ "$1" = "yellow" ]  && a=255 b=165 c=0           # works
+    [ "$1" = "green" ]   && a=0 b=255 c=0             # works
+    [ "$1" = "blue" ]    && a=0 b=0 c=255              # works
+    [ "$1" = "cyan" ]    && a=64 b=244 c=208           # works
     [ "$1" = "magenta" ] && a=255 b=0 c=255         # works but you need to write it correctly
     #[ "$1" = "turquoise" ] && a=100 b=100 c=208
 echo -ne "\033]6;1;bg;red;brightness;$a\a"

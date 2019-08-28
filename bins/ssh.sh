@@ -24,6 +24,7 @@ turquoise="64 224 208"   # seems too blue, needs to get greener
 mediumturquoise="72 209 204"
 zomp="57 167 142"
 magenta="255 0 255"
+orange="255 165 0"
 
 goto=""
 
@@ -37,6 +38,7 @@ goto=""
 [ "`echo $* | grep -o daint`" = "daint" ] && goto=$blue
 [ "`echo $* | grep -o cosmopc`" = "cosmopc" ] && goto=$red
 [ "`echo $* | grep -o fidis`" = "fidis" ] && goto=$turquoise
+[ "`echo $* | grep -o helvetios`" = "helvetios" ] && goto=$orange
 
 
 currenthost=""
