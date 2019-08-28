@@ -35,6 +35,16 @@ from ipi.engine.barostats import Barostat
 from ipi.utils.units import Constants
 import ipi.utils.io as io
 
+class bcolors:
+    red = '\033[31m'
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 def get_new_state(state,svac,sneigh):
         nstate = state.copy() # ['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A' 'A' 'A' ....'V' 'A' 'A' ]
@@ -1429,6 +1439,7 @@ class AlKMC(Motion):
                 return " "+a
 
         def kac(text,l1=11,l2=8):
+            ''' l1 = total lenght, l2 digits after . '''
             ka = "{:"+str(l1)+"."+str(l2)+"f}"
             #print('ka',ka)
             return (ka.format(text)).rjust(l1+1)
@@ -1482,23 +1493,8 @@ class AlKMC(Motion):
             #eknew = 0.5*diffh
             #print('ets==etsnew?',ets==etsnew,ets,etsnew,ene_diff_mev,"mev/def")
             #print('eko==ekn   ?',ekold==eknew,ekold,eknew)
-            if True:
-                etsp  = 0.5*(ene_ref + ene_fin) #*hartree_to_mev
-                print(pp,step,str(i).ljust(3),
-                        kaa(levents[i][-1],3),
-                        A_B,
-                        #kaa(ene_ref+diff_to_base),
-                        kac(ene_ref-diff_to_base),
-                        ">>",
-                        #("{:10.8f}".format(ene_fin)).rjust(11),
-                        kac(ene_fin-diff_to_base),
-                        "||",
-                        kac(ene_diff),
-                        '== meV/def:',
-                        kac(ene_diff_mev,7,2)) #,etsp)
-            if np.abs(ene_diff_mev) > 10000:
-                softexit.trigger("Error: ene diff too high. Exit")
-                #print("Error: ene diff too high. Exit")
+
+
             rates[i] = self.prefactors[levents[i][-1]] * np.exp(-(ets-ene_ref)/kT)
             rates_new[i] = self.prefactors[levents[i][-1]] * np.exp(-(etsnew-ene_ref)/kT)
 
@@ -1520,17 +1516,43 @@ class AlKMC(Motion):
             #print('i',i,'x',x)
             y = ene_diff_mev
 
-
+            si_diff = 0
+            mg_diff = 0
+            solutes_diff = 0
+            ya = 0
             if filled == "filled":
                 self.diff_mev_filled.append([x,y])
                 ya = np.abs(y-self.diff_mev_normal_thisstep[i][1])
                 self.diff_diff_abs_mev_filled.append([x,ya])
 
                 solutes_diff = (self.nsi+self.nmg) - ostr_solutes
+                si_diff = self.nsi - ostr.count('S')
+                mg_diff = self.nmg - ostr.count('M')
                 self.ediff_vs_solutes.append([solutes_diff,ya])
             elif filled == "normal":
                 self.diff_mev_normal.append([x,y])
                 self.diff_mev_normal_thisstep.append([x,y])
+
+            if True:
+                etsp  = 0.5*(ene_ref + ene_fin) #*hartree_to_mev
+                print(pp,step,str(i).ljust(3),
+                        kaa(levents[i][-1],3),
+                        A_B,
+                        #kaa(ene_ref+diff_to_base),
+                        kac(ene_ref-diff_to_base),
+                        ">>",
+                        #("{:10.8f}".format(ene_fin)).rjust(11),
+                        kac(ene_fin-diff_to_base),
+                        "|",
+                        kac(ene_diff,6,4),
+                        '== meV/def:',
+                        kac(ene_diff_mev,6,2),
+                        bcolors.red+str(kac(ya,6,2))+bcolors.ENDC,
+                        si_diff,
+                        mg_diff) #,etsp)
+            if np.abs(ene_diff_mev) > 10000:
+                softexit.trigger("Error: ene diff too high. Exit")
+                #print("Error: ene diff too high. Exit")
 
         if filled == "filled":
             np.savetxt("nnrates_diff_filled_"+str(self.cutoff_filled),self.diff_mev_filled)
