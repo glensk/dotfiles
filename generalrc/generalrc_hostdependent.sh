@@ -57,8 +57,11 @@ get-rgb() {
     echo "$r $g $b"
 }
 
+#echo "aa myhost:$myhost:"
 export mycolor=`color-host $myhost`
-export mycolor_rgb=`get-rgb $mycolor`
+#echo "aa mycolor:$mycolor:"
+export mycolor_rgb="`get-rgb $mycolor`"
+#echo "aa mycolor_rgb:$mycolor_rgb:"
 export myprompthostuser=$mycolor
 export mypromptpath=$mycolor
 #case $onhost in
