@@ -91,5 +91,6 @@ helvetios)
   ;;
 esac
 
+tab-color $myprompthostuser
 #export whichalias mkalias;
 #[ "$currentshell" = "tcsh" ] && setenv whichalias alias;  # I dont need to support tcsh anymore
