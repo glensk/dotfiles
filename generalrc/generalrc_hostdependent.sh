@@ -23,7 +23,7 @@ export color_mac="magenta"
 export color_fidis=""
 
 color-host() {
-    [ "$1" = "mac" ]        && hascolor="magenta" && rgb=
+    [ "$1" = "mac" ]        && hascolor="magenta" 
     [ "$1" = "helvetios" ]  && hascolor="orange"
     [ "$1" = "cosmopc" ]    && hascolor="green"
     [ "$1" = "fidis" ]      && hascolor="cyan"
@@ -54,7 +54,7 @@ get-rgb() {
     [ "$1" = "mediumturquoise" ] && r=72  g=209 b=204  
     [ "$1" = "zomp" ]            && r=57  g=167 b=142  
     [ "$1" = "magenta" ]         && r=255 g=0   b=255  # works but you need to write it correctly
-    echo $r $g $b
+    echo "$r $g $b"
 }
 
 export mycolor=`color-host $myhost`
