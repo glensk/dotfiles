@@ -1336,6 +1336,7 @@ if __name__ == '__main__':
     p = help()  # this gives the possibility to change some __init__ settings
     args = p.parse_args()
     script_path = os.path.dirname(os.path.realpath(__file__))
+    print('script_path',script_path)
     file_orig = script_path+"/md_long_tox.c"
     file_comp = script_path+"/md_long_tox_compile.c"
     file_comp = os.getcwd()+"/md_long_tox_compile.c"

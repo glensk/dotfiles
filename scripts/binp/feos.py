@@ -590,10 +590,7 @@ class eos(object):
     #    return self.surface
 
 
-    def write_data(
-        self,
-        file1="energy.dat.fit",
-        file2="energy.fitdeltas"):
+    def write_data(self,file1="energy.dat.fit",file2="energy.fitdeltas"):
         """ Save files:
                 - energy.dat.fit
                 - Evinet_ATOMS

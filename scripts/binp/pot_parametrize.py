@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 
 import hesse as pot_energy
 #reload(pot_energy)
-import utils
+import utils_rename as utils
 import my_atom
 import imp
 imp.reload(my_atom)
@@ -42,7 +42,7 @@ imp.reload(crystal_generator)
 #import pot_energy_forces
 #reload(pot_energy_forces)
 
-np.set_printoptions(threshold=np.nan)  # print the whole array
+#np.set_printoptions(threshold=np.nan)  # print the whole array
 np.set_printoptions(linewidth=240)    # print only 6 digist after .
 np.set_printoptions(precision=3)    # print only 6 digist after .
 

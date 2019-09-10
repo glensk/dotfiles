@@ -22,7 +22,7 @@ from scipy.ndimage        import map_coordinates
 # non general libraries
 import crystal_generator
 reload(crystal_generator)
-import utils
+import utils_rename as utils
 reload(utils)
 import pot_parametrize
 reload(pot_parametrize)
