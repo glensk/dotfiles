@@ -14,6 +14,8 @@ def help(p = None):
     string = '''
     Examples for using this script:
     -------------------------------
+    % getEnergies_byLammps.py --units meV_pa -p Ni-Al-Mishin-2009.eam.alloy -thermo -v
+
     % getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx 4850:
     % getEnergies_byLammps.py -p n2p2_v1ag --units meV_pa -i input.data -idx :4850
     % getEnergies_byLammps.py -p n2p2_v1ag --units hartree -i simulation.pos_0.xyz -fi ipi
@@ -226,7 +228,7 @@ def get_energies(args):
     ##############################################################
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
-    print('getEne(0) LD_LIBRARY_PATH           :',os.environ['LD_LIBRARY_PATH'])
+    print('getEne(0) LD_LIBRARY_PATH            :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
     lammps()
     os.remove("log.lammps")
@@ -244,7 +246,7 @@ def get_energies(args):
             args.structures_idx = ":3"
 
     if args.test_formation_energies or args.elastic: units='eV'
-    print('getEne(p1) args.potepoch:',args.potepoch)
+    print('getEne(p1) args.potepoch             :',args.potepoch)
     ace = ase_calculate_ene(pot=pot,
             potpath=potpath,
             use_different_epoch=args.potepoch,
@@ -253,10 +255,13 @@ def get_energies(args):
             elastic=args.elastic,
             verbose=verbose)
     ### get the potential
-    print('getEne(p2) ace.pot_get_and_ase_lmp_cmd()')
+    print('getEne(p2)                           : ace.pot_get_and_ase_lmp_cmd()')
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
+    print('getEne(p3)                           : pot defined')
+    print('ace.lmpcmd',ace.lmpcmd)
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(P):")
+
     ##############################################################
     ### again show args
     ##############################################################
@@ -272,7 +277,10 @@ def get_energies(args):
         sys.exit("kaka done")
 
     if args.thermo:
-        my.get_evinet(ace)
+        if args.inputfile == 'POSCAR': args.format_in = "vasp"
+        my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
+        ase_structure = ase_read(args.inputfile,format=args.format_in)
+        ase_structure_relaxed = my.get_evinet(ace,ase_structure)
         sys.exit("kaka done")
 
 
@@ -565,13 +573,24 @@ def get_energies(args):
         else:
             print('ace units',ace.units.split("_"),ace.units.split("_")[0].lower())
             sys.exit('ace units not known')
-        atom_energy_Mg = ace.pot.atom_energy["Mg"]*conv
-        atom_energy_Si = ace.pot.atom_energy["Si"]*conv
-        atom_energy_Al = ace.pot.atom_energy["Al"]*conv
-        #print("atom_energy_Mg",atom_energy_Mg,ace.units,"one_atom",ace.pot.atom_energy["Mg"],"hartee_pa")
-        #print("atom_energy_Si",atom_energy_Si,ace.units,"one_atom",ace.pot.atom_energy["Si"],"hartree_pa")
-        #print("atom_energy_Al",atom_energy_Al,ace.units,"one_atom",ace.pot.atom_energy["Al"],"hartree_pa")
 
+
+        #if True: #verbose > 1:
+        #    print('kk',ace.pot.atom_energy)
+        #    for atom_species in ace.pot.atom_energy:
+        #        atom_energy = ace.pot.atom_energy[atom_species]
+        #        print(atom_species, atom_energy)
+        #    if "Mg" in ace.pot.atom_energy:
+        #        print('yes mg exists')
+        #sys.exit('77')
+        #atom_energy_Mg = ace.pot.atom_energy["Mg"]*conv
+        #atom_energy_Si = ace.pot.atom_energy["Si"]*conv
+        #atom_energy_Al = ace.pot.atom_energy["Al"]*conv
+        #if True: #verbose > 1:
+        #    print("atom_energy_Mg",atom_energy_Mg,ace.units,"one_atom",ace.pot.atom_energy["Mg"],"hartee_pa")
+        #    print("atom_energy_Si",atom_energy_Si,ace.units,"one_atom",ace.pot.atom_energy["Si"],"hartree_pa")
+        #    print("atom_energy_Al",atom_energy_Al,ace.units,"one_atom",ace.pot.atom_energy["Al"],"hartree_pa")
+        #sys.exit('77')
 
         calc_DFT = True
         calc_pot = True
@@ -712,11 +731,10 @@ def get_energies(args):
                 if verbose > 1:
                     print('ene_DFT[idx]     :',ene_DFT[idx],units)
 
-
             if len(ace.units.split("_")) == 1: # per structure
-                ene_DFT_atomic[idx] = n["Mg"]*atom_energy_Mg + n["Si"]*atom_energy_Si + n["Al"]*atom_energy_Al
+                ene_DFT_atomic[idx] = my.get_atomc_energy_from_dicts(n,ace.pot.atom_energy)
             elif len(ace.units.split("_")) == 2: # per atom
-                ene_DFT_atomic[idx] = d["Mg"]*atom_energy_Mg + d["Si"]*atom_energy_Si + d["Al"]*atom_energy_Al
+                ene_DFT_atomic[idx] = my.get_atomc_energy_from_dicts(d,ace.pot.atom_energy)
             else:
                 sys.exit("either per atom or per structure")
 
@@ -777,7 +795,11 @@ def get_energies(args):
                     # print('at si',atom_energy_Si,"meV",atom_energy_Si/conv,"hartree") # at si -150410.566175 meV -5.5274864 hartree
 
                     #if pot == "runner_v2dg" and False: # only in case we load DFT energies from new DFT calcs
-                    if atom_energy_Mg/conv < -17.0:  # we did load the "old" energies
+                    if "Mg" in ace.pot.atom_energy and "Si" in ace.pot.atom_energy and "Al" in ace.pot.atom_energy and ace.pot.atom_energy["Mg"]/conv < -17.0:
+                    #if atom_energy_Mg/conv < -17.0:  # we did load the "old" energies
+                        atom_energy_Mg = ace.pot.atom_energy["Mg"]*conv
+                        atom_energy_Si = ace.pot.atom_energy["Si"]*conv
+                        atom_energy_Al = ace.pot.atom_energy["Al"]*conv
                         #n = my.ase_get_chemical_symbols_to_number_of_species(atoms_tmp[i])
                         ### ene_Al, ene_Mg, ene_Si are per atom, since those are later multi-
                         ### -lied by the number of atoms, this can only work if energies are

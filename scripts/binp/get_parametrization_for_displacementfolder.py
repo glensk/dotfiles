@@ -8,7 +8,7 @@ from lmfit import Model
 from scipy.optimize import curve_fit
 import glob,copy
 import sys,os,argparse
-import utils
+import utils_rename as utils
 import my_atom
 import myutils as my
 from subprocess import call
