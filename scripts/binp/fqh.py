@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import pylab
+#import pylab
 import numpy as np
 import glob
 import sys
@@ -8,11 +8,12 @@ import re
 import os
 import scipy as sp
 from scipy.interpolate import griddata
+import myutils as my
 
 # for plots
 from mpl_toolkits.mplot3d import *
 import matplotlib
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from random import random, seed
 from matplotlib import cm
 import imp
@@ -313,6 +314,18 @@ class qh(object):
         self._filessearchstring_suffix = ""
         for i in self.files:
             suffix = i[len(self._filessearchstring_common):]
+            #print('suffix',suffix,len(suffix),'files',len(self.files),suffix[:10])
+            pos_dot = len(suffix)
+            for pos_dot_,j in enumerate(suffix):
+                if j == ".":
+                    pos_dot = pos_dot_
+                    break
+            #print('pos_dot',pos_dot)
+            digits = 4
+            if pos_dot+digits < len(suffix):
+                suffix = suffix[:pos_dot+digits+1]
+            #print('suffix',suffix,len(suffix),'files',len(self.files),suffix[:10])
+            #sys.exit('3')
             self._filessearchstring_suffix = self._filessearchstring_suffix + "_" + suffix
 
         if self.files == None:
@@ -374,7 +387,8 @@ class qh(object):
             ############################################
             # import files
             ############################################
-            data = pylab.loadtxt(file)
+            #data = pylab.loadtxt(file)
+            data = np.loadtxt(file)
             ############################################
             # check imported files
             ############################################
@@ -860,6 +874,8 @@ class qh(object):
     def write_fqh_surface_2nd(self, filename = None):
         ''' docstring here '''
         if filename == None:
+            print('self._filessearchstring_common',self._filessearchstring_common)
+            print('self._filessearchstring_suffix',self._filessearchstring_suffix)
             filename = self._filessearchstring_common+"Surface_2nd_order_"+self._filessearchstring_suffix+"_e"+str(int(self._multiply_energy))+"_v"+str(int(self._multiply_volume))
         np.savetxt(filename, self.surface,fmt="%.0f %.12f %.12f %.12f")
         _printgreen(filename+" written")
@@ -1053,6 +1069,7 @@ class qh(object):
 if __name__ == '__main__':
     p = qh().help()
     args = p.parse_args()
+    my.create_READMEtxt(os.getcwd())
     qh = qh(args)
     if args.ih != False:
         print(args.ih)
@@ -1072,8 +1089,6 @@ if __name__ == '__main__':
         qh.import_fqh_files()   #(files="Fqh_fromExact[Ff]reqs_[0-9.]*")
         qh.fit_surface()
 
-    import myutils
-    myutils.create_READMEtxt()
     if args.ov != False or args.ofcca != False:
         qh.helmholtz_free_energy(v = args.ov, fccalat=args.ofcca, save = args.ob)
 

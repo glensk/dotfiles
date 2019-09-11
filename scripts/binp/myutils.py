@@ -371,6 +371,18 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
              for i in range(len(reci_cell))]
     return kmesh
 
+
+
+def progress_orig(count, total, suffix=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', suffix))
+    sys.stdout.flush()  # As suggested by Rom Ruben
+
 def progress(count, total, status=''):
     ''' use:
     for i in range(DB2len):
@@ -647,6 +659,8 @@ class mypot( object ):
         self.verbose                    = verbose
         self.elements                   = False  # list e.g. ['Al', 'Mg', 'Si']
         self.atom_energy                = False
+        self.atom_masses                = False # necessary for n2p2 / runner
+        self.atom_masses_str            = False # necessary for n2p2 / runner
         self.atom_types                 = None # needs to be defines for runner/n2p2
                                         # self.atom_types = {'Mg':1,'Al':2,'Si':3}
         self.lmpcmd                     = False
@@ -703,27 +717,34 @@ class mypot( object ):
                 inputnn = self.potpath+"/input.nn"
                 if os.path.isfile(inputnn):
                     self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn)
+
                 self.atom_types_ = {}
+                self.atom_masses = {}
                 for i in self.elements:
                     self.atom_types_[i] = my_atom.atom([i]).number[0]
-                #print('fin',self.atom_types_)
+                    self.atom_masses[i] = my_atom.atom([i]).mass[0]
+                #print('fin (1)',self.atom_types_)
+                #print('fin (M)',self.atom_masses)
                 list_atom_nr = []
                 for i  in self.atom_types_:
                     list_atom_nr.append(self.atom_types_[i])
                     #print(i,self.atom_types_[i])
-                #print('fin 2:',np.sort(np.array(list_atom_nr)))
+                #print('fin (2):',np.sort(np.array(list_atom_nr)))
                 self.atom_types = {}
+                self.atom_masses_str = []
                 for idx,i in enumerate(np.sort(np.array(list_atom_nr))):
                     for j in self.atom_types_:
                         #print(idx,i,"||",j,self.atom_types_[j])
                         if i == self.atom_types_[j]:
                             self.atom_types[j] = idx+1
+                            self.atom_masses_str = self.atom_masses_str+ [ "mass "+str(idx+1)+" "+str(self.atom_masses[j])]
                             #print('-->',j,self.atom_types[j],idx+1)
                             #print('-->xx',self.atom_types)
                             break
 
 
-                #print('fin X',self.atom_types)
+                #print('fin (3)',self.atom_types)
+                #print('fin (M)',self.atom_masses_str)
                 #sys.exit('887')
             elif 'eam' in self.pot and 'alloy' in self.pot: # eam-alloy
                 self.pottype = 'eam-alloy'
@@ -1835,7 +1856,7 @@ def lammps_ext_elastic_init_mod(ace,positions='pos.lmp'):
     'read_data "'+positions+'"',
     "",
     "# Need to set mass to something, just to satisfy LAMMPS",
-    ] + ace.lammps_command_masses()
+    ] + ace.pot.atoms_masses_str #lammps_command_masses()
     return command
 
 def lammps_ext_elastic_potential_mod(ace):
@@ -3158,13 +3179,13 @@ class ase_calculate_ene( object ):
         #]
         return command
 
-    def lammps_command_masses(self):
-        command = [
-                "mass 1 24.305",
-                "mass 2 26.9815385",
-                "mass 3 28.0855",
-                ]
-        return command
+    #def lammps_command_masses(self):
+    #    command = [
+    #            "mass 1 24.305",
+    #            "mass 2 26.9815385",
+    #            "mass 3 28.0855",
+    #            ]
+    #    return command
 
     def pot_get_and_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False):
         ''' geoopt (geometry optimization) is added / or not in
@@ -3205,7 +3226,7 @@ class ase_calculate_ene( object ):
         # so should be easy to make this general.
         self.lmpcmd = [ "## lmpcmd.begin ##" ]
         if self.pot.pottype == "n2p2" or self.pot.pottype == "runner":
-            self.lmpcmd = self.lmpcmd + self.lammps_command_masses()
+            self.lmpcmd = self.lmpcmd + self.pot.atom_masses_str #self.lammps_command_masses()
         else:
             self.lmpcmd = self.lmpcmd
 
@@ -4119,7 +4140,7 @@ class ase_calculate_ene( object ):
             print("get_calculator: keep_alive :",self.keep_alive)
             print("structure/atoms types      :",atoms.get_chemical_symbols())
         if self.calculator == "lammps":
-            if self.verbose:
+            if self.verbose > 1:
                 print('get_calculator (Y1): lmpcmds = self.lmpcmd    :',self.lmpcmd)
                 print('get_calculator (Y2): atom_types=self.atom_types:',self.atom_types)
             asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=self.keep_alive)
@@ -4213,6 +4234,7 @@ class ase_calculate_ene( object ):
         atoms_murn_loop = atoms_murn.copy()
         if verbose:
             print('               vol [Ang^2/at] ene [??]:')
+        print()
         for idx,i in enumerate(dvol_rel):
             if verbose > 2:
                 print()
@@ -4230,7 +4252,7 @@ class ase_calculate_ene( object ):
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
-            print('ene_ev_normal',ene_ev,'ene murn',ene,nat,self.units)
+            print('ene ase tot (eV):',str(round(ene_ev,7)).ljust(10),'nat:'+str(nat),"vol/pa:",str(round(vol/nat,7)).ljust(10),'(eV/at):',str(ene/nat).ljust(19)) #self.units)
             #print('ams3',atoms_murn_loop.get_stress(),ase_vpa(atoms_murn_loop))
             if verbose > 2:
                 stress = atoms_murn_loop.get_stress()[:3]
@@ -4252,14 +4274,16 @@ class ase_calculate_ene( object ):
                 print('333 ene',ene) #,ene2)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
-            if write_Fqh_files:
-                print('write_Fqh_files:',idx,i)
+            if write_Fqh_files and dvol_rel[idx] >= 0.999:
+                #print('write_Fqh_files: idx:',idx,'i:',i,'dvol_rel:',dvol_rel[idx])
                 self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
             if verbose > 2:
                 print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
             if verbose:
                 stress = atoms_murn_loop.get_stress()[:3]
                 print('i',str(i).ljust(5),'vol/nat',str(round(vol/nat,7)).ljust(10),'ene/nat',str(ene/nat).ljust(19),stress)
+        print()
+
 
         if verbose: self.check_frame('get_murn 3 atfer loop           ',frame=atoms_murn)
         if verbose > 1:
@@ -4268,9 +4292,9 @@ class ase_calculate_ene( object ):
             pos = atoms_murn.get_positions()[1]/cell[0,0]
             print("---1-->>",pos)
         if write_energies:
-            print('we1')
+            #print('we1')
             if type(write_energies) == bool:
-                print('we2')
+                #print('we2')
                 write_energies = "energy.dat"
             np.savetxt(write_energies,np.transpose([vol_pa,ene_pa]))
         if verbose > 1:
@@ -4367,11 +4391,11 @@ class ase_calculate_ene( object ):
 
 
         #sys.exit('80')
-        print('xx80.1')
+        #print('xx80.1')
         self.keep_alive = False
         self.get_calculator(atoms_h)
         #sys.exit('81')
-        print('xx80.2')
+        #print('xx80.2')
 
         if debug:
             print("###########################################")
@@ -4384,9 +4408,9 @@ class ase_calculate_ene( object ):
         #ene = self.ene(atoms_h,cellrelax=True,atomrelax=True,print_minimization_to_screen=debug)
         if atomrelax == True:
             self.ase_relax_atomic_positions_only(atoms_h,fmax=0.0001,verbose=False)
-            print('harmonic cell stress',atoms_h.get_stress())
+            #print('harmonic cell stress',atoms_h.get_stress())
         maxforce = np.abs(atoms_h.get_forces()).max()
-        print('xx80.3 maxforce',maxforce)
+        #print('xx80.3 maxforce',maxforce)
         if debug:
             print("###########################################")
             #print("forces harmonic 4:",atoms_h.get_forces()[:3])
@@ -4394,13 +4418,13 @@ class ase_calculate_ene( object ):
             print('out atoms_h str',atoms_h.get_stress())
             print('out maxforce out',maxforce)
 
-        print('xx80.4')
+        #print('xx80.4')
         if atomrelax == True and maxforce > 0.0001:
             print("forces harmonic 4:",atoms_h.get_forces()[:3])
             print('maxforce',maxforce)
             sys.exit('maxforce is too large')
 
-        print('xx80.5')
+        #print('xx80.5')
         if maxforce > 0.0001:
             # from this it needs to be deduced that NEGATIVE EIGENVALUES
             # calculating the hesse makes a segmentation fault with ace lammps
@@ -4409,11 +4433,22 @@ class ase_calculate_ene( object ):
             print("###########################################")
             print('atoms_h.get_cell() before',atoms_h.get_cell())
 
-        print('xx80.6')
+        #print('xx80.6')
+        if True:
+            nat = atoms_h.get_number_of_atoms()
+            #print('xx80.7,nat (0)',nat)
+            if nat < 4:
+                atoms_h *= (4,4,4)
+            nat = atoms_h.get_number_of_atoms()
+            #print('xx80.7,nat (1)',nat)
+            if nat < 10:
+                atoms_h *= (3,3,3)
         nat = atoms_h.get_number_of_atoms()
         if nat < 20:
             atoms_h *= (2,2,2)
-        print('xx80.7')
+        nat = atoms_h.get_number_of_atoms()
+        #print('xx80.7,nat (2)',nat)
+        #sys.exit()
         if debug:
             nat = atoms_h.get_number_of_atoms()
             print("###########################################")
@@ -4423,17 +4458,17 @@ class ase_calculate_ene( object ):
             print("forces max harmonic 2:",abs(atoms_h.get_forces()).max())
             print('atoms_h.get_cell() after mult',atoms_h.get_cell())
             print("###########################################")
-        print('xx80.8')
+        #print('xx80.8')
         pos0 = atoms_h.get_positions()
-        print('xx80.9')
+        #print('xx80.9')
         hessematrix=np.zeros((pos0.shape[0]*3,pos0.shape[0]*3))
-        print('xx81.0')
+        print('xx81.0',nat)
 
         ### schleife ueber alle atome, 1..32
 
         for iidx,i in enumerate(pos0): # loop over all atoms
-            progress(iidx,len(pos0),status=try_readfile)
-            print(iidx,"/",pos0.shape[0]) # loop over xyz 1..3
+            progress(iidx,len(pos0),status=try_readfile) #try_readfile)
+            #print(iidx,"/",pos0.shape[0]) # loop over xyz 1..3
             for jidx,j in enumerate(i):
                 pos1 = np.copy(pos0)
                 pos1[iidx,jidx] = pos1[iidx,jidx]+disp
@@ -4449,7 +4484,7 @@ class ase_calculate_ene( object ):
                 #print('iidx (d)',iidx,"/",pos0.shape[0],'jidx',jidx)
                 hessematrix[iidx*3+jidx] = fah.reshape((1,pos0.shape[0]*        3))/(-disp)
 
-        print('xx81.1')
+        print('xx81.1',nat)
         #np.savetxt("HesseMatrix.dat",hessematrix/97.173617,fmt="%.13f")
         if debug:
             print("get free energy ...")
@@ -4477,8 +4512,8 @@ class ase_calculate_ene( object ):
                 hes.write_hessematrix("Hessematrix"+volstr)
                 if hes.has_negative_eigenvalues == False:
                     # only write for ground state
-                    hes.write_ene_atom("Fqh_per_atom"+volstr)
-                    hes.write_ene_cell("Fqh_per_cell"+volstr)
+                    hes.write_ene_atom("Fqh_"+str(nat)+"at_cell_per_atom"+volstr)
+                    hes.write_ene_cell("Fqh_"+str(nat)+"at_cell_per_cell"+volstr)
             #np.savetxt(try_readfile,free_ene)
 
         #print('k T)shift   ',T0shift_ev_atom)
@@ -4543,12 +4578,12 @@ def get_evinet(ace,atoms):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
     print()
     print("NOW GETTING EVinet ...")
-    vinet = ace.get_murn(atoms,verbose=True,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False)
+    vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=True)
+    sys.exit()
     print('vinet!!!!!!! ... save this:',vinet.parameters)
     vinet.write_data()
     #print('atoms vol',atoms.get_volume())
     print("NOW GETTING Fqh_files ...")
-    #vinet = ace.get_murn(atoms,verbose=True,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=True)
     ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
     return atoms
 

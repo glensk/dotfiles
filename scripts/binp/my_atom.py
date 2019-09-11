@@ -165,11 +165,12 @@ atomic_masses_ase = np.array([
      np.nan])# Lw
 
 # from http://en.wikipedia.org/wiki/List_of_elements (see there for corresponding REFS)
+#
 atomic_masses = np.array([
     np.nan     ,    1.008     ,    4.002602  ,    6.94      ,
     9.012182   ,   10.81      ,   12.011     ,   14.007     ,
     15.999     ,   18.9984032 ,   20.1797    ,   22.98976928,
-    24.305     ,   26.9815386 ,   28.085     ,   30.973762  ,
+    24.305     ,   26.9815386 ,   28.0855    ,   30.973762  ,
     32.06      ,   35.45      ,   39.948     ,   39.0983    ,
     40.078     ,   44.955912  ,   47.867     ,   50.9415    ,
     51.9961    ,   54.938045  ,   55.845     ,   58.933195  ,
@@ -707,6 +708,7 @@ def data(elementlistin = None):
     symbol = [word[0].upper() + word[1:] for word in all_lower]
     number = np.array([atomic_symbols.index(a) for a in symbol])
     mass = atomic_masses[number]
+    mass_ase = atomic_masses_ase[number]
     melting = atomic_melting[number]
 
     getVar = lambda searchList, ind: [searchList[i] for i in ind]

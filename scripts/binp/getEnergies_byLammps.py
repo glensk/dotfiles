@@ -95,6 +95,10 @@ def get_energies(args):
         print(my.pot_all())
         sys.exit()
 
+    ##################################
+    # create the README
+    ##################################
+    my.create_READMEtxt(os.getcwd())
 
     hier = os.path.abspath(os.getcwd())
     allepochs = [False]
@@ -314,7 +318,6 @@ def get_energies(args):
     ############
     if args.test_formation_energies:
         test_formation_energies(ace)
-        my.create_READMEtxt(os.getcwd())
         sys.exit('test_formation_energies done! Exit')
 
     ############
@@ -1002,8 +1005,6 @@ def get_energies(args):
         if args.testkmc or args.testkmc_b or args.testkmc_l:
             ene_std         = mysavetxt(ene_std,kmc_file,units,save=True)
 
-        if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
-            my.create_READMEtxt(os.getcwd())
 
         if args.write_analysis_full or args.write_analysis:
             ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
@@ -1075,8 +1076,6 @@ def get_energies(args):
 
     if args.check_inputdata or args.check_traindata or args.check_testdata or args.check_kmc57data:
         shutil.rmtree(ace.pot.pot_tmpdir)
-    else:
-        my.create_READMEtxt(os.getcwd())
     return
 
 
@@ -1851,14 +1850,12 @@ def get_elastic_constants_al_ext(ace):
         #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
         #if not os.path.isfile(filename):
         #    np.savetxt(filename,np.array([np.float(ace.c44)]))
-        #    my.create_READMEtxt(os.getcwd())
     return ace.c44
 
 def get_elastic_constants_al_from_ene(ace):
     ace.elastic_relax = True
     frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
     ace.get_elastic(frame_al,verbose=ace.verbose)
-    my.create_READMEtxt(os.getcwd())
     sys.exit()
 
     path = my.scripts()+'/tests/Al-Mg-Si/SimpleAlDeformations/SimpleAlDeformations_scf.runner'
