@@ -1,0 +1,9 @@
+pip install --upgrade --user phonopy
+pip install --upgrade --user ase
+pip install --upgrade --user lmfit
+pip install --upgrade --user intel-numpy    # to make numpy faster
+pip install --upgrade --user tqdm
+pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
+pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
+pip install --upgrade --user sklearn  # necessary for andreas soap stuff
+pip install --upgrade --user plotly_express # to make nice scatterplots

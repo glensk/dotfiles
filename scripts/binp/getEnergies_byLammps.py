@@ -92,7 +92,9 @@ def get_energies(args):
 
     '''
     if args.show_availabel_pots:
-        print(my.pot_all())
+        #print(my.pot_all())
+        for i in my.pot_all():
+            print(i)
         sys.exit()
 
     ##################################

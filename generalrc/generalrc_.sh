@@ -105,6 +105,7 @@ case $myhost in
     #cosmopc) source $HOME/aiida/bin/activate; ;;
     # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
     # on mac: 
+    # pip install --upgrade --user phonopy
     # pip install --upgrade --user ase
     # pip install --upgrade --user lmfit
     # pip install --upgrade --user intel-numpy    # to make numpy faster
