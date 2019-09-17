@@ -332,7 +332,7 @@ def install_lammps(args):
     print('os.getcwd() (2)',os.getcwd())
     subprocess.call(["make", "clean-all",])
 
-
+    # yes-USER-MISC makes lammps work wih ipi
     list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC" ]
     if "runner" in extension:
         list = list + [ "yes-USER-RUNNER" ]

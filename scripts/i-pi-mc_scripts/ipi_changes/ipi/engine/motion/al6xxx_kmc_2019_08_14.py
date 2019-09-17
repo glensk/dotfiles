@@ -35,6 +35,8 @@ from ipi.engine.barostats import Barostat
 from ipi.utils.units import Constants
 import ipi.utils.io as io
 
+import my_atom
+
 class bcolors:
     red = '\033[31m'
     HEADER = '\033[95m'
@@ -76,19 +78,96 @@ def get_path_to_potential(infile="in.lmp"):
     out3 = out2.replace('"',"")
 
     outz = grep(infile,"variable nnpDir string")
+
     outx = grep(infile,"pair_style")
     outy = grep(infile,"pair_coeff")
-    print('outz',outz)
-    print('outx',outx)
-    print('outy',outy)
-    #sys.exit()
+    #print('outz',outz)
+    #print('outx',outx)
+    #print('outy',outy)
+    potpath = outz[0].split()[3].replace('"','')
     #print('out2',str(out2))
     #print('out3',str(out3))
     #return out3
-    return [outz[0],outx[0],outy[0]]
+    potstring = [outz[0],outx[0],outy[0]]
+    return potstring,potpath
+
+def grep(filepath,string):
+    out = []
+    file = open(filepath, "r")
+
+    for line in file:
+         if re.search(string, line):
+            line_ = line.rstrip()
+            #print('found:'+line_+":",type(line_))
+            out.append(line_)
+            #print("foundo",out)
+    #print("out",out)
+    return out
 
 
-def  ase_minimize(atomsc_in=False,minimizer="LBFGS",potpath=False):
+def inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn,verbose=False):
+    elements = []
+    if os.path.isfile(inputnn):
+        ##### get elements
+        lines = grep(inputnn,"^elements")
+        if len(lines) == 1:
+            line = lines[0]
+            line_elements_ = line.split()[1:]
+            elements = []
+            for i in line_elements_:
+                #print(i)
+                if i in my_atom.atomic_symbols:
+                    #print("yo",i)
+                    elements.append(i)
+                else:
+                    break
+        if verbose:
+            print('elements ++',elements)
+
+        ##### get atomic energies
+        lines = grep(inputnn,"^atom_energy")
+        ele_list = []
+        ene_list = []
+        for i in lines:
+            if i.split()[1] in elements:
+                ele = i.split()[1]
+                ene = float(i.split()[2])
+                #print('lines',i.split(),"--------->>",ele,ene,type(ene))
+                ele_list.append(ele)
+                ene_list.append(ene)
+                #print("ele_list",ele_list)
+        if verbose:
+            print('1 ele_final:',ele_list,len(ele_list))
+            print('1 ene_final',ene_list,len(ene_list))
+
+        if len(ele_list) == len(ene_list) == 0:
+            ele_list = elements
+        else:
+            elements = ele_list
+
+        if verbose:
+            print('2 ele_final:',ele_list)
+            print('2 ene_final',ene_list)
+        if len(ene_list) == 0 and len(ele_list) != 0:
+            ene_list = list(np.zeros(len(ele_list)))
+        if verbose:
+            print('3 ele_final:',ele_list)
+            print('3 ene_final',ene_list)
+
+        d = {}
+        if len(ele_list) == len(ene_list):
+            d = {}
+            for idx,i in enumerate(ele_list):
+                d[i] = ene_list[idx]
+            elements = ele_list
+            atom_energy = d
+        if verbose:
+            print("elements,",elements)
+            print("atom_energy",atom_energy)
+        return elements, atom_energy
+
+
+def  ase_minimize(atomsc_in=False,minimizer="LBFGS",potstring=False):
     ''' minimizer: LBFGS,GPmin
         currently: expects positions in angstrom, returns positions in bohrradius
     '''
@@ -109,7 +188,7 @@ def  ase_minimize(atomsc_in=False,minimizer="LBFGS",potpath=False):
     # get calculator
     atom_types = {'Mg':1,'Al':2,'Si':3}
     #lmpcmd = ['mass 1 24.305', 'mass 2 26.9815385', 'mass 3 28.0855', 'variable nnpDir string "'+potpath+'"', 'pair_style runner dir ${nnpDir} showewsum 1 showew yes resetew no maxew 1000000', 'pair_coeff * * 14.937658735']
-    lmpcmd = ['mass 1 24.305', 'mass 2 26.9815385', 'mass 3 28.0855', potpath[0],potpath[1],potpath[2]]
+    lmpcmd = ['mass 1 24.305', 'mass 2 26.9815385', 'mass 3 28.0855', potstring[0],potstring[1],potstring[2]]
     #print('lmpcmd',lmpcmd)
     #sys.exit()
     # n2p2p: pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261258369282 cfenergy 0.03674932247495664
@@ -313,7 +392,12 @@ class AlKMC(Motion):
                 sys.exit("if you want self.filled you need to ues ase!")
             self.filled = False
         if self.ase == True:
-            self.potpath = get_path_to_potential()
+            self.potstring, self.potpath = get_path_to_potential()
+            self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy_dict(self.potpath+'/input.nn')
+            print("self.elements",self.elements)
+            print("self.atom_energy",self.atom_energy)
+            #sys.exit()
+
         self.diff_mev_normal = []
         self.diff_mev_filled = []
         self.diff_diff_abs_mev_filled = []
@@ -1300,7 +1384,7 @@ class AlKMC(Motion):
 
             if step > 188:
                 print('gg stepXX',step,'ieval',ieval)
-            newpot,newq,atomsc = ase_minimize(atomsc_in=atomsc,minimizer="gpmin",potpath=self.potpath) #lbfgs")
+            newpot,newq,atomsc = ase_minimize(atomsc_in=atomsc,minimizer="gpmin",potstring=self.potstring) #lbfgs")
             if step > 188:
                 print('hh stepXX',step,'ieval',ieval)
             #if type(savename) == str and self.write_pos == True:
@@ -1690,7 +1774,7 @@ class AlKMC(Motion):
             if True:
                 self.atomsc.set_positions(p2*0.52917721)
                 ase_write("simulation.pos_0.dbeads.extxyz",self.atomsc,format="extxyz",append=True)
-                ene,positions,atomsc = ase_minimize(atomsc_in=self.atomsc,minimizer="gpmin",potpath=self.potpath) #lbfgs")
+                ene,positions,atomsc = ase_minimize(atomsc_in=self.atomsc,minimizer="gpmin",potstring=self.potstring) #lbfgs")
 
 
         #print('p3',p3.shape)
