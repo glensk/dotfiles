@@ -15,7 +15,9 @@ from __future__ import print_function
 from ase.build import bulk as ase_build_bulk
 import time,os,sys,re
 from ase.io import write as ase_write
+from ase.io import read as ase_read
 from collections import defaultdict
+import math
 import pickle
 import threading
 #import logging
@@ -49,7 +51,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def get_new_state(state,svac,sneigh):
-        nstate = state.copy() # ['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A' 'A' 'A' ....'V' 'A' 'A' ]
+        nstate = state.copy() # ['S' 'S' 'S' 'M' 'M' 'M' 'A' 'A'  ....'V'  'A' ]
         nstate[svac], nstate[sneigh] = state[sneigh], state[svac]
         nstr = "".join(nstate) # this is the string that corresponds to the new state
         return nstate,nstr
@@ -232,7 +234,8 @@ def  ase_minimize(atomsc_in=False,minimizer="LBFGS",potstring=False):
         atomsc_out.set_positions(positions_out)
     #print('ASE 4',positions_out.shape)
     #print('ASE 5',len(positions_out))
-    return ene*0.036749322,positions_out.flatten()/0.52917721,atomsc_out
+    eVToHartree = 0.036749322
+    return ene*eVToHartree,positions_out.flatten()/0.52917721,atomsc_out
 
 def gs(NN1,search="S"):
     ''' sums elements in array and return frequency '''
@@ -354,14 +357,28 @@ class AlKMC(Motion):
         # 2. by a list of the lattice sites in 3D space, in 1-1 mapping with the letters
         # 3. by a list of the atoms, whose lattice position is indicated by an integer
 
+        self.nstep          = nstep
+        self.ncell          = ncell
+        self.nvac           = nvac
+        self.nsi            = nsi
+        self.nmg            = nmg
+        self.a0             = a0
+        self.neval          = neval
+        self.ang_to_bohr    = 1.8897261
+        self.bohr_to_ang    = 0.52917721
 
-        self.nstep = nstep
-        self.ncell = ncell
-        self.nvac = nvac
-        self.nsi = nsi
-        self.nmg = nmg
-        self.nsites = self.ncell**3
 
+        self.get_ncell_cell_nsites_sites_and_celltype_from_file("data.extxyz")
+        print("cell primitive    :",not self.cubic)
+        print("cell cubic        :",self.cubic)
+        #print('number of atoms  :',data_extxyz.get_number_of_atoms())
+        print('self.ncell        :',self.ncell)
+        print('self.nsites       :',self.nsites)
+        print("LATTICE PARAM (a0):",self.a0,'(bohrradius)')
+        print("LATTICE PARAM (a0):",self.a0*self.bohr_to_ang,'(angstrom)')
+
+        if self.nvac != 1:
+            sys.exit('ase_minimize can currently handle one one vacancy')
 
         # timing: ipi parallel: 35.4926519394 sec; used only one core with 100%
         # timing: ase parallel:  19.5         sec; used "once core" with ~500%, neval=1 (so 12 runs necessary)
@@ -369,15 +386,15 @@ class AlKMC(Motion):
         # timing: ase parallel:  7.1/         sec; used "once core" with ~500%, neval=4 (so 3 runs necessary)
         # timing: ase parallel:  7.1/7.5      sec; used "once core" with ~500%, neval=8 (so 2 runs necessary)
         # timing: ase parallel:  6.6/6.2      sec; used "once core" with ~700%, neval=12 (so 1 runs necessary)
-
         self.ase            = True  # ase yes? ase_yes_no
         self.normal         = True  # use normal evaluation of energy
         self.filled         = True  # use evaalutation of energy where beyond cutoff only Al
-        self.conventional   = False  # use qubic supercell?
         self.parallel       = False  # run with threading
         self.write_pos      = False   # wrte in_pos_ && out_pos
         self.write_strings  = False  # write AASMAAAAVAASAAA ....
         self.step_isel      = False #[ 1,10,6,8,2,7,4,3,9,5,11 ] # or False
+        self.filled_spheric = False # leave this False!
+        self.calc_smallbox  = True
         self.cutoff_filled  = 1.1   # 1.1 == 1NN +2NN = 18 atoms
         self.cutoff_filled  = 1.5   # 1.5 == 34 atoms (??? in 7x7x7)
                                     # 1.5 == 54 in 5x5x5
@@ -391,26 +408,29 @@ class AlKMC(Motion):
             if self.ase == False and self.filled == True:
                 sys.exit("if you want self.filled you need to ues ase!")
             self.filled = False
-        if self.ase == True:
+        if True: #self.ase == True:
             self.potstring, self.potpath = get_path_to_potential()
             self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy_dict(self.potpath+'/input.nn')
-            print("self.elements",self.elements)
-            print("self.atom_energy",self.atom_energy)
-            #sys.exit()
+            print("self.elements    :",self.elements)
+            print("self.atom_energy :",self.atom_energy)
 
         self.diff_mev_normal = []
         self.diff_mev_filled = []
+        self.diff_mev_filled_std = []
+        self.diff_mev_normal_atomic = []
+        self.diff_mev_filled_atomic = []
         self.diff_diff_abs_mev_filled = []
         self.ediff_vs_solutes = []
 
 
-        if self.conventional:
-            self.ncell = 2
-            self.nsites = 4*self.nsites
-
+        # this is the cellsize of the cut out cell
+        # at least for the qubic = conventional fcc supercell
+        self.ncell_inner = np.int(math.ceil(self.cutoff_filled*2+1))
+        print('self.ncell_inner  :',self.ncell_inner)
+        if self.ncell_inner > self.ncell:
+            sys.exit('check cell 1')
 
         self.natoms = self.nsites - self.nvac
-        self.neval = neval
         self.diffusion_barrier_al = diffusion_barrier_al
         self.diffusion_prefactor_al = diffusion_prefactor_al
         if diffusion_barrier_mg > 0:
@@ -436,51 +456,26 @@ class AlKMC(Motion):
                           "M": self.diffusion_prefactor_mg,
                           "S": self.diffusion_prefactor_si }
 
-        self.a0 = a0
-        cell=np.zeros((3,3))
-        cell[0]=[0.7071067811865475, 0.35355339059327373, 0.35355339059327373]
-        cell[1]=[0.,0.6123724356957945, 0.20412414523193154]
-        cell[2]=[0.,0.,0.5773502691896258]
-
-        if self.conventional:
-            cell[0] = [1,0,0]
-            cell[1] = [0,1,0]
-            cell[2] = [0,0,1]
-
-        self.scell=self.a0*cell
-        self.dcell = Cell()
-        self.dcell.h = self.scell*self.ncell
-
-
-        print("LATTICE PARAM (self.a0)", self.a0)
-        # this is the list of lattice sites, in 3D coordinates
-        ix,iy,iz = np.meshgrid(range(self.ncell), range(self.ncell), range(self.ncell), indexing='ij')
-        self.sites = np.dot(np.asarray([ix.flatten(),iy.flatten(),iz.flatten()]).T, self.scell.T)
-
-        if self.conventional:
-            fcc2 = "/Users/glensk/Thermodynamics/utilities/fcc/EqCoords_direct_fcc_2x2x2sc"
-            self.sites = np.loadtxt(fcc2)*(self.a0*0.52917721*ncell)/0.52917721
-
 
 
         self.neigh  = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*8./9.,verbose=False)
         print()
         self.neigh2 = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0) # ,mindist=self.a0/2.)
         print()
-        #self.neighc = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*1.5)
-        #self.neighc = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*2.5)
-        #self.neighc = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*0.9,verbose=False)  # 1NN    12
-        #self.neighc = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*1.1,verbose=False)  # (1+2)NN 15
         self.neighc = self.determing_connectivity_of_the_fcc_lattice(cutoff = self.a0*self.cutoff_filled,verbose=False)  # (1+2)NN 15
-        print('sn1',self.neigh.shape,self.neigh.shape[1])
-        print('sn2',self.neigh2.shape)
-        print('snc',self.neighc.shape)
 
         self.atomsc         = self.set_up_ase_structure()
         self.atomsc_filled  = self.set_up_ase_structure(alloy=False)
         self.atomsc_neigh   = self.set_up_ase_structure(atoms=self.neigh.shape[1])
         self.atomsc_neigh2  = self.set_up_ase_structure(atoms=self.neigh2.shape[1])
         self.atomsc_neighc  = self.set_up_ase_structure(atoms=self.neighc.shape[1])
+
+
+        atom_small_box = ase_build_bulk("Al",crystalstructure='fcc',a=self.a0*self.bohr_to_ang,cubic=self.cubic)
+        self.atom_small_box
+        self.atomsc_small_box = atom_small_box.repeat(self.ncell_inner)
+        print('self.atom_small_box',self.atom_small_box.cell)
+        sys.exit('77')
 
         print('self.neigh[-1]',self.neigh[-1],'self.neigh.shape',self.neigh.shape)
         #print('self.neigh[63]',self.neigh[63])
@@ -559,6 +554,51 @@ class AlKMC(Motion):
         self.kmcfile = open("KMC_AL6XXX","w+")
         self.tottime = tottime
 
+
+    def get_ncell_cell_nsites_sites_and_celltype_from_file(self,filename):
+        ''' defines self.ncell, self.nsites,
+                     cell, sites
+        '''
+        data_extxyz = ase_read(filename)
+        cell = data_extxyz.cell
+        if cell[0,0] == 0 and cell[1,1] == 0 and cell[2,2] == 0:
+            self.cubic = False  # --> primitive cell
+            self.nsites = self.ncell**3
+            cell=np.zeros((3,3))
+            cell[0]=[0.7071067811865475, 0.35355339059327373, 0.35355339059327373]
+            cell[1]=[0.,0.6123724356957945, 0.20412414523193154]
+            cell[2]=[0.,0.,0.5773502691896258]
+            # this is the list of lattice sites, in 3D coordinates
+            ix,iy,iz = np.meshgrid(range(self.ncell), range(self.ncell), range(self.ncell), indexing='ij')
+            self.sites = np.dot(np.asarray([ix.flatten(),iy.flatten(),iz.flatten()]).T, (self.a0*cell).T)  # this are already the positions in bohrradius
+        elif cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
+            self.cubic = True
+            cell[0] = [1,0,0]
+            cell[1] = [0,1,0]
+            cell[2] = [0,0,1]
+            for i in np.arange(1,20):
+                #print('i',i,i**3)
+                self.ncell = 0
+                if i**3 == data_extxyz.get_number_of_atoms()/4:
+                    self.ncell = i
+                    break
+            if self.ncell == 0:
+                print('self.ncell',self.ncell)
+                softexit.trigger("found conventional supercell but unknown number of atoms; Exit")
+            self.sites = data_extxyz.positions*self.ang_to_bohr
+        else:
+            softexit.trigger("unknown cell type; Exit")
+
+        self.nsites = data_extxyz.get_number_of_atoms()
+
+        # define the cell
+        self.scell=self.a0*cell
+        self.dcell = Cell()
+        self.dcell.h = self.scell*self.ncell
+
+        return
+
+
     def print_pos_ipi(self,text="",first=None):
         pos_tmp = self.dbeads[0].q[0,:]
         pos_tmp.shape = (self.nsites,3)
@@ -567,17 +607,20 @@ class AlKMC(Motion):
             print(text,idx,pos_tmp[idx])
         return
 
-    def set_up_ase_structure(self,atoms=False,alloy=True,cubic=False):
-        atom = ase_build_bulk("Al",crystalstructure='fcc',a=self.a0,cubic=self.conventional)
+    def set_up_ase_structure(self,atoms=False,alloy=True):
+        atom = ase_build_bulk("Al",crystalstructure='fcc',a=self.a0,cubic=self.cubic)
         atomsc = atom.repeat(self.ncell)
         if alloy == True:
             for i in np.arange(self.nsi):  atomsc[i].symbol = 'Si'
             for i in np.arange(self.nsi,self.nmg+self.nsi): atomsc[i].symbol = 'Mg'
             for i in np.arange(1,self.nvac+1)*-1:    atomsc[i].symbol = 'V'
-
+        #print('atomsc cell (1):',atomsc.cell)
         atomsc.set_cell(self.dcell.h.T*0.52917721)
         atomsc.set_positions(self.sites*0.52917721)
+        #print('atomsc cell (2):',atomsc.cell)
         #print('numat',atomsc.get_number_of_atoms())
+
+        ## now delete the vacancies
         if atoms != False:
             while atomsc.get_number_of_atoms() > atoms:
                 del atomsc[-1]
@@ -638,17 +681,22 @@ class AlKMC(Motion):
         return
 
 
-    def fill_state_with_Al(self,idx1,idx2,state,svac_idx):
-        ''' idx1: has to be idx1 (a vacancy)
+    def fill_state_with_Al(self,idx1=-1,idx2=-1,state=None,svac_idx=-1,spherical=False):
+        ''' idx1: has to the index of the vacancy
+            idx2: has to be another atom, a neighbor of the vacancy
             state: can be self.state or nstate or another state
         '''
-        NNcidx_v    = self.neighc[idx1]                              # atoms in the sphere
-        NNcidx_n    = self.neighc[idx2]                              # atoms in the sphere
-        NNcidx      = np.union1d(NNcidx_n,NNcidx_v)
+        NNcidx_v    = self.neighc[idx1]     # atoms around vacancy
+        NNcidx_n    = self.neighc[idx2]     # atoms around swaped vacancy
+        NNcidx      = np.union1d(NNcidx_n,NNcidx_v) # union
+        if self.filled_spheric is True and spherical == "v":
+            NNcidx = NNcidx_v
+        if self.filled_spheric is True and spherical == "n":
+            NNcidx = NNcidx_n
         NNcidx_not  = np.delete(np.arange(len(self.idx)),NNcidx) # remaining atoms
-        state_filled = state.copy()
+        state_filled = state.copy() # ['S' 'S' ... 'M' 'M' ... 'A' ... 'V'  'A' ]
         state_filled[NNcidx_not] = 'A'
-        state_filled[svac_idx] = 'V'
+        state_filled[svac_idx]   = 'V'
         ostr_filled = "".join(state_filled)
         ## up to here it is enough when in cache
         dbead_names_filled = self.dbeads_names.copy()
@@ -702,20 +750,20 @@ class AlKMC(Motion):
                 nstate,nstr = get_new_state(self.state,svac,sneigh)  # is necessary in any case
                 nstate_ref = nstate.copy()  # this is necessary to set later on the swaped positions in dbeads
 
-                if step > 188:
-                    print('aa stepXX',step,'svac',svac,'sneigh',sneigh)
+                #if step > 188:
+                #    print('aa stepXX',step,'svac',svac,'sneigh',sneigh)
 
                 if filled == True or filled_ref == True:
                     ## this loop needs also to be parallel
-                    #######################################################################
+                    ###########################################
                     # creates nstate, nstr for filled state
-                    # reference structure (filled), and ---contrary the the original
+                    # reference structure (filled), and ---contrary the the origig
                     # structure--- needs to be calculated for every swap
-                    # but, only the dbead_names need to be chagned, not the positions
-                    #######################################################################
-                    state_filled, ostr_filled,dbead_names_filled = self.fill_state_with_Al(svac,sneigh,self.state,svac)
+                    # but, only the dbead_names need to be chagned, not the pos
+                    ###########################################
+                    #state_filled, ostr_filled,dbead_names_filled = self.fill_state_with_Al(idx1=svac,idx2=sneigh,state=self.state,svac_idx=svac)
+                    state_filled, ostr_filled,dbead_names_filled = self.fill_state_with_Al(idx1=svac,idx2=sneigh,state=self.state,svac_idx=svac,spherical="v")
                     # this is the reference
-                    #nstate, ostr_filled,dbead_names_filled = self.fill_state_with_Al(svac,sneigh,self.state,svac)
                     ostr = ostr_filled
                     nstr = ostr_filled
 
@@ -742,18 +790,19 @@ class AlKMC(Motion):
 
 
 
-                    #######################################################################
+                    ###########################################
                     ## creates (filled) swapped sate
-                    #######################################################################
+                    ###########################################
                     if filled == True:
-                        nstate, nstr, dbead_names_filled = self.fill_state_with_Al(svac,sneigh,nstate,sneigh)
+                        #nstate, nstr, dbead_names_filled = self.fill_state_with_Al(idx1=svac,idx2=sneigh,state=nstate,svac_idx=sneigh)
+                        nstate, nstr, dbead_names_filled = self.fill_state_with_Al(idx1=svac,idx2=sneigh,state=nstate,svac_idx=sneigh,spherical="n")
 
 
-                if step > 188:
-                    if nstr in self.ecache:
-                        print('bb stepXX',step,'svac',svac,'sneigh',sneigh,"IN ECACHE")
-                    else:
-                        print('bb stepXX',step,'svac',svac,'sneigh',sneigh,"NOT IN ECACHE")
+                #if step > 188:
+                    #if nstr in self.ecache:
+                    #    print('bb stepXX',step,'svac',svac,'sneigh',sneigh,"IN ECACHE")
+                    #else:
+                    #    print('bb stepXX',step,'svac',svac,'sneigh',sneigh,"NOT IN ECACHE")
 
                 if not nstr in self.ecache:
                     #print('calc not in cache')
@@ -770,16 +819,16 @@ class AlKMC(Motion):
                     ###################################
                     ieval = self.find_eval(ethreads)
 
-                    if step > 188:
-                        print('cc stepXX',step,'svac',svac,'sneigh',sneigh,'ieval',ieval)
+                    #if step > 188:
+                    #    print('cc stepXX',step,'svac',svac,'sneigh',sneigh,'ieval',ieval)
 
                     if filled == False and filled_ref == False: # normal case
                         self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(nstate_ref)].flatten()
                         #self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(nstate)].flatten()
                         self.dbeads[ieval].names = self.dbeads_names
 
-                    if step > 188:
-                        print('dd stepXX',step,'svac',svac,'sneigh',sneigh,'ieval',ieval)
+                    #if step > 188:
+                    #    print('dd stepXX',step,'svac',svac,'sneigh',sneigh,'ieval',ieval)
 
                     # filled case
                     if filled == True or filled_ref == True:
@@ -810,8 +859,8 @@ class AlKMC(Motion):
                     if filled_ref == True:
                         savename = "pos_step_"+str(step)+str(svac)+"_"+str(sneigh)+"_filled_ref"
 
-                    if step > 188:
-                        print('ee stepXX',step,'svac',svac,'sneigh',sneigh,'ieval',ieval,'savename',savename)
+                    #if step > 188:
+                    #    print('ee stepXX',step,'svac',svac,'sneigh',sneigh,'ieval',ieval,'savename',savename)
 
                     if self.parallel != True:
                         self.geop_thread(ieval=ieval, nstr=nstr, nevent=nevent,ostr=None,savename=savename,step=step)
@@ -882,12 +931,13 @@ class AlKMC(Motion):
         maxatoms = 999999
         selfneigh  = np.ones((self.nsites,maxatoms),int)*-1
         nneigh  = np.zeros(self.nsites,int)
-        print('cutoff/self.a0',(cutoff/self.a0))
-        cutoff_ = 1.01*(cutoff/self.a0)*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
-        cutoff_ = 1.01*((cutoff/self.a0)*self.a0)**2                                        # perhaps 1.01 it is not enough, must check!
-        print('cutoff_',cutoff_)
-        mindist_ = 1.01*((mindist/self.a0)*self.a0)**2                                        # perhaps 1.01 it is not enough, must check!
-        print('mindist_',mindist)
+        print('cutoff/self.a0:',(cutoff/self.a0))
+        cutoff_ = 1.01*(cutoff/self.a0)*self.a0**2  # perhaps 1.01 it is not enough, must check!
+        cutoff_ = 1.01*((cutoff/self.a0)*self.a0)**2 # perhaps 1.01 it is not enough, must check!
+        print('cutoff_',cutoff_,"(bohrradius^2)")
+        print('cutoff ',cutoff*self.bohr_to_ang,"(Angstrom)")
+        mindist_ = 1.01*((mindist/self.a0)*self.a0)**2 # perhaps 1.01 it is not enough, must check!
+        #print('mindist_',mindist)
         #a02     = 1.01*(0.5)*self.a0**2                                        # perhaps 1.01 it is not enough, must check!
         #print("1NNs",selfneigh[0])
         #print(nneigh)
@@ -918,7 +968,11 @@ class AlKMC(Motion):
             print(">> (4) 1NNs (of atom at idx=0):",selfneigh[0])
             print('>> (4) nneigh',nneigh)
         amount_neighbors_max = np.where(selfneigh[0] > 0)[0].max()+1
-        return selfneigh[:,:amount_neighbors_max]
+
+        out = selfneigh[:,:amount_neighbors_max]
+
+        print('number of atoms in cutoff:',out.shape[1])
+        return out
 
     def barriers_energies_analysis(self,step,levents,rates):
         if step is not None:  # only than we want to write
@@ -1277,9 +1331,7 @@ class AlKMC(Motion):
         f_restart = True
         if self.idx is None or len(self.idx)==0:
             f_restart = False
-            idx =np.asarray(range(self.ncell**3), int) # initialize random distribution of atoms
-            if self.conventional:
-                idx =np.asarray(range(4*self.ncell**3), int) # initialize random distribution of atoms
+            idx =np.asarray(range(self.nsites), int) # initialize random distribution of atoms
             self.prng.rng.shuffle(idx)
             self.idx = idx
 
@@ -1358,8 +1410,8 @@ class AlKMC(Motion):
 
     # threaded geometry optimization
     def geop_thread(self, ieval, nstr, nevent, ostr=None,savename=None,step=None):
-        if step > 188:
-            print('ff stepXX:'+str(step)+':_ffieval:'+str(ieval)+":")
+        #if step > 188:
+        #    print('ff stepXX:'+str(step)+':_ffieval:'+str(ieval)+":")
         if self.write_pos == True:
             if type(savename) == str:
                 # in positions
@@ -1377,21 +1429,29 @@ class AlKMC(Motion):
             atomsc = self.atomsc.copy()
             atomsc.set_positions(p3*0.52917721)
             atomsc.set_chemical_symbols(self.dbeads[ieval].names)
+
+            if self.calc_smallbox:
+                atomsc_small_box = self.atomsc_small_box.copy()
+                # 1. get vacancy position
+                # 2. go through all neighbors
+                sys.exit('not yet')
+            # a) atomsc = self.atomsc_small.copy()
+            # b)
             #if nevent[0] == 27 and nevent[1] == 8:
                 #print('s{vac,neigh}',nevent[0],nevent[1],'idx',idx,atomsc.get_chemical_symbols()[idx],atomsc.positions[idx])
             #if type(savename) == str and self.write_pos == True:
             #    ase_write("in_"+savename+".extxyz",atomsc,format="extxyz",append=False)
 
-            if step > 188:
-                print('gg stepXX',step,'ieval',ieval)
+            #if step > 188:
+            #    print('gg stepXX',step,'ieval',ieval)
             newpot,newq,atomsc = ase_minimize(atomsc_in=atomsc,minimizer="gpmin",potstring=self.potstring) #lbfgs")
-            if step > 188:
-                print('hh stepXX',step,'ieval',ieval)
+            #if step > 188:
+            #    print('hh stepXX',step,'ieval',ieval)
             #if type(savename) == str and self.write_pos == True:
             #    ase_write("out_"+savename+".extxyz",atomsc,format="extxyz",append=False)
             self.dbeads[ieval].q[0] = newq
-            if step > 188:
-                print('ii stepXX',step,'ieval',ieval)
+            #if step > 188:
+            #    print('ii stepXX',step,'ieval',ieval)
         else:
             self.geop[ieval].reset()
             ipot = self.dforces[ieval].pot
@@ -1589,29 +1649,55 @@ class AlKMC(Motion):
             svac    = levents[i][0]
             sneigh  = levents[i][1]
             ene_fin = levents[i][2]   # == same as self.ecache[nstr]
-            #pos = levents[i][3]
+            #pos   = levents[i][3]
             ostr    = levents[i][4]
             nstr    = levents[i][5]
+            ene_ref = self.ecache[ostr]
+
+            ene_sum_atomic_ref = (ostr.count('M')*self.atom_energy['Mg'] + ostr.count('S')*self.atom_energy['Si'] + ostr.count('A')*self.atom_energy['Al'])
+
+            ene_sum_atomic_fin = (nstr.count('M')*self.atom_energy['Mg'] + nstr.count('S')*self.atom_energy['Si'] + nstr.count('A')*self.atom_energy['Al'])
+
+            ene_ref_binding = ene_ref - ene_sum_atomic_ref
+            ene_fin_binding = ene_fin - ene_sum_atomic_fin
+
             ostr_solutes = ostr.count('M')+ostr.count('S')
             nstr_solutes = nstr.count('M')+nstr.count('S')
-            if ostr_solutes != nstr_solutes:
-                softexit.trigger("Error: ostr_solutes != nstr_solutes. Exit")
-            #print('ostr_solutes',ostr_solutes)
-            #print('nstr_solutes',nstr_solutes)
-            ene_ref = self.ecache[ostr]
-            ene_fin2 = self.ecache[nstr]
-            #print('ostr',ostr,'ene_ref',ene_ref)
-            #print('nstr',nstr,'ene_fin',ene_fin,ene_fin2)
-            ene_base = self.ecurr
-            #print('ene_base',ene_base)
-            diff_to_base = ene_ref - ene_base
+
+            solutes_diff = (self.nsi+self.nmg) - ostr_solutes
+            si_diff = self.nsi - ostr.count('S')
+            si_diff_ = self.nsi - nstr.count('S')
+
+            mg_diff = self.nmg - ostr.count('M')
+            mg_diff_ = self.nmg - nstr.count('M')
+
+            diff_si = ostr.count('S')-nstr.count('S')
+            diff_mg = ostr.count('M')-nstr.count('M')
+
+            error_filled = 0
+            edbc = 0
+
+            #if ostr.count('M') != nstr.count('M'):
+            #    softexit.trigger("Error: ostr_M != nstr_M. Exit")
+
+            ene_ref_unfilled = self.ecurr  # normal: self.ecurr == ene_ref
+                                   # filled: self.ecurr != ene_ref
+            diff_to_base = ene_ref - ene_ref_unfilled
             diff_to_base_meV = diff_to_base*hartree_to_mev
-            #print('ene_base',ene_base,'ene_ref',ene_ref,'diff_to_base',diff_to_base,'mev',diff_to_base_meV)
+            if False and i < 3:
+                print('ene_ref_unfilled_meV:',ene_ref_unfilled*hartree_to_mev)
+                print('ene_ref_meV (filled):',ene_ref*hartree_to_mev)
+                print('ene_fin_meV         :',ene_fin*hartree_to_mev)
+                print('diff_to_base_meV    :',diff_to_base_meV)
+                print('ene_sum_atomic_ref  :',ene_sum_atomic_ref*hartree_to_mev)
+                print('ene_sum_atomic_fin  :',ene_sum_atomic_fin*hartree_to_mev)
+                print('ene_ref_binding     :',ene_ref_binding*hartree_to_mev)
+                print('ene_fin_binding     :',ene_fin_binding*hartree_to_mev)
 
 
 
             #print ("Barrier, naive: %f, static: %f" % (0.5*(ecurr + levents[i][2]) + self.diffusion_barrier_al, levents[i][4]))
-            A_B = (str(svac)+"/"+str(sneigh)).ljust(6)  # 53/42   = svac/sneigh
+            A_B = (str(svac)+"/"+str(sneigh)).ljust(7)  # 53/42   = svac/sneigh
             pp = "++"
             if filled == "normal":
                 pp = "+N"
@@ -1620,17 +1706,37 @@ class AlKMC(Motion):
             if i == isel_loc:
                 pp = "**"
             #diffh = levents[i][2]-self.ecurr
-            ene_diff = ene_fin - ene_ref # this also works for the filled structures
+            ene_diff = ene_fin - ene_ref # this also works for filled structures
+            ene_diff_binding = ene_fin_binding - ene_ref_binding
             # if ene_diff is messed up: ostr or nstr are wrongly saved.
             ene_diff_mev = (ene_diff)*hartree_to_mev #/self.neigh.shape[0]
+            ene_diff_mev_binding = ene_diff_binding*hartree_to_mev
+
+            if filled == "filled":
+                deltas = np.array([[diff_si,diff_mg,ene_diff_mev_binding,step,i]])
+                #print('deltas (1)',deltas)
+                corr_1_si = 1198  # circa
+                corr_1_mg = -1772 # circa
+                corr_si = diff_si * corr_1_si
+                corr_mg = diff_mg * corr_1_mg
+                corr = corr_si + corr_mg
+                edbc = ene_diff_mev_binding - corr
+                ene_diff_mev_binding = edbc
+
+                if diff_si is 0 and diff_mg is not 0:
+                    deltas = np.array([[0,1,ene_diff_mev_binding/diff_mg,step,i]])
+                elif diff_si is not 0 and diff_mg is 0:
+                    deltas = np.array([[1,0,ene_diff_mev_binding/diff_si,step,i]])
+                #print('deltas (2)',deltas)
+                #print('corr_si:',corr_si)
+                #print('corr_mg:',corr_mg)
+                #print('corr   :',corr)
+
+
 
             ets  = 0.5*(ene_ref + levents[i][2]) + self.barriers[levents[i][-1]]  #naive heuristic for the ts energy
             etsnew = 0.5*ene_diff+ene_ref        + self.barriers[levents[i][-1]]
 
-            #ekold = ets - ene_ref
-            #eknew = 0.5*diffh
-            #print('ets==etsnew?',ets==etsnew,ets,etsnew,ene_diff_mev,"mev/def")
-            #print('eko==ekn   ?',ekold==eknew,ekold,eknew)
 
 
             rates[i] = self.prefactors[levents[i][-1]] * np.exp(-(ets-ene_ref)/kT)
@@ -1646,30 +1752,44 @@ class AlKMC(Motion):
                 print('ets   :',ets)
                 print('etsnew:',etsnew)
                 softexit.trigger("Error: rates[i] != rates_new[i]. Exit")
-            #diff_mev[i][0] = step*12+i
-            #diff_mev[i][0] = step+(i/len(levents))
-            #diff_mev[i][1] = ene_diff_mev
 
+
+            ###############################################################
+            # differences/delta in energy between initial and final state
+            ###############################################################
+            ###############################################################
             x = step+((i*1.0)/len(levents))
-            #print('i',i,'x',x)
-            y = ene_diff_mev
+            # when same amount of solutes in reference and final cell, ...
+            # ... no difference between ene_diff_mev and ene_diff_mev_binding
 
-            si_diff = 0
-            mg_diff = 0
-            solutes_diff = 0
-            ya = 0
             if filled == "filled":
-                self.diff_mev_filled.append([x,y])
-                ya = np.abs(y-self.diff_mev_normal_thisstep[i][1])
-                self.diff_diff_abs_mev_filled.append([x,ya])
+                if True: # save corrections to spherical
+                    f=open('asd.dat','ab')
+                    np.savetxt(f,deltas,fmt='%.0f %.0f %.1f %.0f %.0f')
+                    f.close()
 
-                solutes_diff = (self.nsi+self.nmg) - ostr_solutes
-                si_diff = self.nsi - ostr.count('S')
-                mg_diff = self.nmg - ostr.count('M')
-                self.ediff_vs_solutes.append([solutes_diff,ya])
+                self.diff_mev_filled.append([x,ene_diff_mev_binding])
+                error_filled = np.abs(ene_diff_mev_binding-self.diff_mev_normal_thisstep[i][1])
+                self.diff_diff_abs_mev_filled.append([x,error_filled])
+                self.ediff_vs_solutes.append([solutes_diff,error_filled])
+                #print('len_norm',len(self.diff_mev_normal))
+                #print('len_fill',len(self.diff_mev_filled))
+                #print()
+                filled__ = np.array(self.diff_mev_filled)[:,1]
+                normal__ = np.array(self.diff_mev_normal)[:,1]
+                normal__ = normal__[:len(filled__)]
+                #print('filled',filled__)
+                #print('normal',normal__)
+                std = np.std(normal__-filled__)
+                self.diff_mev_filled_std.append(std)
+                #if i == 5:
+                #    softexit.trigger("debug")
+                #a = np.std(self.diff_mev_normal[:lenx-1][0][:,1]-self.diff_mev_filled[:lenx][0][:,1])
+
             elif filled == "normal":
-                self.diff_mev_normal.append([x,y])
-                self.diff_mev_normal_thisstep.append([x,y])
+                self.diff_mev_normal.append([x,ene_diff_mev_binding])
+                self.diff_mev_normal_thisstep.append([x,ene_diff_mev_binding])
+
 
             if True:
                 etsp  = 0.5*(ene_ref + ene_fin) #*hartree_to_mev
@@ -1682,32 +1802,42 @@ class AlKMC(Motion):
                         #("{:10.8f}".format(ene_fin)).rjust(11),
                         kac(ene_fin-diff_to_base),
                         "|",
-                        kac(ene_diff,6,4),
-                        '== meV/def:',
-                        kac(ene_diff_mev,6,2),
-                        bcolors.red+str(kac(ya,6,2))+bcolors.ENDC,
-                        si_diff,
-                        mg_diff) #,etsp)
-            if np.abs(ene_diff_mev) > 10000:
+                        'diff (ha/cell):',kac(ene_diff,7,4),
+                        '>mev:',
+                        #kac(ene_diff_mev,6,2),
+                        kac(ene_diff_mev,12,2),
+                        "diff-binding mev:",kac(ene_diff_mev_binding,6,2),
+                        "edbc mev:",kac(edbc,6,2),
+                        bcolors.red+str(kac(error_filled,6,2))+bcolors.ENDC,
+                        ostr.count('S'),nstr.count('S'),
+                        ostr.count('M'),nstr.count('M'))
+
+            if np.abs(ene_diff_mev_binding) > 10000:
                 softexit.trigger("Error: ene diff too high. Exit")
                 #print("Error: ene diff too high. Exit")
 
         if filled == "filled":
-            kk = self.diff_mev_normal
             kk = np.array([self.diff_mev_normal,self.diff_mev_filled])
-            #print('kk')
-            #print(kk)
-            kkx = kk[0][:,1]
-            kky = kk[1][:,1]
-            kk = np.array([kkx,kky]).T
-            #print('kk out')
-            #print(kk)
+            kk = np.array([kk[0][:,1],kk[1][:,1]]).T
+            #print('lenx',len(self.diff_mev_normal))
+            #print('leny',len(self.diff_mev_filled))
+            #print('filled__',filled__)
+            #print('normal__',normal__)
+            #print('self.diff_mev_filled_std.append(std)',self.diff_mev_filled_std)
+            #kb = np.array([kk[0][:,1],kk[1][:,1]]).T
+
 
             if step%10 == 0:
                 np.savetxt("nnrates_diff_filled_"+str(self.cutoff_filled),self.diff_mev_filled)
                 np.savetxt("nnrates_diff_filledabs_"+str(self.cutoff_filled),self.diff_diff_abs_mev_filled)
                 np.savetxt("nnrates_solutes_vs_energy_diff_"+str(self.cutoff_filled),self.ediff_vs_solutes)
                 np.savetxt("nnrates__diff_"+str(self.cutoff_filled),kk)
+                if self.filled_spheric is True:
+                    np.savetxt("nnrates__diff_sph_corr_"+str(self.cutoff_filled),kk)
+                np.savetxt("error_delta_spheric_"+str(self.cutoff_filled),deltas)
+                if filled == 'filled':
+                    np.savetxt("nnrates__diff_std_"+str(self.cutoff_filled),self.diff_mev_filled_std)
+
             #if step == 1:
             #    softexit.trigger("Error: kk. Exit.")
         elif filled == "normal":
@@ -1725,8 +1855,13 @@ class AlKMC(Motion):
             if os.path.isfile("step_"+str(step)+".dat"):
                 os.remove("step_"+str(step)+".dat")
             np.savetxt("step_"+str(step)+".dat",out)
-        print('------------------------------------------------------------------------------------------------')
-        print('------------------------------------------------------------------------------------------------')
+        if len(self.diff_mev_filled_std) > 0:
+            std = self.diff_mev_filled_std[-1]
+        else:
+            std = 0
+        std = kac(std,4,1)
+        print('-- std:',std,'meV --------------------------------------')
+        print('-----------------------------------------------------------')
         return rates,crates,cdf
 
 
@@ -1737,6 +1872,7 @@ class AlKMC(Motion):
         print('>> step',step)
         #self.dbeads[ieval].q[0,:] = self.sites[self.unique_idx(self.state)].flatten()
         #self.dbeads[0].names = self.dbeads_names
+        #print(self.sites[self.idx][:6]*0.52917721)
         if False:
             self.atomsc.set_positions(self.sites[self.idx]*0.52917721)
             ase_write("simulation.pos_0.sitesidx.extxyz",self.atomsc,format="extxyz",append=True)
@@ -1779,7 +1915,7 @@ class AlKMC(Motion):
 
         #print('p3',p3.shape)
         #np.savetxt("pos_beads_"+str(step)  ,p3*0.52917721)
-        if True:
+        if False:
             p3 = np.reshape(self.beads.q[0,:],(-1,3))
             self.atomsc.set_positions(p3*0.52917721)
             ase_write("simulation.pos_0.beads.extxyz",self.atomsc,format="extxyz",append=True)
