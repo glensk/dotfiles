@@ -68,8 +68,8 @@ brew update
 read -p "#### Did everything go smoothly with brew updat? If not ctrc+c; otherwise just press enter" 
 
 
-brew tap 'caskroom/cask'
-brew install 'brew-cask'
+#brew tap 'caskroom/cask'   # is supposed to be depracted
+#brew install 'brew-cask'   # is supposed to be depracted
 # check at http://caskroom.io/search if your package is available
 brew cask install --appdir="/Applications" iterm2
 brew cask install --appdir="/Applications" thunderbird

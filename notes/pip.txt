@@ -7,3 +7,11 @@ pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
 pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
 pip install --upgrade --user sklearn  # necessary for andreas soap stuff
 pip install --upgrade --user plotly_express # to make nice scatterplots
+pip install --upgrade --user colorama # for %./create_energies_daniele.py
+
+on helvetios:
+conda deactivate
+module load intel python/2.7.16
+pip install --upgrade --user 'ase<3.18.0'  # since since version 3.18.0 ase supports only python 3
+pip install --upgrade --user ipython
+pip install --upgrade --user phonopy  # since myutils.py imports phonopy
