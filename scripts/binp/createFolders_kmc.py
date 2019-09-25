@@ -124,7 +124,11 @@ def createjob(args):
     pcsi = nsi/ncell**3.*100
     pcmg = nmg/ncell**3.*100
     pcvac = nvac/ncell**3.*100
-    directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+pot+"_"+\
+    if args.cubic == True:
+        pc = "cubic"
+    else:
+        pc = "primitive"
+    directory = str(ncell)+"x"+str(ncell)+"x"+str(ncell)+"_"+pc+"_"+pot+"_"+\
                 str(temp)+"K_"+\
                 str(nvac)+"Vac_"+str(nmg)+"Mg_"+str(nsi)+"Si__"+\
                 str(round(pcvac,3))+"pctVac_"+str(round(pcmg,3))+"pctMg_"+str(round(pcsi,3))+"pctSi"

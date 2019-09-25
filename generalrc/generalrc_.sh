@@ -102,23 +102,28 @@ tab-color $mypromptpath
 # s1 thermodynamics autojump generalrc
 # conda is necessary for python lammps, for jupyter (mac) ... better load it.
 case $myhost in
-    #cosmopc) source $HOME/aiida/bin/activate; ;;
-    # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
-    # on mac: 
-    # pip install --upgrade --user phonopy
-    # pip install --upgrade --user ase
-    # pip install --upgrade --user lmfit
-    # pip install --upgrade --user intel-numpy    # to make numpy faster
-    # pip install --upgrade --user tqdm
-    # pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
-    # pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
-    # pip install --upgrade --user sklearn  # necessary for andreas soap stuff
-    # pip install --upgrade --user plotly_express # to make nice scatterplots
-
-    fidis)     source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
-    helvetios) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
-    # on fidis/helvetios:
-    # pip install --upgrade --user ase  ## this however made problems 
+#    #cosmopc) source $HOME/aiida/bin/activate; ;;
+#    # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+#    # on mac: 
+#    # pip install --upgrade --user phonopy
+#    # pip install --upgrade --user ase
+#    # pip install --upgrade --user lmfit
+#    # pip install --upgrade --user intel-numpy    # to make numpy faster
+#    # pip install --upgrade --user tqdm
+#    # pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
+#    # pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
+#    # pip install --upgrade --user sklearn  # necessary for andreas soap stuff
+#    # pip install --upgrade --user plotly_express # to make nice scatterplots
+#
+#    fidis)     source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+#    helvetios) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
+#    # on fidis/helvetios:
+#    # conda deactivate
+#    # module load intel python/2.7.16
+#    # pip install --upgrade --user 'ase<3.18.0'  # since since version 3.18.0 ase supports only python 3
+#    # pip install --upgrade --user ipython
+    fidis) moduel load intel python/2.7.16;;
+    helvetios) moduel load intel python/2.7.16;;
 esac
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
