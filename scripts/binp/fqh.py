@@ -105,6 +105,7 @@ class qh(object):
         self._plots = False
         self._verbose = False
         self.__verbose = False
+        self._wqh1 = None
         self._wqh2 = None
         self._wqh3 = None
         self.directory = None
@@ -133,6 +134,7 @@ class qh(object):
             self._alat_bcc = args.bcc
             self._alat_dfcc = args.dfcc
             self._verbose = args.verbose
+            self._wqh1 = args.wqh1
             self._wqh2 = args.wqh2
             self._wqh3 = args.wqh3
             self._plots = args.plots
@@ -184,6 +186,8 @@ class qh(object):
             action='store_true', default=False)
         p.add_argument('-dfcc',
             help='inputfilename has doublefcc alat instead volume (alat**3/8 to get volume)', action='store_true', default=False)
+        p.add_argument('-wqh1', default=False, action='store_true',
+            help='Write Fqh_surface_1st_order')
         p.add_argument('-wqh2', default=False, action='store_true',
             help='Write Fqh_surface_2nd_order')
         p.add_argument('-wqh3', default=False, action='store_true',
@@ -588,8 +592,14 @@ class qh(object):
 
         # define surface
         np.set_printoptions(precision=12)   # to make the output exact
-        self.surf_coefs = np.empty((len(self.temperatures),3))
-        self.surface = np.empty((len(self.temperatures),4))
+        self.surf_coefs_1st = np.empty((len(self.temperatures),2))  # -wf1
+        self.surf_coefs_2nd = np.empty((len(self.temperatures),3))  # -wf2
+        self.surf_coefs_3rd = np.empty((len(self.temperatures),4))  # -wf3
+
+        self.surface_1st  = np.empty((len(self.temperatures),3))
+        self.surface      = np.empty((len(self.temperatures),4))
+        self.surf_out_3rd = np.empty((len(self.temperatures),5))
+
         self.surf_function = []
 
         # define fits
@@ -601,8 +611,6 @@ class qh(object):
 
 
         if self.data.shape[0] > 3:
-            self.surf_coefs_3rd = np.empty((len(self.temperatures),4))
-            self.surf_out_3rd = np.empty((len(self.temperatures),5))
             self.surf_function_3rd = []
             self.data_fit_3rd = np.empty((len(self.volumes),len(self.temperatures)))
             self._data_fit_3rd = np.empty((fitpoints + 1,len(self.temperatures)))
@@ -615,9 +623,11 @@ class qh(object):
                 print("energies   :", energies)
 
             # polynomial fit
-            self.surf_coefs[i] = np.polyfit(self.volumes, energies, 2)
-            self.surface[i] = np.append(self.surf_coefs[i],[t])[::-1]
-            self.surf_function.append(np.poly1d(self.surf_coefs[i]))
+            self.surf_coefs_1st[i] = np.polyfit(self.volumes, energies, 1)
+            self.surf_coefs_2nd[i] = np.polyfit(self.volumes, energies, 2)
+            self.surface_1st[i]    = np.append(self.surf_coefs_1st[i],[t])[::-1]
+            self.surface[i]        = np.append(self.surf_coefs_2nd[i],[t])[::-1]
+            self.surf_function.append(np.poly1d(self.surf_coefs_2nd[i]))
 
 
             #bounds = [10, 12]
@@ -631,7 +641,7 @@ class qh(object):
 
             if self.data.shape[0] > 3:
                 self.surf_coefs_3rd[i] = np.polyfit(self.volumes, energies, 3)
-                self.surf_out_3rd[i] = np.append(self.surf_coefs_3rd[i],[t])[::-1]
+                self.surf_out_3rd[i]   = np.append(self.surf_coefs_3rd[i],[t])[::-1]
                 self.surf_function_3rd.append(np.poly1d(self.surf_coefs_3rd[i]))
 
                 #fit_fn = np.poly1d(self.surf_coefs_3rd)
@@ -659,6 +669,7 @@ class qh(object):
         _printred("fit_surface ... here we might consider just to load the before fitted surf")
         _printgreen("fit_surface ................................................... DONE")
         print("")
+        if self._wqh1: self.write_fqh_surface_1st()
         if self._wqh2: self.write_fqh_surface_2nd()
         if type(self._plots) != bool:  # Then it is a number
             self.plot_energy_vs_volume_qh(self._plots)
@@ -818,11 +829,12 @@ class qh(object):
                 print("ss:",self.surface)
         #print "ska:",self.surface_interpolated
         self.temperatures = self.surface[:,0]
-        self.surf_coefs = np.fliplr(self.surface[:,1:])
+        self.surf_coefs_2nd = np.fliplr(self.surface[:,1:])
+        self.surf_coefs_1st = np.fliplr(self.surface_1st[:,1:])
 
         self.surf_function = []
         for i,t in enumerate(self.temperatures):
-            self.surf_function.append(np.poly1d(self.surf_coefs[i]))
+            self.surf_function.append(np.poly1d(self.surf_coefs_2nd[i]))
         #print self.surface
 
         if self._oqh != False:
@@ -870,6 +882,17 @@ class qh(object):
         ''' .. '''
         np.savez_compressed(filename, data=self.data)
         return
+
+    def write_fqh_surface_1st(self, filename = None):
+        ''' docstring here '''
+        if filename == None:
+            print('self._filessearchstring_common',self._filessearchstring_common)
+            print('self._filessearchstring_suffix',self._filessearchstring_suffix)
+            filename = self._filessearchstring_common+"Surface_1st_order_"+self._filessearchstring_suffix+"_e"+str(int(self._multiply_energy))+"_v"+str(int(self._multiply_volume))
+        np.savetxt(filename, self.surface_1st,fmt="%.0f %.12f %.12f")
+        _printgreen(filename+" written")
+        return
+
 
     def write_fqh_surface_2nd(self, filename = None):
         ''' docstring here '''
@@ -920,9 +943,9 @@ class qh(object):
             temp = int(self.temperatures[idx])
 
             # labletext
-            a0 = str(math.ceil(self.surf_coefs[idx][0]*roundnum)/roundnum)
-            a1 = str(math.ceil(self.surf_coefs[idx][1]*roundnum)/roundnum)
-            a2 = str(math.ceil(self.surf_coefs[idx][2]*roundnum)/roundnum)
+            a0 = str(math.ceil(self.surf_coefs_2nd[idx][0]*roundnum)/roundnum)
+            a1 = str(math.ceil(self.surf_coefs_2nd[idx][1]*roundnum)/roundnum)
+            a2 = str(math.ceil(self.surf_coefs_2nd[idx][2]*roundnum)/roundnum)
 
             # labletext second label
             labeltext2 = ""

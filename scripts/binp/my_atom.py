@@ -578,6 +578,14 @@ rmin["Pt"] = 0.7;rmax["Pt"] = 1.6;alatT0K["Pt"] = 3.98 ;alatTmelt["Pt"]=4.1
 rmin["Ag"] = 0.8;rmax["Ag"] = 1.5;alatT0K["Ag"] = 4.17 ;alatTmelt["Ag"]=4.31
 rmin["Au"] = 0.7;rmax["Au"] = 1.5;alatT0K["Au"] = 4.17 ;alatTmelt["Au"]=4.25
 
+eqvol = {};
+eqvol["Al"] = 16.5
+eqvol["Mg"] = 22.85
+eqvol["Si"] = 20.5
+
+def get_eqvol(element):
+    return eqvol[element]
+
 PRL_L = {};
 PRL_L["Al"] = 6;
 PRL_L["Ag"] = 1;

@@ -581,6 +581,7 @@ def get_atomc_energy_from_dicts(dict_atomic_species_structure,dict_atom_energies
     '''
     out = 0
     for atom_species in dict_atomic_species_structure:
+	print('asxxx',atom_species)
         atom_energy = dict_atom_energies[atom_species]
         en = dict_atomic_species_structure[atom_species]*atom_energy
         out += en
@@ -630,6 +631,11 @@ def qe_get_numelectrons(structure_ase, path_to_pseudos):
 ##################################################################################
 ## functions related to potential
 ##################################################################################
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
 class mypot( object ):
     ''' return a list of available potentials '''
     def __init__(self,pot=False,potpath=False,use_different_epoch=False,verbose=False):
@@ -639,6 +645,7 @@ class mypot( object ):
         self.potpath                    = False        # this is the source where the potential recides
         self.potpath_work               = False        # this is ususally the self.potpath but for cases where different epoch is used ->
         self.pottype                    = False        # n2p2/runner
+        self.pottype_all                = []        # [ 'n2p2','runner','eam',.. ]
         self.potepoch_all               = False
         self.assessed_epochs            = []
         self.assessed_test              = []
@@ -659,7 +666,7 @@ class mypot( object ):
         self.pot_tmpdir                 = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"/" #+timestr+"/"
         self.inputnn                    = False         # path to input.nn
         self.inputdata                  = False         # path to input.data
-        self.pot_all                    = False   # n2p2_v1ag
+        self.pot_all                    = []      # n2p2_v1ag
         self.trigger_set_path_manual    = ["setpath","potpath","pp", ".", "..", "../" ]
         self.verbose                    = verbose
         self.elements                   = False  # list e.g. ['Al', 'Mg', 'Si']
@@ -670,53 +677,88 @@ class mypot( object ):
                                         # self.atom_types = {'Mg':1,'Al':2,'Si':3}
         self.lmpcmd                     = False
         self.pot_all_dict               = {}
+        #self.pot_all_dict_potpath       = {}
+        #self.pot_all_dict_pottype       = {}
         return
 
     def get_pot_all(self):
-        if type(self.pot_all) == bool:
+        if len(self.pot_all) == 0:
             scripts = os.environ['scripts']
             home = os.environ['HOME']
             p1 = scripts+'/potentials/'
             p2 = home+'/sources/lammps/potentials/'
-            check = [ p1+'runner*',
-                      p1+'n2p2*',
-                      p1+'*eam.alloy*',
-                      p2+'*eam.alloy*',
-                      p2+'*.adp']
+            check = [ [p1+'runner*',    'runner'],
+                      [p1+'n2p2*',      'n2p2'],
+                      [p1+'*eam.alloy*','eam'],
+                      [p2+'*eam.alloy*','eam'],
+                      [p2+'*.adp',      'adp'],
+                    ]
             allpot_fullpath = []
-            for i in check:
-                ap = glob.glob(i)
-                allpot_fullpath += ap
+            #allpot_type = []
+            for idx,i in enumerate(check):
+                allpaths = glob.glob(check[idx][0])
+                pottype = check[idx][1]
+                if pottype not in self.pottype_all:
+                    self.pottype_all += [pottype]
+                for jdx,potpath in enumerate(allpaths):
+                    pot = os.path.basename(potpath)
+                    self.pot_all_dict[pot] = [potpath,pottype]
+                    #print('pot',pot)
+                    self.pot_all.append(pot)
 
-            pot_all_tmp = []
-            #print('self.pot_all in :',self.pot_all)
-            for i in allpot_fullpath:
-                pot_all_tmp.append(os.path.basename(i))
-                self.pot_all_dict[os.path.basename(i)] = i
-            for i in self.trigger_set_path_manual:
-                self.pot_all_dict[i] = i
-            self.pot_all = pot_all_tmp + self.trigger_set_path_manual
+            self.pot_all = self.pot_all + self.trigger_set_path_manual
+
+                #allpot_fullpath += allpaths
+                #allpot_type += check[idx][1]
+                #print('idx',idx,i,'ap',allpaths,'cc',check[idx][1])
+
+            #@aa = AttrDict(self.pot_all_dict)
+            #@print('aa',aa.n2p2_v3ag_5000)
+            #@sys.exit()
+            #@for i in allpot_fullpath:
+            #@    print('idxxx',i)
+            #@print()
+            #@pot_all_tmp = []
+            #@#print('self.pot_all in :',self.pot_all)
+            #@for idx,i in enumerate(allpot_fullpath):
+            #@    pot_all_tmp.append(os.path.basename(i))
+            #@    # dict[potname] = path
+            #@    # i = path = dict Value
+            #@    # potname = os.path.basename(i) = dict Key
+            #@    print('idx',idx,i)
+            #@    self.pot_all_dict_potpath[os.path.basename(i)] = allpot_fullpath[idx]
+            #@    #self.pot_all_dict_pottype[os.path.basename(i)] = allpot_type[idx]
+            #@for i in self.trigger_set_path_manual:
+            #@    self.pot_all_dict_potpath[i] = i
+            #@    #self.pot_all_dict_pottype[os.path.basename(i)] = "UNKNOWN"
+            #self.pot_all = pot_all_tmp + self.trigger_set_path_manual
             #print('self.pot_all out:',self.pot_all)
-            #print('self.pot_all_dict',self.pot_all_dict)
-            #print('len',len(self.pot_all_dict))
+            #print('self.pot_all_dict_potpath',self.pot_all_dict_potpath)
+            #print('len',len(self.pot_all_dict_potpath))
             #sys.exit('09i-')
-            if len(self.pot_all_dict) == 0:
+            if len(self.pot_all) == 0:
                 sys.exit('no potentials found; ERROR (92)')
             #ch = "runner_v3ag_5000_7650_new_input_data_2"
-            #if ch in self.pot_all_dict:
-            #    self.potpath = self.pot_all_dict[ch]
+            #if ch in self.pot_all_dict_potpath:
+            #    self.potpath = self.pot_all_dict_potpath[ch]
             #    print('yo',self.potpath)
             #sys.exit()
         return
 
     def get_potpath(self):
+        print('len(self.pot_all_dict)',len(self.pot_all_dict))
         if len(self.pot_all_dict) == 0:
             self.get_pot_all()
-        if self.pot in self.pot_all_dict[self.pot]:
-            self.potpath = self.pot_all_dict[self.pot]
-        else:
-            print('self.pot',self.pot)
-            sys.exit('self.pot not found; ERROR (93)')
+        print('len(self.pot_all_dict)',len(self.pot_all_dict))
+        print('self.pot',self.pot)
+        self.potpath = self.pot_all_dict[self.pot][0]
+        self.pottype = self.pot_all_dict[self.pot][1]
+        print('spp',self.potpath[0])
+        #if self.pot in self.pot_all_dict_potpath[self.pot]:
+        #    self.potpath = self.pot_all_dict_potpath[self.pot]
+        #else:
+        #    print('self.pot',self.pot)
+        #    sys.exit('self.pot not found; ERROR (93)')
 
         #scripts = os.environ['scripts']
         #allpot_fullpath = glob.glob(scripts+'/potentials/*')
@@ -730,6 +772,7 @@ class mypot( object ):
         return
 
     def get_pottype_elements_and_atomic_energies(self):
+        ''' help '''
         # get from input.nn the atomic energies
         if type(self.pot) != bool and type(self.elements) == bool and type(self.atom_energy) == bool:
             self.pottype = self.pot.split("_")[0]
@@ -839,7 +882,7 @@ class mypot( object ):
             print(text,"self.potDONE                ",self.potDONE)
             print(text,"self.verbose                ",self.verbose)
             #print(text,"self.pot_all                ",self.pot_all)
-            print(text,"self.pot_all_dict (len)     ",len(self.pot_all_dict))
+            print(text,"len(self.pot_all_dict)      ",len(self.pot_all_dict))
             print()
 
     def get_my_assessments(self):
@@ -1101,9 +1144,24 @@ class mypot( object ):
         return
 
 def pot_all():
-    all = mypot()
-    all.get_pot_all()
-    return all.pot_all
+    mp = mypot()
+    mp.get_pot_all()
+    return mp.pot_all
+    #return mp.pot_all_dict_potpath
+    ##return mp.pot_all
+
+def list_pot_all():
+    mp = mypot()
+    mp.get_pot_all()
+    for i in mp.pottype_all:
+        print('---------'+"-"*len(i))
+        print('pottype:',i)
+        print('---------'+"-"*len(i))
+        my_dict =  mp.pot_all_dict
+        for item in my_dict:
+            if my_dict[item][1] == i:
+                print(" {} , potpath: {}".format(item,my_dict[item][0]))
+    return
 
 ##################################################################################
 ## ipi related functions
@@ -1911,6 +1969,10 @@ def lammps_ext_elastic_potential_mod(ace):
         command = command + ace.lammps_command_potential_n2p2()
     elif ace.pot.pottype == "runner":
         command = command + ace.lammps_command_potential_runner()
+    elif ace.pot.pottype  == 'eam':
+        command = command + ace.lammps_command_potential_eam_alloy(pair_style="eam/alloy")
+    elif ace.pot.pottype == 'adp':
+        command = command + ace.lammps_command_potential_eam_alloy(pair_style="apd")
     else: sys.exit('potential now known yet')
 
     command = command + [
@@ -3109,7 +3171,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
 
     return ene
 
-def ase_get_chemical_symbols_to_number_of_species(atoms):
+def ase_get_chemical_symbols_to_number_of_species(atoms,known_elements_by_pot=[]):
     symbols = atoms.get_chemical_symbols()
     #numat = atoms.get_number_of_atoms()
     #print('symbols',symbols)
@@ -3128,19 +3190,21 @@ def ase_get_chemical_symbols_to_number_of_species(atoms):
         else:
             d[element] = 0
 
-    dcheck("Mg")
-    dcheck("Si")
-    dcheck("Al")
+    for i in known_elements_by_pot:
+        dcheck(i)
+    #dcheck("Mg")
+    #dcheck("Si")
+    #dcheck("Al")
     return d
 
-def ase_get_chemical_symbols_to_conz(atoms):
+def ase_get_chemical_symbols_to_conz(atoms,known_elements_by_pot=[]):
     symbols = atoms.get_chemical_symbols()
     numat = atoms.get_number_of_atoms()
     #print('symbols',symbols)
     #print('numat',numat)
 
     uniquesym = set(atoms.get_chemical_symbols())
-    # print("uniquesym",uniquesym) # --> set(['Mg', 'Al'])
+    #print("uniquesym",uniquesym) # --> set(['Mg', 'Al'])
     d = {}
     for i in uniquesym:
         #print(i,symbols.count(i),numat)
@@ -3152,11 +3216,14 @@ def ase_get_chemical_symbols_to_conz(atoms):
             #print(element+" exists")
             pass
         else:
-            d[element] = 0.0
+            d[element] = 0
     #print('dd',d)
-    dcheck("Mg")
-    dcheck("Si")
-    dcheck("Al")
+    # here, only check for pot.elements
+    for i in known_elements_by_pot:
+        dcheck(i)
+    #dcheck("Mg")
+    #dcheck("Si")
+    #dcheck("Al")
     return d
 
 def ase_check_chemical_symbols_agree(atoms,ace):
@@ -3201,8 +3268,16 @@ class ase_calculate_ene( object ):
             verbose=False,
             temp=False,
             elastic=False,
+            fqh_atoms_max=None,
+            fqh_supercell=None,
+            fah_atoms_max=None,
+            fah_supercell=None
             ):
 
+        self.fqh_atoms_max  = fqh_atoms_max
+        self.fqh_supercell  = fqh_supercell
+        self.fah_atoms_max  = fah_atoms_max
+        self.fah_supercell  = fah_supercell
         #self.pot = pot
         self.LAMMPS_COMMAND = False
         self.potpath        = potpath
@@ -3280,6 +3355,7 @@ class ase_calculate_ene( object ):
         return command
 
     def lammps_command_potential_eam_alloy(self,pair_style="eam/alloy"):
+	''' pair_style eam/alloy or adp '''
         ## This should acutally be the elements of the structure ....
         out = ""
         for idx,i in enumerate(self.pot.elements):
@@ -4338,6 +4414,8 @@ class ase_calculate_ene( object ):
             if verbose: self.check_frame('get_murn 2 atfer atomrelax only',frame=atoms_murn)
 
         dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,0.998,1.0,1.002,1.005,1.01,1.015,1.02,1.025,1.03]
+        dvol_rel = np.arange(0.97,1.03,0.005)
+        dvol_rel = np.arange(0.985,1.015,0.0025)
         #dvol_rel = np.arange(0.97,1.03,0.001)
         #dvol_rel = np.arange(0.995,1.005,0.0003)
         vol_pa = np.zeros(len(dvol_rel))
@@ -4393,8 +4471,8 @@ class ase_calculate_ene( object ):
             if write_Fqh_files and dvol_rel[idx] >= 0.999:
                 #print('write_Fqh_files: idx:',idx,'i:',i,'dvol_rel:',dvol_rel[idx])
                 print('now phonopy')
-                self.get_fh_phonopy(atomsin=atoms_murn_loop)
-                sys.exit('phonopy 77 done')
+                #self.get_fh_phonopy(atomsin=atoms_murn_loop)
+                #sys.exit('phonopy 77 done')
                 self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
             if verbose > 2:
                 print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
@@ -4594,21 +4672,37 @@ class ase_calculate_ene( object ):
             print('atoms_h.get_cell() before',atoms_h.get_cell())
 
         #print('xx80.6')
-        if True:
-            nat = atoms_h.get_number_of_atoms()
-            #print('xx80.7,nat (0)',nat)
-            if nat < 4:
-                atoms_h *= (4,4,4)
-            nat = atoms_h.get_number_of_atoms()
-            #print('xx80.7,nat (1)',nat)
-            if nat < 10:
-                atoms_h *= (3,3,3)
+        #################################
+        # decide abou supercell size
+        # a) defaut cellsize, or take the defined one
+        #################################
         nat = atoms_h.get_number_of_atoms()
-        if nat < 20:
-            atoms_h *= (2,2,2)
+        print('self.fqh_atoms_max:',self.fqh_atoms_max)
+        print('self.supercell    :',self.fqh_supercell)
+        print('number of atoms   :',nat)
+        if self.fqh_supercell is not None:
+            rep = self.fqh_supercell
+            print('rep from fqh_supercell',rep)
+        elif self.fqh_atoms_max is not None:
+            rep = 1
+            for i in np.arange(2,11):
+                at_ = nat*i**3
+                print('i',i,'at_',at_,'rep',rep)
+                if at_ <= self.fqh_atoms_max:
+                    rep = i
+                elif at_ > self.fqh_atoms_max:
+                    break
+            print('rep from fqh_atoms_max',rep)
+        else:
+            rep = 1
+            print('rep not defined (therefore: rep = 1)')
+
+
+        atoms_h *= (rep,rep,rep)
         nat = atoms_h.get_number_of_atoms()
-        #print('xx80.7,nat (2)',nat)
-        #sys.exit()
+        print('rep',rep,'nat',nat)
+
+
         if debug:
             nat = atoms_h.get_number_of_atoms()
             print("###########################################")
@@ -4666,14 +4760,19 @@ class ase_calculate_ene( object ):
             try_readfile = "Ni"
             vol = atoms_h.get_volume()/atoms_h.get_number_of_atoms()
             volstr = "_"+str(vol)
+            folder = "Fqh_"+str(rep)+"x"+str(rep)+"x"+str(rep)
+            self.fqh_folder = os.getcwd()+"/"+folder
             if True: #hes.has_negative_eigenvalues == False:
                 # write in any case, if it has negative eigenvalues so be it
                 #hes.write_hessematrix(try_readfile+"_hessematrix"+volstr)
-                hes.write_hessematrix("Hessematrix"+volstr)
+                if not os.path.isdir(folder):
+                    os.makedirs(folder)
+                hes.write_hessematrix(folder+"/Hessematrix"+volstr)
                 if hes.has_negative_eigenvalues == False:
                     # only write for ground state
-                    hes.write_ene_atom("Fqh_"+str(nat)+"at_cell_per_atom"+volstr)
-                    hes.write_ene_cell("Fqh_"+str(nat)+"at_cell_per_cell"+volstr)
+                    subfolder = folder+"/Fqh_"+str(nat)+"at_cell_per_"
+                    hes.write_ene_atom(subfolder+"atom"+volstr)
+                    hes.write_ene_cell(subfolder+"cell"+volstr)
             #np.savetxt(try_readfile,free_ene)
 
         #print('k T)shift   ',T0shift_ev_atom)
@@ -4723,7 +4822,7 @@ def ase_mepa(atoms):
 def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
-def get_evinet(ace,atoms):
+def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False):
     #atoms= get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,matrix_element="Ni",cubic=True,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True)
     print('atoms.cell before relaxing cellshape and volume:')
     print(atoms.cell)
@@ -4737,40 +4836,63 @@ def get_evinet(ace,atoms):
     print('atoms.positions after relaxing cellshape and volume:')
     for idx,i in enumerate(atoms.positions):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
+    print('atoms.volume:',atoms.get_volume())
+    print('atoms.volume/nat:',atoms.get_volume()/atoms.get_number_of_atoms())
     print()
-    print("NOW GETTING EVinet ... (first without Fqh to see if EVinet is working)")
+
+
+    print("#############################")
+    print("# NOW GETTING Evinet ... first without Fqh to see if EVinet is working#")
+    print("#############################")
     vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False)
     print('vinet.parameters:',vinet.parameters)
     vinet.write_data()
     #print('atoms vol',atoms.get_volume())
-    print("NOW GETTING Fqh_files ...")
 
-    if False:
-        phonopy_atoms = ase_to_phonopy(atoms)
-        phonon = phonopy_pre_process(phonopy_atoms, supercell_matrix=np.eye(3, dtype='intc'))
-        supercells = phonon.get_supercells_with_displacements()
+    if fqh:
+        print()
+        print()
+        print("#############################")
+        print("# NOW GETTING Fqh_files .. .#")
+        print("#############################")
+        print()
 
-        # Force calculations by calculator
-        set_of_forces = []
-        for scell in supercells:
-            cell = phonopy_to_ase(scell)
-            #cell = Atoms(symbols=scell.get_chemical_symbols(),
-            #             scaled_positions=scell.get_scaled_positions(),
-            #             cell=scell.get_cell(),
-            #             pbc=True)
-            cell.set_calculator(cell)
-            forces = cell.get_forces()
-            drift_force = forces.sum(axis=0)
-            print(("[Phonopy] Drift force:" + "%11.5f" * 3) % tuple(drift_force))
-            # Simple translational invariance
-            for force in forces:
-                force -= drift_force / forces.shape[0]
-            set_of_forces.append(forces)
+        if False:
+            phonopy_atoms = ase_to_phonopy(atoms)
+            phonon = phonopy_pre_process(phonopy_atoms, supercell_matrix=np.eye(3, dtype='intc'))
+            supercells = phonon.get_supercells_with_displacements()
 
-        sys.exit()
+            # Force calculations by calculator
+            set_of_forces = []
+            for scell in supercells:
+                cell = phonopy_to_ase(scell)
+                #cell = Atoms(symbols=scell.get_chemical_symbols(),
+                #             scaled_positions=scell.get_scaled_positions(),
+                #             cell=scell.get_cell(),
+                #             pbc=True)
+                cell.set_calculator(cell)
+                forces = cell.get_forces()
+                drift_force = forces.sum(axis=0)
+                print(("[Phonopy] Drift force:" + "%11.5f" * 3) % tuple(drift_force))
+                # Simple translational invariance
+                for force in forces:
+                    force -= drift_force / forces.shape[0]
+                set_of_forces.append(forces)
 
-    vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=True)
-    #ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
+            sys.exit()
+
+        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=True)
+        print('ace.fqh_folder',ace.fqh_folder)
+        # cd self.fqh_folder
+        # fqh.py -i Fqh_*at_cell_per_atom* -wqh3 -wqh2 -v
+        # mcd thermo
+        # cp ../../EVinet_1 EVinet
+        # cp ../Fqh_*at_cell_per_Surface_3rd_* Fqh
+        # ~/Thermodynamics/getThermodynamics.sh
+
+
+
+        #ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
     return atoms
 
 

@@ -41,7 +41,14 @@ def help(p = None):
     p.add_argument('--units','-u',choices = ['eV','meV_pa','eV_pa','hartree','hartree_pa'],default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--geopt','-g'               ,action='store_true',help='make a geometry optimization of the atoms.')
     p.add_argument('--elastic','-e'             ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
-    p.add_argument('--thermo','-thermo'             ,action='store_true',help='calculate free energy surface.')
+    p.add_argument('--thermo','-thermo'         ,action='store_true',help='calculate free energy surface.')
+    p.add_argument('--evinet','-evinet'         ,action='store_true',help='calculate evinet.')
+    p.add_argument('--fqh','-fqh'               ,action='store_true',help='calculate fqh.')
+    p.add_argument('--fah','-fah'               ,action='store_true',help='calculate fah.')
+    p.add_argument('--fqh_atoms_max','-fqh_atoms_max'           ,default=200,type=int,help='maximum number of atoms for supercells used for fqh')
+    p.add_argument('--fqh_supercell','-fqh_supercell'           ,default=None,type=int,help='amoun of repetitions of supercell for fqh calculations')
+    p.add_argument('--fah_atoms_max','-fah_atoms_max'           ,default=200,type=int,help='maximum number of atoms for supercells used for fah')
+    p.add_argument('--fah_supercell','-fah_supercell'           ,default=None,type=int,help='amoun of repetitions of supercell for fah calculations')
     p.add_argument('--elastic_all',     '-ea'   ,action='store_true',help='calculate elastic constants for every epoch for Al (externally by lammps).')
     p.add_argument('--elastic_from_ene','-ee'   ,action='store_true',help='calculate elastic constants for Al from energies (inernally by ase).')
     p.add_argument('--ase'    ,'-a'             ,action='store_true',default=True,help='Do the calculations by the ase interface to lammps.')
@@ -92,9 +99,7 @@ def get_energies(args):
 
     '''
     if args.show_availabel_pots:
-        #print(my.pot_all())
-        for i in my.pot_all():
-            print(i)
+        my.list_pot_all()
         sys.exit()
 
     ##################################
@@ -259,6 +264,10 @@ def get_energies(args):
             units=units,
             geopt=geopt,
             elastic=args.elastic,
+            fqh_atoms_max = args.fqh_atoms_max,
+            fqh_supercell = args.fqh_supercell,
+            fah_atoms_max = args.fah_atoms_max,
+            fah_supercell = args.fah_supercell,
             verbose=verbose)
     ### get the potential
     print('getEne(p2)                           : ace.pot_get_and_ase_lmp_cmd()')
@@ -282,11 +291,17 @@ def get_energies(args):
         my.analyze_accuracy_of_filling_cell_with_Al(ace)
         sys.exit("kaka done")
 
-    if args.thermo:
+    if args.thermo or args.evinet or args.fqh or args.fah:
+        if args.thermo: args.fqh = True
+        if args.thermo: args.fah = True
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
         my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
         ase_structure = ase_read(args.inputfile,format=args.format_in)
-        ase_structure_relaxed = my.get_evinet(ace,ase_structure)
+        ase_structure_relaxed = my.get_evinet(ace,ase_structure,relax_cellshape_and_volume=True,fqh=args.fqh)
+        print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
+        #ace.get_elastic_external(atomsin=ase_structure_relaxed,verbose=ace.verbose,text="structure",get_all_constants=True)
+        #print('ace.c44:',ace.c44,type(ace.c44))
+
         sys.exit("kaka done")
 
 
@@ -640,10 +655,15 @@ def get_energies(args):
                 for_DFTmax_ = -9999
             if debug:
                 print('kk',for_DFTmax_)
-            d = my.ase_get_chemical_symbols_to_conz(frames[i])
+            print('frame',frames[i].positions)
+            print('spec',frames[i].get_chemical_symbols())
+            print('pe',ace.pot.elements)
+            d = my.ase_get_chemical_symbols_to_conz(frames[i],known_elements_by_pot=ace.pot.elements)
+            print('d454',d)
             if verbose > 2:
                 print('i',i,'d',d)
             n = my.ase_get_chemical_symbols_to_number_of_species(frames[i])
+            print('n454',n)
             if verbose > 2:
                 print('i',i,'n',n)
             cell = frames[i].get_cell()
@@ -696,6 +716,10 @@ def get_energies(args):
                 for_DFTmax[idx] = for_DFTmax_
                 ana_vol[idx] = frames[i].get_volume()
                 ana_vol_pa[idx] = frames[i].get_volume()/frames[i].get_number_of_atoms()
+                print('analys')
+                import my_atom
+                #print('kk',my_atom.get_eqvol("Al"))
+                sys.exit('22')
                 VOL_norm = n["Al"]*16.5+n["Mg"]*22.85+n["Si"]*20.5
                 print('ana_vol',ana_vol[idx])
                 print('VOL_norm',VOL_norm)
@@ -736,6 +760,9 @@ def get_energies(args):
                 if verbose > 1:
                     print('ene_DFT[idx]     :',ene_DFT[idx],units)
 
+            print('d',d)
+            print('n',n)
+            print("ace.pot.atom_energy",ace.pot.atom_energy)
             if len(ace.units.split("_")) == 1: # per structure
                 ene_DFT_atomic[idx] = my.get_atomc_energy_from_dicts(n,ace.pot.atom_energy)
             elif len(ace.units.split("_")) == 2: # per atom
