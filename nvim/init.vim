@@ -17,7 +17,7 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('$HOME/sources/nvim/plugged')
 " Plug 'tpope/vim-surround'                     " I dont seem to use it
-Plug 'Yggdroot/indentLine'                      " shows ['|', '¦', '┆', '┊'] to indicate indents
+Plug 'Yggdroot/indentLine'                      " shows ['|', '¦', '┆', '┊'] to indicate indents; for tex files changes \textit{} to italic text
 Plug 'iCyMind/NeoSolarized'                     " color scheme
 Plug 'majutsushi/tagbar'                        " show functions in current file: <leader>t
 Plug 'ervandew/supertab'                        " tab completion for vim
@@ -60,6 +60,8 @@ autocmd VimEnter * call OnVimEnter()
 """"""""""""""""""""""""""""""""""""""""""
 " settings      
 """"""""""""""""""""""""""""""""""""""""""
+let g:indentLine_fileTypeExclude = ['tex', 'markdown']  " dont use this plugin for tex files
+au Filetype tex setlocal conceallevel=0
 "let g:DiffUnit="Word1" " for diffchar.Vim
 "let g:DiffUnit="Char" " for diffchar.Vim
 source ~/.vim/startup/cmdline-complete.vim    " use ctrl+p in command mode (now tab)
