@@ -843,8 +843,8 @@ class atom(object):     # advantage: once this is executed we know that everythi
         self.reference_volume = reference_volume(elementlist)
 
 
-        print('rs-->',self.reference_state)
-        print('rv-->',self.reference_volume)
+        #print('rs-->',self.reference_state)
+        #print('rv-->',self.reference_volume)
         #print "self._str:",self._str
         def out_as_str(a):
             #a=data(listin)[3]

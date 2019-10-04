@@ -204,6 +204,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         DB2 = np.loadtxt(DB2_path+'/function_average.data')
 
     #sys.exit()
+    # in 20181115_KMC2_fps_considering_oldstruct every structure in function_average.data has only the largest 109 distances
     DB1len = DB1.shape[0]
     DB2len = DB2.shape[0]
     every = 500
@@ -219,6 +220,10 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
     print()
     print()
     # one could in principle check if any of the structures in DB2 are repetitions.
+
+    # DB1 are the known structues (5000)
+    # DB2 are the new structures form KMC
+
     if not os.path.isfile(foldername+'/dist_vec_from_DB1.dat'):
         print('-------------------------------------------------------------------------------')
         print('making '+foldername+'/dist_vec.dat to find the structure in DB2 which is furthest from DB1')
@@ -227,9 +232,9 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         #print("Writing output every",every)
         dist_vec = np.full((DB2len), np.inf)  # 2509
         # this could be easily parallelized ...
-        for i in range(DB2len):  # 0 ... 2508
+        for i in range(DB2len):  # 0 ... 2508  # for every kmc strucuture
             my.progress(i,DB2len)
-            for j in range(DB1len):  # 0 ... 2508
+            for j in range(DB1len):  # 0 ... 5000
                 dist = salg.norm(DB2[i]-DB1[j])
                 if dist < dist_vec[i]:
                     dist_vec[i] = dist
@@ -248,7 +253,7 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
         print('----------------------------------------------------------')
         print('creating dist_vec_fin.dat which holds the distances of DB2')
         print('----------------------------------------------------------')
-        argmax = np.argmax(dist_vec) # this has the largest distance to the previous 5000 struct.
+        argmax = np.argmax(dist_vec) # this is the index of the entry that has the largest distance to the previous 5000 struct. (e.g. 390)
         distmax = dist_vec[argmax]
         # from here on we dont really need dis_vec anymore! Only DB2 distanes will be checked.
         #print('sarting loop....')

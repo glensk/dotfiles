@@ -847,7 +847,7 @@ class mypot( object ):
             else:
                 print('self.pot:',self.pot)
                 sys.exit("self.pot unknown (Error 91)")
-        print('self.elements',self.elements)
+        #print('self.elements',self.elements)
         #import my_atom
         #aa = my_atom.atom()
 
@@ -929,8 +929,8 @@ class mypot( object ):
         for ext in ext_:
             filex = glob.glob(self.potpath+"/assess_"+ext+"_*")
             for i in filex:
-                #print('i99',i)
                 idx = i.replace(self.potpath+"/assess_"+ext+"_","")
+                #print('i99',i,idx)
                 allepochs.append(int(idx))
         self.assessed_epochs = np.sort(list(set(allepochs)))
         self.assessed_test  = [None] * len(self.assessed_epochs)
