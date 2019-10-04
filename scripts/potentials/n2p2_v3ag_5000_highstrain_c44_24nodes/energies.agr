@@ -47,14 +47,14 @@
 @default symbol size 1.000000
 @default sformat "%.8g"
 @background color 0
-@page background fill on
+@page background fill off
 @timestamp off
 @timestamp 0.03, 0.03
 @timestamp color 1
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Tue Oct  1 21:40:40 2019"
+@timestamp def "Fri Oct  4 13:37:31 2019"
 @r0 off
 @link r0 to g0
 @r0 type above
@@ -101,7 +101,7 @@
 @g0 fixedpoint format general general
 @g0 fixedpoint prec 6, 6
 @with g0
-@    world 0.621994304244, 2.02705468, 893.4452848, 112.004938
+@    world 0.624193251154, 2.04689008, 912.565249593, 24.1803556
 @    stack world 0, 0, 0, 0
 @    znorm 1
 @    view 0.150000, 0.150000, 1.150000, 0.850000
@@ -183,7 +183,7 @@
 @    yaxis  label color 1
 @    yaxis  label place normal
 @    yaxis  tick on
-@    yaxis  tick major 1.4
+@    yaxis  tick major 1.2
 @    yaxis  tick minor ticks 9
 @    yaxis  tick default 6
 @    yaxis  tick place rounded true
@@ -200,7 +200,7 @@
 @    yaxis  tick minor size 0.500000
 @    yaxis  ticklabel on
 @    yaxis  ticklabel format general
-@    yaxis  ticklabel prec 5
+@    yaxis  ticklabel prec 2
 @    yaxis  ticklabel formula ""
 @    yaxis  ticklabel append ""
 @    yaxis  ticklabel prepend ""
@@ -223,7 +223,7 @@
 @    altyaxis  off
 @    legend on
 @    legend loctype view
-@    legend 0.85, 0.8
+@    legend 0.5, 0.8
 @    legend box color 1
 @    legend box pattern 1
 @    legend box linewidth 1.0
@@ -342,6 +342,104 @@
 @    s1 errorbar riser clip length 0.100000
 @    s1 comment "Etrain.dat"
 @    s1 legend  ""
+@    s2 hidden false
+@    s2 type xy
+@    s2 symbol 1
+@    s2 symbol size 0.410000
+@    s2 symbol color 1
+@    s2 symbol pattern 1
+@    s2 symbol fill color 1
+@    s2 symbol fill pattern 0
+@    s2 symbol linewidth 1.0
+@    s2 symbol linestyle 1
+@    s2 symbol char 65
+@    s2 symbol char font 0
+@    s2 symbol skip 0
+@    s2 line type 1
+@    s2 line linestyle 3
+@    s2 line linewidth 1.0
+@    s2 line color 1
+@    s2 line pattern 1
+@    s2 baseline type 0
+@    s2 baseline off
+@    s2 dropline off
+@    s2 fill type 0
+@    s2 fill rule 0
+@    s2 fill color 1
+@    s2 fill pattern 1
+@    s2 avalue off
+@    s2 avalue type 2
+@    s2 avalue char size 1.000000
+@    s2 avalue font 0
+@    s2 avalue color 1
+@    s2 avalue rot 0
+@    s2 avalue format general
+@    s2 avalue prec 3
+@    s2 avalue prepend ""
+@    s2 avalue append ""
+@    s2 avalue offset 0.000000 , 0.000000
+@    s2 errorbar on
+@    s2 errorbar place both
+@    s2 errorbar color 1
+@    s2 errorbar pattern 1
+@    s2 errorbar size 1.000000
+@    s2 errorbar linewidth 1.0
+@    s2 errorbar linestyle 1
+@    s2 errorbar riser linewidth 1.0
+@    s2 errorbar riser linestyle 1
+@    s2 errorbar riser clip off
+@    s2 errorbar riser clip length 0.100000
+@    s2 comment "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_5000_highstrain_c44_24nodes/assess_input_data_from_n2p2_v4ag_ppl_987654_21cores/result_bill_test.data"
+@    s2 legend  "RMSE for only the 5000 struct (test)"
+@    s3 hidden false
+@    s3 type xy
+@    s3 symbol 1
+@    s3 symbol size 0.330000
+@    s3 symbol color 2
+@    s3 symbol pattern 1
+@    s3 symbol fill color 2
+@    s3 symbol fill pattern 0
+@    s3 symbol linewidth 1.0
+@    s3 symbol linestyle 1
+@    s3 symbol char 65
+@    s3 symbol char font 0
+@    s3 symbol skip 0
+@    s3 line type 1
+@    s3 line linestyle 3
+@    s3 line linewidth 1.0
+@    s3 line color 2
+@    s3 line pattern 1
+@    s3 baseline type 0
+@    s3 baseline off
+@    s3 dropline off
+@    s3 fill type 0
+@    s3 fill rule 0
+@    s3 fill color 1
+@    s3 fill pattern 1
+@    s3 avalue off
+@    s3 avalue type 2
+@    s3 avalue char size 1.000000
+@    s3 avalue font 0
+@    s3 avalue color 1
+@    s3 avalue rot 0
+@    s3 avalue format general
+@    s3 avalue prec 3
+@    s3 avalue prepend ""
+@    s3 avalue append ""
+@    s3 avalue offset 0.000000 , 0.000000
+@    s3 errorbar on
+@    s3 errorbar place both
+@    s3 errorbar color 2
+@    s3 errorbar pattern 1
+@    s3 errorbar size 1.000000
+@    s3 errorbar linewidth 1.0
+@    s3 errorbar linestyle 1
+@    s3 errorbar riser linewidth 1.0
+@    s3 errorbar riser linestyle 1
+@    s3 errorbar riser clip off
+@    s3 errorbar riser clip length 0.100000
+@    s3 comment "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v3ag_5000_highstrain_c44_24nodes/assess_input_data_from_n2p2_v4ag_ppl_987654_21cores/result_bill_train.data"
+@    s3 legend  "RMSE for only the 5000 structures (train)"
 @target G0.S0
 @type xy
 0 92601.903
@@ -1667,4 +1765,50 @@
 657 2.5603489
 658 2.5609487
 659 2.5604161
+&
+@target G0.S2
+@type xy
+1 23.209593
+2 7.0989072
+3 6.7003867
+5 4.1421807
+7 3.9264768
+10 3.2089533
+15 3.0526576
+21 2.8805123
+26 3.4520372
+30 3.4034243
+42 3.6100303
+60 2.4022504
+84 2.8350028
+119 2.4139403
+168 2.6556965
+236 2.7851526
+332 2.8630304
+468 2.9045615
+658 2.9832462
+659 2.984309
+&
+@target G0.S3
+@type xy
+1 14.638513
+2 8.0091316
+3 5.0292265
+5 4.0288611
+7 3.6053016
+10 3.7753902
+15 3.224393
+21 3.1750902
+26 3.2005074
+30 3.185261
+42 3.8520606
+60 3.5239301
+84 3.2263495
+119 3.2160604
+168 3.2928941
+236 3.4553455
+332 3.3864443
+468 3.3585516
+658 3.4143677
+659 3.4140824
 &
