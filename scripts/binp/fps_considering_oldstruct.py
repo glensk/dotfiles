@@ -35,9 +35,9 @@ def make_fps(db1,db2,nsyms,structures_upperlim):
 
         to get nsyms (and not needing to provide it):
          - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | uniq | grep -v "<.*" # -> gets the elements
-         -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Al" | wc -l # -> gets 64
-         -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Mg" | wc -l # -> gets 64
-         -  grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Si" | wc -l # -> gets 64
+         - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Al" | wc -l # -> gets 64
+         - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Mg" | wc -l # -> gets 64
+         - grep symfunction_short $dotfiles/scripts/potentials/n2p2_v1ag/input.nn | awk '{print $2}' | grep "Si" | wc -l # -> gets 64
     '''
     ### get absolute datafile
     DB1_datafile = str(os.path.abspath(db1))
