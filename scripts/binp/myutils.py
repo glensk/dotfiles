@@ -1503,10 +1503,11 @@ def submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitsk
         os.chdir(jobdir)
         command = ["sbatch"]
         if submit_to_debug_que == True:
-            command = command + ["-p","debug","-t","01:00:00"]
-        command = command + [submitskript]
-        print('sbatch '+submitskript)
-        call(["sbatch",submitskript])
+            command = ["sbatch","-p","debug","-t","01:00:00",submitskript]
+        else:
+            command = ["sbatch",                             submitskript]
+        print('command',command)
+        call(command)
 
     os.chdir(hier)
     return
@@ -2633,7 +2634,7 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minutes=minutes,interactive=interactive)
     submitjob(submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
     #submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
-    create_READMEtxt(add="submit_to_debug_que= "+str(submit_to_debug_que))
+    create_READMEtxt(add="submit_to_debug_que = "+str(submit_to_debug_que))
     os.chdir(hier)
     return
 
@@ -2692,7 +2693,7 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
         if myhost == "daint":
             text_file.write("module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw")
 
-        text_file.write("module list")
+        text_file.write("module list\n")
         text_file.write("export LD_LIBRARY_PATH=$HOME/sources/n2p2/lib:${LD_LIBRARY_PATH}\n")
         text_file.write("#echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH\n")
         text_file.write("\n")
