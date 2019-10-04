@@ -90,3 +90,5 @@ set clipboard=unnamed           " to send copied stuff to system clipboard ( nee
 "if has("autocmd")
 "  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 "endif
+set spell
+set spelllang=en_us

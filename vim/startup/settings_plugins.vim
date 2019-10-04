@@ -3,7 +3,9 @@
 " Plug 'iCyMind/NeoSolarized'                     " color scheme
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 colorscheme NeoSolarized   	" set colorscheme, can only be done after plug#end
-set termguicolors 		    " for colorscheme
+"set termguicolors 		    " for colorscheme... Vim supporting
+"true-color (i.e., 24-bit color) 
+" It looks like solarized doesn't support truecolor. Switched to Solarized8 and everything is good. Had a hell of a time finding that (guess I'm outdated) so leaving this up in case it helps anyone<Paste>: https://github.com/lifepillar/vim-solarized8
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " tagbar            
