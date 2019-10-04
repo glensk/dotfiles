@@ -6,7 +6,8 @@ import filecmp
 #import click
 import numpy as np
 import glob #,pathlib
-from my_atom import atom as my_atom
+#from my_atom import #atom as my_atom
+import my_atom
 from itertools import islice
 
 
@@ -57,7 +58,6 @@ except ImportError:
 
 import hesse
 from feos import eos
-import my_atom
 #try:
 #    from ase.optimize import GPMin
 #except ImportError:
@@ -581,7 +581,7 @@ def get_atomc_energy_from_dicts(dict_atomic_species_structure,dict_atom_energies
     '''
     out = 0
     for atom_species in dict_atomic_species_structure:
-	print('asxxx',atom_species)
+	#print('asxxx',atom_species)
         atom_energy = dict_atom_energies[atom_species]
         en = dict_atomic_species_structure[atom_species]*atom_energy
         out += en
@@ -670,6 +670,7 @@ class mypot( object ):
         self.trigger_set_path_manual    = ["setpath","potpath","pp", ".", "..", "../" ]
         self.verbose                    = verbose
         self.elements                   = False  # list e.g. ['Al', 'Mg', 'Si']
+        self.reference_volumes          = False
         self.atom_energy                = False
         self.atom_masses                = False # necessary for n2p2 / runner
         self.atom_masses_str            = False # necessary for n2p2 / runner
@@ -784,8 +785,9 @@ class mypot( object ):
                 self.atom_types_ = {}
                 self.atom_masses = {}
                 for i in self.elements:
-                    self.atom_types_[i] = my_atom.atom([i]).number[0]
-                    self.atom_masses[i] = my_atom.atom([i]).mass[0]
+                    self.atom_types_[i]         = my_atom.atom([i]).number[0]
+                    self.atom_masses[i]         = my_atom.atom([i]).mass[0]
+                    #self.reference_volumes[i]   = my_atom.atom([i]).reference_volume[0]
                 #print('fin (1)',self.atom_types_)
                 #print('fin (M)',self.atom_masses)
                 list_atom_nr = []
@@ -845,6 +847,25 @@ class mypot( object ):
             else:
                 print('self.pot:',self.pot)
                 sys.exit("self.pot unknown (Error 91)")
+        print('self.elements',self.elements)
+        #import my_atom
+        #aa = my_atom.atom()
+
+        self.reference_volumes = {}
+        for i in self.elements:
+            #self.atom_masses[i]         = my_atom.atom([i]).mass[0]
+            #print('iii',i)
+            #print()
+            #print('all',my_atom.atom([i]))
+            #print()
+            #print('mass',my_atom.atom([i]).mass[0])
+            #print()
+            #print('rv',(my_atom.atom([i]).reference_volume)[0])
+            rv  = (my_atom.atom([i]).reference_volume)[0]
+            self.reference_volumes[i] = rv
+            #print('rv',my_atom.atom([i]).reference_volume[0])
+        #print('rv',self.reference_volumes)
+        #sys.exit('123')
         return
 
     def print_variables_mypot(self,text="",print_nontheless=False):
@@ -877,6 +898,7 @@ class mypot( object ):
             print(text,"self.potcutoff (Angstrom)   ",self.potcutoff)
             print(text,"self.elements               ",self.elements)
             print(text,"self.atom_energy            ",self.atom_energy)
+            print(text,"self.reference_volumes      ",self.reference_volumes)
             print(text,"self.atom_types             ",self.atom_types)
             print(text,"self.pottype                ",self.pottype)
             print(text,"self.potDONE                ",self.potDONE)
@@ -2364,7 +2386,7 @@ def inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn,verbose=False):
             line_elements_ = line.split()[1:]
             elements = []
             for i in line_elements_:
-                #print(i)
+                #print('iii',i)
                 if i in my_atom.atomic_symbols:
                     #print("yo",i)
                     elements.append(i)
@@ -3181,7 +3203,7 @@ def ase_get_chemical_symbols_to_number_of_species(atoms,known_elements_by_pot=[]
     d = {}
     for i in uniquesym:
         #print(i,symbols.count(i),numat)
-        d[i] = symbols.count(i)
+        d[i] = int(symbols.count(i))
 
     def dcheck(element):
         if element in d.keys():

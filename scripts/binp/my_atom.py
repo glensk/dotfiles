@@ -327,6 +327,10 @@ atomic_covalent_radii = np.array([
     _missing,  # Lr
     ])
 
+def get_volume_atomic_reference_state(list_of_elements):
+    ref = reference_state(list_of_elements)
+    return
+
 # This data is from Ashcroft and Mermin.
 atomic_reference_states = [\
     None, #X
@@ -341,9 +345,9 @@ atomic_reference_states = [\
     {'symmetry': 'diatom', 'd': 1.42},#F
     {'symmetry': 'fcc', 'a': 4.43},#Ne
     {'symmetry': 'bcc', 'a': 4.23},#Na
-    {'symmetry': 'hcp', 'c/a': 1.624, 'a': 3.21},#Mg
-    {'symmetry': 'fcc', 'a': 4.05},#Al
-    {'symmetry': 'diamond', 'a': 5.43},#Si
+    {'symmetry': 'hcp', 'c/a': 1.624, 'a': 3.21},#Mg  vol: (2*sqrt(3)*3.21^2)*(3.21*1.624)/8
+    {'symmetry': 'fcc', 'a': 4.05}, # Al    vol: (4.05^3)/4
+    {'symmetry': 'diamond', 'a': 5.43},#Si  vol: (5.43^3)/8
     {'symmetry': 'cubic', 'a': 7.17},#P
     {'symmetry': 'orthorhombic', 'c/a': 2.339, 'a': 10.47,'b/a': 1.229},#S
     {'symmetry': 'orthorhombic', 'c/a': 1.324, 'a': 6.24, 'b/a': 0.718},#Cl
@@ -722,7 +726,29 @@ def data(elementlistin = None):
     getVar = lambda searchList, ind: [searchList[i] for i in ind]
     name = getVar(atomic_names, number)
     reference_state = getVar(atomic_reference_states, number)
-    return number,symbol,name,mass,melting,reference_state
+    reference_volume = []
+    for i in reference_state:
+        crystal_struct = i['symmetry']
+        if crystal_struct == 'fcc':
+            vol = ((i['a'])**3)/4
+            #print('vol',vol)
+        elif crystal_struct == 'hcp':
+            # {'symmetry': 'hcp', 'c/a': 1.624, 'a': 3.21},#Mg  vol: (2*sqrt(3)*3.21^2)*(3.21*1.624)/8
+            a = i['a']
+            c = i['c/a']*a
+            #print('a',a)
+            #print('c',c)
+            vol = ((2*np.sqrt(3))*a**2)*c/8 #*a^2)*c/8
+            #print('vol',vol)
+        elif crystal_struct == 'diamond':
+            vol = ((i['a'])**3)/8
+            #print('vol',vol)
+        else:
+            sys.exit('crystal structure unknown: '+crystal_struct)
+        reference_volume.append(vol)
+        #print('i',i,i['symmetry'])
+        #print('ref',reference_volume)
+    return number,symbol,name,mass,melting,reference_state,reference_volume
 
 def number(listin):
     return data(listin)[0]
@@ -741,6 +767,9 @@ def melting(listin):
 
 def reference_state(listin):
     return data(listin)[5]
+
+def reference_volume(listin):
+    return data(listin)[6]
 
 def calphad_free_energy(listin):
     pass
@@ -790,6 +819,7 @@ class atom(object):     # advantage: once this is executed we know that everythi
         self._t         = False
         self._tr        = False
         self._a         = False
+        self._v         = False
         self._str       = False
         self._verbose   = False
         self._listin    = listin    # self._listin: [aL cU 1 3], [SI], [Ag 7]
@@ -810,7 +840,11 @@ class atom(object):     # advantage: once this is executed we know that everythi
         self.melting = melting(elementlist)
         self.melting_rounded = [ int(math.ceil(b)) for b in self.melting ]
         self.reference_state = reference_state(elementlist)
+        self.reference_volume = reference_volume(elementlist)
 
+
+        print('rs-->',self.reference_state)
+        print('rv-->',self.reference_volume)
         #print "self._str:",self._str
         def out_as_str(a):
             #a=data(listin)[3]
@@ -825,6 +859,7 @@ class atom(object):     # advantage: once this is executed we know that everythi
             if self._s  :print(self.symbol)
             if self._m  :print(self.mass)
             if self._r  :print(self.reference_state)
+            if self._v  :print(self.reference_volume)
             if self._t  :print(self.melting)
             if self._tr :print(self.melting_rounded)
             if self._a  :
@@ -832,6 +867,7 @@ class atom(object):     # advantage: once this is executed we know that everythi
                 print(self.name)
                 print(self.symbol)
                 print(self.mass)
+                print(self.reference_volume)
                 print(self.reference_state)
                 print(self.melting)
                 print(self.melting_rounded)
@@ -840,6 +876,7 @@ class atom(object):     # advantage: once this is executed we know that everythi
             if self._n  :print(out_as_str(self.name))
             if self._s  :print(out_as_str(self.symbol))
             if self._m  :print(out_as_str(self.mass))
+            if self._v  :print(out_as_str(self.reference_volume))
             if self._r  :print(out_as_str(self.reference_state))
             if self._t  :print(out_as_str(self.melting))
             if self._tr :print(out_as_str(self.melting_rounded))
@@ -848,6 +885,7 @@ class atom(object):     # advantage: once this is executed we know that everythi
                 print(out_as_str(self.name))
                 print(out_as_str(self.symbol))
                 print(out_as_str(self.mass))
+                print(out_as_str(self.reference_volume))
                 print(out_as_str(self.reference_state))
                 print(out_as_str(self.melting))
                 print(out_as_str(self.melting_rounded))

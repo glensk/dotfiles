@@ -655,17 +655,15 @@ def get_energies(args):
                 for_DFTmax_ = -9999
             if debug:
                 print('kk',for_DFTmax_)
-            print('frame',frames[i].positions)
-            print('spec',frames[i].get_chemical_symbols())
-            print('pe',ace.pot.elements)
+                print('frame',frames[i].positions)
+                print('spec',frames[i].get_chemical_symbols())
+                print('pe',ace.pot.elements)
             d = my.ase_get_chemical_symbols_to_conz(frames[i],known_elements_by_pot=ace.pot.elements)
-            print('d454',d)
-            if verbose > 2:
-                print('i',i,'d',d)
-            n = my.ase_get_chemical_symbols_to_number_of_species(frames[i])
-            print('n454',n)
-            if verbose > 2:
-                print('i',i,'n',n)
+            if debug:
+                print('d454:',d)
+            n = my.ase_get_chemical_symbols_to_number_of_species(frames[i],known_elements_by_pot=ace.pot.elements)
+            if debug:
+                print('n454:',n)
             cell = frames[i].get_cell()
             pos = frames[i].get_positions()
             cellshape = "?"
@@ -716,15 +714,22 @@ def get_energies(args):
                 for_DFTmax[idx] = for_DFTmax_
                 ana_vol[idx] = frames[i].get_volume()
                 ana_vol_pa[idx] = frames[i].get_volume()/frames[i].get_number_of_atoms()
-                print('analys')
-                import my_atom
-                #print('kk',my_atom.get_eqvol("Al"))
-                sys.exit('22')
-                VOL_norm = n["Al"]*16.5+n["Mg"]*22.85+n["Si"]*20.5
-                print('ana_vol',ana_vol[idx])
-                print('VOL_norm',VOL_norm)
+                #print('analys')
+                #import my_atom
+                ##print('kk',my_atom.get_eqvol("Al"))
+                VOL_norm = 0
+                for ele in n:
+                    nat__ = n[ele]
+                    rv__ = ace.pot.reference_volumes[ele]
+                    #print('ele',ele,'nat',nat,'rv',ace.pot.reference_volumes[ele])
+                    VOL_norm += nat__ * rv__
+
+                #sys.exit('22')
+                #VOL_norm = n["Al"]*16.5+n["Mg"]*22.85+n["Si"]*20.5
+                #print('ana_vol',ana_vol[idx])
+                #print('VOL_norm',VOL_norm)
                 VOL_diff = ana_vol[idx] - VOL_norm
-                print('VOL_diff',VOL_diff)
+                #print('VOL_diff',VOL_diff)
                 ana_VOL_diff_norm[idx] = VOL_diff/VOL_norm
                 #print('ana',ana_atoms_)
                 #print('ka',frames[i].get_all_distances(mic=True))
@@ -760,9 +765,9 @@ def get_energies(args):
                 if verbose > 1:
                     print('ene_DFT[idx]     :',ene_DFT[idx],units)
 
-            print('d',d)
-            print('n',n)
-            print("ace.pot.atom_energy",ace.pot.atom_energy)
+            #print('dd',d)
+            #print('n',n)
+            #print("ace.pot.atom_energy",ace.pot.atom_energy)
             if len(ace.units.split("_")) == 1: # per structure
                 ene_DFT_atomic[idx] = my.get_atomc_energy_from_dicts(n,ace.pot.atom_energy)
             elif len(ace.units.split("_")) == 2: # per atom
