@@ -414,6 +414,7 @@ def help(p = None):
     hesse.py al -eneext -v  (calculates forces and energies from external calculate_enery_forces file)
     hesse.py al -i FORCE_CONSTANTS -p h -v -wh  (to create HesseMatrix_sphinx_al)
     hesse.py al -i HesseMatrix_sphinx_al -p h -v -ene (to get the energy)
+    hesse.py al -i simulation.hess -we -v  (since ipi has same units as sphinx)
 
 
 

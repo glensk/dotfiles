@@ -604,25 +604,42 @@ class get_all_disps():
         #sys.exit()
 
 
-        ##############################################################################
-        # fits
-        ##############################################################################
+        print("#########################################################################")
+        print("# fits on [0.5,0.5,0.0]")
+        print("#########################################################################")
         fit = pot_parametrize.fit_to_func(self.disp_vs_force,function='morse',fixzeroat=self.nndist)
         try:
             fitmc1 = pot_parametrize.fit_to_func(self.disp_vs_force,function='mc1',fixzeroat=self.nndist)
         except TypeError:
             fitmc1 = False
         fit_corrected_for_110 = pot_parametrize.fit_to_func(self.disp_vs_force_corrected_for_110,function='morse',fixzeroat=self.nndist)
+        print('fit.parameters',fit.parameters)
 
-        fit_compare = np.zeros((len(fit.fit),6))
-        fit_compare[:,0] = fit.fit[:,0]
-        fit_compare[:,1] = self.disp_vs_force[:,1]   # actual (VASP) forces
-        fit_compare[:,2] = fit.fit[:,1]              # fitted morse forces
+        fit_on_05_05_0 = np.zeros((len(fit.fit),7))
+        fit_on_05_05_0[:,0] = fit.fit[:,0]
+        dist__hydrogen   = (1./7.2)*fit.fit[:,0]*10**-10
+        dist__           = (1./1.0)*fit.fit[:,0]*10**-10
+        fit_on_05_05_0[:,1] = self.disp_vs_force[:,1]   # actual (VASP) forces
+        fit_on_05_05_0[:,2] = fit.fit[:,1]              # fitted morse forces
+        print('dist__',dist__)
+        for idx,i in enumerate(dist__):
+            print('d',idx,dist__[idx],'force VASP',fit_on_05_05_0[idx,1])
+        k__ = (0.9*10**10)
+        e__ = (1.6*10**(-19))
+        dist__meter = dist__*10**(-10)   # angstrom to meter
+        newton_to_mev_per_angstrom = 6.2415091**11
+        q1__ = ((1.6*78.)*10**(-19)) #78
+        q1__ = ((1.6*2.8)*10**(-19)) #78
+        fit_on_05_05_0[:,6] =  (-k__*((q1__**2) /(dist__**2))*newton_to_mev_per_angstrom)+12.              # columb forces
+
+        # get screened potential (https://en.wikipedia.org/wiki/Electric-field_screening)
+        for idx,i in enumerate(dist__):
+            print('d',idx,dist__[idx],fit_on_05_05_0[idx,6])
         if type(fitmc1) != bool:
-            fit_compare[:,3] = fitmc1.fit[:,1]
-        fit_compare[:,4] = fit_compare[:,1] - fit.fit[:,1]
+            fit_on_05_05_0[:,3] = fitmc1.fit[:,1]
+        fit_on_05_05_0[:,4] = fit_on_05_05_0[:,1] - fit.fit[:,1]
         if type(fitmc1) != bool:
-            fit_compare[:,5] = fit_compare[:,1] - fitmc1.fit[:,1]
+            fit_on_05_05_0[:,5] = fit_on_05_05_0[:,1] - fitmc1.fit[:,1]
 
         if type(fitmc1) != bool:
             np.savetxt(self.dofor+'/disp_fit.parameters_mc1.dat',fitmc1.parameters)
@@ -684,16 +701,29 @@ class get_all_disps():
         # Weight 1Morse 05_05_0
         # Weight 4Morse 0_05_05
         ##############################################################################
-        if False:
+	print("xx@Forces on [0.5,0.5,0.0]")
+	print("xx    dist  VASP   morse  mc1    dmorse  dmc1  Columb")
+        print("xx",fit_on_05_05_0)
+        print("#########################################################################")
+        print("# fits on [0.0,0.5,0.5] previously tox")
+        print("#########################################################################")
+        if True:
             print('dist between pos[0] and pos_0_05_05')
             params = fit.parameters
-            print('p',params)
+            print('params',params)
             for idx,i in enumerate(self.dist_0_05_05_at0):
-                fm = hesse.Morse_derivative(LA.norm(i), *params)
-                fv = hesse.getefvec(i,params,pot = 'm')
-                self.force_0_05_05_rest[idx] = self.force_0_05_05[idx] + fv[1]
-                print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
+                dist_norm                           = np.around(LA.norm(i),5)
+
+
+                fm                                  = np.round(hesse.Morse_derivative(LA.norm(i), *params),4)
+                forces_morse                        = hesse.getefvec(i,params,pot = 'm')
+                self.force_0_05_05_rest[idx]        = self.force_0_05_05[idx] + forces_morse[1]
+                vasp_force                          = self.force_0_05_05[idx] #.ljust(22)
+                vasp_force_norm                     = str(np.around(-LA.norm(abs(vasp_force)),decimals=3)).ljust(6)
+                vasp_minus_morse                    = vasp_force+forces_morse[1]
+                print(str(i).ljust(22),str(dist_norm).ljust(7),'F_0_05_05_vasp',str(vasp_force).ljust(22),"norm:",vasp_force_norm,'F_morse',str(-forces_morse[1]).ljust(22),'norm',str(fm).ljust(7),'vasp-morse',vasp_minus_morse,'norm',str(np.around(LA.norm(vasp_minus_morse),3)).ljust(7))
             #print(self.dist_0_05_05_at0)
+            sys.exit('23')
             print()
             print('force on 0_05_05       remaining forces on 0_05_05          this should be a sum of')
             print('                       (after substr. morse)                a*vec at_000 + b*vec at_05050')
@@ -745,7 +775,7 @@ class get_all_disps():
                 fv = hesse.getefvec(i,params,pot = 'm')
                 self.force_0_05_05_rest[idx] = self.force_0_05_05[idx] + fv[1]
                 print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
-            sys.exit('this parametrization, even for T=0K displacements, is not optimal!, try to add attractive forces on 0_45_45')
+            print('this parametrization, even for T=0K displacements, is not optimal!, try to add attractive forces on 0_45_45')
 
 
         #print('force on 0_05_05 after subtracting mores')
@@ -815,8 +845,9 @@ class get_all_disps():
         if type(fitmc1) != bool:
 	    print('ratio remaining mc1   f[0,0.5,0.5]/f[1,1,0]',self.ratio00505_mc1)
 	print()
-	print("    dist  VASP   morse  mc1    dmorse  dmc1")
-        print(fit_compare)
+	print("@Forces on [0.5,0.5,0.0]")
+	print("    dist  VASP   morse  mc1    dmorse  dmc1  Columb")
+        print(fit_on_05_05_0)
 	print()
         if type(fitmc1) != bool:
 	    print(round(self.f_110,3),round(LA.norm(remaining_on_0_05_05_morse),3),round(LA.norm(remaining_on_0_05_05_mc1),3))

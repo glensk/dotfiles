@@ -117,6 +117,7 @@ def printnormal(*var):
     return printoutcolor(ENDC,var,ENDC)
 
 def printred(*var):
+    ''' print(my.printred("min_at "+str(min_at)+" min_at_orig "+str(min_at_orig)+' (min id '+str(min_at_id)),"this is just an output") '''
     red = '\033[31m'
     ENDC = '\033[0m'
     return printoutcolor(red,var,ENDC)
@@ -900,6 +901,8 @@ class mypot( object ):
             print(text,"self.atom_energy            ",self.atom_energy)
             print(text,"self.reference_volumes      ",self.reference_volumes)
             print(text,"self.atom_types             ",self.atom_types)
+            print(text,"self.atom_masses            ",self.atom_masses)
+            print(text,"self.atom_masses_str        ",self.atom_masses_str)
             print(text,"self.pottype                ",self.pottype)
             print(text,"self.potDONE                ",self.potDONE)
             print(text,"self.verbose                ",self.verbose)
@@ -1770,9 +1773,27 @@ def create_al_structures_for_analysis_SOAP():
             qwrite(f111,f111n,frame,"1NN_Si__1NN_Si__1NN_Mg")
     return
 
-def make_nice_scatterplot(df,tags=None,x="a",y="b",color=None):
+def make_nice_scatterplot(df,tags=None,x="a",y="b",color=None,symbols=False):
     ''' make_nice_scatterplot(dataframe,tags=None,x="a",y="b",color=range(ntot))
-        df is a pandas dataframe
+        df is a pandas dataframe e.g.
+        df = pd.DataFrame(projs) # where projs is a numpy array
+        df.columns = ["a","b"]
+        make_nice_scatterplot(df,tags=tags,x="a",y="b",color=range(ntot))
+
+        or:
+        x = np.arange(len(rd))
+        y = rd  # error in KMC structures
+        color = np.log(fd)
+        from myutils import make_nice_scatterplot as sp
+        dfa = np.array([x,y]).T
+        import pandas as pd
+        df = pd.DataFrame(dfa)
+        df.columns = ["struct","error"]
+        sp(df,x="struct",y="error",color=color)
+
+        example in: fps_correlation_scatterplot.ipynb
+
+
     '''
     import plotly.graph_objects as go
     fig = go.Figure(data=go.Scatter(x=df[x],
@@ -1786,6 +1807,8 @@ def make_nice_scatterplot(df,tags=None,x="a",y="b",color=None):
                                         showscale=True
                                     )
                                     )) # hover text goes here
+    if symbols != False:
+    	fig['data'][0]['marker']['symbol'] = 'triangle-left'
     size = 400
     fig.update_layout(
         autosize=False,
@@ -1977,7 +2000,7 @@ def lammps_ext_elastic_init_mod(ace,positions='pos.lmp'):
     'read_data "'+positions+'"',
     "",
     "# Need to set mass to something, just to satisfy LAMMPS",
-    ] + ace.pot.atoms_masses_str #lammps_command_masses()
+    ] + ace.pot.atom_masses_str #lammps_command_masses()
     return command
 
 def lammps_ext_elastic_potential_mod(ace):
@@ -2172,8 +2195,8 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             #sys.exit('ec')
             ene = ace.elastic_constants
 
-    if ace.verbose > 2:
-        show_ase_atoms_content(atoms,showfirst=10,comment="FINISHED LAMMPS EXTERNALLY")
+    if ace.verbose: # > 2:
+        show_ase_atoms_content(atoms,showfirst=10,comment="LAMMPS EXTERNALLY")
     return ene
 
 ##################################################################################
@@ -4323,8 +4346,6 @@ class ase_calculate_ene( object ):
         #print('hhhhhhhhhhhh',self.pot.pottype)
         #print('hhhhhhhhhhhh',self.lmpcmd)
         if self.pot.pottype == 'eam-alloy':
-            #print('atoms.get_chemical_symbols()',atoms.get_chemical_symbols())
-            #print('atoms.get_chemical_symbols()',np.unique(atoms.get_chemical_symbols()))
             elements = np.unique(atoms.get_chemical_symbols())
             if len(elements) != 1:
                 sys.exit('Error: you have more than one element in you simulation box. I am not sure how to define the eam-alloy potential. using e.g. Al Ni will give different results to Ni Al; in the docs they propose to define all the atoms which does not work in my case')
@@ -4410,7 +4431,8 @@ class ase_calculate_ene( object ):
             atomrelax=False,
             write_energies=False,
             write_Fqh_files=False,
-            get_to_minvol_first=True):
+            get_to_minvol_first=True,
+            printminimal=True):
         ''' the murn will never change the atomsobject
         return_frame_with_volume_per_atom : volume can be specified and he frame scaled
         '''
@@ -4469,7 +4491,8 @@ class ase_calculate_ene( object ):
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
-            print('ene ase tot (eV):',str(round(ene_ev,7)).ljust(10),'nat:'+str(nat),"vol/pa:",str(round(vol/nat,7)).ljust(10),'(eV/at):',str(ene/nat).ljust(19)) #self.units)
+            if printminimal == True:
+                print('ene ase tot (eV):',str(round(ene_ev,7)).ljust(10),'nat:'+str(nat),"vol/pa:",str(round(vol/nat,7)).ljust(10),'(eV/at):',str(ene/nat).ljust(19)) #self.units)
             #print('ams3',atoms_murn_loop.get_stress(),ase_vpa(atoms_murn_loop))
             if verbose > 2:
                 stress = atoms_murn_loop.get_stress()[:3]
@@ -4525,8 +4548,9 @@ class ase_calculate_ene( object ):
         ########################
         vinet = eos()
         data=np.transpose([vol_pa,ene_pa])
-        print('vol_pa',vol_pa)
-        print('ene_pa',ene_pa)
+        if printminimal == True:
+            print('vol_pa',vol_pa)
+            print('ene_pa',ene_pa)
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
         #self.eos = vinet.parameters
         if verbose > 1:

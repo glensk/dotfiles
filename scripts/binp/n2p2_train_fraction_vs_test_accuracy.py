@@ -68,38 +68,47 @@ print('>> (1) searching learning-curve.out files....')
 maxdepth = 2
 if args.potential: maxdepth = 3
 all_learning_curve_files = my.find_files(os.getcwd(),'learning-curve.out',maxdepth=maxdepth)
+if args.both == True:
+    all_learning_curve_files_add = my.find_files(os.getcwd(),'learning-curve-runner.out',maxdepth=maxdepth)
+    print('all_learning_curve_files_add')
+    for i in all_learning_curve_files_add:
+        if args.verbose:
+            print('runner',i)
+        all_learning_curve_files.append(i)
+
 if args.potential:
     for i in all_learning_curve_files:
         if not "potential/learning-curve.out" in i: all_learning_curve_files.remove(i)
 
 if args.verbose:
     print()
-    print('>> (1) ################################## all_learning_curve_files ########')
+    print('>> (2) ################################## all_learning_curve_files ########')
     for i in all_learning_curve_files:
-        print('>> (1) i',i)
-    print('>> (1) ################################## all_learning_curve_files ########')
+        print('>> (2) i',i)
+    print('>> (2) ################################## all_learning_curve_files ########')
     print()
 
-from utils_rename import list_sorted
-all_learning_curve_files = list_sorted(all_learning_curve_files)
-if args.find != -1:
-    all_learning_curve_files_ = []
-    for i in all_learning_curve_files:
-        #print()
-        use = True
-        for j in args.find:
-            #print(i,j in i)
-            if j not in i:
-                use = False
-                #print('cont')
-                continue
-        #print(">>",i,use)
-        if use == True:
-            all_learning_curve_files_.append(i)
-    all_learning_curve_files = all_learning_curve_files_
-    # for i in all_learning_curve_files:
-    #     print('i',i)
-    # sys.exit()
+if False:
+    from utils_rename import list_sorted
+    all_learning_curve_files = list_sorted(all_learning_curve_files)
+    if args.find != -1:
+        all_learning_curve_files_ = []
+        for i in all_learning_curve_files:
+            #print()
+            use = True
+            for j in args.find:
+                #print(i,j in i)
+                if j not in i:
+                    use = False
+                    #print('cont')
+                    continue
+            #print(">>",i,use)
+            if use == True:
+                all_learning_curve_files_.append(i)
+        all_learning_curve_files = all_learning_curve_files_
+        # for i in all_learning_curve_files:
+        #     print('i',i)
+        # sys.exit()
 
 
 print('>> (3) my.q() ....')
@@ -194,9 +203,9 @@ for nnidx,i in enumerate(all_learning_curve_files):
     testf               = round(my.inputnn_get_testfraction(pot.inputnn),2)
     train_fraction      = round(1.-testf,2)
     pot_elements, [al,mg,si]= my.inputnn_get_atomic_symbols_and_atom_energy_list(pot.inputnn)
-    al                  = int(al)
-    mg                  = int(mg)
-    si                  = int(si)
+    al                  = str(int(al)).ljust(2)
+    mg                  = str(int(mg)).ljust(2)
+    si                  = str(int(si)).ljust(2)
 
 
     inputnn = pot.inputnn

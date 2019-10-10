@@ -399,6 +399,7 @@ class ah():
                 )
         return
 
+
     def load_data(self):
         ''' '''
         print "loading data ..."
@@ -418,6 +419,7 @@ class ah():
         self.ahste          = var['ahste']
         self.ahstd          = var['ahstd']
         return
+
 
     def get_dudls_and_averages_from_self_data(self):
         ''' 1st index: volume / lattice constant    (self.a)
@@ -521,8 +523,6 @@ class ah():
                 energies = dudlmean[inda, indt, :]
                 dudlmeanfit[a,t] = get_dudlmeanfit(lambdas, energies)
         return dudlmeanfit
-
-
 
     def get_dudl_vs_temp_folder(self, verbose = False):
         ''' needs:
@@ -650,10 +650,6 @@ class ah():
         return
 
 
-
-
-
-
     def plot_dudl_vs_lambda(self, a, t, l):
         ''' TODO: NOT READY YET
             1st index: a
@@ -723,6 +719,7 @@ class ah():
         if interpolate:
             surface = h.fqh_surface_interpolate(surface)
         return surface
+
 
     def import_surface_expr(self, surface_filename = None, surface = None, sysexit = True):
         if surface == None:
