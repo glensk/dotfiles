@@ -244,3 +244,5 @@ add 'zsh/powerlevel10k/'
 warning: adding embedded git repository: zsh/zsh-autosuggestions
 add 'zsh/zsh-autosuggestions/'
 
+git fetch origin
+git reset --hard origin/master
