@@ -1,0 +1,57 @@
+<simulation mode='static' verbosity='high'>
+  <output prefix='simulation'>
+    <!-- SELECT THE PROPERTIES THAT NEED TO BE PRINTED OUT -->
+    <properties stride='10' filename='out'>  [ step, time{femtosecond}, conserved, temperature{kelvin}, kinetic_md, potential, pressure_md ] </properties>
+    <properties stride='10' filename='ti'>  [ step, pot_component_raw(0), pot_component_raw(1)] </properties>
+    <!-- <trajectory stride='100' filename='pos'> positions </trajectory> -->
+  </output>
+  <total_steps> 10000 </total_steps>
+  <!-- SELECT THE RANDOM NUMBER SEED TO HAVE REPRODUCIBLE SIMULATIONS -->
+  <prng>
+    <seed> 32342 </seed>
+  </prng>
+  <!-- SPECIFY THE MEANS OF COMMUNICATION WITH A PARTICULAR FORCE PROVIDER.-->
+  <!-- ALSO PROVIDE A NAME FOR REFERENCING.-->
+   <ffsocket name='lammps' mode='unix' pbc='true'>
+    <address> md_ff </address>
+  </ffsocket>
+  <ffdebye name='debye'>
+      <hessian shape='(96,96)' mode='file'> hessian.data </hessian>
+      <x_reference mode='file'> x_reference.data </x_reference>
+    <v_reference> -2.89829817e+00 </v_reference>
+  </ffdebye>
+  <!-- DETAILS OF THE SYSTEM.-->
+  <system>
+    <!-- INITIALIZE THE NUMBER OF PARTICLES, MASSES, LABELS, POSITIONS, MOMENTUM, CELL SEPARATELY OR FROM  A CHECKPOINT FILE-->
+<!--    <initialize nbeads='1'>
+      <file mode='xyz'> ../init.xyz </file>
+      <velocities mode='thermal' units='kelvin'> 600 </velocities>
+    </initialize> -->
+    <initialize nbeads='1'>
+        <!--file mode='chk'> ../init.chk </file-->
+    <file mode='xyz'> init.xyz </file>
+    </initialize>
+    <!-- DETAILS OF THE BORN-OPPENHEIMER POTENTIAL.-->
+    <forces>
+      <!--force forcefield='lammps'> </force-->
+      <force forcefield='debye' weight='0.0'> </force>
+      <force forcefield='lammps' weight='1.0'> </force>
+    </forces>
+    <!-- DESCRIBE THE ENSEMBLE -->
+    <ensemble>
+      <temperature units='kelvin'> 600 </temperature>
+    </ensemble>
+    <!-- CHOOSE THE TYPE OF MOTION -->
+    <motion mode='dynamics'>
+      <!-- CHOOSE THE KIND OF DYAMICS : NVT, NPT, NST etc. -->
+      <dynamics mode='nvt' splitting='baoab'>
+        <!-- CHOOSE THE TYPE OF THERMOSTAT : Langevin, SVR -->
+        <thermostat mode='langevin'>
+          <tau units='femtosecond'> 100 </tau>
+        </thermostat>
+        <!-- CHOOSE THE TIMESTEP -->
+        <timestep units='femtosecond'> 1 </timestep>
+      </dynamics>
+    </motion>
+  </system>
+</simulation>

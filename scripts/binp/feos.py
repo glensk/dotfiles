@@ -7,7 +7,7 @@ import glob
 #import pylab
 import argparse   # vasp 2.6.6 would be too old
 import filecmp
-import myutils
+from myutils import create_READMEtxt
 
 np.set_printoptions(suppress=True)   # display arrays withou 000001
 np.set_printoptions(precision=6)    # print only 6 digist after .
@@ -773,4 +773,4 @@ if __name__ == '__main__':
         _printgreen("DONE!")
         print("")
     #eos.plot()
-    myutils.create_READMEtxt()
+    create_READMEtxt()

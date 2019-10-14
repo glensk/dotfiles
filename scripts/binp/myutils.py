@@ -57,7 +57,6 @@ except ImportError:
 #    pass
 
 import hesse
-from feos import eos
 #try:
 #    from ase.optimize import GPMin
 #except ImportError:
@@ -4431,6 +4430,7 @@ class ase_calculate_ene( object ):
             atomrelax=False,
             write_energies=False,
             write_Fqh_files=False,
+            write_Fah_folder=False,
             get_to_minvol_first=True,
             printminimal=True):
         ''' the murn will never change the atomsobject
@@ -4519,7 +4519,7 @@ class ase_calculate_ene( object ):
                 print('now phonopy')
                 #self.get_fh_phonopy(atomsin=atoms_murn_loop)
                 #sys.exit('phonopy 77 done')
-                self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
+                self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=write_Fqh_files)
             if verbose > 2:
                 print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
             if verbose:
@@ -4546,6 +4546,7 @@ class ase_calculate_ene( object ):
         ########################
         # feos
         ########################
+        from feos import eos
         vinet = eos()
         data=np.transpose([vol_pa,ene_pa])
         if printminimal == True:
@@ -4804,22 +4805,25 @@ class ase_calculate_ene( object ):
         #    hes.write_ene_atom()
         #if try_readfile:
         if write_Fqh:
-            try_readfile = "Ni"
+            #try_readfile = "Ni"
             vol = atoms_h.get_volume()/atoms_h.get_number_of_atoms()
             volstr = "_"+str(vol)
             folder = "Fqh_"+str(rep)+"x"+str(rep)+"x"+str(rep)
-            self.fqh_folder = os.getcwd()+"/"+folder
+            self.fqh_folder = write_Fqh+"/fqh"
             if True: #hes.has_negative_eigenvalues == False:
                 # write in any case, if it has negative eigenvalues so be it
                 #hes.write_hessematrix(try_readfile+"_hessematrix"+volstr)
-                if not os.path.isdir(folder):
-                    os.makedirs(folder)
-                hes.write_hessematrix(folder+"/Hessematrix"+volstr)
+                if not os.path.isdir(self.fqh_folder):
+                    os.makedirs(self.fqh_folder)
+                hes.write_hessematrix(self.fqh_folder+"/Hessematrix"+volstr)
                 if hes.has_negative_eigenvalues == False:
                     # only write for ground state
-                    subfolder = folder+"/Fqh_"+str(nat)+"at_cell_per_"
+                    subfolder = self.fqh_folder+"/Fqh_"+str(nat)+"at_cell_per_"
                     hes.write_ene_atom(subfolder+"atom"+volstr)
                     hes.write_ene_cell(subfolder+"cell"+volstr)
+                    ase_write(self.fqh_folder+"/positions"+volstr+".extxyz",atoms_h,format='extxyz')
+                    ase_write(self.fqh_folder+"/positions"+volstr+".POSCAR",atoms_h,format='vasp')
+            #self.fqh_files.append([volstr,])
             #np.savetxt(try_readfile,free_ene)
 
         #print('k T)shift   ',T0shift_ev_atom)
@@ -4869,7 +4873,7 @@ def ase_mepa(atoms):
 def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
-def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False):
+def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
     #atoms= get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,matrix_element="Ni",cubic=True,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True)
     print('atoms.cell before relaxing cellshape and volume:')
     print(atoms.cell)
@@ -4891,9 +4895,11 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False):
     print("#############################")
     print("# NOW GETTING Evinet ... first without Fqh to see if EVinet is working#")
     print("#############################")
-    vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False)
-    print('vinet.parameters:',vinet.parameters)
-    vinet.write_data()
+    os.mkdir("evinet")
+    with cd("evinet"):
+        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False)
+        print('vinet.parameters:',vinet.parameters)
+        vinet.write_data()
     #print('atoms vol',atoms.get_volume())
 
     if fqh:
@@ -4902,9 +4908,10 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False):
         print("#############################")
         print("# NOW GETTING Fqh_files .. .#")
         print("#############################")
-        print()
-
         if False:
+            print("#############################")
+            print("# fqh from phonopy.. .#")
+            print("#############################")
             phonopy_atoms = ase_to_phonopy(atoms)
             phonon = phonopy_pre_process(phonopy_atoms, supercell_matrix=np.eye(3, dtype='intc'))
             supercells = phonon.get_supercells_with_displacements()
@@ -4925,11 +4932,26 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False):
                 for force in forces:
                     force -= drift_force / forces.shape[0]
                 set_of_forces.append(forces)
-
             sys.exit()
 
-        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=True)
+        print("#############################")
+        print("# fqh from manual displacements (in get_murn() )... #")
+        print("#############################")
+        print('oscwd',os.getcwd())
+        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=False,write_Fqh_files=os.getcwd())
         print('ace.fqh_folder',ace.fqh_folder)
+        print('osggg11 tmp3?',os.getcwd())
+        with cd("fqh"):
+            call(["fqh.py -i Fqh_*at_cell_per_atom* -wqh1 -wqh2 -wqh3"],shell=True)
+        print('osggg222 tmp3',os.getcwd())
+        os.mkdir("fqh/thermo")
+        with cd("fqh/thermo"):
+            print('now fqh/termo?',os.getcwd())
+            call(["cp ../../evinet/EVinet_1 EVinet"],shell=True)
+            call(["cp ../Fqh_*at_cell_per_atom_Surface_3rd_order__* Fqh"],shell=True)
+            call(["$HOME/Thermodynamics/getThermodynamics.sh"],shell=True)
+
+
         # cd self.fqh_folder
         # fqh.py -i Fqh_*at_cell_per_atom* -wqh3 -wqh2 -v
         # mcd thermo
@@ -4937,11 +4959,55 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False):
         # cp ../Fqh_*at_cell_per_Surface_3rd_* Fqh
         # ~/Thermodynamics/getThermodynamics.sh
 
+    if fah:
+        print()
+        print()
+        print("##############################")
+        print("# NOW GETTING anharmonic ... #")
+        print("##############################")
 
 
         #ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
     return atoms
 
+def get_hessefiles_vol_pos(folder):
+    paths = glob.glob(folder+'/Hessematrix_*')
+    out = []
+    for path in paths:
+        volstr = path.split("_")[-1]
+        print(path,volstr)
+        out.append([path,float(volstr),folder+'/positions_'+volstr+'.extxyz'])
+    return out
+
+def ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos):
+    folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K"
+    os.makedirs(folder)
+    ipi_inp = "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
+    with cd(folder):
+        print('hessefile',hessefile)
+        hessefile_basename = os.path.basename(hessefile)
+        shutil.copy2(hessefile, folder)
+        print('hfbn',hessefile_basename)
+        shutil.copy2(ipi_inp, folder)
+        ipi_inp_basename = os.path.basename(ipi_inp)
+        print('ipi_inp',ipi_inp_basename)
+        print('pos',pos)
+        frame = ase_read(pos)
+        print('fp',frame.positions)
+        print('fp',frame.positions.flatten())
+        np.savetxt(folder+"/x_reference.data",frame.positions.flatten())
+    return
+
+def get_Mg5Si6_antisites():
+    i = "Mg5Si6"
+    path = scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
+    print('path',path)
+    frame = ase_read(path,format="runner")
+    for idx,i in enumerate(frame.positions):
+        print('idx',idx,i,frame.get_chemical_symbols()[idx])
+        if frame.get_chemical_symbols()[idx] == "Mg":
+
+    return
 
 def ase_repeat_structure(atoms,repeat):
     atomsc = atoms.repeat(repeat)
@@ -5191,4 +5257,5 @@ if __name__ == "__main__":
     #pass
     #n2p2_check_SF_inputnn(inputnn="cursel_64.def")
     #get_number_of_atoms_as_function_of_cutoff()
-    create_al_structures_for_analysis_SOAP()
+    #create_al_structures_for_analysis_SOAP()
+    get_Mg5Si6_antisites()
