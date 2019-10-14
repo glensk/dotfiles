@@ -17,7 +17,7 @@ _ipi_source="$HOME/sources/ipi/"
 export LAMMPSPATH="$HOME/sources/lammps"
 binp_physics="$HOME/.local/binp"  # this is a link o the pinp folder 
 bins_physics="$HOME/.local/bins"  # necessary for aiida_launch... 
-addeverywhere="$_ipi_source:$binp_physics$bins_physics"  # add aiida only in aiases, since I have changed my own stuff.
+addeverywhere="$_ipi_source:$binp_physics:$bins_physics"  # add aiida only in aiases, since I have changed my own stuff.
 
 #####################
 ##### PATH
