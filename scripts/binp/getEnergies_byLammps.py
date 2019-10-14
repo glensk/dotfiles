@@ -105,9 +105,9 @@ def get_energies(args):
     ##################################
     # create the README
     ##################################
-    my.create_READMEtxt(os.getcwd())
-
     hier = os.path.abspath(os.getcwd())
+    my.create_READMEtxt(hier)
+
     allepochs = [False]
     inputfile = infile = args.inputfile
     format_in = args.format_in
@@ -426,14 +426,41 @@ def get_energies(args):
         if args.inputfile == False and args.check_kmc57data:
             args.inputfile = os.environ["dotfiles"]+"/scripts/potentials/aiida_get_structures_new/aiida_exported_group_KMC57.data"
             ext = "kmc57"
-        print('pb',ace.pot.potepoch_bestteste)
-        print('pa',ace.pot.potepoch_all)
-        if type(ace.pot.potepoch_all) == bool:
+        print('pa',ace.pot.potepoch_bestteste)
+        print('pb',ace.pot.potepoch_all,type(ace.pot.potepoch_all))
+        if args.potepoch == False:
             allepochs = [ace.pot.potepoch_bestteste]
         else:
-            allepochs = [ace.pot.potepoch_bestteste,ace.pot.potepoch_all[-1]]
+            allepochs = [args.potepoch]
+
+        #allepochs = ace.pot.potepoch_all
+
+        #print('allepochs 0',allepochs)
+        #if type(ace.pot.potepoch_all) == bool:
+        #    pass
+        #elif ace.pot.potepoch_all == []:
+        #    pass
+        #elif type(ace.pot.potepoch_all) == list:
+        #    allepochs = ace.pot.potepoch_all
+
+        #print('allepochs 1',allepochs)
+        #if type(ace.pot.potepoch_bestteste) == bool:
+        #    pass
+        #elif ace.pot.potepoch_bestteste == []:
+        #    pass
+        #elif type(ace.pot.potepoch_bestteste) == int:
+        #    allepochs = np.append(allepochs,np.array([ace.pot.potepoch_bestteste]))
+        #print('allepochs 2',allepochs)
 
 
+        #if len(ace.pot.potepoch_bestteste) == 0 and type(ace.pot.potepoch_all) == bool:
+        #    allepochs = []
+        #elif len(ace.pot.potepoch_bestteste) != 0 and type(ace.pot.potepoch_all) == bool:
+        #    allepochs = [ace.pot.potepoch_bestteste]
+        #elif len(ace.pot.potepoch_bestteste) != 0 and type(ace.pot.potepoch_all) != bool:
+        #    allepochs = [ace.pot.potepoch_bestteste,ace.pot.potepoch_all[-1]]
+
+        print('allepochs',allepochs)
 
     ###############################
     ### check args.inputfile

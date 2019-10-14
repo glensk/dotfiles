@@ -666,6 +666,7 @@ class mypot( object ):
         self.pot_tmpdir                 = os.environ['HOME']+"/._tmp_pot_"   +str(gethostname())+"/" #+timestr+"/"
         self.inputnn                    = False         # path to input.nn
         self.inputdata                  = False         # path to input.data
+        self.scalingdata                = False         # path to scaling.data
         self.pot_all                    = []      # n2p2_v1ag
         self.trigger_set_path_manual    = ["setpath","potpath","pp", ".", "..", "../" ]
         self.verbose                    = verbose
@@ -1047,10 +1048,23 @@ class mypot( object ):
         ##########################################
         # get potential from path
         ##########################################
+        if self.verbose > 2:
+            print('PPk in0000')
+            print('PPk self.potpath',self.potpath)
+            print('PPk self.potpath_in',self.potpath)
+
         if self.potpath == False and self.potpath_in == False and self.pot in [ ".." , "../", "." ]:
             self.potpath_in = os.path.abspath(self.pot)
+            print('in1111')
 
+        print('PPk self.potpath',self.potpath)
+        if self.potpath_in == False:
+            self.get_pot_all()
+            self.potpath_in = self.pot_all_dict[self.pot][0]
+
+        print('PPk self.potpath',self.potpath)
         if self.potpath_in != False and self.potpath == False:
+            print('in2222')
             if not os.path.isdir(self.potpath_in):
                 sys.exit(self.potpath_in+" does not exist! (1)")
 
@@ -1155,6 +1169,11 @@ class mypot( object ):
             for ff in [f12,f13,f14]:
                 if not os.path.isfile(ff):
                     sys.exit(ff+" does not exist! (65)")
+            print('copying f12',f12)
+            print('copying f13',f13)
+            print('copying f14',f14)
+            print('copying input.nn',self.inputnn)
+            print('copying scalingdata',self.scalingdata)
             cp(f12,self.pot_tmpdir+"/weights.012.data")
             cp(f13,self.pot_tmpdir+"/weights.013.data")
             cp(f14,self.pot_tmpdir+"/weights.014.data")
@@ -2515,7 +2534,9 @@ def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False
     if False: #verbose:
         print('nn',n2p2_runner)
     if not os.path.isfile(filename):
-        sys.exit(filename+" does not exist! (32)")
+        #sys.exit(filename+" does not exist! (32)")
+        print(filename+" does not exist! (32)")
+        return False
 
     finished = False
     if n2p2_runner == "n2p2": # basename == "learning-curve.out": # n2p2
@@ -2618,6 +2639,8 @@ def n2p2_runner_get_bestteste_idx(inputnn):
     else:
         #print('from lc')
         learning_curve = lc = n2p2_runner_get_learning_curve(inputnn)
+        if lc == False:
+            return False
         best_testsete = np.argmin(lc[:,2])
         if job_finished:
             # np.savetxt(best_testsete_file,aa)
@@ -5005,7 +5028,7 @@ def get_Mg5Si6_antisites():
     frame = ase_read(path,format="runner")
     for idx,i in enumerate(frame.positions):
         print('idx',idx,i,frame.get_chemical_symbols()[idx])
-        if frame.get_chemical_symbols()[idx] == "Mg":
+        #if frame.get_chemical_symbols()[idx] == "Mg":
 
     return
 
