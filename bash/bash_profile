@@ -46,7 +46,7 @@ case "$-" in
   [ "$myhost" = "helvetios" ] && exec /bin/zsh -l #exec /bin/bash
   #[ "`echo $host | grep -o cosmopc15`" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
 #[ "$myhost" = "cosmopc15" ] && /bin/zsh -l #exec /bin/bash
-  [ "$myhost" = "cosmopc15" ] && exec /bin/zsh -l #exec /bin/bash
+  [ "$myhost" = "cosmopc" ] && exec /bin/zsh -l #exec /bin/bash
    ;;
 esac
 
