@@ -5021,15 +5021,49 @@ def ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos):
         np.savetxt(folder+"/x_reference.data",frame.positions.flatten())
     return
 
-def get_Mg5Si6_antisites():
-    i = "Mg5Si6"
-    path = scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
-    print('path',path)
-    frame = ase_read(path,format="runner")
-    for idx,i in enumerate(frame.positions):
-        print('idx',idx,i,frame.get_chemical_symbols()[idx])
-        #if frame.get_chemical_symbols()[idx] == "Mg":
+def get_Mg5Si6_and_other_antisites():
+    '''
+    for Mg5Si6:
+    replaces Mg -> Si and Si -> Mg  (22 configurations in Mg5Si6)
+    also replace Mg -> Al? and Si -> Al? (since there is no Al)
 
+    for Mg4Al3Si4:
+    Mg -> Al or Si
+    Si -> Al or Mg
+    Al -> Si or Mg
+    '''
+    doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    for iname in doit:
+        #iname = "Mg5Si6"
+        path = scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+iname+'/aiida_exported_group_NN_relaxed_'+iname+"_n2p2_v2ag_calc__only_relaxed.input.data"
+        print('path',path)
+        frame = ase_read(path,format="runner")
+        for idx,i in enumerate(frame.positions):
+            print('idx',idx,i,frame.get_chemical_symbols()[idx])
+
+        print()
+        print()
+        #chk = ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=["Al","Mg","Si"])
+        #print('chk',chk)
+        frame_ = frame.copy()
+
+        for idx,i in enumerate(frame_.positions):  # go through every position
+            for replace_idx in [0,1]:
+                frame_ = frame.copy()                  # get original frame
+                curr_ele = frame_.get_chemical_symbols()[idx]
+                if curr_ele == "Mg": replace = [ "Al", "Si"]
+                if curr_ele == "Si": replace = [ "Al", "Mg"]
+                if curr_ele == "Al": replace = [ "Si", "Mg"]
+                replace_now = replace[replace_idx]
+                frame_[idx].symbol = replace_now
+
+                #for jdx,j in enumerate(frame_.positions):
+                #    print(idx,'-->jdx',jdx,j,frame_.get_chemical_symbols()[jdx])
+                #print()
+
+                #if idx == 3:
+                #    sys.exit()
+                ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
     return
 
 def ase_repeat_structure(atoms,repeat):
@@ -5281,4 +5315,4 @@ if __name__ == "__main__":
     #n2p2_check_SF_inputnn(inputnn="cursel_64.def")
     #get_number_of_atoms_as_function_of_cutoff()
     #create_al_structures_for_analysis_SOAP()
-    get_Mg5Si6_antisites()
+    get_Mg5Si6_and_other_antisites()
