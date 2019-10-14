@@ -292,17 +292,29 @@ def get_energies(args):
         sys.exit("kaka done")
 
     if args.thermo or args.evinet or args.fqh or args.fah:
+        hesse_vol_pos = my.get_hessefiles_vol_pos(os.getcwd()+"/fqh")
+        print('--')
+        temperature = 900
+        for idx,i in enumerate(hesse_vol_pos):
+            hessefile = i[0]
+            volume  = i[1]
+            pos     = i[2]
+            print(hessefile,volume)
+            my.ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos)
+            sys.exit()
+        sys.exit()
+
         if args.thermo: args.fqh = True
         if args.thermo: args.fah = True
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
         my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
         ase_structure = ase_read(args.inputfile,format=args.format_in)
-        ase_structure_relaxed = my.get_evinet(ace,ase_structure,relax_cellshape_and_volume=True,fqh=args.fqh)
+        ase_structure_relaxed = my.get_evinet(ace,ase_structure,relax_cellshape_and_volume=True,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
         #ace.get_elastic_external(atomsin=ase_structure_relaxed,verbose=ace.verbose,text="structure",get_all_constants=True)
         #print('ace.c44:',ace.c44,type(ace.c44))
 
-        sys.exit("kaka done")
+        sys.exit("Thermodynamic properties done.")
 
 
     ############
@@ -1858,10 +1870,13 @@ def test_Mg2Si(ace):
     print()
     return
 
+
 def test_beta2_bulk(ace):
     print("######## test_Mg5Si6 (low Mg conz) #############")
     print("######## test_Mg5Si6 (low Mg conz) #############")
     print("######## test_Mg5Si6 (low Mg conz) #############")
+    # "Mg9Si5" == beta' (beta prime)
+    # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
     doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
     #doit = [ "Mg5Si6" ]
     for i in doit:

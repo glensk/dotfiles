@@ -131,12 +131,12 @@ esac
 # set Thermodynamics stuff
 # I currently dont use the Thermodynamics scritps
 ##############################################
-#export thermodynamics="$HOME/Thermodynamics"
-#export userme="glensk"
+export thermodynamics="$HOME/Thermodynamics"
+export userme="glensk"
 #export convcrit=0.5
-#if [ -e "$thermodynamics/utilities/" ];then
-#source $thermodynamics/utilities/bashrc_add
-#fi
+if [ -e "$thermodynamics/utilities/" ];then
+source $thermodynamics/utilities/bashrc_add
+fi
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett thermodynamics"
 
 ##############################################
