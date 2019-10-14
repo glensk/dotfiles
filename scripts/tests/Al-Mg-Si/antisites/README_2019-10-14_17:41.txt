@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: 35d5a52b8bfd3ddd1b19a34f3fa14d69bcfb42d3
+
+aiida_submit_runnerfile.py -i out_antisitesMg4Al3Si4.runner -cm scf
