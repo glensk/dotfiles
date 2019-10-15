@@ -32,7 +32,7 @@ def help(p = None):
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
-    p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default=my.get_latest_n2p2_pot(),metavar="",help="potential from $potentials folder e.g. n2p2_v2ag; can also usse . or .. ")
+    p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default="n2p2_v4ag_ppl_987654_21cores" ,metavar="",help="potential from $potentials folder e.g. n2p2_v2ag; can also usse . or .. ")
     p.add_argument('--show_availabel_pots','-sp',action='store_true',help='show available potentials from $potentials')
     p.add_argument('--potpath','-pp',   required=False, type=str, default=False, help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")

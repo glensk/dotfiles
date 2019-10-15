@@ -2788,6 +2788,8 @@ def n2p2_make_training(cores=21,days=7,hours=0,minutes=0,submit_to_que=True,subm
 
 def get_latest_n2p2_pot():
     checkfor = scripts()+"/potentials/n2p2_v*ag/"
+    #checkfor = scripts()+"/potentials/n2p2_v4ag_ppl_987654_21cores/"
+    print('checkfor',checkfor)
     found = glob.glob(checkfor)
     ver = []
     for i in found:
