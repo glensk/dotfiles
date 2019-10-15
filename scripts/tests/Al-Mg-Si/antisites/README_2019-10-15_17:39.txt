@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: 4be6a37974b1e6a62f1d2382beec011f9ed1953f
+
+aiida_export_group_to_runner.py -gn out_antisitesMg5Si6.runner_calc

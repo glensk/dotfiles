@@ -1,0 +1,2 @@
+from 
+/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/tests/Al-Mg-Si/antisites
