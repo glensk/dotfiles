@@ -24,7 +24,7 @@
   <system>
     <!-- INITIALIZE THE NUMBER OF PARTICLES, MASSES, LABELS, POSITIONS, MOMENTUM, CELL SEPARATELY OR FROM  A CHECKPOINT FILE-->
 <!--    <initialize nbeads='1'>
-      <file mode='xyz'> ../init.xyz </file>
+      <file mode='xyz'> initxyz.xyz </file>
       <velocities mode='thermal' units='kelvin'> 600 </velocities>
     </initialize> -->
     <initialize nbeads='1'>
@@ -34,12 +34,12 @@
     <!-- DETAILS OF THE BORN-OPPENHEIMER POTENTIAL.-->
     <forces>
       <!--force forcefield='lammps'> </force-->
-      <force forcefield='debye' weight='0.0'> </force>
-      <force forcefield='lammps' weight='1.0'> </force>
+      <force forcefield='debye' weight='xxx0.0'> </force>
+      <force forcefield='lammps' weight='xxx1.0'> </force>
     </forces>
     <!-- DESCRIBE THE ENSEMBLE -->
     <ensemble>
-      <temperature units='kelvin'> 600 </temperature>
+      <temperature units='kelvin'> xxx600 </temperature>
     </ensemble>
     <!-- CHOOSE THE TYPE OF MOTION -->
     <motion mode='dynamics'>

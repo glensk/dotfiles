@@ -69,7 +69,29 @@ double faktor_harm_vel=alat_lattice*1.602176e-9/a0;
 //printf("hallokk %d\n",faktor);
 double rmax=0;
 double rmin=a0;
+double projx=0;
+double projy=0;
+double projz=0;
 
+FILE *file_out_positions;
+FILE *file_out_temp;
+FILE *file_out_temp_av;
+FILE *file_out_dudl;
+FILE *file_out_dudl_av;
+FILE *file_forces;
+FILE *file_forces_av;
+FILE *file_forces_vs_forces_dft;
+FILE *file_out_check_dist_xyz;
+FILE *file_out_check_dist_r;
+FILE *file_out_check_dist_nn;
+FILE *file_out_check_dist_nn_proj;
+FILE *file_out_prl15_2a;
+FILE *file_out_prl15_2au;
+FILE *file_in_positions;
+FILE *file_in_hesse;
+
+FILE *file_out_new1;
+FILE *file_out_new2;
 
 unsigned int MEIN_RAND_STATE=4;
 
@@ -86,6 +108,7 @@ struct Vel  {double x,y,z;} * vel;
 struct Velff  {double x,y,z;} * velff;
 struct L1nn    {unsigned int ind1,ind2,i1,i2,i3,j1,j2,j3,k1,k2,k3,x0,y0,z0,x1,y1,z1;} * l1nn;
 
+struct Proj {double x,y,z;} proj;
 struct Forcetmp {double x,y,z;} * forcetmp;
 struct Force {double x,y,z;} * force;
 struct Forcedft {double x,y,z;} * forcedft;
@@ -327,6 +350,22 @@ void print_l1nn_to_screen(int i,int j,char stringin[]) {
 	}
 	printsep(stringin);
 }
+
+void projection(double x, double y, double z, double x0,double y0,double z0)
+{
+    double v0v,nv0,fakt;
+    nv0 = sqrt(x0*x0+y0*y0+z0*z0); // Norm[v0]
+    v0v = x*x0+y*y0+z*z0; // v.v0
+    // v0v/nv0 ---> scalar
+	fakt=v0v/nv0/nv0;
+	//printf("in projection %.10f %.10f %.10f %.10f %.10f %.10f\n",x,y,z,x0,y0,z0);
+	//printf("in projection %.10f %.10f %.10f %.10f %.10f %.10f\n",x,y,z,x0*fakt,y0*fakt,z0*fakt);
+	//return(x0*fakt,y0*fakt,z0*fakt);
+	projx = x0*fakt;
+	projy = y0*fakt;
+	projz = z0*fakt;
+}
+
 
 void print_pos_0_to_screen(int idxmax,char stringin[]) {
     int j;
@@ -912,12 +951,15 @@ void analyze_forces(int i,FILE *file_forces,FILE *file_forces_av,FILE *file_forc
 	//exit(1);
 }
 
-void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_check_dist_r,FILE *file_out_check_dist_nn) {
+void write_analyze_positions(int i) { //,FILE *file_out_check_dist_xyz,FILE *file_out_check_dist_r,FILE *file_out_check_dist_nn,FILE *file_out_check_dist_nn_proj,FILE *file_out_prl15_2a,FILE *file_out_prl15_2au) {
     int j=0;
     //double dx,dy,dz,rrx,rry,rrz,rr;
-    double dx,dy,dz,rr;
-    double x,y,z,r;
+    double dx,dy,dz,rr,p1,p2,p3,projlen,dtrans;
+    double x,y,z,r,x0,y0,z0,xn,yn,zn;
 	int k,j1,j2,j3,ind1,ind2;
+	////////////////////////////////
+	// schleife ueber alle atome
+	////////////////////////////////
 		for (j=0;j<atoms;j++) {  // schleife ueber alle atome
 		    dx = (pos[j].x-pos0[j].x)/a0*alat_lattice;  // sollte in angstrom sein
 		    if (dx > N*alat_lattice/2)
@@ -928,9 +970,15 @@ void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_
 		    dz = (pos[j].z-pos0[j].z)/a0*alat_lattice;
 		    if (dz > N*alat_lattice/2)
 		        dz = dz - N*alat_lattice;
-            //printf("abc  of atom %d: %.6f %.6f %.6f\n",j,dx,dy,dz);
+		    // this would be the distances from equilibrium
+            //printf("[dx,dy,dz] of atom %d: %.6f %.6f %.6f\n",j,dx,dy,dz);
+            //printf("a (rel cell) pos  of atom %d: %.6f %.6f %.6f\n",j, pos[j].x/a0,              pos[j].y/a0,             pos[j].z/a0);
+            //printf("b (rel cell) pos0 of atom %d: %.6f %.6f %.6f\n",j,pos0[j].x/a0,             pos0[j].y/a0,            pos0[j].z/a0);
+            //printf("b (angstrom) pos? of atom %d: %.6f %.6f %.6f\n",j,(pos0[j].x-pos[j].x)/a0,(pos0[j].y-pos[j].y)/a0,(pos0[j].z-pos[j].z)/a0);
+            //printf("c (angstrom) pos  of atom %d: %.6f %.6f %.6f\n",j, pos[j].x/a0*alat_lattice, pos[j].y/a0*alat_lattice,pos[j].z/a0*alat_lattice);
+            //printf("d (angstrom) pos0 of atom %d: %.6f %.6f %.6f\n",j,pos0[j].x/a0*alat_lattice,pos0[j].y/a0*alat_lattice,pos0[j].z/a0*alat_lattice);
+            //printf("e (angstrom) posd of atom %d: %.6f %.6f %.6f\n",j,(pos0[j].x-pos[j].x)/a0*alat_lattice,(pos0[j].y-pos[j].y)/a0*alat_lattice,(pos0[j].z-pos[j].z)/a0*alat_lattice);
 		    fprintf(file_out_check_dist_xyz,"%.10f %.10f %.10f\n",dx,dy,dz);
-
             //rrx=sqrt(dx*dx);
             //rry=sqrt(dy*dy);
             //rrz=sqrt(dz*dz); // hiervon waere der mean fuer jedes atom interessant
@@ -951,6 +999,9 @@ void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_
 		    fprintf(file_out_check_dist_r,"%.10f\n",rr);
         }
 
+	////////////////////////////////
+	// schleife ueber naechste nachbarn
+	////////////////////////////////
     for (k=0;k<atoms*first_neighbors/2;k++) {   // 12 * atoms_supercell / 2
         ind1=l1nn[k].ind1;
         ind2=l1nn[k].ind2;
@@ -962,8 +1013,61 @@ void write_analyze_positions(int i,FILE *file_out_check_dist_xyz,FILE *file_out_
 		x=(signed)(pos[ind1].x-pos[ind2].x)/a0*alat_lattice;
 		y=(signed)(pos[ind1].y-pos[ind2].y)/a0*alat_lattice;
 		z=(signed)(pos[ind1].z-pos[ind2].z)/a0*alat_lattice;
+		xn=(signed)(pos[ind1].x-pos[ind2].x)/a0*alat_lattice;
+		yn=(signed)(pos[ind1].y-pos[ind2].y)/a0*alat_lattice;
+		zn=(signed)(pos[ind1].z-pos[ind2].z)/a0*alat_lattice;
+		xn = sqrt(xn*xn);
+		yn = sqrt(yn*yn);
+		zn = sqrt(zn*zn);
+		x0=(signed)(pos0[ind1].x-pos0[ind2].x)/a0*alat_lattice;
+		y0=(signed)(pos0[ind1].y-pos0[ind2].y)/a0*alat_lattice;
+		z0=(signed)(pos0[ind1].z-pos0[ind2].z)/a0*alat_lattice;
+        //printf("nn0 (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,x0,y0,z0);
+        //printf("nn! (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,x,y,z);
+        //printf("nn1 (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,xn,yn,zn);
+        //printf("nn2 (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,xn,yn,zn);
 		r=sqrt(x*x+y*y+z*z);
 		fprintf(file_out_check_dist_nn,"%.10f\n",r);
+
+        // get projection of x,y,z on x0,y0,z0
+		projection(x,y,z,x0,y0,z0);
+		projlen = sqrt(projx*projx+projy*projy+projz*projz);
+		fprintf(file_out_check_dist_nn_proj,"%.10f\n",projlen);  // v = x,y,z in getDistance.math
+
+		dtrans=sqrt((x-projx)*(x-projx)+(y-projy)*(y-projy)+(z-projz)*(z-projz));
+		fprintf(file_out_new1,"%.10f\n",dtrans);  // v = x,y,z in getDistance.math
+		fprintf(file_out_new2,"%.10f %.10f\n",projlen,dtrans);  // v = x,y,z in getDistance.math
+
+        // make the 2d plot for the prl
+        if (x0==0) {
+		    fprintf(file_out_prl15_2a,"%.10f %.10f\n",yn,zn);
+		    fprintf(file_out_prl15_2a,"%.10f %.10f\n",zn,yn);
+		    //fprintf(file_out_prl15_2au,"%.10f %.10f\n",z,y);
+		    //printf("x0=0 step %d:%d:%d %.10f %.10f %.10f\n",k,ind1,ind2,x,y,z);
+	        //printf("xxxx %.10f %.10f %.10f %.10f %.10f %.10f\n",x,y,z,x0,y0,z0);
+		    //printf("xxxy %.10f %.10f %.10f\n",projx,projy,projz);
+		    //exit(1);
+		    //fprintf(file_out_new1,"%.10f %.10f\n",projlen,xn);  // v = x,y,z in getDistance.math
+		    //fprintf(file_out_new2,"%.10f %.10f\n",r,xn);  // v = x,y,z in getDistance.math
+        }
+        if (y0==0) {
+		    fprintf(file_out_prl15_2a,"%.10f %.10f\n",xn,zn);
+		    fprintf(file_out_prl15_2a,"%.10f %.10f\n",zn,xn);
+		    //fprintf(file_out_prl15_2au,"%.10f %.10f\n",z,x);
+		    //fprintf(file_out_prl15_2au,"%.10f %.10f\n",x,z);
+		    //fprintf(file_out_new1,"%.10f %.10f\n",projlen,yn);  // v = x,y,z in getDistance.math
+		    //fprintf(file_out_new2,"%.10f %.10f\n",r,yn);  // v = x,y,z in getDistance.math
+        }
+        if (z0==0) {
+		    fprintf(file_out_prl15_2a,"%.10f %.10f\n",xn,yn);
+		    fprintf(file_out_prl15_2a,"%.10f %.10f\n",yn,xn);
+		    //fprintf(file_out_new1,"%.10f %.10f\n",projlen,zn);  // v = x,y,z in getDistance.math
+		    //fprintf(file_out_new2,"%.10f %.10f\n",r,zn);  // v = x,y,z in getDistance.math
+		    //fprintf(file_out_prl15_2au,"%.10f %.10f\n",xn,zn);
+		    //fprintf(file_out_prl15_2au,"%.10f\n",z);
+		    //printf("z0=0 %d:%d:%d %.10f %.10f %.10f\n",k,ind1,ind2,xn,yn,z);
+		    //fprintf(file_out_prl15_2au,"%.10f %.10f\n",y,x);
+        }
     }
 }
 
@@ -1889,6 +1993,9 @@ struct Bar{
     double std;
 };
 
+
+
+
 struct Bar funct();
 struct Bar funct(double a[], int num_elements){
     struct Bar result;
@@ -2152,19 +2259,23 @@ int main(int argc,char *argv[]){
     int ii=0;
     int zeitschritte,l;
     clock_t start,end;
-    FILE *file_out_positions;
-    FILE *file_out_temp;
-    FILE *file_out_temp_av;
-    FILE *file_out_dudl;
-    FILE *file_out_dudl_av;
-    FILE *file_forces;
-    FILE *file_forces_av;
-    FILE *file_forces_vs_forces_dft;
-    FILE *file_out_check_dist_xyz;
-    FILE *file_out_check_dist_r;
-    FILE *file_out_check_dist_nn;
-    FILE *file_in_positions;
-    FILE *file_in_hesse;
+    //FILE *file_out_positions;
+    //FILE *file_out_temp;
+    //FILE *file_out_temp_av;
+    //FILE *file_out_dudl;
+    //FILE *file_out_dudl_av;
+    //FILE *file_forces;
+    //FILE *file_forces_av;
+    //FILE *file_forces_vs_forces_dft;
+    //FILE *file_out_check_dist_xyz;
+    //FILE *file_out_check_dist_r;
+    //FILE *file_out_check_dist_nn;
+    //FILE *file_out_check_dist_nn_proj;
+    //FILE *file_out_prl15_2a;
+    //FILE *file_out_prl15_2au;
+    //FILE *file_in_positions;
+    //FILE *file_in_hesse;
+
     //FILE *file_out_check_dist_fcheck;
     double T,dt,a,b,c,rr;
     double dudl_sum=0;
@@ -2282,6 +2393,11 @@ int main(int argc,char *argv[]){
 	    file_out_check_dist_xyz =(FILE *)fopen("out_analyze_positions_distances_from_equilibrium_xyz.dat","w");
 	    file_out_check_dist_r   =(FILE *)fopen("out_analyze_positions_distances_from_equilibrium_r.dat","w");
 	    file_out_check_dist_nn  =(FILE *)fopen("out_analyze_positions_distances_nn.dat","w");
+	    file_out_check_dist_nn_proj  =(FILE *)fopen("out_analyze_positions_distances_nn_proj.dat","w");
+	    file_out_prl15_2a       =(FILE *)fopen("out_analyze_positions_prl15_2a.dat","w");
+	    file_out_prl15_2au      =(FILE *)fopen("out_analyze_positions_prl15_2au.dat","w");
+	    file_out_new1            =(FILE *)fopen("out_analyze_new1.dat","w");
+	    file_out_new2            =(FILE *)fopen("out_analyze_new2.dat","w");
 	}
 
 
@@ -2342,7 +2458,7 @@ int main(int argc,char *argv[]){
             analyze_forces(i,file_forces,file_forces_av,  file_forces_vs_forces_dft,write_analyze_forces,read_hesse);
 
             if (write_analyze==1) {
-                write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn);};
+                write_analyze_positions(i);}; //,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn,file_out_check_dist_nn_proj,file_out_prl15_2a,file_out_prl15_2au);};
 
             //forces_to_velocities(dt); // only necessary when volocities are necessary
 
@@ -2421,9 +2537,13 @@ int main(int argc,char *argv[]){
 
         if (write_analyze==1){
             fclose(file_forces_vs_forces_dft);
-            fclose(file_out_check_dist_xyz);
-            fclose(file_out_check_dist_r);
-            fclose(file_out_check_dist_nn);
+            //fclose(file_out_check_dist_xyz);
+            //fclose(file_out_check_dist_r);
+            //fclose(file_out_check_dist_nn);
+            //fclose(file_out_check_dist_nn_proj);
+            //fclose(file_out_new);
+            //fclose(file_out_prl15_2a);
+            //fclose(file_out_prl15_2au);
         };
 	    //fclose(file_out_check_dist_fcheck);
 	    //fclose(file_out_temp);
@@ -2522,7 +2642,7 @@ int main(int argc,char *argv[]){
                 if (i%l==l-1) {write_positions_tofile(file_out_positions,write_positions_rel);};}
 
             if (write_analyze==1) {
-                write_analyze_positions(i,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn);
+                write_analyze_positions(i);//,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn,file_out_check_dist_nn_proj,file_out_prl15_2a,file_out_prl15_2au);
                 };
 
 
@@ -2560,6 +2680,11 @@ int main(int argc,char *argv[]){
 	    fclose(file_out_check_dist_xyz);
 	    fclose(file_out_check_dist_r);
 	    fclose(file_out_check_dist_nn);
+	    fclose(file_out_check_dist_nn_proj);
+	    fclose(file_out_new1);
+	    fclose(file_out_new2);
+	    fclose(file_out_prl15_2a);
+	    fclose(file_out_prl15_2au);
     }
     if (read_pos == 1) {fclose(file_in_positions);}
 

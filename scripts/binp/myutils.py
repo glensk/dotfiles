@@ -5,7 +5,7 @@ import os,sys,re,fnmatch
 import filecmp
 #import click
 import numpy as np
-import glob #,pathlib
+import glob,random #,pathlib
 #from my_atom import #atom as my_atom
 import my_atom
 from itertools import islice
@@ -4998,27 +4998,53 @@ def get_hessefiles_vol_pos(folder):
     out = []
     for path in paths:
         volstr = path.split("_")[-1]
-        print(path,volstr)
+        print("->",path,volstr)
+        pos = folder+'/positions_'+volstr+'.extxyz'
+        if not os.path.isfile(pos):
+            print('pos',pos)
+            sys.exit('not found 77')
         out.append([path,float(volstr),folder+'/positions_'+volstr+'.extxyz'])
+    if len(out) == 0:
+        print('no Hessematrix_* files found in',folder)
     return out
 
 def ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos):
-    folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K"
-    os.makedirs(folder)
-    ipi_inp = "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
-    with cd(folder):
-        print('hessefile',hessefile)
-        hessefile_basename = os.path.basename(hessefile)
-        shutil.copy2(hessefile, folder)
-        print('hfbn',hessefile_basename)
-        shutil.copy2(ipi_inp, folder)
-        ipi_inp_basename = os.path.basename(ipi_inp)
-        print('ipi_inp',ipi_inp_basename)
-        print('pos',pos)
-        frame = ase_read(pos)
-        print('fp',frame.positions)
-        print('fp',frame.positions.flatten())
-        np.savetxt(folder+"/x_reference.data",frame.positions.flatten())
+    lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
+    lambdas = [ 0.15, 0.5, 0.85 ]
+    for l in lambdas:
+        rand_nr = random.randint(1,99999)
+        folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K/lambda"+str(l)+"_"+str(rand_nr)
+        if os.path.isdir(folder):
+            sys.exit(folder+" does already exist!")
+        os.makedirs(folder)
+        ipi_inp = "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
+
+        with cd(folder):
+            print('hessefile',hessefile)
+            hessefile_basename = os.path.basename(hessefile)
+            shutil.copy2(hessefile, folder)
+            print('hfbn',hessefile_basename)
+            shutil.copy2(ipi_inp, folder)
+            ipi_inp_basename = os.path.basename(ipi_inp)
+            print('ipi_inp',ipi_inp_basename)
+            print('pos',pos)
+            pos_basename = os.path.basename(pos)
+            frame = ase_read(pos)
+            ase_write(folder+"/pos.xyz",frame,format='ipi')
+            ase_write(folder+"/pos.lmp",frame,format='lammps')
+            # /Users/glensk/Library/Python/2.7/lib/python/site-packages/ase/io/ipi.py
+            print('fp',frame.positions)
+            print('fp',frame.positions.flatten())
+            ang_to_bohr = 1.8897261
+            np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+            nat = frame.get_number_of_atoms()
+            sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
+            sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.xyz')
+            sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
+            sed(folder+'/'+ipi_inp_basename,'xxx1.0',str(l))
+            sed(folder+'/'+ipi_inp_basename,'xxx0.0',str(1.-l))
+            sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
+            sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
     return
 
 def get_Mg5Si6_and_other_antisites():

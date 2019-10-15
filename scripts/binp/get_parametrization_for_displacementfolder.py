@@ -576,9 +576,9 @@ class get_all_disps():
         ##############################################################################
         if self.verbose > 2:
             print(self.disp_vs_force)
-        self.disp_vs_force = my.remove_duplicates_in_numpy_xy_array_and_sort(self.disp_vs_force,roundto=10)
-        self.disp_vs_force_110 = my.remove_duplicates_in_numpy_xy_array_and_sort(self.disp_vs_force_110,roundto=10)
-        self.disp_vs_force_corrected_for_110 = np.copy(self.disp_vs_force)
+        self.disp_vs_force                      = my.remove_duplicates_in_numpy_xy_array_and_sort(self.disp_vs_force,roundto=10)
+        self.disp_vs_force_110                  = my.remove_duplicates_in_numpy_xy_array_and_sort(self.disp_vs_force_110,roundto=10)
+        self.disp_vs_force_corrected_for_110    = np.copy(self.disp_vs_force)
         self.disp_vs_force_corrected_for_110[:,1] += self.disp_vs_force_110[:,1]
         if self.verbose > 2:
             print('---------------------------')
@@ -593,16 +593,16 @@ class get_all_disps():
         #sys.exit()
 
 
-        print("#########################################################################")
-        print("# fits on [0.5,0.5,0.0]")
-        print("#########################################################################")
+        #print("#########################################################################")
+        #print("# fits on [0.5,0.5,0.0]")
+        #print("#########################################################################")
         fit = pot_parametrize.fit_to_func(self.disp_vs_force,function='morse',fixzeroat=self.nndist)
         try:
             fitmc1 = pot_parametrize.fit_to_func(self.disp_vs_force,function='mc1',fixzeroat=self.nndist)
         except TypeError:
             fitmc1 = False
         fit_corrected_for_110 = pot_parametrize.fit_to_func(self.disp_vs_force_corrected_for_110,function='morse',fixzeroat=self.nndist)
-        print('fit.parameters',fit.parameters)
+        print('# fits on [0.5,0.5,0.0]: fit.parameters morse',fit.parameters)
 
         fit_on_05_05_0 = np.zeros((len(fit.fit),7))
         fit_on_05_05_0[:,0] = fit.fit[:,0]
@@ -610,9 +610,7 @@ class get_all_disps():
         dist__           = (1./1.0)*fit.fit[:,0]*10**-10
         fit_on_05_05_0[:,1] = self.disp_vs_force[:,1]   # actual (VASP) forces
         fit_on_05_05_0[:,2] = fit.fit[:,1]              # fitted morse forces
-        print('dist__',dist__)
-        for idx,i in enumerate(dist__):
-            print('d',idx,dist__[idx],'force VASP',fit_on_05_05_0[idx,1])
+        #print('dist__',dist__)
         k__ = (0.9*10**10)
         e__ = (1.6*10**(-19))
         dist__meter = dist__*10**(-10)   # angstrom to meter
@@ -622,8 +620,8 @@ class get_all_disps():
         fit_on_05_05_0[:,6] =  (-k__*((q1__**2) /(dist__**2))*newton_to_mev_per_angstrom)+12.              # columb forces
 
         # get screened potential (https://en.wikipedia.org/wiki/Electric-field_screening)
-        for idx,i in enumerate(dist__):
-            print('d',idx,dist__[idx],fit_on_05_05_0[idx,6])
+        #for idx,i in enumerate(dist__):
+        #    print('d',str(idx).ljust(3),str(dist__[idx]).ljust(25),'force VASP',str(fit_on_05_05_0[idx,1]).ljust(30),"columb",fit_on_05_05_0[idx,6])
         if type(fitmc1) != bool:
             fit_on_05_05_0[:,3] = fitmc1.fit[:,1]
         fit_on_05_05_0[:,4] = fit_on_05_05_0[:,1] - fit.fit[:,1]
@@ -690,17 +688,19 @@ class get_all_disps():
         # Weight 1Morse 05_05_0
         # Weight 4Morse 0_05_05
         ##############################################################################
-	print("xx@Forces on [0.5,0.5,0.0]")
-	print("xx    dist  VASP   morse  mc1    dmorse  dmc1  Columb")
+        print("#########################################################################")
+	print("# xx@Forces on [0.5,0.5,0.0]")
+        print("#########################################################################")
+	print("  dist  VASP   morse  mc1    dmorse  dmc1  Columb")
         for i in fit_on_05_05_0:
             print(i)
         print("#########################################################################")
         print("# fits on [0.0,0.5,0.5] previously tox")
         print("#########################################################################")
         if True:
-            print('dist between pos[0] and pos_0_05_05')
+            print('dist pos[0] to pos_0_05_05 ')
             params = fit.parameters
-            print('params',params)
+            #print('params',params)
             for idx,i in enumerate(self.dist_0_05_05_at0):
                 dist_norm                           = np.around(LA.norm(i),5)
 

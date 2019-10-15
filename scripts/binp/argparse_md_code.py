@@ -219,6 +219,8 @@ def help(p = None):
     p.add_argument('-cef',   '--calculate_energy_and_forces', required=False,
        help=argparse.SUPPRESS, default=False)
 
+    p.add_argument('-lam',   '--lam' , required=False,
+       help='do MD for lambda (default = 1 )', type=float, default=1)
     p.add_argument('-dbl',   '--do_both_lambdas', required=False, action='store_true',
        help=argparse.SUPPRESS, default=False)
 
@@ -1381,6 +1383,9 @@ if __name__ == '__main__':
         args.element_mass = my_atom.atom([args.element]).mass[0]
 
         lam01_ = [ "1" ]
+        if args.lam == 1.0: lam01_ = [ '1' ]
+        if args.lam == 0.0: lam01_ = [ '0' ]
+        print('lam01_',lam01_)
         if args.do_both_lambdas:
             lam01_ = ["0","1"]
 
