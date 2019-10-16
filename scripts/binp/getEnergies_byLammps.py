@@ -32,12 +32,10 @@ def help(p = None):
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
-    #p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default="n2p2_v4ag_ppl_987654_21cores" ,metavar="",help="potential from $potentials folder e.g. n2p2_v2ag; can also usse . or .. ")
     p.add_argument('--potpath','-p',   required=False, type=str, default="n2p2_v4ag_ppl_987654_21cores", help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--show_availabel_pots','-sp',action='store_true',help='show available potentials from $potentials')
     p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
-    #p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--units','-u',choices = ['eV','meV_pa','eV_pa','hartree','hartree_pa'],default='hartree_pa',help='In which units should the output be given')
     p.add_argument('--geopt','-g'               ,action='store_true',help='make a geometry optimization of the atoms.')
     p.add_argument('--elastic','-e'             ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
@@ -63,7 +61,7 @@ def help(p = None):
     p.add_argument('--testkmc_l','-kmcl'        ,action='store_true',help='test accuracy of kmc structures for last epoch')
     p.add_argument('--testkmc_a','-kmca'        ,action='store_true',help='test accuracy of kmc structures for all epochs')
     p.add_argument('--testaccuracy_kmc_approx','-kaka'        ,action='store_true',help='test accuracy of fomation energy in kmc wehn substituting outer shells by Al')
-    p.add_argument('--check_testdata','-ctest'  ,action='store_true',help='test accuracy of test.data')
+    p.add_argument('--check_testdata', '-ctest' ,action='store_true',help='test accuracy of test.data')
     p.add_argument('--check_traindata','-ctrain',action='store_true',help='test accuracy of train.data')
     p.add_argument('--check_inputdata','-cinput',action='store_true',help='test accuracy of input.data structures used')
     p.add_argument('--check_kmc57data','-ckmc'  ,action='store_true',help='test accuracy of kmc57.data')
@@ -109,7 +107,6 @@ def get_energies(args):
     my.create_READMEtxt(hier)
 
     allepochs = [False]
-    inputfile = infile = args.inputfile
     format_in = args.format_in
 
     units = args.units
@@ -1917,12 +1914,15 @@ def test_beta2_bulk(ace):
     		path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
         frame = ase_read(path,format="runner")
 
-        #get_formation_energy(ace,frame,i+" (unrelaxed    )",atomrelax=False,cellrelax=False,volumerelax=False)
-        try_read = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
-        get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
-        try_read = ace.savefolder+"h_"+i+"_at_NN_relaxed"
-        get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True,DFT_ene=False,try_harmonic_readfile=try_read)
-        ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
+        print('frame:::!',frame)
+        print('frame:::?',frame.symbols)
+        if False:
+            #get_formation_energy(ace,frame,i+" (unrelaxed    )",atomrelax=False,cellrelax=False,volumerelax=False)
+            try_read = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
+            get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
+            try_read = ace.savefolder+"h_"+i+"_at_NN_relaxed"
+            get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True,DFT_ene=False,try_harmonic_readfile=try_read)
+            ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
 
     return
 
