@@ -32,9 +32,9 @@ def help(p = None):
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
-    p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default="n2p2_v4ag_ppl_987654_21cores" ,metavar="",help="potential from $potentials folder e.g. n2p2_v2ag; can also usse . or .. ")
+    #p.add_argument('-p' ,'--pot',       required=False, choices=my.pot_all(), default="n2p2_v4ag_ppl_987654_21cores" ,metavar="",help="potential from $potentials folder e.g. n2p2_v2ag; can also usse . or .. ")
+    p.add_argument('--potpath','-p',   required=False, type=str, default="n2p2_v4ag_ppl_987654_21cores", help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--show_availabel_pots','-sp',action='store_true',help='show available potentials from $potentials')
-    p.add_argument('--potpath','-pp',   required=False, type=str, default=False, help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
     p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
     #p.add_argument('--units','-u',type=click.Choice(['eV','meV_pa','eV_pa','hartree','hartree_pa']),default='hartree_pa',help='In which units should the output be given')
@@ -111,8 +111,6 @@ def get_energies(args):
     allepochs = [False]
     inputfile = infile = args.inputfile
     format_in = args.format_in
-    pot = args.pot
-    potpath = args.potpath
 
     units = args.units
     debug = args.debug
@@ -258,9 +256,8 @@ def get_energies(args):
 
     if args.test_formation_energies or args.elastic: units='eV'
     print('getEne(p1) args.potepoch             :',args.potepoch)
-    ace = ase_calculate_ene(pot=pot,
-            potpath=potpath,
-            use_different_epoch=args.potepoch,
+    ace = ase_calculate_ene(potpath_in=args.potpath,
+            use_epoch=args.potepoch,
             units=units,
             geopt=geopt,
             elastic=args.elastic,
@@ -322,18 +319,18 @@ def get_energies(args):
     ############
     if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
         if args.testkmc_b:
-            allepochs = args.potepoch = ace.pot.use_different_epoch = [ace.pot.potepoch_bestteste]
+            allepochs = args.potepoch = ace.pot.use_epoch = [ace.pot.potepoch_bestteste]
             print('args.potepoch',args.potepoch)
-            print('ace.pot.use_different_epoch',ace.pot.use_different_epoch)
+            print('ace.pot.use_epoch',ace.pot.use_epoch)
         if args.testkmc_l:
-            allepochs = args.potepoch = ace.pot.use_different_epoch = [ace.pot.potepoch_all[-1]]
+            allepochs = args.potepoch = ace.pot.use_epoch = [ace.pot.potepoch_all[-1]]
             print('args.potepoch',args.potepoch)
-            print('ace.pot.use_different_epoch',ace.pot.use_different_epoch)
+            print('ace.pot.use_epoch',ace.pot.use_epoch)
         if args.testkmc_a:
-            args.potepoch = ace.pot.use_different_epoch = ace.pot.potepoch_all[-1]
+            args.potepoch = ace.pot.use_epoch = ace.pot.potepoch_all[-1]
             allepochs = ace.pot.potepoch_all
             print('args.potepoch',args.potepoch)
-            print('ace.pot.use_different_epoch',ace.pot.use_different_epoch)
+            print('ace.pot.use_epoch',ace.pot.use_epoch)
 
         if args.potepoch == False:
             sys.exit('Error: need to specify a particular epoch for kmctest')
@@ -375,9 +372,9 @@ def get_energies(args):
             else:
                 count += 1
                 print('epoch',str(epoch).ljust(5),'not already in, count('+str(count)+")")
-                ace = ase_calculate_ene(pot=pot,
-                        potpath=potpath,
-                        use_different_epoch=epoch,
+                ace = ase_calculate_ene(
+                        potpath_in=args.potpath,
+                        use_epoch=epoch,
                         units=units,
                         geopt=geopt,
                         elastic=args.elastic,
@@ -535,16 +532,14 @@ def get_energies(args):
             ## define the actual pot
             ###############################
             # the ase_calculate_ene(...) changes the used epoch since mypot(...) is called
-            ace = ase_calculate_ene(pot=pot,
-                            potpath=potpath,
-                            use_different_epoch=use_epoch,
+            ace = ase_calculate_ene(potpath_in=args.potpath,
+                            use_epoch=use_epoch,
                             units=units,
                             geopt=geopt,
                             elastic=args.elastic,
                             verbose=args.verbose)
-            # ace.pot = my.mypot(pot,self.potpath,use_different_epoch=use_different_epoch,verbose=self.verbose)
             ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
-
+            sys.exit('666666666666666')
             if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
                 kmc_file = kmc_folder+"/ene_std_epoch_"+str(use_epoch)+".dat"
                 if os.path.isfile(kmc_file):
@@ -1143,7 +1138,7 @@ def get_energies(args):
                     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
                     ### write analyze.csv
                     try:
-                        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+                        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+args.pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
                     except IndexError:
                         print('len',len(ene_DFT))
                         print(ene_DFT.shape)

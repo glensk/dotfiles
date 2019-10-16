@@ -638,10 +638,10 @@ class AttrDict(dict):
 
 class mypot( object ):
     ''' return a list of available potentials '''
-    def __init__(self,pot=False,potpath=False,use_different_epoch=False,verbose=False):
-        self.pot                        = pot         # n2p2_v1ag
-        self.potpath_in                 = potpath
-        self.use_different_epoch        = use_different_epoch
+    def __init__(self,potpath_in=False,use_epoch=False,verbose=False):
+        self.potpath_in                 = potpath_in
+        self.pot                        = False       # n2p2_v1ag
+        self.use_epoch                  = use_epoch
         self.potpath                    = False        # this is the source where the potential recides
         self.potpath_work               = False        # this is ususally the self.potpath but for cases where different epoch is used ->
         self.pottype                    = False        # n2p2/runner
@@ -654,7 +654,8 @@ class mypot( object ):
         self.assessed_c44               = []
         self.assessed_input             = []
         self.potepoch_bestteste         = False
-        self.potepoch_bestteste_checked = False
+        self.potepoch_linked            = False
+        self.potepoch_using             = False
         self.c44_al_file                = False
         self.c44_al                     = False
         self.potDONE                    = False         # n2p2_v1ag
@@ -667,7 +668,6 @@ class mypot( object ):
         self.inputnn                    = False         # path to input.nn
         self.inputdata                  = False         # path to input.data
         self.scalingdata                = False         # path to scaling.data
-        self.pot_all                    = []      # n2p2_v1ag
         self.trigger_set_path_manual    = ["setpath","potpath","pp", ".", "..", "../" ]
         self.verbose                    = verbose
         self.elements                   = False  # list e.g. ['Al', 'Mg', 'Si']
@@ -679,12 +679,11 @@ class mypot( object ):
                                         # self.atom_types = {'Mg':1,'Al':2,'Si':3}
         self.lmpcmd                     = False
         self.pot_all_dict               = {}
-        #self.pot_all_dict_potpath       = {}
-        #self.pot_all_dict_pottype       = {}
+        self.get_pot_all()
         return
 
     def get_pot_all(self):
-        if len(self.pot_all) == 0:
+        if len(self.pot_all_dict) == 0:
             scripts = os.environ['scripts']
             home = os.environ['HOME']
             p1 = scripts+'/potentials/'
@@ -704,80 +703,21 @@ class mypot( object ):
                     self.pottype_all += [pottype]
                 for jdx,potpath in enumerate(allpaths):
                     pot = os.path.basename(potpath)
-                    self.pot_all_dict[pot] = [potpath,pottype]
+                    self.pot_all_dict[pot] = [potpath,pottype,pot]
                     #print('pot',pot)
-                    self.pot_all.append(pot)
+                    #self.pot_all.append(pot)
 
-            self.pot_all = self.pot_all + self.trigger_set_path_manual
+            #self.pot_all = self.pot_all + self.trigger_set_path_manual
 
-                #allpot_fullpath += allpaths
-                #allpot_type += check[idx][1]
-                #print('idx',idx,i,'ap',allpaths,'cc',check[idx][1])
-
-            #@aa = AttrDict(self.pot_all_dict)
-            #@print('aa',aa.n2p2_v3ag_5000)
-            #@sys.exit()
-            #@for i in allpot_fullpath:
-            #@    print('idxxx',i)
-            #@print()
-            #@pot_all_tmp = []
-            #@#print('self.pot_all in :',self.pot_all)
-            #@for idx,i in enumerate(allpot_fullpath):
-            #@    pot_all_tmp.append(os.path.basename(i))
-            #@    # dict[potname] = path
-            #@    # i = path = dict Value
-            #@    # potname = os.path.basename(i) = dict Key
-            #@    print('idx',idx,i)
-            #@    self.pot_all_dict_potpath[os.path.basename(i)] = allpot_fullpath[idx]
-            #@    #self.pot_all_dict_pottype[os.path.basename(i)] = allpot_type[idx]
-            #@for i in self.trigger_set_path_manual:
-            #@    self.pot_all_dict_potpath[i] = i
-            #@    #self.pot_all_dict_pottype[os.path.basename(i)] = "UNKNOWN"
-            #self.pot_all = pot_all_tmp + self.trigger_set_path_manual
-            #print('self.pot_all out:',self.pot_all)
-            #print('self.pot_all_dict_potpath',self.pot_all_dict_potpath)
-            #print('len',len(self.pot_all_dict_potpath))
-            #sys.exit('09i-')
-            if len(self.pot_all) == 0:
-                sys.exit('no potentials found; ERROR (92)')
-            #ch = "runner_v3ag_5000_7650_new_input_data_2"
-            #if ch in self.pot_all_dict_potpath:
-            #    self.potpath = self.pot_all_dict_potpath[ch]
-            #    print('yo',self.potpath)
-            #sys.exit()
+            #if len(self.pot_all) == 0:
+            #    sys.exit('no potentials found; ERROR (92)')
         return
 
-    def get_potpath(self):
-        print('len(self.pot_all_dict)',len(self.pot_all_dict))
-        if len(self.pot_all_dict) == 0:
-            self.get_pot_all()
-        print('len(self.pot_all_dict)',len(self.pot_all_dict))
-        print('self.pot',self.pot)
-        self.potpath = self.pot_all_dict[self.pot][0]
-        self.pottype = self.pot_all_dict[self.pot][1]
-        print('spp',self.potpath[0])
-        #if self.pot in self.pot_all_dict_potpath[self.pot]:
-        #    self.potpath = self.pot_all_dict_potpath[self.pot]
-        #else:
-        #    print('self.pot',self.pot)
-        #    sys.exit('self.pot not found; ERROR (93)')
-
-        #scripts = os.environ['scripts']
-        #allpot_fullpath = glob.glob(scripts+'/potentials/*')
-        #self.pot_all = self.trigger_set_path_manual
-        #for i in allpot_fullpath:
-        #    #print(i)
-        #    if type(self.pot) != bool:
-        #        if self.pot == os.path.basename(i):
-        #            self.potpath = i
-        #            break
-        return
 
     def get_pottype_elements_and_atomic_energies(self):
         ''' help '''
         # get from input.nn the atomic energies
         if type(self.pot) != bool and type(self.elements) == bool and type(self.atom_energy) == bool:
-            self.pottype = self.pot.split("_")[0]
             if self.pottype == "runner" or self.pottype == "n2p2":
                 inputnn = self.potpath+"/input.nn"
                 if os.path.isfile(inputnn):
@@ -853,6 +793,7 @@ class mypot( object ):
         #aa = my_atom.atom()
 
         self.reference_volumes = {}
+        self.atomic_numbers = {}
         for i in self.elements:
             #self.atom_masses[i]         = my_atom.atom([i]).mass[0]
             #print('iii',i)
@@ -863,18 +804,21 @@ class mypot( object ):
             #print()
             #print('rv',(my_atom.atom([i]).reference_volume)[0])
             rv  = (my_atom.atom([i]).reference_volume)[0]
+            an  = (my_atom.atom([i]).number)[0]
             self.reference_volumes[i] = rv
+            self.atomic_numbers[i] = an
             #print('rv',my_atom.atom([i]).reference_volume[0])
         #print('rv',self.reference_volumes)
         #sys.exit('123')
         return
 
-    def print_variables_mypot(self,text="",print_nontheless=False):
+    def print_variables_mypot(self,text="",print_nontheless=False,exit=False):
         if self.verbose > 1 or print_nontheless:
+            print(text,"self.potpath_in             ",self.potpath_in)
             print(text,"self.pot                    ",self.pot)
             print(text,"self.potpath (source = src) ",self.potpath)
+            print(text,"self.pottype                ",self.pottype)
             print(text,"self.potpath_work (typ src) ",self.potpath_work)
-            print(text,"self.potpath_in             ",self.potpath_in)
             print(text,"self.inputnn                ",self.inputnn)
             print(text,"self.inputdata              ",self.inputdata)
             print(text,"self.learning_curve_file    ",self.learning_curve_file)
@@ -884,9 +828,10 @@ class mypot( object ):
             print(text,"self.assessed_train         ",self.assessed_train)
             print(text,"self.assessed_kmc57         ",self.assessed_kmc57)
             print(text,"self.assessed_c44           ",self.assessed_c44)
-            print(text,"self.use_different_epoch    ",self.use_different_epoch)
-            print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste,"(It was checked that this is the linked potential)")
-            print(text,"self.potepoch_bestteste_chk?",self.potepoch_bestteste_checked)
+            print(text,"self.use_epoch              ",self.use_epoch)
+            print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste)
+            print(text,"self.potepoch_linked        ",self.potepoch_linked)
+            print(text,"self.potepoch_using         ",self.potepoch_using)
             print(text,"self.c44_al_file            ",self.c44_al_file)
             if type(self.c44_al) != bool:
                 print(text,"self.c44_al                 ",np.round(self.c44_al,2),"GPa")
@@ -903,12 +848,12 @@ class mypot( object ):
             print(text,"self.atom_types             ",self.atom_types)
             print(text,"self.atom_masses            ",self.atom_masses)
             print(text,"self.atom_masses_str        ",self.atom_masses_str)
-            print(text,"self.pottype                ",self.pottype)
             print(text,"self.potDONE                ",self.potDONE)
             print(text,"self.verbose                ",self.verbose)
-            #print(text,"self.pot_all                ",self.pot_all)
             print(text,"len(self.pot_all_dict)      ",len(self.pot_all_dict))
-            print()
+        if exit == True:
+            sys.exit('778899')
+        return
 
     def get_my_assessments(self):
         self.test_b = self.test_l = self.train_b = self.train_l = self.kmc57_b = self.kmc57_l = False
@@ -918,7 +863,6 @@ class mypot( object ):
         #print('all',self.potepoch_all)
         epoch_last = self.potepoch_all[-1]
         #print('epoch_last',epoch_last)
-        #self.print_variables_mypot('ka',print_nontheless=True)
         #print('epoch_best',self.potepoch_bestteste)
 
         ext_ = [ 'test', 'train', 'kmc57', 'input' ]
@@ -1042,57 +986,58 @@ class mypot( object ):
 
     def get(self,exit=True,showerrors=True):
         ''' exit is True if for instance weithts files do not exist '''
-        self.potepoch_bestteste_checked = False
+        #self.potepoch_bestteste_checked = False
         self.print_variables_mypot('PPk get potential: in')
 
-        ##########################################
-        # get potential from path
-        ##########################################
+        #############################################
+        # get potential from path  1. get potpath_in
+        #############################################
         if self.verbose > 2:
             print('PPk in0000')
             print('PPk self.potpath',self.potpath)
             print('PPk self.potpath_in',self.potpath)
 
-        if self.potpath == False and self.potpath_in == False and self.pot in [ ".." , "../", "." ]:
-            self.potpath_in = os.path.abspath(self.pot)
-            print('in1111')
-
-        print('PPk self.potpath',self.potpath)
-        if self.potpath_in == False:
+        ##### get first list of know potentials
+        if len(self.pot_all_dict) == 0:
             self.get_pot_all()
-            self.potpath_in = self.pot_all_dict[self.pot][0]
 
-        print('PPk self.potpath',self.potpath)
-        if self.potpath_in != False and self.potpath == False:
-            print('in2222')
-            if not os.path.isdir(self.potpath_in):
-                sys.exit(self.potpath_in+" does not exist! (1)")
-
-            if not os.path.isfile(self.potpath_in+"/input.nn"):
-                print("PPa could not find "+self.potpath_in+"/input.nn")
-                self.potpath_in = "/".join(self.potpath_in.split("/")[:-1])
-                if not os.path.isfile(self.potpath_in+"/input.nn"):
-                    print("PPb could not find "+self.potpath_in+"/input.nn")
-                    self.potpath_in = "/".join(self.potpath_in.split("/")[:-1])
-                    if not os.path.isfile(self.potpath_in+"/input.nn"):
-                        sys.exit("PPc could not find "+self.potpath_in+"/input.nn")
-
-            if exit == True:
-                checkfiles = [ "input.nn", "scaling.data", "weights.012.data", "weights.013.data", "weights.014.data" ]
-                for i in checkfiles:
-                    if not os.path.isfile(self.potpath_in+"/"+i):
-                        sys.exit(self.potpath_in+"/"+i+" does not exist! (2)")
-
+        try:
+            # here a proper name of a potential was specified
+            self.potpath = self.pot_all_dict[self.potpath_in][0]
+            self.pottype = self.pot_all_dict[self.potpath_in][1]
+            self.pot     = self.pot_all_dict[self.potpath_in][2]
+        except:
+            # here only a relative path or something like this has been specified ../
             self.potpath = os.path.abspath(self.potpath_in)
-            self.inputnn     = isfiledir(self.potpath_in+"/input.nn",exit=True)
-            self.scalingdata = isfiledir(self.potpath_in+"/scaling.data",exit=True)
-
-            self.inputdata = isfiledir(self.potpath_in+"/input.data",check_extension=[".extxyz"])
-            self.testdata  = isfiledir(self.potpath_in+"/test.data",check_extension=[".extxyz"])
-            self.traindata = isfiledir(self.potpath_in+"/train.data",check_extension=[".extxyz"])
+            self.pot     = os.path.basename(self.potpath_in)
+        self.get_pottype_elements_and_atomic_energies()  # defines self.pottype if not defined
 
 
-            self.pottype = inputnn_runner_or_n2p2(self.inputnn)
+        if self.potpath == False:
+            self.print_variables_mypot(text="self.potpath not found! (1)",print_nontheless=False,exit=True)
+
+        if self.verbose:
+            print('PPk self.potpath_in',self.potpath_in)
+            print('PPk self.potpath   ',self.potpath)
+            print('PPk self.pottype   ',self.pottype)
+            print('PPk self.pot       ',self.pot)
+
+        if self.pottype in [ "runner", "n2p2" ]:
+            checkfiles = [ "input.nn", "scaling.data"] #, "weights.012.data", "weights.013.data", "weights.014.data" ]
+            for i in self.atomic_numbers:
+                filename = "weights."+(str(self.atomic_numbers[i]).zfill(3))+".data"
+                checkfiles += [filename]
+
+            for i in checkfiles:
+                if not os.path.isfile(self.potpath+"/"+i):
+                    sys.exit(self.potpath+"/"+i+" does not exist! (3)")
+
+            self.inputnn     = isfiledir(self.potpath+"/input.nn",exit=True)
+            self.scalingdata = isfiledir(self.potpath+"/scaling.data",exit=True)
+            self.inputdata   = isfiledir(self.potpath+"/input.data",check_extension=[".extxyz"])
+            self.testdata    = isfiledir(self.potpath+"/test.data",check_extension=[".extxyz"])
+            self.traindata   = isfiledir(self.potpath+"/train.data",check_extension=[".extxyz"])
+            #self.pottype    = inputnn_runner_or_n2p2(self.inputnn)
             self.learning_curve_file = n2p2_runner_get_learning_curve_filename(self.inputnn)
             try:
                 self.potepoch_all = inputnn_get_potential_number_from_all_weightsfiles(self.inputnn)
@@ -1100,87 +1045,132 @@ class mypot( object ):
                 self.potepoch_all = []
             self.potepoch_bestteste = n2p2_runner_get_bestteste_idx(self.inputnn)
 
-            #### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
-            if exit == True:
-                file1 = self.potpath_in+"/weights.012.data"
-                epstr = str(self.potepoch_bestteste).zfill(6)
-                file2 = self.potpath_in+"/weights.012."+epstr+".out"
-                if not filecmp.cmp(file1, file1):
-                    sys.exit("PPd File "+file1+" is not "+file2)
-                else:
-                    self.potepoch_bestteste_checked = True
-
-            self.pot = self.pottype+"_frompath"
-        else:
-            ##########################################
-            # get potential from string
-            ##########################################
-            self.get_potpath()
-        self.get_pottype_elements_and_atomic_energies()
+            self.potepoch_linked = False
+            weightfiles = glob.glob(self.potpath+'/weights.*.data')
+            for i in weightfiles:
+                if os.path.islink(i):
+                    a = os.path.basename(os.path.realpath(i))
+                    self.potepoch_linked = int(a[12:18])
 
 
-        ### check if self.pottype can be computed on this host!
-        add = 'PPe Your lammps version does not seem to work with '+self.pottype+"!"
-        if self.pottype == "runner":
-            self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
-            self.potcutoff = 14.937658735
-        if self.pottype == "n2p2":
-            self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
-            self.potcutoff = 10.6  # the minimum cutoff of the SF was 20bohrradius = 10.58Angstrom
+            ##### check if current weights.xxx.data files are the ones from weights.xxx. self.potepoch_bestteste
+            #if False: # dont do this test, accept any potential that is linke, even if this one is not the best (forced c44 agreement)
+            #    if exit == True:
+            #        file1 = self.potpath+"/weights.012.data"
+            #        epstr = str(self.potepoch_bestteste).zfill(6)
+            #        file2 = self.potpath+"/weights.012."+epstr+".out"
+            #        print('file1',file1)
+            #        print('file2',file2)
+            #        print('epstr',epstr)
+            #        filecompare = filecmp.cmp(file1, file2)
+            #        print('filecompare',filecompare)
+            #        sys.exit()
+            #        if not filecmp.cmp(file1, file2):
+            #            sys.exit("PPd File "+file1+" is not "+file2)
+            #        else:
+            #            self.potepoch_bestteste_checked = True
 
 
-        if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False and showerrors == True:
-            #sys.exit("ERROR: "+self.potlib+" not found!"+add)
-            print("ERROR: "+self.potlib+" not found!"+add)
+            ### check if self.pottype can be computed on this host!
+            add = 'PPe Your lammps version does not seem to work with '+self.pottype+"!"
+            if self.pottype == "runner":
+                self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-RUNNER"
+                self.potcutoff = 14.937658735
+            if self.pottype == "n2p2":
+                self.potlib = os.environ["LAMMPSPATH"]+"/src/USER-NNP"
+                self.potcutoff = 10.6  # the minimum cutoff of the SF was 20bohrradius = 10.58Angstrom
 
-        if self.use_different_epoch == False:
-            self.potpath_work = self.potpath
-            #print('se false')
-        elif int(self.use_different_epoch) == self.potepoch_bestteste:
-            self.potpath_work = self.potpath
-        else:  # use_different_epoch
-            if self.verbose:
-                print("PPf copy files ...")
-            #print('se true')
-            self.potpath_work = self.pot_tmpdir
-            #print('self.potpath_work (1)',self.potpath_work)
-            epstr = str(self.use_different_epoch).zfill(6)
-            if not os.path.isdir(self.pot_tmpdir):
-                mkdir(self.pot_tmpdir)
-            f12 = self.potpath+"/weights.012."+epstr+".out"
-            f13 = self.potpath+"/weights.013."+epstr+".out"
-            f14 = self.potpath+"/weights.014."+epstr+".out"
 
-            f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
-            f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
-            f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
-            f12b = self.potpath+"/../weights.012."+epstr+".out"
-            f13b = self.potpath+"/../weights.013."+epstr+".out"
-            f14b = self.potpath+"/../weights.014."+epstr+".out"
-            if not os.path.isfile(f12):
-                #print("f12 dne",f12)
-                f12 = f12a
-                #print("f12 new",f12)
-            if not os.path.isfile(f13): f13 = f13a
-            if not os.path.isfile(f14): f14 = f14a
-            if not os.path.isfile(f12): f12 = f12b
-            if not os.path.isfile(f13): f13 = f13b
-            if not os.path.isfile(f14): f14 = f14b
-            for ff in [f12,f13,f14]:
-                if not os.path.isfile(ff):
-                    sys.exit(ff+" does not exist! (65)")
-            print('copying f12',f12)
-            print('copying f13',f13)
-            print('copying f14',f14)
-            print('copying input.nn',self.inputnn)
-            print('copying scalingdata',self.scalingdata)
-            cp(f12,self.pot_tmpdir+"/weights.012.data")
-            cp(f13,self.pot_tmpdir+"/weights.013.data")
-            cp(f14,self.pot_tmpdir+"/weights.014.data")
-            cp(self.scalingdata,self.pot_tmpdir)
-            cp(self.inputnn,self.pot_tmpdir)
-            print('... copying potential',epstr,'to',self.pot_tmpdir)
-            #print('self.potpath_work (2)',self.potpath_work)
+            if self.pottype in [ "runner", "n2p2" ] and os.path.isdir(self.potlib) == False and showerrors == True:
+                #sys.exit("ERROR: "+self.potlib+" not found!"+add)
+                print("ERROR: "+self.potlib+" not found!"+add)
+
+
+            ###################################
+            # check if we use the right epoch
+            ###################################
+            # if no epoch to use specified, use whatever is available
+            print('useepo',self.use_epoch,type(self.use_epoch))
+            print('linked',self.potepoch_linked,type(self.potepoch_linked))
+            if self.use_epoch == False:
+                self.potpath_work   = self.potpath
+                self.potepoch_using  = self.potepoch_linked
+            elif self.use_epoch != False and self.potepoch_linked == self.use_epoch:
+                # some epoch is specified but it is already the linked one!
+                self.potpath_work   = self.potpath
+                self.potepoch_using  = self.potepoch_linked
+            else:
+                # some epoch is specified but it is not the linked one
+                self.potpath_work = self.pot_tmpdir
+                print('We need to work in a different folder since other epoch is linked!')
+                epstr = str(self.use_epoch).zfill(6)
+                print("PPf copy files ...",epstr)
+                if not os.path.isdir(self.pot_tmpdir):
+                    mkdir(self.pot_tmpdir)
+                f  = []
+                fa = []
+                fb = []
+                wfn = []
+                for i in self.atomic_numbers:
+                    #filename = "weights."+(str(self.atomic_numbers[i]).zfill(3))+".data"
+                    atnrstr_ = str(self.atomic_numbers[i]).zfill(3)
+                    weightsfile = "weights."+atnrstr_+"."+epstr+".out"
+                    wfn += ["weights."+atnrstr_+".data"]
+                    f_  = self.potpath+"/"+weightsfile
+                    fa_ = self.potpath+"/../_weights/"+weightsfile
+                    fb_ = self.potpath+"/../"+weightsfile
+
+                    print('f_',f_)
+                    if not os.path.isfile(f_): f_ = fa_
+                    if not os.path.isfile(f_): f_ = fb_
+                    if not os.path.isfile(f_): sys.exit(f_+" does not exist! (65)")
+
+                    f  += [f_]
+                    fa += [fa_]
+                    fb += [fb_]
+
+                #f12 = self.potpath+"/weights.012."+epstr+".out"
+                #f13 = self.potpath+"/weights.013."+epstr+".out"
+                #f14 = self.potpath+"/weights.014."+epstr+".out"
+
+                #f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
+                #f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
+                #f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
+
+                #f12b = self.potpath+"/../weights.012."+epstr+".out"
+                #f13b = self.potpath+"/../weights.013."+epstr+".out"
+                #f14b = self.potpath+"/../weights.014."+epstr+".out"
+                #if not os.path.isfile(f[0]): f[0] = fa[0]
+                #if not os.path.isfile(f[1]): f[1] = fa[1]
+                #if not os.path.isfile(f[2]): f[2] = fa[2]
+                #if not os.path.isfile(f[0]): f[0] = fb[0]
+                #if not os.path.isfile(f[1]): f[1] = fb[1]
+                #if not os.path.isfile(f[2]): f[2] = fb[2]
+                #if not os.path.isfile(f[0]): sys.exit(f[0]+" does not exist! (65)")
+                #if not os.path.isfile(f[1]): sys.exit(f[1]+" does not exist! (66)")
+                #if not os.path.isfile(f[2]): sys.exit(f[2]+" does not exist! (67)")
+
+
+                #for ff in [f12,f13,f14]:
+                #    if not os.path.isfile(ff):
+                #        sys.exit(ff+" does not exist! (65)")
+                for idx,i in enumerate(f):
+                    if self.verbose:
+                        print('copying',i,'to',self.pot_tmpdir+'/'+wfn[idx])
+                    cp(i,self.pot_tmpdir+"/"+wfn[idx]) #weights.012.data")
+                #print('copying f13',f[1],'to',self.pot_tmpdir)
+                #print('copying f14',f[2],'to',self.pot_tmpdir)
+                #print('copying input.nn',self.inputnn)
+                #print('copying scalingdata',self.scalingdata)
+                #cp(f12,self.pot_tmpdir+"/weights.012.data")
+                #cp(f13,self.pot_tmpdir+"/weights.013.data")
+                #cp(f14,self.pot_tmpdir+"/weights.014.data")
+                print("self.pot_tmpdir",self.pot_tmpdir)
+                cp(self.scalingdata,self.pot_tmpdir)
+                cp(self.inputnn,self.pot_tmpdir)
+                if self.verbose:
+                    print('... copying potential',epstr,'to',self.pot_tmpdir)
+                #print('self.potpath_work (2)',self.potpath_work)
         self.potDONE = True
         #print('self.potpath_work (3)',self.potpath_work)
         self.print_variables_mypot('get potential: out')
@@ -3329,9 +3319,8 @@ class ase_calculate_ene( object ):
     if only pot is defined, static calculation.
     '''
     def __init__(self,
-            pot,
-            potpath,
-            use_different_epoch=False,
+            potpath_in,
+            use_epoch=False,
             units=False,
             geopt=False,
             kmc=False,
@@ -3350,7 +3339,6 @@ class ase_calculate_ene( object ):
         self.fah_supercell  = fah_supercell
         #self.pot = pot
         self.LAMMPS_COMMAND = False
-        self.potpath        = potpath
         self.mypot          = False
         self.units          = units.lower()
         self.geopt          = geopt          # so far only for ene object.
@@ -3361,7 +3349,7 @@ class ase_calculate_ene( object ):
         self.atoms          = False          # ase atoms object (frame)
         if self.verbose:
             print('>> ase_calculate_ene: initializing mypot .... to self.pot')
-        self.pot            = mypot(pot,self.potpath,use_different_epoch = use_different_epoch,verbose = self.verbose)
+        self.pot            = mypot(potpath_in,use_epoch = use_epoch,verbose = self.verbose)
 
         #####################
         # for the calculator
