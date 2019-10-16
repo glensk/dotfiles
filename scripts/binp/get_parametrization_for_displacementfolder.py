@@ -94,10 +94,10 @@ class get_one_disp():
             self.idx_1_1_0 = getindex(self.pos/self.alat,np.array([1,1,0]))
             self.idx_05_05_0 = getindex(self.pos/self.alat,np.array([0.5,0.5,0]))
 
-            self.p_1_1_0 = self.pos[self.idx_1_1_0]
+            self.p_1_1_0   = self.pos[self.idx_1_1_0]
             self.p_05_05_0 = self.pos[self.idx_05_05_0]
 
-            self.f_1_1_0 = self.forces[self.idx_1_1_0]
+            self.f_1_1_0   = self.forces[self.idx_1_1_0]
             self.f_05_05_0 = self.forces[self.idx_05_05_0]
         return
 
@@ -333,8 +333,10 @@ class get_all_disps():
         self.dist_0_05_05_at1   = np.zeros((len(self.folder_alldisp),3))
 
         self.force_0_05_05      = np.zeros((len(self.folder_alldisp),3))
-        self.force_45_45_0      = np.zeros((len(self.folder_alldisp),3))
         self.force_05_45_0      = np.zeros((len(self.folder_alldisp),3))
+        self.force_1_1_1        = np.zeros((len(self.folder_alldisp),3))
+        self.force_1_1_0        = np.zeros((len(self.folder_alldisp),3))
+        self.force_45_45_0      = np.zeros((len(self.folder_alldisp),3))
         self.force_0_05_05_rest = np.zeros((len(self.folder_alldisp),3))
         self.force_05_05_0_rest = np.zeros((len(self.folder_alldisp),3))
 
@@ -378,6 +380,8 @@ class get_all_disps():
             pos_forces = np.loadtxt(i+'/POSITIONs')
             pos    = pos_forces[:,[0,1,2]]
             forces = pos_forces[:,[3,4,5]]
+
+
             #if not os.path.isfile(i+'/pos'):
             #    with my.cd(i):
             #        call(["extractPOSITIONS.sh -o pos"],shell=True)
@@ -444,6 +448,21 @@ class get_all_disps():
             #    print("forces")
             #    print(forces[-1])
 
+            pos_ = np.copy(pos)
+            for iidx,i in enumerate(pos):
+                #print(iidx,i)
+                for jdx,j in enumerate(i):
+                    #print(jdx,j,'--',pos_[iidx,jdx],'sc',self.sc,'alat',self.alat,'--',self.sc*self.alat/2)
+                    if pos_[iidx,jdx] > self.sc*self.alat/2:
+                        pos_[iidx,jdx] = pos_[iidx,jdx]-self.sc*self.alat
+            #print('pos_',pos_.shape)
+            if idx == 0:
+                self.force_all          = np.zeros((len(self.folder_alldisp),pos.shape[0],pos.shape[1]))
+                self.pos_all            = np.zeros((len(self.folder_alldisp),pos.shape[0],pos.shape[1]))
+
+            self.force_all[idx] = forces
+            self.pos_all[idx] = pos_
+
 
             ##########################################################################################
             # This is so for for a random displacement, whichever was loaded last
@@ -467,15 +486,12 @@ class get_all_disps():
             idx_1_1_0   = dosearch([1.0,1.0,0],"idx_1_1_0",pos,self.alat)
             p_1_1_0     = pos[idx_1_1_0]
             f_1_1_0     = forces[idx_1_1_0]
-
-            if self.verbose > 1:
-                print("idx_05_05_0",idx_05_05_0)
-                print("p_05_05_0",p_05_05_0)
-                print("f_05_05_0",f_05_05_0)
+            self.force_1_1_0[idx] = f_1_1_0
 
             idx_45_45_0 = dosearch([round(self.sc-0.5,12),round(self.sc-0.5,12),0],"idx_45_45_0",pos,self.alat)
             p_45_45_0   =    pos[idx_45_45_0]
             f_45_45_0   = forces[idx_45_45_0]
+            self.force_45_45_0[idx] = f_45_45_0
 
             idx_40_40_0 = dosearch([round(self.sc-1.0,12),round(self.sc-1.0,12),0],"idx_40_40_0",pos,self.alat)
             p_40_40_0   =    pos[idx_40_40_0]
@@ -488,6 +504,11 @@ class get_all_disps():
             idx_05_45_0 = dosearch([0.5,round(self.sc-0.5,12),0],"idx_05_45_0",pos,self.alat)
             p_05_45_0   =    pos[idx_05_45_0]
             f_05_45_0   = forces[idx_05_45_0]
+            self.force_05_45_0[idx] = f_05_45_0
+
+            idx_45_05_0 = dosearch([round(self.sc-0.5,12),0.5,0],"idx_45_05_0",pos,self.alat)
+            p_45_05_0   =    pos[idx_45_05_0]
+            f_45_05_0   = forces[idx_45_05_0]
 
             if self.verbose > 1:
                 print("idx_45_45_0",idx_45_45_0)
@@ -496,14 +517,13 @@ class get_all_disps():
             idx_0_05_05 = getindex(pos/self.alat,np.array([0,0.5,0.5]))
             p_0_05_05 = pos[idx_0_05_05]
             f_0_05_05 = forces[idx_0_05_05]
+            self.force_0_05_05[idx] = f_0_05_05
 
             d_0_05_05_at0 = p_0_05_05-pos[0]
             d_0_05_05_at1 = p_0_05_05 - p_05_05_0
 
             self.dist_0_05_05_at0[idx] = d_0_05_05_at0
             self.dist_0_05_05_at1[idx] = d_0_05_05_at1
-            self.force_0_05_05[idx] = f_0_05_05
-            self.force_45_45_0[idx] = f_45_45_0
             if self.verbose2:
                 print('idx',disp,'f_0_05_05:',f_0_05_05,'attractive force:',d_0_05_05_at0, LA.norm(d_0_05_05_at0))
 
@@ -550,20 +570,31 @@ class get_all_disps():
             ##############################################################################
             # put together disp vs forces at atom [0.5,0.5,0
             ##############################################################################
-            self.disp_vs_force[idx,0] = LA.norm(p_05_05_0-pos[0]) # repulsive dist
-            self.disp_vs_force[idx,1] = - np.sign(f_05_05_0[0])*LA.norm(f_05_05_0) # repulsive forces
-            self.disp_vs_force[idx+da,0] = self.nndist + disp # attractive dist
-            self.disp_vs_force[idx+da,1] = np.sign(f_45_45_0[0])*LA.norm(f_45_45_0) # attractive forces
+            self.disp_vs_force[idx,0]       = LA.norm(p_05_05_0-pos[0]) # repulsive dist
+            self.disp_vs_force[idx,1]       = -np.sign(f_05_05_0[0])*LA.norm(f_05_05_0) # repulsive forces
+            self.disp_vs_force[idx+da,0]    = self.nndist + disp # attractive dist
+            self.disp_vs_force[idx+da,1]    = np.sign(f_45_45_0[0])*LA.norm(f_45_45_0) # attractive forces
 
             ##############################################################################
             # put together disp vs forces at atom 1_1_0 to substract from force @ 05_05_0 as a correction
             ##############################################################################
-            self.disp_vs_force_110[idx,0] = LA.norm(p_05_05_0-pos[0])  # distance
-            self.disp_vs_force_110[idx,1] =  - np.sign(f_1_1_0[0])*LA.norm(f_1_1_0)           # forces repulsive ... in this case the sign is different
+            self.disp_vs_force_110[idx,0]    = LA.norm(p_05_05_0-pos[0])  # distance
+            self.disp_vs_force_110[idx,1]    = -np.sign(f_1_1_0[0])*LA.norm(f_1_1_0)           # forces repulsive ... in this case the sign is different
             self.disp_vs_force_110[idx+da,0] = self.nndist + disp
             self.disp_vs_force_110[idx+da,1] = np.sign(f_40_40_0[0])*LA.norm(f_40_40_0)
 
+            ##############################################################################
+            # put together disp vs forces at atom 05_45_0
+            ##############################################################################
 
+
+
+
+    #######################################################################################
+    #######################################################################################
+    # here all folders are defined
+    #######################################################################################
+    #######################################################################################
         self.disp_vs_force = restrict_xrange_of_array(array = self.disp_vs_force,
                          xmin = self.nndist - self.rmin_distmax,
                          xmax = self.nndist + self.rmax_distmax)
@@ -587,7 +618,6 @@ class get_all_disps():
             print(self.disp_vs_force)
             print('---------------------------')
         #print('??')
-        #print(self.disp_vs_force_110)
         #print('corr')
         #print(self.disp_vs_force_corrected_for_110)
         #sys.exit()
@@ -703,8 +733,6 @@ class get_all_disps():
             #print('params',params)
             for idx,i in enumerate(self.dist_0_05_05_at0):
                 dist_norm                           = np.around(LA.norm(i),5)
-
-
                 fm                                  = np.round(hesse.Morse_derivative(LA.norm(i), *params),4)
                 forces_morse                        = hesse.getefvec(i,params,pot = 'm')
                 self.force_0_05_05_rest[idx]        = self.force_0_05_05[idx] + forces_morse[1]
@@ -766,7 +794,39 @@ class get_all_disps():
                 print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
             print('this parametrization, even for T=0K displacements, is not optimal!, try to add attractive forces on 0_45_45')
 
+        print("#########################################################################")
+        print("# fits on [0.5,-0.5,0.0]")
+        print("#########################################################################")
+        if True:
+            for idx,i in enumerate(self.force_05_45_0):
+                dd = self.pos_all[idx,idx_05_45_0]-self.pos_all[idx,0]
+                dd = self.pos_all[idx,0]-self.pos_all[idx,idx_05_45_0]
+                dist_norm                           = np.around(LA.norm(dd),5)
+                fm                                  = np.round(hesse.Morse_derivative(LA.norm(dd), *params),4)
+                forces_morse                        = hesse.getefvec(dd,params,pot = 'm')
+                print('idx',idx,i,"##""##",i[0],i[1],i[2],"##f",self.force_all[idx,idx_05_45_0],"##p",self.pos_all[idx,idx_05_45_0],self.pos_all[idx,0],dd,dist_norm,'for',fm,'ro',forces_morse)
+        print("#########################################################################")
+        print("# fits ueber alle ersten nachbarn vom [0.0,0.0,0.0] atom")
+        print("# first look at atoms in (001) plane")
+        print("#########################################################################")
+        import inspect, re
+        def varname(p):
+            for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
+                m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
+                if m:
+                    return m.group(1)
 
+        indexes_NN = [ idx_05_05_0, idx_05_45_0, idx_45_05_0, idx_45_45_0]
+        for idx_nn in indexes_NN:
+            for disp_idx in np.arange(len(self.pos_all)):
+                dd = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,idx_nn]
+                print(idx_nn,self.pos_all[disp_idx,idx_nn],self.force_all[disp_idx,idx_nn],dd)
+        print()
+        print('idx_05_05_0',idx_05_05_0,self.pos_all[0,idx_05_05_0])
+        print('idx_05_45_0',idx_05_45_0,self.pos_all[0,idx_05_45_0])
+        print('idx_45_05_0',idx_45_05_0,self.pos_all[0,idx_45_05_0])
+        print('idx_45_45_0',idx_45_45_0,self.pos_all[0,idx_45_45_0])
+        sys.exit()
         #print('force on 0_05_05 after subtracting mores')
         #print('fp',*fit.parameters)
         #fp = hesse.Morse_derivative(2.9, *fit.parameters)
