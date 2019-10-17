@@ -376,6 +376,7 @@ class get_all_disps():
                     call(["OUTCAR_forces-last-ARRAY.sh > forces"],shell=True)
             if not os.path.isfile(i+'/POSITIONs'):
                 with my.cd(i):
+                    print('pwd',os.getcwd())
                     call(["extractPOSITIONS.sh"],shell=True)
             pos_forces = np.loadtxt(i+'/POSITIONs')
             pos    = pos_forces[:,[0,1,2]]
@@ -439,9 +440,10 @@ class get_all_disps():
                 print("self.alatTmelt    (3):",self.alatTmelt)
                 print("self.sc           (3):",self.sc)
                 print("self.alat         (3):",self.alat)
+            print('100',forces)
 
-            if os.path.isfile(i+'/forces'):
-                forces = np.loadtxt(i+'/forces')
+            #if os.path.isfile(i+'/forces'):
+            #    forces = np.loadtxt(i+'/forces')
             #if self.verbose:
             #    print('pos')
             #    print(pos[-1])
@@ -817,16 +819,31 @@ class get_all_disps():
                     return m.group(1)
 
         indexes_NN = [ idx_05_05_0, idx_05_45_0, idx_45_05_0, idx_45_45_0]
+        indexes_NN = [ idx_05_05_0, idx_45_45_0]
+        x = []
+        y = []
         for idx_nn in indexes_NN:
             for disp_idx in np.arange(len(self.pos_all)):
                 dd = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,idx_nn]
-                print(idx_nn,self.pos_all[disp_idx,idx_nn],self.force_all[disp_idx,idx_nn],dd)
+                dist_norm     = np.around(LA.norm(dd),5)
+                x += [LA.norm(dd)]
+                y += [LA.norm(self.force_all[disp_idx,idx_nn])]
+                fm            = np.round(hesse.Morse_derivative(LA.norm(dd), *params),4)
+                forces_morse  = hesse.getefvec(dd,params,pot = 'm')
+                fm_           = np.round(hesse.Morse_derivative(LA.norm(dd[0]), *params),4)
+                forces_morse_ = hesse.getefvec(dd[0],params,pot = 'm')
+                print(idx_nn,self.pos_all[disp_idx,idx_nn],'diff pos = dd:',dd,'forces vasp:',self.force_all[disp_idx,idx_nn],'dist_norm',dist_norm,'fm',fm,'forces morse:',forces_morse[1],'fm_',fm_,'fmm',forces_morse_[1])
+
+        x = np.array(x)
+        y = np.array(y)
+        print('x',x)
+        print('y',y)
         print()
-        print('idx_05_05_0',idx_05_05_0,self.pos_all[0,idx_05_05_0])
-        print('idx_05_45_0',idx_05_45_0,self.pos_all[0,idx_05_45_0])
-        print('idx_45_05_0',idx_45_05_0,self.pos_all[0,idx_45_05_0])
-        print('idx_45_45_0',idx_45_45_0,self.pos_all[0,idx_45_45_0])
-        sys.exit()
+        print('idx_05_05_0',idx_05_05_0,'diff pos:',self.pos_all[0,idx_05_05_0])
+        print('idx_05_45_0',idx_05_45_0,'diff pos:',self.pos_all[0,idx_05_45_0])
+        print('idx_45_05_0',idx_45_05_0,'diff pos:',self.pos_all[0,idx_45_05_0])
+        print('idx_45_45_0',idx_45_45_0,'diff pos:',self.pos_all[0,idx_45_45_0])
+        ##sys.exit()
         #print('force on 0_05_05 after subtracting mores')
         #print('fp',*fit.parameters)
         #fp = hesse.Morse_derivative(2.9, *fit.parameters)
