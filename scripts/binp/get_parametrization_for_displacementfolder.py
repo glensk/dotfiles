@@ -818,26 +818,144 @@ class get_all_disps():
                 if m:
                     return m.group(1)
 
-        indexes_NN = [ idx_05_05_0, idx_05_45_0, idx_45_05_0, idx_45_45_0]
-        indexes_NN = [ idx_05_05_0, idx_45_45_0]
+        indexes_NN              = [ idx_05_05_0, idx_05_45_0, idx_45_05_0, idx_45_45_0]
+        indexes_NN_forces_sign  = [ -1.,         1          , 1          , 1 ]
+
+        # repulsive and attractive
+        indexes_NN              = [ idx_05_05_0, idx_45_45_0]
+        indexes_NN_forces_sign  = [ -1.,         1. ]
+
+        # only repulsive
+        #indexes_NN              = [ idx_05_05_0]
+        #indexes_NN_forces_sign  = [ -1.       ]
+
+        #indexes_NN = [ idx_05_05_0, idx_45_45_0, idx_05_45_0, idx_0_05_05 ]
+        #indexes_NN_forces_sign  = [ -1.,         1          , 1          , 1 ]
         x = []
         y = []
-        for idx_nn in indexes_NN:
+        for idx_nn, indexname_nn in enumerate(indexes_NN):
+            print()
             for disp_idx in np.arange(len(self.pos_all)):
-                dd = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,idx_nn]
-                dist_norm     = np.around(LA.norm(dd),5)
-                x += [LA.norm(dd)]
-                y += [LA.norm(self.force_all[disp_idx,idx_nn])]
-                fm            = np.round(hesse.Morse_derivative(LA.norm(dd), *params),4)
-                forces_morse  = hesse.getefvec(dd,params,pot = 'm')
-                fm_           = np.round(hesse.Morse_derivative(LA.norm(dd[0]), *params),4)
-                forces_morse_ = hesse.getefvec(dd[0],params,pot = 'm')
-                print(idx_nn,self.pos_all[disp_idx,idx_nn],'diff pos = dd:',dd,'forces vasp:',self.force_all[disp_idx,idx_nn],'dist_norm',dist_norm,'fm',fm,'forces morse:',forces_morse[1],'fm_',fm_,'fmm',forces_morse_[1])
-
+                D = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,indexname_nn]
+                dist_norm     = np.around(LA.norm(D),5)
+                x += [LA.norm(D)]
+                y += [indexes_NN_forces_sign[idx_nn]*LA.norm(self.force_all[disp_idx,indexname_nn])]
+                fm            = np.round(hesse.Morse_derivative(LA.norm(D), *params),4)
+                Fm = hesse.getefvec(D,params,pot = 'm')[1]
+                Fv = self.force_all[disp_idx,indexname_nn]
+                fv = LA.norm(Fv)
+                Fr = Fv - Fm
+                print(
+                        str(indexname_nn).ljust(3),
+                        str(self.pos_all[disp_idx,indexname_nn]).ljust(19),
+                        '|d|',str(dist_norm).ljust(7),
+                        'D:',str(D).ljust(22),
+                        '||',
+                        'Fv:',str(Fv).ljust(22),
+                        '|fv|',str(fv).ljust(22),
+                        '|fm|:',str(fm).ljust(7),
+                        'Fm:',str(Fm).ljust(22),
+                        'Fr:',str(Fr).ljust(22)
+                        )
+        print(      print())
         x = np.array(x)
         y = np.array(y)
+        xrel = x/(self.alat/np.sqrt(2.))/np.sqrt(2)
         print('x',x)
+        print('xrel',xrel)
         print('y',y)
+        take_xrel = True
+        add = ""
+        if take_xrel == True:
+            x = xrel
+            add = "_xrel"
+        np.savetxt("xy.dat",np.array([x,y]).T)
+
+        from lmfit import Model,minimize
+        xy = np.loadtxt("/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400.txt")
+        print(hesse.__file__)
+        mmodel = Model(hesse.Michael_polynomial)
+        mmodel.set_param_hint('a' ,value=1) #, min=0.01, max=0.5)
+        mmodel.set_param_hint('b' ,value=1) #,  min=1.0,  max=3.0)
+        mmodel.set_param_hint('c' ,value=1) #,  min=1.0,  max=3.0)
+        mmodel.set_param_hint('d' ,value=1) #,  min=1.0,  max=y[:,0]3.0)
+        mmodel.set_param_hint('e' ,value=1) #,  min=1.0,  max=y[:,0]3.0)
+        print('len(xy)',len(xy))
+        result = mmodel.fit(xy[:,1], r=xy[:,0])
+        print('result done')
+        print('Michaels Model for michaels curve from plot:',np.round([
+            result.best_values.get('a'),
+            result.best_values.get('b'),
+            result.best_values.get('c'),
+            result.best_values.get('d'),
+            result.best_values.get('e')
+            ],3))
+        np.savetxt("xy"+add+"_michael_from_plot.dat",np.array([xy[:,0],result.best_fit]).T)
+        print('saved',"xy"+add+"_michael_from_plot.dat")
+        sys.exit('88866666666666')
+        if True:
+            from lmfit import Model,minimize
+            print('alat',self.alat,'re (is fixed, will be 0):',self.alat/np.sqrt(2.))
+            morsemodel = Model(hesse.Morse_derivative)
+            morsemodel.set_param_hint('re' ,value=self.alat/np.sqrt(2.), vary=False)
+            if take_xrel == True:
+                morsemodel.set_param_hint('re' ,value=1./np.sqrt(2.), vary=False)
+            morsemodel.set_param_hint('De' ,value=0.25) #, min=0.01, max=0.5)
+            morsemodel.set_param_hint('aa' ,value=1.5) #,  min=1.0,  max=3.0)
+            result = morsemodel.fit(y, r=x)
+            print('vgl (only repulsive )',np.round([result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')],3))
+            print('result.best_fit',result.best_fit)
+            np.savetxt("xy_morse.dat",np.array([x,result.best_fit]).T)
+
+
+            #mmodel = Model(hesse.Michael_polynomial)
+            mmodel = Model(hesse.Michael_polynomial_for_morsevalues_positive)
+            mmodel.set_param_hint('req' ,value=self.alat/np.sqrt(2.), vary=False)
+            if take_xrel == True:
+                mmodel.set_param_hint('req' ,value=1./np.sqrt(2.), vary=False)
+            mmodel.set_param_hint('a' ,value=1) #, min=0.01, max=0.5)
+            mmodel.set_param_hint('b' ,value=1) #,  min=1.0,  max=3.0)
+            mmodel.set_param_hint('c' ,value=1) #,  min=1.0,  max=3.0)
+            mmodel.set_param_hint('d' ,value=1) #,  min=1.0,  max=3.0)
+            result = mmodel.fit(y, r=x)
+            print('Michaels Model for polynomial positive',np.round([
+                result.best_values.get('a'),
+                result.best_values.get('b'),
+                result.best_values.get('c'),
+                result.best_values.get('d'),
+                result.best_values.get('req'),
+                ],3))
+            params = [ result.best_values.get('a'), result.best_values.get('b'), result.best_values.get('c'), result.best_values.get('d')]
+            print("forces with this model @eq:")
+            print('-->',result.best_values)
+            np.savetxt("xy_michael_pos.dat",np.array([x,result.best_fit]).T)
+            print('result.best_fit',result.best_fit)
+            #plt.plot(x, y, 'bo')
+            #plt.plot(x, result.init_fit, 'k--', label='initial fit')
+            #plt.plot(x, result.best_fit, 'r-', label='best fit')
+            #plt.legend(loc='best')
+            #plt.show()
+
+
+            mmodel = Model(hesse.Michael_polynomial)
+            mmodel.set_param_hint('req' ,value=self.alat/np.sqrt(2.), vary=False)
+            if take_xrel == True:
+                mmodel.set_param_hint('req' ,value=1./np.sqrt(2.), vary=False)
+            mmodel.set_param_hint('a' ,value=1) #, min=0.01, max=0.5)
+            mmodel.set_param_hint('b' ,value=1) #,  min=1.0,  max=3.0)
+            mmodel.set_param_hint('c' ,value=1) #,  min=1.0,  max=3.0)
+            mmodel.set_param_hint('d' ,value=1) #,  min=1.0,  max=3.0)
+            result = mmodel.fit(y, r=x)
+            print('Michaels Model for rel x',np.round([
+                result.best_values.get('a'),
+                result.best_values.get('b'),
+                result.best_values.get('c'),
+                result.best_values.get('d')
+                ],3))
+            np.savetxt("xy_michael_norm.dat",np.array([x,result.best_fit]).T)
+
+
+        sys.exit('78786')
         print()
         print('idx_05_05_0',idx_05_05_0,'diff pos:',self.pos_all[0,idx_05_05_0])
         print('idx_05_45_0',idx_05_45_0,'diff pos:',self.pos_all[0,idx_05_45_0])

@@ -1187,6 +1187,90 @@ def Morse_derivative(r,De,aa,re):
     '''
     return 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
 
+
+def Michael_polynomial(r,a,b,c,d,e):
+    ''' a is a simple offset
+        Michael chose (when using r in relative coordinates) a and b in such a way as to
+        make Michael_polynomial_derivative(r,b,c,d) = 0;
+    '''
+    #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+    return a + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+
+def MP(r,a,b,c,d,e):
+    ''' a is a simple offset
+        Michael chose (when using r in relative coordinates) a and b in such a way as to
+        make Michael_polynomial_derivative(r,b,c,d) = 0;
+     '''
+    #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+    # rcut = 0.84
+    # b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
+    return a + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+
+def MPEnoB(r,a,c,d,e):
+    ''' this is supposed to be the integral of the force, still to do'''
+    return 1
+
+def MPE(r,a,b,c,d,e):
+    ''' this is supposed to be the integral of the force, still to do'''
+    return 1
+
+def MPnoB(r,a,c,d,e):
+    ''' a is a simple offset
+        Michael chose (when using r in relative coordinates) a and b in such a way as to
+        make Michael_polynomial_derivative(r,b,c,d) = 0;
+     '''
+    #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+    rcut = 0.84
+    b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
+    return a + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+
+def Michael_polynomial_for_morsevalues_positive(r,a,b,c,d,req):
+    return Michael_polynomial(r,a,b,c,d) + Michael_polynomial(req,a,b,c,d)
+
+def MPd(r,b,c,d,e):
+    ''' r=0.84 == rcut
+    drei freie (wenn man die wahl des cutoffs nicht als freien parameter
+    zaehlt), die anderen zwei bestimmen sich aus der bedingung V'(rcut)=0 und
+    V''(rcut)=0.
+    '''
+    # V'(rcut=0.84) = MPd(rcut) == 0
+    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. - b/rcut**2. = 0
+    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. = b/rcut**2.
+    # (- 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3.)*rcut**2. = b
+    # (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut) = b
+    return  - 4.*e/r**5. - 3.*d/r**4. - 2.*c/r**3. - b/r**2.
+
+def MPdnoB(r,c,d,e):
+    ''' r=0.84 == rcut
+    drei freie (wenn man die wahl des cutoffs nicht als freien parameter
+    zaehlt), die anderen zwei bestimmen sich aus der bedingung V'(rcut)=0 und
+    V''(rcut)=0.
+    '''
+    # V'(rcut=0.84) = MPd(rcut) == 0
+    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. - b/rcut**2. = 0
+    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. = b/rcut**2.
+    # (- 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3.)*rcut**2. = b
+    # (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut) = b
+    rcut = 0.84
+    b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
+    return  - 4.*e/r**5. - 3.*d/r**4. - 2.*c/r**3. - b/r**2.
+
+def MPdd(r,b,c,d,e):
+    ''' r=0.84 == rcut
+    drei freie (wenn man die wahl des cutoffs nicht als freien parameter
+    zaehlt), die anderen zwei bestimmen sich aus der bedingung V'(rcut)=0 und
+    V''(rcut)=0.
+    '''
+    # V''(rcut=0.84) = 0
+    # 20.*e/rcut**6. + 12.*d/rcut**5. + 6.*c/rcut**4. + 2.*b/rcut**3. = 0.
+    # 2.*b/rcut**3. = - 20.*e/rcut**6. - 12.*d/rcut**5. - 6.*c/rcut**4.
+    # b = 0.5 (- 20.*e/rcut**6. - 12.*d/rcut**5. - 6.*c/rcut**4.)*rcut**3.
+    rcut = 0.84
+    b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)        # from first derivative
+    return  20.*e/r**6. + 12.*d/r**5. + 6.*c/r**4. + 2.*b/r**3.
+
+
+
 def mc1(r,De,aa,re,B,A):
     ''' Energy: x(mathematica) -> r-re(python) '''
     #return Morse(r,De,aa,re)+A*np.exp((-3.+B)*(r-re))+\
@@ -1640,16 +1724,16 @@ def get_energy_forces(
             print(fah)
         return eahmev,eah,fah
 
-def getefvec(vec,params,pot = False):
+def getefvec(vec,params,pot = False,paramsder=False):
     vecnorm=np.linalg.norm(vec)
     if abs(vecnorm) <= 0.000000000000000000000001:
         return 0.0,np.array([0.0,0.0,0.0])
     #print "vn:",vecnorm,params,pot
-    enorm,fnorm = getef(vecnorm,params,pot)
+    enorm,fnorm = getef(vecnorm,params,pot,paramsder=paramsder)
     fvec = vec/vecnorm*fnorm
     return enorm, fvec
 
-def getef(vecnorm,params,pot = False):
+def getef(vecnorm,params,pot = False,paramsder=False):
     '''
     help text
     '''
@@ -1697,13 +1781,24 @@ def getef(vecnorm,params,pot = False):
     if pot == 'mc1':
         function = mc1
         functionder = mc1_derivative
+    if pot == 'MP':
+        function = MPE
+        functionder = MP
+    if pot == 'MPnoB':
+        function = MPEnoB   # her
+        functionder = MPnoB
     if function == None:
         sys.exit("pot not recognized")
     #e =    function(longvecnorm,*params)
     #f = functionder(longvecnorm,*params)
     #print "vecnorm:",vecnorm
     #print "params:",params
+    #print('functi-->',function)
+    #print('funcde-->',functionder)
+    #print('params-->',params)
     e =    function(vecnorm,*params)
+    #if paramsder != False:
+    #    params = paramsder
     f = functionder(vecnorm,*params)
     return e,f
 
