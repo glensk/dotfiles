@@ -1605,6 +1605,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     eDFT = ""
     if DFT_ene != False:
         eDFT   		= my.ase_enepot(frame  ,units=ace.units)
+        e           = ace.ene(frame)
         print('energy_DFT',eDFT)
         ediff_ev  	= energy_NN_cell_unrelaxed_or_DFTrelaxed - eDFT
         ediff_mev_pa 	= ediff_ev*1000./nat
@@ -1624,11 +1625,13 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         f.close()
 
     # write NN@DFT
+    energy_NN_cell_unrelaxed_or_DFTrelaxed = ace.ene_allfix(frame)
+    print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
     heat_precip_T0K_NN_unrelaxed  = (energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.eform_dilute_mg_ - d["Si"]*ace.eform_dilute_si_ - d["Al"]*ace.eform_dilute_al_)/nat
+    print('heat_precip_T0K_NN_unrelaxed',heat_precip_T0K_NN_unrelaxed)
     print('appending to',ace.written_summary[1])
     f=open(ace.written_summary[1], "a+")
     f.write(str(conz)+"   "+str(heat_precip_T0K_NN_unrelaxed)+" "+text.replace(" ", "_")+"\n")
-    f.close()
 
     # @ T=0K relax
     if atomrelax:   ace.ase_relax_atomic_positions_only(frame)
@@ -1654,7 +1657,6 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     check = ace.check_frame('',frame=frame,verbose=False)
     #print('22 atomrelax',atomrelax,'volumerelax',volumerelax,"check",check)
     print_compare_ene_vs_DFT(my.printred("NN "+text+" @0K"),heat_precip_T0K,heat_precip_T0K_DFT,vinet,"-",check=check)
-
     #if ace.verbose:
     #    print("NN energy structure/precipitate (eV)",e)
     #    print("NN energy eform_dilute_mg (eV)",ace.eform_dilute_mg,"times",d["Mg"])
@@ -1884,43 +1886,38 @@ def test_Mg2Si(ace):
 
 
 def test_beta2_bulk(ace):
-    print("######## test_Mg5Si6 (low Mg conz) #############")
-    print("######## test_Mg5Si6 (low Mg conz) #############")
-    print("######## test_Mg5Si6 (low Mg conz) #############")
+    print("######## test_beta2_bulk #############")
     # "Mg9Si5" == beta' (beta prime)
     # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
     doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
     #doit = [ "Mg5Si6" ]
+    doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
     for i in doit:
         print()
     	print("########",i,"############")
-        #print()
-        #path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+"/POSCAR'
-        #frame = ase_read(path,format="vasp")
-        #get_formation_energy(ace,frame,"Mg5Si6 (fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True)
-
-        #path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/'
-        #frame = ase_read(path+"runner.data",format="runner")
 
         path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
-        path = os.environ['potentials'] #my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
-
 	if i == "Mg9Si5":
     		path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
         frame = ase_read(path,format="runner")
 
-        print('frame:::!',frame)
-        print('frame:::?',frame.symbols)
+        if False:
+            pass
+            #path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
+            #print('path',path)
+            #frame = ase_read(path,":",format="runner")
+            #frame_DFT_relax = frame[-1]
+
+        #print('frame:::!',frame)
+        #print('frame:::?',frame.symbols)
         if True:
             #get_formation_energy(ace,frame,i+" (unrelaxed    )",atomrelax=False,cellrelax=False,volumerelax=False)
-            try_read = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
-            get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
-
-            get_formation_energy(ace,frame,i+" (NN@DFT fully relaxed)", atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
-
-            try_read = ace.savefolder+"h_"+i+"_at_NN_relaxed"
-            get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=False,try_harmonic_readfile=try_read)
+            hessematrix_try = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
+            get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
+            hessematrix_try = ace.savefolder+"h_"+i+"_at_NN_relaxed"
+            get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=False,try_harmonic_readfile=hessematrix_try)
             ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
+            sys.exit('8009')
 
     return
 
@@ -1930,16 +1927,39 @@ def load_diluete_pure_values():
     filename = scripts+'/tests/Al-Mg-Si/get_dilute_si_mg_f.'+pot+".dat"
 
 
-def test_formation_energies(ace):
-    print('>> test_formation_energies')
-    path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
-    doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
-    for i in doit:
-    ace.atTemp = 443
 
+def test_formation_energies_loesch(ace):
+    print('>> test_formation_energies')
+    #doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    for i in doit:
+        path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
+        print('path',path)
+        frame = ase_read(path,":",format="runner")
+        frame_DFT_relax = frame[-1]
+        print('frame[0] :::?',frame[0].symbols,frame[0].get_potential_energy(),np.abs(frame[0].get_forces()).max())
+        print('frame[-1]:::?',frame[-1].symbols,frame[-1].get_potential_energy(),np.abs(frame[-1].get_forces()).max())
+    print('-----')
+    import glob
+    doit = glob.glob(os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_mg9si5_stable_phonons_v2_a*")
+
+    for i in doit:
+        print('path',i)
+        frame = ase_read(i,":",format="runner")
+        print('frame[-1]:::?',frame[-1].symbols,frame[-1].get_potential_energy(),np.abs(frame[-1].get_forces()).max())
+
+    print('-----')
+    path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data"
+    frame = ase_read(path,":",format="runner")
+    print('frame[0] :::?',frame[0].symbols,frame[0].get_potential_energy(),np.abs(frame[0].get_forces()).max())
+    print('frame[-1]:::?',frame[-1].symbols,frame[-1].get_potential_energy(),np.abs(frame[-1].get_forces()).max())
+    sys.exit()
+
+def test_formation_energies(ace):
+    print("########### test_formation_energies   #########################")
+    ace.atTemp = 443
     print("########### get_basic_NN_energies_ace #########################")
     get_basic_NN_energies_ace(ace)
-    print("########### get_dilute_si_mg_f #########################")
     ace.written_summary = [
             ace.savefolder+"summary_formations_DFT_T0.dat",
             ace.savefolder+"summary_formations_NNatDFT_T0.dat",
@@ -1948,15 +1968,13 @@ def test_formation_energies(ace):
     for i in ace.written_summary:
         if os.path.isfile(i): os.remove(i)
 
+    print("########### get_dilute_si_mg_f #########################")
     get_dilute_si_mg_f(ace)
 
     file = ace.savefolder+"summary_formationsT0.dat"
     if os.path.isfile(file): os.remove(file)
     file = ace.savefolder+"summary_formationsT"+str(ace.atTemp)+".dat"
     if os.path.isfile(file): os.remove(file)
-    print()
-    print("########### test_formation_energies #########################")
-    print()
     #test_si_si_vac(ace)
     #test_Mg2Si(ace)
     #test_Mg9Si5(ace)
