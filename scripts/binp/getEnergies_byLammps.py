@@ -1591,7 +1591,7 @@ def get_dilute_si_mg_f(ace):
 def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=False,try_harmonic_readfile=False,debug=False):
     ''' Bill sais that T=443 is the relevant temperature '''
     energy_NN_cell_unrelaxed_or_DFTrelaxed = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
-    print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
+    #print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
 
     d = my.ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=ace.pot.elements)
     #print('d',d)
@@ -1606,10 +1606,10 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     if DFT_ene != False:
         eDFT   		= my.ase_enepot(frame  ,units=ace.units)
         e           = ace.ene(frame)
-        print('energy_DFT',eDFT)
+        #print('energy_DFT',eDFT)
         ediff_ev  	= energy_NN_cell_unrelaxed_or_DFTrelaxed - eDFT
         ediff_mev_pa 	= ediff_ev*1000./nat
-        print("##",text,'e - eDFT:',round(ediff_mev_pa,3),"meV/pa")
+        #print("##",text,'e - eDFT:',round(ediff_mev_pa,3),"meV/pa")
         heat_precip_T0K_DFT = (eDFT - d["Mg"]*ace.fDFT_dilute_mg - d["Si"]*ace.fDFT_dilute_si - d["Al"]*ace.fDFT_dilute_al)/nat
         if ace.verbose:
             show_energy_diff_DFT_NN(frame,eDFT,e,text,units="eV")
@@ -1619,20 +1619,21 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
             print(my.printred("DFT: divide everything by       "+str(nat)+" to get to the DFT formation energy of "+str(heat_precip_T0K_DFT)+" eV"))
 
         # write DFT@DFT
-        print('appending to',ace.written_summary[0])
+        if ace.verbose:
+            print('appending to',ace.written_summary[0])
         f=open(ace.written_summary[0], "a+")
         f.write(str(conz)+"   "+str(heat_precip_T0K_DFT)+" "+text.replace(" ", "_")+"\n")
         f.close()
 
     # write NN@DFT
     energy_NN_cell_unrelaxed_or_DFTrelaxed = ace.ene_allfix(frame)
-    print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
+    #print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
     heat_precip_T0K_NN_unrelaxed  = (energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.eform_dilute_mg_ - d["Si"]*ace.eform_dilute_si_ - d["Al"]*ace.eform_dilute_al_)/nat
-    print('heat_precip_T0K_NN_unrelaxed',heat_precip_T0K_NN_unrelaxed)
-    print('appending to',ace.written_summary[1])
+    #print('heat_precip_T0K_NN_unrelaxed',heat_precip_T0K_NN_unrelaxed)
+    if ace.verbose:
+        print('appending to',ace.written_summary[1])
     f=open(ace.written_summary[1], "a+")
     f.write(str(conz)+"   "+str(heat_precip_T0K_NN_unrelaxed)+" "+text.replace(" ", "_")+"\n")
-
     # @ T=0K relax
     if atomrelax:   ace.ase_relax_atomic_positions_only(frame)
     if volumerelax: ace.ase_relax_cellshape_and_volume_only(frame)
@@ -1649,7 +1650,8 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         print(my.printred('NN ace.eform_dilute_mg_'),ace.eform_dilute_mg_)
         print(my.printred('NN ace.eform_dilute_si_'),ace.eform_dilute_si_)
     heat_precip_T0K         = (energy_NN_cell_NNrelaxed - d["Mg"]*ace.eform_dilute_mg_ - d["Si"]*ace.eform_dilute_si_ - d["Al"]*ace.eform_dilute_al_)/nat
-    print('appending to',ace.written_summary[2])
+    if ace.verbose:
+        print('appending to',ace.written_summary[2])
     f=open(ace.written_summary[2], "a+")
     f.write(str(conz)+"   "+str(heat_precip_T0K)+" "+text.replace(" ", "_")+"\n")
     f.close()
@@ -1885,44 +1887,46 @@ def test_Mg2Si(ace):
     return
 
 
-def test_beta2_bulk(ace):
-    print("######## test_beta2_bulk #############")
-    # "Mg9Si5" == beta' (beta prime)
-    # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
-    doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+def test_antisites(ace):
+    print("######## antisites #############")
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
-    doit = [ "Mg5Si6" ]
-    doit = [ "Mg9Si5" ]
     for i in doit:
-    	print("########",i,"############")
-        #path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
-	#if i == "Mg9Si5":
-    	#	path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
-        #frame = ase_read(path,format="runner")
-
-        if True:
-            if i in [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]:
-                path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
-                print('p1')
-            elif i in [ "Mg9Si5" ]:
-                path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data"
-                print('p2')
-            print('path',path)
-            frame = ase_read(path,":",format="runner")
-            print('type(frame)',type(frame))
-            frame = frame[-1] # DFT_relax
-
-        #print('frame:::!',frame)
-        #print('frame:::?',frame.symbols)
-        if True:
-            #get_formation_energy(ace,frame,i+" (unrelaxed    )",atomrelax=False,cellrelax=False,volumerelax=False)
+        path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_out_antisites"+i+".runner_calc__all_steps.input.data"
+        frames = ase_read(path,":",format="runner")
+        for frame in frames:
             hessematrix_try = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
             get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
             hessematrix_try = ace.savefolder+"h_"+i+"_at_NN_relaxed"
             get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=False,try_harmonic_readfile=hessematrix_try)
             ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
-            sys.exit('8009')
+    return
 
+def test_beta2_bulk(ace):
+    print("######## test_beta2_bulk #############")
+    # "Mg9Si5" == beta' (beta prime)
+    # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
+    doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    #doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    #doit = [ "Mg5Si6" ]
+    #doit = [ "Mg9Si5" ]
+    for i in doit:
+    	print("########",i,"############")
+        if i in [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]:
+            path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
+            print('p1')
+        elif i in [ "Mg9Si5" ]:
+            path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data"
+            #print('p2')
+        #print('path',path)
+        frame = ase_read(path,":",format="runner")
+        #print('type(frame)',type(frame))
+        frame = frame[-1] # DFT_relax
+        if True:
+            hessematrix_try = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
+            get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
+            hessematrix_try = ace.savefolder+"h_"+i+"_at_NN_relaxed"
+            get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=False,try_harmonic_readfile=hessematrix_try)
+            ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
     return
 
 
@@ -1985,6 +1989,7 @@ def test_formation_energies(ace):
 
     ##test_Mg9Si5_pos(ace)
     test_beta2_bulk(ace)
+    test_antisites(ace)
     ##test_betaprime_mg9si5_find_global_min(ace,eform_dilute_si, eform_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
     return
 
