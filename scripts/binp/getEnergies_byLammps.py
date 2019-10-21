@@ -1891,6 +1891,7 @@ def test_antisites(ace):
     print("######## antisites #############")
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
     for i in doit:
+        print('antisites based on',i)
         path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_out_antisites"+i+".runner_calc__all_steps.input.data"
         frames = ase_read(path,":",format="runner")
         for frame in frames:
@@ -1975,6 +1976,8 @@ def test_formation_energies(ace):
             ]
     for i in ace.written_summary:
         if os.path.isfile(i): os.remove(i)
+        print('saving to',i)
+
 
     print("########### get_dilute_si_mg_f #########################")
     get_dilute_si_mg_f(ace)
