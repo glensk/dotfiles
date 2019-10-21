@@ -4397,22 +4397,26 @@ class ase_calculate_ene( object ):
             atoms.set_calculator(asecalcLAMMPS)
         return
 
-    def ase_relax_atomic_positions_only(self,atoms,fmax=0.0001,verbose=False):
+    def ase_relax_atomic_positions_only(self,atoms,fmax=0.0001,verbose=False,output_to_screen=False):
         ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
         self.keep_alive = True
         self.get_calculator(atoms)
 
         if verbose:
-            print('relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
+            print('1: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
 
         logfile="-" # output to screen
         logfile="tmp" # output to file and not to screen
-        opt = LBFGS(atoms,logfile=logfile)
+        if output_to_screen == True:
+            logfile = '-'
+        #opt = LBFGS(atoms,logfile=logfile)
+        opt = FIRE(atoms,logfile=logfile,dt = 0.1)
+        #opt = BFGS(atoms,logfile=logfile)
         opt.run(fmax=fmax)
         if os.path.isfile("tmp"):
             os.remove("tmp")
         if verbose:
-            print('relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
+            print('2: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
         return
 
     def ase_relax_cellshape_and_volume_only(self,atoms,verbose=False):
@@ -5036,7 +5040,7 @@ def ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos):
             sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
     return
 
-def get_Mg5Si6_and_other_antisites():
+def get_Mg5Si6_and_other_antisites(ace):
     '''
     for Mg5Si6:
     replaces Mg -> Si and Si -> Mg  (22 configurations in Mg5Si6)
@@ -5076,6 +5080,7 @@ def get_Mg5Si6_and_other_antisites():
             if idx == 11:
                 print('now done')
                 continue
+            print('iname',iname,'idx',idx)
             for replace_idx in [0,1]:
                 frame_ = frame.copy()                  # get original frame
                 frame_rep_ = frame_rep.copy()                  # get original frame
@@ -5097,11 +5102,13 @@ def get_Mg5Si6_and_other_antisites():
 
                 #if idx == 3:
                 #    sys.exit()
-    ace.ase_relax_atomic_positions_only(frame)
-    ace.ase_relax_cellshape_and_volume_only(frame)
-    ace.ase_relax_atomic_positions_only(frame)
-    ace.ase_relax_cellshape_and_volume_only(frame)
-                ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
+                #ace.ase_relax_atomic_positions_only(frame_)
+                #ace.ase_relax_cellshape_and_volume_only(frame_)
+                print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax pos')
+                ace.ase_relax_atomic_positions_only(frame_rep_,verbose=True,output_to_screen=True)
+                print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax cellshape')
+                ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
+                #ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
                 ase_write("out_antisites_rep"+iname+".runner",frame_rep,format='runner',append=True)
                 struct_written += 1
     return

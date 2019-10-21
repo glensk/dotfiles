@@ -1952,6 +1952,8 @@ def load_diluete_pure_values():
 
 
 def test_formation_energies(ace):
+    my.get_Mg5Si6_and_other_antisites(ace)
+    sys.exit()
     print("########### test_formation_energies   #########################")
     ace.atTemp = 443
     print("########### get_basic_NN_energies_ace #########################")
