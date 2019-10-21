@@ -1890,23 +1890,27 @@ def test_beta2_bulk(ace):
     # "Mg9Si5" == beta' (beta prime)
     # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
     doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
-    #doit = [ "Mg5Si6" ]
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    doit = [ "Mg5Si6" ]
+    doit = [ "Mg9Si5" ]
     for i in doit:
-        print()
     	print("########",i,"############")
+        #path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
+	#if i == "Mg9Si5":
+    	#	path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
+        #frame = ase_read(path,format="runner")
 
-        path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
-	if i == "Mg9Si5":
-    		path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
-        frame = ase_read(path,format="runner")
-
-        if False:
-            pass
-            #path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
-            #print('path',path)
-            #frame = ase_read(path,":",format="runner")
-            #frame_DFT_relax = frame[-1]
+        if True:
+            if i in [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]:
+                path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
+                print('p1')
+            elif i in [ "Mg9Si5" ]:
+                path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data"
+                print('p2')
+            print('path',path)
+            frame = ase_read(path,":",format="runner")
+            print('type(frame)',type(frame))
+            frame = frame[-1] # DFT_relax
 
         #print('frame:::!',frame)
         #print('frame:::?',frame.symbols)
