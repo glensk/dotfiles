@@ -5053,24 +5053,43 @@ def get_Mg5Si6_and_other_antisites():
         path = scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+iname+'/aiida_exported_group_NN_relaxed_'+iname+"_n2p2_v2ag_calc__only_relaxed.input.data"
         print('path',path)
         frame = ase_read(path,format="runner")
+        print('fram.cell()')
+        print(frame.cell)
         for idx,i in enumerate(frame.positions):
             print('idx',idx,i,frame.get_chemical_symbols()[idx])
 
         print()
         print()
+        frame_rep = frame.repeat([1,3,2])
+        print('fram_rep.cell()')
+        print(frame_rep.cell)
+        for idx,i in enumerate(frame_rep.positions):
+            print('idx',idx,i,frame_rep.get_chemical_symbols()[idx])
+
         #chk = ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=["Al","Mg","Si"])
         #print('chk',chk)
         frame_ = frame.copy()
+        frame_rep_ = frame_rep.copy()
 
+        struct_written = 0
         for idx,i in enumerate(frame_.positions):  # go through every position
+            if idx == 11:
+                print('now done')
+                continue
             for replace_idx in [0,1]:
                 frame_ = frame.copy()                  # get original frame
+                frame_rep_ = frame_rep.copy()                  # get original frame
+
                 curr_ele = frame_.get_chemical_symbols()[idx]
+                curr_ele_rep = frame_rep.get_chemical_symbols()[idx]
+                if curr_ele != curr_ele_rep:
+                    sys.exit('something went wrong in repetition')
                 if curr_ele == "Mg": replace = [ "Al", "Si"]
                 if curr_ele == "Si": replace = [ "Al", "Mg"]
                 if curr_ele == "Al": replace = [ "Si", "Mg"]
                 replace_now = replace[replace_idx]
                 frame_[idx].symbol = replace_now
+                frame_rep_[idx].symbol = replace_now
 
                 #for jdx,j in enumerate(frame_.positions):
                 #    print(idx,'-->jdx',jdx,j,frame_.get_chemical_symbols()[jdx])
@@ -5078,7 +5097,13 @@ def get_Mg5Si6_and_other_antisites():
 
                 #if idx == 3:
                 #    sys.exit()
+    ace.ase_relax_atomic_positions_only(frame)
+    ace.ase_relax_cellshape_and_volume_only(frame)
+    ace.ase_relax_atomic_positions_only(frame)
+    ace.ase_relax_cellshape_and_volume_only(frame)
                 ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
+                ase_write("out_antisites_rep"+iname+".runner",frame_rep,format='runner',append=True)
+                struct_written += 1
     return
 
 def ase_repeat_structure(atoms,repeat):
