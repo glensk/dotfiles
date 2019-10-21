@@ -857,6 +857,7 @@ def prepare_input_file(file_orig,file_comp,args):
     if type(args.element_mass)  not in [np.float64,float]: sys.exit('\nERROR: args.element_mass is wrongly defined')
     #print('kka',type(args.alat_mor))
     if type(args.alat)          not in [np.float64,float]: sys.exit('\nERROR: args.alat is wrongly defined !!'+str(type(args.alat)))
+    print('aa',args.alat_mor,type(args.alat_mor))
     if type(args.alat_mor)      not in [np.float64,float]: sys.exit('\nERROR: args.alat_mor is wrongly defined')
     if type(args.a_mor)         not in [np.float64,float]: sys.exit('\nERROR: args.a_mor is wrongly defined')
     if type(args.D_mor)         not in [np.float64,float]: sys.exit('\nERROR: args.D_mor is wrongly defined')

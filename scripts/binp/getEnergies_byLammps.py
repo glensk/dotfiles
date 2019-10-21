@@ -1216,9 +1216,9 @@ def print_compare_ene_vs_DFT(text,pot_ene,DFT_ene="--",eos=False,f300=False,chec
     pot_ene_out = "%.4f" % round(pot_ene*conversion,4)
     #print('p',pot_ene_out,conversion,type(pot_ene_out),type(conversion))
     #print('p',pot_ene_out,conversion,"-->",pot_ene_out*conversion)
-    print(text.ljust(45)+":",
+    print(text.ljust(45)+": NN_ene_form:",
             str(pot_ene_out).ljust(9),
-            units.ljust(3)+" DFT:",
+            units.ljust(3)+" DFT_ene_form:",
             str(DFT_ene_out).ljust(9),
             "diff:",
             str(diff).ljust(5),
@@ -1590,7 +1590,10 @@ def get_dilute_si_mg_f(ace):
 
 def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=False,try_harmonic_readfile=False,debug=False):
     ''' Bill sais that T=443 is the relevant temperature '''
-    d = my.ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=["Al","Mg","Si"])
+    energy_NN_cell_unrelaxed_or_DFTrelaxed = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
+    print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
+
+    d = my.ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=ace.pot.elements)
     #print('d',d)
     conz1 = d["Mg"]
     conz2 = (d["Mg"]+d["Si"])
@@ -1602,8 +1605,8 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     eDFT = ""
     if DFT_ene != False:
         eDFT   		= my.ase_enepot(frame  ,units=ace.units)
-        e      		= ace.ene(frame)
-        ediff_ev  	= e - eDFT
+        print('energy_DFT',eDFT)
+        ediff_ev  	= energy_NN_cell_unrelaxed_or_DFTrelaxed - eDFT
         ediff_mev_pa 	= ediff_ev*1000./nat
         print("##",text,'e - eDFT:',round(ediff_mev_pa,3),"meV/pa")
         heat_precip_T0K_DFT = (eDFT - d["Mg"]*ace.fDFT_dilute_mg - d["Si"]*ace.fDFT_dilute_si - d["Al"]*ace.fDFT_dilute_al)/nat
@@ -1613,30 +1616,40 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
             print(my.printred("DFT")+" energy eform_dilute_mg (eV)",ace.fDFT_dilute_mg,"times",d["Mg"])
             print(my.printred("DFT")+" energy eform_dilute_si (eV)",ace.fDFT_dilute_si,"times",d["Si"])
             print(my.printred("DFT: divide everything by       "+str(nat)+" to get to the DFT formation energy of "+str(heat_precip_T0K_DFT)+" eV"))
-        if "@DFT" in text:
-            print('writing to',ace.written_summary[0])
-            f=open(ace.written_summary[0], "a+")
-            f.write(str(conz)+"   "+str(heat_precip_T0K_DFT)+" "+text.replace(" ", "_")+"\n")
-            f.close()
-	else:
-            print('no @DFT in text')
 
-    # @ T=0K
-    if atomrelax: ace.ase_relax_atomic_positions_only(frame)
+        # write DFT@DFT
+        print('appending to',ace.written_summary[0])
+        f=open(ace.written_summary[0], "a+")
+        f.write(str(conz)+"   "+str(heat_precip_T0K_DFT)+" "+text.replace(" ", "_")+"\n")
+        f.close()
+
+    # write NN@DFT
+    heat_precip_T0K_NN_unrelaxed  = (energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.eform_dilute_mg_ - d["Si"]*ace.eform_dilute_si_ - d["Al"]*ace.eform_dilute_al_)/nat
+    print('appending to',ace.written_summary[1])
+    f=open(ace.written_summary[1], "a+")
+    f.write(str(conz)+"   "+str(heat_precip_T0K_NN_unrelaxed)+" "+text.replace(" ", "_")+"\n")
+    f.close()
+
+    # @ T=0K relax
+    if atomrelax:   ace.ase_relax_atomic_positions_only(frame)
     if volumerelax: ace.ase_relax_cellshape_and_volume_only(frame)
-    if atomrelax: ace.ase_relax_atomic_positions_only(frame)
+    if atomrelax:   ace.ase_relax_atomic_positions_only(frame)
     if volumerelax: ace.ase_relax_cellshape_and_volume_only(frame)
     check = ace.check_frame('',frame=frame,verbose=False)
     #print('11 atomrelax',atomrelax,'volumerelax',volumerelax,"check",check)
     vinet = ace.get_murn(frame,verbose=False,return_minimum_volume_frame = volumerelax, atomrelax=atomrelax,write_energies=False,printminimal=False)
-    e = ace.ene(frame) #,atomrelax=atomrelax,cellrelax=cellrelax)
+    energy_NN_cell_NNrelaxed = ace.ene(frame) #,atomrelax=atomrelax,cellrelax=cellrelax)
     #print('d mg:',d["Mg"],'d si:',d["Si"],'d al:',d["Al"])
     #heat_precip_T0K         = (e - d["Mg"]*ace.eform_dilute_mg - d["Si"]*ace.eform_dilute_si - d["Al"]*ace.eform_dilute_al)/nat
     if ace.verbose:
-        print('e                   ',e)
+        print('energy_NN_cell_NNrelaxed',energy_NN_cell_NNrelaxed)
         print(my.printred('NN ace.eform_dilute_mg_'),ace.eform_dilute_mg_)
         print(my.printred('NN ace.eform_dilute_si_'),ace.eform_dilute_si_)
-    heat_precip_T0K         = (e - d["Mg"]*ace.eform_dilute_mg_ - d["Si"]*ace.eform_dilute_si_ - d["Al"]*ace.eform_dilute_al_)/nat
+    heat_precip_T0K         = (energy_NN_cell_NNrelaxed - d["Mg"]*ace.eform_dilute_mg_ - d["Si"]*ace.eform_dilute_si_ - d["Al"]*ace.eform_dilute_al_)/nat
+    print('appending to',ace.written_summary[2])
+    f=open(ace.written_summary[2], "a+")
+    f.write(str(conz)+"   "+str(heat_precip_T0K)+" "+text.replace(" ", "_")+"\n")
+    f.close()
 
     check = ace.check_frame('',frame=frame,verbose=False)
     #print('22 atomrelax',atomrelax,'volumerelax',volumerelax,"check",check)
@@ -1647,27 +1660,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     #    print("NN energy eform_dilute_mg (eV)",ace.eform_dilute_mg,"times",d["Mg"])
     #    print("NN energy eform_dilute_si (eV)",ace.eform_dilute_si,"times",d["Si"])
     #    print("divide everything by       ",nat,"to get to the formation energy @T=0K:",heat_precip_T0K_DFT)
-    if "NN@DFT" in text:
-        #if ace.verbose:
-        #    print("free_ene_cell_"+text[:6]+".dat")
-        #np.savetxt("free_ene_cell_"+text[:6]+".dat",free_ene.ene_cell_only_ev_T0shifted)
-        #np.savetxt("free_ene_atom_"+text[:6]+".dat",free_ene.ene_atom_only_ev_T0shifted)
-        #np.savetxt("free_ene_atom_"+text[:6]+"_only.dat",free_ene.ene_atom_only_ev)
-        print('writing to',ace.written_summary[1])
-        f=open(ace.written_summary[1], "a+")
-        f.write(str(conz)+"   "+str(heat_precip_T0K)+" "+text.replace(" ", "_")+"\n")
-        f.close()
 
-    if "NN@NN" in text:
-        #if ace.verbose:
-        #    print("free_ene_cell_"+text[:6]+".dat")
-        #np.savetxt("free_ene_cell_"+text[:6]+".dat",free_ene.ene_cell_only_ev_T0shifted)
-        #np.savetxt("free_ene_atom_"+text[:6]+".dat",free_ene.ene_atom_only_ev_T0shifted)
-        #np.savetxt("free_ene_atom_"+text[:6]+"_only.dat",free_ene.ene_atom_only_ev)
-        print('writing to',ace.written_summary[2])
-        f=open(ace.written_summary[2], "a+")
-        f.write(str(conz)+"   "+str(heat_precip_T0K)+" "+text.replace(" ", "_")+"\n")
-        f.close()
 
     if False:  # if T>0K
         # @ ace.atTemp K
@@ -1916,12 +1909,15 @@ def test_beta2_bulk(ace):
 
         print('frame:::!',frame)
         print('frame:::?',frame.symbols)
-        if False:
+        if True:
             #get_formation_energy(ace,frame,i+" (unrelaxed    )",atomrelax=False,cellrelax=False,volumerelax=False)
             try_read = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
             get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
+
+            get_formation_energy(ace,frame,i+" (NN@DFT fully relaxed)", atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=try_read)
+
             try_read = ace.savefolder+"h_"+i+"_at_NN_relaxed"
-            get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)",atomrelax=True,cellrelax=True,volumerelax=True,DFT_ene=False,try_harmonic_readfile=try_read)
+            get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=False,try_harmonic_readfile=try_read)
             ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
 
     return

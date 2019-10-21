@@ -723,6 +723,8 @@ class mypot( object ):
                 if os.path.isfile(inputnn):
                     self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn)
 
+                print('self.elements',self.elements)
+                print('self.atom_energy',self.atom_energy)
                 self.atom_types_ = {}
                 self.atom_masses = {}
                 for i in self.elements:

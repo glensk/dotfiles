@@ -1204,7 +1204,18 @@ def MP(r,a,b,c,d,e):
     #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
     # rcut = 0.84
     # b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
-    return a + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+    return a* + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+
+
+def MPam(r,a,b,c,d,e):
+    ''' a is a simple offset
+        Michael chose (when using r in relative coordinates) a and b in such a way as to
+        make Michael_polynomial_derivative(r,b,c,d) = 0;
+     '''
+    #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
+    # rcut = 0.84
+    # b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
+    return a* + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
 
 def MPEnoB(r,a,c,d,e):
     ''' this is supposed to be the integral of the force, still to do'''
@@ -1224,8 +1235,8 @@ def MPnoB(r,a,c,d,e):
     b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
     return a + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
 
-def Michael_polynomial_for_morsevalues_positive(r,a,b,c,d,req):
-    return Michael_polynomial(r,a,b,c,d) + Michael_polynomial(req,a,b,c,d)
+def Michael_polynomial_for_morsevalues_positive(r,a,b,c,d):
+    return Michael_polynomial(r,a,b,c,d,e) - Michael_polynomial(req,a,b,c,d,e)
 
 def MPd(r,b,c,d,e):
     ''' r=0.84 == rcut
@@ -1233,11 +1244,6 @@ def MPd(r,b,c,d,e):
     zaehlt), die anderen zwei bestimmen sich aus der bedingung V'(rcut)=0 und
     V''(rcut)=0.
     '''
-    # V'(rcut=0.84) = MPd(rcut) == 0
-    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. - b/rcut**2. = 0
-    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. = b/rcut**2.
-    # (- 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3.)*rcut**2. = b
-    # (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut) = b
     return  - 4.*e/r**5. - 3.*d/r**4. - 2.*c/r**3. - b/r**2.
 
 def MPdnoB(r,c,d,e):
@@ -1261,12 +1267,23 @@ def MPdd(r,b,c,d,e):
     zaehlt), die anderen zwei bestimmen sich aus der bedingung V'(rcut)=0 und
     V''(rcut)=0.
     '''
+    return  20.*e/r**6. + 12.*d/r**5. + 6.*c/r**4. + 2.*b/r**3.
+
+def MPddnoB(r,c,d,e):
+    ''' r=0.84 == rcut
+    drei freie (wenn man die wahl des cutoffs nicht als freien parameter
+    zaehlt), die anderen zwei bestimmen sich aus der bedingung V'(rcut)=0 und
+    V''(rcut)=0.
+    '''
     # V''(rcut=0.84) = 0
     # 20.*e/rcut**6. + 12.*d/rcut**5. + 6.*c/rcut**4. + 2.*b/rcut**3. = 0.
     # 2.*b/rcut**3. = - 20.*e/rcut**6. - 12.*d/rcut**5. - 6.*c/rcut**4.
     # b = 0.5 (- 20.*e/rcut**6. - 12.*d/rcut**5. - 6.*c/rcut**4.)*rcut**3.
+    # b = - 10.*e/rcut**3. - 6.*d/rcut**2. - 3.*c/rcut
+    # --> b 2nd derivative 2 b 3rd derivative V'(rcut=0.84) = 0 = V''(rcut=0.84)
+    # -->  - 10.*e/rcut**3. - 6.*d/rcut**2. - 3.*c/rcut = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
     rcut = 0.84
-    b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)        # from first derivative
+    # b(e,d,c) or c(b,e,d)
     return  20.*e/r**6. + 12.*d/r**5. + 6.*c/r**4. + 2.*b/r**3.
 
 

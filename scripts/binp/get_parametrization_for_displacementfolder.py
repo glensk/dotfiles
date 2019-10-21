@@ -503,6 +503,10 @@ class get_all_disps():
             p_45_0_45   =    pos[idx_45_0_45]
             f_45_0_45   = forces[idx_45_0_45]
 
+            idx_0_45_45 = dosearch([0, round(self.sc-0.5,12),round(self.sc-0.5,12)],"idx_0_45_45",pos,self.alat)
+            p_0_45_45   =    pos[idx_0_45_45]
+            f_0_45_45   = forces[idx_0_45_45]
+
             idx_05_45_0 = dosearch([0.5,round(self.sc-0.5,12),0],"idx_05_45_0",pos,self.alat)
             p_05_45_0   =    pos[idx_05_45_0]
             f_05_45_0   = forces[idx_05_45_0]
@@ -520,6 +524,7 @@ class get_all_disps():
             p_0_05_05 = pos[idx_0_05_05]
             f_0_05_05 = forces[idx_0_05_05]
             self.force_0_05_05[idx] = f_0_05_05
+
 
             d_0_05_05_at0 = p_0_05_05-pos[0]
             d_0_05_05_at1 = p_0_05_05 - p_05_05_0
@@ -796,6 +801,120 @@ class get_all_disps():
                 print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
             print('this parametrization, even for T=0K displacements, is not optimal!, try to add attractive forces on 0_45_45')
 
+
+        if True:
+            print("###################################################")
+            print("# parametrize Morse from morse_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400.txt")
+            print("###################################################")
+            path = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/morse_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400.txt"
+            xymorse = np.loadtxt(path)
+            morsemodel = Model(hesse.Morse_derivative)
+            morsemodel_var = [ 'De','aa','re' ]
+            morsemodel.set_param_hint('re' ,value=1./np.sqrt(2.), vary=False)
+            morsemodel.set_param_hint('De' ,value=0.25)
+            morsemodel.set_param_hint('aa' ,value=1.5)
+            result = morsemodel.fit(xymorse[:,1], r=xymorse[:,0])
+            parameters_morse = []
+            for i in morsemodel_var:
+                coef = result.best_values.get(i)
+                print(i,":",coef)
+                parameters_morse.append(coef)
+            np.savetxt("xy"+add+"_morse.dat",np.array([xymorse[:,0],result.best_fit]).T)
+            print('saved',"xy"+add+"_morse.dat")
+
+            # now for unscaled positions
+            morsemodel.set_param_hint('re' ,value=self.alat/np.sqrt(2.), vary=False)
+            morsemodel.set_param_hint('De' ,value=0.25)
+            morsemodel.set_param_hint('aa' ,value=1.5)
+            result = morsemodel.fit(xymorse[:,1], r=xymorse[:,0]*self.alat)
+            parameters_morse = []
+            for i in morsemodel_var:
+                coef = result.best_values.get(i)
+                print("for positions in angstrom:",i,":",coef)
+                parameters_morse.append(coef)
+
+            # now for unscaled positions to obtain michaels parametrization
+            morsemodel = Model(hesse.Michael_polynomial_for_morsevalues_positive)
+            morsemodel_function_var     = [ 'a','b','c','d','e' ]
+
+        if True:
+            print("###################################################")
+            print("# parametrize michaels plot from Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400")
+            print("###################################################")
+            from lmfit import Model,minimize
+            path ="/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400.txt"
+            xy = np.loadtxt(path)
+            xmin = xy[:,0].min()
+            xmax = xy[:,0].max()
+            xred_dense = np.arange(xmin,xmax,0.001)
+            #print('xy')
+            #print(xy)
+            print(hesse.__file__)
+
+            ################## define the fitting function
+            fix_B = False
+            fix_michaeles_values = False
+            mmodel_function     = hesse.MP
+            mmodel_function_der = hesse.MPd
+            mmodel_key          = 'MP'
+            mmodel_function_var     = [ 'a','b','c','d','e' ]
+            mmodel_function_var_der = [ 'b','c','d','e' ]
+            add = "_byes"
+            if fix_B == True:
+                mmodel_function     = hesse.MPnoB
+                mmodel_function_der = hesse.MPdnoB
+                mmodel_key          = 'MPnoB'
+                mmodel_function_var     = [ 'a','c','d','e' ]
+                mmodel_function_var_der = [ 'c','d','e' ]
+                add = "_bfix"
+
+            mmodel = Model(mmodel_function)
+            for i in mmodel_function_var: mmodel.set_param_hint(i ,value=1) #, min=0.01, max=0.5)
+            if fix_michaeles_values:
+                mmodel.set_param_hint('c' ,value=-21.129154,vary=False) #,  min=1.0,  max=3.0)
+                mmodel.set_param_hint('d' ,value=19.455654,vary=False) #,  min=1.0,  max=y[:,0]3.0)
+                mmodel.set_param_hint('e' ,value=-5.814014,vary=False) #,  min=1.0,  max=y[:,0]3.0)
+
+            print('len(xy)',len(xy))
+            result = mmodel.fit(xy[:,1], r=xy[:,0])
+            parameters = []
+            parameters_der = []
+            print('Michaels Model for michaels curve from plot:')
+            for i in mmodel_function_var:
+                coef = result.best_values.get(i)
+                print(i,":",coef)
+                parameters.append(coef)
+            for i in mmodel_function_var_der:
+                coef = result.best_values.get(i)
+                #print(i,":",coef)
+                parameters_der.append(coef)
+            print('parameters    ',parameters)
+            print('parameters_der',parameters_der)
+            np.savetxt("xy"+add+"_michael_from_plot.dat",np.array([xy[:,0],result.best_fit]).T)
+            print('saved',"xy"+add+"_michael_from_plot.dat")
+            #a,b,c,d,e= 2.911,   2.91,  -22.591,  20.,     -5.878
+            #Michaels Model for michaels curve from plot: [  2.911   2.91  -22.591  20.     -5.878]
+            print('---------> r=0.71',mmodel_function(0.71,*parameters))
+            np.savetxt("xy"+add+"_michael_from_plot_dendse.dat",np.array([xred_dense,mmodel_function(xred_dense,*parameters)]).T)
+            np.savetxt("xy"+add+"_michael_from_plot_dendse_der.dat",np.array([xred_dense,mmodel_function_der(xred_dense,*parameters_der)]).T)
+
+        if True:
+            print("###################################################")
+            print("# parametrize michaels plot from Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400 getting michaels numbers")
+            print("###################################################")
+            mmm_func = hesse.MPam
+            mmodel = Model(mmm_func)
+            mmodel_function_var     = [ 'a','b','c','d','e' ]
+            for i in mmodel_function_var: mmodel.set_param_hint(i ,value=1) #, min=0.01, max=0.5)
+            result = mmodel.fit(xy[:,1], r=xy[:,0])
+            parameters_mp = []
+            for i in mmodel_function_var:
+                coef = result.best_values.get(i)
+                print(i,":",coef)
+                parameters_mp.append(coef)
+            np.savetxt("xy_MichaelsFIT.dat",np.array([xy[:,0],mmm_func(xy[:,0],*parameters_mp)]).T)
+
+
         print("#########################################################################")
         print("# fits on [0.5,-0.5,0.0]")
         print("#########################################################################")
@@ -807,6 +926,8 @@ class get_all_disps():
                 fm                                  = np.round(hesse.Morse_derivative(LA.norm(dd), *params),4)
                 forces_morse                        = hesse.getefvec(dd,params,pot = 'm')
                 print('idx',idx,i,"##""##",i[0],i[1],i[2],"##f",self.force_all[idx,idx_05_45_0],"##p",self.pos_all[idx,idx_05_45_0],self.pos_all[idx,0],dd,dist_norm,'for',fm,'ro',forces_morse)
+
+        print()
         print("#########################################################################")
         print("# fits ueber alle ersten nachbarn vom [0.0,0.0,0.0] atom")
         print("# first look at atoms in (001) plane")
@@ -829,33 +950,71 @@ class get_all_disps():
         #indexes_NN              = [ idx_05_05_0]
         #indexes_NN_forces_sign  = [ -1.       ]
 
-        #indexes_NN = [ idx_05_05_0, idx_45_45_0, idx_05_45_0, idx_0_05_05 ]
-        #indexes_NN_forces_sign  = [ -1.,         1          , 1          , 1 ]
+        # all atoms in the 001 plane
+        indexes_NN              = [ idx_05_05_0, idx_45_45_0, idx_05_45_0, idx_45_05_0, idx_0_05_05, idx_0_45_45 ]
+        indexes_NN_forces_sign  = [ -1.,         1          , 1          , 1          , 1          , 1]
         x = []
         y = []
+        ymo = []
+        ymi = []
         for idx_nn, indexname_nn in enumerate(indexes_NN):
             print()
             for disp_idx in np.arange(len(self.pos_all)):
-                D = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,indexname_nn]
+                D  = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,indexname_nn]
                 dist_norm     = np.around(LA.norm(D),5)
                 x += [LA.norm(D)]
-                y += [indexes_NN_forces_sign[idx_nn]*LA.norm(self.force_all[disp_idx,indexname_nn])]
-                fm            = np.round(hesse.Morse_derivative(LA.norm(D), *params),4)
-                Fm = hesse.getefvec(D,params,pot = 'm')[1]
                 Fv = self.force_all[disp_idx,indexname_nn]
-                fv = LA.norm(Fv)
-                Fr = Fv - Fm
+                fv = indexes_NN_forces_sign[idx_nn]*LA.norm(Fv)   # affected by sign
+                y += [fv]
+
+                #### use a particular model
+                fmo = hesse.Morse_derivative(LA.norm(D), *params)
+                Fmo = hesse.getefvec(D,params,pot = 'm')[1]
+                Fdmo = Fv - Fmo
+                fmieq  = mmodel_function(1/np.sqrt(2.),*parameters)
+                fmipd  = mmodel_function(dist_norm/self.alat,*parameters)
+                fmi = fmipd - fmieq
+                ymo += [fmo]
+                ymi += [fmi]
+                #print('parameters    ',parameters)
+                #print('parameters_der',parameters_der)
+                #print('mmodel_function',mmodel_function)  # MPnoB
+                #print('mmodel_key     ',mmodel_key)       # MPnoB
+                D0 = self.pos_all[0,0]-self.pos_all[0,indexname_nn]
+                Fmieq = hesse.getefvec(D0/self.alat,parameters,pot = mmodel_key,paramsder=parameters_der)[1]
+                Fmid  = hesse.getefvec(D/self.alat,parameters,pot = mmodel_key,paramsder=parameters_der)[1]
+                Fmi   = Fmid - Fmieq
+                Fdmi = Fv - (Fmid-Fmieq)
+                if disp_idx == 0 or disp_idx == 7:
+                    print(
+                        '|fmipd|:',str(np.round(fmipd,5)).ljust(8),
+                        '-|fmieq|:',str(np.round(fmieq,5)).ljust(8),
+                        'Fv:',str(Fv).ljust(22),
+                        'Fmieq:',str(Fmieq).ljust(22),
+                        'Fmid:',str(Fmid).ljust(22),
+                        'Fmi:',str(Fmi).ljust(22)
+                            )
                 print(
                         str(indexname_nn).ljust(3),
                         str(self.pos_all[disp_idx,indexname_nn]).ljust(19),
-                        '|d|',str(dist_norm).ljust(7),
-                        'D:',str(D).ljust(22),
+                        '|d|',str(np.round(dist_norm,4)).ljust(6),str(np.round(dist_norm/self.alat,4)).ljust(6),
+                        'D:',str(D).ljust(23),
+                        'D:',str(D/self.alat).ljust(23),
                         '||',
+                        '|fv!|',str(np.round(fv,5)).ljust(8),
+                        '|fmo|:',str(np.round(fmo,5)).ljust(8),
+                        '|fmi|:',str(np.round(fmi,5)).ljust(8),
+                        #'|fmipd|:',str(np.round(fmipd,5)).ljust(8),
+                        #'-|fmieq|:',str(np.round(fmieq,5)).ljust(8),
                         'Fv:',str(Fv).ljust(22),
-                        '|fv|',str(fv).ljust(22),
-                        '|fm|:',str(fm).ljust(7),
-                        'Fm:',str(Fm).ljust(22),
-                        'Fr:',str(Fr).ljust(22)
+                        'Fmo:',str(Fmo).ljust(22),
+                        #'Fmi:',str(Fmi).ljust(22),
+                        'Fdmo:',str(Fdmo).ljust(22),
+                        'Fdmi:',str(Fdmi).ljust(22),
+                        #'Fmieq:',str(Fmieq).ljust(22),
+                        #'-> r=0.71',np.round(fmp,5),
+                        #'r=|d|:',np.round(fmpd,5),
+                        #'fmi:',np.round(fmfmii,5)
                         )
         print(      print())
         x = np.array(x)
@@ -869,47 +1028,21 @@ class get_all_disps():
         if take_xrel == True:
             x = xrel
             add = "_xrel"
-        np.savetxt("xy.dat",np.array([x,y]).T)
+        np.savetxt("xy_from_vasp_plot"+add+".dat",np.array([x,y]).T)
+        np.savetxt("xy_from_mors"+add+".dat",np.array([x,ymo]).T)
+        np.savetxt("xy_from_mich"+add+".dat",np.array([x,ymi]).T)
+        #print(self.disp_vs_force)
+        np.savetxt("xy_from_VASP"+add+".dat",np.array([self.disp_vs_force[:,0]/self.alat,self.disp_vs_force[:,1]]).T)
+        print('written')
 
-        from lmfit import Model,minimize
-        xy = np.loadtxt("/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400.txt")
-        print(hesse.__file__)
-        mmodel = Model(hesse.Michael_polynomial)
-        mmodel.set_param_hint('a' ,value=1) #, min=0.01, max=0.5)
-        mmodel.set_param_hint('b' ,value=1) #,  min=1.0,  max=3.0)
-        mmodel.set_param_hint('c' ,value=1) #,  min=1.0,  max=3.0)
-        mmodel.set_param_hint('d' ,value=1) #,  min=1.0,  max=y[:,0]3.0)
-        mmodel.set_param_hint('e' ,value=1) #,  min=1.0,  max=y[:,0]3.0)
-        print('len(xy)',len(xy))
-        result = mmodel.fit(xy[:,1], r=xy[:,0])
-        print('result done')
-        print('Michaels Model for michaels curve from plot:',np.round([
-            result.best_values.get('a'),
-            result.best_values.get('b'),
-            result.best_values.get('c'),
-            result.best_values.get('d'),
-            result.best_values.get('e')
-            ],3))
-        np.savetxt("xy"+add+"_michael_from_plot.dat",np.array([xy[:,0],result.best_fit]).T)
-        print('saved',"xy"+add+"_michael_from_plot.dat")
-        sys.exit('88866666666666')
+
+
+        sys.exit()
         if True:
-            from lmfit import Model,minimize
-            print('alat',self.alat,'re (is fixed, will be 0):',self.alat/np.sqrt(2.))
-            morsemodel = Model(hesse.Morse_derivative)
-            morsemodel.set_param_hint('re' ,value=self.alat/np.sqrt(2.), vary=False)
-            if take_xrel == True:
-                morsemodel.set_param_hint('re' ,value=1./np.sqrt(2.), vary=False)
-            morsemodel.set_param_hint('De' ,value=0.25) #, min=0.01, max=0.5)
-            morsemodel.set_param_hint('aa' ,value=1.5) #,  min=1.0,  max=3.0)
-            result = morsemodel.fit(y, r=x)
-            print('vgl (only repulsive )',np.round([result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')],3))
-            print('result.best_fit',result.best_fit)
-            np.savetxt("xy_morse.dat",np.array([x,result.best_fit]).T)
-
-
-            #mmodel = Model(hesse.Michael_polynomial)
-            mmodel = Model(hesse.Michael_polynomial_for_morsevalues_positive)
+            print("###################################################")
+            print("# parametrize Michael_polynomial_for_morsevalues_positive (x oder xrel)")
+            print("###################################################")
+            mmodel = Model(hesse.MP_for_morsevalues_positive)
             mmodel.set_param_hint('req' ,value=self.alat/np.sqrt(2.), vary=False)
             if take_xrel == True:
                 mmodel.set_param_hint('req' ,value=1./np.sqrt(2.), vary=False)
@@ -917,27 +1050,28 @@ class get_all_disps():
             mmodel.set_param_hint('b' ,value=1) #,  min=1.0,  max=3.0)
             mmodel.set_param_hint('c' ,value=1) #,  min=1.0,  max=3.0)
             mmodel.set_param_hint('d' ,value=1) #,  min=1.0,  max=3.0)
+            mmodel.set_param_hint('e' ,value=1) #,  min=1.0,  max=3.0)
+            #mmodel.set_param_hint('req' ,value=1/np.sqrt(2.)) #,  min=1.0,  max=3.0)
             result = mmodel.fit(y, r=x)
             print('Michaels Model for polynomial positive',np.round([
                 result.best_values.get('a'),
                 result.best_values.get('b'),
                 result.best_values.get('c'),
                 result.best_values.get('d'),
+                result.best_values.get('e'),
                 result.best_values.get('req'),
                 ],3))
-            params = [ result.best_values.get('a'), result.best_values.get('b'), result.best_values.get('c'), result.best_values.get('d')]
-            print("forces with this model @eq:")
-            print('-->',result.best_values)
-            np.savetxt("xy_michael_pos.dat",np.array([x,result.best_fit]).T)
+            #print("forces with this model @eq:")
+            #print('-->',result.best_values)
+            np.savetxt("xy"+add+"_michael_for_polynomial_pos.dat",np.array([x,result.best_fit]).T)
             print('result.best_fit',result.best_fit)
-            #plt.plot(x, y, 'bo')
-            #plt.plot(x, result.init_fit, 'k--', label='initial fit')
-            #plt.plot(x, result.best_fit, 'r-', label='best fit')
-            #plt.legend(loc='best')
-            #plt.show()
 
 
-            mmodel = Model(hesse.Michael_polynomial)
+        if True:
+            print("###################################################")
+            print("# parametrize MP (x oder xrel)")
+            print("###################################################")
+            mmodel = Model(hesse.MP)
             mmodel.set_param_hint('req' ,value=self.alat/np.sqrt(2.), vary=False)
             if take_xrel == True:
                 mmodel.set_param_hint('req' ,value=1./np.sqrt(2.), vary=False)
@@ -945,14 +1079,16 @@ class get_all_disps():
             mmodel.set_param_hint('b' ,value=1) #,  min=1.0,  max=3.0)
             mmodel.set_param_hint('c' ,value=1) #,  min=1.0,  max=3.0)
             mmodel.set_param_hint('d' ,value=1) #,  min=1.0,  max=3.0)
+            mmodel.set_param_hint('e' ,value=1) #,  min=1.0,  max=3.0)
             result = mmodel.fit(y, r=x)
             print('Michaels Model for rel x',np.round([
                 result.best_values.get('a'),
                 result.best_values.get('b'),
                 result.best_values.get('c'),
-                result.best_values.get('d')
+                result.best_values.get('d'),
+                result.best_values.get('e')
                 ],3))
-            np.savetxt("xy_michael_norm.dat",np.array([x,result.best_fit]).T)
+            np.savetxt("xy"+add+"_michael_polynomial.dat",np.array([x,result.best_fit]).T)
 
 
         sys.exit('78786')

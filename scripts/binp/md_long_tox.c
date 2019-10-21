@@ -151,6 +151,10 @@ double fdiff_dft_la_av=0;
 double fdiff_dft_harm_av=0;
 double fdudl_dft_harm_av=0;
 
+double fstd_dft=0;
+double fstd_la=0;
+double fcov_dft_la=0;
+
 double forces_diffmax=0;
 
 double getaverage(double a, int T, double val)
@@ -918,35 +922,50 @@ void analyze_forces(int i,FILE *file_forces,FILE *file_forces_av,FILE *file_forc
 	    //printf("diffmax %.10f dx \%.10f\n",forces_diffmax,dx);
         //fprintf(fab,"%5.3f %5.3f %5.3f\n",dx,dy,dz);
         // write to file if necessary
-        fdiff_dft_la_av    = getaverage(fdiff_dft_la_av,iat3+j*3,dx*dx); // since <x> = 0 : (x-<x>) = x
+        fdiff_dft_la_av    = getaverage(fdiff_dft_la_av,  iat3+j*3+0,dx*dx); // since <x> = 0 : (x-<x>) = x
+        fdiff_dft_la_av    = getaverage(fdiff_dft_la_av,  iat3+j*3+1,dy*dy);
+        fdiff_dft_la_av    = getaverage(fdiff_dft_la_av,  iat3+j*3+2,dz*dz);
+
         fdiff_dft_harm_av  = getaverage(fdiff_dft_harm_av,iat3+j*3,ddx*ddx); // since <x> = 0 : (x-<x>) = x
+        fdiff_dft_harm_av  = getaverage(fdiff_dft_harm_av,iat3+j*3,ddy*ddy); // since <x> = 0 : (x-<x>) = x
+        fdiff_dft_harm_av  = getaverage(fdiff_dft_harm_av,iat3+j*3,ddz*ddz); // since <x> = 0 : (x-<x>) = x
+
+
+        fstd_dft       = getaverage(fstd_dft,     iat3+j*3,forcedft[j].x*forcedft[j].x);
+        fstd_dft       = getaverage(fstd_dft,     iat3+j*3,forcedft[j].y*forcedft[j].y);
+        fstd_dft       = getaverage(fstd_dft,     iat3+j*3,forcedft[j].z*forcedft[j].z);
+        fstd_la        = getaverage(fstd_la ,     iat3+j*3,forcelax*forcelax);
+        fstd_la        = getaverage(fstd_la ,     iat3+j*3,forcelay*forcelay);
+        fstd_la        = getaverage(fstd_la ,     iat3+j*3,forcelaz*forcelaz);
+        fcov_dft_la    = getaverage(fcov_dft_la,  iat3+j*3,forcedft[j].x*forcelax);
+        fcov_dft_la    = getaverage(fcov_dft_la,  iat3+j*3,forcedft[j].y*forcelay);
+        fcov_dft_la    = getaverage(fcov_dft_la,  iat3+j*3,forcedft[j].z*forcelaz);
+
         //printf("x i %d dx %.10f fdiff_dft_la_av %.10f
         //\n",iat3+j*3,dx,fdiff_dft_la_av);
 	    if (write_analyze_forces==1) {
 	        fprintf(file_forces_vs_forces_dft,"%5.4f  %5.4f\n",forcedft[j].x,forcelax);
-	        fprintf(file_forces   ,"%d  %5.5f\n",iat3+j*3,dx);
-	        fprintf(file_forces_av,"%d  %5.5f\n",iat3+j*3,sqrt(fdiff_dft_la_av));
-	    };
-
-        fdiff_dft_la_av    = getaverage(fdiff_dft_la_av,iat3+j*3+1,dy*dy);
-        fdiff_dft_harm_av  = getaverage(fdiff_dft_harm_av,iat3+j*3,ddy*ddy); // since <x> = 0 : (x-<x>) = x
-        //printf("y i %d dy %.10f fdiff_dft_la_av %.10f
-        //\n",iat3+j*3+1,dy,fdiff_dft_la_av);
-	    if (write_analyze_forces==1) {
 	        fprintf(file_forces_vs_forces_dft,"%5.4f  %5.4f\n",forcedft[j].y,forcelay);
-	        fprintf(file_forces   ,"%d  %5.5f\n",iat3+j*3+1,dy);
-	        fprintf(file_forces_av,"%d  %5.5f\n",iat3+j*3+1,sqrt(fdiff_dft_la_av));
-	    };
-
-        fdiff_dft_la_av    = getaverage(fdiff_dft_la_av,iat3+j*3+2,dz*dz);
-        fdiff_dft_harm_av  = getaverage(fdiff_dft_harm_av,iat3+j*3,ddz*ddz); // since <x> = 0 : (x-<x>) = x
-        //printf("z i %d dz %.10f fdiff_dft_la_av %.10f
-        //\n",iat3+j*3+2,dz,fdiff_dft_la_av);
-	    if (write_analyze_forces==1) {
 	        fprintf(file_forces_vs_forces_dft,"%5.4f  %5.4f\n",forcedft[j].z,forcelaz);
+
+	        fprintf(file_forces   ,"%d  %5.5f\n",iat3+j*3+0,dx);
+	        fprintf(file_forces   ,"%d  %5.5f\n",iat3+j*3+1,dy);
 	        fprintf(file_forces   ,"%d  %5.5f\n",iat3+j*3+2,dz);
+
+	        fprintf(file_forces_av,"%d  %5.5f\n",iat3+j*3+0,sqrt(fdiff_dft_la_av));
+	        fprintf(file_forces_av,"%d  %5.5f\n",iat3+j*3+1,sqrt(fdiff_dft_la_av));
 	        fprintf(file_forces_av,"%d  %5.5f\n",iat3+j*3+2,sqrt(fdiff_dft_la_av));
 	    };
+
+        //printf("y i %d dy %.10f fdiff_dft_la_av %.10f
+        //\n",iat3+j*3+1,dy,fdiff_dft_la_av);
+	    //if (write_analyze_forces==1) {
+	    //};
+
+        //printf("z i %d dz %.10f fdiff_dft_la_av %.10f
+        //\n",iat3+j*3+2,dz,fdiff_dft_la_av);
+	    //if (write_analyze_forces==1) {
+	    //};
 	}
 	//exit(1);
 }
@@ -1569,8 +1588,9 @@ void read_hessematrix(double** hessemat,int read_hesse,const char *filename_in_h
     }
 }
 
-
+//////////////////////////////
 // related to la
+//////////////////////////////
 void calculate_forces_energy_la(double dt,int verbose) {
     // dies funktioniert zur zeit nur wenn interne coordinated von der init(T)
     // genutzt werden und nicht bei readpos generell (was es aber soll!)
@@ -1608,7 +1628,7 @@ void calculate_forces_energy_la(double dt,int verbose) {
         // Morse' == force == 2.*De*aa*dum*(1.-dum)
 		dum=exp(-a_par*(r/d0*r0_eq_morse-r0_eq_morse));  // part = e^(-a(r-re)) == dum
 		dumm1=dum-1.;
-		f=(2.*D_par*a_par)*dumm1*dum;               // dass soll der andere teil vom morse sein, check it!
+		f=(2.*D_par*a_par)*dumm1*dum;               // das ist die erste ableitung (also die Kraft)
         // In [2]: def Morseder(r,De,aa,re):
         //    ...:     return 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
         // In [1]: def Morse(r,De,aa,re):
@@ -2259,22 +2279,6 @@ int main(int argc,char *argv[]){
     int ii=0;
     int zeitschritte,l;
     clock_t start,end;
-    //FILE *file_out_positions;
-    //FILE *file_out_temp;
-    //FILE *file_out_temp_av;
-    //FILE *file_out_dudl;
-    //FILE *file_out_dudl_av;
-    //FILE *file_forces;
-    //FILE *file_forces_av;
-    //FILE *file_forces_vs_forces_dft;
-    //FILE *file_out_check_dist_xyz;
-    //FILE *file_out_check_dist_r;
-    //FILE *file_out_check_dist_nn;
-    //FILE *file_out_check_dist_nn_proj;
-    //FILE *file_out_prl15_2a;
-    //FILE *file_out_prl15_2au;
-    //FILE *file_in_positions;
-    //FILE *file_in_hesse;
 
     //FILE *file_out_check_dist_fcheck;
     double T,dt,a,b,c,rr;
@@ -2413,7 +2417,7 @@ int main(int argc,char *argv[]){
 	    if (write_analyze_forces==1) {
 	        file_forces              =(FILE *)fopen("out_forcesdiff.dat","w");
 	        file_forces_av           =(FILE *)fopen("out_forcesstd.dat","w");
-	        file_forces_vs_forces_dft=(FILE *)fopen("out_forces_vs_dft.dat","w");
+	        file_forces_vs_forces_dft=(FILE *)fopen("out_forces_vs_dft_prl2015_Fig3b.dat","w");
             write_forces_head(file_forces,file_forces_av);
             write_analyze_forces_vs_dft_head(file_forces_vs_forces_dft);
         };
@@ -2526,6 +2530,9 @@ int main(int argc,char *argv[]){
         //printf("Forces std <DFT-H>   : %6.3f (eV/A) delta angle degree: \n",sqrt(fdudl_dft_harm_av*1000.));
         printf("Forces std <DFT-H>   : %6.5f (eV/A)\n",sqrt(fdiff_dft_harm_av));
         printf("Forces std <DFT-LA>  : %6.5f (eV/A)\n",sqrt(fdiff_dft_la_av));
+        printf("Forces std <DFT>     : %6.5f (eV/A) (this inly considers DFT forces)\n",sqrt(fstd_dft));
+        printf("Forces std <LA>      : %6.5f (eV/A) (this only considers LA  forces)\n",sqrt(fstd_la));
+        printf("pearson correlation  : %6.5f (between LA and DFT)\n",fcov_dft_la/(sqrt(fstd_dft)*sqrt(fstd_la)));
         printf("\n");
         printf("Energy dudl (DFT-H)  : %6.4f meV/atom (works in general )\n",dudl_dft_harm_av);
         printf("Energy dudl (DFT-LA) : %6.4f meV/atom (works in general lon and tox)\n",dudl_dft_la_av);
@@ -2537,17 +2544,7 @@ int main(int argc,char *argv[]){
 
         if (write_analyze==1){
             fclose(file_forces_vs_forces_dft);
-            //fclose(file_out_check_dist_xyz);
-            //fclose(file_out_check_dist_r);
-            //fclose(file_out_check_dist_nn);
-            //fclose(file_out_check_dist_nn_proj);
-            //fclose(file_out_new);
-            //fclose(file_out_prl15_2a);
-            //fclose(file_out_prl15_2au);
         };
-	    //fclose(file_out_check_dist_fcheck);
-	    //fclose(file_out_temp);
-	    //fclose(file_out_temp_av);
 	    fclose(file_out_dudl);
 	    fclose(file_out_dudl_av);
 	    if (write_analyze_forces==1) {
@@ -2642,7 +2639,7 @@ int main(int argc,char *argv[]){
                 if (i%l==l-1) {write_positions_tofile(file_out_positions,write_positions_rel);};}
 
             if (write_analyze==1) {
-                write_analyze_positions(i);//,file_out_check_dist_xyz,file_out_check_dist_r,file_out_check_dist_nn,file_out_check_dist_nn_proj,file_out_prl15_2a,file_out_prl15_2au);
+                write_analyze_positions(i);
                 };
 
 
