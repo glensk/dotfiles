@@ -1903,6 +1903,8 @@ def test_beta2_bulk(ace):
         #frame = ase_read(path+"runner.data",format="runner")
 
         path = my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
+        path = os.environ['potentials'] #my.scripts()+'/tests/Al-Mg-Si/Beta2-bulk/'+i+'/aiida_exported_group_NN_relaxed_'+i+"_n2p2_v2ag_calc__only_relaxed.input.data"
+
 	if i == "Mg9Si5":
     		path = my.scripts()+'/tests/Al-Mg-Si/Mg9Si5_beta_prime/exported_from_aiida/aiida_exported_group_BetaPrime_vc-relaxed__only_relaxed.input.data'
         frame = ase_read(path,format="runner")
@@ -1930,7 +1932,9 @@ def load_diluete_pure_values():
 
 def test_formation_energies(ace):
     print('>> test_formation_energies')
-
+    path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
+    print('path',path)
+    sys.exit()
     ace.atTemp = 443
 
     print("########### get_basic_NN_energies_ace #########################")
