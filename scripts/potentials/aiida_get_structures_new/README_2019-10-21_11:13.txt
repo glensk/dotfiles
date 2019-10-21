@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: 532d088454605bd89432b918d7976db87e1fbeb9
+
+aiida_export_group_to_runner.py -gn mg9si5_stable_phonons_v2_atomrelax_cellrelax_minimahopping.runner.group_calc
