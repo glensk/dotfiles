@@ -5079,7 +5079,7 @@ def get_Mg5Si6_and_other_antisites(ace):
         for idx,i in enumerate(frame_.positions):  # go through every position
             if idx == 11:
                 print('now done')
-                continue
+                break
             print('iname',iname,'idx',idx)
             for replace_idx in [0,1]:
                 frame_ = frame.copy()                  # get original frame
@@ -5105,9 +5105,9 @@ def get_Mg5Si6_and_other_antisites(ace):
                 #ace.ase_relax_atomic_positions_only(frame_)
                 #ace.ase_relax_cellshape_and_volume_only(frame_)
                 print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax pos')
-                ace.ase_relax_atomic_positions_only(frame_rep_,verbose=True,output_to_screen=True)
+                #ace.ase_relax_atomic_positions_only(frame_rep_,verbose=True,output_to_screen=True)
                 print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax cellshape')
-                ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
+                #ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
                 #ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
                 ase_write("out_antisites_rep"+iname+".runner",frame_rep,format='runner',append=True)
                 struct_written += 1
