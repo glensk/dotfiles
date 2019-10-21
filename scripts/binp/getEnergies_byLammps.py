@@ -1591,7 +1591,7 @@ def get_dilute_si_mg_f(ace):
 def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=False,try_harmonic_readfile=False,debug=False):
     ''' Bill sais that T=443 is the relevant temperature '''
     energy_NN_cell_unrelaxed_or_DFTrelaxed = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
-    #print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
+    print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
 
     d = my.ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=ace.pot.elements)
     #print('d',d)
@@ -1889,8 +1889,18 @@ def test_Mg2Si(ace):
 
 def test_antisites(ace):
     print("######## antisites #############")
+
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    doit = [ "Mg5Al2Si4" ]
     for i in doit:
+        # where to save the formation energies
+        wsp = ace.savefolder+"summary_formations_antisites_"+i+"_"
+        ace.written_summary = [ wsp+"DFT_T0.dat", wsp+"NNatDFT_T0.dat",wsp+"NN_T0.dat" ]
+        for wsp_ in ace.written_summary:
+            if os.path.isfile(wsp_): os.remove(wsp_)
+            print('saving to',wsp_)
+
+        # get the formation energies
         print('antisites based on',i)
         path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_out_antisites"+i+".runner_calc__all_steps.input.data"
         frames = ase_read(path,":",format="runner")
@@ -1899,11 +1909,16 @@ def test_antisites(ace):
             get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
             hessematrix_try = ace.savefolder+"h_"+i+"_at_NN_relaxed"
             get_formation_energy(ace,frame,i+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=False,try_harmonic_readfile=hessematrix_try)
-            ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
+            #ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
     return
 
 def test_beta2_bulk(ace):
     print("######## test_beta2_bulk #############")
+    wsp = ace.savefolder+"summary_formations_beta_"
+    ace.written_summary = [ wsp+"DFT_T0.dat", wsp+"NNatDFT_T0.dat",wsp+"NN_T0.dat" ]
+    for i in ace.written_summary:
+        if os.path.isfile(i): os.remove(i)
+
     # "Mg9Si5" == beta' (beta prime)
     # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
     doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
@@ -1914,10 +1929,8 @@ def test_beta2_bulk(ace):
     	print("########",i,"############")
         if i in [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]:
             path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
-            print('p1')
         elif i in [ "Mg9Si5" ]:
             path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data"
-            #print('p2')
         #print('path',path)
         frame = ase_read(path,":",format="runner")
         #print('type(frame)',type(frame))
@@ -1969,14 +1982,7 @@ def test_formation_energies(ace):
     ace.atTemp = 443
     print("########### get_basic_NN_energies_ace #########################")
     get_basic_NN_energies_ace(ace)
-    ace.written_summary = [
-            ace.savefolder+"summary_formations_DFT_T0.dat",
-            ace.savefolder+"summary_formations_NNatDFT_T0.dat",
-            ace.savefolder+"summary_formations_NN_T0.dat"
-            ]
-    for i in ace.written_summary:
-        if os.path.isfile(i): os.remove(i)
-        print('saving to',i)
+
 
 
     print("########### get_dilute_si_mg_f #########################")
@@ -1991,7 +1997,7 @@ def test_formation_energies(ace):
     #test_Mg9Si5(ace)
 
     ##test_Mg9Si5_pos(ace)
-    test_beta2_bulk(ace)
+    #test_beta2_bulk(ace)
     test_antisites(ace)
     ##test_betaprime_mg9si5_find_global_min(ace,eform_dilute_si, eform_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
     return
