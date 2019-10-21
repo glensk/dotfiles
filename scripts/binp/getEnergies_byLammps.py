@@ -1919,6 +1919,7 @@ def test_beta2_bulk(ace):
     ace.written_summary = [ wsp+"DFT_T0.dat", wsp+"NNatDFT_T0.dat",wsp+"NN_T0.dat" ]
     for i in ace.written_summary:
         if os.path.isfile(i): os.remove(i)
+        print('writing',i)
 
     # "Mg9Si5" == beta' (beta prime)
     # "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" are the three beta'' (beta double prime)
@@ -1952,8 +1953,8 @@ def load_diluete_pure_values():
 
 
 def test_formation_energies(ace):
-    my.get_Mg5Si6_and_other_antisites(ace)
-    sys.exit()
+    #my.get_Mg5Si6_and_other_antisites(ace)
+    #sys.exit()
     print("########### test_formation_energies   #########################")
     ace.atTemp = 443
     print("########### get_basic_NN_energies_ace #########################")
@@ -1974,7 +1975,7 @@ def test_formation_energies(ace):
 
     ##test_Mg9Si5_pos(ace)
     test_beta2_bulk(ace)
-    test_antisites(ace)
+    #test_antisites(ace)
     ##test_betaprime_mg9si5_find_global_min(ace,eform_dilute_si, eform_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
     return
 
