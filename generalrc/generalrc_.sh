@@ -205,6 +205,7 @@ source $dotfiles/$currentshell/$currentshell\_set
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"
 
 ########################## make sure that nvim is istalled
+#if [ "`command -v curl`" = "" ] && pip install --upgrade --user curl
 [ ! -e "$MYVIM" ] && echo "MYVIM is not installed!" && install_git.py -i nvim
 
 ########################## make sure that nvim has xclip/pbcopy
