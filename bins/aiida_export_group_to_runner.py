@@ -126,7 +126,8 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
     print('volume:',ase_structure.get_volume()/ase_structure.get_number_of_atoms())
     print('volume:',ase_structure.get_volume())
     print('stress:',stress)
-    print('c44 ST:',stress[2][1]*1000./2.,"GPa")
+    if type(stress) is not bool:
+        print('c44 ST:',stress[2][1]*1000./2.,"GPa")
     strain = cell[0,1]/cell[0,0]*2.
     e0_meV_pa = -537462.638416432193
     e0_eV = e0_meV_pa/1000.*4.  # from EVinet

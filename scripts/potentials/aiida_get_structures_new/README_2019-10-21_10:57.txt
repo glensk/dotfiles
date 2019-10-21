@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: f561ee0f77fad3037a798ff18e5279641d98abaa
+
+aiida_export_group_to_runner.py -gn NN_relaxed_Mg5Si6_n2p2_v2ag_calc
