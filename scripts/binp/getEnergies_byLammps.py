@@ -1933,8 +1933,8 @@ def load_diluete_pure_values():
 def test_formation_energies(ace):
     print('>> test_formation_energies')
     path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
-    print('path',path)
-    sys.exit()
+    doit = [ "Mg9Si5", "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
+    for i in doit:
     ace.atTemp = 443
 
     print("########### get_basic_NN_energies_ace #########################")
