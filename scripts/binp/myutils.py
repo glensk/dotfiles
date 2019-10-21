@@ -4488,10 +4488,8 @@ class ase_calculate_ene( object ):
         atoms_murn_loop = atoms_murn.copy()
         if verbose:
             print('               vol [Ang^2/at] ene [??]:')
-        print()
         for idx,i in enumerate(dvol_rel):
             if verbose > 2:
-                print()
                 print('000 idx:',idx,'i:',i)
             atoms_murn_loop.set_cell(cell_ref*i,scale_atoms=True)
             if verbose > 2:
@@ -4540,7 +4538,6 @@ class ase_calculate_ene( object ):
             if verbose:
                 stress = atoms_murn_loop.get_stress()[:3]
                 print('i',str(i).ljust(5),'vol/nat',str(round(vol/nat,7)).ljust(10),'ene/nat',str(ene/nat).ljust(19),stress)
-        print()
 
 
         if verbose: self.check_frame('get_murn 3 atfer loop           ',frame=atoms_murn)
