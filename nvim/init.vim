@@ -1,11 +1,35 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
-" get/install all plugins if some/all do not exist
+" get/install (for vim) all plugins if some/all do not exist
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 if empty(glob('$HOME/sources/nvim/autoload/plug.vim'))
   silent !curl -fLo $HOME/sources/nvim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+
+if empty(glob('$HOME/sources/nvim/autoload/plug.vim'))
+  " in case curl is not available
+  silent !mkdir -p $HOME/sources/nvim/autoload
+  silent !cd $HOME/sources/nvim/autoload && wget https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" get/install (for nvim==NeoVim) all plugins if some/all do not exist
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if empty(glob('$HOME/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo $HOME/.local/share/nvim/site/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+if empty(glob('$HOME/.local/share/nvim/site/autoload/plug.vim'))
+  " in case curl is not available
+  silent !mkdir -p $HOME/.local/share/nvim/site/autoload 
+  silent !cd $HOME/.local/share/nvim/site/autoload && wget https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim cheatsheat 
