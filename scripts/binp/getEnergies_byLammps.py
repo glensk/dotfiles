@@ -54,7 +54,7 @@ def help(p = None):
     p.add_argument('--ipi'    ,'-ipi'           ,action='store_true',help='Do the calculations externally by ipi-lammps and not through ase interface.')
 
     p.add_argument('--test_this_script','-t'    ,action='store_true',help='check if getEnergies_byLammps.py is working correctly.')
-    p.add_argument('--test_formation_energies','-tf',  action='store_true',help='Assess formation energies of particular test structures.')
+    p.add_argument('--test_formation_energies','-fe',  action='store_true',help='Assess formation energies of particular test structures.')
     p.add_argument('--test3'  ,'-t3'            ,action='store_true',help='test3')
     p.add_argument('--testkmc'  ,'-kmc'         ,action='store_true',help='test accuracy of kmc structures')
     p.add_argument('--testkmc_b','-kmcb'        ,action='store_true',help='test accuracy of kmc structures for epoch with best_test energies')

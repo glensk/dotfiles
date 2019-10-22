@@ -1,6 +1,0 @@
-# using https://github.com/glensk/dotfiles/trunk/scripts
-# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
-# used sha: 3a02e7824fa18d980da7f7f27361e2018efbdc8f
-# execution time: 0.0125379562378 seconds.
-
-getEnergies_byLammps.py --units meV_pa -wa -tf -i ../aiida_exported_group_out_antisites_repMg4Al3Si4.runner_calc__all_steps.input.data
