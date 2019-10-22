@@ -282,41 +282,6 @@ chmod 600 ~/.ssh/config
 echo
 echo "# autojump ########################################################################"
 echo "# autojump .... (if autojump is not working enable this in the LINK_files.sh skript"
-if [ ! -e "autojump" ];then
-    echo "installing autojump"
-    cd $dotfiles
-    git clone https://github.com/wting/autojump.git
-    cd $dotfiles/autojump 
-    ./install.py 
-    cd $dotfiles
-fi
-
-echo
-echo "# zsh-history-substring-search ####################################################"
-if [ ! -e "$dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh" ];then
-    echo installing zsh-history-substring-search since it is not available
-    cd $dotfiles/zsh
-    rm -rf zsh-history-substring-search 
-    git clone https://github.com/zsh-users/zsh-history-substring-search.git
-fi
-
-echo
-echo "# zsh-syntax-highlighting #########################################################"
-if [ ! -e "$dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ];then
-    echo installing zsh-syntax-highlighting since it is not available
-    cd $dotfiles/zsh
-    rm -rf zsh-syntax-highlighting
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
-fi
-
-echo
-echo "# zsh-autosuggestions #############################################################"
-if [ ! -e "$dotfiles/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ];then
-    echo installing zsh-autosuggestions since it is not available
-    cd $dotfiles/zsh
-    rm -rf zsh-autosuggestions
-    git clone https://github.com/zsh-users/zsh-autosuggestions  
-fi
 
 echo
 echo "# make git not upload *.pyc files #################################################"
