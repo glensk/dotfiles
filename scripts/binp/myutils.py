@@ -5109,7 +5109,7 @@ def get_Mg5Si6_and_other_antisites(ace):
                 print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax cellshape')
                 #ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
                 #ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
-                ase_write("out_antisites_rep"+iname+".runner",frame_rep,format='runner',append=True)
+                ase_write("out_antisites_rep"+iname+".runner",frame_rep_,format='runner',append=True)
                 struct_written += 1
     return
 
