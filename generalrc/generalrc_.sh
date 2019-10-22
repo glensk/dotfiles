@@ -182,7 +182,16 @@ export NOTES_EXT="txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/n
 # autojump 
 # takes a bit too long to laod ... and i dont use it
 ##############################################
+if [ ! -e "$HOME/.local/autojump" ];then
+    mkdir -p $HOME/.local/
+    cd $HOME/.local/
+    echo "installing autojump"
+    git clone git://github.com/wting/autojump.git
+    cd autojump 
+    ./install.py #or ./uninstall.py
+fi
 #case "$currentshell" in 
+#    Alternative: /Users/glensk/.local/zsh
 #    zsh) source ~/.autojump/share/autojump/autojump.zsh;;
 #    bash) [[ -s $HOME/.autojump/etc/profile.d/autojump.sh ]] && source $HOME/.autojump/etc/profile.d/autojump.sh;;
 #esac
@@ -197,8 +206,6 @@ export NOTES_EXT="txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/n
 source $dotfiles/$currentshell/$currentshell\_set
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett zsh_set"
 
-##############################################
-# set host variables  
 ##############################################
 [ "$printloadstat" = "true" ] && echo " myhost $myhost"
 
