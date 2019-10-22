@@ -27,9 +27,6 @@ vim/view/
 vim/bundle/
 vim/.netrwhist
 autojump/
-zsh/oh-my-zsh/
-zsh/zsh-syntax-highlighting/
-zsh/zsh-autosuggestions/
 ipython-qt-console-solarized-syntax-highlighting/
 generalrc/generalrc_alias_oncmmd
 generalrc/generalrc_alias_oncmmc
