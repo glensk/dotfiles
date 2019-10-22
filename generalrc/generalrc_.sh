@@ -179,6 +179,10 @@ export NOTES_EXT="txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/n
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett setenv"
 
 ##############################################
+# aiida-alloy (daniel marchand)
+##############################################
+
+##############################################
 # autojump 
 # takes a bit too long to laod ... and i dont use it
 ##############################################
