@@ -127,8 +127,28 @@ setopt ALWAYS_TO_END            # Move to the end on complete completion
 ############## zsh-syntax-highlighting ###################################### 0.02s
 ############## zsh-history-substring-search ################################# 0.01s
 #if [ ${ZSH_VERSION//\./} -ge 430 ]; then   ## takes 0.02 sec to load .... too long!
-source $dotfiles/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $dotfiles/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+if [ ! -e "$HOME/.local/zsh/zsh-syntax-highlighting" ];then
+    mkdir -p $HOME/.local/zsh/
+    cd $HOME/.local/zsh/
+    echo "installing zsh-syntax-highlighting.zsh"
+    git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
+fi
+if [ ! -e "$HOME/.local/zsh/zsh-autosuggestions" ];then
+    mkdir -p $HOME/.local/zsh/
+    cd $HOME/.local/zsh/
+    echo "installing zsh-autosuggestions"
+    git clone https://github.com/zsh-users/zsh-autosuggestions
+fi
+if [ ! -e "$HOME/.local/zsh/zsh-history-substring-search" ];then
+    mkdir -p $HOME/.local/zsh/
+    cd $HOME/.local/zsh/
+    echo "installing zsh-history-substring-search"
+    git clone https://github.com/zsh-users/zsh-history-substring-search.git
+fi
+
+source $HOME/.local/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOME/.local/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.local/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 #export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'   # https://coderwall.com/p/pb1uzq/z-shell-colors or 
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=239'   # https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
 #source $dotfiles/zsh/powerlevel10k/powerlevel10k.zsh-theme
@@ -158,8 +178,6 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=239'   # https://upload.wikimedia.org
 #@#ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=cyan
 #@#ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=cyan
 #@#ZSH_HIGHLIGHT_STYLES[assign]=none
-
-[ -e "$dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh" ] && source $dotfiles/zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # to secelt menue entro just once with out first leaving menu end then additional
 # enerter press  # when menu shows it would be nice to go directly down and not

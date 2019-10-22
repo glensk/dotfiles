@@ -1,18 +1,9 @@
 [submodule "zsh/oh-my-zsh"]
 	path = zsh/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
-[submodule "zsh/zsh-syntax-highlighting"]
-	path = zsh/zsh-syntax-highlighting
-	url = git://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule "z"]
 	path = z
 	url = https://github.com/rupa/z
-[submodule "zsh/zsh-history-substring-search"]
-	path = zsh/zsh-history-substring-search
-	url = git://github.com/zsh-users/zsh-history-substring-search.git
 [submodule "autojump"]
 	path = autojump
 	url = git://github.com/joelthelion/autojump.git
-[submodule "zsh/zsh-autosuggestions"]
-	path = zsh/zsh-autosuggestions
-	url = https://github.com/zsh-users/zsh-autosuggestions
