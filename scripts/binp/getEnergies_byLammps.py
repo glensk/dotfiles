@@ -340,7 +340,7 @@ def get_energies(args):
     ### formation energies
     ############
     if args.test_formation_energies:
-        test_formation_energies(ace)
+        test_formation_energies(ace,args)
         sys.exit('test_formation_energies done! Exit')
 
     ############
@@ -1913,6 +1913,24 @@ def test_antisites(ace):
             #ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
     return
 
+def test_inputfile_formation_energy(ace,args):
+    # where to save the formation energies
+    wsp = os.getcwd()+"/summary_formations_"
+    ace.written_summary = [ wsp+"DFT_T0.dat", wsp+"NNatDFT_T0.dat",wsp+"NN_T0.dat" ]
+    for wsp_ in ace.written_summary:
+        if os.path.isfile(wsp_): os.remove(wsp_)
+        print('saving to',wsp_)
+
+    # get the formation energies
+    frames = ase_read(args.inputfile,":",format="runner")
+    for idx,frame in enumerate(frames):
+        #hessematrix_try = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
+        #get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
+        #hessematrix_try = ace.savefolder+"h_"+i+"_at_NN_relaxed"
+        get_formation_energy(ace,frame,str(idx)+" (NN@NN  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=True,try_harmonic_readfile=False)
+        #ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
+    return
+
 def test_beta2_bulk(ace):
     print("######## test_beta2_bulk #############")
     wsp = ace.savefolder+"summary_formations_beta_"
@@ -1952,7 +1970,8 @@ def load_diluete_pure_values():
 
 
 
-def test_formation_energies(ace):
+def test_formation_energies(ace,args):
+    print('args.inputfile',args.inputfile)
     #my.get_Mg5Si6_and_other_antisites(ace)
     #sys.exit()
     print("########### test_formation_energies   #########################")
@@ -1974,7 +1993,8 @@ def test_formation_energies(ace):
     #test_Mg9Si5(ace)
 
     ##test_Mg9Si5_pos(ace)
-    test_beta2_bulk(ace)
+    test_inputfile_formation_energy(ace,args)
+    #test_beta2_bulk(ace)
     #test_antisites(ace)
     ##test_betaprime_mg9si5_find_global_min(ace,eform_dilute_si, eform_dilute_mg, f_dilute_si_300, f_dilute_mg_300)
     return
