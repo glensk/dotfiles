@@ -38,3 +38,5 @@ function.data
 sources/atomsk_*/
 sources_bin
 licence_version_1.55
+zsh/zsh-autosuggestions
+zsh/zsh-syntax-highlighting
