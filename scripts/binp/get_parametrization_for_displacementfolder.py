@@ -561,7 +561,7 @@ class get_all_disps():
                     print('force on 0_05_05:',disp,LA.norm(f_0_05_05),f_0_05_05)
                 self.ratio0510  = (LA.norm(f_1_1_0)*np.sign(f_1_1_0[0]))/LA.norm(f_05_05_0)
                 self.ratio0510 = round(self.ratio0510,3)
-		add = "ATTRACTIVE! to "
+		add = "ATTRACTIVE_to_"
                 if self.verbose:
                     print('ratio f[0.5,0.5,0]/f[1,1,0]',self.ratio0510)
                 #np.sign(ele.forces[0][0])
@@ -817,7 +817,7 @@ class get_all_disps():
             parameters_morse = []
             for i in morsemodel_var:
                 coef = result.best_values.get(i)
-                print(i,":",coef)
+                print(i,"Morse_derivative:",coef)
                 parameters_morse.append(coef)
             np.savetxt("xy"+add+"_morse.dat",np.array([xymorse[:,0],result.best_fit]).T)
             print('saved',"xy"+add+"_morse.dat")
@@ -830,7 +830,7 @@ class get_all_disps():
             parameters_morse = []
             for i in morsemodel_var:
                 coef = result.best_values.get(i)
-                print("for positions in angstrom:",i,":",coef)
+                print("for positions in angstrom:",i,"Morse_derivative:",coef)
                 parameters_morse.append(coef)
 
             # now for unscaled positions to obtain michaels parametrization
@@ -839,10 +839,10 @@ class get_all_disps():
 
         if True:
             print("###################################################")
-            print("# parametrize michaels plot from Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400")
+            print("# parametrize michaels plot: Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400")
             print("###################################################")
             from lmfit import Model,minimize
-            path ="/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400.txt"
+            path ="/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400_2.txt"
             xy = np.loadtxt(path)
             xmin = xy[:,0].min()
             xmax = xy[:,0].max()
@@ -852,67 +852,56 @@ class get_all_disps():
             print(hesse.__file__)
 
             ################## define the fitting function
-            fix_B = False
-            fix_michaeles_values = False
-            mmodel_function     = hesse.MP
-            mmodel_function_der = hesse.MPd
-            mmodel_key          = 'MP'
-            mmodel_function_var     = [ 'a','b','c','d','e' ]
-            mmodel_function_var_der = [ 'b','c','d','e' ]
-            add = "_byes"
-            if fix_B == True:
-                mmodel_function     = hesse.MPnoB
-                mmodel_function_der = hesse.MPdnoB
-                mmodel_key          = 'MPnoB'
-                mmodel_function_var     = [ 'a','c','d','e' ]
-                mmodel_function_var_der = [ 'c','d','e' ]
-                add = "_bfix"
+            for allvar in [True,False]:
+                print()
+                print()
+                mmodel_function     = hesse.Michael_poly_der
+                mmodel_function_var     = [ 'a','b','c','d' ]
+                mmodel_function_der     = hesse.Michael_poly_der_der
+                mmodel_function_var_der = [ 'a','b','c','d' ]
+                add = 'allvar____'
 
-            mmodel = Model(mmodel_function)
-            for i in mmodel_function_var: mmodel.set_param_hint(i ,value=1) #, min=0.01, max=0.5)
-            if fix_michaeles_values:
-                mmodel.set_param_hint('c' ,value=-21.129154,vary=False) #,  min=1.0,  max=3.0)
-                mmodel.set_param_hint('d' ,value=19.455654,vary=False) #,  min=1.0,  max=y[:,0]3.0)
-                mmodel.set_param_hint('e' ,value=-5.814014,vary=False) #,  min=1.0,  max=y[:,0]3.0)
+                if allvar == False:
+                    mmodel_function     = hesse.Michael_poly_der_noA_noB
+                    mmodel_function_var     = [ 'c','d' ]
+                    mmodel_function_der     = hesse.Michael_poly_der_der_noA_noB
+                    mmodel_function_var_der = [ 'c','d' ]
+                    add = "allvar_noB"
 
-            print('len(xy)',len(xy))
-            result = mmodel.fit(xy[:,1], r=xy[:,0])
-            parameters = []
-            parameters_der = []
-            print('Michaels Model for michaels curve from plot:')
-            for i in mmodel_function_var:
-                coef = result.best_values.get(i)
-                print(i,":",coef)
-                parameters.append(coef)
-            for i in mmodel_function_var_der:
-                coef = result.best_values.get(i)
-                #print(i,":",coef)
-                parameters_der.append(coef)
-            print('parameters    ',parameters)
-            print('parameters_der',parameters_der)
-            np.savetxt("xy"+add+"_michael_from_plot.dat",np.array([xy[:,0],result.best_fit]).T)
-            print('saved',"xy"+add+"_michael_from_plot.dat")
-            #a,b,c,d,e= 2.911,   2.91,  -22.591,  20.,     -5.878
-            #Michaels Model for michaels curve from plot: [  2.911   2.91  -22.591  20.     -5.878]
-            print('---------> r=0.71',mmodel_function(0.71,*parameters))
-            np.savetxt("xy"+add+"_michael_from_plot_dendse.dat",np.array([xred_dense,mmodel_function(xred_dense,*parameters)]).T)
-            np.savetxt("xy"+add+"_michael_from_plot_dendse_der.dat",np.array([xred_dense,mmodel_function_der(xred_dense,*parameters_der)]).T)
+                #######################
+                # hier die kraefte
+                #######################
+                mmodel = Model(mmodel_function)
+                for i in mmodel_function_var: mmodel.set_param_hint(i ,value=1) #, min=0.01, max=0.5)
+                result = mmodel.fit(xy[:,1], r=xy[:,0])
+                parameters = []
+                for i in mmodel_function_var:
+                    coef = result.best_values.get(i)
+                    print(i,"mpd xx:",coef)
+                    parameters.append(coef)
+                print('parameters    ',parameters)
+                name = "xy"+add+"_michael_from_plot.dat"
+                np.savetxt(name,np.array([xy[:,0],result.best_fit]).T)
+                print('saved AAA FORCES',name)
+
+                parameters_der = []
+                for i in mmodel_function_var_der:
+                    coef = result.best_values.get(i)
+                    print(i,"derivative:",coef)
+                    parameters_der.append(coef)
+                print('parameters_der',parameters_der)
+                np.savetxt(name+"_der.dat",np.array([xred_dense,mmodel_function_der(xred_dense,*parameters_der)]).T)
+                print('saved AAA FORCES derivative',name+"_der.dat")
 
         if True:
             print("###################################################")
-            print("# parametrize michaels plot from Michaels_model_michaels_plot_3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400 getting michaels numbers")
+            print("# parametrize ueber 7 auslenkungen entlang [110]")
             print("###################################################")
-            mmm_func = hesse.MPam
-            mmodel = Model(mmm_func)
-            mmodel_function_var     = [ 'a','b','c','d','e' ]
-            for i in mmodel_function_var: mmodel.set_param_hint(i ,value=1) #, min=0.01, max=0.5)
-            result = mmodel.fit(xy[:,1], r=xy[:,0])
-            parameters_mp = []
-            for i in mmodel_function_var:
-                coef = result.best_values.get(i)
-                print(i,":",coef)
-                parameters_mp.append(coef)
-            np.savetxt("xy_MichaelsFIT.dat",np.array([xy[:,0],mmm_func(xy[:,0],*parameters_mp)]).T)
+            print(self.disp_vs_force)
+            xy = self.disp_vs_force
+            xy[:,0] = xy[:,0]/self.alat
+            print(self.disp_vs_force)
+            sys.exit()
 
 
         print("#########################################################################")

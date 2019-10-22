@@ -1188,6 +1188,55 @@ def Morse_derivative(r,De,aa,re):
     return 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
 
 
+def Michael_poly_der(r,a,b,c,d):
+    ''' dies sind die kraefte '''
+    return a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)
+
+def Michael_poly_der_der(r,a,b,c,d):
+    ''' erste ableitung der Kraefte '''
+    return  - 3.*d/r**4. - 2.*c/r**3. - b/r**2.
+
+def Michael_poly_der_der_der(r,a,b,c,d):
+    return  12.*d/r**5. + 6.*c/r**4. + 2.*b/r**3.
+
+
+def Michael_poly_der_noA_noB(r,c,d):
+    ''' dies sind die kraefte ohne a, works'''
+    rcut = 0.84
+    # ForcesDerivative(rcut=0.84)=0
+    # - 3.*d/rcut**4. - 2.*c/rcut**3. - b/rcut**2. = 0
+    b = - 3.*d/rcut**2. - 2.*c/rcut  # from first der b(d,c)
+
+    # Forces(rcut=0,84) = 0
+    # a + b*r**(-1) + c*r**(-2) + d*r**(-3) = 0 --> a =  - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3)
+    a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)
+    return a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)
+
+def Michael_poly_der_der_noA_noB(r,c,d):
+    rcut = 0.84
+    b = - 3.*d/rcut**2. - 2.*c/rcut  # from first der b(d,c)
+    return  - 3.*d/r**4. - 2.*c/r**3. - b/r**2.
+
+
+def Michael_poly_der_der_noB(r,c,d):
+    ''' erste ableitung der Kraefte '''
+    # Forces'(rcut=0,84) = 0
+    # - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3. - b/rcut**2. = 0
+    # b/rcut**2. = - 4.*e/rcut**5. - 3.*d/rcut**4. - 2.*c/rcut**3.
+    # b =  - 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut
+    rcut = 0.84
+    #b = - 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut
+    b = - 3.*d/rcut**2. - 2.*c/rcut  # from here
+    #a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) #- e*rcut**(-4)
+    #a = - [(- 3.*d/rcut**2. - 2.*c/rcut)*rcut**(-1)] - c*rcut**(-2) - d*rcut**(-3)
+    a = 3.*d/rcut +2.*c - c*rcut**(-2) - d*rcut**(-3)
+    return  - 3.*d/r**4. - 2.*c/r**3. - b/r**2.
+
+def Michael_poly_der_der_der_noB(r,b,c,d,e):
+    ''' zweite ableitung der Kraefte '''
+    return  20.*e/r**6. + 12.*d/r**5. + 6.*c/r**4. + 2.*b/r**3.
+
+
 def Michael_polynomial(r,a,b,c,d,e):
     ''' a is a simple offset
         Michael chose (when using r in relative coordinates) a and b in such a way as to
@@ -1196,26 +1245,8 @@ def Michael_polynomial(r,a,b,c,d,e):
     #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
     return a + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
 
-def MP(r,a,b,c,d,e):
-    ''' a is a simple offset
-        Michael chose (when using r in relative coordinates) a and b in such a way as to
-        make Michael_polynomial_derivative(r,b,c,d) = 0;
-     '''
-    #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
-    # rcut = 0.84
-    # b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
-    return a* + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
 
 
-def MPam(r,a,b,c,d,e):
-    ''' a is a simple offset
-        Michael chose (when using r in relative coordinates) a and b in such a way as to
-        make Michael_polynomial_derivative(r,b,c,d) = 0;
-     '''
-    #return a*r**(0) + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
-    # rcut = 0.84
-    # b = (- 4.*e/rcut**3. - 3.*d/rcut**2. - 2.*c/rcut)
-    return a* + b*r**(-1) + c*r**(-2) + d*r**(-3) + e*r**(-4)
 
 def MPEnoB(r,a,c,d,e):
     ''' this is supposed to be the integral of the force, still to do'''

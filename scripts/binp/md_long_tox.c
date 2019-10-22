@@ -860,7 +860,21 @@ void analyze_forces(int i,FILE *file_forces,FILE *file_forces_av,FILE *file_forc
     // sum1 += sqrt(dftforces^2) und davon die summe ueber alle eintraege
     // sum2 +=sqrt(laforces^2) und davon die summe ueber alle eintraege
     // sum1/eintraege
-    //
+
+    //for (i=0;i<atoms*first_neighbors/2;i++) {   // 12 * atoms_supercell / 2
+    //    ind1=l1nn[i].ind1;
+    //    ind2=l1nn[i].ind2;
+    //    j1=l1nn[i].j1;
+    //    j2=l1nn[i].j2;
+    //    j3=l1nn[i].j3;
+
+    //    // abstaende nn
+	//	x=(signed)(pos[ind1].x-pos[ind2].x);
+	//	y=(signed)(pos[ind1].y-pos[ind2].y);
+	//	z=(signed)(pos[ind1].z-pos[ind2].z);
+	//	r=sqrt(x*x+y*y+z*z);
+    //};
+
     int j;
     int iat3;
     double forcelax,forcelay,forcelaz,dx,dy,dz,dx_abs,dy_abs,dz_abs,ddx,ddy,ddz,ddx_abs,ddy_abs,ddz_abs,diffmax;
@@ -868,7 +882,7 @@ void analyze_forces(int i,FILE *file_forces,FILE *file_forces_av,FILE *file_forc
 	//printf("%.10f\n",2.0);
 	forces_diffmax = 0;
 
-	for (j=0;j<atoms;j++) {
+	for (j=0;j<atoms;j++) { // goes through all atoms
         forcelax = force[j].x*faktor_force; // force la
         forcelay = force[j].y*faktor_force; // force la
         forcelaz = force[j].z*faktor_force; // force la
@@ -1827,6 +1841,10 @@ void calculate_forces_energy_la(double dt,int verbose) {
     u_la_tox=u_la_tox*faktor_per_atom;
     //printf("tox FINAL MEV %2.8f\n",u_la_tox);
     u_la=u_la+u_la_tox;
+
+    //forcelax = force[j].x*faktor_force; // force la
+    //forcelay = force[j].y*faktor_force; // force la
+    //forcelaz = force[j].z*faktor_force; // force la
 }
 
 void forces_to_velocities(double dt) {
@@ -2447,7 +2465,9 @@ int main(int argc,char *argv[]){
 
 
         if (verbose>2) {printf("STARTING MD  \n");};
+        printf("STARTING MD  \n");
         for (i=0;i<(zeitschritte);i++) {
+            //double progress = (i / zeitschritte) * 100;
             // this strats from 0 to have right numbering with dudl;
             // is i=0 also necessary to get the correct first positioins? -> no
             // for the new way we average it might be also necessary to start with 0
@@ -2536,6 +2556,8 @@ int main(int argc,char *argv[]){
         printf("\n");
         printf("Energy dudl (DFT-H)  : %6.4f meV/atom (works in general )\n",dudl_dft_harm_av);
         printf("Energy dudl (DFT-LA) : %6.4f meV/atom (works in general lon and tox)\n",dudl_dft_la_av);
+        printf("\n");
+        printf("MAKE FOR EVERY STEP: rmin, rmax, deltaF_max(between LA and DFT)\n");
         printf("\n");
         printf("rmin           %5.3f rmin_distmax: %5.3f Angstrom\n",rmin/a0*alat_lattice,alat_lattice/sqrt(2)-rmin/a0*alat_lattice);
         printf("nndist         %5.3f\n",alat_lattice/sqrt(2));

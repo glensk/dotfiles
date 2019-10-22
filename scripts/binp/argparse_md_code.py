@@ -196,6 +196,7 @@ def help(p = None):
        help='run/evolve the MD on the harmonic Hessematrix instead of the la potentila (lambda=0.0)')
 
     ### specify folder to import POSITIONs from
+    p.add_argument('-p', '--parametrization', choices=['prl2019_900K','prl2019_300K'], help='particular parametrization')
     p.add_argument('-fmd30',   '--f_md_2x2x2_30' , default=False,required=False,action='store_true',
        help='run/evolve the MD on from the displacements/ti folder for set element using 30__PTS_dosall')
     p.add_argument('--f_d_5x5x5','-f_d_5x5x5' , default=False,required=False,action='store_true',
@@ -624,6 +625,18 @@ def obtain_parametrization_E_from_parametrize_displacements_skript(args): #KKK
 
         print_parameters(args,idx="(E)")
         return
+
+def obtain_parametrization_H_from_p_variable(args):
+    if args.parametrization == 'prl2019_900K':
+        if args.element_all == ['Al'] and args.alat == 4.14:
+            args.D_mor = 0.258
+            args.a_mor = 1.437
+            args.alat_mor = 4.14
+            args.t1 = -0.072
+        else:
+            print('element is',args.element_all,'and not [\'Al\']')
+            print('args.alat is',args.alat,'and not 4.14')
+            sys.exit('exit 778776')
 
 def obtain_input_folder_A_for_f_md_2x2x2_30_f_d_5x5x5(args):
     if args.verbose:
@@ -1459,6 +1472,7 @@ if __name__ == '__main__':
                 #    parameters = Analyze_Forces_and_make_parametrization.get_all_disps(dofor=args.get_parametrization_from_displacements)
                 #has_parametrization   = check_for_disp_fit_parameters_morse(args)
                 get_alat_mor(args)
+                obtain_parametrization_H_from_p_variable(args)  # -p prl2019_900K
                 print_parameters(args,idx="(11)")
 
                 if sweep_idx == 0:
