@@ -3451,7 +3451,7 @@ class ase_calculate_ene( object ):
         #]
         return command
 
-    def pot_get_and_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False):
+    def pot_get_and_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False,ipi=False):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
@@ -3533,14 +3533,15 @@ class ase_calculate_ene( object ):
                 # with n2p2 in the parallel version, inet is not working
                 # "fix 1 all ipi fidis 12345",     # for fidis job
                 # "fix 1 all ipi mac 77776 unix",  # for mac job
-                #
-        if self.kmc:
-            if self.ffsocket == "unix": add = "unix"
-            if self.ffsocket == "inet": add = ""
-            if address == False:
-                address = gethostname()
-            self.lmpcmd = self.lmpcmd + [ "",
-                "fix 1 all ipi "+str(address)+" 12345 "+str(add), "" ]
+
+        if self.ffsocket == "unix": add = "unix"
+        if self.ffsocket == "inet": add = ""
+        if address == False:
+            address = gethostname()
+
+        if self.kmc or ipi:
+            self.lmpcmd = self.lmpcmd + [ "", "## in case run by ipi: ",
+            "## fix 1 all ipi "+str(address)+" 12345 "+str(add), "" ]
 
         self.lmpcmd = self.lmpcmd + [ "### lmpcmd.end  ####" ]
         if self.verbose > 1:
@@ -5059,6 +5060,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             execute_file = 'in.lmp'
             ace.nsteps = 200000000
             #print('ace',ace.
+            ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False)
             lammps_write_inputfile(folder=folder,filename=execute_file,positions='pos.lmp',ace=ace)
 
 
@@ -5076,6 +5078,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
             sed(folder+'/'+ipi_inp_basename,'xxx123',str(300))  # steps
             sed(folder+'/'+ipi_inp_basename,'xxxene',str(0))
+            sed(folder+'/'+ipi_inp_basename,'md_ff',str('mac'))
     return
 
 def get_hessefiles_vol_pos(folder):
