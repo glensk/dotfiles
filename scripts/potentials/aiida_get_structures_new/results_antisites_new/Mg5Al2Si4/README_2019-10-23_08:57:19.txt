@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 85cb5263e287ab60267d5275087598c85fa0dac5
+# execution time: 0.0332350730896 seconds.
+
+getEnergies_byLammps.py -fe -i ../../aiida_exported_group_out_antisites_repMg5Al2Si4_NEW.runner_calc__all_steps.input.data
