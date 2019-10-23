@@ -5,7 +5,7 @@
     <properties stride='10' filename='ti'>  [ step, pot_component_raw(0), pot_component_raw(1)] </properties>
     <!-- <trajectory stride='100' filename='pos'> positions </trajectory> -->
   </output>
-  <total_steps> 10000 </total_steps>
+  <total_steps> xxx123 </total_steps>
   <!-- SELECT THE RANDOM NUMBER SEED TO HAVE REPRODUCIBLE SIMULATIONS -->
   <prng>
     <seed> 32342 </seed>
@@ -18,7 +18,7 @@
   <ffdebye name='debye'>
       <hessian shape='(96,96)' mode='file'> hessian.data </hessian>
       <x_reference mode='file'> x_reference.data </x_reference>
-    <v_reference> -2.89829817e+00 </v_reference>
+    <v_reference> xxxene </v_reference>
   </ffdebye>
   <!-- DETAILS OF THE SYSTEM.-->
   <system>

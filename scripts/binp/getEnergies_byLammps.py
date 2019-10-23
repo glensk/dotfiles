@@ -266,16 +266,21 @@ def get_energies(args):
     ### get the potential
     print('getEne(p2)                           : ace.pot_get_and_ase_lmp_cmd()')
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
-    print('getEne(p3)                           : pot defined')
+    if args.verbose > 2:
+        print('getEne(p3)                           : pot defined')
     print('ace.lmpcmd',ace.lmpcmd)
     units = ace.units
     ace.pot.print_variables_mypot(print_nontheless=True,text="getEne(P):")
+    if args.verbose > 2:
+        print('getEne(p4)                           : pot defined')
 
     ##############################################################
     ### again show args
     ##############################################################
     if args.verbose:
         my.print_args(args)
+    if args.verbose > 2:
+        print('getEne(p5)                           : pot defined')
 
 
     ###################################################################
@@ -284,8 +289,13 @@ def get_energies(args):
     if args.testaccuracy_kmc_approx:
         my.analyze_accuracy_of_filling_cell_with_Al(ace)
         sys.exit("kaka done")
+    if args.verbose > 2:
+        print('getEne(p6)                           : pot defined')
 
     if args.thermo or args.evinet or args.fqh or args.fah:
+        print("##############################")
+        print("# NOW GETTING anharmonic ... #")
+        print("##############################")
         hesse_vol_pos = my.get_hessefiles_vol_pos(os.getcwd()+"/fqh")
         print('--')
         temperature = 900
@@ -294,15 +304,26 @@ def get_energies(args):
             volume  = i[1]
             pos     = i[2]
             print(hessefile,volume)
-            my.ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos)
+            my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos)
             sys.exit()
         sys.exit()
+        #get_basic_NN_energies_ace(ace)
+        #sys.exit()
+        #frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
+        #print('frame_al.cell',frame_al.cell)
+        #print('frame_al.positions',frame_al.positions)
 
         if args.thermo: args.fqh = True
         if args.thermo: args.fah = True
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
+        if args.verbose > 2:
+            print('getEne(p7) reading structure ... ')
         my.check_isfile_or_isfiles([args.inputfile],verbose=verbose)
+        print('args.format_in',args.format_in)
         ase_structure = ase_read(args.inputfile,format=args.format_in)
+        print('ase_structure.cell',ase_structure.cell)
+        print('ase_structure.positions',ase_structure.positions)
+        #sys.exit()
         ase_structure_relaxed = my.get_evinet(ace,ase_structure,relax_cellshape_and_volume=True,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
         #ace.get_elastic_external(atomsin=ase_structure_relaxed,verbose=ace.verbose,text="structure",get_all_constants=True)
@@ -310,6 +331,8 @@ def get_energies(args):
 
         sys.exit("Thermodynamic properties done.")
 
+    if args.verbose > 2:
+        print('getEne(p7)                           : pot defined')
 
     ############
     ### testkmc
@@ -568,8 +591,6 @@ def get_energies(args):
             print(frames[0].cell)
             sys.exit('Exit when show_ositions of first structure')
 
-        print()
-        print('pot                          :',args.pot)
         print()
         print('ase                          :',args.ase)
         print('lmp                          :',args.lmp)
@@ -1415,7 +1436,8 @@ def get_al_fcc_equilibrium(ace):
     #print('e_ and f_ al should all be done consistently from the NN!!!')
     if not os.path.isfile(filename_frame):
         ase_write(ace.savefolder+"frame_al_fcc.runner",frame_al,format='runner')
-    ace.get_elastic_external(atomsin=ace.al_fcc,verbose=False,text="Al_fcc bulk 4at",get_all_constants="C44")
+    #ace.get_elastic_external(atomsin=ace.al_fcc,verbose=False,text="Al_fcc bulk 4at",get_all_constants="C44")
+    ace.get_elastic_external(atomsin=ace.al_fcc,verbose=False,text="Al_fcc bulk 4at",get_all_constants=False)
 
     #frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=3,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
     #print('nat',frame_al.get_number_of_atoms())
@@ -1978,7 +2000,6 @@ def test_formation_energies(ace,args):
     ace.atTemp = 443
     print("########### get_basic_NN_energies_ace #########################")
     get_basic_NN_energies_ace(ace)
-
 
 
     print("########### get_dilute_si_mg_f #########################")
