@@ -131,7 +131,7 @@ if [ ! -e "$HOME/.local/zsh/zsh-syntax-highlighting" ];then
     mkdir -p $HOME/.local/zsh/
     cd $HOME/.local/zsh/
     echo "installing zsh-syntax-highlighting.zsh"
-    git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
 fi
 if [ ! -e "$HOME/.local/zsh/zsh-autosuggestions" ];then
     mkdir -p $HOME/.local/zsh/
