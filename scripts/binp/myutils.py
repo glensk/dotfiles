@@ -2922,7 +2922,7 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0=False,matrix_ele
         cubic: bool
             Construct cubic unit cell if possible.
     """
-    print('whichcell:',whichcell)
+    #print('whichcell:',whichcell)
     defect = False
     defect_element = False
     if "_" in whichcell:
