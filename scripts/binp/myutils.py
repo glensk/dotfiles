@@ -718,6 +718,12 @@ class mypot( object ):
         ''' help '''
         # get from input.nn the atomic energies
         if type(self.pot) != bool and type(self.elements) == bool and type(self.atom_energy) == bool:
+            print('self.pot (0):',self.pot,self.pot[:6])
+            if self.pot[:6] == 'runner': self.pottype = 'runner'
+            if self.pot[:4] == 'n2p2': self.pottype = 'n2p2'
+            print('self.pottype (0)',self.pottype)
+            #if 'runner' in self.pot: self.pottype('runner')
+            #if 'n2p2' in self.pot: self.pottype('n2p2')
             if self.pottype == "runner" or self.pottype == "n2p2":
                 inputnn = self.potpath+"/input.nn"
                 if os.path.isfile(inputnn):
@@ -762,11 +768,15 @@ class mypot( object ):
                     self.atom_energy[i] = 0 #self.elements[idx]
             else:
                 print('self.pot:',self.pot)
+                print()
+                list_pot_all()
+                print()
+                print('self.pot:',self.pot)
+                print('self.pottype:',self.pottype)
                 sys.exit("self.pot unknown (Error 91)")
         #print('self.elements',self.elements)
-        #import my_atom
-        #aa = my_atom.atom()
-
+        print('self.pot',self.pot)
+        print('self.potpath',self.potpath)
         print('self.elements',self.elements)
         print('self.atom_energy',self.atom_energy)
         self.atom_types_ = {}
@@ -2887,7 +2897,7 @@ def runner_exec(test=False):
 ##################################################################################
 ## ase funcions
 ##################################################################################
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True):
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0=False,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True,verbose=False):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -2912,6 +2922,36 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="
         cubic: bool
             Construct cubic unit cell if possible.
     """
+    print('whichcell:',whichcell)
+    defect = False
+    defect_element = False
+    if "_" in whichcell:
+        #print('yes _',whichcell.split("_"))
+        defect    = whichcell.split("_")[1]  # dilute, vac, ...
+        whichcell = whichcell.split("_")[0]
+        #print('me',matrix_element)
+        if defect == 'dilute' and len(matrix_element) != 2:
+            sys.exit('please provide two matrix elements, first = matrix, second is the solute atom type')
+        elif defect == 'vac' and len(matrix_element) != 1:
+            sys.extit('please provide only one matrix element')
+
+        if defect == 'dilute':
+            defect_element = matrix_element[1]
+            matrix_element = matrix_element[0]
+
+    if verbose:
+        print('defect',defect)
+        print('whichcell',whichcell)
+        print('matrix_element',matrix_element)
+        print('defect_element',defect_element)
+
+    if a0 == False:
+        state = my_atom.atom([matrix_element]).reference_state[0]
+        #print('a0',a0)
+        #print('state',state)
+        #print('state',state['symmetry'])
+        #print('state',state['a'])
+        a0 = state['a']
     if whichcell == "fcc":
         atom = ase_build_bulk(matrix_element,crystalstructure='fcc',a=a0,cubic=cubic)
     elif whichcell == "hcp":
@@ -2922,11 +2962,18 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="
         a = 5.47
         atom = crystal(matrix_element, [(0,0,0)], spacegroup=227, cellpar=[a, a, a, 90, 90, 90])
     else:
-        sys.exti("whichcell has to be in fcc or hcp")
+        sys.exti("whichcell: "+str(whichcell)+" has to be in fcc or hcp")
 
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
+
+    if defect == "dilute":
+        atomsc[0].symbol = defect_element
+
+    if defect == 'vac':
+        del atomsc[0]
+
 
     #for i in np.arange(nmg):
     #    atomsc[i].symbol = 'Mg'
@@ -4922,7 +4969,6 @@ def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
 def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
-    #atoms= get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,matrix_element="Ni",cubic=True,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True)
     print('atoms.cell (angstrom) before relaxing cellshape and volume:')
     print(atoms.cell)
     print('atoms.positions before relaxing cellshape and volume:')
@@ -4946,7 +4992,7 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     print("#############################")
     os.mkdir("evinet")
     with cd("evinet"):
-        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False)
+        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False,atomrelax=True)
         print('vinet.parameters:',vinet.parameters)
         vinet.write_data()
     #print('atoms vol',atoms.get_volume())

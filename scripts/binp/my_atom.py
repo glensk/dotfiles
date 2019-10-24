@@ -807,10 +807,10 @@ class atom(object):     # advantage: once this is executed we know that everythi
             #
             # or
             # import my_atom
-            # atom = my_atom.atom([args.element])
+            # a0   = my_atom.atom(["Al"]).number[0]   # 13
+            # state = my_atom.atom([matrix_element]).reference_state[0]  # state {'a': 4.05, 'symmetry': 'fcc'}
+            #
             # print atom.melting_rounded[0]
-            #
-            #
         self._z         = False
         self._n         = False
         self._s         = False

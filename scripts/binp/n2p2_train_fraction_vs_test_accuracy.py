@@ -144,7 +144,7 @@ for nnidx,i in enumerate(all_learning_curve_files):
     #################################################################
     # get the potential
     #################################################################
-    pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
+    pot = my.mypot(potpath_in=folder,use_epoch=False,verbose=args.verbose)
     pot.get(exit=False,showerrors=False)
     pot.get_my_assessments()  # gets kmc57_{b,l}, train_{b,l}, test_{b,l}
 
