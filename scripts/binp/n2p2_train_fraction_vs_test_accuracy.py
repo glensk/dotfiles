@@ -71,6 +71,7 @@ all_learning_curve_files = my.find_files(os.getcwd(),'learning-curve.out',maxdep
 if args.both == True:
     all_learning_curve_files_add = my.find_files(os.getcwd(),'learning-curve-runner.out',maxdepth=maxdepth)
     print('all_learning_curve_files_add')
+    sys.exit('no! runner dont need it..')
     for i in all_learning_curve_files_add:
         if args.verbose:
             print('runner',i)

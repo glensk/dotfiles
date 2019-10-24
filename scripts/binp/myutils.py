@@ -718,10 +718,10 @@ class mypot( object ):
         ''' help '''
         # get from input.nn the atomic energies
         if type(self.pot) != bool and type(self.elements) == bool and type(self.atom_energy) == bool:
-            print('self.pot (0):',self.pot,self.pot[:6])
+            #print('self.pot (0):',self.pot,self.pot[:6])
             if self.pot[:6] == 'runner': self.pottype = 'runner'
             if self.pot[:4] == 'n2p2': self.pottype = 'n2p2'
-            print('self.pottype (0)',self.pottype)
+            #print('self.pottype (0)',self.pottype)
             #if 'runner' in self.pot: self.pottype('runner')
             #if 'n2p2' in self.pot: self.pottype('n2p2')
             if self.pottype == "runner" or self.pottype == "n2p2":
@@ -775,10 +775,10 @@ class mypot( object ):
                 print('self.pottype:',self.pottype)
                 sys.exit("self.pot unknown (Error 91)")
         #print('self.elements',self.elements)
-        print('self.pot',self.pot)
-        print('self.potpath',self.potpath)
-        print('self.elements',self.elements)
-        print('self.atom_energy',self.atom_energy)
+        #print('self.pot',self.pot)
+        #print('self.potpath',self.potpath)
+        #print('self.elements',self.elements)
+        #print('self.atom_energy',self.atom_energy)
         self.atom_types_ = {}
         self.atom_masses = {}
         for i in self.elements:
@@ -1109,8 +1109,8 @@ class mypot( object ):
             # check if we use the right epoch
             ###################################
             # if no epoch to use specified, use whatever is available
-            print('useepo',self.use_epoch,type(self.use_epoch))
-            print('linked',self.potepoch_linked,type(self.potepoch_linked))
+            #print('useepo',self.use_epoch,type(self.use_epoch))
+            #print('linked',self.potepoch_linked,type(self.potepoch_linked))
             if self.use_epoch == False:
                 self.potpath_work   = self.potpath
                 self.potepoch_using  = self.potepoch_linked
