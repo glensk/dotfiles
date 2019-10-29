@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import numpy as np
+from ase import Atoms
 from scipy.fftpack import fft
 from scipy.fftpack import ifft
 from lmfit import Model
@@ -347,90 +348,33 @@ class get_all_disps():
                 print(idx,i)
             print()
 
-        create_dofor_POSITIONs = False
-        create_dofor_u_OUTCAR = False
-
-        if not os.path.isfile(self.dofor+"/POSITIONs"):
-            create_dofor_POSITIONs = True
-            open(self.dofor+"/POSITIONs", 'a').close()
-        if not os.path.isfile(self.dofor+"/u_OUTCAR"):
-            create_dofor_u_OUTCAR = True
-            open(self.dofor+"/u_OUTCAR", 'a').close()
-
         for idx,i in enumerate(self.folder_alldisp):
             if idx == 0 and self.verbose:
                 print("folder_alldisp[i] (W):",i)
             disp = float(i.split("Ang_")[-1].split("/")[0])
-            #try:
-            #    print(i.split("Ang_"))
-            #    sys.exit()
-            #except ValueError:
-            #    print(i.split("Ang_"))
-            #    sys.exit()
             self.disps.append(disp)
-            if not os.path.isfile(i+'/pos'):
-                with my.cd(i):
-                    call(["OUTCAR_positions-last-ARRAY.sh > pos"],shell=True)
-            if not os.path.isfile(i+'/forces'):
-                with my.cd(i):
-                    call(["OUTCAR_forces-last-ARRAY.sh > forces"],shell=True)
-            if not os.path.isfile(i+'/POSITIONs'):
-                with my.cd(i):
-                    print('pwd',os.getcwd())
-                    call(["extractPOSITIONS.sh"],shell=True)
-            pos_forces = np.loadtxt(i+'/POSITIONs')
-            pos    = pos_forces[:,[0,1,2]]
-            forces = pos_forces[:,[3,4,5]]
-
-
-            #if not os.path.isfile(i+'/pos'):
-            #    with my.cd(i):
-            #        call(["extractPOSITIONS.sh -o pos"],shell=True)
-            #if not os.path.isfile(i+'/forces'):
-            #    with my.cd(i):
-            #        call(["extractPOSITIONS.sh -f -o forces"],shell=True)
-            if not os.path.isfile(i+'/u_OUTCAR'):
-                with my.cd(i):
-                    call(["OUTCAR_ene-potential_energy_without_first_substracted.sh > u_OUTCAR"],shell=True)
-
-            if create_dofor_POSITIONs == True:
-                with my.cd(i):
-                    call(["cat POSITIONs >> ../POSITIONs"],shell=True)
-            if create_dofor_u_OUTCAR == True:
-                with my.cd(i):
-                    call(["cat u_OUTCAR >> ../u_OUTCAR"],shell=True)
-            #alat = float(i.split("vasp4/")[1].split("Ang")[0])
-
-            if self.verbose > 1:
-                print('loadtxt (pos):',i+'/pos')
-                print('loadtxt (forces):',i+'/forces')
+            pos,forces,cell = my.folder_get_pos_forces_cell(i)
+            sc, alat = my.try_to_get_alat_and_sc_from_cell_and_positions(cell,pos)
 
             ### get self.sc in case it is necessary
             if self.sc == False:
-                #print('ps',pos.shape[0])
-                #print('ps',pos.shape[0]/4)
-                #print('ps',(pos.shape[0]/4)**(1./3.))
-                #print('ps',round((pos.shape[0]/4)**(1./3.),10))
-                #print('ps',int(round((pos.shape[0]/4)**(1./3.),10)))
-                self.sc = int(round((pos.shape[0]/4)**(1./3.),10))
-            if self.verbose > 1:
-                print('self.sc',self.sc)
-                #print(pos[:10])
-                #print(pos.flatten()[:10])
-                #print(np.sort(pos.flatten())[:10])
-                #print(np.unique(np.sort(pos.flatten()))[:10])
+                self.sc = sc
+            else:
+                if self.sc != sc:
+                    sys.exit('sc not self.sc (77); Exit')
 
             if self.alat == False:
-                if pos[0][2] == pos[1][0] == pos[1][1] == 0:
-                    alat = pos[1][2]
-                #alat = np.unique(np.sort(pos.flatten()))[2]
-                if alat > 6 or alat < 3:
-                    print('alat',alat)
-                    sys.exit("this does not seem to be a correct alat")
                 self.alat = alat
-                self.nndist = self.alat/np.sqrt(2.)
+            else:
+                if self.alat != alat:
+                    sys.exit('alat not self.alat (77); Exit')
+
+            self.nndist = self.alat/np.sqrt(2.)
+
             if self.verbose > 1:
+                print('self.sc  ',self.sc)
                 print('self.alat',self.alat)
+
             if idx == 0 and self.verbose == True:
                 print("self.dofor        (3):",self.dofor)
                 print("self.element      (3):",self.element)
@@ -440,30 +384,29 @@ class get_all_disps():
                 print("self.alatTmelt    (3):",self.alatTmelt)
                 print("self.sc           (3):",self.sc)
                 print("self.alat         (3):",self.alat)
-            print('100',forces)
 
-            #if os.path.isfile(i+'/forces'):
-            #    forces = np.loadtxt(i+'/forces')
-            #if self.verbose:
-            #    print('pos')
-            #    print(pos[-1])
-            #    print("forces")
-            #    print(forces[-1])
+            #print('100',forces)
+            #print('pos')
+            #print(pos)
 
-            pos_ = np.copy(pos)
-            for iidx,i in enumerate(pos):
-                #print(iidx,i)
-                for jdx,j in enumerate(i):
-                    #print(jdx,j,'--',pos_[iidx,jdx],'sc',self.sc,'alat',self.alat,'--',self.sc*self.alat/2)
-                    if pos_[iidx,jdx] > self.sc*self.alat/2:
-                        pos_[iidx,jdx] = pos_[iidx,jdx]-self.sc*self.alat
-            #print('pos_',pos_.shape)
+
             if idx == 0:
                 self.force_all          = np.zeros((len(self.folder_alldisp),pos.shape[0],pos.shape[1]))
                 self.pos_all            = np.zeros((len(self.folder_alldisp),pos.shape[0],pos.shape[1]))
 
             self.force_all[idx] = forces
+            pos_ = my.center_positions_around_0(pos,self.sc,self.alat)
             self.pos_all[idx] = pos_
+            #for idx,i in enumerate(pos_):
+            #    print('idx',idx,pos[idx],pos_[idx])
+
+            if disp == 0.0:
+                atoms = Atoms(self.element+str(len(pos_)),pos_,cell=cell,pbc=[1,1,1])
+                #for idx,i in enumerate(atoms.positions):
+                #    print('idx',idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
+                #print(atoms.cell)
+                #print(atoms.pbc)
+                NN1,NN2,NN3 = my.get_NN1_NN2_NN3_from_positions(atoms,alat,atomnr=0,verbose=args.verbose)
 
 
             ##########################################################################################
@@ -633,14 +576,24 @@ class get_all_disps():
         #print("#########################################################################")
         #print("# fits on [0.5,0.5,0.0]")
         #print("#########################################################################")
-        fit = pot_parametrize.fit_to_func(self.disp_vs_force,function='morse',fixzeroat=self.nndist)
+        fit     = pot_parametrize.fit_to_func(self.disp_vs_force,function='morse',fixzeroat=self.nndist)
+        self.disp_vs_force_rel = np.copy(self.disp_vs_force)
+        self.disp_vs_force_rel[:,0] = self.disp_vs_force_rel[:,0]/self.alat
+        #print('disp_vs_force_rel')
+        #print(disp_vs_force_rel)
+        #print()
+        #print(self.nndist/self.alat)
+        fit_rel           = pot_parametrize.fit_to_func(self.disp_vs_force_rel,function='morse',fixzeroat=self.nndist/self.alat)
+        fit_rel_repulsive = pot_parametrize.fit_to_func(self.disp_vs_force_rel,function='ma',fixzeroat=self.nndist/self.alat)
         try:
             fitmc1 = pot_parametrize.fit_to_func(self.disp_vs_force,function='mc1',fixzeroat=self.nndist)
         except TypeError:
             fitmc1 = False
         fit_corrected_for_110 = pot_parametrize.fit_to_func(self.disp_vs_force_corrected_for_110,function='morse',fixzeroat=self.nndist)
-        print('# fits on [0.5,0.5,0.0]: fit.parameters morse',fit.parameters)
-
+        print('# fits on [0.5,0.5,0.0]: fit.parameters                   morse',fit.parameters)
+        print('# fits on [0.5,0.5,0.0]: fit_rel.parameters               morse',fit_rel.parameters)
+        print('# fits on [0.5,0.5,0.0]: fit_rel_repulsive.parameters     morse',fit_rel_repulsive.parameters)
+        print('# fits on [0.5,0.5,0.0]: fit_corrected_for_110.parameters morse',fit_corrected_for_110.parameters)
         fit_on_05_05_0 = np.zeros((len(fit.fit),7))
         fit_on_05_05_0[:,0] = fit.fit[:,0]
         dist__hydrogen   = (1./7.2)*fit.fit[:,0]*10**-10
@@ -670,10 +623,22 @@ class get_all_disps():
         np.savetxt(self.dofor+'/disp_fit.parameters_morse.dat',fit.parameters)
         np.savetxt(self.dofor+'/disp_fit_corr_110.parameters_morse.dat',fit_corrected_for_110.parameters)
         np.savetxt(self.dofor+'/disp_vs_forces.dat',self.disp_vs_force)
+        np.savetxt(self.dofor+'/disp_vs_forces_rel.dat',self.disp_vs_force_rel)
+        print('saved',self.dofor+'/disp_vs_forces.dat')
+        print('saved',self.dofor+'/disp_vs_forces_rel.dat')
+        print('saved',self.dofor+'/disp_fit.parameters_morse.dat')
         if type(fitmc1) != bool:
             np.savetxt(self.dofor+'/disp_vs_fitted_mc1.dat',fitmc1.fit)
         np.savetxt(self.dofor+'/disp_vs_fitted_morse.dat',fit.fit)
-
+        print('saved',self.dofor+'/disp_vs_fitted_morse.dat')
+        np.savetxt(self.dofor+'/disp_vs_fitted_morse_rel.dat',fit_rel.fit)
+        print('saved',self.dofor+'/disp_vs_fitted_morse_rel.dat')
+        np.savetxt(self.dofor+'/disp_vs_fitted_morse_rel_repulsive.dat',fit_rel_repulsive.fit)
+        print('saved',self.dofor+'/disp_vs_fitted_morse_rel_repulsive.dat')
+        f1 = hesse.Morse_repulsive_derivative_to_normaldata(fit_rel_repulsive.datax, *fit_rel_repulsive.parameters)
+        f2 = hesse.Morse_repulsive_derivative(fit_rel_repulsive.datax, *fit_rel_repulsive.parameters)
+        np.savetxt(self.dofor+'/disp_vs_f1.dat',np.array([fit_rel_repulsive.datax,f1]).T)
+        np.savetxt(self.dofor+'/disp_vs_f2.dat',np.array([fit_rel_repulsive.datax,f2]).T)
 
         ##############################################################################
         # shift to other alat
@@ -732,16 +697,16 @@ class get_all_disps():
         for i in fit_on_05_05_0:
             print(i)
         print("#########################################################################")
-        print("# fits on [0.0,0.5,0.5] previously tox")
+        print("# fits on [0.0,0.5,0.5] previously tox (params_morse_normal)")
         print("#########################################################################")
         if True:
             print('dist pos[0] to pos_0_05_05 ')
-            params = fit.parameters
-            #print('params',params)
+            params_morse_normal     = fit.parameters
+            print('params_morse_normal',params_morse_normal)
             for idx,i in enumerate(self.dist_0_05_05_at0):
                 dist_norm                           = np.around(LA.norm(i),5)
-                fm                                  = np.round(hesse.Morse_derivative(LA.norm(i), *params),4)
-                forces_morse                        = hesse.getefvec(i,params,pot = 'm')
+                fm                                  = np.round(hesse.Morse_derivative(LA.norm(i), *params_morse_normal),4)
+                forces_morse                        = hesse.getefvec(i,params_morse_normal,pot = 'm')
                 self.force_0_05_05_rest[idx]        = self.force_0_05_05[idx] + forces_morse[1]
                 vasp_force                          = self.force_0_05_05[idx] #.ljust(22)
                 vasp_force_norm                     = str(np.around(-LA.norm(abs(vasp_force)),decimals=3)).ljust(6)
@@ -769,7 +734,7 @@ class get_all_disps():
             y1 = self.disp_vs_force[:da,1][::-1]
             #for idx,i in enumerate(r1):print(r1[idx],y1[idx])
             result = morsemodel.fit(y1, r=r1)
-            print('vgl (obtained by fit)',params)
+            print('vgl (obtained by fit)',params_morse_normal)
             print('vgl (only repulsive )',np.round([result.best_values.get('De'),result.best_values.get('aa'),result.best_values.get('re')],3))
 
             r1a = self.disp_vs_force[(da-1):,0]
@@ -796,7 +761,7 @@ class get_all_disps():
             print("STILL DID NOT INCLUDE THE ATTRACTIVE PART TIMES 4")
             for idx,i in enumerate(self.dist_0_05_05_at0):
                 fm = hesse.Morse_derivative(LA.norm(i), *params_weighted)
-                fv = hesse.getefvec(i,params,pot = 'm')
+                fv = hesse.getefvec(i,params_morse_normal,pot = 'm')
                 self.force_0_05_05_rest[idx] = self.force_0_05_05[idx] + fv[1]
                 print(i,LA.norm(i),'force_0_05_05 vasp_full',self.force_0_05_05[idx],"norm",-LA.norm(abs(self.force_0_05_05[idx])),'force morse',fm,'fv',-fv[1]) #,LA.norm(fv[1]))
             print('this parametrization, even for T=0K displacements, is not optimal!, try to add attractive forces on 0_45_45')
@@ -846,6 +811,8 @@ class get_all_disps():
             xy = np.loadtxt(path)
             xmin = xy[:,0].min()
             xmax = xy[:,0].max()
+            print('xmin',xmin)
+            print('xmax',xmax)
             xred_dense = np.arange(xmin,xmax,0.001)
             #print('xy')
             #print(xy)
@@ -877,7 +844,7 @@ class get_all_disps():
                 parameters = []
                 for i in mmodel_function_var:
                     coef = result.best_values.get(i)
-                    print(i,"mpd xx:",coef)
+                    print(i,"Forces xx:",coef)
                     parameters.append(coef)
                 print('parameters    ',parameters)
                 name = "xy"+add+"_michael_from_plot.dat"
@@ -890,10 +857,14 @@ class get_all_disps():
                     print(i,"derivative:",coef)
                     parameters_der.append(coef)
                 print('parameters_der',parameters_der)
+                if add == "allvar_noB":
+                    parameters_mi = parameters
+                    mmodel_key = 'Michael_poly_der_noA_noB'
+
                 np.savetxt(name+"_der.dat",np.array([xred_dense,mmodel_function_der(xred_dense,*parameters_der)]).T)
                 print('saved AAA FORCES derivative',name+"_der.dat")
 
-        if True:
+        if False:
             print("###################################################")
             print("# parametrize ueber 7 auslenkungen entlang [110]")
             print("###################################################")
@@ -904,17 +875,61 @@ class get_all_disps():
             sys.exit()
 
 
-        print("#########################################################################")
-        print("# fits on [0.5,-0.5,0.0]")
-        print("#########################################################################")
-        if True:
+        if False:
+            print("#########################################################################")
+            print("# fits on [0.5,-0.5,0.0]")
+            print("#########################################################################")
             for idx,i in enumerate(self.force_05_45_0):
                 dd = self.pos_all[idx,idx_05_45_0]-self.pos_all[idx,0]
                 dd = self.pos_all[idx,0]-self.pos_all[idx,idx_05_45_0]
                 dist_norm                           = np.around(LA.norm(dd),5)
-                fm                                  = np.round(hesse.Morse_derivative(LA.norm(dd), *params),4)
-                forces_morse                        = hesse.getefvec(dd,params,pot = 'm')
+                fm                                  = np.round(hesse.Morse_derivative(LA.norm(dd), *params_morse_normal),4)
+                forces_morse                        = hesse.getefvec(dd,params_morse_normal,pot = 'm')
                 print('idx',idx,i,"##""##",i[0],i[1],i[2],"##f",self.force_all[idx,idx_05_45_0],"##p",self.pos_all[idx,idx_05_45_0],self.pos_all[idx,0],dd,dist_norm,'for',fm,'ro',forces_morse)
+
+
+
+        if True:
+            print("############################################################")
+            print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)")
+            print("############################################################")
+            params_abcd,params_abcd_,params_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms)
+            mmodel_abcd = hesse.Michael_poly_der
+            print('params_abcd  ',params_abcd)
+            print('params_abcd_ ',params_abcd_)
+            print('params_abcd__',params_cd)
+            np.savetxt("xy_CHECK.dat",np.array([xred_dense,-1*mmodel_abcd(xred_dense,*params_abcd)]).T)
+            np.savetxt("xy_CHECK_.dat",np.array([xred_dense,-1*mmodel_abcd(xred_dense,*params_abcd_)]).T)
+            np.savetxt("xy_CHECK__.dat",np.array([xred_dense,-1*mmodel_abcd(xred_dense,*params_cd)]).T)
+
+        if True:
+            print("############################################################")
+            print("# parametrize Michaels Model only along 110 (axial) (a,b,c,d)")
+            print("############################################################")
+            params_axial_abcd,params_axial_abcd_,params_axial_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,parametrize_only_idx=[idx_05_05_0,idx_45_45_0])
+            mmodel_axial_abcd = hesse.Michael_poly_der
+            print('params_axial_abcd  ',params_axial_abcd)
+            print('params_axial_abcd_ ',params_axial_abcd_)
+            print('params_axial_abcd__',params_axial_cd)
+            np.savetxt("xy_CHECK_axial.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd)]).T)
+            np.savetxt("xy_CHECK_axial_.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd_)]).T)
+            np.savetxt("xy_CHECK_axial__.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_cd)]).T)
+
+
+        if True:
+            print("############################################################")
+            print("# parametrize first Michael_poly_der numerical")
+            print("# parametrize Morse over all neighbors")
+            print("############################################################")
+            params_m,params_m_,params_m__= my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,parametrize_only_idx=[idx_05_05_0,idx_45_45_0],function=hesse.Michael_poly_der)
+            print('first only axial forces')
+            mmodel_axial_abcd = hesse.Michael_poly_der
+            print('params_axial_abcd  ',params_axial_abcd)
+            print('params_axial_abcd_ ',params_axial_abcd_)
+            print('params_axial_abcd__',params_axial_cd)
+            np.savetxt("xy_CHECK_axial.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd)]).T)
+            np.savetxt("xy_CHECK_axial_.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd_)]).T)
+            np.savetxt("xy_CHECK_axial__.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_cd)]).T)
 
         print()
         print("#########################################################################")
@@ -935,6 +950,10 @@ class get_all_disps():
         indexes_NN              = [ idx_05_05_0, idx_45_45_0]
         indexes_NN_forces_sign  = [ -1.,         1. ]
 
+        # repulsive and attractive and tox 0,0.5,0.5
+        indexes_NN              = [ idx_05_05_0, idx_45_45_0, idx_0_05_05 ]
+        indexes_NN_forces_sign  = [ -1.,         1.,          1 ]
+
         # only repulsive
         #indexes_NN              = [ idx_05_05_0]
         #indexes_NN_forces_sign  = [ -1.       ]
@@ -942,68 +961,123 @@ class get_all_disps():
         # all atoms in the 001 plane
         indexes_NN              = [ idx_05_05_0, idx_45_45_0, idx_05_45_0, idx_45_05_0, idx_0_05_05, idx_0_45_45 ]
         indexes_NN_forces_sign  = [ -1.,         1          , 1          , 1          , 1          , 1]
+
+        # all atoms in the 001 plane
+        #indexes_NN              = [ idx_05_05_0,  idx_0_05_05]
+        #indexes_NN_forces_sign  = [ -1.        , 1          ]
         x = []
         y = []
-        ymo = []
         ymi = []
+        print('params_morse_normal    :',params_morse_normal)
+        print('params_morse_normal_rel:',fit_rel.parameters)
+        print('parameters             :',parameters)
+        print('mmodel_function        :',mmodel_function)
+        print('mmodel_function_der    :',mmodel_function_der)
+        print('mmodel_key             :',mmodel_key)
+
+
         for idx_nn, indexname_nn in enumerate(indexes_NN):
             print()
             for disp_idx in np.arange(len(self.pos_all)):
                 D  = self.pos_all[disp_idx,0]-self.pos_all[disp_idx,indexname_nn]
                 dist_norm     = np.around(LA.norm(D),5)
+                dist_norm_rel = dist_norm/self.alat
                 x += [LA.norm(D)]
                 Fv = self.force_all[disp_idx,indexname_nn]
                 fv = indexes_NN_forces_sign[idx_nn]*LA.norm(Fv)   # affected by sign
                 y += [fv]
 
                 #### use a particular model
-                fmo = hesse.Morse_derivative(LA.norm(D), *params)
-                Fmo = hesse.getefvec(D,params,pot = 'm')[1]
-                Fdmo = Fv - Fmo
+                if True: # do the test
+                    fmo_test = hesse.Morse_derivative(LA.norm(D/self.alat), *fit_rel.parameters)
+                    Fmo_test = hesse.getefvec(D/self.alat,fit_rel.parameters,pot = 'm')[1]
+
+                ### use michaels model by summing over all neighbors
+                #print('f_all')
+                Fmo = -my.get_forces_on_atom_by_considering_all_its_1NNs(fit_rel.parameters,fit_rel.model,atoms,alat,atomnr=indexname_nn,pos=self.pos_all[disp_idx]/self.alat)
+                Fma = -my.get_forces_on_atom_by_considering_all_its_1NNs(fit_rel_repulsive.parameters,hesse.Morse_repulsive_derivative,atoms,alat,atomnr=indexname_nn,pos=self.pos_all[disp_idx]/self.alat)
+                f_all    = my.get_forces_on_atom_by_considering_all_its_1NNs(params_cd,mmodel_abcd,atoms,alat,atomnr=indexname_nn,pos=self.pos_all[disp_idx]/self.alat)
+                f_all_ax = my.get_forces_on_atom_by_considering_all_its_1NNs(params_axial_cd,mmodel_abcd,atoms,alat,atomnr=indexname_nn,pos=self.pos_all[disp_idx]/self.alat)
+
+
                 fmieq  = mmodel_function(1/np.sqrt(2.),*parameters)
-                fmipd  = mmodel_function(dist_norm/self.alat,*parameters)
+                fmipd  = mmodel_function(dist_norm_rel,*parameters)
                 fmi = fmipd - fmieq
-                ymo += [fmo]
+                #fmaeq  = mmodel_function(1/np.sqrt(2.),*parameters)
+                #fmapd  = mmodel_function(dist_norm_rel,*parameters)
+                if False:
+                    fal = mmodel_abcd(dist_norm_rel,*par_full) - mmodel_function(1/np.sqrt(2.),*par_full)
+
+                fmi_test = hesse.Michael_poly_der_noA_noB_axial_subtract(dist_norm_rel,*parameters)
                 ymi += [fmi]
-                #print('parameters    ',parameters)
-                #print('parameters_der',parameters_der)
-                #print('mmodel_function',mmodel_function)  # MPnoB
-                #print('mmodel_key     ',mmodel_key)       # MPnoB
                 D0 = self.pos_all[0,0]-self.pos_all[0,indexname_nn]
                 Fmieq = hesse.getefvec(D0/self.alat,parameters,pot = mmodel_key,paramsder=parameters_der)[1]
                 Fmid  = hesse.getefvec(D/self.alat,parameters,pot = mmodel_key,paramsder=parameters_der)[1]
+                #Fmieq = hesse.getefvec(D0/self.alat,parameters,pot = mmodel_key)[1] #,paramsder=parameters_der)[1]
+                #Fmid  = hesse.getefvec(D/self.alat,parameters,pot = mmodel_key)[1] #,paramsder=parameters_der)[1]
                 Fmi   = Fmid - Fmieq
-                Fdmi = Fv - (Fmid-Fmieq)
-                if disp_idx == 0 or disp_idx == 7:
-                    print(
-                        '|fmipd|:',str(np.round(fmipd,5)).ljust(8),
-                        '-|fmieq|:',str(np.round(fmieq,5)).ljust(8),
-                        'Fv:',str(Fv).ljust(22),
-                        'Fmieq:',str(Fmieq).ljust(22),
-                        'Fmid:',str(Fmid).ljust(22),
-                        'Fmi:',str(Fmi).ljust(22)
-                            )
+                #if disp_idx == 0 or disp_idx == 7:
+                #    print(
+                #        '|fmipd|:',str(np.round(fmipd,5)).ljust(8),
+                #        '-|fmieq|:',str(np.round(fmieq,5)).ljust(8),
+                #        'Fv:',str(Fv).ljust(22),
+                #        'Fmieq:',str(Fmieq).ljust(22),
+                #        'Fmid:',str(Fmid).ljust(22),
+                #        'Fmi:',str(Fmi).ljust(22)
+                #            )
                 print(
                         str(indexname_nn).ljust(3),
                         str(self.pos_all[disp_idx,indexname_nn]).ljust(19),
-                        '|d|',str(np.round(dist_norm,4)).ljust(6),str(np.round(dist_norm/self.alat,4)).ljust(6),
+                        '|d|',str(np.round(dist_norm,4)).ljust(6),str(np.round(dist_norm_rel,4)).ljust(6),
                         'D:',str(D).ljust(23),
                         'D:',str(D/self.alat).ljust(23),
                         '||',
-                        '|fv!|',str(np.round(fv,5)).ljust(8),
-                        '|fmo|:',str(np.round(fmo,5)).ljust(8),
-                        '|fmi|:',str(np.round(fmi,5)).ljust(8),
+                        #'|fv!|',str(np.round(fv,5)).ljust(8),
+                        #'|fmo_t|:',str(np.round(fmo_test,5)).ljust(8),
+                        #'|fmi|:',str(np.round(fmi,5)).ljust(8),
+                        #'|fmi_test|:',str(np.round(fmi_test,5)).ljust(8),
                         #'|fmipd|:',str(np.round(fmipd,5)).ljust(8),
                         #'-|fmieq|:',str(np.round(fmieq,5)).ljust(8),
-                        'Fv:',str(Fv).ljust(22),
-                        'Fmo:',str(Fmo).ljust(22),
+                        #'Fv:',str(Fv).ljust(22),
+                        #'Fmo:',str(Fmo).ljust(22),
+                        #'Fma:',str(Fma).ljust(22),
+                        #'Fmo_t:',str(Fmo_test).ljust(22),
                         #'Fmi:',str(Fmi).ljust(22),
-                        'Fdmo:',str(Fdmo).ljust(22),
-                        'Fdmi:',str(Fdmi).ljust(22),
+                        #'Fmid:',str(Fmid).ljust(22),
+                        #'Fmieq:',str(Fmieq).ljust(22),
+                        #'Fmo:' ,str(Fmo).ljust(22),
+                        'Fd_Fmo:' ,str(Fv - Fmo).ljust(22),
+                        'Fd_Fma:' ,str(Fv - Fma).ljust(22),
+                        'Fd_mi_ax:' ,str(Fv - Fmi).ljust(22),
+                        'dF_all:'   ,str(Fv -f_all).ljust(22),
+                        'dF_all_ax:',str(Fv -f_all_ax).ljust(22),
                         #'Fmieq:',str(Fmieq).ljust(22),
                         #'-> r=0.71',np.round(fmp,5),
                         #'r=|d|:',np.round(fmpd,5),
                         #'fmi:',np.round(fmfmii,5)
+                        )
+                if disp_idx == 7 and False:
+                    # this need basically to loop over all interacting particles (here: first NN)
+                    # Fv = sum over all forces
+                    vec = D/self.alat               # given for every particle
+                    vecnorm = r = np.linalg.norm(vec)   # given for every particle
+                    vec_over_vecnorm = vec/vecnorm
+                    fnorm = hesse.Michael_poly_der_noA_noB(r,*parameters)  # this gives only the force, I would like to get this
+                    #fnorm =
+                    force = vec_over_vecnorm * fnorm
+                    print("@@!!",
+                        'v_o_v:',str(vec_over_vecnorm).ljust(22),
+                        'Fv:',str(Fv).ljust(22),
+                        'D:',str(vec).ljust(23),
+                        'Fmid:',str(Fmid).ljust(22),
+                        'fnorm:',str(fnorm).ljust(22),
+                        'force:',str(force).ljust(22),
+                        " 1. get a function that for a given ATOM, gives all its 1NN (NN=a,b,c,d,...) (or its 2NN, 3NN, ...), basically, D for particular neighbors.",
+                        " 2. write down the equation to solve: FORCE_VASP(ATOM)__x = SUM_over_all_neighbors[v_o_v__NN__x*Forcefunction(r)]",
+                        "                                      FORCE_VASP(ATOM)__y = SUM_over_all_neighbors[v_o_v__NN__y*Forcefunction(r)]",
+                        "                                      FORCE_VASP(ATOM)__z = SUM_over_all_neighbors[v_o_v__NN__z*Forcefunction(r)]",
+                        " 3. This gives, for every displacement (=7), for every NN (=12), three (=x,y,z) equations.",
+                        " was ich jetzt loesen muss ist ein gleichungssystem von vielen vektoren D and die VASP force, mache , basically, D for particular neighbors."
                         )
         print(      print())
         x = np.array(x)
@@ -1012,17 +1086,45 @@ class get_all_disps():
         print('x',x)
         print('xrel',xrel)
         print('y',y)
+
         take_xrel = True
         add = ""
         if take_xrel == True:
             x = xrel
             add = "_xrel"
-        np.savetxt("xy_from_vasp_plot"+add+".dat",np.array([x,y]).T)
-        np.savetxt("xy_from_mors"+add+".dat",np.array([x,ymo]).T)
-        np.savetxt("xy_from_mich"+add+".dat",np.array([x,ymi]).T)
+
+        np.savetxt("xy_from_VASP"+add+".dat",np.array(self.disp_vs_force_rel))
+        np.savetxt("xy_chosen_displacements_"+add+".dat",np.array([x,y]).T)
+        print('written',"xy_from_VASP"+add+".dat")
+        print('written',"xy_chosen_displacements_"+add+".dat")
+
+
+
+        if True:
+            print("###################################################")
+            print("# parametrize michaels function from original vasp forces (only axial)")
+            print("###################################################")
+            print('x',x)
+            print('y',y)
+            mmodel_function = hesse.Michael_poly_der_noA_noB_axial_subtract
+            mmodel_function_resulting = hesse.Michael_poly_der_noA_noB
+            mmodel = Model(mmodel_function)
+            print('mmodel:',mmodel)
+            mmodel_function_var = [ 'c','d' ]
+            for i in mmodel_function_var: mmodel.set_param_hint(i ,value=1) #, min=0.01, max=0.5)
+            result = mmodel.fit(y, r=x)
+            parameters_mi = []
+            for i in mmodel_function_var:
+                coef = result.best_values.get(i)
+                print(i,"Forces xx:",coef)
+                parameters_mi.append(coef)
+
+            np.savetxt("xy_chosen_displacements_"+add+"fit.dat",np.array([xred_dense,mmodel_function(xred_dense,*parameters_mi)]).T)
+            np.savetxt("xy_chosen_displacements_"+add+"fit_resulting.dat",np.array([xred_dense,mmodel_function_resulting(xred_dense,*parameters_mi)]).T)
+        #np.savetxt("xy_from_mich"+add+".dat",np.array([x,ymi]).T)
         #print(self.disp_vs_force)
-        np.savetxt("xy_from_VASP"+add+".dat",np.array([self.disp_vs_force[:,0]/self.alat,self.disp_vs_force[:,1]]).T)
-        print('written')
+
+
 
 
 
@@ -1290,6 +1392,8 @@ if __name__ == '__main__':
         e.g. get_parametrization_for_displacementfolder.py -f . -spta 4.09 -rp
         e.g. get_parametrization_for_displacementfolder.py -e Al --folder_alat_lattice_T0K    # searches a particular folder for the parametrization
         e.g. get_parametrization_for_displacementfolder.py -e Al --folder_alat_lattice_T0K -v -spta 4.13   # to get corresponding shifted parametrization at other alat
+        e.g. get_parametrization_for_displacementfolder.py -e Al -f /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400/ -v
+
 
 
 

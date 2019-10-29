@@ -51,6 +51,7 @@ def help(p = None):
           (gives correct std and dudl as python scripts -> $basefolder/ti/summary_al; change to lambda0.0 to see corresponding result)
     - argparse_md_code.py -rp $testfolder_al_disp/POSITIONs -v -D_mor 0.2793 -a_mor 1.432673 -a 4.13 -N 5 -waf
     - argparse_md_code.py  -f $basefolder/ti/ti_original_hesse/Al/lambda0.0_20604/ -v -wa  (for lambda 0.0 and 1.0 gives same ene std harm)
+    - argparse_md_code.py -e Al -f /Users/glensk/Dropbox/Albert/v/pp/al/molecular_dynamics_lifetimes/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_run_2 -p prl2019_900K
 
     - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2   # parametrization from the 2x2x2 supercell displacements (I think)
 	==> (Al) ene_std:   8.8 for_std:  0.157  dudl/2:   7.4  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43267  D_mor 0.27930 ||(PRL NO )

@@ -1184,9 +1184,37 @@ def Morse_derivative(r,De,aa,re):
     subst: np.exp(-aa*(r-re)) == dum
     2.*aa*De*dum*(1.-dum)
 
+    das maximum der kraefete ist bei r = re + Ln(2)/aa
+
     '''
     return 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
 
+def Morse_repulsive(r,De,aa,re):
+    ''' Mathematica:
+    U[r_] := d (1 - Exp[-a (r - re)])^2;
+    Solve[D[D[U[r], r], r] == 0, r, Reals]; (*r -> -((-a re - Log[2])/a)*)
+    '''
+    rmax = re + np.log(2)/aa
+    return Morse(r,De,aa,re) - Morse(rmax,De,aa,re)
+
+def Morse_repulsive_derivative(r,De,aa,re):
+    ''' Mathematica:
+    U[r_] := d (1 - Exp[-a (r - re)])^2;
+    Solve[D[D[U[r], r], r] == 0, r, Reals]; (*r -> -((-a re - Log[2])/a)*)
+    '''
+    rmax = re + np.log(2)/aa
+    return Morse_derivative(r,De,aa,re) - Morse_derivative(rmax,De,aa,re)
+
+def Morse_repulsive_derivative(r,De,aa,re):
+    ''' Mathematica:
+    U[r_] := d (1 - Exp[-a (r - re)])^2;
+    Solve[D[D[U[r], r], r] == 0, r, Reals]; (*r -> -((-a re - Log[2])/a)*)
+    '''
+    #rmax = re + np.log(2)/aa
+    return Morse_derivative(r,De,aa,re) - Morse_derivative(re+np.log(2)/aa,De,aa,re)
+
+def Morse_repulsive_derivative_to_normaldata(r,De,aa,re):
+    return Morse_repulsive_derivative(r,De,aa,re) - Morse_repulsive_derivative(re,De,aa,re)
 
 def Michael_poly_der(r,a,b,c,d):
     ''' dies sind die kraefte '''
@@ -1200,9 +1228,14 @@ def Michael_poly_der_der_der(r,a,b,c,d):
     return  12.*d/r**5. + 6.*c/r**4. + 2.*b/r**3.
 
 
+def Michael_poly_noA_noB(r,c,d):
+    ''' this is the energy '''
+    return 1
+
 def Michael_poly_der_noA_noB(r,c,d):
     ''' dies sind die kraefte ohne a, works'''
     rcut = 0.84
+    rcut = 0.88
     # ForcesDerivative(rcut=0.84)=0
     # - 3.*d/rcut**4. - 2.*c/rcut**3. - b/rcut**2. = 0
     b = - 3.*d/rcut**2. - 2.*c/rcut  # from first der b(d,c)
@@ -1211,6 +1244,10 @@ def Michael_poly_der_noA_noB(r,c,d):
     # a + b*r**(-1) + c*r**(-2) + d*r**(-3) = 0 --> a =  - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3)
     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)
     return a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)
+
+def Michael_poly_der_noA_noB_axial_subtract(r,c,d):
+    ''' the equilibrium distance is always 1./np.sqrt(2.) in rel coords '''
+    return Michael_poly_der_noA_noB(r,c,d) - Michael_poly_der_noA_noB(1./np.sqrt(2.),c,d)
 
 def Michael_poly_der_der_noA_noB(r,c,d):
     rcut = 0.84
@@ -1835,6 +1872,9 @@ def getef(vecnorm,params,pot = False,paramsder=False):
     if pot == 'MPnoB':
         function = MPEnoB   # her
         functionder = MPnoB
+    if pot == 'Michael_poly_der_noA_noB':
+        function = Michael_poly_noA_noB   # energy
+        functionder = Michael_poly_der_noA_noB
     if function == None:
         sys.exit("pot not recognized")
     #e =    function(longvecnorm,*params)
