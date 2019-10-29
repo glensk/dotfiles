@@ -4884,7 +4884,7 @@ class ase_calculate_ene( object ):
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
             #if printminimal == True:
-            if True:
+            if verbose:
                 print('ene ase tot (eV):',str(round(ene_ev,7)).ljust(10),'nat:'+str(nat),"vol/pa:",str(round(vol/nat,7)).ljust(10),'(eV/at):',str(ene/nat).ljust(19)) #self.units)
             #print('ams3',atoms_murn_loop.get_stress(),ase_vpa(atoms_murn_loop))
             if verbose > 2:
