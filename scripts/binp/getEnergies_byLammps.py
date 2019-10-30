@@ -1707,12 +1707,17 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     conz2 = (d["Mg"]+d["Si"])
     conz = np.float(d["Mg"])/np.float((d["Mg"]+d["Si"]))
     nat = frame.get_number_of_atoms()
-    print('d[Mg]',d["Mg"],'d[Si]',d["Si"],'number_of_atoms=nat:',nat,'formula_unit',formula_unit)
+    print('d[Mg]:',d["Mg"],'d[Si]:',d["Si"],'d[Al]:',d["Al"],'number_of_atoms=nat:',nat,'formula_unit',formula_unit)
+    print('ace.fDFT_dilute_mg',ace.fDFT_dilute_mg,"ace.E_SS_Mg",ace.E_SS_Mg)
+    print('ace.fDFT_dilute_si',ace.fDFT_dilute_si,"ace.E_SS_Si",ace.E_SS_Si)
+    print('ace.fDFT_dilute_al',ace.fDFT_dilute_al,"ace.E_SS_Al",ace.E_SS_Al)
+    print('energy_NN_cell_unrelaxed_or_DFTrelaxed',energy_NN_cell_unrelaxed_or_DFTrelaxed)
 
     heat_precip_T0K_DFT = "-"
     eDFT = ""
     if DFT_ene != False:
         eDFT   		= my.ase_enepot(frame  ,units=ace.units)
+        print('eDFT                                  ',eDFT)
         e           = ace.ene(frame)
         #print('energy_DFT',eDFT)
         ediff_ev  	= energy_NN_cell_unrelaxed_or_DFTrelaxed - eDFT
@@ -1736,11 +1741,13 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
             eform = heat_precip_T0K_DFT*formula_unit
             #print('eform DFT per formula unit:',np.round(eform,3))
             f=open(ace.written_summary[0]+"_per_formula_unit.dat", "a+")
+            print('wirttein to',ace.written_summary[0]+"_per_formula_unit.dat")
             f.write(str(conz)+"   "+str(eform)+" "+text.replace(" ", "_")+"\n")
             f.close()
 
 
     # write NN@DFT
+    print('-->>',energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.E_SS_Mg - d["Si"]*ace.E_SS_Si - d["Al"]*ace.E_SS_Al)
     heat_precip_T0K_NN_unrelaxed  = (energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.E_SS_Mg - d["Si"]*ace.E_SS_Si - d["Al"]*ace.E_SS_Al)/nat
     print_compare_ene_vs_DFT(my.printred("@fixed   pos: NN "+text+" @0K"),heat_precip_T0K_NN_unrelaxed,heat_precip_T0K_DFT,False,"-",check="",verbose=ace.verbose,formula_unit=formula_unit)
     #print('heat_precip_T0K_NN_unrelaxed',heat_precip_T0K_NN_unrelaxed)
@@ -1754,6 +1761,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         eform = heat_precip_T0K_NN_unrelaxed*formula_unit
         #print('eform NN per formula unit:',np.round(eform,3))
         f=open(ace.written_summary[1]+"_per_formula_unit.dat", "a+")
+        print('wirttein to',ace.written_summary[1]+"_per_formula_unit.dat")
         f.write(str(conz)+"   "+str(eform)+" "+text.replace(" ", "_")+"\n")
         f.close()
 
@@ -1783,6 +1791,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         if formula_unit != False:
             eform = heat_precip_T0K*formula_unit
             f=open(ace.written_summary[2]+"_per_formula_unit.dat", "a+")
+            print('wirttein to',ace.written_summary[2]+"_per_formula_unit.dat")
             f.write(str(conz)+"   "+str(eform)+" "+text.replace(" ", "_")+"\n")
             f.close()
 
@@ -2021,12 +2030,16 @@ def test_antisites(ace):
     print("######## antisites #############")
 
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
-    doit = [ "Mg5Al2Si4" ]
-    doit = [ "Mg5Si6" ]
+    #doit = [ "Mg5Si6" ]
+    #doit = [ "Mg5Al2Si4" ]
+    doit = [ "Mg4Al3Si4" ]
+    pwd = os.getcwd()
+    print('pwd',pwd)
     for i in doit:
         # where to save the formation energies
         #wsp = ace.savefolder+"summary_formations_antisites_"+i+"_"
-        wsp = os.getcwd()+"/summary_formations_antisites_"+i+"_"
+
+        wsp = pwd+"/summary_formations_antisites_"+i+"_"
         ace.written_summary = [ wsp+"DFT_T0.dat", wsp+"NNatDFT_T0.dat",wsp+"NN_T0.dat" ]
         for wsp_ in ace.written_summary:
             if os.path.isfile(wsp_): os.remove(wsp_)
@@ -2039,7 +2052,7 @@ def test_antisites(ace):
         frames = ase_read(path,":",format="runner")
         #print('frames[0].nat',frames[0].get_number_of_atoms())
         #print('frames[0].nat',frames[0].get_number_of_atoms()/2)
-        formula_unit = frames[0].get_number_of_atoms()/2
+        formula_unit = 11. #frames[0].get_number_of_atoms()/2
         for frame in frames:
             #hessematrix_try = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
             #get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
