@@ -326,7 +326,8 @@ def get_energies(args):
                 print('after relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx],frames.get_forces()[idx])
     if args.inputfile != False:
         my.check_isfile_or_isfiles([args.inputfile],verbose=args.verbose)
-        frames = ase_read(args.inputfile,format=args.format_in)
+        print('args.format_in',args.format_in)
+        frames = ase_read(args.inputfile) #,format=args.format_in)
 
 
     if args.thermo or args.evinet or args.fqh or args.fah:
