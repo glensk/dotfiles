@@ -1342,6 +1342,7 @@ def get_dilute_formation_energy(text="dilute formation energy supercell",sc="all
 
         print('############## get the dilute frame Al+{Si,Mg} (T=0K ene_al_xx)')
         frame_path = ace.savefolder+"frame_solute_Al"+str(nat-1)+solute_element+"1.runner"
+        print('fp',frame_path)
         if os.path.isfile(frame_path):
             if ace.verbose:
                 print('read frame path:',frame_path)
@@ -1349,7 +1350,28 @@ def get_dilute_formation_energy(text="dilute formation energy supercell",sc="all
             ene_al_xx = ace.ene(frame_al_xx) # this is already relaxed
         else:
             frame_al_xx = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=sc,nsi=nsi,nmg=nmg,nvac=nvac,a0=(vpa*4.)**(1./3.),cubic=True)
+            # here, we want to work in he constant pressure approach
+            # for this we need to relax atomic positions && volume
+            print('p0 p',frame_al_xx.positions[0])
+            print('p0 v',frame_al_xx.get_volume())
+            print('p0 s',frame_al_xx.get_stress())
             ene_al_xx = ace.ene(frame_al_xx,atomrelax=True) # this takes a bit of time
+            print('p1 p',frame_al_xx.positions[0])
+            print('p1 v',frame_al_xx.get_volume())
+            print('p1 s',frame_al_xx.get_stress())
+
+            ase_relax_atomic_positions_only(self,frame_al_xxx,fmax=0.0001,verbose=False,output_to_screen=False)
+            print('p2 p',frame_al_xx.positions[0])
+            print('p2 v',frame_al_xx.get_volume())
+            print('p2 s',frame_al_xx.get_stress())
+
+
+            ase_relax_cellshape_and_volume_only(self,atoms,verbose=False)
+            print('p3 p',frame_al_xx.positions[0])
+            print('p3 v',frame_al_xx.get_volume())
+            print('p3 s',frame_al_xx.get_stress())
+            #ace.ase_relax_atomic_positions_only(struct_dilute_si_NN,fmax=0.0001,verbose=False)
+            sys.exit()
             ase_write(frame_path,frame_al_xx,format="runner")
 
 
@@ -1359,14 +1381,16 @@ def get_dilute_formation_energy(text="dilute formation energy supercell",sc="all
         ############## get the dilute_formation @T=0K && ace.eform_dilute_xx_
         dilute_formation      = ene_al_xx  - (sc**3.*4. -1.) * ace.al_fcc_ene_pa
         ace.E_SS_Al                     = ace.al_fcc_ene_pa
-        print('XX ace.E_SS_Al',ace.E_SS_Al)
+        #print('XX ace.E_SS_Al',ace.E_SS_Al)
         #sys.exit('5555555')
         if solute_element == "Si":
             ace.E_SS_Si              = dilute_formation
             print('XX ace.E_SS_Si     has ene in sc:',sc,"ene",ene_al_xx)
+            print('stress',ace.stress(frame_al_xx))
         if solute_element == "Mg":
             ace.E_SS_Mg              = dilute_formation
             print('XX ace.E_SS_Mg     has ene in sc:',sc,"ene",ene_al_xx)
+            print('stress',ace.stress(frame_al_xx))
 
 
         ############## get the temperature dependent stuff
@@ -1535,10 +1559,11 @@ def get_basic_NN_energies_ace(ace):
         print("NN 4 Al vpa @T=0K",my.ase_vpa(ace.al_fcc)) #,"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     #sys.exit('ace fcc al si dc')
         print('before too lon 12')
-    get_dilute_formation_energy(text="NN dilute formation energy Si ",sc=4,nsi=1,nmg=0,e_si_diamond_pa=ace.si_dc_ene_pa,ace=ace,t2="Kobayashi 0.375 eV")
+    sc = 3;
+    get_dilute_formation_energy(text="NN dilute formation energy Si ",sc=sc,nsi=1,nmg=0,e_si_diamond_pa=ace.si_dc_ene_pa,ace=ace,t2="Kobayashi 0.375 eV")
     #sys.exit('too lon 12')
-    get_dilute_formation_energy(text="NN dilute formation energy Mg ",sc=4,nsi=0,nmg=1,e_si_diamond_pa=ace.mg_hcp_ene_pa,ace=ace,t2="Kobayashi 0.090 eV")
-    get_dilute_formation_energy(text="NN dilute formation energy Vac",sc=4,nsi=0,nmg=0,nvac=1,e_si_diamond_pa=0.,ace=ace,t2="Kobayashi 0.654 eV")
+    get_dilute_formation_energy(text="NN dilute formation energy Mg ",sc=sc,nsi=0,nmg=1,e_si_diamond_pa=ace.mg_hcp_ene_pa,ace=ace,t2="Kobayashi 0.090 eV")
+    get_dilute_formation_energy(text="NN dilute formation energy Vac",sc=sc,nsi=0,nmg=0,nvac=1,e_si_diamond_pa=0.,ace=ace,t2="Kobayashi 0.654 eV")
     print()
     return
 
@@ -1604,6 +1629,8 @@ def get_dilute_si_mg_f(ace):
     print()
     print('ace.e_pure_al   (',108,'atoms)',ace.e_pure_al/108,"(per atom)")
     print('ace.e_dilute_si (',108,'atoms)',ace.e_dilute_si,"(per cell)")
+    print('stress disule_si',ace.stress(struct_dilute_si_NN))
+    print('stress disule_mg',ace.stress(struct_dilute_mg_NN))
 
 
     print()
