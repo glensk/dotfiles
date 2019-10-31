@@ -4818,6 +4818,40 @@ class ase_calculate_ene( object ):
         if verbose > 1: self.check_frame('ase_relax_cellshape_and_volume_only out',frame=atoms)
         return
 
+    def ase_relax_cellshape_volume_positions(self,atoms,verbose=False):
+        print('relaxing cellshape, volume, positions .... this may take a while.')
+        self.get_calculator(atoms)
+        delta_pos_max = 0.00001
+        stress_max = 0.000001
+
+        i = 0
+        stressmax = 10
+        deltaposmax = 10
+        while stressmax > stress_max or deltaposmax > delta_pos_max:
+            i+=1
+            pos_in = atoms.copy().positions
+            #print('px0 p',atoms.positions[1])
+            self.ase_relax_atomic_positions_only(atoms,fmax=0.0001,verbose=False,output_to_screen=False)
+            #print('px1 p',atoms.positions[1])
+            self.ase_relax_cellshape_and_volume_only(atoms,verbose=False)
+            #print('px2 p',atoms.positions[1])
+            pos_out = atoms.positions
+
+            if verbose:
+                print(i,'px?in  p',pos_in[1])
+                print(i,'px?out p',pos_out[1])
+
+
+            deltaposmax = np.abs(pos_in - pos_out).max()
+            if verbose:
+                print(i,'deltaposmax',deltaposmax)
+            stressmax = np.abs(atoms.get_stress()).max()
+            if verbose:
+                print(i,i, 'stressmax',stressmax)
+        return
+
+
+
     def get_murn(self,atomsin=False,verbose=False,
             return_minimum_volume_frame=False,
             return_frame_with_volume_per_atom=False,
