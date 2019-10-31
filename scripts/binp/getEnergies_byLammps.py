@@ -1674,13 +1674,13 @@ def get_dilute_si_mg_f(ace):
     # from NN:
     #  ene 107al1si
     # -57663.3933854  - (-58045.8813009/108*107) - (ace.si_dc_ene_pa)
-    kb = ace.e_dilute_si - (107*ace.al_fcc_ene_pa) - ace.si_dc_ene_pa
-    print('kb',kb)
-    print('ace.e_dilute_si         (eV)',ace.e_dilute_si,"?? -57663.3933854 eV (in3x3x3cell)")
-    print('ace.si_dc_ene_pa        (eV)',ace.si_dc_ene_pa,"?? -155.368143627 eV")
-    print("ace.e_pure_al/108       (eV)",ace.e_pure_al/108,"?? -537461.99 eV")
-    print("(107*ace.e_pure_al/108) (eV)",(107*ace.e_pure_al/108),"??, -57508.4338719 eV")
-    sys.exit()
+    if False:
+        kb = ace.e_dilute_si - (107*ace.al_fcc_ene_pa) - ace.si_dc_ene_pa
+        print('kb',kb)
+        print('ace.e_dilute_si         (eV)',ace.e_dilute_si,"?? -57663.3933854 eV (in3x3x3cell)")
+        print('ace.si_dc_ene_pa        (eV)',ace.si_dc_ene_pa,"?? -155.368143627 eV")
+        print("ace.e_pure_al/108       (eV)",ace.e_pure_al/108,"?? -537461.99 eV")
+        print("(107*ace.e_pure_al/108) (eV)",(107*ace.e_pure_al/108),"??, -57508.4338719 eV")
     #
     #   -533920.334868975333*108  -(107*-537461.993661476416) -(-155368.146177827992) = 405 meV ! correct formation energy one si in al
     # = -57663396.1658493         -57508433.321778
