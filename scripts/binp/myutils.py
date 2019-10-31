@@ -4822,7 +4822,9 @@ class ase_calculate_ene( object ):
         print('relaxing cellshape, volume, positions .... this may take a while.')
         self.get_calculator(atoms)
         delta_pos_max = 0.00001
-        stress_max = 0.000001
+        stress_max = 0.00001
+        delta_pos_max = 0.1
+        stress_max = 0.1
 
         i = 0
         stressmax = 10

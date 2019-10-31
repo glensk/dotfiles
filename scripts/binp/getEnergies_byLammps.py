@@ -1666,15 +1666,15 @@ def get_dilute_si_mg_f(ace):
 
     #print('ace.si_dc_ene_pa',ace.si_dc_ene_pa)
 
-    ka =  ace.e_dilute_si    - 107*ace.al_fcc_ene_pa  - ace.si_dc_ene_pa     # eV per defect
-    print('ka',ka,'eV')
-    # for one si in al: from vasp PBE energies
-    #  ene 31al1si/32          ene1al                 ene1si
-    # -3784.479489982940*32-(-3745.245421433458*31)-(-5424.95)
-    # from NN:
-    #  ene 107al1si
-    # -57663.3933854  - (-58045.8813009/108*107) - (ace.si_dc_ene_pa)
     if False:
+        ka =  ace.e_dilute_si    - 107*ace.al_fcc_ene_pa  - ace.si_dc_ene_pa     # eV per defect
+        print('ka',ka,'eV')
+        # for one si in al: from vasp PBE energies
+        #  ene 31al1si/32          ene1al                 ene1si
+        # -3784.479489982940*32-(-3745.245421433458*31)-(-5424.95)
+        # from NN:
+        #  ene 107al1si
+        # -57663.3933854  - (-58045.8813009/108*107) - (ace.si_dc_ene_pa)
         kb = ace.e_dilute_si - (107*ace.al_fcc_ene_pa) - ace.si_dc_ene_pa
         print('kb',kb)
         print('ace.e_dilute_si         (eV)',ace.e_dilute_si,"?? -57663.3933854 eV (in3x3x3cell)")
@@ -2044,8 +2044,45 @@ def test_Mg2Si(ace):
     return
 
 
+def relax_structure_fully_and_save_to_pot(ace,read=False):
+    pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
+    readpath = pathbase + read
+    if not os.path.isfile(readpath):
+        sys.exit('readpath '+readpath+" does NOT exist (55); Exit")
+
+    print('read from',readpath)
+    frames = ase_read(readpath,":",format="runner")  # frames with DFT energies.
+    #print('ace.pot',ace.pot.pot)
+    #print('ace.pot',ace.pot.potpath)
+    #print('ace.pot',ace.pot.use_epoch)
+    savefolder = ace.pot.potpath+"/epoch_"+str(ace.pot.use_epoch)
+    if not os.path.isdir(savefolder):
+        os.mkdir(savefolder)
+    savepath = savefolder+"/RELAXED_fully_"+read
+    if os.path.isfile(savepath):
+        frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
+        if len(frames) == len(frames_out):
+            return frames
+        else:
+            print('savepath exists but has different name than readpath')
+            sys.exit('savepath '+savepath+" does already exist (55); Exit")
+
+    print('saved to ',savepath)
+    for idx,atoms in enumerate(frames):
+        print('idx',idx,'out of',len(frames))
+        ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
+        ase_write(savepath,atoms,format='runner',append=True)
+    frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
+    return frames_out
+
+
+
 def test_antisites(ace):
     print("######## antisites #############")
+    i =  "Mg4Al3Si4"
+    read = "aiida_exported_group_out_antisites_rep"+i+"_NEW.runner_calc__all_steps.input.data"
+    frames_relaxed = relax_structure_fully_and_save_to_pot(ace,read)
+    sys.exit('88888866666')
 
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
     #doit = [ "Mg5Si6" ]
@@ -2067,7 +2104,7 @@ def test_antisites(ace):
         print('antisites based on',i)
         path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_out_antisites"+i+".runner_calc__all_steps.input.data"
         path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_out_antisites_rep"+i+"_NEW.runner_calc__all_steps.input.data"
-        frames = ase_read(path,":",format="runner")
+        frames = ase_read(path,":",format="runner")  # frames with DFT energies.
         #print('frames[0].nat',frames[0].get_number_of_atoms())
         #print('frames[0].nat',frames[0].get_number_of_atoms()/2)
         formula_unit = 11. #frames[0].get_number_of_atoms()/2
