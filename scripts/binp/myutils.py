@@ -5365,6 +5365,58 @@ def ase_mepa(atoms):
 def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
+def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
+    pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
+    readpath = pathbase + read
+    if not os.path.isfile(readpath):
+        sys.exit('readpath '+readpath+" does NOT exist (55); Exit")
+
+    #print('read from',readpath)
+    #print('whichstruct',whichstruct)
+    frames = ase_read(readpath,index=whichstruct,format="runner")  # frames with DFT energies.
+    #print('type(frames)',type(frames))
+    #print('frames.cell',frames.cell)
+    if type(frames) != list:
+        frames = [frames]
+    #print('whichstruct',whichstruct)
+    #print('frame len',len(frames))
+    #print('ace.pot',ace.pot.pot)
+    #print('ace.pot',ace.pot.potpath)
+    #print('ace.pot',ace.pot.use_epoch)
+    savefolder = ace.pot.potpath+"/epoch_"+str(ace.pot.use_epoch)
+    if not os.path.isdir(savefolder):
+        os.mkdir(savefolder)
+    savepath = savefolder+"/RELAXED_fully_"+read
+
+    ######################################
+    # just read in and return if it exists
+    ######################################
+    if os.path.isfile(savepath):
+        print('savepath exists',savepath)
+        frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
+        if len(frames) == len(frames_out):
+            return frames
+        else:
+            print('savepath exists but has different name than readpath')
+            sys.exit('savepath '+savepath+" does already exist (55); Exit")
+
+    print('will be saved to ',savepath)
+    ######################################
+    # relax if necessary
+    ######################################
+    for idx,atoms in enumerate(frames):
+        #print('idx',idx,'out of',len(frames))
+        #print('aaa')
+        #print(atoms.get_cell())
+        #print(atoms.positions)
+        #print('c')
+        ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
+        ase_write(savepath,atoms,format='runner',append=True)
+    frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
+    print('was saved to ',savepath)
+    return frames_out
+
+
 def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
     print('atoms.cell (angstrom) before relaxing cellshape and volume:')
     print(atoms.cell)

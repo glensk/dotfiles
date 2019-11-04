@@ -2044,45 +2044,56 @@ def test_Mg2Si(ace):
     return
 
 
-def relax_structure_fully_and_save_to_pot(ace,read=False):
-    pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
-    readpath = pathbase + read
-    if not os.path.isfile(readpath):
-        sys.exit('readpath '+readpath+" does NOT exist (55); Exit")
-
-    print('read from',readpath)
-    frames = ase_read(readpath,":",format="runner")  # frames with DFT energies.
-    #print('ace.pot',ace.pot.pot)
-    #print('ace.pot',ace.pot.potpath)
-    #print('ace.pot',ace.pot.use_epoch)
-    savefolder = ace.pot.potpath+"/epoch_"+str(ace.pot.use_epoch)
-    if not os.path.isdir(savefolder):
-        os.mkdir(savefolder)
-    savepath = savefolder+"/RELAXED_fully_"+read
-    if os.path.isfile(savepath):
-        frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
-        if len(frames) == len(frames_out):
-            return frames
-        else:
-            print('savepath exists but has different name than readpath')
-            sys.exit('savepath '+savepath+" does already exist (55); Exit")
-
-    print('saved to ',savepath)
-    for idx,atoms in enumerate(frames):
-        print('idx',idx,'out of',len(frames))
-        ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
-        ase_write(savepath,atoms,format='runner',append=True)
-    frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
-    return frames_out
 
 
 
 def test_antisites(ace):
     print("######## antisites #############")
-    i =  "Mg4Al3Si4"
-    i =  "Mg5Al2Si4"
+    i =  "Mg4Al3Si4" # done
+    # i =  "Mg5Al2Si4" # done
+    # i = "Mg5Si6" # done
+
+
     read = "aiida_exported_group_out_antisites_rep"+i+"_NEW.runner_calc__all_steps.input.data"
-    frames_relaxed = relax_structure_fully_and_save_to_pot(ace,read)
+    antisite_relaxed = my.ase_relax_structure_fully_and_save_to_pot(ace,read)
+    print('done-----------1')
+
+    read = "aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
+    origphase_relaxed = my.ase_relax_structure_fully_and_save_to_pot(ace,read,whichstruct=-1)[0]
+    nn_ene_orig = ace.ene(origphase_relaxed.copy())
+    dft_ene_orig = my.ase_enepot(origphase_relaxed,units='eV')
+    print('origphase_relaxed    nat:',origphase_relaxed.get_number_of_atoms())
+    print('origphase_relaxed  NNene:',nn_ene_orig)
+    print('origphase_relaxed DFTene:',dft_ene_orig)
+    d = my.ase_get_chemical_symbols_to_number_of_species(origphase_relaxed,known_elements_by_pot=[])
+    print('origphase_relaxed',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
+
+    for idx,i in enumerate(antisite_relaxed):
+        print('nat  :',i.get_number_of_atoms())
+        nn_ene_antisite = ace.ene(i.copy())
+        print('nn_ene_antisite:',nn_ene_antisite)
+
+        f = i.get_number_of_atoms()/origphase_relaxed.get_number_of_atoms()
+        print('f',f)
+        print('origphase_relaxed*f:',"Al:",d["Al"]*f,"Mg:",d["Mg"]*f,"Si:",d["Si"]*f)
+
+
+        dd = my.ase_get_chemical_symbols_to_number_of_species(i,known_elements_by_pot=[])
+        al_antisite = dd["Al"]
+        mg_antisite = dd["Mg"]
+        si_antisite = dd["Si"]
+        al_orig = d["Al"]*f
+        mg_orig = d["Mg"]*f
+        si_orig = d["Si"]*f
+        print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"])
+        print('nn_ene_orig*f:',nn_ene_orig*f)
+        print('al',al_orig,al_antisite)
+        print('mg',mg_orig,mg_antisite)
+        print('si',si_orig,si_antisite)
+
+        sys.exit()
+    print('done-----------2')
+
     sys.exit('88888866666')
 
     doit = [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]
