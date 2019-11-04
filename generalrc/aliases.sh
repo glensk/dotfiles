@@ -126,6 +126,7 @@ alias unbz2='tar -jxvf'
 alias killall='killall -9'
 
 #$1 gnuplot 'gnuplot -persist'
+alias amc='argparse_md_code.py'
 alias i='ipython'
 #$1 load_last_saved_settings='$dotfiles/mac_KeyRemap4MacBook/load_last_saved_settings.sh'
 alias cpdf='$dotfiles/bin/cpdf-binaries/OSX-Intel/cpdf'
