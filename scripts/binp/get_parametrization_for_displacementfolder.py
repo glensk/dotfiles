@@ -594,6 +594,12 @@ class get_all_disps():
         print('# fits on [0.5,0.5,0.0]: fit_rel.parameters               morse',fit_rel.parameters)
         print('# fits on [0.5,0.5,0.0]: fit_rel_repulsive.parameters     morse',fit_rel_repulsive.parameters)
         print('# fits on [0.5,0.5,0.0]: fit_corrected_for_110.parameters morse',fit_corrected_for_110.parameters)
+	#for i in fit.parameters:
+	#    print(i)
+	#print()
+	#for i in fit_rel.parameters:
+	#    print(i)
+        #sys.exit('111111111112233')
         fit_on_05_05_0 = np.zeros((len(fit.fit),7))
         fit_on_05_05_0[:,0] = fit.fit[:,0]
         dist__hydrogen   = (1./7.2)*fit.fit[:,0]*10**-10
@@ -684,6 +690,93 @@ class get_all_disps():
             np.savetxt(parametrizationfile_morse,fit_shifted.parameters)
             if self.only_return_parametrization_file == True:
                 return parametrizationfile_morse
+
+        if True:
+            #print("############################################################")
+            #print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)")
+            #print("############################################################")
+            #############################################################
+            # Al (as a rule of thumb: ene std/ 2 = error in free energy)
+            #############################################################
+            # --- 7 displacements -----------------------------------------------
+            # LA no tox       7 displacements (orig from disp foler) (amc -e Al -v -pm 7_morse          )       ps: 0.99835  ene std: 0.2973 meV/atom  for std: 0.01297
+            # LA no tox       7 displacements                        (amc -e Al -v -pm 7_morseprl -t1o 0)       pc: 0.99723  ene std: 0.4165 meV/atom  for std: 0.01604
+            # LA with tox     7 displacements (orig from disp foler) (amc -e Al -v -pm 7_morse -t1 -0.065)      ps: 0.99927  ene std: 0.0164 meV/atom  for std: 0.00619 a_mor:1.5256625969 D_mor:0.213311082
+            # LA with tox     7 displacements                        (amc -e Al -v -pm 7_morseprl       )       ps: 0.99875  ene std: 0.0883 meV/atom  for std: 0.00810
+            # POLY            7 displacements                        (amc -e Al -v -pm 7_poly        )          ps: 0.99935  ene std: 0.0190 meV/atom  for std: 0.00588  ** best (=POLY)
+
+            # --- SUM_run1/first_20000 ------------------------------------------
+            # LA no   tox     SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_morse)             ps: 0.99061  ene std: 3.7131 meV/atom  for std: 0.11227
+            # LA no   tox     SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_morseprl -t1o 0)   ps: 0.98824  ene std: 4.5969 meV/atom  for std: 0.14161
+            # LA with tox     SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_morse -t1 -0.065)  ps: 0.99616  ene std: 0.8286 meV/atom  for std: 0.05077
+            # LA with tox     SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_morseprl)          ps: 0.99539  ene std: 0.8035 meV/atom  for std: 0.06043
+            # POLY            SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_poly ) (  cd)      ps: 0.99638  ene std: 0.7584 meV/atom  for std: 0.04931  ** best in std_ene (=POLY)
+            # POLY            SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_poly ) (abcd)      ps: 0.99632  ene std: 0.7897 meV/atom  for std: 0.04978
+
+            # --- 2000_PTS_dosall -#####--SAME      LATTICE CONSTANT ------------
+            # POLY             7 displacements             (amc -e Al -pm 7_poly for 4.13 MD                    ps: 0.99855  ene std: 0.0365
+            # POLY            2000 0__PTS                  (amc -e Al -pm 7_poly --f_md_2x2x2_30                ps: 0.99637  ene std: 2.0677
+
+            # --- 2000_PTS_dosall -#####--DIFFERENT LATTICE CONSTANT ------------
+            # LA no   tox     2000 0__PTS_dosall_ ...      (amc -e Al --f_md_2x2x2_30)                          ps: 0.98858  ene std: 8.8278 meV/atom  for std: 0.15698
+            # LA with tox     2000 0__PTS_dosall_ ...      (amc -e Al --f_md_2x2x2_30 -t1 -0.072)               ps: 0.99679  ene std: 2.3736 meV/atom  for std: 0.06278
+            # POLY            2000 0__PTS_dosall_ ...      (amc -e Al --f_md_2x2x2_30 -pm prl2015_polycorralat) ps: 0.99634  ene std: 2.0745 meV/atom  for std: 0.05248
+            # POLY            2000 0__PTS_dosall_ ...      (amc -e Al --f_md_2x2x2_30 -pm 20000_poly)           ps: 0.99637  ene std: 2.1900 meV/atom  for std: 0.06278  ** best in std_ene (=POLY)
+            #
+
+            #############################################################
+            # Pt (as a rule of thumb: ene std/ 2 = error in free energy)
+            #############################################################
+            # in /Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Pt/3x3x3sc_4.1Ang_quer_2x2x2kp_vasp4:
+            # LA no tox       7 displacements              (amc -e Pt -f .)                                     ps: 0.99755  ene std: 0.6370  meV/atom  for std: 0.03135 (a_mor=1.849;D_mor=0.25)
+            # LA with tox     7 displacements              (amc -e Pt -f . -t1 -0.135)                          ps: 0.99884  ene std: 0.0186  meV/atom  for std: 0.01746
+            #                                              (== amc -e Pt -f . -t1 -0.135 -alat_mor 4.1 -a_mor 1.8496052614 -D_mor 0.2504607705)
+            # LA with tox     7 displacements   (amc -e Pt -f . -t1 -0.135 -alat_mor 4.1 -a_mor 1.8496 -D_mor 0.25)
+            #                                                                                                   ps: 0.99883  ene std: 0.0186  meV/atom  for std: 0.01754
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly)    (cd)                            ps: 0.99825  ene std: 0.4035  meV/atom  for std: 0.02261
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly)    (abcd)                          ps: 0.99870  ene std: 0.3360  meV/atom  for std: 0.02021
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o 0.05)    (abcd)                ps: 0.99879  ene std: 0.1132  meV/atom  for std: 0.01788
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o 0.041)   (abcd)                ps: 0.99881  ene std: 0.1512  meV/atom  for std: 0.01788
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o -0.06)   (abcd) (rcut=0.84)    ps: 0.99892  ene std: 0.0410  meV/atom  for std: 0.01704  ** best (=POLY+TOX)
+
+
+
+            # LA with tox     2000 0__PTS_dosall_ ..(amc -e Pt --f_md_2x2x2_30 -t1 -0.135 -alat_mor 4.1 -a_mor 1.8496 -D_mor 0.25)
+            #                                                                                                   ps: 0.98739  ene std: 9.8001  meV/atom  for std: 0.20689
+            # LA no   tox     2000 0__PTS_dosall_ ..(amc -e Pt --f_md_2x2x2_30)                                 ps: 0.97421  ene std: 31.7570 meV/atom  for std: 0.42125
+            # POLY            2000 0__PTS_dosall ...(amc -e Pt -pm 7_poly --f_md_2x2x2_30) (params_cd rcut0.88) ps: 0.98477  ene std: 15.3497 meV/atom  for std: 0.29601
+            # POLY            2000 0__PTS_dosall ...(amc -e Pt -pm 7_poly --f_md_2x2x2_30) (params_cd rcut0.84) ps: 0.98582  ene std: 14.6261 meV/atom  for std: 0.27421
+            # POLY            2000 0__PTS_dosall ...(amc -e Pt -pm 7_poly --f_md_2x2x2_30) (params_abcd)        ps: 0.98584  ene std: 13.5977 meV/atom  for std: 0.21300
+            # POLY            2000 0__PTS_dosall ...(amc -e Pt -pm 7_poly --f_md_2x2x2_30 -t1o 0.041) (par_abcd)ps: 0.98671  ene std: 9.6987  meV/atom  for std: 0.22360  ** best (=POLY+TOX)
+            # POLY            2000 0__PTS_dosall ...(amc -e Pt -pm 7_poly --f_md_2x2x2_30 -t1o 0.05 ) (par_abcd)ps: 0.98644  ene std: 9.8821  meV/atom  for std: 0.23063
+            # POLY            2000 0__PTS_dosall ...(amc -e Pt -pm 7_poly --f_md_2x2x2_30 -t1o -0.06) (rcut0.84)ps: 0.98868  ene std: 8.2412  meV/atom  for std: 0.21188  ** best (=POLY+TOX)
+
+            #############################################################
+            # Ir (as a rule of thumb: ene std/ 2 = error in free energy)
+            #############################################################
+            # POLY         2000 displacements  (amc  Ir -pm 7_poly --f_md_2x2x2_30 -t1o 0.08)(  cd; rcut=084) ps: 0.98372  ene std:  10.0525 meV/atom  for std:
+            # POLY            7 displacements  (amc  Ir -pm 7_poly                          )(  cd; rcut=084) ps: 0.98817  ene std:  10.0525 meV/atom  for std:
+
+            # POLY            7 displacements  (amc  Ir -pm 7_poly)                  (abcd; rcut=088)         ps: 0.98512  ene std:  2.4026  meV/atom  for std: 0.11722
+            # POLY            7 displacements  (amc  Ir -pm 7_poly)                  (  cd; rcut=088)         ps: 0.98887  ene std:  2.1500  meV/atom  for std: 0.09742
+            # POLY            7 displacements  (amc  Ir -pm 7_poly)                  (  cd; rcut=084)         ps: 0.98817  ene std:  2.2560  meV/atom  for std: 0.09952
+            # POLY            7 displacements  (amc  Ir -pm 7_poly -t1o 0.26)        (  cd; rcut=088)         ps: 0.99255  ene std:  0.9503  meV/atom  for std: 0.06706
+            # LA              7 displacements  (amc  Ir -pm 7_morse         )        (              )         ps: 0.98480  ene std:  2.2345  meV/atom  for std: 0.09378
+            # LA + tox        7 displacements  (amc  Ir -pm 7_morse -t1o 0.3)        (              )         ps: 0.98914  ene std:  0.8450  meV/atom  for std: 0.07454
+            #
+            # LA + tox     2000 displacements  (amc  Ir -pm 7_morse -t1o 0.3 --f_md_2x2x2_30                  ps: 0.96823  ene std: 22.9657  meV/atom  for std: 0.46523
+            # POLY + tox   2000 displacements  (amc  Ir -pm 7_poly  -t1o 0.26 --f_md_2x2x2_30                 ps: 0.97609  ene std: 17.8781  meV/atom  for std: 0.40539
+            # POLY         2000 displacements  (amc  Ir -pm 7_poly            --f_md_2x2x2_30                 ps: 0.98246  ene std: 13.4180  meV/atom  for std: 0.34881 ** best (=POLY WITHOUT TOX)
+            # POLY + tox   2000 displacements  (amc  Ir -pm 7_poly  -t1o 0.07 --f_md_2x2x2_30                 ps: 0.98389  ene std:  9.7953  meV/atom  for std: 0.31164
+
+            print('self.dofor',self.dofor)
+            params_abcd,params_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,rcut=0.88,save_parametrization=self.dofor)
+            print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)",params_abcd)
+            print("# parametrize Michaels Model ueber alle nachbarn (    c,d)",params_cd)
+            params_abcd,params_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,rcut=0.84,save_parametrization=self.dofor)
+            print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)",params_abcd)
+            print("# parametrize Michaels Model ueber alle nachbarn (    c,d)",params_cd)
+            sys.exit('778866')
 
         ##############################################################################
         # force on 0_05_05 (previously tox)
@@ -889,34 +982,20 @@ class get_all_disps():
 
 
 
-        if True:
-            print("############################################################")
-            print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)")
-            print("############################################################")
-            params_abcd,params_abcd_,params_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms)
-            mmodel_abcd = hesse.Michael_poly_der
-            print('params_abcd  ',params_abcd)
-            print('params_abcd_ ',params_abcd_)
-            print('params_abcd__',params_cd)
-            np.savetxt("xy_CHECK.dat",np.array([xred_dense,-1*mmodel_abcd(xred_dense,*params_abcd)]).T)
-            np.savetxt("xy_CHECK_.dat",np.array([xred_dense,-1*mmodel_abcd(xred_dense,*params_abcd_)]).T)
-            np.savetxt("xy_CHECK__.dat",np.array([xred_dense,-1*mmodel_abcd(xred_dense,*params_cd)]).T)
 
-        if True:
+        if False:
             print("############################################################")
             print("# parametrize Michaels Model only along 110 (axial) (a,b,c,d)")
             print("############################################################")
-            params_axial_abcd,params_axial_abcd_,params_axial_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,parametrize_only_idx=[idx_05_05_0,idx_45_45_0])
+            params_axial_abcd,params_axial_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,parametrize_only_idx=[idx_05_05_0,idx_45_45_0],rcut=0.88)
             mmodel_axial_abcd = hesse.Michael_poly_der
-            print('params_axial_abcd  ',params_axial_abcd)
-            print('params_axial_abcd_ ',params_axial_abcd_)
-            print('params_axial_abcd__',params_axial_cd)
-            np.savetxt("xy_CHECK_axial.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd)]).T)
-            np.savetxt("xy_CHECK_axial_.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd_)]).T)
-            np.savetxt("xy_CHECK_axial__.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_cd)]).T)
+            print('params_axial_abcd',params_axial_abcd)
+            print('params_axial_cd  ',params_axial_cd)
+            np.savetxt("xy_CHECK_axial_abcd.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd)]).T)
+            np.savetxt("xy_CHECK_axial_cd.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_cd)]).T)
 
 
-        if True:
+        if False:
             print("############################################################")
             print("# parametrize first Michael_poly_der numerical")
             print("# parametrize Morse over all neighbors")
@@ -925,11 +1004,10 @@ class get_all_disps():
             print('first only axial forces')
             mmodel_axial_abcd = hesse.Michael_poly_der
             print('params_axial_abcd  ',params_axial_abcd)
-            print('params_axial_abcd_ ',params_axial_abcd_)
             print('params_axial_abcd__',params_axial_cd)
             np.savetxt("xy_CHECK_axial.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd)]).T)
-            np.savetxt("xy_CHECK_axial_.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_abcd_)]).T)
             np.savetxt("xy_CHECK_axial__.dat",np.array([xred_dense,-1*mmodel_axial_abcd(xred_dense,*params_axial_cd)]).T)
+        sys.exit('1234556')
 
         print()
         print("#########################################################################")

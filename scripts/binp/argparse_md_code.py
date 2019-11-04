@@ -51,7 +51,7 @@ def help(p = None):
           (gives correct std and dudl as python scripts -> $basefolder/ti/summary_al; change to lambda0.0 to see corresponding result)
     - argparse_md_code.py -rp $testfolder_al_disp/POSITIONs -v -D_mor 0.2793 -a_mor 1.432673 -a 4.13 -N 5 -waf
     - argparse_md_code.py  -f $basefolder/ti/ti_original_hesse/Al/lambda0.0_20604/ -v -wa  (for lambda 0.0 and 1.0 gives same ene std harm)
-    - argparse_md_code.py -e Al -f /Users/glensk/Dropbox/Albert/v/pp/al/molecular_dynamics_lifetimes/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_run_2 -p prl2019_900K
+    - argparse_md_code.py -e Al -f /Users/glensk/Dropbox/Albert/v/pp/al/molecular_dynamics_lifetimes/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_every_tenth/SUM_every_thousendth/ -p prl2019_900K
 
     - argparse_md_code.py -ea --f_md_2x2x2_30 -dbl -vm2   # parametrization from the 2x2x2 supercell displacements (I think)
 	==> (Al) ene_std:   8.8 for_std:  0.157  dudl/2:   7.4  ||| alat 4.130 ||| alat_mor 4.130 a_mor 1.43267  D_mor 0.27930 ||(PRL NO )
@@ -196,8 +196,31 @@ def help(p = None):
     p.add_argument('-eh',   '--evolve_harmonic' , required=False,action='store_true',
        help='run/evolve the MD on the harmonic Hessematrix instead of the la potentila (lambda=0.0)')
 
-    ### specify folder to import POSITIONs from
+    ####################################################
+    ### specify parametrization
+    ####################################################
     p.add_argument('-p', '--parametrization', choices=['prl2019_900K','prl2019_300K'], help='particular parametrization')
+    p.add_argument('-gpf_dispfolder_setfolder',          '--gpf_dispfolder_setfolder', required=False, default=False, type=str,
+       help=argparse.SUPPRESS)
+    p.add_argument('-gpf_dispfolder_5x5x5',              '--gpf_dispfolder_5x5x5', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
+    p.add_argument('-gpf_dispfolder_5x5x5_weighted',     '--gpf_dispfolder_5x5x5_weighted', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
+    p.add_argument('-gpf_dispfolder_5x5x5_alat_mor_T0K', '--gpf_dispfolder_5x5x5_alat_mor_T0K', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
+    p.add_argument('-gpf_dispfolder_5x5x5_alat_mor_current_alat', '--gpf_dispfolder_5x5x5_alat_mor_current_alat', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
+    p.add_argument('-gpf_dispfolder_alat_lattice_T0K',   '--gpf_dispfolder_alat_lattice_T0K', required=False, action='store_true',
+            help='get a parametrisation which has been done @T=0K alat', default=False)
+    p.add_argument('-gpf_dispfolder_spta', '--gpf_dispfolder_shift_parametrization_to_alat', required=False, type=float, default=False,
+             help="at another atom distance, the morse would have a static force which cancels out in equilibrium. Find the static force for the chosed alat_lattice and shift the forces to parametrize correspondingly.")
+    p.add_argument('-gpf_dispfolder_cf110', '--gpf_dispfolder_correct_for_110_forces', required=False, type=float, default=False,
+             help="correct forces on 05_05_0 atom by the forces on 1_1_0 atom.")
+
+
+    ####################################################
+    ### specify folder to import POSITIONs from
+    ####################################################
     p.add_argument('-fmd30',   '--f_md_2x2x2_30' , default=False,required=False,action='store_true',
        help='run/evolve the MD on from the displacements/ti folder for set element using 30__PTS_dosall')
     p.add_argument('--f_d_5x5x5','-f_d_5x5x5' , default=False,required=False,action='store_true',
@@ -231,22 +254,7 @@ def help(p = None):
        help='sweep a_mor variable and return for_std as funcion of a_mor')
     p.add_argument('-sd',          '--sweep_D_mor', required=False, default=False, action='store_true',
        help='sweep D_mor variable and return for_std as funcion of D_mor')
-    p.add_argument('-gpf_dispfolder_setfolder',          '--gpf_dispfolder_setfolder', required=False, default=False, type=str,
-       help=argparse.SUPPRESS)
-    p.add_argument('-gpf_dispfolder_5x5x5',              '--gpf_dispfolder_5x5x5', required=False, action='store_true',
-       help=argparse.SUPPRESS, default=False)
-    p.add_argument('-gpf_dispfolder_5x5x5_weighted',     '--gpf_dispfolder_5x5x5_weighted', required=False, action='store_true',
-       help=argparse.SUPPRESS, default=False)
-    p.add_argument('-gpf_dispfolder_5x5x5_alat_mor_T0K', '--gpf_dispfolder_5x5x5_alat_mor_T0K', required=False, action='store_true',
-       help=argparse.SUPPRESS, default=False)
-    p.add_argument('-gpf_dispfolder_5x5x5_alat_mor_current_alat', '--gpf_dispfolder_5x5x5_alat_mor_current_alat', required=False, action='store_true',
-       help=argparse.SUPPRESS, default=False)
-    p.add_argument('-gpf_dispfolder_alat_lattice_T0K',   '--gpf_dispfolder_alat_lattice_T0K', required=False, action='store_true',
-            help='get a parametrisation which has been done @T=0K alat', default=False)
-    p.add_argument('-gpf_dispfolder_spta', '--gpf_dispfolder_shift_parametrization_to_alat', required=False, type=float, default=False,
-             help="at another atom distance, the morse would have a static force which cancels out in equilibrium. Find the static force for the chosed alat_lattice and shift the forces to parametrize correspondingly.")
-    p.add_argument('-gpf_dispfolder_cf110', '--gpf_dispfolder_correct_for_110_forces', required=False, type=float, default=False,
-             help="correct forces on 05_05_0 atom by the forces on 1_1_0 atom.")
+
 
 
 
@@ -306,7 +314,16 @@ def help(p = None):
        help='morse parameter for well depth (default = False); value for al 0.27', type=float, default=False)
     p.add_argument('-t1',   '--t1', required=False,
        help='linear constant in transversal direction out of plane (default = 0.00)', type=float, default=False)
+    p.add_argument('-t1o',   '--t1overwrite', required=False,
+       help='linear constant in transversal direction out of plane (default = 0.00)', type=float, default=False)
        #help='linear constant in transversal direction out of plane (default = -0.65)', type=float, default=-0.65)
+    # polynom parameters for 1NN
+    p.add_argument('-pm',   '--poly_michael', required=False, default = False,
+       help='poly parameter aa,bb,cc,dd,rcut', type=str)
+    p.add_argument('--michael_poly_yes_no', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
+    p.add_argument('--poly_michael_par', required=False, action='store_true',
+       help=argparse.SUPPRESS, default=False)
 
     p.add_argument('-v','--verbose',
             help='verbose', action='count', default=False)
@@ -358,10 +375,14 @@ def ccc(file):
         count = len(archive.infolist())
     return
 
-def check_for_disp_fit_parameters_morse(agrs):
-    if type(args.folder) == bool:
+def check_for_disp_fit_parameters_morse(agrs,folder=False):
+    if folder == False:
+        usefolder = args.folder
+    else:
+        usefolder = folder
+    if type(usefolder) == bool:
         return False
-    file = args.folder+"/disp_fit.parameters_morse.dat"
+    file = usefolder+"/disp_fit.parameters_morse.dat"
     if os.path.exists(file):
         a = np.loadtxt(file)
         #print(a)
@@ -383,8 +404,8 @@ def obtain_parametrization_G_from_calculate_energy_and_forces(args):
 
 
     ############################# scheck for energy and forces ############################
-    file = args.folder+"/calculate_energy_and_forces"
-    if not os.path.exists(file):
+    fileceaf = args.folder+"/calculate_energy_and_forces"
+    if not os.path.exists(fileceaf):
         args.calculate_energy_and_forces = False
         if args.verbose:
             print("############ obtain_parametrization_G_from_calculate_energy_and_forces "+printred("(does NOT exist (1)")+ " ... #################")
@@ -395,13 +416,14 @@ def obtain_parametrization_G_from_calculate_energy_and_forces(args):
 
 
     ####### Here we assme now that calculate_energy_and_forces exists!
-    args.calculate_energy_and_forces = file
+    args.calculate_energy_and_forces = fileceaf
     if args.verbose:
         print("############ check_for_calculate_energy_and_forces "+printgreen("(does exist)")+" ... ###########")
+        print("############",fileceaf)
     #print printgreen('calculate_energy_and_forces does exist! taking parametrization from it!')
-    #print printgreen(file)
+    #print printgreen(fileceaf)
     import imp
-    par = imp.load_source('par', file)
+    par = imp.load_source('par', fileceaf)
     ver = 0
     try:
         par.u1nn_pot
@@ -426,13 +448,13 @@ def obtain_parametrization_G_from_calculate_energy_and_forces(args):
     #print 'ver',ver
     #sys.exit()
     if ver == 0:
-        print('dont understand this',file)
+        print('dont understand this',fileceaf)
         return
 
 
     #print 'parx',par.u1nn_pot
 
-    #print(printgreen(file))
+    #print(printgreen(fileceaf))
     #print('par.u1nn_pot',par.u1nn_pot)
     #sys.exit()
     if par.u1nn_pot == 'm':
@@ -473,6 +495,21 @@ def obtain_parametrization_G_from_calculate_energy_and_forces(args):
     print_parameters(args,idx="(G)")
     return True
 
+def obtain_parametrization_J_from_disp_fit_parameters_morse_dat(args):
+    if args.verbose:
+        print("############ obtain_parametrization_J_from_disp_fit_parameters_morse_dat... #################################")
+    if type(args.folder) != bool:
+        if type(args.D_mor) == bool == type(args.a_mor) == type(args.alat_mor):
+            if os.path.isfile(args.folder+"/disp_fit.parameters_morse.dat"):
+                ka_tmp = np.loadtxt(args.folder+"/disp_fit.parameters_morse.dat")
+                args.D_mor = ka_tmp[0]
+                args.a_mor = ka_tmp[1]
+                args.alat_mor = ka_tmp[2]*np.sqrt(2)  # *np.sqrt(2) necesssary to get alat_mor to ~ 4.14 angstrom
+    print_parameters(args,idx="(J)")
+    return
+
+
+
 def get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist(args):
     if args.verbose:
         print("############ get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist ... ########################################")
@@ -496,26 +533,28 @@ def get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist(args):
                     args.supercell = int(i)
                     break
             #print 'args.sc 2',args.supercell,type(args.supercell)
-    if type(args.supercell) == bool and os.path.isfile(args.folder+'/POSCAR'):
-        file = open(args.folder+'/POSCAR','r')
-        for idx,i in enumerate(file):
-            if idx > 4 and idx < 8:
-                #print i.rstrip(),type(i)
-                try:
-                    atoms = int(i.rstrip())
-                    for i in np.arange(100):
-                        if i*i*i*4 == atoms:
-                            args.supercell = int(i)
-                            #print 'atoms',atoms,args.supercell
-                            break
-                except ValueError:
-                    pass
+
+        # this can only be done if args.folder is defined
+        if type(args.supercell) == bool and os.path.isfile(args.folder+'/POSCAR'):
+            file = open(args.folder+'/POSCAR','r')
+            for idx,i in enumerate(file):
+                if idx > 4 and idx < 8:
+                    #print i.rstrip(),type(i)
+                    try:
+                        atoms = int(i.rstrip())
+                        for i in np.arange(100):
+                            if i*i*i*4 == atoms:
+                                args.supercell = int(i)
+                                #print 'atoms',atoms,args.supercell
+                                break
+                    except ValueError:
+                        pass
     print_parameters(args,idx="(C)")
     return
 
-def get_alat_mor(args):
+def get_alat_mor_K(args):
     if args.verbose:
-        print("############ get_alat_mor ... ########################################")
+        print("############ get_alat_mor_K ... ########################################")
 
     ##### try to get sc from cell file
     if type(args.supercell) == bool and args.read_positions != False:
@@ -551,6 +590,7 @@ def get_alat_mor(args):
     #if type(args.alat_mor) == bool:
     #    #print 'args.alat:',args.alat
     #    args.alat_mor = np.copy(args.alat)  # not so sure if I want that
+    print_parameters(args,idx="(K)")
     return
 
 def print_parameters(args,idx="(?)"):
@@ -624,8 +664,8 @@ def obtain_parametrization_E_from_parametrize_displacements_skript(args): #KKK
         if args.gpf_dispfolder_5x5x5_alat_mor_T0K:
             args.alat_mor = my_atom.alatT0K[args.element]
 
-        print_parameters(args,idx="(E)")
-        return
+    print_parameters(args,idx="(E)")
+    return
 
 def obtain_parametrization_H_from_p_variable(args):
     if args.parametrization == 'prl2019_900K':
@@ -638,6 +678,99 @@ def obtain_parametrization_H_from_p_variable(args):
             print('element is',args.element_all,'and not [\'Al\']')
             print('args.alat is',args.alat,'and not 4.14')
             sys.exit('exit 778776')
+    print_parameters(args,idx="(H)")
+    return
+
+def set_morsepar_to_zer0_and_use_micheal_poly():
+    args.michael_poly_yes_no = 1
+    args.D_mor      = 0.0
+    args.a_mor      = 0.0
+    args.alat_mor   = 0.0
+    args.t1         = 0.0
+    return
+
+def set_michael_poly_to0_and_use_morse():
+    args.poly_michael_par = [0,0,0,0,0.1]
+    args.michael_poly_yes_no = 0
+    return
+
+def obtain_parametrization_I_from_michaels_polynomial(args):
+    # folder MD             :
+    if type(args.poly_michael) != bool:
+        print('args.poly_michael xx-in:',args.poly_michael)
+        print('args.poly_michael xx-in:',args.poly_michael.split("_"))
+        print('args.folder       xx-in:',args.folder)
+        print('args.element      xx-in:',args.element)
+
+        ################## check element and define folder
+        if args.element == "Al":
+            #folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400"
+            #folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/4x4x4sc_4.13Ang_quer_2x2x2kp_vasp4"
+            folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.13Ang_quer_2x2x2kp_7disp"
+            folder_PTS_30_polycorralat = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/4x4x4sc_4.13Ang_quer_2x2x2kp_vasp4"
+        if args.element == "Pt":
+            folder_parametrization     = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Pt/3x3x3sc_4.1Ang_quer_2x2x2kp_vasp4"
+            folder_PTS_30_polycorralat = folder_parametrization
+        if args.element == "Ir":
+            # 30__PTS_dosall == 3.99
+            folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Ir/3x3x3sc_3.99Ang_quer_2x2x2kp_vasp4"
+            folder_PTS_30_polycorralat = folder_parametrization
+        if args.element not in [ "Al", "Pt", "Ir" ]:
+            sys.exit('so far only for Al & Pt & Ir')
+
+        ################## check if '7' (from displacements) or '2000pts' from 2000_PTS ti folder
+        if  args.poly_michael.split("_")[0] == "prl2015":
+            print('print folder will be taken from --f_md_2x2x2_30')
+            args.f_md_2x2x2_30 = True
+            set_michael_poly_to0_and_use_morse()
+        elif args.poly_michael.split("_")[0] == '7':
+            args.folder = folder_parametrization # 7 isplacements
+
+        ################## get parametrization
+        if args.poly_michael.split("_")[1] in ['morse','morseprl']:
+            set_michael_poly_to0_and_use_morse()
+
+        if args.poly_michael.split("_")[1] == 'morse':
+            # get D_mor a_mor from disp_fit.parameters_morse.dat
+            check_for_disp_fit_parameters_morse(args,folder=folder_parametrization)
+        elif args.poly_michael.split("_")[1] == 'poly':
+            set_morsepar_to_zer0_and_use_micheal_poly()
+            #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.88.dat")
+            ##args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
+
+            #############
+            #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.84.dat")
+            args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.84.dat")
+        elif args.poly_michael.split("_")[1] == 'morseprl':
+            args.parametrization = "prl2019_900K"
+        elif args.poly_michael.split("_")[1] == 'polycorralat':
+            set_morsepar_to_zer0_and_use_micheal_poly()
+            args.poly_michael_par = np.loadtxt(folder_PTS_30_polycorralat+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
+        else:
+            sys.exit('second part not known')
+
+        if args.element == "Al":
+            #############################################
+            # define the forlder for the MD POSITIONs
+            #############################################
+            if args.poly_michael.split("_")[0] == '20000':
+                args.folder = "/Users/glensk/Dropbox/Albert/v/pp/al/molecular_dynamics_lifetimes/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_run_1/first_20000"
+            #args.folder = "/Users/glensk/Dropbox/Albert/v/pp/al/molecular_dynamics_lifetimes/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_every_tenth/SUM_every_thousendth/"
+
+
+            #############################################
+            # define the parametrization
+            #############################################
+    else:
+        set_michael_poly_to0_and_use_morse()
+
+    print('args.poly_michael 	    yy-out:',args.poly_michael)
+    print('args.michael_poly_yes_no yy-out:',args.michael_poly_yes_no)
+    print('args.poly_michael_par    yy-out:',args.poly_michael_par)
+    print('args.folder       	    yy-out:',args.folder)
+    print('args.element      	    yy-out:',args.element)
+    print('args.parametrization     yy-out:',args.parametrization)
+    return
 
 def obtain_input_folder_A_for_f_md_2x2x2_30_f_d_5x5x5(args):
     if args.verbose:
@@ -833,6 +966,13 @@ def prepare_input_file(file_orig,file_comp,args):
         print('COMPILING (0) with args.a_mor            :',args.a_mor)
         print('COMPILING (0) with args.D_mor            :',args.D_mor)
         print('COMPILING (0) with args.t1               :',args.t1)
+        print()
+        print('COMPILING (0) with args.michael_poly_yes_no:',args.michael_poly_yes_no)
+        print('COMPILING (0) with args.poly_michael_par[0]  :',args.poly_michael_par[0])
+        print('COMPILING (0) with args.poly_michael_par[1]  :',args.poly_michael_par[1])
+        print('COMPILING (0) with args.poly_michael_par[2]  :',args.poly_michael_par[2])
+        print('COMPILING (0) with args.poly_michael_par[3]  :',args.poly_michael_par[3])
+        print('COMPILING (0) with args.poly_michael_par[4]  :',args.poly_michael_par[4])
 
 
 
@@ -842,8 +982,16 @@ def prepare_input_file(file_orig,file_comp,args):
     change_file(file_comp,'^#define alat_morse.*','#define alat_morse ('+str(args.alat_mor)+")")
     change_file(file_comp,'^#define a_mor.*','#define a_mor ('+str(args.a_mor)+")")
     change_file(file_comp,'^#define D_mor.*','#define D_mor ('+str(args.D_mor)+")")
+    change_file(file_comp,'^#define michael_poly_yes_no.*','#define michael_poly_yes_no '+str(args.michael_poly_yes_no))
+    change_file(file_comp,'^#define poly_aa.*','#define poly_aa ('+str(args.poly_michael_par[0])+")")
+    change_file(file_comp,'^#define poly_bb.*','#define poly_bb ('+str(args.poly_michael_par[1])+")")
+    change_file(file_comp,'^#define poly_cc.*','#define poly_cc ('+str(args.poly_michael_par[2])+")")
+    change_file(file_comp,'^#define poly_dd.*','#define poly_dd ('+str(args.poly_michael_par[3])+")")
+    change_file(file_comp,'^#define poly_rcut.*','#define poly_rcut ('+str(args.poly_michael_par[4])+")")
     if type(args.t1) == bool:
         args.t1 = 0.0
+    if type(args.t1overwrite) != bool:
+        args.t1 = args.t1overwrite
     change_file(file_comp,'^#define ktr_tox.*','#define ktr_tox ('+str(args.t1)+")")
 
     if args.read_positions:
@@ -871,11 +1019,12 @@ def prepare_input_file(file_orig,file_comp,args):
     if type(args.element_mass)  not in [np.float64,float]: sys.exit('\nERROR: args.element_mass is wrongly defined')
     #print('kka',type(args.alat_mor))
     if type(args.alat)          not in [np.float64,float]: sys.exit('\nERROR: args.alat is wrongly defined !!'+str(type(args.alat)))
-    print('aa',args.alat_mor,type(args.alat_mor))
-    if type(args.alat_mor)      not in [np.float64,float]: sys.exit('\nERROR: args.alat_mor is wrongly defined')
-    if type(args.a_mor)         not in [np.float64,float]: sys.exit('\nERROR: args.a_mor is wrongly defined')
-    if type(args.D_mor)         not in [np.float64,float]: sys.exit('\nERROR: args.D_mor is wrongly defined')
-    #print("t1",args.t1,type(args.t1))
+    if args.michael_poly_yes_no != 1:
+        if type(args.alat_mor)      not in [np.float64,float]:
+            print('args.alat_mor:',args.alat_mor,'type:',type(args.alat_mor))
+            sys.exit('\nERROR: args.alat_mor is wrongly defined')
+        if type(args.a_mor)         not in [np.float64,float]: sys.exit('\nERROR: args.a_mor is wrongly defined')
+        if type(args.D_mor)         not in [np.float64,float]: sys.exit('\nERROR: args.D_mor is wrongly defined')
     #print_parameters(args,idx="(tmpttt)")
 
     columns0 = False
@@ -1352,6 +1501,8 @@ def common_start(*strings):
 if __name__ == '__main__':
     p = help()  # this gives the possibility to change some __init__ settings
     args = p.parse_args()
+    if args.folder in [ "." ]: args.folder = os.getcwd()
+    if args.folder in [ "..", "../" ]: args.folder = os.getcwd()
     script_path = os.path.dirname(os.path.realpath(__file__))
     print('script_path',script_path)
     file_orig = script_path+"/md_long_tox.c"
@@ -1462,6 +1613,7 @@ if __name__ == '__main__':
                 #########################################################################
                 # get the parametrization
                 #########################################################################
+                obtain_parametrization_I_from_michaels_polynomial(args)
                 obtain_input_folder_A_for_f_md_2x2x2_30_f_d_5x5x5(args)  # f_md_2x2x2_30
                 obtain_input_folder_B_and_related_files(args)  # once args.folder is defined this is very good
                 get_supercell_C_at_least_try_from_eqcoords_or_poscar_if_exist(args)
@@ -1472,10 +1624,11 @@ if __name__ == '__main__':
                 #if args.get_parametrization_from_displacements:
                 #    parameters = Analyze_Forces_and_make_parametrization.get_all_disps(dofor=args.get_parametrization_from_displacements)
                 #has_parametrization   = check_for_disp_fit_parameters_morse(args)
-                get_alat_mor(args)
+                get_alat_mor_K(args)
                 obtain_parametrization_H_from_p_variable(args)  # -p prl2019_900K
+                obtain_parametrization_J_from_disp_fit_parameters_morse_dat(args)
+                #print('args.t1',args.t1)
                 print_parameters(args,idx="(11)")
-
                 if sweep_idx == 0:
                     print('a!!',args.a_mor)
                     print('D!!',args.D_mor)

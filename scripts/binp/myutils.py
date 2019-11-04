@@ -1609,132 +1609,6 @@ def get_NN1_NN2_NN3_from_positions(atoms,alat,atomnr=0,verbose=False):
         print("NN3",NN3,'len',len(NN3))
     return NN1,NN2,NN3
 
-def get_michaels_paramerization(pos_all,force_all,NN1,alat,atoms,parametrize_only_idx=False,rcut=0.88,function=False):
-    ''' NN1 are the NN1idx
-        atoms : an ase object of the perfect cell.
-
-         1. get a function that for a given ATOM, gives all its 1NN (NN=a,b,c,d,...) (or its 2NN, 3NN, ...), basically, D for particular neighbors.
-         2. write down the equation to solve: FORCE_VASP(ATOM)__x = SUM_over_all_neighbors[v_o_v__NN__x*Forcefunction(r)]
-                                              FORCE_VASP(ATOM)__y = SUM_over_all_neighbors[v_o_v__NN__y*Forcefunction(r)]
-                                              FORCE_VASP(ATOM)__z = SUM_over_all_neighbors[v_o_v__NN__z*Forcefunction(r)]
-         3. This gives, for every displacement (=7), for every NN (=12), three (=x,y,z) equations.
-         was ich jetzt loesen muss ist ein gleichungssystem von vielen vektoren D and die VASP force, mache , basically, D for particular neighbors.
-
-    '''
-    a = []
-    b = []
-
-    a_ = []
-    b_ = []
-
-    a__ = []
-    b__ = []
-    for disp_idx in np.arange(len(pos_all)):    # for all displacements
-    #disp_idx=7
-        parametrize_over_atoms = NN1
-        if parametrize_only_idx != False:
-            parametrize_over_atoms = parametrize_only_idx
-
-        for idxnn1,nn1 in enumerate(parametrize_over_atoms): # for all first NN
-            Fv = force_all[disp_idx,nn1]
-            for xyz in [0,1,2]:         # for xyz
-                Fvx = Fv[xyz]
-
-                NN1_1st_neigh = get_NN1_from_positions(atoms,alat,atomnr=nn1,verbose=False)
-                ##print('idxnn1',idxnn1,nn1,"NN1_1st_neigh:",NN1_1st_neigh)
-                #print("Fv",Fv,"===")
-                Dx = np.zeros(12)
-                R  = np.zeros(12)
-                Rcut  = np.zeros(12)
-                for idxnn11,nn11 in enumerate(NN1_1st_neigh):    # for all neighbors of a particular 1NN
-                    D  = pos_all[disp_idx,nn1]-pos_all[disp_idx,nn11]
-                    #if parametrize_only_idx != False:
-                    #    #print("D",D)
-                    #    #print('i will take this D!')
-                    #    print("D",D,'nn1',nn1,'nn11',nn11)
-                    Drel = D/alat               # given for every particle
-                    vecnorm = r = np.linalg.norm(Drel)   # given for every particle
-                    v_o_v = Drel/vecnorm
-                    R[idxnn11] = r
-                    Rcut[idxnn11] = rcut
-                    Dx[idxnn11] = v_o_v[xyz]
-                    if function != False:
-                        force_add = function(R)*Dx[idxnn11]
-
-                #print('idxnn11',idxnn11,'p1',pos_all[disp_idx,nn1],'p2',pos_all[disp_idx,nn11],'D',D,"Drel",Drel,'v_o_v',v_o_v,'r',r)
-                # this is the model without fixing anything:
-                # Forces: a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)
-                # Forces * xyz : (a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)) * x  # where x = xyz = v_o_v
-                # for every vasp force:
-                # Force_vasp_x(r=R) = SUM_over_all_neigh[ax + bx/R + cx/R^2 + dx/R^3]  ## R is given; x = Dx
-                # ( a + b/(r_1)^1 + c/(r_1)^2 + d/(r_1)^3 ) * x_1 +
-                # ( a + b/(r_2)^1 + c/(r_2)^2 + d/(r_2)^3 ) * x_2
-                #  ==
-                #  a ( x_1          + x_2          + x_3 ... )  # == np.sum(Dx)
-                #  b ( x_1/(r_1)    + x_2/(r_2)    + ...        # == np.sum(Dx/R)
-                #  c ( x_1/(r_1)^2  + x_2/(r_2)^2  + ...        # == np.sum(Dx/R**2.)
-                #  d ( x_1/(r_1)^3  + x_2/(r_2)^3  + ...        # == np.sum(Dx/R**3.)
-                #                          a*           b*          c*                  d*
-                a_add =  [np.array([ np.sum(Dx), np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
-                a += a_add
-                b += [Fv[xyz]]
-
-                # Forces(rcut=0.88) = 0
-                a_add_ =  [np.array([ np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
-                a_ += a_add_
-                no_a_corr_F =  np.sum(Dx/rcut) + np.sum(Dx/rcut**2.)  + np.sum(Dx/rcut**3.)
-                b_ += [Fv[xyz]+no_a_corr_F]
-
-
-                # with constraints:
-                #     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)   -- > && a * np.sum(Dx)
-                a_add_ =  [np.array([ np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
-                a_ += a_add_
-                no_a_corr_F =  np.sum(Dx/rcut) + np.sum(Dx/rcut**2.)  + np.sum(Dx/rcut**3.)
-                b_ += [Fv[xyz]+no_a_corr_F]
-
-                # with constraints:
-                #     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)   -- > && a * np.sum(Dx)
-                #     b = - 3.*d/rcut**2. - 2.*c/rcut  # from first der b(d,c)
-                a_add__ =  [np.array([ np.sum(Dx/R**2.)+np.sum(Dx/(rcut**2.))-np.sum((Dx*2.)/(R*rcut)), np.sum(Dx/R**3.)+np.sum((2.*Dx)/(rcut**3.))-np.sum(3*Dx/(R*rcut**2.)) ])]
-                a__ += a_add__
-
-                #print('xyz',xyz,a_add)
-            #if parametrize_only_along_110 == True:
-            #    print('Dx',Dx)
-            #    print('R ',R)
-            #print('Dx/R ',Dx/R)
-            #print('a',np.sum(Dx)) #,np.sum(Dy),np.sum(Dz))
-            #print('b',np.sum(Dx/R)) #,np.sum(Dy/R),np.sum(Dz/R))
-            #print('c',np.sum(Dx/R**2.)) #,np.sum(Dy/R**2.),np.sum(Dz/R**2.))
-            #print('d',np.sum(Dx/R**3.)) #,np.sum(Dy/R**3.),np.sum(Dz/R**3.))
-    a = np.array(a)
-    b = np.array(b)
-    a_ = np.array(a_)
-    b_ = np.array(b_)
-    a__ = np.array(a__)
-    b__ = np.array(b__)
-    #print('b',b,'len(b)',len(b))
-    #print('a',a,'len(a)',len(a))
-    params  = np.linalg.lstsq(a, b,rcond=None)[0]
-    params_ = np.linalg.lstsq(a_, b_,rcond=None)[0]
-    params__ = np.linalg.lstsq(a__, b,rcond=None)[0]
-    print('params      ',params)
-    aa = - params_[0]*rcut**(-1) - params_[1]*rcut**(-2) - params_[2]*rcut**(-3)
-    print('params_ (i) ',params_)
-    params_ = [aa,params_[0],params_[1],params_[2]]
-    print('params_ (ii)',params_)
-
-
-    bb = -3*params__[1]*rcut**(-2) -2.*params__[0]/rcut
-    aa = - bb*rcut**(-1) - params__[0]*rcut**(-2) - params__[1]*rcut**(-3)
-    print('params__(i) ',params__)
-    params__ = [aa,bb,params__[0],params__[1]]
-    print('params__(ii)',params__)
-    #for i in params:
-    #    print(i)
-    return params,params_,params__
-
 def get_forces_on_atom_by_considering_all_its_1NNs(params,forcefunc,atoms,alat,atomnr,pos):
     ''' alat  : 4.13 (angstrom)
         atoms : an ase object of the perfect cell.
@@ -2022,6 +1896,189 @@ def make_nice_scatterplot(df,tags=None,x="a",y="b",color=None,symbols=False):
     fig.show()
     return
 
+##################################################################################
+## parametrize foces
+##################################################################################
+def get_michaels_paramerization(pos_all,force_all,NN1,alat,atoms,parametrize_only_idx=False,rcut=0.88,function=False,save_parametrization=False):
+    ''' NN1 are the NN1idx
+        atoms : an ase object of the perfect cell.
+
+         1. get a function that for a given ATOM, gives all its 1NN (NN=a,b,c,d,...) (or its 2NN, 3NN, ...), basically, D for particular neighbors.
+         2. write down the equation to solve: FORCE_VASP(ATOM)__x = SUM_over_all_neighbors[v_o_v__NN__x*Forcefunction(r)]
+                                              FORCE_VASP(ATOM)__y = SUM_over_all_neighbors[v_o_v__NN__y*Forcefunction(r)]
+                                              FORCE_VASP(ATOM)__z = SUM_over_all_neighbors[v_o_v__NN__z*Forcefunction(r)]
+         3. This gives, for every displacement (=7), for every NN (=12), three (=x,y,z) equations.
+         was ich jetzt loesen muss ist ein gleichungssystem von vielen vektoren D and die VASP force, mache , basically, D for particular neighbors.
+
+    '''
+    if save_parametrization != False:
+        abcd_name = "poly_abcd_rcut"+str(rcut)+".dat"
+        cd_name   = "poly_cd_rcut"+str(rcut)+".dat"
+        parametrizationfile_abcd = save_parametrization+"/disp_fit.parameters."+abcd_name
+        parametrizationfile_cd   = save_parametrization+"/disp_fit.parameters."+cd_name
+        if os.path.isfile(parametrizationfile_abcd) and os.path.isfile(parametrizationfile_cd):
+            params_abcd = np.loadtxt(parametrizationfile_abcd)
+            params_cd   = np.loadtxt(parametrizationfile_cd)
+            return params_abcd,params_cd
+
+    a = []
+    b = []
+
+    a_ = []
+    b_ = []
+
+    a__ = []
+    b__ = []
+    rmin =  10000000000000000
+    rmax = -10000000000000000
+    for disp_idx in np.arange(len(pos_all)):    # for all displacements
+    #disp_idx=7
+        parametrize_over_atoms = NN1
+        if parametrize_only_idx != False:
+            parametrize_over_atoms = parametrize_only_idx
+
+        for idxnn1,nn1 in enumerate(parametrize_over_atoms): # for all first NN
+            Fv = force_all[disp_idx,nn1]
+            for xyz in [0,1,2]:         # for xyz
+                Fvx = Fv[xyz]
+
+                NN1_1st_neigh = get_NN1_from_positions(atoms,alat,atomnr=nn1,verbose=False)
+                ##print('idxnn1',idxnn1,nn1,"NN1_1st_neigh:",NN1_1st_neigh)
+                #print("Fv",Fv,"===")
+                Dx = np.zeros(12)
+                R  = np.zeros(12)
+                Rcut  = np.zeros(12)
+                for idxnn11,nn11 in enumerate(NN1_1st_neigh):    # for all neighbors of a particular 1NN
+                    D  = pos_all[disp_idx,nn1]-pos_all[disp_idx,nn11]
+                    #if parametrize_only_idx != False:
+                    #    #print("D",D)
+                    #    #print('i will take this D!')
+                    #    print("D",D,'nn1',nn1,'nn11',nn11)
+                    Drel = D/alat               # given for every particle
+                    vecnorm = r = np.linalg.norm(Drel)   # given for every particle
+                    if r > rmax:
+                        rmax = r
+                    if r < rmin:
+                        rmin = r
+                    v_o_v = Drel/vecnorm
+                    R[idxnn11] = r
+                    Rcut[idxnn11] = rcut
+                    Dx[idxnn11] = v_o_v[xyz]
+                    if function != False:
+                        force_add = function(R)*Dx[idxnn11]
+
+                #print('idxnn11',idxnn11,'p1',pos_all[disp_idx,nn1],'p2',pos_all[disp_idx,nn11],'D',D,"Drel",Drel,'v_o_v',v_o_v,'r',r)
+                # this is the model without fixing anything:
+                # Forces: a + b*r**(-1) + c*r**(-2) + d*r**(-3)
+                # Forces * xyz : (a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)) * x  # where x = xyz = v_o_v
+                # for every vasp force:
+                # Force_vasp_x(r=R) = SUM_over_all_neigh[ax + bx/R + cx/R^2 + dx/R^3]  ## R is given; x = Dx
+                # ( a + b/(r_1)^1 + c/(r_1)^2 + d/(r_1)^3 ) * x_1 +
+                # ( a + b/(r_2)^1 + c/(r_2)^2 + d/(r_2)^3 ) * x_2
+                #  ==
+                #  a ( x_1          + x_2          + x_3 ... )  # = np.sum(Dx)
+                #  b ( x_1/(r_1)    + x_2/(r_2)    + ...        # = np.sum(Dx/R)
+                #  c ( x_1/(r_1)^2  + x_2/(r_2)^2  + ...        # = np.sum(Dx/R**2.)
+                #  d ( x_1/(r_1)^3  + x_2/(r_2)^3  + ...        # = np.sum(Dx/R**3.)
+                #  --> a*np.sum(Dx) + b*np.sum(Dx/R) + c*np.sum(Dx/R**2.) + d*np.sum(Dx/R**3) = Fvx  # **1)
+
+                #############################
+                # allgemein ohne constraints **1)
+                #############################
+                a_add =  [np.array([ np.sum(Dx), np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
+                a += a_add
+                b += [Fv[xyz]]
+
+                #############################
+                # Forces(rcut=0.88) = 0
+                #############################
+                a_add_ =  [np.array([ np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
+                a_ += a_add_
+                no_a_corr_F =  np.sum(Dx/rcut) + np.sum(Dx/rcut**2.)  + np.sum(Dx/rcut**3.)
+                b_ += [Fv[xyz]+no_a_corr_F]
+
+
+                # with constraints:
+                # V[r_] := aa + dd/r^3 + cc/r^2 + bb/r
+                # V'[r]  = -((3 dd)/r^4) - (2 cc)/r^3 - bb/r^2
+                # V''[r] = (12 dd)/r^5 + (6 cc)/r^4 + (2 bb)/r^3
+                #
+                # Solve[V[rcut] == 0, aa]       --> aa -> (-dd - cc rcut - bb rcut^2)/rcut^3
+                # Vnoa[r_] := (-dd - cc rcut - bb rcut^2)/rcut^3 + dd/r^3 + cc/r^2 + bb/r
+                # Solve[Vnoa'[rcut] == 0, bb]   -->  bb -> (-3 dd - 2 cc rcut)/rcut^2
+                #
+                #
+                #     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)   -- > && a * np.sum(Dx)
+                a_add_ =  [np.array([ np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
+                a_ += a_add_
+                no_a_corr_F =  np.sum(Dx/rcut) + np.sum(Dx/rcut**2.)  + np.sum(Dx/rcut**3.)
+                b_ += [Fv[xyz]+no_a_corr_F]
+
+                # with constraints:
+                #     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)   -- > && a * np.sum(Dx)
+                #     b = - 3.*d/rcut**2. - 2.*c/rcut  # from first der b(d,c)
+                a_add__ =  [np.array([ np.sum(Dx/R**2.)+np.sum(Dx/(rcut**2.))-np.sum((Dx*2.)/(R*rcut)), np.sum(Dx/R**3.)+np.sum((2.*Dx)/(rcut**3.))-np.sum(3*Dx/(R*rcut**2.)) ])]
+                a__ += a_add__
+
+                #print('xyz',xyz,a_add)
+            #if parametrize_only_along_110 == True:
+            #    print('Dx',Dx)
+            #    print('R ',R)
+            #print('Dx/R ',Dx/R)
+            #print('a',np.sum(Dx)) #,np.sum(Dy),np.sum(Dz))
+            #print('b',np.sum(Dx/R)) #,np.sum(Dy/R),np.sum(Dz/R))
+            #print('c',np.sum(Dx/R**2.)) #,np.sum(Dy/R**2.),np.sum(Dz/R**2.))
+            #print('d',np.sum(Dx/R**3.)) #,np.sum(Dy/R**3.),np.sum(Dz/R**3.))
+    a = np.array(a)
+    b = np.array(b)
+    a_ = np.array(a_)
+    b_ = np.array(b_)
+    a__ = np.array(a__)
+    b__ = np.array(b__)
+    #print('b',b,'len(b)',len(b))
+    #print('a',a,'len(a)',len(a))
+    params  = np.linalg.lstsq(a, b,rcond=None)[0]
+    #params_ = np.linalg.lstsq(a_, b_,rcond=None)[0]
+    params__ = np.linalg.lstsq(a__, b,rcond=None)[0]
+    #print('params      ',params)
+    #aa = - params_[0]*rcut**(-1) - params_[1]*rcut**(-2) - params_[2]*rcut**(-3)
+    #print('params_ (i) ',params_)
+    #params_ = [aa,params_[0],params_[1],params_[2]]
+    #print('params_ (ii)',params_)
+
+
+    bb = -3*params__[1]*rcut**(-2) -2.*params__[0]/rcut
+    aa = - bb*rcut**(-1) - params__[0]*rcut**(-2) - params__[1]*rcut**(-3)
+    #print('params__(i) ',params__)
+    params_abcd = [params[0],params[1],params[2],params[3],rcut,rmin,rmax]
+    params_cd   = [aa,bb,params__[0],params__[1],rcut,rmin,rmax]
+    #print('params__(ii)',params__)
+    #for i in params:
+    #    print(i)
+    print('params_abcd:',params_abcd)
+    print('params_cd  :',params_cd)
+    print('params_abcdx',params_abcd[:4])
+    print('params_cd  x',params_cd[:4])
+    if save_parametrization != False:
+        mmodel_abcd = hesse.Michael_poly_der
+        print('rmin',rmin)
+        print('rmax',rmax)
+        if rmax < 0.9:
+            rmax = 1.2
+        if rmin > 0.5:
+            rmin = 0.5
+        xred_dense = np.arange(rmin,rmax,0.001)
+        np.savetxt(save_parametrization+"/disp_vs_forces_"+abcd_name,np.array([xred_dense,-1*mmodel_abcd(xred_dense,*(params_abcd[:4]))]).T)
+        np.savetxt(save_parametrization+"/disp_vs_forces_"+cd_name,np.array([xred_dense,-1*mmodel_abcd(xred_dense,*(params_cd[:4]))]).T)
+        print('saved',save_parametrization+"/disp_vs_forces_"+abcd_name)
+        print('saved',save_parametrization+"/disp_vs_forces_"+cd_name)
+        np.savetxt(parametrizationfile_abcd,params_abcd)
+        np.savetxt(parametrizationfile_cd,params_cd)
+        print('saved',parametrizationfile_abcd)
+        print('saved',parametrizationfile_cd)
+
+
+    return params_abcd,params_cd
 
 ##################################################################################
 ## lammps functions
@@ -3073,28 +3130,28 @@ def folder_get_pos_forces_cell(i):
     create_dofor_POSITIONs = False
     create_dofor_u_OUTCAR = False
     if not os.path.isfile(i+'/pos'):
-        with my.cd(i):
+        with cd(i):
             call(["OUTCAR_positions-last-ARRAY.sh > pos"],shell=True)
     if not os.path.isfile(i+'/forces'):
-        with my.cd(i):
+        with cd(i):
             call(["OUTCAR_forces-last-ARRAY.sh > forces"],shell=True)
 
     if not os.path.isfile(i+'/POSITIONs'):
-        with my.cd(i):
+        with cd(i):
             #print('pwd',os.getcwd())
             call(["extractPOSITIONS.sh"],shell=True)
     pos_forces  = np.loadtxt(i+'/POSITIONs')
     pos         = pos_forces[:,[0,1,2]]
     forces      = pos_forces[:,[3,4,5]]
     if not os.path.isfile(i+'/u_OUTCAR'):
-        with my.cd(i):
+        with cd(i):
             call(["OUTCAR_ene-potential_energy_without_first_substracted.sh > u_OUTCAR"],shell=True)
 
     #@if create_dofor_POSITIONs == True:
-    #@    with my.cd(i):
+    #@    with cd(i):
     #@        call(["cat POSITIONs >> ../POSITIONs"],shell=True)
     #@if create_dofor_u_OUTCAR == True:
-    #@    with my.cd(i):
+    #@    with cd(i):
     #@        call(["cat u_OUTCAR >> ../u_OUTCAR"],shell=True)
     #alat = float(i.split("vasp4/")[1].split("Ang")[0])
     if os.path.isfile(i+'/cell'):
@@ -3126,14 +3183,13 @@ def try_to_get_alat_and_sc_from_cell_and_positions(cell,positions):
     if c[0,0] == c[1,1] == c[2,2] and c[0,1] == c[0,2] == c[1,0] == c[1,2] == c[2,0] == c[2,1] == 0:
         celltype = 'cubic'
         sc = 1
-        alat = c[0,0]
-        #print('yesc',sc,alat)
-        #for i in np.arange(1,10):
-        for i in np.arange(1,4):
+        scalat = c[0,0]
+        #print('c[0,0] == scalat',scalat)
+        for i in np.arange(1,10):
             alltrue = False
-            #print('i (=sc)',i,'alat/i',alat/i)
+            #print('i (=sc) =',i,'scalat/i',scalat/i)
             for j in np.arange(1,i):
-                pos = np.array([0,0,(alat/i)*j])
+                pos = np.array([0,0,(scalat/i)*j])
                 chk = check_vec_in_array(pos, positions)
                 #print('pos?',pos,chk)
                 if chk == True:
@@ -3141,10 +3197,13 @@ def try_to_get_alat_and_sc_from_cell_and_positions(cell,positions):
                 elif chk == False:
                     alltrue = False
                     break
-            #print('-------------->>>>>>>>>>>>>>>>>',i,alltrue)
+            #print('i (=sc) =',i,'scalat/i',scalat/i,"alltue?",alltrue)
             if alltrue == True:
                 sc = i
                 alat = c[0,0]/sc
+            #print('i (=sc) =',i,'scalat/i',scalat/i,"alltue?",alltrue,"--> sc:",sc,"alat",alat)
+    #print('sc --------->',sc)
+    #print('alat ------->',alat)
 
     if alat > 6 or alat < 3:
         print('alat',alat)

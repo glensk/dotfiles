@@ -1216,6 +1216,14 @@ def Morse_repulsive_derivative(r,De,aa,re):
 def Morse_repulsive_derivative_to_normaldata(r,De,aa,re):
     return Morse_repulsive_derivative(r,De,aa,re) - Morse_repulsive_derivative(re,De,aa,re)
 
+def Michael_poly(r,a,b,c,d):
+    ''' dies ist die energie
+    Mathematica:    V[r_]:= aa + dd/r^3 + cc/r^2 + bb/r
+    Integrate[V[r], r] -->
+    -(dd/(2 r^2)) - cc/r + aa r + bb Log[r]
+    '''
+    return -(d/(2.*r**2.)) - c/r + a*r + b*np.log(r)
+
 def Michael_poly_der(r,a,b,c,d):
     ''' dies sind die kraefte '''
     return a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)
