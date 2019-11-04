@@ -2080,6 +2080,7 @@ def relax_structure_fully_and_save_to_pot(ace,read=False):
 def test_antisites(ace):
     print("######## antisites #############")
     i =  "Mg4Al3Si4"
+    i =  "Mg5Al2Si4"
     read = "aiida_exported_group_out_antisites_rep"+i+"_NEW.runner_calc__all_steps.input.data"
     frames_relaxed = relax_structure_fully_and_save_to_pot(ace,read)
     sys.exit('88888866666')
