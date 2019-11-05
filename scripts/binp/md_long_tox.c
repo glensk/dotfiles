@@ -236,7 +236,7 @@ void init_l1nn() {
 		    // j1 im prinzip auch
 JUMPIN:
 			ind2=(((i3+j3+2*N)%(2*N)/2)*2*N+(i2+j2+2*N)%(2*N))*2*N+(i1+j1+2*N)%(2*N);
-            //printf("ind1: %d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f ind2: %d pos[ind2] %3.3f %3.3f %3.3f\n",ind1,pos[ind1].x*faktor,pos[ind1].z*faktor,pos[ind1].z*faktor,ind2,pos[ind2].x*faktor,pos[ind2].z*faktor,pos[ind2].z*faktor);
+            printf("ind1: %d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f ind2: %d pos[ind2] %3.3f %3.3f %3.3f\n",ind1,pos[ind1].x*faktor,pos[ind1].y*faktor,pos[ind1].z*faktor,ind2,pos[ind2].x*faktor,pos[ind2].y*faktor,pos[ind2].z*faktor);
 
             l1nn[i].ind1=ind1;
             l1nn[i].ind2=ind2;
@@ -1660,7 +1660,7 @@ void calculate_forces_energy_la(double dt,int verbose) {
         // i = 0 .. 192
         ind1=l1nn[i].ind1;
         ind2=l1nn[i].ind2;
-        //printf("xxind1: %d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f ind2: %d pos[ind2] %3.3f %3.3f %3.3f\n",ind1,pos[ind1].x*faktor,pos[ind1].z*faktor,pos[ind1].z*faktor,ind2,pos[ind2].x*faktor,pos[ind2].z*faktor,pos[ind2].z*faktor);
+        printf("i: %3d xxind1: %3d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f ind2: %3d pos[ind2] %3.3f %3.3f %3.3f dxdydz %3.3f %3.3f %3.3f\n",i,ind1,pos[ind1].x*faktor,pos[ind1].y*faktor,pos[ind1].z*faktor,ind2,pos[ind2].x*faktor,pos[ind2].y*faktor,pos[ind2].z*faktor,(pos[ind2].x-pos[ind1].x)*faktor,(pos[ind2].y-pos[ind1].y)*faktor,(pos[ind2].z-pos[ind1].z)*faktor);
 
         j1=l1nn[i].j1;
         j2=l1nn[i].j2;
@@ -1672,6 +1672,8 @@ void calculate_forces_energy_la(double dt,int verbose) {
 		z=(signed)(pos[ind1].z-pos[ind2].z);
 		r=sqrt(x*x+y*y+z*z);
 
+        // Analysis
+        //printf("--> r  : %5.5f (req   angstrom) xyz: %3.5f %3.5f %3.5f\n",r*da0_alat_lattice,x*da0_alat_lattice,y*da0_alat_lattice,z*da0_alat_lattice);
 		if ( r > rmax ) {rmax = r;};
 		if ( r < rmin ) {rmin = r;};
         //printf("--> r!!: %5.10f --> %5.10f (in angsrom) aa: %5.10f\n",r,r/a0*alat_lattice,aa);
@@ -2623,7 +2625,8 @@ int main(int argc,char *argv[]){
             u_dft                  = arr_u_dft[i];
             get_pos_from_externalfile(file_in_positions,columns);
             calculate_forces_energy_la(dt,verbose);
-
+            printf("hierxxz\n");
+            exit(1);
             if (read_hesse==1) {calculate_forces_energy_hesse(hessemat);};
 
             // analyze_forces is only of interest if DFT forces available
