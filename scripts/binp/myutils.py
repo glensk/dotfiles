@@ -5373,6 +5373,7 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
 
     #print('read from',readpath)
     #print('whichstruct',whichstruct)
+    print('readpath',readpath)
     frames = ase_read(readpath,index=whichstruct,format="runner")  # frames with DFT energies.
     #print('type(frames)',type(frames))
     #print('frames.cell',frames.cell)
@@ -5392,15 +5393,15 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
     # just read in and return if it exists
     ######################################
     if os.path.isfile(savepath):
-        print('savepath exists',savepath)
+        print('savepath (exists)',savepath)
         frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
         if len(frames) == len(frames_out):
-            return frames
+            return frames_out, frames
         else:
             print('savepath exists but has different name than readpath')
             sys.exit('savepath '+savepath+" does already exist (55); Exit")
 
-    print('will be saved to ',savepath)
+    print('savepath (will be created)',savepath)
     ######################################
     # relax if necessary
     ######################################
@@ -5413,8 +5414,8 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
         ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
         ase_write(savepath,atoms,format='runner',append=True)
     frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
-    print('was saved to ',savepath)
-    return frames_out
+    print('savepath (created)',savepath)
+    return frames_out, frames
 
 
 def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
