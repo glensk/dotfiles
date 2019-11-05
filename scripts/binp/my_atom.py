@@ -743,7 +743,10 @@ def data(elementlistin = None):
         elif crystal_struct == 'diamond':
             vol = ((i['a'])**3)/8
             #print('vol',vol)
+        elif crystal_struct == 'bcc':
+            vol = ((i['a'])**3.)/2.
         else:
+            print('a',i['a'])
             sys.exit('crystal structure unknown: '+crystal_struct)
         reference_volume.append(vol)
         #print('i',i,i['symmetry'])
