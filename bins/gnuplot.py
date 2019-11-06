@@ -198,6 +198,9 @@ def gnuplot_defaults(args):
         myhost = check_for_known_hosts(exit=False)
         #print('my',myhost)
         #sys.exit()
+        term="x11"
+        #term="aqua"
+        #term="xterm"
         if myhost == "helvetios":
             term="x11"
         elif myhost == "qt":
