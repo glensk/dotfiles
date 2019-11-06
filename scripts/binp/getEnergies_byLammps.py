@@ -2103,10 +2103,10 @@ def test_antisites(ace):
         antisite_initiali_ene_dft = my.ase_enepot(antisite_initiali,units='eV')
 
         antisite_nat = i.get_number_of_atoms()
-        #print('antisite_relaxedi_ene_nn :',antisite_relaxedi_ene_nn,'nat',antisite_nat)
-        #print('antisite_initiali_ene_nn :',antisite_initiali_ene_nn,'nat',antisite_nat)
-        #print('antisite_relaxedi_ene_dft:',antisite_relaxedi_ene_dft,'nat',antisite_nat)
-        #print('antisite_initiali_ene_dft:',antisite_initiali_ene_dft,'nat',antisite_nat)
+        print('antisite_initiali_ene_nn :',antisite_initiali_ene_nn,'nat',antisite_nat)
+        print('antisite_relaxedi_ene_nn :',antisite_relaxedi_ene_nn,'nat',antisite_nat)
+        print('antisite_initiali_ene_dft:',antisite_initiali_ene_dft,'nat',antisite_nat)
+        print('antisite_relaxedi_ene_dft:',antisite_relaxedi_ene_dft,'nat',antisite_nat)
 
         #print('f',f)
         #print('origphase_relaxed*f:',"Al:",d["Al"]*f,"Mg:",d["Mg"]*f,"Si:",d["Si"]*f,'origphase_relaxed_ene_nn*f:',orig_relaxed_ene_nn*f)
