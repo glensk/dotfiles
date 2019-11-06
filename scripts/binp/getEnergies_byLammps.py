@@ -2113,21 +2113,25 @@ def test_antisites(ace):
 
             antisite_initiali_ene_dft = my.ase_enepot(antisite_initiali,units='eV')
             max_dft_forces = np.abs(antisite_initiali.get_forces()).max()
+            max_dft_forces = np.round(max_dft_forces,5)
+            max_dft_forces2 = np.round(max_dft_forces,2)
             print('antisite_initiali_ene_dft:',antisite_initiali_ene_dft,'max_dft_forces',max_dft_forces)
 
             antisite_initiali_ene_nn  = ace.ene(antisite_initiali) #.copy())
             max_nn_forces = np.abs(antisite_initiali.get_forces()).max()
+            #max_nn_forces = np.round(max_nn_forces,5)
             print('antisite_initiali_ene_nn :',antisite_initiali_ene_nn ,'max_nn_forces ',max_nn_forces)
 
             antisite_relaxedi_ene_nn  = ace.ene(antisite_relaxedi_by_nn.copy())
             max_nn_forces0 = np.abs(antisite_relaxedi_by_nn.get_forces()).max()
+            #max_nn_forces0 = np.round(max_nn_forces0,5)
             print('antisite_relaxedi_ene_nn :',antisite_relaxedi_ene_nn ,'max_nn_forces0',max_nn_forces0)
-
+            #sys.exit()
 
             antisite_nat = i.get_number_of_atoms()
-            print('ace.E_SS_Al',ace.E_SS_Al)
-            print('ace.E_SS_Mg',ace.E_SS_Mg)
-            print('ace.E_SS_Si',ace.E_SS_Si)
+            #print('ace.E_SS_Al',ace.E_SS_Al)
+            #print('ace.E_SS_Mg',ace.E_SS_Mg)
+            #print('ace.E_SS_Si',ace.E_SS_Si)
             #print('f',f)
 
 
@@ -2152,6 +2156,7 @@ def test_antisites(ace):
             if al_d == 1 : text2 = "Al"
             if mg_d == 1 : text2 = "Mg"
             if si_d == 1 : text2 = "Si"
+            text2=text2+"_"+str(max_dft_forces2)
 
 
             ## The errors in the E_SS_{Al,Mg,Si} (between DFT and NN) do not matter at all here, since those are way too small to influence the result since only two Al/Mg/Si
