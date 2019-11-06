@@ -3320,10 +3320,13 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0=False,matrix_ele
         c = 5.21
         atom = crystal(matrix_element, [(1./3., 2./3., 3./4.)], spacegroup=194, cellpar=[a, a, c, 90, 90, 120])
     elif whichcell == "dc":
-        a = 5.47
-        atom = crystal(matrix_element, [(0,0,0)], spacegroup=227, cellpar=[a, a, a, 90, 90, 90])
+        #a = 5.47
+        atom = crystal(matrix_element, [(0,0,0)], spacegroup=227, cellpar=[a0, a0, a0, 90, 90, 90])
+    elif whichcell == "bcc":
+        atom = ase_build_bulk(matrix_element,crystalstructure='bcc',a=a0,cubic=cubic)
+
     else:
-        sys.exti("whichcell: "+str(whichcell)+" has to be in fcc or hcp")
+        sys.exti("whichcell: "+str(whichcell)+" has to be in fcc/hcp/dc/bcc")
 
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
