@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: e025f9a5fc9b627cd715c5cebff8bc385bf33a6b
+
+aiida_submit_runnerfile.py -cm scf -i relaxed_Mg4Al3Si4_n2p2_v4ag_ppl_987654_21cores.runner
