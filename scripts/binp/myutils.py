@@ -5373,7 +5373,7 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
 
     #print('read from',readpath)
     #print('whichstruct',whichstruct)
-    print('readpath',readpath)
+    print('readpath',readpath,'whichstruct:',whichstruct)
     frames = ase_read(readpath,index=whichstruct,format="runner")  # frames with DFT energies.
     #print('type(frames)',type(frames))
     #print('frames.cell',frames.cell)
