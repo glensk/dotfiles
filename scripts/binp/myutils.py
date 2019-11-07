@@ -5593,6 +5593,11 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             sed(folder+'/'+ipi_inp_basename,'md_ff',str('md_ff'))
             print(folder)
             print('next thing to do: put the socket in the in.lmp!')
+            print('executing this with:')
+            print('python $HOME/sources/ipi/bin/i-pi ipi_input_thermodynamic_integration_template.xml')
+            print('~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp')
+            print()
+            print('gives simulation.ti which has in 3rd column the total energy for the nn')
     return
 
 def get_hessefiles_vol_pos(folder):
