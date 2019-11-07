@@ -1,0 +1,73 @@
+# Built with EasyBuild version 3.8.1 on 2019-05-09_15-56-24
+# contributed by Guilherme Peretti Pezzi, Luca Marsella and Anton Kozhevnikov (CSCS)
+# Marco customizations:
+#   changed version
+#   changed source URL
+#   added --disable-xml
+#   removed patch to Makefile
+
+easyblock = "ConfigureMake"
+
+name = 'QuantumESPRESSO'
+version = '6.3-backports-20181003-bfgspatch'
+
+homepage = 'http://www.quantum-espresso.org/'
+description = """Quantum ESPRESSO  is an integrated suite of computer codes
+ for electronic-structure calculations and materials modeling at the nanoscale.
+ It is based on density-functional theory, plane waves, and pseudopotentials
+  (both norm-conserving and ultrasoft)."""
+
+toolchain = {'name': 'CrayIntel', 'version': '18.08'}
+toolchainopts = {'usempi': True, 'openmp': True}
+
+#sources = ['https://gitlab.com/QEF/q-e/-/archive/' + 'qe-%(version)s/q-e-qe-%(version)s.tar.gz']
+#sources = ['/users/dmarchan/Install/Tar/q-e-29c951ebbfc3b2248d0308102d05c4c081db891e_bfgspatch.tar.gz']
+sources = ['/scratch/snx3000/dmarchan/CSCS_37512/q-e-29c951ebbfc3b2248d0308102d05c4c081db891e_bfgspatch.tar.gz']
+
+preconfigopts = ' module unload cray-libsci && module list && '
+preconfigopts += ' SCALAPACK_LIBS="-L$MKLROOT/lib/intel64 -lmkl_scalapack_lp64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_lp64" '
+preconfigopts += ' LD_LIBS="-lpthread -lstdc++ -ldl" ' 
+preconfigopts += ' FFLAGS="-O3 -g -assume byterecl -traceback -qopenmp" '
+preconfigopts += ' LDFLAGS="-qopenmp" F90FLAGS="$FFLAGS" FFT_LIBS="-mkl" FC="ftn" CFLAGS="-O3" CC="cc" '
+configopts = ' ARCH=crayxt --enable-openmp --enable-parallel --with-scalapack --disable-xml '
+
+# correct install rule in Makefile with a phony target (a folder "install" already exists)  
+#prebuildopts = ' sed -i -e "s/install :/.PHONY: install\\ninstall:/" Makefile && '
+#prebuildopts += ' module unload cray-libsci && module list && cat make.inc && '
+prebuildopts = ' module unload cray-libsci && module list && cat make.inc && '
+buildopts = 'pw -j'
+# a single make process is required, since parallel builds fail
+maxparallel = 1
+
+sanity_check_paths = {
+      'files': ['bin/pw.x'],  #, 'bin/cp.x'],
+      'dirs': ['']
+}
+
+moduleclass = 'chem'
+
+# Build statistics
+buildstats = [{
+    "build_time": 257.8,
+    "command_line": ["--allow-loaded-modules='ddt,EasyBuild-custom,EasyBuild'", "--buildpath='/run/user/25387/easybuild/build'", "--containerpath='/users/dmarchan/Install/containers'", "--external-modules-metadata='/apps/common/UES/jenkins/production/easybuild/cray_external_modules_metadata.cfg'", '--force', "--hide-deps='absl,ANTLR,APR,APR-util,Autoconf,Automake,Autotools,Bison,Bazel,cloudpickle,CMake,configurable-http-proxy,Coreutils,Cube,dask,Doxygen,Eigen,FLTK,GCCcore,GL2PS,glmnet,GLPK,GLib,GTS,GraphicsMagick,help2man,IPython,JasPer,LLVM,LOKI,Loki,LibTIFF,M4,Mako,Mesa,NASM,NASM,OPARI2,OTF2,OpenPGM,PCRE,PDT,PIL,Pillow,PROJ,PyGTS,PyQt,PyYAML,PyZMQ,Python-Xlib,Python-bare,Qhull,Qt,SCOTCH,SCons,SIONlib,SIP,SQLite,SWIG,Serf,Szip,Tcl,Tk,UDUNITS,X11,XZ,ZeroMQ,arpack-ng,backports.weakref,binutils,bokeh,byacc,bzip2,cairo,cURL,cuDNN,expat,flex,fontconfig,freetype,funcsigs,gc,gettext,gnuplot,gperf,guile,hwloc,inputproto,jemalloc,kbproto,libGLU,libgpuarray,libQGLViewer,libspatialindex,libX11,libXau,libXdmcp,libXext,libXrender,libcerf,libdrm,libevent,libffi,libgd,libiberty,libjpeg-turbo,libjpeg-turbo,libpng,libpthread-stubs,libreadline,libsodium,libtool,libunistring,libunwind,libutempter,libxcb,libxml2,libxshmfence,libyaml,make,minieigen,mock,mxml,ncurses,nettle,networkx,nodejs,nose-parameterized,numactl,parameterized,pixman,pkg-config,ploticus,popt,protobuf,protobuf-core,qrupdate,renderproto,scikit-image,scikit-learn,util-linux,Werkzeug,wheel,xcb-proto,xextproto,xorg-macros,xproto,xtrans,zlib'", "--hide-toolchains='CrayCCE,CrayGNU,CrayIntel,CrayPGI,GCCcore,gmvapich2,gmvolf,foss,gompi'", "--include-easyblocks='/apps/common/UES/jenkins/production/easybuild/easyblocks/*.py'", "--installpath='/users/dmarchan/Install'", "--module-syntax='Tcl'", "--modules-tool='EnvironmentModulesC'", "--optarch='broadwell'", "--packagepath='/users/dmarchan/Install/packages'", "--prefix='/users/dmarchan/Install'", "--repositorypath='/users/dmarchan/Install/ebfiles_repo'", "--robot='/apps/common/UES/jenkins/production/easybuild/easyconfigs:/apps/common/UES/easybuild/software/EasyBuild/3.8.1/lib/python2.7/site-packages/easybuild_easyconfigs-3.8.1-py2.7.egg/easybuild/easyconfigs'", "--robot-paths='/apps/common/UES/jenkins/production/easybuild/easyconfigs:'", "--sourcepath='/users/dmarchan/sources'", "--tmpdir='/run/user/25387/easybuild/tmp'", 'QuantumESPRESSO-6.3-backports-bfgspatch-21081003-CrayIntel-18.08.eb'],
+    "core_count": 20,
+    "cpu_model": "Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz",
+    "cpu_speed": 3000.0,
+    "cpu_vendor": "Intel",
+    "easybuild-easyblocks_version": "3.8.1",
+    "easybuild-framework_version": "3.8.1",
+    "gcc_version": "Using built-in specs.; COLLECT_GCC=gcc; COLLECT_LTO_WRAPPER=/usr/lib64/gcc/x86_64-suse-linux/4.8/lto-wrapper; Target: x86_64-suse-linux; Configured with: ../configure --prefix=/usr --infodir=/usr/share/info --mandir=/usr/share/man --libdir=/usr/lib64 --libexecdir=/usr/lib64 --enable-languages=c,c++,objc,fortran,obj-c++,java,ada --enable-checking=release --with-gxx-include-dir=/usr/include/c++/4.8 --enable-ssp --disable-libssp --disable-plugin --with-bugurl=http://bugs.opensuse.org/ --with-pkgversion='SUSE Linux' --disable-libgcj --disable-libmudflap --with-slibdir=/lib64 --with-system-zlib --enable-__cxa_atexit --enable-libstdcxx-allocator=new --disable-libstdcxx-pch --enable-version-specific-runtime-libs --enable-linker-build-id --enable-linux-futex --program-suffix=-4.8 --without-system-libunwind --with-arch-32=i586 --with-tune=generic --build=x86_64-suse-linux --host=x86_64-suse-linux; Thread model: posix; gcc version 4.8.5 (SUSE Linux) ; ",
+    "glibc_version": "2.22",
+    "hostname": "daint102",
+    "install_size": 39544295,
+    "modules_tool": ('EnvironmentModulesC', '/opt/cray/pe/modules/3.2.10.6/bin/modulecmd', '3.2.10'),
+    "os_name": "SLES",
+    "os_type": "Linux",
+    "os_version": "12",
+    "platform_name": "x86_64-unknown-linux",
+    "python_version": "2.7.13 (default, Jan 11 2017, 10:56:06) [GCC]",
+    "system_gcc_path": "/usr/bin/gcc",
+    "system_python_path": "/usr/bin/python",
+    "timestamp": 1557410184,
+    "total_memory": 257103,
+}]
