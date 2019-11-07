@@ -190,7 +190,7 @@ if [ ! -e "$HOME/.local/autojump" ];then
     mkdir -p $HOME/.local/
     cd $HOME/.local/
     echo "installing autojump"
-    git clone git://github.com/wting/autojump.git
+    git clone https://github.com/wting/autojump.git
     cd autojump 
     ./install.py #or ./uninstall.py
 fi

@@ -20,6 +20,30 @@
 #define a_mor         (1.432673)	   // m^-1 a  Morese parameter
 #define D_mor         (0.279300)	   // J    D  Morse parameter
 #define ktr_tox       (-0.09)	   //N/m	transversale kraftkonstante
+
+#define michael_poly_yes_no 1
+// for polynomial: a + b*r**(-1) + c*r**(-2) + d*r**(-3)
+// for rcut = 0.88
+//params_abcd   [-21.769  54.463 -45.499  12.692]
+//params_abcd__ [-19.557990008508305, 49.93759327856454, -42.453041782507114, 12.015227100764047]   pc: 0.99935
+//#define aa            (-19.557990008508305)
+//#define bb            (49.93759327856454)
+//#define cc            (-42.453041782507114)
+//#define dd            (12.015227100764047)
+
+// for rcut = 0.84
+//params_abcd   [-21.769  54.463 -45.499  12.692]                                                   pc: 0.99935
+//params_abcd__ [-20.452444362904057, 51.786965651529364, -43.70836806717401, 12.296391796377739]/  pc: 0.99936
+//#define aa            (-21.769)
+//#define bb            (54.463)
+//#define cc            (-45.499)
+//#define dd            (12.692)
+#define poly_aa            (-20.452444362904057)
+#define poly_bb            (51.786965651529364)
+#define poly_cc            (-43.70836806717401)
+#define poly_dd            (12.296391796377739)
+#define poly_rcut          (0.88)
+
 //////////////////////////// end definitions //////////////////////////////
 
 
@@ -40,6 +64,9 @@
 #define d0 (3037000500./N*alat_morse/alat_lattice)              // is fixed! (d0=2.920351 = 4.13/np.sqrt(2))
 #define a0 (4294967296./N)              // == 2^32 ; is fixed! (a0=4.13); 2^32 = 4,294,967,296 bytes; 4,294,967,296 / (1,024 x 1,024) = 4,096 MB = 4GB
 #define a0_alat_lattice (a0/alat_lattice)
+#define da0_alat_lattice (1./a0_alat_lattice)
+#define req ((alat_lattice/sqrt(2.))/da0_alat_lattice)
+#define poly_0 (-(poly_dd/(2.*poly_rcut*poly_rcut)) - poly_cc/poly_rcut + poly_aa*poly_rcut + poly_bb*log(poly_rcut))
 #define a_par (a_mor*1e10)	            // m^-1 a  Morese parameter
 #define D_par (D_mor*1.602176e-19)	    // J    D  Morse parameter
 #define r0_mor (alat_morse/sqrt(2))	    // m    r0 Morse parameter for a = 4.14/sqrt(2)
@@ -54,9 +81,9 @@
 #define stepsdudlmax (200000)
 #define faktor_temperature (m_element/k_B/(12.*N*N*N))
 
-double faktor_rel_pos=1./(a0*N);       // show in relative
-double faktor=alat_lattice/a0;   // show in absolute
-//double faktor=1./a0;           // show in internal coords
+double faktor_rel_pos=1./(a0*N); // show positions in relative coordinates
+double faktor=alat_lattice/a0;   // show positions in absolute (angstrom)
+//double faktor=1./a0;           // show positions in internal coords
 
 double faktor_hesse=-1000./(atoms-1.)/2.;
 //double faktor_hesse2=faktor*faktor*faktor_hesse;
@@ -110,6 +137,7 @@ struct L1nn    {unsigned int ind1,ind2,i1,i2,i3,j1,j2,j3,k1,k2,k3,x0,y0,z0,x1,y1
 
 struct Proj {double x,y,z;} proj;
 struct Forcetmp {double x,y,z;} * forcetmp;
+struct Forcepoly {double x,y,z;} * forcepoly;
 struct Force {double x,y,z;} * force;
 struct Forcedft {double x,y,z;} * forcedft;
 struct Forceharm {double x,y,z;} * forceharm;
@@ -126,6 +154,7 @@ struct Dudl {double u_dft,u_la,u_harm,\
 
 
 double u_la=0;
+double u_pl=0;
 double u_la_av=0;
 
 double u_la_tox=0;
@@ -194,6 +223,10 @@ void init_l1nn() {
 		j1=-1;  // das sind die relativen coordinaten der naechsten nachbarn
 		j2=1;   // das sind die relativen coordinaten der naechsten nachbarn
 		j3=0;   // das sind die relativen coordinaten der naechsten nachbarn
+
+        /// Analysis
+        // not all of the atoms pos[ind1].{x,y,z} exist
+        //printf("ind1: %d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f\n",ind1,pos[ind1].x*faktor,pos[ind1].z*faktor,pos[ind1].z*faktor);
 		goto JUMPIN;
 		for (j3=-1;j3<=1;j3++) for (j2=-1;j2<=1;j2++) for (j1=-1+(j3+j2+3)%2;j1<=1;j1+=2) {
 		    // j{1,2,3} sind die relativen coordinaten der naechsten nachbarn
@@ -203,6 +236,7 @@ void init_l1nn() {
 		    // j1 im prinzip auch
 JUMPIN:
 			ind2=(((i3+j3+2*N)%(2*N)/2)*2*N+(i2+j2+2*N)%(2*N))*2*N+(i1+j1+2*N)%(2*N);
+            //printf("ind1: %d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f ind2: %d pos[ind2] %3.3f %3.3f %3.3f\n",ind1,pos[ind1].x*faktor,pos[ind1].y*faktor,pos[ind1].z*faktor,ind2,pos[ind2].x*faktor,pos[ind2].y*faktor,pos[ind2].z*faktor);
 
             l1nn[i].ind1=ind1;
             l1nn[i].ind2=ind2;
@@ -268,6 +302,7 @@ void init(double T) {
 	l1nn=(struct L1nn *)malloc(sizeof(struct L1nn)*atoms*first_neighbors/2); // 12 neighbors, to exclude double counting /2 (every atoms interacts just ones with its nearest neighbor)
 
     forcetmp=(struct Forcetmp *)malloc(sizeof(struct Forcetmp)*atoms);
+    forcepoly=(struct Forcepoly *)malloc(sizeof(struct Forcepoly)*atoms);
 	force=(struct Force *)malloc(sizeof(struct Force)*atoms);
 	forcedft=(struct Forcedft *)malloc(sizeof(struct Forcedft)*atoms);
 	forceharm=(struct Forceharm *)malloc(sizeof(struct Forceharm)*atoms);
@@ -586,14 +621,14 @@ void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int 
 	fprintf(anmerkung,"\n");
 	//@@fprintf(anmerkung,"PROGRAM START  : %s\n", buff);
 	fprintf(anmerkung,"N              : %d\n",N);
-	fprintf(anmerkung,"alat_lattice   : %-20.10f\n",alat_lattice);
-	fprintf(anmerkung,"alat_morse     : %-20.10f\n",alat_morse);
+	fprintf(anmerkung,"alat_lattice   : %-20.10f (~4.14) \n",alat_lattice);
+	fprintf(anmerkung,"alat_morse     : %-20.10f (~4.14) (~4.14)  \n",alat_morse);
 	fprintf(anmerkung,"d0             : %-10.10f\n",d0);
 	fprintf(anmerkung,"a0             : %g (4294967296./N)\n",a0);
 	fprintf(anmerkung,"r0_mor         : %g\n",r0_mor);
 	fprintf(anmerkung,"r0_eq_morse    : %g\n",r0_eq_morse);
-	fprintf(anmerkung,"a_mor          : %-20.10f\n",a_mor);
-	fprintf(anmerkung,"D_mor          : %-20.10f\n",D_mor);
+	fprintf(anmerkung,"a_mor          : %-20.10f (~1.43)\n",a_mor);
+	fprintf(anmerkung,"D_mor          : %-20.10f (~0.26)\n",D_mor);
 	fprintf(anmerkung,"ktr_tox        : %-20.10f\n",ktr_tox);
 	fprintf(anmerkung,"m_element      : %-20.10f\n",m_element/1.660538e-27);
 
@@ -638,14 +673,14 @@ void write_out_info(double T,double dt,int zeitschritte, int l,int read_pos,int 
 	// print to screen
 	printsep("");
 	printf("N              : %d\n",N);
-	printf("alat_lattice   : %-20.10f\n",alat_lattice);
-	printf("alat_morse     : %-20.10f\n",alat_morse);
+	printf("alat_lattice   : %-20.10f (~4.14)\n",alat_lattice);
+	printf("alat_morse     : %-20.10f (~4.14)\n",alat_morse);
 	printf("d0             : %g (3037000500./N*alat_morse/alat_lattice) \n",d0);
 	printf("a0             : %g (4294967296./N)==bins per a0\n",a0);
 	printf("r0_mor         : %g\n",r0_mor);
 	printf("r0_eq_morse    : %g\n",r0_eq_morse);
-	printf("a_mor          : %-20.10f\n",a_mor);
-	printf("D_mor          : %-20.10f\n",D_mor);
+	printf("a_mor          : %-20.10f (~1.43)\n",a_mor);
+	printf("D_mor          : %-20.10f (~0.26)\n",D_mor);
 	printf("ktr_tox        : %-20.10f\n",ktr_tox);
 	printf("m_element      : %-20.10f\n",m_element/1.660538e-27);
 	printf("\n");
@@ -886,6 +921,7 @@ void analyze_forces(int i,FILE *file_forces,FILE *file_forces_av,FILE *file_forc
         forcelax = force[j].x*faktor_force; // force la
         forcelay = force[j].y*faktor_force; // force la
         forcelaz = force[j].z*faktor_force; // force la
+	    //printf("--> FDFT, FLA, FPL: %5.4f  %5.4f %5.4f\n",forcedft[j].x,forcelax,forcepoly[j].x*faktor_force);
         //dx = fabs(forcedft[j].x-x);  // difference in forces, needs actually be saved for every step
         //dy = fabs(forcedft[j].y-y);
         //dz = fabs(forcedft[j].z-z);
@@ -994,13 +1030,13 @@ void write_analyze_positions(int i) { //,FILE *file_out_check_dist_xyz,FILE *fil
 	// schleife ueber alle atome
 	////////////////////////////////
 		for (j=0;j<atoms;j++) {  // schleife ueber alle atome
-		    dx = (pos[j].x-pos0[j].x)/a0*alat_lattice;  // sollte in angstrom sein
+		    dx = (pos[j].x-pos0[j].x)*da0_alat_lattice;  // sollte in angstrom sein
 		    if (dx > N*alat_lattice/2)
 		        dx = dx - N*alat_lattice;
-		    dy = (pos[j].y-pos0[j].y)/a0*alat_lattice;
+		    dy = (pos[j].y-pos0[j].y)*da0_alat_lattice;
 		    if (dy > N*alat_lattice/2)
 		        dy = dy - N*alat_lattice;
-		    dz = (pos[j].z-pos0[j].z)/a0*alat_lattice;
+		    dz = (pos[j].z-pos0[j].z)*a0_alat_lattice;
 		    if (dz > N*alat_lattice/2)
 		        dz = dz - N*alat_lattice;
 		    // this would be the distances from equilibrium
@@ -1043,18 +1079,18 @@ void write_analyze_positions(int i) { //,FILE *file_out_check_dist_xyz,FILE *fil
         j3=l1nn[k].j3;
 
         // abstaende nn
-		x=(signed)(pos[ind1].x-pos[ind2].x)/a0*alat_lattice;
-		y=(signed)(pos[ind1].y-pos[ind2].y)/a0*alat_lattice;
-		z=(signed)(pos[ind1].z-pos[ind2].z)/a0*alat_lattice;
-		xn=(signed)(pos[ind1].x-pos[ind2].x)/a0*alat_lattice;
-		yn=(signed)(pos[ind1].y-pos[ind2].y)/a0*alat_lattice;
-		zn=(signed)(pos[ind1].z-pos[ind2].z)/a0*alat_lattice;
+		x=(signed)(pos[ind1].x-pos[ind2].x)*da0_alat_lattice;
+		y=(signed)(pos[ind1].y-pos[ind2].y)*da0_alat_lattice;
+		z=(signed)(pos[ind1].z-pos[ind2].z)*da0_alat_lattice;
+		xn=(signed)(pos[ind1].x-pos[ind2].x)*da0_alat_lattice;
+		yn=(signed)(pos[ind1].y-pos[ind2].y)*da0_alat_lattice;
+		zn=(signed)(pos[ind1].z-pos[ind2].z)*da0_alat_lattice;
 		xn = sqrt(xn*xn);
 		yn = sqrt(yn*yn);
 		zn = sqrt(zn*zn);
-		x0=(signed)(pos0[ind1].x-pos0[ind2].x)/a0*alat_lattice;
-		y0=(signed)(pos0[ind1].y-pos0[ind2].y)/a0*alat_lattice;
-		z0=(signed)(pos0[ind1].z-pos0[ind2].z)/a0*alat_lattice;
+		x0=(signed)(pos0[ind1].x-pos0[ind2].x)*da0_alat_lattice;
+		y0=(signed)(pos0[ind1].y-pos0[ind2].y)*da0_alat_lattice;
+		z0=(signed)(pos0[ind1].z-pos0[ind2].z)*da0_alat_lattice;
         //printf("nn0 (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,x0,y0,z0);
         //printf("nn! (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,x,y,z);
         //printf("nn1 (angstrom) pos? of atom %d:%d:%d %.6f %.6f %.6f\n",k,ind1,ind2,xn,yn,zn);
@@ -1198,6 +1234,7 @@ void set_forces_energy_zero() {
 	    force[j].z=0;
     }
     u_la=0;
+    u_pl=0;
     u_la_tox=0;
 }
 
@@ -1610,26 +1647,39 @@ void calculate_forces_energy_la(double dt,int verbose) {
     // genutzt werden und nicht bei readpos generell (was es aber soll!)
 	int i,j,i1,i2,i3,j1,j2,j3,steps,ind1,ind2;
 	//double x,y,z,r,f,fx,fy,fz,dum,dtm,a0ktr_par,dtmfx,dtmfy,dtmfz,dumm1; //,energy;
-	double x,y,z,r,f,fx,fy,fz,dum,a0ktr_par,dtmfx,dtmfy,dtmfz,dumm1; //,energy;
+	double x,y,z,r,rang,rrel,faktor_analysis,fevang,eev1,eev2,fpoly,fxpoly,fypoly,fzpoly,f,fx,fy,fz,dum,a0ktr_par,dtmfx,dtmfy,dtmfz,dumm1; //,energy;
     //dtm = dt/m_element;              // This saves 8% of computational time;
     a0ktr_par = ktr_par/a0;     // This saves 2% of total time;
     set_forces_energy_zero();
 
+	//printf("--> EM (in): %2.16f, SUM: %2.16f\n",u_la*faktor_energy_atom,u_la*faktor_energy_atom);
+	//printf("--> EPL(in): %2.16f, SUM: %2.16f\n",u_pl*faktor_energy_atom,u_pl*faktor_energy_atom);
     for (i=0;i<atoms*first_neighbors/2;i++) {   // 12 * atoms_supercell / 2
+        // atoms == number of atoms == 32 in 2x2x2 fcc supercell
+        // fist_neighbors = 12
+        // i = 0 .. 192
         ind1=l1nn[i].ind1;
         ind2=l1nn[i].ind2;
+        //printf("i: %3d xxind1: %3d pos[ind1].{x,y,z} %3.3f %3.3f %3.3f ind2: %3d pos[ind2] %3.3f %3.3f %3.3f dxdydz %3.3f %3.3f %3.3f\n",i,ind1,pos[ind1].x*faktor,pos[ind1].y*faktor,pos[ind1].z*faktor,ind2,pos[ind2].x*faktor,pos[ind2].y*faktor,pos[ind2].z*faktor,(pos[ind2].x-pos[ind1].x)*faktor,(pos[ind2].y-pos[ind1].y)*faktor,(pos[ind2].z-pos[ind1].z)*faktor);
+
         j1=l1nn[i].j1;
         j2=l1nn[i].j2;
         j3=l1nn[i].j3;
 
-        // abstaende nn
+        // abstaende nn  == Dx Dy Dz
 		x=(signed)(pos[ind1].x-pos[ind2].x);
 		y=(signed)(pos[ind1].y-pos[ind2].y);
 		z=(signed)(pos[ind1].z-pos[ind2].z);
 		r=sqrt(x*x+y*y+z*z);
 
+        // Analysis
+        //printf("--> r  : %5.5f (req   angstrom) xyz: %3.5f %3.5f %3.5f\n",r*da0_alat_lattice,x*da0_alat_lattice,y*da0_alat_lattice,z*da0_alat_lattice);
 		if ( r > rmax ) {rmax = r;};
 		if ( r < rmin ) {rmin = r;};
+        //printf("--> r!!: %5.10f --> %5.10f (in angsrom) aa: %5.10f\n",r,r/a0*alat_lattice,aa);
+        //printf("--> r?1: %5.10f --> %5.10f (in angsrom) aa: %5.10f\n",r,r/a0_alat_lattice,aa);
+        //printf("--> r?2: %5.10f --> %5.10f (in angsrom) aa: %5.10f\n",r,r*da0_alat_lattice,aa);
+
 		//fprintf(file_out_check_dist_r,"%.10f\n",rr);
 
         //r=1518500250;  // == 1.5185e+09 == d0 --> r=r0 --> r*faktor:2.920351
@@ -1638,37 +1688,118 @@ void calculate_forces_energy_la(double dt,int verbose) {
         // Morse  == energ == De*(1.-np.exp(-aa*(r-re)))**2
         //                    (a − b)^2 = (a − b)(a − b) = a^2 − 2ab + b^2
         // Morse' == force == 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
-        //           --> subst: np.exp(-aa*(r-re)) == dum
+        //           --> subst: dum == np.exp(-aa*(r-re))
         // Morse' == force == 2.*De*aa*dum*(1.-dum)
-		dum=exp(-a_par*(r/d0*r0_eq_morse-r0_eq_morse));  // part = e^(-a(r-re)) == dum
-		dumm1=dum-1.;
-		f=(2.*D_par*a_par)*dumm1*dum;               // das ist die erste ableitung (also die Kraft)
-        // In [2]: def Morseder(r,De,aa,re):
-        //    ...:     return 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
-        // In [1]: def Morse(r,De,aa,re):
-        //    ...:     return De*(1.-np.exp(-aa*(r-re)))**2
-        //
-        // In [12]: Morse(2.7,0.2793,1.432673,4.13/np.sqrt(2))
-        // Out[12]: 0.038485917929653904
-        // --> r:1403923935 r*faktor:2.700000 f*faktor:0.407348662 u_la:0.038485918
-        //
-        //
-        // In [13]: Morseder(2.7,0.2793,1.432673,4.13/np.sqrt(2))
-        // Out[13]: -0.40734866425804167
-        // --> r:1403923935 r*faktor:2.700000 f*faktor:0.407348662 u_la:0.038485918
-        //
-        //
-		//u_la = D_par*(1.-dum)*(1.-dum); // alle drei definitionen gleichwertig
-		u_la+=D_par*dumm1*dumm1; // alle drei definitionen gleichwertig
-		//u_la = D_par*(1.-2.*dum+dum*dum); // alle drei definitionen gleichwertig
-		// fakotr in u_la: 1.60217598e-19
-		//printf("r:%2.0f r*faktor:%2.6f f*faktor:%2.9f u_la: %2.9f\n",r,r*faktor,f*faktor_force,u_la*faktor_energy_cell);
-		//printf("e: %2.6f\n",u_la*faktor_energy);
-		//exit(1);
-        //print_pos_forces_to_screen(7,"",faktor,-99);
-        // this is the acceleration on particle ind1 and and opposit
-        // acceleration on ind2
-        // dv = dt a
+
+        if ( michael_poly_yes_no == 0 ) {
+            ///////////////////////////
+            // Morse forces
+            ///////////////////////////
+		    dum=exp(-a_par*(r/d0*r0_eq_morse-r0_eq_morse));  // part = e^(-a(r-re)) == dum
+		    dumm1=dum-1.;
+		    // this force is positive defined (for atoms that are close together)
+		    f=(2.*D_par*a_par)*dumm1*dum;               // das ist die erste ableitung (also die Kraft)
+
+		    // SOME ANALYSIS (can be commented in)
+		    // SOME ANALYSIS (can be commented in)
+		    // SOME ANALYSIS (can be commented in)
+		    //faktor_analysis = 4.8;
+		    //if (f*f*faktor_force*faktor_force > faktor_analysis) {
+            //    //req = (alat_lattice/sqrt(2.))/da0_alat_lattice;
+		    //    printf("\n");
+		    //    printf("**********************************************\n");
+            //    printf("--> r  : %5.10f (req   angstrom)\n",r*da0_alat_lattice);
+            //    printf("--> req: %5.10f (req   angstrom)\n",req*da0_alat_lattice);
+            //    printf("--> drm: %5.10f (r-req angstrom)\n",(r-req)*da0_alat_lattice);
+            //    printf("-->  rm: %5.10f (in    angstrom)\n",r*da0_alat_lattice);
+            //    printf("-->  fm: %5.10f (in eV/angstrom)\n",f*faktor_force);
+		    //    printf("-->  em: %2.16f (in eV for this bond = Morse energy)\n",D_par*dumm1*dumm1*faktor_energy_cell);
+		    //    //printf("--> em: %2.16f (in meV/(atom-1) for this bond = Morse energy)\n",D_par*dumm1*dumm1*faktor_energy_atom);
+		    //    // @ displacement of 0.6angstrom in Al, force is ~-3.6 eV/angstrom; == f*faktor_force
+		    //    // and energy is there 7.3 eV
+		    //    //
+            //    }
+
+            // In [2]: def Morseder(r,De,aa,re):
+            //    ...:     return 2.*aa*De*np.exp(-aa*(r-re))*(1.-np.exp(-aa*(r-re)))
+            // In [1]: def Morse(r,De,aa,re):
+            //    ...:     return De*(1.-np.exp(-aa*(r-re)))**2
+            //
+            // In [12]: Morse(2.7,0.2793,1.432673,4.13/np.sqrt(2))
+            // Out[12]: 0.038485917929653904
+            // --> r:1403923935 r*faktor:2.700000 f*faktor:0.407348662 u_la:0.038485918
+            //
+            //
+            // In [13]: Morseder(2.7,0.2793,1.432673,4.13/np.sqrt(2))
+            // Out[13]: -0.40734866425804167
+            // --> r:1403923935 r*faktor:2.700000 f*faktor:0.407348662 u_la:0.038485918
+            //
+            //
+		    //u_la = D_par*(1.-dum)*(1.-dum); // alle drei definitionen gleichwertig
+
+            ///////////////////////////
+            // Morse energy
+            ///////////////////////////
+		    u_la+=D_par*dumm1*dumm1; // alle drei definitionen gleichwertig
+		    //u_la = D_par*(1.-2.*dum+dum*dum); // alle drei definitionen gleichwertig
+		    // faktor in u_la: 1.60217598e-19
+		    //printf("r:%2.0f r*faktor:%2.6f f*faktor:%2.9f u_la: %2.9f\n",r,r*faktor,f*faktor_force,u_la*faktor_energy_cell);
+            //print_pos_forces_to_screen(7,"",faktor,-99);
+            // this is the acceleration on particle ind1 and and opposit
+            // acceleration on ind2
+            // dv = dt a
+        }
+        else
+        {   // if michael_poly_yes_no == 1
+            ///////////////////////////
+            // polynomial forces
+            ///////////////////////////
+            rang    = r*da0_alat_lattice;
+            rrel = rang/alat_lattice;
+            //fevang= aa + bb*rang**(-1) + cc*rang**(-2) + dd*rang**(-3);
+            // this force is positive defined for positive r (as is the poly)
+            fevang= poly_aa + poly_bb/rrel + poly_cc/(rrel*rrel) + poly_dd/(rrel*rrel*rrel);
+            fpoly = fevang/faktor_force;
+            fxpoly = (x/r)*fpoly;  // doing this saves 20% of computational time
+            fypoly = (y/r)*fpoly;  // doing this saves 20% of computational time
+            fzpoly = (z/r)*fpoly;  // doing this saves 20% of computational time
+            forcepoly[ind1].x+=fxpoly;	//in N
+		    forcepoly[ind2].x-=fxpoly;
+		    forcepoly[ind1].y+=fypoly;
+		    forcepoly[ind2].y-=fypoly;
+		    forcepoly[ind1].z+=fzpoly;
+		    forcepoly[ind2].z-=fzpoly;
+            //eev_eq = -(dd/(2.*rrel*rrel)) - cc/rrel + aa*rrel + bb*log(rrel); //- 17.1065183970574175;
+            eev1 = -(poly_dd/(2.*rrel*rrel)) - poly_cc/rrel + poly_aa*rrel + poly_bb*log(rrel) - poly_0;
+            eev2 = eev1*-alat_lattice/faktor_energy_cell;
+		    //if (D_par*dumm1*dumm1*faktor_energy_atom > 0.3) {exit(1);};
+		    u_pl+=eev2; // alle drei definitionen gleichwertig
+
+		    // reassign
+		    u_la+=eev2;
+		    f = fpoly;
+		    // SOME ANALYSIS (can be commented in)
+		    // SOME ANALYSIS (can be commented in)
+		    // SOME ANALYSIS (can be commented in)
+		    //if (f*f*faktor_force*faktor_force > faktor_analysis) {
+            //    //req = (alat_lattice/sqrt(2.))/da0_alat_lattice;
+		    //    printf("\n");
+            //    printf("--> rm: %5.10f (in    angstrom = rang)\n",rang);
+            //    printf("--> rm: %5.10f (in    angstrom = rrel)\n",rrel);
+            //    printf("-->drm: %5.10f (r-req angstrom)\n",(r-req)*da0_alat_lattice);
+            //    printf("--> fp: %5.10f (in eV/angstrom)\n",f*faktor_force);
+            //    printf("\n");
+		    //    printf("--> eev1 %2.16f \n",eev1);
+		    //    printf("--> eev2 %2.16f \n",eev2);
+		    //    printf("--> eev1*-alat_lattice! %2.16f \n",eev1*-alat_lattice);
+		    //    printf("--> eev2*-alat_lattice! %2.16f \n",eev2*-alat_lattice);
+		    //    printf("--> ep: %2.16f (in eV for this bond = Poly energy)\n",eev2*faktor_energy_cell);
+		    //    //printf("--> ep: %2.16f (in eV for this bond = Morse energy)\n",D_par*dumm1*dumm1*faktor_energy_cell);
+		    //    //
+		    //    // eev1*-alat_lattice = 0.894 != eev2*faktor_energy_cell
+            //}
+        }
+
         fx = (x/r)*f;  // doing this saves 20% of computational time
         fy = (y/r)*f;  // doing this saves 20% of computational time
         fz = (z/r)*f;  // doing this saves 20% of computational time
@@ -1836,7 +1967,11 @@ void calculate_forces_energy_la(double dt,int verbose) {
 		//} // innere schleife ueber j
 	} // aeusere schleife ueber i
 
+    // afer u_la*faktor_energy_atom the energy (u_la) is in meV/atom
+	//printf("--> EM (out0: %2.16f, SUM: %2.16f\n",u_la*faktor_energy_atom,u_la*faktor_energy_atom);
     u_la=u_la*faktor_energy_atom;
+    //u_pl=u_pl*faktor_energy_atom;
+	//printf("--> EM (out1: %2.16f, SUM: %2.16f\n",u_la,u_la);
     //printf("tox FINAL %2.8f\n",u_la_tox);
     u_la_tox=u_la_tox*faktor_per_atom;
     //printf("tox FINAL MEV %2.8f\n",u_la_tox);
@@ -1845,6 +1980,19 @@ void calculate_forces_energy_la(double dt,int verbose) {
     //forcelax = force[j].x*faktor_force; // force la
     //forcelay = force[j].y*faktor_force; // force la
     //forcelaz = force[j].z*faktor_force; // force la
+    //
+    // Analysis
+	// printf("--> EM (out2: %2.16f, SUM: %2.16f\n",u_la,u_la);
+	// printf("--> EP (outX: %2.16f, SUM: %2.16f\n",u_pl,u_pl);
+	// 0.0 out2: 0.0000000000000000, outx: 113.7627341525623450,
+	// 0.1 out2: 0.2001199123119097, outx: 113.9200635744249297,
+	// 0.2 out2: 0.8121808717818103, outx: 114.4057222777140339,
+	// 0.3 out2: 1.8726345409233012, outx: 115.2622177763509228,
+	// 0.4 out2: 3.4468617213209667, outx: 116.5655730451549772,
+	// 0.5 out2: 5.6365938075227620, outx: 118.4337801760384394,
+	// 0.6 out2: 8.5912804506724108, outx: 121.0400939144639949,
+	// 0.7 out2: 12.52443834075111 , outx: 124.6328463556048689,
+	// delta     3.94                      3.59
 }
 
 void forces_to_velocities(double dt) {
@@ -2423,7 +2571,7 @@ int main(int argc,char *argv[]){
 	}
 
 
-
+	start = clock();
     if (read_pos==1) {
         printf("///////////////////////////////////////////////////////////////////////////////\n");
         printf("/////      MD from POSITIONs %d steps\n",zeitschritte);
@@ -2466,16 +2614,19 @@ int main(int argc,char *argv[]){
 
         if (verbose>2) {printf("STARTING MD  \n");};
         printf("STARTING MD  \n");
+        //int l = 100;
         for (i=0;i<(zeitschritte);i++) {
             //double progress = (i / zeitschritte) * 100;
             // this strats from 0 to have right numbering with dudl;
             // is i=0 also necessary to get the correct first positioins? -> no
             // for the new way we average it might be also necessary to start with 0
-            if (verbose>1) {printf("(a) Step %d   \n",i);}
+            if (verbose>1) {printf("(a) Step %d   \b",i);}
+            //if (i%l==l-1) {if (verbose>0) {printf("%d\b%",i);}};
             u_dft                  = arr_u_dft[i];
             get_pos_from_externalfile(file_in_positions,columns);
             calculate_forces_energy_la(dt,verbose);
-
+            //printf("hierxxz\n");
+            //exit(1);
             if (read_hesse==1) {calculate_forces_energy_hesse(hessemat);};
 
             // analyze_forces is only of interest if DFT forces available
@@ -2522,7 +2673,6 @@ int main(int argc,char *argv[]){
                 printf("\n");
                 }
 
-
             if (write_positions_forces==1) {
                 if (i%l==l-1) {write_positions_forces_tofile(file_out_positions);};}
             if (write_positions==1) {
@@ -2537,8 +2687,20 @@ int main(int argc,char *argv[]){
             //printf("%d %10.3f\n",i,temperature);
             write_dudl(i,file_out_dudl,file_out_dudl_av,read_hesse,read_uoutcar);
             }
+        printf("\n");
         printf("///////////////////////////////////////////////////////////////////////////////\n");
         printf("/////      MD from POSITIONs DONE last step was %d \n",i);
+        if (michael_poly_yes_no == 1) {
+            printf("/////      MODEL: POLYNOM MICHAEL\n");
+            printf("/////      MODEL: poly_aa %3.8f \n",poly_aa);
+            printf("/////      MODEL: poly_bb %3.8f \n",poly_bb);
+            printf("/////      MODEL: poly_cc %3.8f \n",poly_cc);
+            printf("/////      MODEL: poly_dd %3.8f \n",poly_dd);
+        };
+        if (michael_poly_yes_no == 0) {
+            if (ktr_tox == 0.0)   {printf("/////      MODEL:LA       \n");};
+            if (ktr_tox != 0.0)   {printf("/////      MODEL:LA + TOX \n");};
+        };
         printf("///////////////////////////////////////////////////////////////////////////////\n");
 
         if (write_analyze==1){
@@ -2552,16 +2714,16 @@ int main(int argc,char *argv[]){
         printf("Forces std <DFT-LA>  : %6.5f (eV/A)\n",sqrt(fdiff_dft_la_av));
         printf("Forces std <DFT>     : %6.5f (eV/A) (this inly considers DFT forces)\n",sqrt(fstd_dft));
         printf("Forces std <LA>      : %6.5f (eV/A) (this only considers LA  forces)\n",sqrt(fstd_la));
-        printf("pearson correlation  : %6.5f (between LA and DFT)\n",fcov_dft_la/(sqrt(fstd_dft)*sqrt(fstd_la)));
+        printf("pearson correlation F: %6.5f (between LA and DFT)\n",fcov_dft_la/(sqrt(fstd_dft)*sqrt(fstd_la)));
         printf("\n");
         printf("Energy dudl (DFT-H)  : %6.4f meV/atom (works in general )\n",dudl_dft_harm_av);
         printf("Energy dudl (DFT-LA) : %6.4f meV/atom (works in general lon and tox)\n",dudl_dft_la_av);
         printf("\n");
         printf("MAKE FOR EVERY STEP: rmin, rmax, deltaF_max(between LA and DFT)\n");
         printf("\n");
-        printf("rmin           %5.3f rmin_distmax: %5.3f Angstrom\n",rmin/a0*alat_lattice,alat_lattice/sqrt(2)-rmin/a0*alat_lattice);
-        printf("nndist         %5.3f\n",alat_lattice/sqrt(2));
-        printf("rmax           %5.3f rmax_distmax: %5.3f Angstrom\n",rmax/a0*alat_lattice,-1.*(alat_lattice/sqrt(2)-rmax/a0*alat_lattice));
+        printf("rmin           %5.3f rel (%5.3f) rmin_distmax: %5.3f Angstrom\n",rmin*da0_alat_lattice,rmin*da0_alat_lattice/alat_lattice,alat_lattice/sqrt(2)-rmin*da0_alat_lattice);
+        printf("nndist         %5.3f rel (%5.3f)\n",alat_lattice/sqrt(2),alat_lattice/sqrt(2)/alat_lattice);
+        printf("rmax           %5.3f rel (%5.3f) rmax_distmax: %5.3f Angstrom\n",rmax*da0_alat_lattice,rmax*da0_alat_lattice/alat_lattice,-1.*(alat_lattice/sqrt(2)-rmax*da0_alat_lattice));
 
 
         if (write_analyze==1){
@@ -2611,7 +2773,6 @@ int main(int argc,char *argv[]){
 
         preequilibration_if_no_readpos(dt,read_pos,file_out_temp,hessemat,faktor_verlet,read_hesse,evolve_md_on_hesse);
 
-	    start = clock();
         printf("... MD start ... for %d steps\n",zeitschritte);
         for (i=0;i<(zeitschritte+1);i++) {
             //printf("\n");

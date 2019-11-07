@@ -64,9 +64,33 @@ def read_ipi(fileobj, index):
     #print('ipi cell_str:',cell_str)
     lst = cell_str.split()[2:8]
     #print('ipi lst:',lst)
-    cell_out = [float(i) for i in lst]   # [14.34366105636912, 14.34366105636912, 14.34366105636912, 60.0, 60.0, 60.0]
+    lst2 = cell_str.split()[8:]
+    #print('ipi lst2:',lst2)
+    conv = False
+    for i in lst2:
+        #print(i)
+        if "positions" in i:
+            #print('--p->',i)
+            if "atomic_unit" in i:
+                conv = 0.52917721
+            elif "angstrom" in i:
+                conv = 1.
+        if "cell" in i:
+            #print('--c->',i)
+            if "atomic_unit" in i:
+                conv = 0.52917721
+            elif "angstrom" in i:
+                conv = 1.
+    if conv == False:
+        print('ipi inputfile:',fileobj)
+        sys.exit("ipi.py: Error: did not recognise units of ipi inputfile")
+    cell_out = [float(i) for i in lst] # [14.34366105636912, 14.34366105636912, 14.34366105636912, 60.0, 60.0, 60.0]
     #print('out',out)
     #print('cell_out:',cell_out)
+    cell_out[0] = cell_out[0]*conv
+    cell_out[1] = cell_out[1]*conv
+    cell_out[2] = cell_out[2]*conv
+    #print(cell_out[0],type(cell_out[0]))
     pbc = (True, True, True)
     #print('xxx',cell_str[2])
 
@@ -80,19 +104,23 @@ def read_ipi(fileobj, index):
             symbol, x, y, z = line.split()[:4]
             symbol = symbol.lower().capitalize()
             symbols.append(symbol)
-            positions.append([float(x), float(y), float(z)])
+            positions.append([float(x)*conv, float(y)*conv, float(z)*conv])
         #atoms[0].set_cell(atoms[0].get_cell_lengths_and_angles()))
         yield Atoms(symbols=symbols, positions=positions, cell=cell_out, pbc=pbc)
 
 
 #def simple_write_xyz(fileobj, images, comment=''):
-def write_ipi(fileobj, images, comment=''):
+def write_ipi(fileobj, images, comment=''): #,convert_ang_to_bohrradius=False):
+    #print('convert_ang_to_bohrradius',convert_ang_to_bohrradius)
     if len(images) != 1:
          sys.exit('you can only give write_ipi one frame at a time!')
     frame = images[0].copy()
 
     symbols = frame.get_chemical_symbols()
     laa = frame.get_cell_lengths_and_angles()
+    #if convert_ang_to_bohrradius:
+    #    atb = 1.8897261
+    #    laa[0:3] = laa[0:3]*atb
     comment = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+" Step: 4  Bead: 0 positions{angstrom} cell{angstrom}"
     newcell, newpos = convert_cell(frame.cell, frame.positions)
     frame.set_cell(newcell)

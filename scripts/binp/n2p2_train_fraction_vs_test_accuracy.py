@@ -68,13 +68,32 @@ print('>> (1) searching learning-curve.out files....')
 maxdepth = 2
 if args.potential: maxdepth = 3
 all_learning_curve_files = my.find_files(os.getcwd(),'learning-curve.out',maxdepth=maxdepth)
+
+# keep only n2p2
+if args.both == True:
+    pass
+else:
+    all_learning_curve_files_ = []
+    for i in all_learning_curve_files:
+        if "potentials/n2p2" in i: all_learning_curve_files_ += [i]
+    all_learning_curve_files = all_learning_curve_files_
+
 if args.both == True:
     all_learning_curve_files_add = my.find_files(os.getcwd(),'learning-curve-runner.out',maxdepth=maxdepth)
     print('all_learning_curve_files_add')
+    #sys.exit('no! runner dont need it..')
     for i in all_learning_curve_files_add:
         if args.verbose:
             print('runner',i)
         all_learning_curve_files.append(i)
+
+if args.find != -1:
+    print('args.find',args.find)
+    all_learning_curve_files_ = []
+    for i in all_learning_curve_files:
+        for j in args.find:
+            if j in i: all_learning_curve_files_ += [i]
+    all_learning_curve_files = all_learning_curve_files_
 
 if args.potential:
     for i in all_learning_curve_files:
@@ -144,7 +163,7 @@ for nnidx,i in enumerate(all_learning_curve_files):
     #################################################################
     # get the potential
     #################################################################
-    pot = my.mypot(False,folder,use_different_epoch=False,verbose=args.verbose)
+    pot = my.mypot(potpath_in=folder,use_epoch=False,verbose=args.verbose)
     pot.get(exit=False,showerrors=False)
     pot.get_my_assessments()  # gets kmc57_{b,l}, train_{b,l}, test_{b,l}
 

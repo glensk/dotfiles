@@ -90,7 +90,7 @@ class fit_to_func( object ):
 
         self.fixzeroat  = fixzeroat # nearest neighbor distance
         self.function   = function
-        self.function_known = [ 'l', 'm', 'morse', 'mc1', 'poly' ]
+        self.function_known = [ 'l', 'm', 'morse', 'mc1', 'poly', 'ma' ]
         if self.function not in self.function_known:
             sys.exit("function "+function+" not in "+str(self.function_known))
         self.weights    = weights
@@ -133,6 +133,7 @@ class fit_to_func( object ):
             self.fity = pot_energy.LJ_derivative(self.fitx, 0.0342863, self.fixzeroat)
 
         if self.function == 'm' or self.function == 'morse':
+            self.model = pot_energy.Morse_derivative
             #print('morse roxx')
             self.parameters, self.function_covariance = \
                     optimize.curve_fit(lambda r, De, aa: pot_energy.Morse_derivative(r, De, aa, self.fixzeroat), self.datax, self.datay, p0=[0.02, 1.96], maxfev=100000)
@@ -144,8 +145,23 @@ class fit_to_func( object ):
             self.fitx_interpolated = np.arange(self.fitx.min(),self.fitx.max(),0.001)
             self.fity_interpolated = pot_energy.Morse_derivative(self.fitx_interpolated, *self.parameters)
 
+        if self.function == 'ma':
+            self.model = pot_energy.Morse_repulsive_derivative_to_normaldata
+            #print('morse roxx')
+            self.parameters, self.function_covariance = \
+                    optimize.curve_fit(lambda r, De, aa: pot_energy.Morse_repulsive_derivative_to_normaldata(r, De, aa, self.fixzeroat), self.datax, self.datay, p0=[0.02, 1.96], maxfev=100000)
+                #optimize.curve_fit(lambda r, De, aa: pot_energy.Morse_derivative(r, De, aa, self.fixzeroat), datax, datay,p0=[0.02, 1.96],sigma = weights[:,1], absolute_sigma = False, maxfev=10000000)
+                #optimize.curve_fit(Morse_derivativeNN, data[:,0], data[:,1], maxfev=1000)
+            self.parameters = np.array([self.parameters[0],self.parameters[1],self.fixzeroat])
+            self.fity = self.model(self.fitx, *self.parameters)
+            fitdelta = self.model(self.datax, *self.parameters) - self.datay
+            self.fitx_interpolated = np.arange(self.fitx.min(),self.fitx.max(),0.001)
+            self.fity_interpolated = self.model(self.fitx_interpolated, *self.parameters)
+
+
 
         if self.function == 'mc1':
+            self.model = pot_energy.mc1_derivative
             try:
                 self.parameters, self.function_covariance = \
                     optimize.curve_fit(lambda r, De, aa, A, B: pot_energy.mc1_derivative(r, De, aa, self.fixzeroat, A, B), self.datax, self.datay, maxfev=100000)

@@ -111,6 +111,14 @@ def read_lastline(file):
             f.seek(-2, os.SEEK_CUR)
         return f.readline().decode()
 
+def read_firstlines(filepath,lines):
+    # grep first four lines
+    with open(filepath) as myfile:
+        head = list(islice(myfile, lines))
+    #print('head')
+    return head
+
+
 def printnormal(*var):
     ENDC = '\033[0m'
     return printoutcolor(ENDC,var,ENDC)
@@ -375,8 +383,6 @@ def get_kmesh_size_daniel(ase_structure, kmesh_l):
     kmesh = [np.ceil(kmesh_l * np.linalg.norm(reci_cell[i]))
              for i in range(len(reci_cell))]
     return kmesh
-
-
 
 def progress_orig(count, total, suffix=''):
     bar_len = 60
@@ -718,37 +724,16 @@ class mypot( object ):
         ''' help '''
         # get from input.nn the atomic energies
         if type(self.pot) != bool and type(self.elements) == bool and type(self.atom_energy) == bool:
+            #print('self.pot (0):',self.pot,self.pot[:6])
+            if self.pot[:6] == 'runner': self.pottype = 'runner'
+            if self.pot[:4] == 'n2p2': self.pottype = 'n2p2'
+            #print('self.pottype (0)',self.pottype)
+            #if 'runner' in self.pot: self.pottype('runner')
+            #if 'n2p2' in self.pot: self.pottype('n2p2')
             if self.pottype == "runner" or self.pottype == "n2p2":
                 inputnn = self.potpath+"/input.nn"
                 if os.path.isfile(inputnn):
                     self.elements, self.atom_energy = inputnn_get_atomic_symbols_and_atom_energy_dict(inputnn)
-
-                print('self.elements',self.elements)
-                print('self.atom_energy',self.atom_energy)
-                self.atom_types_ = {}
-                self.atom_masses = {}
-                for i in self.elements:
-                    self.atom_types_[i]         = my_atom.atom([i]).number[0]
-                    self.atom_masses[i]         = my_atom.atom([i]).mass[0]
-                    #self.reference_volumes[i]   = my_atom.atom([i]).reference_volume[0]
-                #print('fin (1)',self.atom_types_)
-                #print('fin (M)',self.atom_masses)
-                list_atom_nr = []
-                for i  in self.atom_types_:
-                    list_atom_nr.append(self.atom_types_[i])
-                    #print(i,self.atom_types_[i])
-                #print('fin (2):',np.sort(np.array(list_atom_nr)))
-                self.atom_types = {}
-                self.atom_masses_str = []
-                for idx,i in enumerate(np.sort(np.array(list_atom_nr))):
-                    for j in self.atom_types_:
-                        #print(idx,i,"||",j,self.atom_types_[j])
-                        if i == self.atom_types_[j]:
-                            self.atom_types[j] = idx+1
-                            self.atom_masses_str = self.atom_masses_str+ [ "mass "+str(idx+1)+" "+str(self.atom_masses[j])]
-                            #print('-->',j,self.atom_types[j],idx+1)
-                            #print('-->xx',self.atom_types)
-                            break
 
 
                 #print('fin (3)',self.atom_types)
@@ -789,10 +774,48 @@ class mypot( object ):
                     self.atom_energy[i] = 0 #self.elements[idx]
             else:
                 print('self.pot:',self.pot)
+                print()
+                list_pot_all()
+                print()
+                print('self.pot:',self.pot)
+                print('self.pottype:',self.pottype)
                 sys.exit("self.pot unknown (Error 91)")
         #print('self.elements',self.elements)
-        #import my_atom
-        #aa = my_atom.atom()
+        #print('self.pot',self.pot)
+        #print('self.potpath',self.potpath)
+        #print('self.elements',self.elements)
+        #print('self.atom_energy',self.atom_energy)
+        self.atom_types_ = {}
+        self.atom_masses = {}
+        for i in self.elements:
+            self.atom_types_[i]         = my_atom.atom([i]).number[0]
+            self.atom_masses[i]         = my_atom.atom([i]).mass[0]
+            #self.reference_volumes[i]   = my_atom.atom([i]).reference_volume[0]
+        #print('fin (1)',self.atom_types_)
+        #print('fin (M)',self.atom_masses)
+        list_atom_nr = []
+        for i  in self.atom_types_:
+            list_atom_nr.append(self.atom_types_[i])
+            #print(i,self.atom_types_[i])
+        #print('fin (2):',np.sort(np.array(list_atom_nr)))
+        self.atom_types = {}
+        self.atom_masses_str = []
+        for idx,i in enumerate(np.sort(np.array(list_atom_nr))):
+            for j in self.atom_types_:
+                #print(idx,i,"||",j,self.atom_types_[j])
+                if i == self.atom_types_[j]:
+                    self.atom_types[j] = idx+1
+                    self.atom_masses_str = self.atom_masses_str+ [ "mass "+str(idx+1)+" "+str(self.atom_masses[j])]
+                    #print('-->',j,self.atom_types[j],idx+1)
+                    #print('-->xx',self.atom_types)
+                    break
+
+
+
+
+
+
+
 
         self.reference_volumes = {}
         self.atomic_numbers = {}
@@ -1092,8 +1115,8 @@ class mypot( object ):
             # check if we use the right epoch
             ###################################
             # if no epoch to use specified, use whatever is available
-            print('useepo',self.use_epoch,type(self.use_epoch))
-            print('linked',self.potepoch_linked,type(self.potepoch_linked))
+            #print('useepo',self.use_epoch,type(self.use_epoch))
+            #print('linked',self.potepoch_linked,type(self.potepoch_linked))
             if self.use_epoch == False:
                 self.potpath_work   = self.potpath
                 self.potepoch_using  = self.potepoch_linked
@@ -1566,6 +1589,43 @@ def get_number_of_atoms_as_function_of_cutoff():
         print(cutoff,len(NN))
     return
 
+def get_NN1_from_positions(atoms,alat,atomnr=0,verbose=False):
+    NN1         = ase_get_neighborlist(atoms,atomnr=atomnr,cutoff=0.8*alat,skin=0.1)
+    return NN1
+
+def get_NN1_NN2_NN3_from_positions(atoms,alat,atomnr=0,verbose=False):
+    NN1         = ase_get_neighborlist(atoms,atomnr=atomnr,cutoff=0.8*alat,skin=0.1)
+    NN1_NN2     = ase_get_neighborlist(atoms,atomnr=atomnr,cutoff=1.1*alat,skin=0.1)
+    NN1_NN2_NN3 = ase_get_neighborlist(atoms,atomnr=atomnr,cutoff=1.23*alat,skin=0.1)
+    NN2         = np.sort(np.array(diff(NN1_NN2,NN1)))
+    NN2_NN3     = np.sort(np.array(diff(NN1_NN2_NN3,NN1)))
+    NN3         = np.sort(np.array(diff(NN2_NN3,NN2)))
+    if verbose:
+        print("NN1",NN1,'len',len(NN1))
+        #print("NN2_NN1    :",NN1_NN2)
+        #print("NN2_NN1_NN3:",NN1_NN2_NN3)
+        #print("NN2_NN3:",NN2_NN3)
+        print("NN2",NN2,'len',len(NN2))
+        print("NN3",NN3,'len',len(NN3))
+    return NN1,NN2,NN3
+
+def get_forces_on_atom_by_considering_all_its_1NNs(params,forcefunc,atoms,alat,atomnr,pos):
+    ''' alat  : 4.13 (angstrom)
+        atoms : an ase object of the perfect cell.
+    '''
+    NN1_1st_neigh = get_NN1_from_positions(atoms,alat,atomnr=atomnr,verbose=False)
+    #print('NN1_1st_neigh',NN1_1st_neigh)
+    F = 0
+    for idxnn11,nn11 in enumerate(NN1_1st_neigh):    # for all neighbors of a particular 1NN
+        D  = vec = pos[atomnr]-pos[nn11]
+        vecnorm = r = np.linalg.norm(vec)
+        fnorm = forcefunc(vecnorm,*params)
+        forces = vec/vecnorm*fnorm
+        #print('a1',atomnr,'a2',nn11,'r',str(np.round(r,3)).ljust(5),'fnorm',str(np.round(fnorm,3)).ljust(3),'p1',pos[atomnr],'p2',pos[nn11],"D",D,'forces',forces)
+        F += forces
+    #print('FORCES',F)
+    return F
+
 def create_al_sphere(a0=4.05,matrix_element="Al",cubic=True,ncell=4,nvac=1,cutoff=4.05,vacidx=0):
     ''' cutoff = a0 # a0 includes up to 2NN '''
     nndist = a0/np.sqrt(2.)
@@ -1836,6 +1896,189 @@ def make_nice_scatterplot(df,tags=None,x="a",y="b",color=None,symbols=False):
     fig.show()
     return
 
+##################################################################################
+## parametrize foces
+##################################################################################
+def get_michaels_paramerization(pos_all,force_all,NN1,alat,atoms,parametrize_only_idx=False,rcut=0.88,function=False,save_parametrization=False):
+    ''' NN1 are the NN1idx
+        atoms : an ase object of the perfect cell.
+
+         1. get a function that for a given ATOM, gives all its 1NN (NN=a,b,c,d,...) (or its 2NN, 3NN, ...), basically, D for particular neighbors.
+         2. write down the equation to solve: FORCE_VASP(ATOM)__x = SUM_over_all_neighbors[v_o_v__NN__x*Forcefunction(r)]
+                                              FORCE_VASP(ATOM)__y = SUM_over_all_neighbors[v_o_v__NN__y*Forcefunction(r)]
+                                              FORCE_VASP(ATOM)__z = SUM_over_all_neighbors[v_o_v__NN__z*Forcefunction(r)]
+         3. This gives, for every displacement (=7), for every NN (=12), three (=x,y,z) equations.
+         was ich jetzt loesen muss ist ein gleichungssystem von vielen vektoren D and die VASP force, mache , basically, D for particular neighbors.
+
+    '''
+    if save_parametrization != False:
+        abcd_name = "poly_abcd_rcut"+str(rcut)+".dat"
+        cd_name   = "poly_cd_rcut"+str(rcut)+".dat"
+        parametrizationfile_abcd = save_parametrization+"/disp_fit.parameters."+abcd_name
+        parametrizationfile_cd   = save_parametrization+"/disp_fit.parameters."+cd_name
+        if os.path.isfile(parametrizationfile_abcd) and os.path.isfile(parametrizationfile_cd):
+            params_abcd = np.loadtxt(parametrizationfile_abcd)
+            params_cd   = np.loadtxt(parametrizationfile_cd)
+            return params_abcd,params_cd
+
+    a = []
+    b = []
+
+    a_ = []
+    b_ = []
+
+    a__ = []
+    b__ = []
+    rmin =  10000000000000000
+    rmax = -10000000000000000
+    for disp_idx in np.arange(len(pos_all)):    # for all displacements
+    #disp_idx=7
+        parametrize_over_atoms = NN1
+        if parametrize_only_idx != False:
+            parametrize_over_atoms = parametrize_only_idx
+
+        for idxnn1,nn1 in enumerate(parametrize_over_atoms): # for all first NN
+            Fv = force_all[disp_idx,nn1]
+            for xyz in [0,1,2]:         # for xyz
+                Fvx = Fv[xyz]
+
+                NN1_1st_neigh = get_NN1_from_positions(atoms,alat,atomnr=nn1,verbose=False)
+                ##print('idxnn1',idxnn1,nn1,"NN1_1st_neigh:",NN1_1st_neigh)
+                #print("Fv",Fv,"===")
+                Dx = np.zeros(12)
+                R  = np.zeros(12)
+                Rcut  = np.zeros(12)
+                for idxnn11,nn11 in enumerate(NN1_1st_neigh):    # for all neighbors of a particular 1NN
+                    D  = pos_all[disp_idx,nn1]-pos_all[disp_idx,nn11]
+                    #if parametrize_only_idx != False:
+                    #    #print("D",D)
+                    #    #print('i will take this D!')
+                    #    print("D",D,'nn1',nn1,'nn11',nn11)
+                    Drel = D/alat               # given for every particle
+                    vecnorm = r = np.linalg.norm(Drel)   # given for every particle
+                    if r > rmax:
+                        rmax = r
+                    if r < rmin:
+                        rmin = r
+                    v_o_v = Drel/vecnorm
+                    R[idxnn11] = r
+                    Rcut[idxnn11] = rcut
+                    Dx[idxnn11] = v_o_v[xyz]
+                    if function != False:
+                        force_add = function(R)*Dx[idxnn11]
+
+                #print('idxnn11',idxnn11,'p1',pos_all[disp_idx,nn1],'p2',pos_all[disp_idx,nn11],'D',D,"Drel",Drel,'v_o_v',v_o_v,'r',r)
+                # this is the model without fixing anything:
+                # Forces: a + b*r**(-1) + c*r**(-2) + d*r**(-3)
+                # Forces * xyz : (a + b*r**(-1) + c*r**(-2) + d*r**(-3) #+ e*r**(-4)) * x  # where x = xyz = v_o_v
+                # for every vasp force:
+                # Force_vasp_x(r=R) = SUM_over_all_neigh[ax + bx/R + cx/R^2 + dx/R^3]  ## R is given; x = Dx
+                # ( a + b/(r_1)^1 + c/(r_1)^2 + d/(r_1)^3 ) * x_1 +
+                # ( a + b/(r_2)^1 + c/(r_2)^2 + d/(r_2)^3 ) * x_2
+                #  ==
+                #  a ( x_1          + x_2          + x_3 ... )  # = np.sum(Dx)
+                #  b ( x_1/(r_1)    + x_2/(r_2)    + ...        # = np.sum(Dx/R)
+                #  c ( x_1/(r_1)^2  + x_2/(r_2)^2  + ...        # = np.sum(Dx/R**2.)
+                #  d ( x_1/(r_1)^3  + x_2/(r_2)^3  + ...        # = np.sum(Dx/R**3.)
+                #  --> a*np.sum(Dx) + b*np.sum(Dx/R) + c*np.sum(Dx/R**2.) + d*np.sum(Dx/R**3) = Fvx  # **1)
+
+                #############################
+                # allgemein ohne constraints **1)
+                #############################
+                a_add =  [np.array([ np.sum(Dx), np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
+                a += a_add
+                b += [Fv[xyz]]
+
+                #############################
+                # Forces(rcut=0.88) = 0
+                #############################
+                a_add_ =  [np.array([ np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
+                a_ += a_add_
+                no_a_corr_F =  np.sum(Dx/rcut) + np.sum(Dx/rcut**2.)  + np.sum(Dx/rcut**3.)
+                b_ += [Fv[xyz]+no_a_corr_F]
+
+
+                # with constraints:
+                # V[r_] := aa + dd/r^3 + cc/r^2 + bb/r
+                # V'[r]  = -((3 dd)/r^4) - (2 cc)/r^3 - bb/r^2
+                # V''[r] = (12 dd)/r^5 + (6 cc)/r^4 + (2 bb)/r^3
+                #
+                # Solve[V[rcut] == 0, aa]       --> aa -> (-dd - cc rcut - bb rcut^2)/rcut^3
+                # Vnoa[r_] := (-dd - cc rcut - bb rcut^2)/rcut^3 + dd/r^3 + cc/r^2 + bb/r
+                # Solve[Vnoa'[rcut] == 0, bb]   -->  bb -> (-3 dd - 2 cc rcut)/rcut^2
+                #
+                #
+                #     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)   -- > && a * np.sum(Dx)
+                a_add_ =  [np.array([ np.sum(Dx/R), np.sum(Dx/R**2.), np.sum(Dx/R**3.) ])]
+                a_ += a_add_
+                no_a_corr_F =  np.sum(Dx/rcut) + np.sum(Dx/rcut**2.)  + np.sum(Dx/rcut**3.)
+                b_ += [Fv[xyz]+no_a_corr_F]
+
+                # with constraints:
+                #     a = - b*rcut**(-1) - c*rcut**(-2) - d*rcut**(-3) # a(b,c,d)   -- > && a * np.sum(Dx)
+                #     b = - 3.*d/rcut**2. - 2.*c/rcut  # from first der b(d,c)
+                a_add__ =  [np.array([ np.sum(Dx/R**2.)+np.sum(Dx/(rcut**2.))-np.sum((Dx*2.)/(R*rcut)), np.sum(Dx/R**3.)+np.sum((2.*Dx)/(rcut**3.))-np.sum(3*Dx/(R*rcut**2.)) ])]
+                a__ += a_add__
+
+                #print('xyz',xyz,a_add)
+            #if parametrize_only_along_110 == True:
+            #    print('Dx',Dx)
+            #    print('R ',R)
+            #print('Dx/R ',Dx/R)
+            #print('a',np.sum(Dx)) #,np.sum(Dy),np.sum(Dz))
+            #print('b',np.sum(Dx/R)) #,np.sum(Dy/R),np.sum(Dz/R))
+            #print('c',np.sum(Dx/R**2.)) #,np.sum(Dy/R**2.),np.sum(Dz/R**2.))
+            #print('d',np.sum(Dx/R**3.)) #,np.sum(Dy/R**3.),np.sum(Dz/R**3.))
+    a = np.array(a)
+    b = np.array(b)
+    a_ = np.array(a_)
+    b_ = np.array(b_)
+    a__ = np.array(a__)
+    b__ = np.array(b__)
+    #print('b',b,'len(b)',len(b))
+    #print('a',a,'len(a)',len(a))
+    params  = np.linalg.lstsq(a, b,rcond=None)[0]
+    #params_ = np.linalg.lstsq(a_, b_,rcond=None)[0]
+    params__ = np.linalg.lstsq(a__, b,rcond=None)[0]
+    #print('params      ',params)
+    #aa = - params_[0]*rcut**(-1) - params_[1]*rcut**(-2) - params_[2]*rcut**(-3)
+    #print('params_ (i) ',params_)
+    #params_ = [aa,params_[0],params_[1],params_[2]]
+    #print('params_ (ii)',params_)
+
+
+    bb = -3*params__[1]*rcut**(-2) -2.*params__[0]/rcut
+    aa = - bb*rcut**(-1) - params__[0]*rcut**(-2) - params__[1]*rcut**(-3)
+    #print('params__(i) ',params__)
+    params_abcd = [params[0],params[1],params[2],params[3],rcut,rmin,rmax]
+    params_cd   = [aa,bb,params__[0],params__[1],rcut,rmin,rmax]
+    #print('params__(ii)',params__)
+    #for i in params:
+    #    print(i)
+    print('params_abcd:',params_abcd)
+    print('params_cd  :',params_cd)
+    print('params_abcdx',params_abcd[:4])
+    print('params_cd  x',params_cd[:4])
+    if save_parametrization != False:
+        mmodel_abcd = hesse.Michael_poly_der
+        print('rmin',rmin)
+        print('rmax',rmax)
+        if rmax < 0.9:
+            rmax = 1.2
+        if rmin > 0.5:
+            rmin = 0.5
+        xred_dense = np.arange(rmin,rmax,0.001)
+        np.savetxt(save_parametrization+"/disp_vs_forces_"+abcd_name,np.array([xred_dense,-1*mmodel_abcd(xred_dense,*(params_abcd[:4]))]).T)
+        np.savetxt(save_parametrization+"/disp_vs_forces_"+cd_name,np.array([xred_dense,-1*mmodel_abcd(xred_dense,*(params_cd[:4]))]).T)
+        print('saved',save_parametrization+"/disp_vs_forces_"+abcd_name)
+        print('saved',save_parametrization+"/disp_vs_forces_"+cd_name)
+        np.savetxt(parametrizationfile_abcd,params_abcd)
+        np.savetxt(parametrizationfile_cd,params_cd)
+        print('saved',parametrizationfile_abcd)
+        print('saved',parametrizationfile_cd)
+
+
+    return params_abcd,params_cd
 
 ##################################################################################
 ## lammps functions
@@ -1906,6 +2149,9 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
 
     if ace.kmc:
         ace.nsteps = 66000000   # this needs to by any very high number
+    if ace.ipi:
+        # write fix 1 all ipi md_ff 77776 unix
+        f.write('fix 1 all ipi md_ff 77776 unix\n')
     f.write("run "+str(ace.nsteps)+"\n")
     return
 
@@ -2025,11 +2271,13 @@ def lammps_ext_elastic_potential_mod(ace):
         command = command + ace.lammps_command_potential_n2p2()
     elif ace.pot.pottype == "runner":
         command = command + ace.lammps_command_potential_runner()
-    elif ace.pot.pottype  == 'eam':
+    elif ace.pot.pottype  in [ 'eam', 'eam-alloy' ]:
         command = command + ace.lammps_command_potential_eam_alloy(pair_style="eam/alloy")
     elif ace.pot.pottype == 'adp':
         command = command + ace.lammps_command_potential_eam_alloy(pair_style="apd")
-    else: sys.exit('potential now known yet')
+    else:
+        print('ace.pot.pottype:',ace.pot.pottype)
+        sys.exit('potential now known yet')
 
     command = command + [
     "",
@@ -2105,10 +2353,16 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.set_calculator(None)
-    atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner')
+
+
+    if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
+        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner')
+    elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
+        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
+    else:
+        sys.exit('44321 Error: dont know how to write this lammps file')
     if ace.verbose:
         print('written ',ace.pot.lammps_tmpdir+'/pos.lmp')
-
     ###############################################################
     # write in.lmp (for mormal energy calculation)
     ###############################################################
@@ -2155,6 +2409,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         # extract energy and forces
         ###############################################################
         if not get_elastic_constants:
+            print('pwd',os.getcwd())
             ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
             ene=float(ene)
             #print('ene',ene,'lammps in eV')
@@ -2868,10 +3123,145 @@ def runner_exec(test=False):
         sys.exit('runner_exec variable is not defined or is not an existing file')
     return runner_exec
 
+
+
+##################################################################################
+## getting positions
+##################################################################################
+def folder_get_pos_forces_cell(i):
+    ''' i is the folder '''
+    create_dofor_POSITIONs = False
+    create_dofor_u_OUTCAR = False
+    if not os.path.isfile(i+'/pos'):
+        with cd(i):
+            call(["OUTCAR_positions-last-ARRAY.sh > pos"],shell=True)
+    if not os.path.isfile(i+'/forces'):
+        with cd(i):
+            call(["OUTCAR_forces-last-ARRAY.sh > forces"],shell=True)
+
+    if not os.path.isfile(i+'/POSITIONs'):
+        with cd(i):
+            #print('pwd',os.getcwd())
+            call(["extractPOSITIONS.sh"],shell=True)
+    pos_forces  = np.loadtxt(i+'/POSITIONs')
+    pos         = pos_forces[:,[0,1,2]]
+    forces      = pos_forces[:,[3,4,5]]
+    if not os.path.isfile(i+'/u_OUTCAR'):
+        with cd(i):
+            call(["OUTCAR_ene-potential_energy_without_first_substracted.sh > u_OUTCAR"],shell=True)
+
+    #@if create_dofor_POSITIONs == True:
+    #@    with cd(i):
+    #@        call(["cat POSITIONs >> ../POSITIONs"],shell=True)
+    #@if create_dofor_u_OUTCAR == True:
+    #@    with cd(i):
+    #@        call(["cat u_OUTCAR >> ../u_OUTCAR"],shell=True)
+    #alat = float(i.split("vasp4/")[1].split("Ang")[0])
+    if os.path.isfile(i+'/cell'):
+        cell = np.loadtxt(i+'/cell')
+        #print('cell1',cell)
+    elif os.path.isfile(i+'/POSCAR'):
+        cell = POSCAR_get_cell(i+'/POSCAR')
+    else:
+        sys.exit('could not determine cell dimensions')
+    #print(i)
+    #print('cell',cell)
+    #sys.exit()
+    return pos,forces,cell
+
+def check_vec_in_array(test,array):
+    #for idx,x in enumerate(array):
+    #    print('idx',idx,'x',x,'test',test)
+    #print()
+    #return any(np.array_equal(x, test) for x in array)
+    return any(np.allclose(x, test) for x in array)
+
+def try_to_get_alat_and_sc_from_cell_and_positions(cell,positions):
+    ''' this should work for all cubic cells (fcc, bcc, dc) '''
+    sc = 0
+    alat = 0
+
+    c = cell
+    celltype = False
+    if c[0,0] == c[1,1] == c[2,2] and c[0,1] == c[0,2] == c[1,0] == c[1,2] == c[2,0] == c[2,1] == 0:
+        celltype = 'cubic'
+        sc = 1
+        scalat = c[0,0]
+        #print('c[0,0] == scalat',scalat)
+        for i in np.arange(1,10):
+            alltrue = False
+            #print('i (=sc) =',i,'scalat/i',scalat/i)
+            for j in np.arange(1,i):
+                pos = np.array([0,0,(scalat/i)*j])
+                chk = check_vec_in_array(pos, positions)
+                #print('pos?',pos,chk)
+                if chk == True:
+                    alltrue = True
+                elif chk == False:
+                    alltrue = False
+                    break
+            #print('i (=sc) =',i,'scalat/i',scalat/i,"alltue?",alltrue)
+            if alltrue == True:
+                sc = i
+                alat = c[0,0]/sc
+            #print('i (=sc) =',i,'scalat/i',scalat/i,"alltue?",alltrue,"--> sc:",sc,"alat",alat)
+    #print('sc --------->',sc)
+    #print('alat ------->',alat)
+
+    if alat > 6 or alat < 3:
+        print('alat',alat)
+        print('cell')
+        print(cell)
+        print('celltype:',celltype)
+        print()
+        print('c[0,0] == c[1,1] == c[2,2]:',c[0,0] == c[1,1] == c[2,2])
+        print('c[0,1] == c[0,2] == c[1,0] == c[1,2] == c[2,0] == c[2,1] == 0:',c[0,1] == c[0,2] == c[1,0] == c[1,2] == c[2,0] == c[2,1] == 0)
+        sys.exit("this does not seem to be a correct alat")
+    return sc,alat
+
+def center_positions_around_0(pos,sc,alat):
+    pos_ = np.copy(pos)
+    # this brings the displaced atom into the middle of the cell.
+    for iidx,i in enumerate(pos):  # every atomic positions
+        #print(iidx,i)
+        for jdx,j in enumerate(i):
+            #print(jdx,j,'--',pos_[iidx,jdx],'sc',self.sc,'alat',self.alat,'--',self.sc*self.alat/2)
+            if pos_[iidx,jdx] > sc*alat/2.:
+                pos_[iidx,jdx] = pos_[iidx,jdx]-sc*alat
+    return pos_
+
+def POSCAR_get_cell(path_to_POSCAR):
+    head = read_firstlines(path_to_POSCAR,7)
+    wc3 = []
+    for idx,i in enumerate(head):
+        #print(i)
+        #print(i.split())
+        line = i.split()
+        wc = len(line)
+        #print('idx',idx,'line',line,'wc',wc)
+        if wc == 3: wc3 += [idx]
+    #print('wc3',wc3)
+    for idx,i in enumerate(wc3):
+        linenr = wc3[idx]
+        if wc3[idx] == linenr and wc3[idx+1] == linenr+1 and wc3[idx+2] == linenr+2:
+            #print('aha',linenr,'idx',idx)
+            cell = head[wc3[idx]:wc3[idx]+3]
+            break
+    #print('ok',cell)
+    cell_ = np.zeros((3,3))
+    for idx,j in enumerate(cell):
+        #print('-->',[float(i) for i in j.split()])
+        cell_[idx] = [float(i) for i in j.split()]
+    cell = cell_
+    #frame = ase_read(i+'/POSCAR',format='vasp')
+    #cell = frame.cell
+    #print('cell2',cell)
+    return cell
+
 ##################################################################################
 ## ase funcions
 ##################################################################################
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True):
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0=False,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True,verbose=False):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -2896,6 +3286,36 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="
         cubic: bool
             Construct cubic unit cell if possible.
     """
+    #print('whichcell:',whichcell)
+    defect = False
+    defect_element = False
+    if "_" in whichcell:
+        #print('yes _',whichcell.split("_"))
+        defect    = whichcell.split("_")[1]  # dilute, vac, ...
+        whichcell = whichcell.split("_")[0]
+        #print('me',matrix_element)
+        if defect == 'dilute' and len(matrix_element) != 2:
+            sys.exit('please provide two matrix elements, first = matrix, second is the solute atom type')
+        elif defect == 'vac' and len(matrix_element) != 1:
+            sys.extit('please provide only one matrix element')
+
+        if defect == 'dilute':
+            defect_element = matrix_element[1]
+            matrix_element = matrix_element[0]
+
+    if verbose:
+        print('defect',defect)
+        print('whichcell',whichcell)
+        print('matrix_element',matrix_element)
+        print('defect_element',defect_element)
+
+    if a0 == False:
+        state = my_atom.atom([matrix_element]).reference_state[0]
+        #print('a0',a0)
+        #print('state',state)
+        #print('state',state['symmetry'])
+        #print('state',state['a'])
+        a0 = state['a']
     if whichcell == "fcc":
         atom = ase_build_bulk(matrix_element,crystalstructure='fcc',a=a0,cubic=cubic)
     elif whichcell == "hcp":
@@ -2903,14 +3323,24 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="
         c = 5.21
         atom = crystal(matrix_element, [(1./3., 2./3., 3./4.)], spacegroup=194, cellpar=[a, a, c, 90, 90, 120])
     elif whichcell == "dc":
-        a = 5.47
-        atom = crystal(matrix_element, [(0,0,0)], spacegroup=227, cellpar=[a, a, a, 90, 90, 90])
+        #a = 5.47
+        atom = crystal(matrix_element, [(0,0,0)], spacegroup=227, cellpar=[a0, a0, a0, 90, 90, 90])
+    elif whichcell == "bcc":
+        atom = ase_build_bulk(matrix_element,crystalstructure='bcc',a=a0,cubic=cubic)
+
     else:
-        sys.exti("whichcell has to be in fcc or hcp")
+        sys.exti("whichcell: "+str(whichcell)+" has to be in fcc/hcp/dc/bcc")
 
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
+
+    if defect == "dilute":
+        atomsc[0].symbol = defect_element
+
+    if defect == 'vac':
+        del atomsc[0]
+
 
     #for i in np.arange(nmg):
     #    atomsc[i].symbol = 'Mg'
@@ -3364,6 +3794,7 @@ class ase_calculate_ene( object ):
         #print('init')
         # case of MD or KMC
         self.kmc  = kmc
+        self.ipi = False
         self.temp = temp
 
         #self.eos = [ False, False, False, False] # e0_meV/pa, v0_ang^3/pa, B0, B0der]
@@ -3435,7 +3866,7 @@ class ase_calculate_ene( object ):
         #]
         return command
 
-    def pot_get_and_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False):
+    def pot_get_and_ase_lmp_cmd(self,kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False,ipi=False):
         ''' geoopt (geometry optimization) is added / or not in
             lammps_write_inputfile(); here only the potential is set.
             ffsocket: ipi ffsocket [ "unix" or "inet" ]
@@ -3472,7 +3903,7 @@ class ase_calculate_ene( object ):
         #sys.exit()
         # this depends only on the potential which is already defined
         # so should be easy to make this general.
-        self.lmpcmd = [ "## lmpcmd.begin ##" ]
+        self.lmpcmd = [ "### lmpcmd.begin ###" ]
         if self.pot.pottype == "n2p2" or self.pot.pottype == "runner":
             self.lmpcmd = self.lmpcmd + self.pot.atom_masses_str #self.lammps_command_masses()
         else:
@@ -3502,24 +3933,32 @@ class ase_calculate_ene( object ):
             print('self.pot.pottype:',self.pot.pottype)
             print('self.pot.pot    :',self.pot.pot)
             sys.exit('pot '+str(self.pot.pot)+' not found! (X)')
+        #print('self.lm (1) ',self.lmpcmd)
+        #elements = np.unique(atoms.get_chemical_symbols())
 
+        #self.lmpcmd = self.lmpcmd + [ 'ka ka test\n' ]
+        #print('self.lm (2) ',self.lmpcmd)
         if self.kmc:
-            if self.ffsocket == "unix": add = "unix"
-            if self.ffsocket == "inet": add = ""
-            if address == False:
-                address = gethostname()
             self.lmpcmd = self.lmpcmd + [
                 "",
                 "timestep 0.001   # timestep (ps)",
                 "velocity all create "+str(self.temp)+" 4928459",  # create initial velocities 4928459 is random seed for velocity initialization"
-                "thermo 1   # screen output interval (timesteps)",
-                "fix 1 all ipi "+str(address)+" 12345 "+str(add),
+                "thermo 1   # screen output interval (timesteps)"
                 ]
                 # with n2p2 in the parallel version, inet is not working
                 # "fix 1 all ipi fidis 12345",     # for fidis job
                 # "fix 1 all ipi mac 77776 unix",  # for mac job
 
-        self.lmpcmd = self.lmpcmd + [ "########## lmpcmd.end  #############" ]
+        if self.ffsocket == "unix": add = "unix"
+        if self.ffsocket == "inet": add = ""
+        if address == False:
+            address = gethostname()
+
+        if self.kmc or ipi:
+            self.lmpcmd = self.lmpcmd + [ "", "## in case run by ipi: ",
+            "## fix 1 all ipi "+str(address)+" 12345 "+str(add), "" ]
+
+        self.lmpcmd = self.lmpcmd + [ "### lmpcmd.end  ####" ]
         if self.verbose > 1:
             print('HERE THE lmpcmd I got',self.lmpcmd)
         self.print_variables_ase("pot_get_and_ase_lmp_cmd_FIN")
@@ -4358,29 +4797,31 @@ class ase_calculate_ene( object ):
     def get_calculator(self,atoms):
 	''' here it would be good to have the pot values... '''
         #print('hhhhhhhhhhhh',self.pot.pottype)
-        #print('hhhhhhhhhhhh',self.lmpcmd)
-        if self.pot.pottype == 'eam-alloy':
-            elements = np.unique(atoms.get_chemical_symbols())
-            if len(elements) != 1:
-                sys.exit('Error: you have more than one element in you simulation box. I am not sure how to define the eam-alloy potential. using e.g. Al Ni will give different results to Ni Al; in the docs they propose to define all the atoms which does not work in my case')
-            else:
-                out = " "+elements[0]
+        #print('hhhhhhhhhhhh in ',self.lmpcmd)
+        #if self.pot.pottype in [ 'eam', 'eam-alloy' ]:
+        #    elements = np.unique(atoms.get_chemical_symbols())
+        #    if len(elements) != 1:
+        #        sys.exit('Error: you have more than one element in you simulation box. I am not sure how to define the eam-alloy potential. using e.g. Al Ni will give different results to Ni Al; in the docs they propose to define all the atoms which does not work in my case')
+        #    else:
+        #        out = " "+elements[0]
 
-            self.atom_types = None
-            ### This should acutally be the elements of the structure ....
-            #out = ""
-            #for idx,i in enumerate(atoms.get_chemical_symbols()):
-            #    print('self.pot.elements['+str(idx)+']:',i)
-            #    out = out +" "+i
-            #    out = " Al"
-            #    out = " Ni"
-            #    out = " Al Ni"
-            #    out = " Ni Al"
+        #    self.atom_types = None
+        #    ### This should acutally be the elements of the structure ....
+        #    #out = ""
+        #    #for idx,i in enumerate(atoms.get_chemical_symbols()):
+        #    #    print('self.pot.elements['+str(idx)+']:',i)
+        #    #    out = out +" "+i
+        #    #    out = " Al"
+        #    #    out = " Ni"
+        #    #    out = " Al Ni"
+        #    #    out = " Ni Al"
 
-            self.lmpcmd = [
-            "pair_style eam/alloy",
-            "pair_coeff * * "+self.pot.potpath+out
-            ]
+        #    self.lmpcmd = [
+        #    "pair_style eam/alloy",
+        #    "pair_coeff * * "+self.pot.potpath+out
+        #    ]
+        #print('hhhhhhhhhhhh out ',self.lmpcmd)
+        #sys.exit()
         #print('hhhhhhhhhhhh----',self.lmpcmd)
 
         if self.verbose > 1:
@@ -4442,6 +4883,42 @@ class ase_calculate_ene( object ):
             os.remove("tmp")
         if verbose > 1: self.check_frame('ase_relax_cellshape_and_volume_only out',frame=atoms)
         return
+
+    def ase_relax_cellshape_volume_positions(self,atoms,verbose=False):
+        print('relaxing cellshape, volume, positions .... this may take a while.')
+        self.get_calculator(atoms)
+        delta_pos_max = 0.00001
+        stress_max = 0.00001
+        #delta_pos_max = 0.1
+        #stress_max = 0.1
+
+        i = 0
+        stressmax = 10
+        deltaposmax = 10
+        while stressmax > stress_max or deltaposmax > delta_pos_max:
+            i+=1
+            pos_in = atoms.copy().positions
+            #print('px0 p',atoms.positions[1])
+            self.ase_relax_atomic_positions_only(atoms,fmax=0.0001,verbose=False,output_to_screen=False)
+            #print('px1 p',atoms.positions[1])
+            self.ase_relax_cellshape_and_volume_only(atoms,verbose=False)
+            #print('px2 p',atoms.positions[1])
+            pos_out = atoms.positions
+
+            if verbose:
+                print(i,'px?in  p',pos_in[1])
+                print(i,'px?out p',pos_out[1])
+
+
+            deltaposmax = np.abs(pos_in - pos_out).max()
+            if verbose:
+                print(i,'deltaposmax',deltaposmax)
+            stressmax = np.abs(atoms.get_stress()).max()
+            if verbose:
+                print(i,i, 'stressmax',stressmax)
+        return
+
+
 
     def get_murn(self,atomsin=False,verbose=False,
             return_minimum_volume_frame=False,
@@ -4508,7 +4985,8 @@ class ase_calculate_ene( object ):
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
-            if printminimal == True:
+            #if printminimal == True:
+            if verbose:
                 print('ene ase tot (eV):',str(round(ene_ev,7)).ljust(10),'nat:'+str(nat),"vol/pa:",str(round(vol/nat,7)).ljust(10),'(eV/at):',str(ene/nat).ljust(19)) #self.units)
             #print('ams3',atoms_murn_loop.get_stress(),ase_vpa(atoms_murn_loop))
             if verbose > 2:
@@ -4553,9 +5031,14 @@ class ase_calculate_ene( object ):
         if write_energies:
             #print('we1')
             if type(write_energies) == bool:
-                #print('we2')
-                write_energies = "energy.dat"
+                print('we2')
+                print('vol_pa',vol_pa)
+                print('ene_pa',ene_pa)
+
+                write_energies      = "energy_eV_per_atom_vs_ang3_per_atom.dat"
+                write_energies_cell = "energy_eV_per_cell_vs_ang3_per_cell.dat"
             np.savetxt(write_energies,np.transpose([vol_pa,ene_pa]))
+            np.savetxt(write_energies_cell,np.transpose([vol_pa*nat,ene_pa*nat]))
         if verbose > 1:
             print('loop done')
 
@@ -4889,11 +5372,64 @@ def ase_mepa(atoms):
 def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
+def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
+    pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
+    readpath = pathbase + read
+    if not os.path.isfile(readpath):
+        sys.exit('readpath '+readpath+" does NOT exist (55); Exit")
+
+    #print('read from',readpath)
+    #print('whichstruct',whichstruct)
+    print('readpath',readpath,'whichstruct:',whichstruct)
+    frames = ase_read(readpath,index=whichstruct,format="runner")  # frames with DFT energies.
+    #print('type(frames)',type(frames))
+    #print('frames.cell',frames.cell)
+    if type(frames) != list:
+        frames = [frames]
+    #print('whichstruct',whichstruct)
+    #print('frame len',len(frames))
+    #print('ace.pot',ace.pot.pot)
+    #print('ace.pot',ace.pot.potpath)
+    #print('ace.pot',ace.pot.use_epoch)
+    savefolder = ace.pot.potpath+"/epoch_"+str(ace.pot.use_epoch)
+    if not os.path.isdir(savefolder):
+        os.mkdir(savefolder)
+    savepath = savefolder+"/RELAXED_fully_"+read
+
+    ######################################
+    # just read in and return if it exists
+    ######################################
+    if os.path.isfile(savepath):
+        print('savepath (exists)',savepath)
+        frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
+        if len(frames) == len(frames_out):
+            return frames_out, frames
+        else:
+            print('savepath exists but has different name than readpath')
+            sys.exit('savepath '+savepath+" does already exist (55); Exit")
+
+    print('savepath (will be created)',savepath)
+    ######################################
+    # relax if necessary
+    ######################################
+    for idx,atoms in enumerate(frames):
+        #print('idx',idx,'out of',len(frames))
+        #print('aaa')
+        #print(atoms.get_cell())
+        #print(atoms.positions)
+        #print('c')
+        ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
+        ase_write(savepath,atoms,format='runner',append=True)
+    frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
+    print('savepath (created)',savepath)
+    return frames_out, frames
+
+
 def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
-    #atoms= get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,matrix_element="Ni",cubic=True,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True)
-    print('atoms.cell before relaxing cellshape and volume:')
+    print('atoms.cell (angstrom) before relaxing cellshape and volume:')
     print(atoms.cell)
     print('atoms.positions before relaxing cellshape and volume:')
+    print('in angstrom')
     for idx,i in enumerate(atoms.positions):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
     print()
@@ -4913,7 +5449,7 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     print("#############################")
     os.mkdir("evinet")
     with cd("evinet"):
-        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False)
+        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False,atomrelax=True)
         print('vinet.parameters:',vinet.parameters)
         vinet.write_data()
     #print('atoms vol',atoms.get_volume())
@@ -4986,6 +5522,79 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         #ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
     return atoms
 
+
+def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
+    lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
+    #lambdas = [ 0.15, 0.5, 0.85 ]
+    for l in lambdas:
+        rand_nr = random.randint(1,99999)
+        rand_nr = '1234567'
+        folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K/lambda"+str(l)+"_"+str(rand_nr)
+        if os.path.isdir(folder):
+            sys.exit(folder+" does already exist!")
+        os.makedirs(folder)
+        ipi_inp = "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
+
+        with cd(folder):
+            print('hessefile',hessefile)
+            print('to folder',folder)
+            print()
+            hessefile_basename = os.path.basename(hessefile)
+            shutil.copy2(hessefile, folder)
+            print('hfbn',hessefile_basename)
+            shutil.copy2(ipi_inp, folder)
+            ipi_inp_basename = os.path.basename(ipi_inp)
+            print('ipi_inp',ipi_inp_basename)
+            print('pos',pos)
+            print('to folder',folder)
+            print()
+            pos_basename = os.path.basename(pos)
+            frame = ase_read(pos)
+            ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
+            ene_hartree = ene*0.036749322
+            print('ene',ene,"eV")
+            print('ene_hartree',ene_hartree,"hartree")
+            ase_write(folder+"/pos.ipi.xyz",frame,format='ipi')
+            #ase_write(folder+"/pos.lmp",frame,format='lammps-data')
+
+            ##
+            if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
+                frame.write(folder+'/pos.lmp',format='lammps-runner')
+            elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
+                frame.write(folder+'/pos.lmp',format='lammps-data')
+            else:
+                sys.exit('44321 Error: dont know how to write this lammps file')
+
+            execute_file = 'in.lmp'
+            ace.ipi = True
+            print('ace.nsteps1',ace.nsteps)
+
+            #print('ace.ipi',ace.
+            ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=2000000000,ffsocket='inet',address=False)
+            print('ace.nsteps2',ace.nsteps)
+            lammps_write_inputfile(folder=folder,filename=execute_file,positions='pos.lmp',ace=ace)
+            print('ace.nsteps3',ace.nsteps)
+
+            #print('fp',frame.positions)
+            #print('fp',frame.positions.flatten())
+            ang_to_bohr = 1.8897261
+            np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+            nat = frame.get_number_of_atoms()
+            sed(folder+'/'+ipi_inp_basename,'xxx123',str(300))  # steps
+            sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
+            sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.ipi.xyz')
+            sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
+            sed(folder+'/'+ipi_inp_basename,'xxx1.0',str(l))
+            sed(folder+'/'+ipi_inp_basename,'xxx0.0',str(1.-l))
+            sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
+            sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
+            sed(folder+'/'+ipi_inp_basename,'xxxene',str(0))
+            sed(folder+'/'+ipi_inp_basename,'md_ff',str('md_ff'))
+            print(folder)
+            print('next thing to do: put the socket in the in.lmp!')
+            sys.exit('ddd')
+    return
+
 def get_hessefiles_vol_pos(folder):
     paths = glob.glob(folder+'/Hessematrix_*')
     out = []
@@ -5000,45 +5609,6 @@ def get_hessefiles_vol_pos(folder):
     if len(out) == 0:
         print('no Hessematrix_* files found in',folder)
     return out
-
-def ipi_thermodynamic_integraton_from_fqh(volume,temperature,hessefile,pos):
-    lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
-    lambdas = [ 0.15, 0.5, 0.85 ]
-    for l in lambdas:
-        rand_nr = random.randint(1,99999)
-        folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K/lambda"+str(l)+"_"+str(rand_nr)
-        if os.path.isdir(folder):
-            sys.exit(folder+" does already exist!")
-        os.makedirs(folder)
-        ipi_inp = "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
-
-        with cd(folder):
-            print('hessefile',hessefile)
-            hessefile_basename = os.path.basename(hessefile)
-            shutil.copy2(hessefile, folder)
-            print('hfbn',hessefile_basename)
-            shutil.copy2(ipi_inp, folder)
-            ipi_inp_basename = os.path.basename(ipi_inp)
-            print('ipi_inp',ipi_inp_basename)
-            print('pos',pos)
-            pos_basename = os.path.basename(pos)
-            frame = ase_read(pos)
-            ase_write(folder+"/pos.xyz",frame,format='ipi')
-            ase_write(folder+"/pos.lmp",frame,format='lammps')
-            # /Users/glensk/Library/Python/2.7/lib/python/site-packages/ase/io/ipi.py
-            print('fp',frame.positions)
-            print('fp',frame.positions.flatten())
-            ang_to_bohr = 1.8897261
-            np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
-            nat = frame.get_number_of_atoms()
-            sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
-            sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.xyz')
-            sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
-            sed(folder+'/'+ipi_inp_basename,'xxx1.0',str(l))
-            sed(folder+'/'+ipi_inp_basename,'xxx0.0',str(1.-l))
-            sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
-            sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
-    return
 
 def get_Mg5Si6_and_other_antisites(ace):
     '''
@@ -5109,7 +5679,7 @@ def get_Mg5Si6_and_other_antisites(ace):
                 print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax cellshape')
                 #ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
                 #ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
-                ase_write("out_antisites_rep"+iname+".runner",frame_rep,format='runner',append=True)
+                ase_write("out_antisites_rep"+iname+".runner",frame_rep_,format='runner',append=True)
                 struct_written += 1
     return
 

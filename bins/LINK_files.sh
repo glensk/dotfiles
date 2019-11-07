@@ -279,11 +279,6 @@ if [ -e "$HOME/.config/terminator" ]; then
     fi
 chmod 600 ~/.ssh/config
 
-echo
-echo "# autojump ########################################################################"
-echo "# autojump .... (if autojump is not working enable this in the LINK_files.sh skript"
-
-echo
 echo "# make git not upload *.pyc files #################################################"
 cd $dotfiles
 git rm --cached *.pyc

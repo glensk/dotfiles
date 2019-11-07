@@ -743,7 +743,10 @@ def data(elementlistin = None):
         elif crystal_struct == 'diamond':
             vol = ((i['a'])**3)/8
             #print('vol',vol)
+        elif crystal_struct == 'bcc':
+            vol = ((i['a'])**3.)/2.
         else:
+            print('a',i['a'])
             sys.exit('crystal structure unknown: '+crystal_struct)
         reference_volume.append(vol)
         #print('i',i,i['symmetry'])
@@ -807,10 +810,10 @@ class atom(object):     # advantage: once this is executed we know that everythi
             #
             # or
             # import my_atom
-            # atom = my_atom.atom([args.element])
+            # a0   = my_atom.atom(["Al"]).number[0]   # 13
+            # state = my_atom.atom([matrix_element]).reference_state[0]  # state {'a': 4.05, 'symmetry': 'fcc'}
+            #
             # print atom.melting_rounded[0]
-            #
-            #
         self._z         = False
         self._n         = False
         self._s         = False
