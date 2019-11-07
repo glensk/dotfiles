@@ -5526,6 +5526,7 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
 def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     #lambdas = [ 0.15, 0.5, 0.85 ]
+    lambdas = [ 0.0, 1.0 ]
     for l in lambdas:
         rand_nr = random.randint(1,99999)
         rand_nr = '1234567'
@@ -5580,7 +5581,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             ang_to_bohr = 1.8897261
             np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
             nat = frame.get_number_of_atoms()
-            sed(folder+'/'+ipi_inp_basename,'xxx123',str(300))  # steps
+            sed(folder+'/'+ipi_inp_basename,'xxx123',str(10))  # steps
             sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
             sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.ipi.xyz')
             sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
@@ -5592,7 +5593,6 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             sed(folder+'/'+ipi_inp_basename,'md_ff',str('md_ff'))
             print(folder)
             print('next thing to do: put the socket in the in.lmp!')
-            sys.exit('ddd')
     return
 
 def get_hessefiles_vol_pos(folder):
