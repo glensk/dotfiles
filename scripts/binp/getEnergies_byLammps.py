@@ -338,18 +338,17 @@ def get_energies(args):
         # -533920.334868975333 16.528710460497 79.180381312792 2.610462793516
         # -533920.334868975333*108-(107*-537461.993661476416)-(-155368.146177827992) == 405.302 meV ! that is correct!
 
-        if False:
+        if True:
             print("##############################")
             print("# NOW GETTING anharmonic ... #")
             print("##############################")
             hesse_vol_pos = my.get_hessefiles_vol_pos(os.getcwd()+"/fqh")
-            print('--')
             temperature = 900
             for idx,i in enumerate(hesse_vol_pos):
                 hessefile = i[0]
                 volume  = i[1]
                 pos     = i[2]
-                print(hessefile,volume)
+                print("->",hessefile,volume)
                 my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos)
                 sys.exit()
             sys.exit()

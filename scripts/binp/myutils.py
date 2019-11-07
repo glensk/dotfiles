@@ -2149,6 +2149,9 @@ def lammps_write_inputfile(folder,filename='in.lmp',positions=False,ace=False):
 
     if ace.kmc:
         ace.nsteps = 66000000   # this needs to by any very high number
+    if ace.ipi:
+        # write fix 1 all ipi md_ff 77776 unix
+        f.write('fix 1 all ipi md_ff 77776 unix\n')
     f.write("run "+str(ace.nsteps)+"\n")
     return
 
@@ -3791,6 +3794,7 @@ class ase_calculate_ene( object ):
         #print('init')
         # case of MD or KMC
         self.kmc  = kmc
+        self.ipi = False
         self.temp = temp
 
         #self.eos = [ False, False, False, False] # e0_meV/pa, v0_ang^3/pa, B0, B0der]
@@ -5524,6 +5528,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
     #lambdas = [ 0.15, 0.5, 0.85 ]
     for l in lambdas:
         rand_nr = random.randint(1,99999)
+        rand_nr = '1234567'
         folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K/lambda"+str(l)+"_"+str(rand_nr)
         if os.path.isdir(folder):
             sys.exit(folder+" does already exist!")
@@ -5532,6 +5537,8 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
 
         with cd(folder):
             print('hessefile',hessefile)
+            print('to folder',folder)
+            print()
             hessefile_basename = os.path.basename(hessefile)
             shutil.copy2(hessefile, folder)
             print('hfbn',hessefile_basename)
@@ -5539,6 +5546,8 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             ipi_inp_basename = os.path.basename(ipi_inp)
             print('ipi_inp',ipi_inp_basename)
             print('pos',pos)
+            print('to folder',folder)
+            print()
             pos_basename = os.path.basename(pos)
             frame = ase_read(pos)
             ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
@@ -5557,17 +5566,21 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
                 sys.exit('44321 Error: dont know how to write this lammps file')
 
             execute_file = 'in.lmp'
-            ace.nsteps = 200000000
-            #print('ace',ace.
-            ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=0,ffsocket='inet',address=False)
-            lammps_write_inputfile(folder=folder,filename=execute_file,positions='pos.lmp',ace=ace)
+            ace.ipi = True
+            print('ace.nsteps1',ace.nsteps)
 
+            #print('ace.ipi',ace.
+            ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=2000000000,ffsocket='inet',address=False)
+            print('ace.nsteps2',ace.nsteps)
+            lammps_write_inputfile(folder=folder,filename=execute_file,positions='pos.lmp',ace=ace)
+            print('ace.nsteps3',ace.nsteps)
 
             #print('fp',frame.positions)
             #print('fp',frame.positions.flatten())
             ang_to_bohr = 1.8897261
             np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
             nat = frame.get_number_of_atoms()
+            sed(folder+'/'+ipi_inp_basename,'xxx123',str(300))  # steps
             sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
             sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.ipi.xyz')
             sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
@@ -5575,9 +5588,11 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             sed(folder+'/'+ipi_inp_basename,'xxx0.0',str(1.-l))
             sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
             sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
-            sed(folder+'/'+ipi_inp_basename,'xxx123',str(300))  # steps
             sed(folder+'/'+ipi_inp_basename,'xxxene',str(0))
-            sed(folder+'/'+ipi_inp_basename,'md_ff',str('mac'))
+            sed(folder+'/'+ipi_inp_basename,'md_ff',str('md_ff'))
+            print(folder)
+            print('next thing to do: put the socket in the in.lmp!')
+            sys.exit('ddd')
     return
 
 def get_hessefiles_vol_pos(folder):
