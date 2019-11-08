@@ -1131,13 +1131,25 @@ def get_energies(args):
                 # enough for meV_pa
                 if ace.units == "mev_pa":
                     show = 3
+                elif ace.units == "hartree":
+                    show = 6
 
                 fmt_one = '%16.'+str(show)+'f'
                 fmt_one = '%10.'+str(show)+'f'
                 fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
                 ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
 
-                print(ka3 % (i,idx,structures_to_calc,ene_diff_abs[idx],frames[i].get_number_of_atoms(),at_si,at_mg,at_al,ene_DFT[idx],ene_pot[idx],ene_pot_wo_atomic[idx],for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+                print(ka3 % (
+                    i,
+                    idx,
+                    structures_to_calc,
+                    ene_diff_abs[idx],
+                    frames[i].get_number_of_atoms(),
+                    at_si,at_mg,at_al,
+                    ene_DFT[idx],
+                    ene_pot[idx],
+                    ene_pot_wo_atomic[idx],
+                    for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
                 return
 
 
