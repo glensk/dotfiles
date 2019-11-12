@@ -222,6 +222,7 @@ def launch(code_node, structure_group_name, workchain_group_name,
         raise Exception("Invalid calc_method: {}".format(calc_method))
 
     # setup parameters
+    print('intern code_node:',code_node)
     code = load_node(code_node)
     structure_group = Group.get_from_string(structure_group_name)
     workchain_group = Group.get_or_create(name=workchain_group_name)[0]

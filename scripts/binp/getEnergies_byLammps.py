@@ -2127,6 +2127,9 @@ def test_antisites(ace):
     phase =  "Mg5Al2Si4" # done
     phase = "Mg5Si6" # done
 
+
+    potpath_using = ace.pot.potpath+"/epoch_"+str(ace.pot.potpath_using)
+
     doit = [ "Mg4Al3Si4", "Mg5Al2Si4", "Mg5Si6" ]
     for phase in doit:
         ######################################
@@ -2143,7 +2146,8 @@ def test_antisites(ace):
         print('------- original phase -----')
         read_orig_phase = "aiida_exported_group_NN_relaxed_"+phase+"_n2p2_v2ag_calc__all_steps.input.data"
         # read_orig_phase = xxx
-        origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_orig_phase,whichstruct=-1)
+        read_orig_phase_fullpaht = "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
+        origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_fullpath=read_orig_phase_fullpaht,whichstruct=-1)
         # origphase_relaxe is the DFT relaxed one!
         # origphase_initial is just the first structure, possibly relaxed by a different NN.
 
@@ -2154,7 +2158,6 @@ def test_antisites(ace):
         # print('origphase_relaxed',origphase_relaxed)
         # only the origphase initial will (in this case) have the DFT
         origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
-
         # this was really minimized by dft
         orig_relaxed_dft_ene_dft = my.ase_enepot(origphase_relaxed_dft,units='eV')
         max_dft_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
@@ -2173,6 +2176,7 @@ def test_antisites(ace):
         #print('fnn')
         #print(origphase_relaxed_nn.get_forces())
 
+        sys.exit('33452')
         d = my.ase_get_chemical_symbols_to_number_of_species(origphase_relaxed_nn,known_elements_by_pot=["Al","Mg","Si"])
         #print('origphase_relaxed',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
         #print()

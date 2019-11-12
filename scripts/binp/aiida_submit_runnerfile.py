@@ -52,8 +52,9 @@ def aiida_submit_job(args):
     print("launching job ...")
     # callback is necessary since launch is a decorated click funtion and could not be called otherwise
     bpn = "9b370584-3f56-471c-a724-dbaadf022ec5"
+    print('submitting to --code_node 114134') #113998') #114027')
     command = ["aiida_launch_workflow_alalloy.py",
-            "--code_node","1",
+            "--code_node","114134", #113998", #114027", #"1" .. "113998",  # this would be the new daint "code_node"
             "--structure_group_name",group_name,
             "--workchain_group_name",group_name+"_calc",
             "--base_parameter_node",bpn,

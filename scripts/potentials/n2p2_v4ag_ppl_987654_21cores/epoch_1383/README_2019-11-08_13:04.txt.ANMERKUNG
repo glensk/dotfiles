@@ -1,0 +1,17 @@
+(aiida) 13:03:40 glensk@cosmopc15 /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_False
+%aiida_submit_runnerfile.py -cm scf -i relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner
+
+Atoms(symbols='Mg5Si6Mg5Si6', pbc=[True, True, True], cell=[[14.381892605820532, -1.0583544211276824e-10, -4.894816595872266], [5.291772105638412e-11, 4.062779552301392, 0.0], [-0.1843292056121252, 0.0, 6.913512907863241]], positions=..., calculator=SinglePointCalculator(...))
+groupname: relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner
+aaa dataset_path relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner
+aaa group_name relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner
+
+loading dataset: relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner to group: relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner
+written  /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_False/README_2019-11-08_13:04.txt
+launching job ...
+('xx dryrun', False, False, False, False)
+Preparing to launch uuid: f04eba4f-fded-466d-b317-5043597861af (pk: 113999)
+WorkChain: uuid: facd3e71-55fd-4e75-ade6-488fecfba253 (pk: 114012) submitted
+timing: 10.5355129242s
+written  /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_False/README_2019-11-08_13:04.txt
+(aiida) 13:04:37 glensk@cosmopc15 /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_False

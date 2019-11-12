@@ -5376,9 +5376,16 @@ def ase_mepa(atoms):
 def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
-def ase_relax_structure_fully_and_save_to_pot(ace,read=False,whichstruct=":"):
-    pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
-    readpath = pathbase + read
+def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False,whichstruct=":"):
+    if read != False:
+        pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
+        readpath = pathbase + read
+    print('ace',ace.pot.potpath)
+    sys.exit('77')
+    if read_fullpath != False:
+        read = os.path.basename(read_fullpath)
+        readpath = read_fullpath
+
     if not os.path.isfile(readpath):
         sys.exit('readpath '+readpath+" does NOT exist (55); Exit")
 
