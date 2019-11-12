@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: dc301b40bfc31899c252ce5e26772c8e4a6dcbb5
+
+aiida_export_group_to_runner.py -gn out_reference_rep.runner_calc
