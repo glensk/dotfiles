@@ -1,0 +1,4 @@
+# using https://gitlab.com/daniel.marchand/aiida-alloy
+# used sha: 0e4f883b33f156e9514e9ebe7cf354c0785c99e5
+
+aiida_submit_runnerfile.py -cm scf -i RELAXED_fully_aiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.data

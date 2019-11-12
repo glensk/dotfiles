@@ -113,18 +113,17 @@ def get_timesorted_scfs(worknode, relax_worknode=False):
     return timesorted_scf
 
 def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
-    print()
-    print('using write_pwbase_torunner',pwbasenode.uuid)
+    print('A using write_pwbase_torunner pwbasenode.uuid:',pwbasenode.uuid)
     scf_node = get_timesorted_scfs(pwbasenode)[-1]
-
     ase_structure = scf_node.inp.structure.get_ase()
     cell = ase_structure.get_cell()
 
-    print(scf_node,'cell[0]',cell[0]*ANGSTROM_TO_BOHRRADIUS)
+    print('E',scf_node)
+    print('F cell[0]',cell[0]*ANGSTROM_TO_BOHRRADIUS)
     print('cell  :',cell[0],cell[1],cell[2])
     vvv = ase_structure.get_volume()/ase_structure.get_number_of_atoms()
-    print('volume:',ase_structure.get_volume()/ase_structure.get_number_of_atoms())
-    print('volume:',ase_structure.get_volume())
+    print('volume_pa:',ase_structure.get_volume()/ase_structure.get_number_of_atoms())
+    print('volume   :',ase_structure.get_volume())
     print('stress:',stress)
     if type(stress) is not bool:
         print('c44 ST:',stress[2][1]*1000./2.,"GPa")
@@ -165,6 +164,8 @@ def write_pwbase_torunner(fileout, pwbasenode, extra_comments={},stress=False):
     write_runner_cell(fileout, cell)
     write_runner_atomlines(fileout, positions, elements, atomicforce_array=atomicforce_array)
     write_runner_finalline(fileout, energy=energy)
+    print('wirtten to',fileout)
+    print()
     return strain, energy,e0_eV,vol
 
 def get_timesorted_trajectories(relaxworkcalc):
@@ -279,7 +280,7 @@ def createjob(group_name, filename, write_only_relaxed, supress_readme, verbose)
         file = filename
         fileout = open(filename, "w")
 
-    if verbose:
+    if True: #verbose:
         print('file           :', file)
         print('structure_group:', group_name)
 
