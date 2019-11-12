@@ -29,6 +29,9 @@ TageRest
 ----------------------------------- uebertrag 0.0 + (10.5 days for 2019) = 10.5
 0.0 10.5
 4    6.5    05.08.2019 eva/marcel (mo-mi)                       (eingetragen)
+0.0  6.5    22.11.2019 compensation EPFL-open-doors Holiday park(eingetragen)
+1.0  5.5    25.11.2019 Urlaub Holiday park                      (eingetragen)
+
 1.0  5.5    23.12.2019 Weihnachten
 0.5  5.0    24.12.2019 Weihnachten
 1    4.0    27.12.2019 Weihnachten

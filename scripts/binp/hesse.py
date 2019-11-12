@@ -7,6 +7,7 @@ from __future__ import print_function
 # /Users/glensk/Dropbox/proj/proj_current/__2017.01_phonon_linewidth_al/__2015.08_phonon_lifetimes_2_for_munich/calculations/allq_Al_2_4.13_1000000steps_timestep0.001_totaltime10000ps_900K_dump_10_test_manual_short/check_one_disp/coords_pyton_forces_1
 
 import my_atom as atom
+import myutils
 import os
 import sys
 import math
@@ -279,10 +280,24 @@ def read_Hessematrix(hessematrixfile = "HesseMatrix_sphinx" ):
     #print('normal function')
     return hessematrix
 
+def dpos(pos,pos0,cell):
+    if myutils.cell_is_cubic(cell) == True:
+        u = pos - pos0
+        for ind,i in enumerate(u):
+            if  u[ind][0] > cell[0,0]/2.:
+                u[ind][0] = u[ind][0] - cell[0,0]
+            if  u[ind][1] > cell[0,0]/2.:
+                u[ind][1] = u[ind][1] - cell[0,0]
+            if  u[ind][2] > cell[0,0]/2.:
+                u[ind][2] = u[ind][2] - cell[0,0]
+        return u
+    raise TypeError('cell is not cubic!')
+
 def qh_forces(dpos = None, h = None ):
     '''
-    dpos = deltas of positions in cartesian coords
-    h = hessematrix
+    dpos := deltas of positions in cartesian coords
+    h    := hessematrix
+    h = read_Hessematrix(hessematrixfile = hessefile)
     '''
     #print dpos
     #print '---'
@@ -292,6 +307,10 @@ def qh_forces(dpos = None, h = None ):
     return f.reshape(dpos.shape)
 
 def qh_energy_cell(dpos = None, h = None ):
+    ''' returns : energy in meV/cell
+        dpos    : Angstrom
+        h       : atomic units (as sphinx, ipi, ...)
+    '''
     f = qh_forces( dpos = dpos, h = h )
     e = -np.dot(np.ndarray.flatten(dpos),np.ndarray.flatten(f))/2.
     if e < 1e-8 and e > -1e-8:
@@ -299,6 +318,10 @@ def qh_energy_cell(dpos = None, h = None ):
     return e
 
 def qh_energy_atom(dpos = None, h = None ):
+    ''' returns Uref in meV/atom
+        dpos    : Angstrom
+        h       : atomic units (as sphinx, ipi, ...)
+    '''
     ecell = qh_energy_cell( dpos = dpos, h = h )
     #print "ecell:",ecell
     atoms = len(np.ndarray.flatten(dpos))/3.-1.
@@ -1680,6 +1703,8 @@ def get_energy_forces(
         if type(hessefile) == bool and type(h) == bool:
             if os.path.isfile("HesseMatrix_sphinx"):
                 hessefile = "HesseMatrix_sphinx"
+            elif os.path.isfile("hessian.data"):
+                hessefile = "hessian.data"
         if type(hessefile) == bool and type(h) == bool:
             sys.exit("please provide a hessefile or h as a numpy matrix")
         if type(hessefile) != bool and type(h) != bool:
@@ -1712,13 +1737,15 @@ def get_energy_forces(
         #print "============="
         u = crystal.rcar-crystal0.rcar
         #print "uorig:",u
-        for ind,i in enumerate(u):
-            if  u[ind][0] > crystal.cellvec[0,0]/2:
-                u[ind][0] = u[ind][0] - crystal.cellvec[0,0]
-            if  u[ind][1] > crystal.cellvec[0,0]/2:
-                u[ind][1] = u[ind][1] - crystal.cellvec[0,0]
-            if  u[ind][2] > crystal.cellvec[0,0]/2:
-                u[ind][2] = u[ind][2] - crystal.cellvec[0,0]
+        #############################################
+        # die naechsten zeilen schieben den kristall in die "mitte"
+        #__alat_half = crystal.cellvec[0,0]/2
+        #__alat      = crystal.cellvec[0,0]
+        ## e.g.: u_ = (np.array([[4.06,4.06,4.06],[4.06,4.07,4.08],[-0.1,-0.3,3]])+2.025)%4.05-2.025
+        #u_ = (crystal.rcal + __alat_half)%__alat-alat_half
+        #u = u_
+        #############################################
+        u = dpos(crystal.rcar,crystal0.rcar,crystal.cellvec)
         #print "u out:",u
         if returndu:
             return u

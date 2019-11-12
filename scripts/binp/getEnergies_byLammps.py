@@ -91,6 +91,8 @@ def help(p = None):
     p.add_argument('--write_forcesx','-wfx',action='store_true',help='write forcesx.out of particular strucuture')
     p.add_argument('--write_analysis','-wa',action='store_true',help='write ene_{DFT,pot}... default: False')
     p.add_argument('--write_analysis_full','-waf',action='store_true',help='write ene_{DFT,pot}... default: False')
+    p.add_argument('-poe','--print_only_energies',   help='print only the energies and no additional ifno', action='count', default=False)
+    p.add_argument('-ghe','--get_harmonic_energy',   help='get the harmonic energy', action='count', default=False)
     p.add_argument('-d','--debug',   help='verbose', action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
@@ -101,6 +103,27 @@ def get_energies(args):
     for a given potential.
 
     '''
+    if os.path.isfile("../simulation.ti"):
+        aaatest = np.loadtxt("../simulation.ti")
+    else:
+        aaatest = np.zeros((1000,3))
+    if args.get_harmonic_energy:
+        import hesse
+        hessefile = '../hessian.data'
+        hessefile = '../HesseMatrix_4.13'
+        hesse_matrix = hesse.read_Hessematrix(hessefile)
+        if os.path.isfile('../init.xyz'):
+            pos0 = ase_read('../init.xyz',format='ipi')
+        elif os.path.isfile('../OUTCAR'):
+            print('reading outcar')
+            #pos0 = ase_read('../OUTCAR',format='vasp-out') # this is as index=0
+            #pos0 = ase_read('../OUTCAR',format='vasp-out',index=":") # works
+            pos0 = ase_read('../OUTCAR',format='vasp-out',index=0) # works
+        print('pos0 typ',type(pos0))
+        print('pos0 len',len(pos0))
+        print(pos0.positions)
+        print(pos0.cell)
+
     if args.thermo or args.evinet or args.fqh or args.fah:
         if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
     if args.show_availabel_pots:
@@ -326,8 +349,9 @@ def get_energies(args):
                 print('after relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx],frames.get_forces()[idx])
     if args.inputfile != False:
         my.check_isfile_or_isfiles([args.inputfile],verbose=args.verbose)
-        print('args.format_in',args.format_in)
-        frames = ase_read(args.inputfile) #,format=args.format_in)
+        print('args.inputfile:',args.inputfile)
+        print('args.format_in:',args.format_in)
+        frames = ase_read(args.inputfile,format=args.format_in,index=":")
 
 
     if args.thermo or args.evinet or args.fqh or args.fah:
@@ -670,6 +694,7 @@ def get_energies(args):
         ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
         ene_pot          = np.empty(structures_to_calc);ene_pot[:]  = np.nan
         ene_pot_wo_atomic= np.empty(structures_to_calc);ene_pot_wo_atomic[:]  = np.nan
+        ene_harmonic     = np.empty((structures_to_calc,2));#ene_harmonic[:]  = np.nan
         ene_pot_ase      = np.empty(structures_to_calc);ene_pot_ase[:]  = np.nan
         ene_pot_ase_geop = np.empty(structures_to_calc);ene_pot_ase_geop[:]  = np.nan
         ene_pot_lmp      = np.empty(structures_to_calc);ene_pot_lmp[:]  = np.nan
@@ -936,6 +961,24 @@ def get_energies(args):
                     #    print('idy',idy,atoms_tmp.get_chemical_symbols()[idy])
                     #print('--4')
                     ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=debug)
+                    if args.get_harmonic_energy:
+                        #print('hm')
+                        #print(hesse_matrix)
+                        #print('cell')
+                        #print(atoms_tmp.cell)
+                        ##u = crystal.rcar-crystal0.rcar
+                        ###print "uorig:",u
+                        #print('pos')
+                        #print(atoms_tmp.positions)
+                        u = hesse.dpos(atoms_tmp.positions,pos0.positions,atoms_tmp.cell)
+                        #print('u')
+                        #print(u)
+
+                        ene_harmonic[idx,0] = hesse.qh_energy_cell(dpos = u, h = hesse_matrix)
+                        ene_harmonic[idx,1] = hesse.qh_energy_atom(dpos = u, h = hesse_matrix)
+                        #print('ene_harmonic',ene_harmonic[idx])
+
+
                     #print('ae',ene_pot_ase[idx])
                     if args.write_forces or args.write_forcesx:
                         if args.write_forcesx:
@@ -1139,7 +1182,25 @@ def get_energies(args):
                 fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
                 ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
 
-                print(ka3 % (
+                if args.print_only_energies:
+                    #__alat_half = crystal.cellvec[0,0]/2
+                    #__alat      = crystal.cellvec[0,0]
+                    ## e.g.: u_ = (np.array([[4.06,4.06,4.06],[4.06,4.07,4.08],[-0.1,-0.3,3]])+2.025)%4.05-2.025
+                    #u_ = (crystal.rcal + __alat_half)%__alat-alat_half
+
+                    if True: #ace.units == 'hartree':
+                        aatest = aaatest[i][2]
+                        #print('ene_harmonic',ene_harmonic[idx])
+                        eh = np.round(ene_harmonic[idx],2)
+                        print(str(i).ljust(5),
+                                'ene DFT:',np.round(ene_DFT[idx],3),
+                                'ene_pot',np.round(ene_pot[idx],3),
+                                'aatest:',np.round(aatest,3),
+                                'eh: meV/{atom,cell}',eh)
+                    else:
+                        print(str(i).ljust(5),ene_diff_abs[idx])
+                else:
+                    print(ka3 % (
                     i,
                     idx,
                     structures_to_calc,
@@ -1150,6 +1211,8 @@ def get_energies(args):
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+                if idx == 2:
+                    sys.exit('56859')
                 return
 
 

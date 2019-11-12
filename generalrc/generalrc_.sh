@@ -105,8 +105,18 @@ case $myhost in
 #    #cosmopc) source $HOME/aiida/bin/activate; ;;
 #    # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 #    # on mac: 
+#    # https://opensource.com/article/19/5/python-3-default-mac
+#    # brew install pyenv
+#    # pyenv install 3.7.5
+#    # pyenv global 3.7.5
+#    # when pip -V made problems after : pip install --upgrade --user pip
+#    # it was however suggested to run : pip install --upgrade pip (without user)
+#    # solved by python -m pip uninstall pip
+
+
+#    # on mac: 
 #    # pip install --upgrade --user phonopy
-#    # pip install --upgrade --user ase
+#    # pip install --upgrade --user ase              # or pip3 for python3
 #    # pip install --upgrade --user lmfit
 #    # pip install --upgrade --user intel-numpy    # to make numpy faster
 #    # pip install --upgrade --user tqdm
@@ -124,7 +134,12 @@ case $myhost in
 #    # pip install --upgrade --user ipython
     fidis) moduel load intel python/2.7.16;;
     helvetios) moduel load intel python/2.7.16;;
+    mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate
 esac
+    # This would give me python 3 by default, quickly
+    #if [ "`command -v pyenv`" != "" ]; then 
+    #    eval "$(pyenv init -)"   # this loads python 3.7.5
+    #fi
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################

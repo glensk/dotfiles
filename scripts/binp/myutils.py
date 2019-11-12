@@ -1488,6 +1488,12 @@ def convert_cell(cell,pos):
     else:
         return cell, pos
 
+def cell_is_cubic(cell):
+    if cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
+        if cell[0,0] == cell[1,1] == cell[2,2]:
+            return True
+    return False
+
 def create_READMEtxt(directory=False,add=False):
     ''' wiretes a README.txt file '''
     if directory == False:
@@ -3660,7 +3666,6 @@ def ase_enepot(atoms,units='eV',verbose=False):
             ene = ene/atoms.get_number_of_atoms()
         else:
             sys.exit("energy can not have this units (ending must be pa, eV_pa or hartree_pa)")
-
     return ene
 
 def ase_get_chemical_symbols_to_number_of_species(atoms,known_elements_by_pot=[]):
@@ -3850,7 +3855,7 @@ class ase_calculate_ene( object ):
         ## This should acutally be the elements of the structure ....
         out = ""
         for idx,i in enumerate(self.pot.elements):
-            print('self.pot.elements['+str(idx)+']:',i)
+            #print('self.pot.elements['+str(idx)+']:',i)
             out = out +" "+i
 
         command = [
@@ -4994,14 +4999,13 @@ class ase_calculate_ene( object ):
                 cell = atoms_murn_loop.get_cell()
                 pos = atoms_murn_loop.get_positions()[1]/cell[0,0]
 
-                if cell[0,1] == cell[0,2] == cell[1,0] == cell[1,2] == cell[2,0] == cell[2,1] == 0:
-                    if cell[0,0] == cell[1,1] == cell[2,2]:
-                        if round(stress[0],6) == round(stress[1],6) == round(stress[2],6):
-                            print('murn cell++  ',round(cell[0,0],6),pos)
-                        else:
-                            print('murn cell--  ',cell[0,0],stress)
+                if cell_is_cubic == True:
+                    if round(stress[0],6) == round(stress[1],6) == round(stress[2],6):
+                        print('murn cell++  ',round(cell[0,0],6),pos)
                     else:
-                        print('murn cell---  ',cell[0,0],cell[1,1],cell[2,2])
+                        print('murn cell--  ',cell[0,0],stress)
+                else:
+                    print('murn cell---  ',cell[0,0],cell[1,1],cell[2,2])
             #ene = ase_enepot(atoms_murn_loop) #,units=ace.units)    # core dump
             #ene = atoms_murn_loop.get_potential_energy()            # core dump
             #ene = ase_enepot(atoms_murn_loop,units=self.units,verbose=self.verbose)  # core dump
@@ -5597,7 +5601,8 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             print('python $HOME/sources/ipi/bin/i-pi ipi_input_thermodynamic_integration_template.xml')
             print('~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp')
             print()
-            print('gives simulation.ti which has in 3rd column the total energy for the nn')
+            print('gives simulation.ti which has in 3rd column the total energy for the nn; independent of how lambdas are defined.')
+            print('3rd column in simulation.ti is also independent of v_reference> -2.89829817e+00')
     return
 
 def get_hessefiles_vol_pos(folder):

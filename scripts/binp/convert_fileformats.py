@@ -209,8 +209,11 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
 
     known_formats = ase_get_known_formats()
 
-    if len(frame_or_frames) > 1:
-        my.get_from_prompt_Yy_orexit("Do you want to write "+str(len(frame_or_frames))+" files/structures to drive? [Yy]")
+
+    #if len(frame_or_frames) > 1:
+    #    outfilename = get_outfilename(args)
+    #    print('outfilename',outfilename)
+    #    my.get_from_prompt_Yy_orexit("Do you want to write "+str(len(frame_or_frames))+" files/structures to drive? [Yy]")
 
     for idx,frameone in enumerate(frame_or_frames):
 
@@ -219,6 +222,7 @@ def convert_file(infile, formatin=False,formatout=False,outfilename=False,args=F
         #print('idx:',idx,type(idx))
         #outfilename = get_outfilename(args,idx)
         outfilename = get_outfilename(args)
+
         if formatout in known_formats:
             print('formatout        :',formatout,"known by default")
             save_ase_object_in_ase_format(frameone,outfilename,formatout)
