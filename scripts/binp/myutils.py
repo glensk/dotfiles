@@ -853,10 +853,10 @@ class mypot( object ):
             print(text,"self.assessed_train         ",self.assessed_train)
             print(text,"self.assessed_kmc57         ",self.assessed_kmc57)
             print(text,"self.assessed_c44           ",self.assessed_c44)
-            print(text,"self.use_epoch              ",self.use_epoch)
+            print(text,"self.use_epoch (from input) ",self.use_epoch)
             print(text,"self.potepoch_bestteste     ",self.potepoch_bestteste)
             print(text,"self.potepoch_linked        ",self.potepoch_linked)
-            print(text,"self.potepoch_using         ",self.potepoch_using)
+            print(text,"self.potepoch_using (finaly)",self.potepoch_using)
             print(text,"self.c44_al_file            ",self.c44_al_file)
             if type(self.c44_al) != bool:
                 print(text,"self.c44_al                 ",np.round(self.c44_al,2),"GPa")
@@ -5380,8 +5380,8 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False
     if read != False:
         pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
         readpath = pathbase + read
-    print('ace',ace.pot.potpath)
-    sys.exit('77')
+    #print('ace',ace.pot.potpath)
+    #sys.exit('77')
     if read_fullpath != False:
         read = os.path.basename(read_fullpath)
         readpath = read_fullpath
@@ -5402,7 +5402,7 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False
     #print('ace.pot',ace.pot.pot)
     #print('ace.pot',ace.pot.potpath)
     #print('ace.pot',ace.pot.use_epoch)
-    savefolder = ace.pot.potpath+"/epoch_"+str(ace.pot.use_epoch)
+    savefolder = ace.pot.potpath+"/epoch_"+str(ace.pot.potepoch_using)
     if not os.path.isdir(savefolder):
         os.mkdir(savefolder)
     savepath = savefolder+"/RELAXED_fully_"+read
@@ -5657,47 +5657,52 @@ def get_Mg5Si6_and_other_antisites(ace):
         for idx,i in enumerate(frame_rep.positions):
             print('idx',idx,i,frame_rep.get_chemical_symbols()[idx])
 
+        ace.ase_relax_atomic_positions_only(frame_rep,verbose=True,output_to_screen=True)
+        ase_write("out_reference_rep"+iname+".runner",frame_rep,format='runner',append=True)
+        ase_write("out_reference_rep.runner",frame_rep,format='runner',append=True)
         #chk = ase_get_chemical_symbols_to_number_of_species(frame,known_elements_by_pot=["Al","Mg","Si"])
         #print('chk',chk)
-        frame_ = frame.copy()
-        frame_rep_ = frame_rep.copy()
 
-        struct_written = 0
-        for idx,i in enumerate(frame_.positions):  # go through every position
-            if idx == 11:
-                print('now done')
-                break
-            print('iname',iname,'idx',idx)
-            for replace_idx in [0,1]:
-                frame_ = frame.copy()                  # get original frame
-                frame_rep_ = frame_rep.copy()                  # get original frame
+        if False:
+            frame_ = frame.copy()
+            frame_rep_ = frame_rep.copy()
 
-                curr_ele = frame_.get_chemical_symbols()[idx]
-                curr_ele_rep = frame_rep.get_chemical_symbols()[idx]
-                if curr_ele != curr_ele_rep:
-                    sys.exit('something went wrong in repetition')
-                if curr_ele == "Mg": replace = [ "Al", "Si"]
-                if curr_ele == "Si": replace = [ "Al", "Mg"]
-                if curr_ele == "Al": replace = [ "Si", "Mg"]
-                replace_now = replace[replace_idx]
-                frame_[idx].symbol = replace_now
-                frame_rep_[idx].symbol = replace_now
+            struct_written = 0
+            for idx,i in enumerate(frame_.positions):  # go through every position
+                if idx == 11:
+                    print('now done')
+                    break
+                print('iname',iname,'idx',idx)
+                for replace_idx in [0,1]:
+                    frame_ = frame.copy()                  # get original frame
+                    frame_rep_ = frame_rep.copy()                  # get original frame
 
-                #for jdx,j in enumerate(frame_.positions):
-                #    print(idx,'-->jdx',jdx,j,frame_.get_chemical_symbols()[jdx])
-                #print()
+                    curr_ele = frame_.get_chemical_symbols()[idx]
+                    curr_ele_rep = frame_rep.get_chemical_symbols()[idx]
+                    if curr_ele != curr_ele_rep:
+                        sys.exit('something went wrong in repetition')
+                    if curr_ele == "Mg": replace = [ "Al", "Si"]
+                    if curr_ele == "Si": replace = [ "Al", "Mg"]
+                    if curr_ele == "Al": replace = [ "Si", "Mg"]
+                    replace_now = replace[replace_idx]
+                    frame_[idx].symbol = replace_now
+                    frame_rep_[idx].symbol = replace_now
 
-                #if idx == 3:
-                #    sys.exit()
-                #ace.ase_relax_atomic_positions_only(frame_)
-                #ace.ase_relax_cellshape_and_volume_only(frame_)
-                print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax pos')
-                ace.ase_relax_atomic_positions_only(frame_rep_,verbose=True,output_to_screen=True)
-                print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax cellshape')
-                #ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
-                #ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
-                ase_write("out_antisites_rep"+iname+".runner",frame_rep_,format='runner',append=True)
-                struct_written += 1
+                    #for jdx,j in enumerate(frame_.positions):
+                    #    print(idx,'-->jdx',jdx,j,frame_.get_chemical_symbols()[jdx])
+                    #print()
+
+                    #if idx == 3:
+                    #    sys.exit()
+                    #ace.ase_relax_atomic_positions_only(frame_)
+                    #ace.ase_relax_cellshape_and_volume_only(frame_)
+                    print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax pos')
+                    ace.ase_relax_atomic_positions_only(frame_rep_,verbose=True,output_to_screen=True)
+                    print('iname',iname,'idx',idx,'replace_idx',replace_idx,'relax cellshape')
+                    #ace.ase_relax_cellshape_and_volume_only(frame_rep_,verbose=True)
+                    #ase_write("out_antisites"+iname+".runner",frame_,format='runner',append=True)
+                    ase_write("out_antisites_rep"+iname+".runner",frame_rep_,format='runner',append=True)
+                    struct_written += 1
     return
 
 def ase_repeat_structure(atoms,repeat):
