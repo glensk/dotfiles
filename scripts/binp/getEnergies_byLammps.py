@@ -1205,7 +1205,8 @@ def get_energies(args):
                                 'ene DFT:',np.round(ene_DFT[idx],3),
                                 'ene_pot',np.round(ene_pot[idx],3),
                                 'aatest:',np.round(aatest,3),
-                                'eh: meV/{atom,cell}',eh)
+                                'eh eV/cell:',eh[0],
+                                'eh meV/(atom-1) = dUdL:',eh[1])
                     else:
                         print(str(i).ljust(5),ene_diff_abs[idx])
                 else:
