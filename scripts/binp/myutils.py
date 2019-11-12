@@ -3632,6 +3632,8 @@ def ase_get_unique_frames(frames):
 def ase_enepot(atoms,units='eV',verbose=False):
     ''' units: eV, eV_pa, hartree, hartree_pa
         check before if calculator is attached
+        this gives the DFT energy if no calculator is attached
+        and the NN/eam energy if a corresponding (lammps) calculator is attached
     '''
 
     #print('now in ene')
@@ -3641,13 +3643,13 @@ def ase_enepot(atoms,units='eV',verbose=False):
         # in the case of of an ace calculations, it calculates the energy      -> get_stress() CAN     be obtained.
         #print('before')
         ene = atoms.get_potential_energy()
-        #print('ene:',ene,atoms.info)
+        #print('ene1:',ene,'atoms.info',atoms.info)
         #uuid = atoms.info["comment"]
         #print('uuid',uuid)
         #stress = atoms.get_stress()
         #print('stress:',stress)
     except: # RuntimeError:
-        #print("had runtime error, e.g. ther cant be an energy in the POSCAR")
+        print("had runtime error, e.g. ther cant be an energy in the POSCAR")
         ene = 0.
         #stress = False
     if verbose > 1:
@@ -3655,18 +3657,19 @@ def ase_enepot(atoms,units='eV',verbose=False):
     units_split = units.split("_")
     #print('us',units_split,units_split[1])
     if units_split[0].lower() == 'ev':
-        pass
+        ene_units = ene
     elif units_split[0].lower() == 'mev':
-        ene = ene*1000.
+        ene_units = ene*1000.
     elif units_split[0] == "hartree" or units_split[0] == "Hartree":
-        ene = ene/aseunits.Hartree
+        ene_units = ene/aseunits.Hartree
 
     if len(units_split) == 2:
         if units_split[1] == 'pa':
-            ene = ene/atoms.get_number_of_atoms()
+            ene_units = ene/atoms.get_number_of_atoms()
         else:
             sys.exit("energy can not have this units (ending must be pa, eV_pa or hartree_pa)")
-    return ene
+    #print('ene2:',ene)
+    return ene_units, ene
 
 def ase_get_chemical_symbols_to_number_of_species(atoms,known_elements_by_pot=[]):
     symbols = atoms.get_chemical_symbols()
@@ -3985,14 +3988,15 @@ class ase_calculate_ene( object ):
         keep_alive = False
         asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=keep_alive)
         atoms.set_calculator(asecalcLAMMPS)
-        ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        ene,ene_ev_tot = ase_enepot(atoms,units=self.units,verbose=self.verbose)
         return ene
 
     def ene_new(self,atoms=False,
             atomrelax=False,
             volumerelax=False,
             cellshaperelax=False,
-            print_minimization_to_screen=False,minimizer="LGBFGS"):
+            print_minimization_to_screen=False,minimizer="LGBFGS",
+            return_both=False):
         ''' atoms is an ase object
             if don_change_atomsobject is chosen,
         '''
@@ -4169,7 +4173,7 @@ class ase_calculate_ene( object ):
         # calculate the energy
         ######################################################
         #print('atxxx',atoms)
-        ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        ene,ene_ev_tot = ase_enepot(atoms,units=self.units,verbose=self.verbose)
         if print_minimization_to_screen:
             print('atoms')
             print(atoms.get_positions()[:3])
@@ -4189,7 +4193,10 @@ class ase_calculate_ene( object ):
 
         #print('forces out',atomrelax,cellrelax)
         #print(atoms.get_forces()[:3])
-        return ene
+        if return_both == True:
+            return ene,ene_ev_tot
+        else:
+            return ene
 
     def ene(self,atoms=False,
             atomrelax=False,
@@ -4198,7 +4205,8 @@ class ase_calculate_ene( object ):
             cellvolumerelax=False,
             print_minimization_to_screen=False,
             minimizer="LGBFGS",
-            debug=False):
+            debug=False,
+            return_both=False):
         ''' atoms is an ase object
             if don_change_atomsobject is chosen,
         '''
@@ -4377,7 +4385,8 @@ class ase_calculate_ene( object ):
         # calculate the energy
         ######################################################
         #print('atxxx',atoms)
-        ene = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        ene,ene_ev_tot = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        #print('self.units:',self.units,'ene pot',ene,'ene_ev_tot',ene_ev_tot)
         #print('jo')
         if print_minimization_to_screen:
             print('atoms')
@@ -4398,7 +4407,10 @@ class ase_calculate_ene( object ):
 
         #print('forces out',atomrelax,cellrelax)
         #print(atoms.get_forces()[:3])
-        return ene
+        if return_both == True:
+            return ene,ene_ev_tot
+        else:
+            return ene
 
     def stress(self,atoms=False):
         atoms = self.define_wrapped_self_atoms(atoms)

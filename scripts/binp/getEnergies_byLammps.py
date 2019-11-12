@@ -587,9 +587,12 @@ def get_energies(args):
         print('getEne (23): args.structures_idx ...     :',args.structures_idx)
         #print('try with guessing')
         frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
+
         try:
             a = frames[0].cell     # this is just minimal check weather
             v = frames[0].get_volume()  # minimal check,
+            #print('cell',a)
+            #print(frames[0].get_chemical_symbols())
         except (IndexError,ValueError): # was probably a different filetype
             #print('try with fix ')
             frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
@@ -699,6 +702,12 @@ def get_energies(args):
         ana_dist_min     = np.empty(structures_to_calc);ana_dist_min[:]  = np.nan
 
         ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
+        ene_DFT_eV_cell  = np.empty(structures_to_calc);ene_DFT_eV_cell[:]  = np.nan
+        ene_pot_eV_cell  = np.empty(structures_to_calc);ene_pot_eV_cell[:]  = np.nan
+        ene_DFT_dudl     = np.empty(structures_to_calc);ene_DFT_dudl[:]  = np.nan
+        ene_pot_dudl     = np.empty(structures_to_calc);ene_pot_dudl[:]  = np.nan
+        ene_pot_ase_dudl = np.empty(structures_to_calc);ene_pot_ase_dudl[:]  = np.nan
+        ene_pot_lmp_dudl = np.empty(structures_to_calc);ene_pot_lmp_dudl[:]  = np.nan
         ene_DFT_atomic   = np.empty(structures_to_calc);ene_DFT_atomic[:]  = np.nan
         ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
         ene_pot          = np.empty(structures_to_calc);ene_pot[:]  = np.nan
@@ -867,6 +876,8 @@ def get_energies(args):
                 VOL_norm = 0
                 for ele in n:
                     nat__ = n[ele]
+                    #print('nat__',nat__,'ele',ele)
+
                     rv__ = ace.pot.reference_volumes[ele]
                     #print('ele',ele,'nat',nat,'rv',ace.pot.reference_volumes[ele])
                     VOL_norm += nat__ * rv__
@@ -921,8 +932,14 @@ def get_energies(args):
             if calc_DFT: ### ene from DFT
                 if debug:
                     print("DD before ene_DFT")
-                ene_DFT[idx] = my.ase_enepot(frames[i],units=ace.units)
-
+                f_tmp = copy.deepcopy(frames[i])
+                f_atoms = f_tmp.get_number_of_atoms()
+                ene_DFT[idx],ene_DFT_eV_cell[idx] = my.ase_enepot(frames[i],units=ace.units)
+                #print('ene_DFT        ',ene_DFT[idx])
+                #print('ene_DFT_eV_cell',ene_DFT_eV_cell[idx])
+                ene_DFT_dudl[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
+                #print('ene_DFT_dudl   ',ene_DFT_dudl[idx])
+                #sys.exit()
                 if verbose > 2: #be_very_verbose:
                     my.show_ase_atoms_content(frames[i],showfirst=3,comment = "STAT2")
                 if verbose > 1:
@@ -969,7 +986,11 @@ def get_energies(args):
                     #for idy,cs in enumerate(atoms_tmp.get_chemical_symbols()):
                     #    print('idy',idy,atoms_tmp.get_chemical_symbols()[idy])
                     #print('--4')
-                    ene_pot_ase[idx] = ace.ene(atoms_tmp,debug=debug)
+                    f_tmp = copy.deepcopy(atoms_tmp)
+                    f_atoms = f_tmp.get_number_of_atoms()
+                    ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
+                    ene_pot_dudl[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
+                    #print('ene_pot_dudl   ',ene_pot_dudl[idx])
                     if args.get_harmonic_energy:
                         #print('hm')
                         #print(hesse_matrix)
@@ -999,7 +1020,6 @@ def get_energies(args):
                         #sys.exit()
                     if debug:
                         print("BBB after: ene_pot_ase")
-                    #ene_pot_ase[idx] = my.ase_enepot(atoms_tmp)
                     if debug:
                         print("CCC")
                     ###### old atom energies (giulio/daniele)
@@ -1201,12 +1221,16 @@ def get_energies(args):
                         aatest = aaatest[i][2]
                         #print('ene_harmonic',ene_harmonic[idx])
                         eh = np.round(ene_harmonic[idx],2)
+                        e__pot = (ene_pot[idx] - ene_pot[0])/31*32
                         print(str(i).ljust(5),
-                                'ene DFT:',np.round(ene_DFT[idx],3),
-                                'ene_pot',np.round(ene_pot[idx],3),
-                                'aatest:',np.round(aatest,3),
-                                'eh eV/cell:',eh[0],
-                                'eh meV/(atom-1) = dUdL:',eh[1])
+                                'ene DFT:',str(np.round(ene_DFT[idx],3)).ljust(9),
+                                'ene_pot',str(np.round(ene_pot[idx],3)).ljust(9),
+                                'aatest:',str(np.round(aatest,3)).ljust(9),
+                                'ene_DFT_dudl' ,str(np.round(ene_DFT_dudl[idx],3)).ljust(9),
+                                'ene_pot_dudl' ,str(np.round(ene_pot_dudl[idx],3)).ljust(9),
+                                'e__pot      ' ,str(np.round(e__pot,3)).ljust(9),
+                                #'eh eV/cell:',eh[0],
+                                'eh meV/(atom-1) = dUdL (Uref=harmonic):',eh[1])
                     else:
                         print(str(i).ljust(5),ene_diff_abs[idx])
                 else:
@@ -1221,7 +1245,7 @@ def get_energies(args):
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
-                if idx == 2:
+                if idx == 60:
                     sys.exit('56859')
                 return
 
@@ -1385,14 +1409,14 @@ def test_si_si_vac(ace):
     tests = scripts+'/tests/'
     sisivac = tests+'/Al-Mg-Si/si-si-vac/'
     ff = '/aiida.in.final.runner'
-    e_al108 =       ace.ene(ase_read(sisivac+'/al108'+ff))
-    e_al107vac1 =   ace.ene(ase_read(sisivac+'/al107vac1'+ff))
-    e_al107si1 =    ace.ene(ase_read(sisivac+'/al107si1'+ff))
-    e_al106si2 =    ace.ene(ase_read(sisivac+'/al106si2'+ff))
-    e_al105si2va1 = ace.ene(ase_read(sisivac+'/al105si2va1'+ff))
-    e_ss_al = e_al108/108.
-    e_ss_va = e_al107vac1 - e_al108/108. * 107.
-    e_ss_one_si = e_al107si1 - e_al108/108. * 107.
+    e_al108             = ace.ene(ase_read(sisivac+'/al108'+ff))
+    e_al107vac1         = ace.ene(ase_read(sisivac+'/al107vac1'+ff))
+    e_al107si1          = ace.ene(ase_read(sisivac+'/al107si1'+ff))
+    e_al106si2          = ace.ene(ase_read(sisivac+'/al106si2'+ff))
+    e_al105si2va1       = ace.ene(ase_read(sisivac+'/al105si2va1'+ff))
+    e_ss_al             = e_al108/108.
+    e_ss_va             = e_al107vac1 - e_al108/108. * 107.
+    e_ss_one_si         = e_al107si1 - e_al108/108. * 107.
     e_si_si_vac_complex = e_al105si2va1 - 2.*e_ss_one_si - e_ss_va - 105.*e_ss_al
 
     #p0rint_compare_ene_vs_DFT('vacancy_formation (unrelaxed) NN: ',e_ss_va,
@@ -1404,8 +1428,6 @@ def test_si_si_vac(ace):
 def show_energy_diff_DFT_NN(struct,eDFT,e,text,units="eV"):
     ''' show_energy_diff_DFT_NN(struct_pure_al,ace.eDFT_pure_al,ace.e_pure_al,"pure al",units="eV") '''
     nat = struct.get_number_of_atoms()
-    #eDFT = my.ase_enepot(struct_pure_al  ,units="eV")
-    #e    = ace.ene(struct_pure_al)
     print(text.ljust(20," "),str(eDFT).ljust(15),"eV",str(e).ljust(15),"eV","diff",str(eDFT-e).ljust(17),"eV/cell","diff mev_pa",str((eDFT-e)/nat*1000).ljust(15),"meV_pa")
     return
 
@@ -1443,9 +1465,9 @@ def get_dilute_formation_energy(matrix_element="Al",text="dilute formation energ
         ############## get the dilute_formation @T=0K && ace.eform_dilute_xx_
         ############## get the dilute_formation @T=0K && ace.eform_dilute_xx_
         ############## get the dilute_formation @T=0K && ace.eform_dilute_xx_
-        ene_al_xx = ace.ene(frame_al_xx) # this is already relaxed
+        ene_al_xx             = ace.ene(frame_al_xx) # this is already relaxed
         dilute_formation      = ene_al_xx  - (sc**3.*4. -1.) * ace.al_fcc_ene_pa
-        ace.E_SS_Al                     = ace.al_fcc_ene_pa
+        ace.E_SS_Al           = ace.al_fcc_ene_pa
         #print('XX ace.E_SS_Al',ace.E_SS_Al)
         #sys.exit('5555555')
         if solute_element == "Si":
@@ -1488,7 +1510,7 @@ def get_dilute_formation_energy(matrix_element="Al",text="dilute formation energ
 
         ### bulk free energy
         ### bulk free energy
-	if False: # if to calculate T>0K
+        if False: # if to calculate T>0K
         	filename = ace.savefolder+"/h_"+sc_str+"_pure_al"
         	if ace.verbose:
         	    print('tryread harmonic path dilute frame:',filename)
@@ -1650,10 +1672,10 @@ def get_dilute_si_mg_f(ace):
     struct_dilute_si = frames[2]
 
     # @ 0K (eV/cell)
-    ace.eDFT_bprim      = my.ase_enepot(struct_bprime   ,units=ace.units)
-    ace.eDFT_pure_al    = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
-    ace.eDFT_dilute_mg  = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
-    ace.eDFT_dilute_si  = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
+    ace.eDFT_bprim,kb_      = my.ase_enepot(struct_bprime   ,units=ace.units)
+    ace.eDFT_pure_al,kb_    = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
+    ace.eDFT_dilute_mg,kb_  = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
+    ace.eDFT_dilute_si,kb_  = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
     sc = 3
 
     if False:
@@ -1818,7 +1840,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     heat_precip_T0K_DFT = "-"
     eDFT = ""
     if DFT_ene != False:
-        eDFT   		= my.ase_enepot(frame  ,units=ace.units)
+        eDFT,kb_   		= my.ase_enepot(frame  ,units=ace.units)
         print('eDFT                                  ',eDFT)
         e           = ace.ene(frame)
         #print('energy_DFT',eDFT)
@@ -1983,10 +2005,10 @@ def test_betaprime_mg9si5_find_global_min(ace,eform_dilute_si, eform_dilute_mg, 
 
 
 
-        eDFT_pure_al   = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
-        eDFT_dilute_mg = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
-        eDFT_dilute_si = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
-        eDFT_precip    = my.ase_enepot(struct_mg9si5   ,units=ace.units) # 28 atoms, 10Si, 18Mg
+        eDFT_pure_al,kb_   = my.ase_enepot(struct_pure_al  ,units=ace.units) # 108 atoms
+        eDFT_dilute_mg,kb_ = my.ase_enepot(struct_dilute_mg,units=ace.units) # 108 atoms
+        eDFT_dilute_si,kb_ = my.ase_enepot(struct_dilute_si,units=ace.units) # 108 atoms
+        eDFT_precip,kb_    = my.ase_enepot(struct_mg9si5   ,units=ace.units) # 28 atoms, 10Si, 18Mg
 
         e_precip    = ace.ene(struct_mg9si5) # 28 atoms, 10Si, 18Mg
 
@@ -2180,7 +2202,7 @@ def test_antisites(ace):
         # only the origphase initial will (in this case) have the DFT
         origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
         # this was really minimized by dft
-        orig_relaxed_dft_ene_dft = my.ase_enepot(origphase_relaxed_dft,units='eV')
+        orig_relaxed_dft_ene_dft,kb_ = my.ase_enepot(origphase_relaxed_dft,units='eV')
         max_dft_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
         print('orig_relaxed_dft_ene_dft:',orig_relaxed_dft_ene_dft,"max_dft_forces_o",max_dft_forces_o)
         #print(origphase_relaxed_dft.get_forces())
@@ -2209,7 +2231,7 @@ def test_antisites(ace):
             antisite_initiali = antisite_initial[idx]
             antisite_relaxedi_by_nn = antisite_relaxed_by_nn[idx]
 
-            antisite_initiali_ene_dft = my.ase_enepot(antisite_initiali,units='eV')
+            antisite_initiali_ene_dft,kb_ = my.ase_enepot(antisite_initiali,units='eV')
             max_dft_forces = np.abs(antisite_initiali.get_forces()).max()
             max_dft_forces = np.round(max_dft_forces,5)
             max_dft_forces2 = np.round(max_dft_forces,2)
@@ -2351,7 +2373,7 @@ def test_beta2_bulk(ace):
     #doit = [ "Mg9Si5" ]
 
     for i in doit:
-    	print("########",i,"############")
+        print("########",i,"############")
         if i in [ "Mg5Si6", "Mg5Al2Si4", "Mg4Al3Si4" ]:
             formula_unit = 11
             path = os.environ['potentials']+"/aiida_get_structures_new/aiida_exported_group_NN_relaxed_"+i+"_n2p2_v2ag_calc__all_steps.input.data"
