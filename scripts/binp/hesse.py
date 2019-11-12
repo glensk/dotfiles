@@ -307,7 +307,7 @@ def qh_forces(dpos = None, h = None ):
     return f.reshape(dpos.shape)
 
 def qh_energy_cell(dpos = None, h = None ):
-    ''' returns : energy in meV/cell
+    ''' returns : energy in eV/cell
         dpos    : Angstrom
         h       : atomic units (as sphinx, ipi, ...)
     '''
@@ -318,7 +318,7 @@ def qh_energy_cell(dpos = None, h = None ):
     return e
 
 def qh_energy_atom(dpos = None, h = None ):
-    ''' returns Uref in meV/atom
+    ''' returns Uref in meV/(atom-1)
         dpos    : Angstrom
         h       : atomic units (as sphinx, ipi, ...)
     '''
