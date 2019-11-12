@@ -34,6 +34,7 @@ def help(p = None):
     p.add_argument('-sys_ele','--sys_ele', nargs='*', default=False, help="in case no inutfile is given, define the element manually")
     p.add_argument('-sys_ncell','--sys_ncell', type=int, default=1, help="in case no inutfile is given, define how often the primitive/conventional cell is repeated")
 
+    p.add_argument('-dpm','--do_particular_myuils', required=False, type=str,default='', help="module to run")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
     p.add_argument('--potpath','-p',   required=False, type=str, default="n2p2_v4ag_ppl_987654_21cores", help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
@@ -432,6 +433,14 @@ def get_energies(args):
     if args.formation_energies:
         formation_energies(ace,args)
         sys.exit('formation_energies done! Exit')
+
+    if args.do_particular_myuils:
+        print('args.inputfile',args.inputfile)
+        print('args.do_particular_myuils',args.do_particular_myuils)
+        function = eval('my.'+args.do_particular_myuils)
+        #my.get_Mg5Si6_and_other_antisites(ace)
+        function(ace)
+        sys.exit()
 
     ############
     ### elastic / elastic_all
@@ -2123,12 +2132,20 @@ def test_Mg2Si(ace):
 
 def test_antisites(ace):
     print("######## antisites #############")
+    print('taken from:')
+    print('verdi group list -A')
+    print('  83 out_antisites_repMg4Al3Si4_NEW.runner       albert.glensk.gmail.com')
+    print('  84 out_antisites_repMg4Al3Si4_NEW.runner_calc  albert.glensk@gmail.com')
+    print('  85 out_antisites_repMg5Al2Si4_NEW.runner       albert.glensk@gmail.com')
+    print('  86 out_antisites_repMg5Al2Si4_NEW.runner_calc  albert.glensk@gmail.com')
+    print('  87 out_antisites_repMg5Si6_NEW.runner          albert.glensk@gmail.com')
+    print('  88 out_antisites_repMg5Si6_NEW.runner_calc     albert.glensk@gmail.com')
     phase =  "Mg4Al3Si4" # done
     phase =  "Mg5Al2Si4" # done
     phase = "Mg5Si6" # done
 
 
-    potpath_using = ace.pot.potpath+"/epoch_"+str(ace.pot.potpath_using)
+    potpath_using = ace.pot.potpath+"/epoch_"+str(ace.pot.potepoch_using)
 
     doit = [ "Mg4Al3Si4", "Mg5Al2Si4", "Mg5Si6" ]
     for phase in doit:
@@ -2146,8 +2163,11 @@ def test_antisites(ace):
         print('------- original phase -----')
         read_orig_phase = "aiida_exported_group_NN_relaxed_"+phase+"_n2p2_v2ag_calc__all_steps.input.data"
         # read_orig_phase = xxx
-        read_orig_phase_fullpaht = "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
-        origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_fullpath=read_orig_phase_fullpaht,whichstruct=-1)
+
+        read_orig_phase_fullpath = False
+        if False:
+            read_orig_phase_fullpath = "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
+        origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read=read_orig_phase,read_fullpath=read_orig_phase_fullpath,whichstruct=-1)
         # origphase_relaxe is the DFT relaxed one!
         # origphase_initial is just the first structure, possibly relaxed by a different NN.
 
@@ -2176,7 +2196,6 @@ def test_antisites(ace):
         #print('fnn')
         #print(origphase_relaxed_nn.get_forces())
 
-        sys.exit('33452')
         d = my.ase_get_chemical_symbols_to_number_of_species(origphase_relaxed_nn,known_elements_by_pot=["Al","Mg","Si"])
         #print('origphase_relaxed',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
         #print()
@@ -2200,11 +2219,13 @@ def test_antisites(ace):
             #max_nn_forces = np.round(max_nn_forces,5)
             print('antisite_initiali_ene_nn :',antisite_initiali_ene_nn ,'max_nn_forces ',max_nn_forces)
 
+            check_forces = 0.00011
+            if max_nn_forces > check_forces:
+                sys.exit('max forces > '+str(check_forces))
             antisite_relaxedi_ene_nn  = ace.ene(antisite_relaxedi_by_nn.copy())
             max_nn_forces0 = np.abs(antisite_relaxedi_by_nn.get_forces()).max()
             #max_nn_forces0 = np.round(max_nn_forces0,5)
             print('antisite_relaxedi_ene_nn :',antisite_relaxedi_ene_nn ,'max_nn_forces0',max_nn_forces0)
-            #sys.exit()
 
             antisite_nat = i.get_number_of_atoms()
             #print('ace.E_SS_Al',ace.E_SS_Al)
