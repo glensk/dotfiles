@@ -1759,6 +1759,7 @@ def get_dilute_si_mg_f(ace):
     print('E^{SS}_{X}')
     print_compare_ene_vs_DFT('formation dilute si (1Si in bulk Al) 3x3x3',ace.eform_dilute_si,ace.fDFT_dilute_si, '-',"-")
     print_compare_ene_vs_DFT('formation dilute mg (1Mg in bulk Al) 3x3x3',ace.eform_dilute_mg,ace.fDFT_dilute_mg, '-',"-")
+    print_compare_ene_vs_DFT('formation dilute al (       bulk Al) 3x3x3',ace.eform_dilute_al,ace.fDFT_dilute_al, '-',"-")
     print(',ace.eform_dilute_si',ace.eform_dilute_si)
     print()
     print('formation energies of the dilute systems (all atoms are acounted for)')
