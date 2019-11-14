@@ -1473,12 +1473,14 @@ def get_dilute_formation_energy(matrix_element="Al",text="dilute formation energ
         if solute_element == "Si":
             ace.E_SS_Si              = dilute_formation
             ace.struct_dilute_si_NN  = frame_al_xx
-            print('XX ace.E_SS_Si     has ene in sc:',sc,"ene",ene_al_xx)
+            print('XX ace.E_SS_Si            :',ace.E_SS_Si)
+            print('XX ace.struct_dilute_si_NN:',ace.struct_dilute_si_NN,'in sc:',sc)
             print('stress',ace.stress(frame_al_xx))
         if solute_element == "Mg":
             ace.E_SS_Mg              = dilute_formation
             ace.struct_dilute_mg_NN  = frame_al_xx
-            print('XX ace.E_SS_Mg     has ene in sc:',sc,"ene",ene_al_xx)
+            print('XX ace.E_SS_Mg:',ace.E_SS_Mg)
+            print('XX ace.struct_dilute_mg_NN:',ace.struct_dilute_mg_NN,'in sc:',sc)
             print('stress',ace.stress(frame_al_xx))
 
 
@@ -1727,6 +1729,7 @@ def get_dilute_si_mg_f(ace):
 
     print()
 
+    print('ace.E_SS_Al',ace.E_SS_Al)
     print('ace.E_SS_Mg',ace.E_SS_Mg)
     print('ace.E_SS_Si',ace.E_SS_Si)
 
@@ -2179,6 +2182,8 @@ def test_antisites(ace):
         read_antisites = "aiida_exported_group_out_antisites_rep"+phase+"_NEW.runner_calc__all_steps.input.data"
         # read_antisites = xxx
         antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites)
+        print('type(antisite_relaxed_by_nn:',type(antisite_relaxed_by_nn))
+        print('type(antisite_initial_by_nn:',type(antisite_initial))
 
         ######################################
         ## get the original phase
@@ -2188,9 +2193,12 @@ def test_antisites(ace):
         # read_orig_phase = xxx
 
         read_orig_phase_fullpath = False
-        if False:
+        if True:
             read_orig_phase_fullpath = "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
+            read_orig_phase_fullpath = potpath_using+"/export/aiida_exported_group_out_reference_rep"+phase+".runner_calc__all_steps.input.data"
         origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read=read_orig_phase,read_fullpath=read_orig_phase_fullpath,whichstruct=-1)
+        print('type(origphase_relaxed)',type(origphase_relaxed))
+        print('type(origphase_initial)',type(origphase_initial))
         # origphase_relaxe is the DFT relaxed one!
         # origphase_initial is just the first structure, possibly relaxed by a different NN.
 
@@ -2200,32 +2208,47 @@ def test_antisites(ace):
         print('len(origphase_initial)',len(origphase_initial))
         # print('origphase_relaxed',origphase_relaxed)
         # only the origphase initial will (in this case) have the DFT
-        origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
-        # this was really minimized by dft
-        orig_relaxed_dft_ene_dft,kb_ = my.ase_enepot(origphase_relaxed_dft,units='eV')
-        max_dft_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
-        print('orig_relaxed_dft_ene_dft:',orig_relaxed_dft_ene_dft,"max_dft_forces_o",max_dft_forces_o)
-        #print(origphase_relaxed_dft.get_forces())
+        origphase_relaxed,origphase_initial = origphase_relaxed[0],origphase_initial[0]
+        origphase_initial_ene_dft,kb_ = my.ase_enepot(origphase_initial,units='eV')
+        max_dft_forces = np.abs(origphase_initial.get_forces()).max()
+        max_dft_forces = np.round(max_dft_forces,5)
+        print('origphase_initial_ene_dft:',origphase_initial_ene_dft,'max_dft_forces',max_dft_forces)
 
-        orig_relaxed_dft_ene_nn = ace.ene(origphase_relaxed_dft)
-        max_nn_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
-        print('orig_relaxed_dft_ene_nn :',orig_relaxed_dft_ene_nn,"max_nn_forces_o",max_nn_forces_o)
-        #print('fnn')
-        #print(origphase_relaxed_dft.get_forces())
+        origphase_initial_ene_nn      = ace.ene(origphase_initial) #.copy())
+        max_nn_forces = np.abs(origphase_initial.get_forces()).max()
+        print('origphase_initial_ene_nn :',origphase_initial_ene_nn ,'max_nn_forces ',max_nn_forces)
 
-        orig_relaxed_nn_ene_nn  = ace.ene(origphase_relaxed_nn)
-        max_nn_forces0_o = np.abs(origphase_relaxed_nn.get_forces()).max()
-        print('orig_relaxed_nn_ene_nn  :',orig_relaxed_nn_ene_nn,"max_nn_forces0_o",max_nn_forces0_o)
-        #print('fnn')
-        #print(origphase_relaxed_nn.get_forces())
+        origphase_relaxed_ene_nn      = ace.ene(origphase_relaxed) #.copy())
+        max_nn_forces = np.abs(origphase_relaxed.get_forces()).max()
+        print('origphase_relaxed_ene_nn :',origphase_relaxed_ene_nn ,'max_nn_forces ',max_nn_forces)
 
-        d = my.ase_get_chemical_symbols_to_number_of_species(origphase_relaxed_nn,known_elements_by_pot=["Al","Mg","Si"])
-        #print('origphase_relaxed',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
+        if False:
+            # DEL!!origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
+            # this was really minimized by dft
+            orig_relaxed_dft_ene_dft,kb_ = my.ase_enepot(origphase_relaxed_dft,units='eV')
+            max_dft_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
+            print('orig_relaxed_dft_ene_dft:',orig_relaxed_dft_ene_dft,"max_dft_forces_o",max_dft_forces_o)
+            #print(origphase_relaxed_dft.get_forces())
+
+            orig_relaxed_dft_ene_nn = ace.ene(origphase_relaxed_dft)
+            max_nn_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
+            print('orig_relaxed_dft_ene_nn :',orig_relaxed_dft_ene_nn,"max_nn_forces_o",max_nn_forces_o)
+            #print('fnn')
+            #print(origphase_relaxed_dft.get_forces())
+
+            orig_relaxed_nn_ene_nn  = ace.ene(origphase_relaxed_nn)
+            max_nn_forces0_o = np.abs(origphase_relaxed_nn.get_forces()).max()
+            print('orig_relaxed_nn_ene_nn  :',orig_relaxed_nn_ene_nn,"max_nn_forces0_o",max_nn_forces0_o)
+            #print('fnn')
+            #print(origphase_relaxed_nn.get_forces())
+
+        d = my.ase_get_chemical_symbols_to_number_of_species(origphase_initial,known_elements_by_pot=["Al","Mg","Si"])
+        print('origphase',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
         #print()
         #print()
         out = []
         for idx,i in enumerate(antisite_relaxed_by_nn):
-            f = i.get_number_of_atoms()/origphase_relaxed_nn.get_number_of_atoms()
+            f = i.get_number_of_atoms()/origphase_initial.get_number_of_atoms()
             print()
             print()
             antisite_initiali = antisite_initial[idx]
@@ -2267,8 +2290,8 @@ def test_antisites(ace):
             al_d = al_antisite - al_orig
             mg_d = mg_antisite - mg_orig
             si_d = si_antisite - si_orig
-            print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"],'antisite_relaxed_ene_nn   :',antisite_relaxedi_ene_nn)
-            print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"],'antisite_ene_nn_diff      :',antisite_relaxedi_ene_nn-orig_relaxed_nn_ene_nn*f)
+            print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"],'antisite_relaxed_ene_nn   :') #,antisite_relaxedi_ene_nn)
+            print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"],'antisite_ene_nn_diff      :') #,antisite_relaxedi_ene_nn-orig_relaxed_nn_ene_nn*f)
             #print('al_d',al_d,-al_d*ace.E_SS_Al)
             #print('mg_d',mg_d,-mg_d*ace.E_SS_Mg)
             #print('si_d',si_d,-si_d*ace.E_SS_Si)
@@ -2282,18 +2305,23 @@ def test_antisites(ace):
 
 
             ## The errors in the E_SS_{Al,Mg,Si} (between DFT and NN) do not matter at all here, since those are way too small to influence the result since only two Al/Mg/Si
-            Eform_relaxed_nn = antisite_relaxedi_ene_nn - orig_relaxed_nn_ene_nn*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            #Eform_relaxed_nn = antisite_relaxedi_ene_nn - orig_relaxed_nn_ene_nn*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            Eform_relaxed_nn = 0
 
-            Eform_initial_nn = antisite_initiali_ene_nn - orig_relaxed_nn_ene_nn*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            #Eform_initial_nn = antisite_initiali_ene_nn - orig_relaxed_nn_ene_nn*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            Eform_initial_nn = antisite_initiali_ene_nn - origphase_initial_ene_nn*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
 
             #Eform_relaxed_dft = antisite_relaxedi_ene_dft - orig_relaxed_dft_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
             Eform_relaxed_dft = 0 # does not exist yet
-            Eform_initial_dft = antisite_initiali_ene_dft - orig_relaxed_dft_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            #Eform_initial_dft = antisite_initiali_ene_dft - orig_relaxed_dft_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            Eform_initial_dft = antisite_initiali_ene_dft - origphase_initial_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
             #print("Eform_relaxed_nn :",Eform_relaxed_nn)
             #print("Eform_initial_nn :",Eform_initial_nn)
             #print("Eform_relaxed_dft:",Eform_relaxed_dft)
             #print("Eform_initial_dft:",Eform_initial_dft)
-            print('from to:',text1,text2,Eform_relaxed_nn,Eform_initial_nn,Eform_relaxed_dft,Eform_initial_dft)
+            print('from to:',text1,text2,
+                    Eform_relaxed_nn,Eform_initial_nn,
+                    Eform_relaxed_dft,Eform_initial_dft)
             out.append([idx,Eform_relaxed_nn,Eform_initial_nn,Eform_relaxed_dft,Eform_initial_dft,text1+text2])
             #print('out',out)
             #if idx == 3:
