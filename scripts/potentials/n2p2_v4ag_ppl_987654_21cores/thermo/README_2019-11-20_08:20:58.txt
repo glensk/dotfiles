@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 5d335c90d659f3d1aa1b28ba1e953b51a93db2c5
+# execution time: 0.231794834137 seconds.
+
+getEnergies_byLammps.py -evinet -sys fcc -sys_ele Al -sys_ncell 1
