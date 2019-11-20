@@ -111,7 +111,7 @@ export CC=icc;export CXX=icc;export FC=ifort;export F77=ifort
 - ./configure --prefix=/Users/glensk/local 
 - make          # 
 - sudo make install  # dont sudo make install! breaks lammps with brew! 
-                # creates mpirun in mac_conf/bin/mpirun
+                     # creates mpirun in mac_conf/bin/mpirun
 
 source /opt/intel/composer_xe_2015.1.108/mkl/bin/mklvars.sh intel64  # sets DYLD
 
@@ -144,7 +144,7 @@ e) change getshmem.c file
 then cd vasp folder  (cd ..)
 vi src/lib/getshmem.c
 # now set in line 6:
-define SHM_NORESERVE 0
+define SHM_NORESERVE 0   # or append #?
 #
 
 f) compile vasp!  (what might improve the performance on cmmd or mac is the avx flag in the makefile)

@@ -1666,7 +1666,7 @@ void calculate_forces_energy_la(double dt,int verbose) {
         j2=l1nn[i].j2;
         j3=l1nn[i].j3;
 
-        // abstaende nn  == Dx Dy Dz
+        // abstaende nn  == Dx Dy Dz (distvec = NN1_distances[s,a1,a2])
 		x=(signed)(pos[ind1].x-pos[ind2].x);
 		y=(signed)(pos[ind1].y-pos[ind2].y);
 		z=(signed)(pos[ind1].z-pos[ind2].z);

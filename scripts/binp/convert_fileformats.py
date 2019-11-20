@@ -147,7 +147,11 @@ def read_in_file_or_files_and_make_ase_object(infile,formatin=False,verbose=Fals
 
     if formatin in known_formats:
         print('formatin         :',formatin,"(known by ase by default)")
-        frame_or_frames = read(infile,':',format=formatin) # all structures
+        if formatin == 'vasp-out':
+            print('reading',infile,'and getting free energy; if you want energy->0 you need to change force_sonsistent to False')
+            frame_or_frames = read(infile,':',format=formatin,force_consistent=True) # all structures
+        else:
+            frame_or_frames = read(infile,':',format=formatin) # all structures
         print('infile (read in) :',infile,"(successfully)")
         print('frames           :',len(frame_or_frames))
         if len(frame_or_frames) == 0:

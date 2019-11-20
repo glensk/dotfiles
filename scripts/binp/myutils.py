@@ -9,6 +9,7 @@ import glob,random #,pathlib
 #from my_atom import #atom as my_atom
 import my_atom
 from itertools import islice
+import h5py
 
 
 from copy import deepcopy
@@ -34,6 +35,7 @@ from ase.optimize import GPMin
 from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
 from ase import units as aseunits
+from ase.calculators.singlepoint import SinglePointCalculator
 
 from phonopy import Phonopy
 from phonopy.structure.atoms import PhonopyAtoms
@@ -65,6 +67,15 @@ import time
 #import myutils as my
 
 start_time = time.time()
+
+def help(p = None):
+    string = '''
+    myutils.py -ex abc  # executs function abc
+    '''
+    p = argparse.ArgumentParser(description=string,
+            formatter_class=argparse.RawTextHelpFormatter)
+    p.add_argument('-ef','--execute_function', required=False, type=str,default='', help="function to run")
+    return p
 
 ##################################################################################
 ## genereal helper funcions
@@ -1224,6 +1235,8 @@ def list_pot_all():
 ##################################################################################
 ## ipi related functions
 ##################################################################################
+
+
 def create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml", nsteps=False,stride=100,seed=12345,a0=4.057,ncell=4,nsi=3,nmg=3,nvac=1,neval=8,temp=300,verbosity="low",checkpoint_restart_stride=10,nodes=1,address="hostname_jobdir",testrun=False,cubic=False):
     '''
         nodes is only necessary to define ffsockets
@@ -1598,6 +1611,231 @@ def get_number_of_atoms_as_function_of_cutoff():
 def get_NN1_from_positions(atoms,alat,atomnr=0,verbose=False):
     NN1         = ase_get_neighborlist(atoms,atomnr=atomnr,cutoff=0.8*alat,skin=0.1)
     return NN1
+
+def get_NN1_idx_for_every_atom(atoms,crystal_structure='fcc'):
+    ''' crystal_strucure = fcc,bcc,hcp ...
+    '''
+    if crystal_structure == 'fcc':
+        amount_first_NN        = 12
+        amount_first_NN_unuque = 6
+    elif crystal_structure == 'bcc':
+        amount_first_NN = 8
+        amount_first_NN_unuque = 4
+    else:
+        print('crystal_structure',crystal_structure)
+        sys.exit('so far only for fcc and bcc')
+
+    sc,alat = try_to_get_alat_and_sc_from_cell_and_positions(atoms.cell,atoms.positions)
+    #print('sc',sc,'alat',alat)
+
+    ## get first NN for every atom
+    NN1_       = np.zeros((atoms.get_number_of_atoms(),amount_first_NN))
+    #NN1_unique = np.zeros((atoms.get_number_of_atoms(),amount_first_NN_unuque))
+    for i in np.arange(atoms.get_number_of_atoms()):
+        lookat = i
+        ka = get_NN1_from_positions(atoms,alat*1.1,atomnr=lookat,verbose=False)
+        #print('ka',ka,'len',len(ka))
+        NN1_[i] = get_NN1_from_positions(atoms,alat*1.1,atomnr=lookat,verbose=False)
+    NN1_ = NN1_.astype(int)
+    #print('NN1_')
+    #print(NN1_)
+    #get_NN1_idx_unique_for_every_atom(NN1_)
+    return NN1_
+
+def get_NN1_idx_unique_for_every_atom(NN1):
+    print("NN1shape--->",NN1.shape)
+    nat  = NN1.shape[0]
+    neigh = NN1.shape[1]
+    if ((neigh % 2) == 0) == False:
+        print("NN1shape--->",NN1.shape)
+        sys.exit('odd number of neighbors, exi')
+    print('nat  ',nat  )
+    print('neigh',neigh)
+    print('neigh',neigh/2)
+
+    def make_NN1uniqe_one_free_spot(NN1uniq,verbose=True):
+        # if line is full
+        #   check if corresponding atoms have fewer lines and if so swich
+        possible_all = np.zeros(len(NN1uniq))
+        for idx,i in enumerate(NN1uniq):
+            possible = np.where(NN1uniq[idx]==-1)[0]
+            possible_all[idx] = int(len(possible))
+
+        for idx,idss in enumerate(NN1uniq):
+            print(idx,NN1uniq[idx],'possible',possible_all[idx],type(possible_all[idx]))
+
+        # check if all equal length:
+        if np.all(possible_all == possible_all[0]):
+            print('all equal')
+            return NN1uniq
+
+        # if different lenght (if diff == 1, skip it)
+        #print('poss',possible_all)
+        #print('diff',np.diff(possible_all))
+        #diff = np.abs(np.diff(possible_all)).max()
+        minlength = possible_all.min()
+        maxlength = possible_all.max()
+        if np.abs(minlength-maxlength) <= 2:
+            print('all close to equal (diff 2)')
+            return NN1uniq
+
+        at1_weg_all = np.where(possible_all == minlength)[0]
+        print('at1_weg_all',at1_weg_all)
+        for at1_weg in at1_weg_all:
+            at2_check_all = NN1uniq[at1_weg]
+            print('at1_weg (a)',at1_weg,'at2_check_all',at2_check_all)
+            at2_check_all = at2_check_all[np.where(at2_check_all >= 0)]
+            at2_check_possibilities = possible_all[at2_check_all]
+            at2_take_check = np.where(at2_check_possibilities == at2_check_possibilities.max())[0][0]
+            print('at1_weg (b)',at1_weg,'at2_check_all',at2_check_all,at2_check_possibilities,'take',at2_take_check)
+            NN1_unique = add_to_line_which_atom(NN1uniq,line_nr=at2_take_check,atom=at1_weg)
+            #for at2_check in at2_check_all:
+            #    at = np.where(possible_all == minlength)[0]
+
+        sys.exit('not close')
+        for idx,i in enumerate(NN1uniq):
+            if len(possible) == 0: # line is full
+                otheratoms = NN1uniq[idx] # == i
+                if verbose:
+                    print('#############################')
+                    for ddd,idss in enumerate(NN1uniq):
+                        print(ddd,NN1uniq[ddd])
+                    print('#############################')
+                    print('full',idx,'otheratoms',otheratoms)
+                    sys.exit()
+                shortest = 0
+                for o in otheratoms:
+                    possible_o = np.where(NN1uniq[o]==-1)[0]
+                    print('posible_o',possible_o,len(possible_o))
+                    #if len(possible_o) > shortest:
+                    #    shortest =
+        for ddd,idss in enumerate(NN1uniq):
+            print(ddd,NN1uniq[ddd])
+        sys.exit()
+        return NN1uniq
+
+
+    def add_to_line_which_atom(NN1uniq,line_nr,atom):
+        ''' line is the line/atom where to add
+            atom is the corresponding atom to add in this line
+        '''
+        for ddd,idss in enumerate(NN1uniq):
+            print('before',ddd,NN1uniq[ddd])
+        line = NN1uniq[line_nr]
+        print('line_nr',line_nr,'line(a)',line)
+        number_in_line = np.where(line==-1)[0]
+        print('number_in_line',number_in_line)
+        NN1uniq[line,nnext] = atom
+        line = NN1uniq[line_nr]
+        print('line(b)',line)
+        for ddd,idss in enumerate(NN1uniq):
+            print('after',ddd,NN1uniq[ddd])
+        sys.exit()
+        return NN1uniq
+
+    def get_atom_with_most_empty_slots(at1,at2_all,NN1uniq):
+        ''' this needs to be done before it is decided which atoms are used '''
+        print('at1',at1)
+        print('at2_all',at2_all)
+        at_all = np.concatenate((np.array([at1]),at2_all))
+        print('at_all',at_all)
+        line_possible = np.array([-1,-1])
+        for idx,i in enumerate(at_all):
+            print('idx',idx,'i',i)
+            print('NN1uniq[i]',NN1uniq[i])
+            possible = np.where(NN1uniq[i]==-1)[0]
+            if len(possible) >= line_possible[1]:
+                line_possible = np.array([i,len(possible)])
+        atnext = line_possible[0]
+        nnext  = np.where(NN1uniq[atnext]==-1)[0]
+        if line_possible[1] == 0 or len(nnext) == 0:
+            print('line_possible:',line_possible,"(if 0 -> problem)")
+            for ddd,idss in enumerate(NN1uniq):
+                print(ddd,NN1uniq[ddd])
+            sys.exit('neither nnextat1 nor nnextat2')
+        # here, atnext can either be from at1 or at2_all
+        return atnext,nnext[0]
+
+    NN1uniq = (np.ones((nat,(neigh/2)))*-1).astype(int)
+    liste_in = []
+    for at1 in np.arange(nat):
+        at2idx = 0
+        at2_all = NN1[at1]
+        # -----> at1 (a) 12 at2_all [ 4  5  6  7 16 18 20 22 24 25 28 29]
+        print('-----> at1 (a)',at1,'at2_all',at2_all)
+        for at2idx,at2 in enumerate(at2_all):
+            at2_all_rest = at2_all[at2idx:]
+            ww = [at1,at2]
+            ww2 = [at2,at1]
+            if ww in liste_in or ww2 in liste_in:
+                print('have already',ww,ww2)
+            else:
+
+                NN1uniq = make_NN1uniqe_one_free_spot(NN1uniq,verbose=True)
+                atnext,nnext = get_atom_with_most_empty_slots(at1,at2_all_rest,NN1uniq)
+                print('need to append (a)',at1,at2_all,'-> atnext',atnext,nnext)
+                if at1 == 20:
+                    sys.exit('kk')
+
+                if atnext == at1:
+                    ww = [at1,at2]
+                    ww2 = [at2,at1]
+                    atom_ = at2
+                else:  # one of the at2_all
+                    ww = [atnext,at1]
+                    ww2= [at1,atnext]
+                    atom_ = at1
+
+                if ww in liste_in or ww2 in liste_in:
+                    print('have already',ww,ww2)
+                else:
+                #if ww not in liste_in and ww2 not in liste_in:
+                    liste_in.append(ww)
+                    liste_in.append(ww2)
+                    print('appending      (b)','-> atnext',atnext,nnext)
+                    NN1uniq[atnext,nnext] = atom_
+                #nnextat1 = np.where(NN1uniq[at1]==-1)[0]
+                #nnextat2 = np.where(NN1uniq[at2]==-1)[0]
+                #print('need to append',ww,ww2,nnextat1,nnextat2,'-> atnext',atnext)
+                #if len(nnextat2) >= len(nnextat1):
+                #    if len(nnextat2) == len(nnextat1) == 0:
+                #        for ddd,idss in enumerate(NN1uniq):
+                #            print(ddd,NN1uniq[ddd])
+                #        sys.exit('neither nnextat1 nor nnextat2')
+
+                #    NN1uniq[at2,nnextat2[0]] = at1
+                #else:
+                #    NN1uniq[at1,nnextat1[0]] = at2
+
+                #if len(nnextat1) > 0:
+                #    NN1uniq[at1,nnextat1[0]] = at2
+                #else:
+                #    if len(nnextat2) > 0:
+                #        NN1uniq[at2,nnextat2[0]] = at1
+                #    else:
+                #        for ddd,idss in enumerate(NN1uniq):
+                #            print(ddd,NN1uniq[ddd])
+                #        sys.exit('neither nnextat1 nor nnextat2')
+                #if at2idx < neigh/2.:
+                #    nnextat1 = np.where(NN1uniq[at1]==-1)[0]
+                #    NN1uniq[at1,nnextat1[0]] = at2
+                #elif at2idx >= neigh/2.:
+                #    #print('nnext1',NN1uniq[at2])
+                #    #print('nnext2',NN1uniq[at2]<0)
+                #    nnextat2 = np.where(NN1uniq[at2]==-1)[0]
+                #    NN1uniq[at2,nnextat2[0]] = at1
+            at2idx += 1
+        print('-----> at1 (b)',at1,'at2_all',at2_all)
+        for ddd,idss in enumerate(NN1uniq):
+            print(ddd,NN1uniq[ddd])
+        #if at1 == 3:
+        #    sys.exit()
+
+    print('NN1uniq')
+    print(NN1uniq)
+    sys.exit()
+    return
+
 
 def get_NN1_NN2_NN3_from_positions(atoms,alat,atomnr=0,verbose=False):
     NN1         = ase_get_neighborlist(atoms,atomnr=atomnr,cutoff=0.8*alat,skin=0.1)
@@ -3182,6 +3420,94 @@ def check_vec_in_array(test,array):
     #return any(np.array_equal(x, test) for x in array)
     return any(np.allclose(x, test) for x in array)
 
+def try_to_get_from_positions_only__nat_cryst_sc_cell(positions,forces,verbose=False):
+    '''
+    nat,cryst,sc,alat,cell,pos0 = try_to_get_from_positions_only__nat_cryst_sc_cell(pos,forces,verbose=False)
+
+    pos: (all) positions from POSITIONs
+    forces: (all) forces from POSITIONs
+    %head POSITIONs
+    0.00000 0.00000 0.00000 0.000000 -0.000000 -0.000000
+    0.00000 0.00000 4.13000 0.000000 -0.000000 0.000000
+    0.00000 4.13000 0.00000 0.000000 -0.000000 -0.000000
+    0.00000 4.13000 4.13000 -0.000000 -0.000000 -0.000000
+    4.13000 0.00000 0.00000 -0.000000 -0.000000 0.000000
+    4.13000 0.00000 4.13000 -0.000000 0.000000 -0.000000
+    4.13000 4.13000 0.00000 -0.000000 0.000000 -0.000000
+    4.13000 4.13000 4.13000 0.000000 -0.000000 0.000000
+    0.00000 2.06500 2.06500 -0.000000 0.000000 -0.000000
+    0.00000 2.06500 6.19500 0.000000 -0.000000 0.000000
+    '''
+    #########################
+    # get nat (e.g. 32 atoms)
+    #########################
+    f = forces
+    p = positions
+    nat = 0
+    for i in np.arange(len(forces)):
+        fa = np.abs(f[i]).max()
+        #print(i,fa)
+        if fa > 1e-4:
+            nat = i
+            break
+        if i == 950:
+            print('hit 950 entries')
+            sys.exit()
+    if verbose:
+        print('nat:',nat)
+    if nat < 4:
+        sys.exit('did not find the number of atoms: suggest to take first step, and scan for next occurenct of positions of first step +small epsilon (due to MD step)')
+    # first check fcc up to sc = 6:
+    #########################
+    # get cryst (fcc or bcc)
+    # get sc (N=2)
+    #########################
+    cryst = False
+    sc = False
+    for i in np.arange(1,7):
+        ifcc = ((i**3.)*4).astype(int)
+        ibcc = ((i**3.)*2).astype(int)
+        #print(i,ifcc,'fcc') # case of fcc
+        #print(i,ibcc,'bcc') # case of fcc
+        if ifcc == nat:
+            cryst = 'fcc'
+            sc = i
+        if ibcc == nat:
+            cryst = 'fcc'
+            sc = i
+    if verbose:
+        print('cryst',cryst)
+        print('sc',sc)
+    #########################
+    # get alat (e.g. 4.05 angstrom)
+    #########################
+    pos0 = p[:nat]
+    if verbose:
+        print('pos0')
+        print(pos0)
+        print('pos0/sc')
+        print(pos0/sc)
+    alat = 0
+    if pos0[1,0] == 0 == pos0[1,1]:
+        #print('y1')
+        if pos0[1,2] > 2.0:
+            alat = pos0[1,2]
+            #print('y2',alat)
+    if verbose:
+        print('alat',alat)
+    if alat == 0:
+        sys.exit('did not find alat')
+
+
+    #########################
+    # get cell (e.g. [[4.05,0,0],[0,4.05,0],[0,0,4.05]])
+    #########################
+    cell = np.eye(3, dtype=int)*sc*alat
+    if verbose:
+        print('cell')
+        print(cell)
+    return nat, cryst, sc, alat, cell, pos0
+
 def try_to_get_alat_and_sc_from_cell_and_positions(cell,positions):
     ''' this should work for all cubic cells (fcc, bcc, dc) '''
     sc = 0
@@ -3267,7 +3593,174 @@ def POSCAR_get_cell(path_to_POSCAR):
 ##################################################################################
 ## ase funcions
 ##################################################################################
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0=False,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True,verbose=False):
+def load_POSITIONs_to_ase_frames(folder,matrix_element="Al"):
+    ''' to make ase object ouf ot this I would need the cell '''
+    posxyz = folder+"/POSITIONs.extxyz"
+    if os.path.isfile(posxyz):
+        print('reading frames',posxyz)
+        frames = ase_read(posxyz,index=":")
+        print('reading frames done')
+        #print('type',type(frames))
+        #print(frames[0].cell)
+        #print(frames[0].info)
+        return frames
+
+    print('reading POSITIONs ...')
+    pos_forces = np.loadtxt(folder+"/POSITIONs")
+    print('done ...')
+    #print('reading outcar...')
+    #pos = ase_read(folder+'/OUTCAR',format='vasp-out',index=0) # works
+    #pos = ase_read(folder+'/OUTCAR',format='vasp-out',index=":") # works
+    #print('pos.type',type(pos))
+    #print('len(pos)',len(pos))
+    #print('done ...')
+    #pos     = pos_forces[:,[0,1,2]].reshape((-1,nat,3))
+    #forces  = pos_forces[:,[3,4,5]].reshape((-1,nat,3))
+    pos     = pos_forces[:,[0,1,2]].reshape((-1,3))
+    forces  = pos_forces[:,[3,4,5]].reshape((-1,3))
+    #print(pos[0])
+    #print()
+    #print(pos[1])
+    #print(np.abs(pos[:]).max())
+    #print(np.abs(pos[0]).max())
+    #print(np.abs(pos[1]).max())
+    #print(np.abs(pos[2]).max())
+    #print(np.abs(pos[3]).max())
+    #print(np.abs(pos[1]).max())
+    #print(forces[0])
+    nat,cryst,sc,alat,cell,pos0 = try_to_get_from_positions_only__nat_cryst_sc_cell(pos,forces,verbose=False)
+
+    ## reshape pos forces
+    pos     = pos_forces[:,[0,1,2]].reshape((-1,nat,3))
+    forces  = pos_forces[:,[3,4,5]].reshape((-1,nat,3))
+    #print(pos.shape)
+    steps = (pos.shape[0])
+    #print('steps',steps)
+    if os.path.isfile(folder+"/u_OUTCAR"):
+        energies = np.loadtxt(folder+"/u_OUTCAR")*(nat-1.)/1000.
+    elif os.path.isfile(folder+"/u_OUTCAR_without_first_substracted"):
+        energies = np.loadtxt(folder+"/u_OUTCAR_without_first_substracted")*(nat-1.)/1000.
+    else:
+        energies = np.zeros(steps)
+
+    #print('pos0')
+    #print(pos0)
+    bulk = get_ase_atoms_object_kmc_al_si_mg_vac(sc,a0=alat,matrix_element=matrix_element,cubic=True,create_fake_vacancy=False,whichcell=cryst,normal_ordering=True,pos0=pos0,verbose=False)
+    #print('bulk')
+    #print(bulk.positions[:3])
+    #print(bulk.cell)
+    #print(bulk.get_pbc())
+    #print(type(bulk))
+
+    # reassign all positions/forces
+    #print('setting pos forces')
+    #print('ene3',energies[:3])
+    frames = []
+    for idx in np.arange(steps):
+        bulk_new = bulk.copy()  # needs to be a new object
+        #print(idx,'bn',type(bulk_new),bulk_new.cell)
+        #print(idx,'bp',type(bulk_new),bulk_new.positions[:2])
+        #print(idx,'b?',type(bulk_new),pos[idx][:2])
+        bulk_new.set_positions(pos[idx])
+        #if idx < 4:
+        #    print('ene',idx,energies[idx])
+        #print('bni',bulk_new.info)
+        #bulk_new.info = {'comment': 'ka'}
+        bulk_new.info['cryst'] = cryst
+        bulk_new.info['alat'] = alat
+        bulk_new.info['sc'] = sc
+        calc = SinglePointCalculator(bulk_new, energy=energies[idx], forces=forces[idx])
+        bulk_new.set_calculator(calc)
+        #bulk_new.set_forces(forces[idx])
+        #bulk_new.forces = forces[idx]
+        #print(idx,'bx',type(bulk_new),bulk_new.cell)
+        #frames.append(bulk.set_positions(pos[idx]))
+        frames.append(bulk_new)
+        #if idx == 4:
+        #    sys.exit()
+    verbose = False
+    if verbose:
+        print('done; len(frames)',len(frames),frames[0])
+        print('done; type(frames)',type(frames),type(frames[0]))
+        print()
+    #for idx in np.arange(3):
+    #    print(idx,'pp',pos[idx][:2])
+    #    frames[idx].set_positions(pos[idx])
+    #    #frames[idx].forces = pos[idx]
+    if verbose:
+        print()
+        print('f[x]: out')
+        print('f[0]:',frames[0].positions[:1],frames[0].get_forces()[:1])
+        print('f[1]:',frames[1].positions[:1],frames[1].get_forces()[:1])
+        print('f[2]:',frames[2].positions[:1],frames[2].get_forces()[:1])
+        print()
+        print('ref: pos')
+        print('ref pos[0]:',pos[0][:1],forces[0][:1])
+        print('ref pos[1]:',pos[1][:1],forces[1][:1])
+        print('ref pos[2]:',pos[2][:1],forces[2][:1])
+    print('write POSITIONs.extxyz',posxyz)
+    ase_write(posxyz,frames,format='extxyz')
+    print('write POSITIONs.extxyz done')
+    return frames
+
+def get_all_1NN_dist_vec_from_POSITIONs(folder,matrix_element="Al",verbose=False):
+    '''
+    dimensions:
+        NN1_distances = np.zeros((steps,nat,NN1_neighbors,3))
+    '''
+    frames = load_POSITIONs_to_ase_frames(folder,matrix_element=matrix_element)
+    cryst = frames[0].info['cryst']
+
+    print('cryst',cryst)
+    if os.path.isfile(folder+'/POSITIONs.distances.h5'):
+        print('found',folder+'/POSITIONs.distances.h5')
+        h5f = h5py.File(folder+'/POSITIONs.distances.h5','r')
+        NN1_distances = h5f['NN1_distances'][:]
+        NN1 = h5f['NN1'][:]
+        h5f.close()
+    else:
+        print('creaeing h5f ...')
+        steps = len(frames)
+        print('steps',steps)
+
+        ## get the ase object
+        #if False:
+        #    bulk = poscar = ase_read(folder+'/POSCAR',format='vasp')
+        #    print(poscar.positions)
+
+        ## get the list of first NN
+        NN1 = get_NN1_idx_for_every_atom(frames[0],crystal_structure=cryst)
+        if verbose:
+            print('NN1.shape',NN1.shape)
+            print(NN1)
+        NN1_neighbors = NN1.shape[1]
+        nat = NN1.shape[0]
+        if verbose:
+            print('nat          :',nat)
+            print('NN1_neighbors:',NN1_neighbors)
+
+
+        NN1_distances = np.zeros((steps,nat,NN1_neighbors,3))
+        # get distance vectors of 1NN for every step
+        for step,frame in enumerate(frames):
+            for atom in np.arange(nat):
+                dall = frame.get_distances(atom,NN1[atom],mic=True,vector=True)
+                #print('step',step,'atom',atom,'atompos',frame.positions[atom],'dall',dall.shape)
+                NN1_distances[step,atom] = dall
+        print('saving POSITIONs.distances.h5')
+        h5f = h5py.File(folder+'/POSITIONs.distances.h5', 'w')
+        h5f.create_dataset('NN1_distances', data=NN1_distances)
+        h5f.create_dataset('NN1', data=NN1)
+        h5f.close()
+        print('NN1_distances done')
+
+    # it would be nice to have only the unique distances
+    # meaning, every interaction between atoms only once (and not twice)
+    # this would ~half size of the NN1_distacnes
+    return NN1_distances,NN1,frames
+
+
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True,pos0=False,verbose=False):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -3397,6 +3890,9 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0=False,matrix_ele
     #number_of_atoms = atomsc.get_number_of_atoms()
     #nal = number_of_atoms - nsi - nmg
     #ase.io.write('kalmp',atomsc,format='lammps-dump')
+    if type(pos0) != bool:
+        for i in np.arange(len(pos0)):
+            atomsc[i].position = pos0[i]
     return atomsc
 
 def ase_get_neighborlist(frame,atomnr=0,cutoff=3.,skin=0.1):
@@ -4974,6 +5470,7 @@ class ase_calculate_ene( object ):
         dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,0.998,1.0,1.002,1.005,1.01,1.015,1.02,1.025,1.03]
         dvol_rel = np.arange(0.97,1.03,0.005)
         dvol_rel = np.arange(0.985,1.015,0.0025)
+        dvol_rel = np.arange(0.9,1.1,0.01)
         #dvol_rel = np.arange(0.97,1.03,0.001)
         #dvol_rel = np.arange(0.995,1.005,0.0003)
         vol_pa = np.zeros(len(dvol_rel))
@@ -4981,6 +5478,7 @@ class ase_calculate_ene( object ):
 
 
         cell_ref = atoms_murn.get_cell()
+        cell_ref_vol_pa = atoms_murn.get_volume()/atoms_murn.get_number_of_atoms()
         nat = atoms_murn.get_number_of_atoms()
 
         atoms_murn_loop = atoms_murn.copy()
@@ -4995,6 +5493,9 @@ class ase_calculate_ene( object ):
             #print('111 cell',atoms_murn_loop.get_cell())
             #print('111 cell',atoms_murn_loop.get_cell()[0,0]/atoms_murn_loop.get_cell()[1,1])
             vol=atoms_murn_loop.get_volume()
+            vol_per_atom = vol/atoms_murn_loop.get_number_of_atoms()
+            percent = np.round(vol_per_atom/cell_ref_vol_pa,2)
+            print('idx!!',idx,np.round(i,2),np.round(vol,2),'vpa',np.round(vol_per_atom,2),'ref',cell_ref_vol_pa,percent)
             if verbose > 2:
                 print('222 vol',atoms_murn_loop.get_volume())
             #ene = self.ene(atoms_murn_loop)                         # works
@@ -5770,6 +6271,7 @@ class ase_get_known_formats_class():
     """
     def __init__(self,verbose = False):
         self.formatspy              = os.path.dirname(ase.io.__file__)+"/formats.py"
+        self.vasp_out               = os.path.dirname(ase.io.__file__)+"/vasp.py"
         self.all_known_formats      = []
         self.all_known_formats_ase  = False
         self.my_formats_shall       = [ 'runner',   'lammps-runner', 'lammps-data'   ,'ipi'   , 'quippy'    ]
@@ -5867,6 +6369,18 @@ class ase_get_known_formats_class():
             self.verbose = True
             self.copy()
             self.adapt_formatspy(writeformatspy = copy_and_adapt_formatspy_anyhow)
+
+        #################################################
+        # check if vasp-out format writes free energies
+        vaspout = grep(self.vasp_out,'force_consistent=')
+        #print('vo',vaspout)
+        vo = vaspout[0].split("force_consistent=")
+        #print('vo',vo)
+        #print('vo[1]',vo[1])
+        if vo[1][:5] == "False":
+            print('make vasp.out write free energies by default (not sigma->0 energies)')
+            sed(self.vasp_out,"force_consistent=False","force_consistent=True")
+        if self.verbose: print(">> vasp.py adapted to write free energies by default.")
         return
 
 def convert_energy(ene,units_in_,units_out_,frame,verbose=False):
@@ -5962,7 +6476,15 @@ def ase_showpos(atomsc_sphere):
     return
 
 if __name__ == "__main__":
-    #pass
+    p = help()
+    args = p.parse_args()
+    if args.verbose:
+        print_args(args)
+    if args.execute_function:
+        function = eval(args.execute_function)
+        function()
+        hier = os.path.abspath(os.getcwd())
+        create_READMEtxt(hier)
     #n2p2_check_SF_inputnn(inputnn="cursel_64.def")
     #get_number_of_atoms_as_function_of_cutoff()
     #create_al_structures_for_analysis_SOAP()

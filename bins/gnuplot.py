@@ -196,15 +196,15 @@ def gnuplot_defaults(args):
         #hostname = os.environ['myhost']
         #print('hostname',hostname)
         myhost = check_for_known_hosts(exit=False)
-        #print('my',myhost)
+        print('myhost',myhost)
         #sys.exit()
         term="x11"
         #term="aqua"
         #term="xterm"
         if myhost == "helvetios":
             term="x11"
-        elif myhost == "qt":
-            term="x11"
+        elif myhost == "mac":
+            term="qt"
         ca('set term '+term+' font "Times-New-Roman,12"')
         #ca('set term aqua font "Times-New-Roman,12"')
         #ca("set terminal x11 font \'Verdana,10\'")

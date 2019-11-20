@@ -38,7 +38,7 @@ if [ "$myhost" = "mac" ];then
     #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
     #phonopybin="$phonopy/bin"
     #phonopybin2=""
-    #vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
+    vasp="$HOME/local/bin"   # dont confuse this path with /usr/local/bin where also icc and ifort are installed!
     #vimctags="$HOME/Dropbox/scripts/dotfiles/vim/ctags-5.8/installfolder/bin"
     #sphinx="$HOME/Dropbox/scripts/phonons/sphinx/bin"
 
@@ -60,6 +60,6 @@ if [ "$myhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
     export PATH="$f2py:$brew:$PATH"   # brew necessary to load coreutils
-    #export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH" # lets try without ... dont know for which progs I used those
+    export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH" # lets try without ... dont know for which progs I used those
     #export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"  # lets try without
 fi

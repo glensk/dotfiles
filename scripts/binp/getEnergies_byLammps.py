@@ -24,6 +24,8 @@ def help(p = None):
     % getEnergies_byLammps.py -p . -e
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.ipi -fi ipi -ru
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammps-runner
+    % getEnergies_byLammps.py -evinet -p runner_v3ag_4998_3 -sys fcc -sys_ele Al
+
 
 
     '''
@@ -104,26 +106,46 @@ def get_energies(args):
     for a given potential.
 
     '''
+    ##############################################################
+    ### check if ase runner/quippy/lammpps-data formats are known
+    ### use -v (verbose) option to see known formats
+    ##############################################################
+    ase_formats = my.ase_get_known_formats_class(verbose=args.verbose)
+    ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
+
+
     if os.path.isfile("../simulation.ti"):
         aaatest = np.loadtxt("../simulation.ti")
     else:
         aaatest = np.zeros((1000,3))
+
     if args.get_harmonic_energy:
+        # needs to determine u and h
+        # u can be obtained from normal positions probably.
         import hesse
-        hessefile = '../hessian.data'
         hessefile = '../HesseMatrix_4.13'
+        if not os.path.isfile(hessefile):
+            hessefile = '../hessian.data'
         hesse_matrix = hesse.read_Hessematrix(hessefile)
+
         if os.path.isfile('../init.xyz'):
             pos0 = ase_read('../init.xyz',format='ipi')
+
         elif os.path.isfile('../OUTCAR'):
             print('reading outcar')
             #pos0 = ase_read('../OUTCAR',format='vasp-out') # this is as index=0
             #pos0 = ase_read('../OUTCAR',format='vasp-out',index=":") # works
             pos0 = ase_read('../OUTCAR',format='vasp-out',index=0) # works
+            ase_write('POSCAR',pos0,format='vasp')
+            ase_write('data.lmp',pos0,format='lammps-data')
+            ang_to_bohr = 1.8897261
+            np.savetxt("x_reference.data",pos0.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+            ase_write("init.xyz",pos0,format='ipi')
         print('pos0 typ',type(pos0))
         print('pos0 len',len(pos0))
         print(pos0.positions)
         print(pos0.cell)
+
 
     if args.thermo or args.evinet or args.fqh or args.fah:
         if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
@@ -252,12 +274,6 @@ def get_energies(args):
         ase = False
 
 
-    ##############################################################
-    ### check if ase runner/quippy/lammpps-data formats are known
-    ### use -v (verbose) option to see known formats
-    ##############################################################
-    ase_formats = my.ase_get_known_formats_class(verbose=verbose)
-    ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
 
     ##############################################################
     ### check if lammps is working with ase
@@ -363,7 +379,7 @@ def get_energies(args):
         # -533920.334868975333 16.528710460497 79.180381312792 2.610462793516
         # -533920.334868975333*108-(107*-537461.993661476416)-(-155368.146177827992) == 405.302 meV ! that is correct!
 
-        if True:
+        if False:
             print("##############################")
             print("# NOW GETTING anharmonic ... #")
             print("##############################")
@@ -704,15 +720,15 @@ def get_energies(args):
         ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
         ene_DFT_eV_cell  = np.empty(structures_to_calc);ene_DFT_eV_cell[:]  = np.nan
         ene_pot_eV_cell  = np.empty(structures_to_calc);ene_pot_eV_cell[:]  = np.nan
-        ene_DFT_dudl     = np.empty(structures_to_calc);ene_DFT_dudl[:]  = np.nan
-        ene_pot_dudl     = np.empty(structures_to_calc);ene_pot_dudl[:]  = np.nan
+        ene_DFT_m0        = np.empty(structures_to_calc);ene_DFT_m0[:]  = np.nan
+        ene_pot_m0     = np.empty(structures_to_calc);ene_pot_m0[:]  = np.nan
+        ene_har_m0     = np.empty(structures_to_calc);ene_har_m0[:]  = np.nan
         ene_pot_ase_dudl = np.empty(structures_to_calc);ene_pot_ase_dudl[:]  = np.nan
         ene_pot_lmp_dudl = np.empty(structures_to_calc);ene_pot_lmp_dudl[:]  = np.nan
         ene_DFT_atomic   = np.empty(structures_to_calc);ene_DFT_atomic[:]  = np.nan
         ene_DFT_wo_atomic= np.empty(structures_to_calc);ene_DFT_wo_atomic[:]  = np.nan
         ene_pot          = np.empty(structures_to_calc);ene_pot[:]  = np.nan
         ene_pot_wo_atomic= np.empty(structures_to_calc);ene_pot_wo_atomic[:]  = np.nan
-        ene_harmonic     = np.empty((structures_to_calc,2));#ene_harmonic[:]  = np.nan
         ene_pot_ase      = np.empty(structures_to_calc);ene_pot_ase[:]  = np.nan
         ene_pot_ase_geop = np.empty(structures_to_calc);ene_pot_ase_geop[:]  = np.nan
         ene_pot_lmp      = np.empty(structures_to_calc);ene_pot_lmp[:]  = np.nan
@@ -723,6 +739,15 @@ def get_energies(args):
         ene_ste          = np.empty(structures_to_calc);ene_ste[:]  = np.nan
         ene_mean         = np.empty(structures_to_calc);ene_mean[:] = np.nan
         ene_diff_lam_ase = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
+
+
+        dudl_pot_to_DFT      = np.empty(structures_to_calc);dudl_pot_to_DFT[:]  = np.nan
+        dudl_har_to_DFT     = np.empty(structures_to_calc);dudl_har_to_DFT[:]  = np.nan
+        dudl_har_to_pot     = np.empty(structures_to_calc);dudl_har_to_pot[:]  = np.nan
+        dudlav_pot_to_DFT      = np.empty(structures_to_calc);dudlav_pot_to_DFT[:]  = np.nan
+        dudlav_har_to_DFT     = np.empty(structures_to_calc);dudlav_har_to_DFT[:]  = np.nan
+        dudlav_har_to_pot     = np.empty(structures_to_calc);dudlav_har_to_pot[:]  = np.nan
+
         for_DFTmax       = np.empty(structures_to_calc);for_DFTmax[:]  = np.nan
         uuids            = np.empty(structures_to_calc,dtype='|S1');uuids[:]  = ''
         #sys.exit('get uuid of structure and save structure energy somewhere (cache)')
@@ -937,8 +962,7 @@ def get_energies(args):
                 ene_DFT[idx],ene_DFT_eV_cell[idx] = my.ase_enepot(frames[i],units=ace.units)
                 #print('ene_DFT        ',ene_DFT[idx])
                 #print('ene_DFT_eV_cell',ene_DFT_eV_cell[idx])
-                ene_DFT_dudl[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
-                #print('ene_DFT_dudl   ',ene_DFT_dudl[idx])
+                ene_DFT_m0[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
                 #sys.exit()
                 if verbose > 2: #be_very_verbose:
                     my.show_ase_atoms_content(frames[i],showfirst=3,comment = "STAT2")
@@ -989,8 +1013,10 @@ def get_energies(args):
                     f_tmp = copy.deepcopy(atoms_tmp)
                     f_atoms = f_tmp.get_number_of_atoms()
                     ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
-                    ene_pot_dudl[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
-                    #print('ene_pot_dudl   ',ene_pot_dudl[idx])
+                    ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
+                    dudl_pot_to_DFT[idx]   = ene_DFT_m0[idx] - ene_pot_m0[idx]
+                    dudlav_pot_to_DFT[idx] = np.mean(dudl_pot_to_DFT[:idx])
+                    #print('ene_pot_m0   ',ene_pot_m0[idx])
                     if args.get_harmonic_energy:
                         #print('hm')
                         #print(hesse_matrix)
@@ -1004,9 +1030,13 @@ def get_energies(args):
                         #print('u')
                         #print(u)
 
-                        ene_harmonic[idx,0] = hesse.qh_energy_cell(dpos = u, h = hesse_matrix)
-                        ene_harmonic[idx,1] = hesse.qh_energy_atom(dpos = u, h = hesse_matrix)
-                        #print('ene_harmonic',ene_harmonic[idx])
+                        ene_har_m0[idx] = hesse.qh_energy_atom(dpos = u, h = hesse_matrix)
+                        dudl_har_to_DFT[idx]   = ene_DFT_m0[idx] - ene_har_m0[idx]
+                        dudl_har_to_pot[idx]   = ene_pot_m0[idx] - ene_har_m0[idx]
+
+                        dudlav_har_to_DFT[idx] = np.mean(dudl_har_to_DFT[:idx])
+                        dudlav_har_to_pot[idx] = np.mean(dudl_har_to_pot[:idx])
+
 
 
                     #print('ae',ene_pot_ase[idx])
@@ -1211,6 +1241,11 @@ def get_energies(args):
                 fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
                 ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
 
+                def srl(nr,rnd,l):
+                    return str(np.round(nr,rnd)).ljust(l)
+                def sr(nr,rnd):
+                    return str(np.round(nr,rnd))
+
                 if args.print_only_energies:
                     #__alat_half = crystal.cellvec[0,0]/2
                     #__alat      = crystal.cellvec[0,0]
@@ -1219,18 +1254,24 @@ def get_energies(args):
 
                     if True: #ace.units == 'hartree':
                         aatest = aaatest[i][2]
-                        #print('ene_harmonic',ene_harmonic[idx])
-                        eh = np.round(ene_harmonic[idx],2)
-                        e__pot = (ene_pot[idx] - ene_pot[0])/31*32
                         print(str(i).ljust(5),
-                                'ene DFT:',str(np.round(ene_DFT[idx],3)).ljust(9),
-                                'ene_pot',str(np.round(ene_pot[idx],3)).ljust(9),
-                                'aatest:',str(np.round(aatest,3)).ljust(9),
-                                'ene_DFT_dudl' ,str(np.round(ene_DFT_dudl[idx],3)).ljust(9),
-                                'ene_pot_dudl' ,str(np.round(ene_pot_dudl[idx],3)).ljust(9),
-                                'e__pot      ' ,str(np.round(e__pot,3)).ljust(9),
-                                #'eh eV/cell:',eh[0],
-                                'eh meV/(atom-1) = dUdL (Uref=harmonic):',eh[1])
+                                'ene_DFT:',srl(ene_DFT[idx],3,9),
+                                'ene_pot',srl(ene_pot[idx],3,9),
+                                'aatest:',srl(aatest,3,9),
+                                'ene_DFT_m0' ,srl(ene_DFT_m0[idx],3,9),
+                                'ene_har_m0:',srl(ene_har_m0[idx],2,9),
+                                'ene_pot_m0' ,srl(ene_pot_m0[idx],3,9),
+
+                                'dudl_pot_to_DFT',sr(dudl_pot_to_DFT[idx],2),
+                                'dudlav_pot_to_DFT',sr(dudlav_pot_to_DFT[idx],2),
+
+                                'dudl_har_to_DFT',  sr(dudl_har_to_DFT[idx],2),
+                                'dudlav_har_to_DFT',sr(dudlav_har_to_DFT[idx],2),
+
+                                'dudl_har_to_pot',  sr(dudl_har_to_pot[idx],2),
+                                'dudlav_har_to_pot',sr(dudlav_har_to_pot[idx],2),
+                                )
+
                     else:
                         print(str(i).ljust(5),ene_diff_abs[idx])
                 else:
@@ -1245,8 +1286,8 @@ def get_energies(args):
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
-                if idx == 60:
-                    sys.exit('56859')
+                #if idx == 60:
+                #    sys.exit('56859')
                 return
 
 

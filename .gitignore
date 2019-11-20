@@ -2,6 +2,7 @@
 tmp_assess/
 bin_unused/
 .DS_Store
+.sendx
 Icon^M^M
 omnifocus/
 osx/
