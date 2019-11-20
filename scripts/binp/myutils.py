@@ -5471,7 +5471,7 @@ class ase_calculate_ene( object ):
         dvol_rel = np.arange(0.97,1.03,0.005)
         dvol_rel = np.arange(0.985,1.015,0.0025)
         dvol_rel = np.arange(0.9,1.1,0.01)
-        dvol_rel = np.arange(0.85,1.15,0.01)
+        dvol_rel = np.arange(0.80,1.20,0.01)
         #dvol_rel = np.arange(0.97,1.03,0.001)
         #dvol_rel = np.arange(0.995,1.005,0.0003)
         vol_pa = np.zeros(len(dvol_rel))
