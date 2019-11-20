@@ -5496,7 +5496,6 @@ class ase_calculate_ene( object ):
             vol=atoms_murn_loop.get_volume()
             vol_per_atom = vol/atoms_murn_loop.get_number_of_atoms()
             percent = np.round(vol_per_atom/cell_ref_vol_pa,2)
-            print('idx!!',idx,np.round(i,2),np.round(vol,2),'vpa',np.round(vol_per_atom,2),'ref',cell_ref_vol_pa,percent)
             if verbose > 2:
                 print('222 vol',atoms_murn_loop.get_volume())
             #ene = self.ene(atoms_murn_loop)                         # works
@@ -5504,6 +5503,7 @@ class ase_calculate_ene( object ):
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
+            print('idx!!',idx,np.round(i,2),np.round(vol,2),'vpa',np.round(vol_per_atom,2),'ref',cell_ref_vol_pa,percent,'ene_pa',ene/nat)
             #if printminimal == True:
             if verbose:
                 print('ene ase tot (eV):',str(round(ene_ev,7)).ljust(10),'nat:'+str(nat),"vol/pa:",str(round(vol/nat,7)).ljust(10),'(eV/at):',str(ene/nat).ljust(19)) #self.units)
