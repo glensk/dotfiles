@@ -54,7 +54,7 @@
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Wed Nov 20 09:19:07 2019"
+@timestamp def "Wed Nov 20 09:36:01 2019"
 @r0 off
 @link r0 to g0
 @r0 type above
@@ -101,7 +101,7 @@
 @g0 fixedpoint format general general
 @g0 fixedpoint prec 6, 6
 @with g0
-@    world 0.5, -545, 2, -532
+@    world 0.473731797866, -545.051432338, 1.75309129902, -525.92613516
 @    stack world 0, 0, 0, 0
 @    znorm 1
 @    view 0.150000, 0.150000, 1.150000, 0.850000
@@ -183,7 +183,7 @@
 @    yaxis  label color 1
 @    yaxis  label place normal
 @    yaxis  tick on
-@    yaxis  tick major 2
+@    yaxis  tick major 5
 @    yaxis  tick minor ticks 1
 @    yaxis  tick default 6
 @    yaxis  tick place rounded true
@@ -223,7 +223,7 @@
 @    altyaxis  off
 @    legend on
 @    legend loctype view
-@    legend 0.85, 0.8
+@    legend 0.6, 0.8
 @    legend box color 1
 @    legend box pattern 1
 @    legend box linewidth 1.0
@@ -489,13 +489,62 @@
 @    s4 errorbar riser clip length 0.100000
 @    s4 comment "n2p2_v3ag_repeated_2424_28cores/thermo/evinet/energy_eV_per_atom_vs_ang3_per_atom.dat"
 @    s4 legend  ""
-@    s6 hidden false
+@    s5 hidden true
+@    s5 type xy
+@    s5 symbol 0
+@    s5 symbol size 1.000000
+@    s5 symbol color 1
+@    s5 symbol pattern 1
+@    s5 symbol fill color 1
+@    s5 symbol fill pattern 0
+@    s5 symbol linewidth 1.0
+@    s5 symbol linestyle 1
+@    s5 symbol char 65
+@    s5 symbol char font 0
+@    s5 symbol skip 0
+@    s5 line type 1
+@    s5 line linestyle 1
+@    s5 line linewidth 2.0
+@    s5 line color 1
+@    s5 line pattern 1
+@    s5 baseline type 0
+@    s5 baseline off
+@    s5 dropline off
+@    s5 fill type 0
+@    s5 fill rule 0
+@    s5 fill color 1
+@    s5 fill pattern 1
+@    s5 avalue off
+@    s5 avalue type 2
+@    s5 avalue char size 1.000000
+@    s5 avalue font 0
+@    s5 avalue color 1
+@    s5 avalue rot 0
+@    s5 avalue format general
+@    s5 avalue prec 3
+@    s5 avalue prepend ""
+@    s5 avalue append ""
+@    s5 avalue offset 0.000000 , 0.000000
+@    s5 errorbar on
+@    s5 errorbar place both
+@    s5 errorbar color 1
+@    s5 errorbar pattern 1
+@    s5 errorbar size 1.000000
+@    s5 errorbar linewidth 1.0
+@    s5 errorbar linestyle 1
+@    s5 errorbar riser linewidth 1.0
+@    s5 errorbar riser linestyle 1
+@    s5 errorbar riser clip off
+@    s5 errorbar riser clip length 0.100000
+@    s5 comment "copy of setdata G0.S6"
+@    s5 legend  ""
+@    s6 hidden true
 @    s6 type xy
 @    s6 symbol 2
 @    s6 symbol size 0.490000
-@    s6 symbol color 7
+@    s6 symbol color 11
 @    s6 symbol pattern 1
-@    s6 symbol fill color 7
+@    s6 symbol fill color 11
 @    s6 symbol fill pattern 0
 @    s6 symbol linewidth 1.0
 @    s6 symbol linestyle 1
@@ -527,7 +576,7 @@
 @    s6 avalue offset 0.000000 , 0.000000
 @    s6 errorbar on
 @    s6 errorbar place both
-@    s6 errorbar color 7
+@    s6 errorbar color 11
 @    s6 errorbar pattern 1
 @    s6 errorbar size 1.000000
 @    s6 errorbar linewidth 1.0
@@ -538,6 +587,104 @@
 @    s6 errorbar riser clip length 0.100000
 @    s6 comment "/Users/glensk/Downloads/figures/Reuss.dat"
 @    s6 legend  ""
+@    s7 hidden false
+@    s7 type xy
+@    s7 symbol 1
+@    s7 symbol size 0.490000
+@    s7 symbol color 7
+@    s7 symbol pattern 1
+@    s7 symbol fill color 7
+@    s7 symbol fill pattern 0
+@    s7 symbol linewidth 1.0
+@    s7 symbol linestyle 1
+@    s7 symbol char 65
+@    s7 symbol char font 0
+@    s7 symbol skip 0
+@    s7 line type 0
+@    s7 line linestyle 1
+@    s7 line linewidth 1.0
+@    s7 line color 8
+@    s7 line pattern 1
+@    s7 baseline type 0
+@    s7 baseline off
+@    s7 dropline off
+@    s7 fill type 0
+@    s7 fill rule 0
+@    s7 fill color 1
+@    s7 fill pattern 1
+@    s7 avalue off
+@    s7 avalue type 2
+@    s7 avalue char size 1.000000
+@    s7 avalue font 0
+@    s7 avalue color 1
+@    s7 avalue rot 0
+@    s7 avalue format general
+@    s7 avalue prec 3
+@    s7 avalue prepend ""
+@    s7 avalue append ""
+@    s7 avalue offset 0.000000 , 0.000000
+@    s7 errorbar on
+@    s7 errorbar place both
+@    s7 errorbar color 7
+@    s7 errorbar pattern 1
+@    s7 errorbar size 1.000000
+@    s7 errorbar linewidth 1.0
+@    s7 errorbar linestyle 1
+@    s7 errorbar riser linewidth 1.0
+@    s7 errorbar riser linestyle 1
+@    s7 errorbar riser clip off
+@    s7 errorbar riser clip length 0.100000
+@    s7 comment "/Users/glensk/Downloads/figures/Reuss.dat"
+@    s7 legend  "DFT extracted"
+@    s8 hidden false
+@    s8 type xy
+@    s8 symbol 2
+@    s8 symbol size 0.490000
+@    s8 symbol color 1
+@    s8 symbol pattern 1
+@    s8 symbol fill color 1
+@    s8 symbol fill pattern 0
+@    s8 symbol linewidth 1.0
+@    s8 symbol linestyle 1
+@    s8 symbol char 65
+@    s8 symbol char font 0
+@    s8 symbol skip 0
+@    s8 line type 0
+@    s8 line linestyle 1
+@    s8 line linewidth 1.0
+@    s8 line color 1
+@    s8 line pattern 1
+@    s8 baseline type 0
+@    s8 baseline off
+@    s8 dropline off
+@    s8 fill type 0
+@    s8 fill rule 0
+@    s8 fill color 1
+@    s8 fill pattern 1
+@    s8 avalue off
+@    s8 avalue type 2
+@    s8 avalue char size 1.000000
+@    s8 avalue font 0
+@    s8 avalue color 1
+@    s8 avalue rot 0
+@    s8 avalue format general
+@    s8 avalue prec 3
+@    s8 avalue prepend ""
+@    s8 avalue append ""
+@    s8 avalue offset 0.000000 , 0.000000
+@    s8 errorbar on
+@    s8 errorbar place both
+@    s8 errorbar color 1
+@    s8 errorbar pattern 1
+@    s8 errorbar size 1.000000
+@    s8 errorbar linewidth 1.0
+@    s8 errorbar linestyle 1
+@    s8 errorbar riser linewidth 1.0
+@    s8 errorbar riser linestyle 1
+@    s8 errorbar riser clip off
+@    s8 errorbar riser clip length 0.100000
+@    s8 comment "copy of setdata G0.S7"
+@    s8 legend  "DFT extracted with (V/V_0)*2-1"
 @target G0.S0
 @type xy
 0.512 -532.83495
@@ -753,6 +900,32 @@
 1.6428727 -536.84414
 1.6849956 -536.79962
 &
+@target G0.S5
+@type xy
+2.2 -462.438
+2.36 -491.763
+2.56 -509.885
+2.76 -521.582
+3.16 -532.29
+4.68 -536.409
+2.96 -528.171
+3.32 -536.079
+3.52 -536.244
+3.72 -537.068
+3.92 -536.738
+4.08 -537.397
+4.28 -537.068
+4.48 -537.068
+4.88 -536.573
+5.04 -536.244
+5.24 -536.079
+5.44 -535.42
+5.64 -535.42
+5.8 -534.761
+3.32 -534.926
+3.92 -537.562
+3.28 -611.697
+&
 @target G0.S6
 @type xy
 0.55 -462.438
@@ -778,4 +951,56 @@
 0.83 -534.926
 0.98 -537.562
 0.82 -611.697
+&
+@target G0.S7
+@type xy
+0.55 -462.438
+0.59 -491.763
+0.64 -509.885
+0.69 -521.582
+0.79 -532.29
+1.17 -536.409
+0.74 -528.171
+0.83 -536.079
+0.88 -536.244
+0.93 -537.068
+0.98 -536.738
+1.02 -537.397
+1.07 -537.068
+1.12 -537.068
+1.22 -536.573
+1.26 -536.244
+1.31 -536.079
+1.36 -535.42
+1.41 -535.42
+1.45 -534.761
+0.83 -534.926
+0.98 -537.562
+0.82 -611.697
+&
+@target G0.S8
+@type xy
+0.1 -462.438
+0.18 -491.763
+0.28 -509.885
+0.38 -521.582
+0.58 -532.29
+1.34 -536.409
+0.48 -528.171
+0.66 -536.079
+0.76 -536.244
+0.86 -537.068
+0.96 -536.738
+1.04 -537.397
+1.14 -537.068
+1.24 -537.068
+1.44 -536.573
+1.52 -536.244
+1.62 -536.079
+1.72 -535.42
+1.82 -535.42
+1.9 -534.761
+0.66 -534.926
+0.96 -537.562
+0.64 -611.697
 &

@@ -5485,6 +5485,10 @@ class ase_calculate_ene( object ):
         atoms_murn_loop = atoms_murn.copy()
         if verbose:
             print('               vol [Ang^2/at] ene [??]:')
+        print('nat:',nat)
+        print('vol cell:',atoms_murn.get_volume())
+        print('vol cell/pa:',atoms_murn.get_volume()/nat)
+
         for idx,i in enumerate(dvol_rel):
             if verbose > 2:
                 print('000 idx:',idx,'i:',i)
