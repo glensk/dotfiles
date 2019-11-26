@@ -394,7 +394,6 @@ def get_energies(args):
                 my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos)
                 sys.exit()
             sys.exit()
-        #get_basic_NN_energies_ace(ace)
         #sys.exit()
         #frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
         #print('frame_al.cell',frame_al.cell)
@@ -1547,6 +1546,11 @@ def get_dilute_formation_energy(matrix_element="Al",text="dilute formation energ
             print('XX ace.E_SS_Mg:',ace.E_SS_Mg)
             print('XX ace.struct_dilute_mg_NN:',ace.struct_dilute_mg_NN,'in sc:',sc)
             print('stress',ace.stress(frame_al_xx))
+        if solute_element == "Vac":
+            ace.E_SS_vac             = dilute_formation
+            ace.struct_vac_NN        = frame_al_xx
+            print('XX ace.E_SS_vac           :',ace.E_SS_vac)
+           # print('XX ace.struct_vac_NN      :',ace.struct_dilute_vac_NN,'in sc:',sc)
 
 
         ############## get the temperature dependent stuff
@@ -1794,9 +1798,10 @@ def get_dilute_si_mg_f(ace):
 
     print()
 
-    print('ace.E_SS_Al',ace.E_SS_Al)
-    print('ace.E_SS_Mg',ace.E_SS_Mg)
-    print('ace.E_SS_Si',ace.E_SS_Si)
+    print('ace.E_SS_Al :',ace.E_SS_Al,"energy of one Al")
+    print('ace.E_SS_Mg :',ace.E_SS_Mg,"one Mg is left over")
+    print('ace.E_SS_Si :',ace.E_SS_Si,"one Si is left over")
+    print('ace.E_SS_vac:',ace.E_SS_vac,"vacancy formation energy")
 
     print("                         ","DFT(eV)          NN(eV)                 eV all atoms")
     print("                         ","per cell         per celper cell        eV all atoms")

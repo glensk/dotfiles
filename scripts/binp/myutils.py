@@ -741,6 +741,9 @@ class mypot( object ):
             #print('self.pottype (0)',self.pottype)
             #if 'runner' in self.pot: self.pottype('runner')
             #if 'n2p2' in self.pot: self.pottype('n2p2')
+            if self.pottype in self.trigger_set_path_manual or self.pot in self.trigger_set_path_manual:
+                self.pottype = inputnn_runner_or_n2p2(self.potpath+"/input.nn")
+
             if self.pottype == "runner" or self.pottype == "n2p2":
                 inputnn = self.potpath+"/input.nn"
                 if os.path.isfile(inputnn):
@@ -783,11 +786,12 @@ class mypot( object ):
                 self.atom_energy = {}
                 for idx,i in enumerate(self.elements):
                     self.atom_energy[i] = 0 #self.elements[idx]
-            else:
+            if self.pottype == False:
                 list_pot_all()
                 print()
                 print('self.pot    :',self.pot)
                 print('self.pottype:',self.pottype)
+                print('self.potpath:',self.potpath)
                 sys.exit("self.pot unknown (Error 91)")
         #print('self.elements',self.elements)
         #print('self.pot',self.pot)
