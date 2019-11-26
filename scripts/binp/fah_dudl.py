@@ -18,27 +18,26 @@ class dudl( object ):
         self.verbose            = False
         self._filenamein        = filename
         self.filename           = False
-        self.dUdL               = False
+        self.dudl               = False
         self.correlation_length = 15
 
         self.load_dudl()
-        self.u                  = self.dUdL[:,[0,4]]
-        self.uref               = self.dUdL[:,[0,5]]
-        self.dudl               = np.array([self.dUdL[:,0],self.u[:,1]-self.uref[:,1]]).transpose()
-        self.dudluncor          = self.dudl[::self.correlation_length]
-        self.dudluncorstd       = False
-        for i in range(1,len(self.dudluncor)):
-            #self.dudluncorstd = utils.append_row_to_2d_array(self.dudluncorstd,[i,self.dudluncor[:i,1].std()])
-            self.dudluncorstd = utils.append_row_to_2d_array(self.dudluncorstd,[self.dudluncor[i,0],self.dudluncor[:i,1].std()])
-        self.dudluncorerr       = False
-        for i in range(1,len(self.dudluncor)):
-            #self.dudluncorerr = utils.append_row_to_2d_array(self.dudluncorerr,[i,self.dudluncor[:i,1].std()/np.sqrt(i)])
-            self.dudluncorerr = utils.append_row_to_2d_array(self.dudluncorerr,[self.dudluncor[i,0],self.dudluncor[:i,1].std()/np.sqrt(i)])
+        self.u                  = self.dudl[:,[0,4]]
+        self.uref               = self.dudl[:,[0,5]]
+        self.dudl               = np.array([self.dudl[:,0],self.u[:,1]-self.uref[:,1]]).transpose()
+        self.dudl               = self.dudl[::self.correlation_length]
+        for i in range(1,len(self.dudl)):
+            #self.dudl = utils.append_row_to_2d_array(self.dudl,[i,self.dudl[:i,1].std()])
+            self.dudl = utils.append_row_to_2d_array(self.dudl,[self.dudl[i,0],self.dudl[:i,1].std()])
+        self.dudl       = False
+        for i in range(1,len(self.dudl)):
+            #self.dudl = utils.append_row_to_2d_array(self.dudl,[i,self.dudl[:i,1].std()/np.sqrt(i)])
+            self.dudl = utils.append_row_to_2d_array(self.dudl,[self.dudl[i,0],self.dudl[:i,1].std()/np.sqrt(i)])
 
 
     def load_dudl(self):
         ''' load in dudl file '''
-        if type(self.dUdL) != bool:
+        if type(self.dudl) != bool:
             return
 
         if type(self._filenamein) == bool:
@@ -66,7 +65,7 @@ class dudl( object ):
             print "self.filename:",self.filename
             sys.exit("filename not found")
 
-        self.dUdL = np.loadtxt(self.filename)
+        self.dudl = np.loadtxt(self.filename)
         return
 
     def plt(self, show ):

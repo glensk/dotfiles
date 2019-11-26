@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import sys,os,copy,argparse,shutil
+from subprocess import check_output,call
 #import click
+import glob,time
 import numpy as np
 import myutils as my
+import fah
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
 from ase.io import write as ase_write
@@ -24,7 +27,9 @@ def help(p = None):
     % getEnergies_byLammps.py -p . -e
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.ipi -fi ipi -ru
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammps-runner
-    % getEnergies_byLammps.py -evinet -p runner_v3ag_4998_3 -sys fcc -sys_ele Al
+    % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -evinet
+    % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -fqh
+
 
 
 
@@ -115,41 +120,42 @@ def get_energies(args):
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
 
 
-    if os.path.isfile("../simulation.ti"):
-        aaatest = np.loadtxt("../simulation.ti")
-    else:
-        aaatest = np.zeros((1000,3))
+    #dudl = fah.get_dudl_from_file_with_energies_lambda_0_1('../simulation.ti',number_of_atoms=32)
+    #dudlav = get_dudlav_from_dudl(dudl)
+    #save_dudl_to_file('../',dudl,filename="dudl"):
+    #if os.path.isfile("../simulation.ti"):
+    #    aaatest = np.loadtxt("../simulation.ti")
+    #else:
+    #    aaatest = np.zeros((1000,3))
 
-    if args.get_harmonic_energy:
-        # needs to determine u and h
-        # u can be obtained from normal positions probably.
-        import hesse
-        hessefile = '../HesseMatrix_4.13'
-        if not os.path.isfile(hessefile):
-            hessefile = '../hessian.data'
-        hesse_matrix = hesse.read_Hessematrix(hessefile)
+    #if args.get_harmonic_energy:
+    #    # needs to determine u and h
+    #    # u can be obtained from normal positions probably.
+    #    import hesse
+    #    hessefile = '../HesseMatrix_4.13'
+    #    if not os.path.isfile(hessefile):
+    #        hessefile = '../hessian.data'
+    #    hesse_matrix = hesse.read_Hessematrix(hessefile)
 
-        if os.path.isfile('../init.xyz'):
-            pos0 = ase_read('../init.xyz',format='ipi')
+    #    if os.path.isfile('../init.xyz'):
+    #        pos0 = ase_read('../init.xyz',format='ipi')
 
-        elif os.path.isfile('../OUTCAR'):
-            print('reading outcar')
-            #pos0 = ase_read('../OUTCAR',format='vasp-out') # this is as index=0
-            #pos0 = ase_read('../OUTCAR',format='vasp-out',index=":") # works
-            pos0 = ase_read('../OUTCAR',format='vasp-out',index=0) # works
-            ase_write('POSCAR',pos0,format='vasp')
-            ase_write('data.lmp',pos0,format='lammps-data')
-            ang_to_bohr = 1.8897261
-            np.savetxt("x_reference.data",pos0.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
-            ase_write("init.xyz",pos0,format='ipi')
-        print('pos0 typ',type(pos0))
-        print('pos0 len',len(pos0))
-        print(pos0.positions)
-        print(pos0.cell)
+    #    elif os.path.isfile('../OUTCAR'):
+    #        print('reading outcar')
+    #        #pos0 = ase_read('../OUTCAR',format='vasp-out') # this is as index=0
+    #        #pos0 = ase_read('../OUTCAR',format='vasp-out',index=":") # works
+    #        pos0 = ase_read('../OUTCAR',format='vasp-out',index=0) # works
+    #        ase_write('POSCAR',pos0,format='vasp')
+    #        ase_write('data.lmp',pos0,format='lammps-data')
+    #        ang_to_bohr = 1.8897261
+    #        np.savetxt("x_reference.data",pos0.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+    #        ase_write("init.xyz",pos0,format='ipi')
+    #    print('pos0 typ',type(pos0))
+    #    print('pos0 len',len(pos0))
+    #    print(pos0.positions)
+    #    print(pos0.cell)
 
 
-    if args.thermo or args.evinet or args.fqh or args.fah:
-        if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
     if args.show_availabel_pots:
         my.list_pot_all()
         sys.exit()
@@ -158,7 +164,7 @@ def get_energies(args):
     # create the README
     ##################################
     hier = os.path.abspath(os.getcwd())
-    my.create_READMEtxt(hier)
+    readmepath = my.create_READMEtxt(hier)
 
     allepochs = [False]
     format_in = args.format_in
@@ -380,21 +386,74 @@ def get_energies(args):
         # -533920.334868975333 16.528710460497 79.180381312792 2.610462793516
         # -533920.334868975333*108-(107*-537461.993661476416)-(-155368.146177827992) == 405.302 meV ! that is correct!
 
-        if False:
+        #if args.thermo or args.evinet or args.fqh or args.fah:
+        #    if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
+        print("##############################")
+        print("# anharmonic ... #")
+        print("##############################")
+        if os.path.isdir("fah"):
+            print("##############################")
+            print("# NOW reading in anharmonic ... #")
+            print("##############################")
+
+        if os.path.isdir("fah"):
+            print("##############################")
+            print("# NOW running anharmonic ... #")
+            print("##############################")
+            hier = os.getcwd()
+            print('os.getcwd()',os.getcwd())
+            os.chdir(hier+"/fah")
+
+            fvta = glob.glob(os.getcwd()+"/*_*K")
+            print('fvta',fvta)
+            for fvt in fvta:
+                os.chdir(fvt)
+                print('os.getcwd() fvt',os.getcwd())
+                flsa = glob.glob(os.getcwd()+"/lambda*_*")
+                for fls in flsa:
+                    os.chdir(fls)
+                    print('os.getcwd() fls',os.getcwd())
+
+                    if True:  # read dudl
+                        dudl = fah.get_dudl_from_file_with_energies_lambda_0_1('simulation.ti',number_of_atoms=32)
+                        dudlav = fah.get_dudlav_from_dudl(dudl)
+                        print('dudav[-1]',dudlav[-1])
+                    if False:  # run anharmonic
+                        if os.path.isfile(os.getcwd()+'/simulation.ti'):
+                            print('simulation.ti exists in:')
+                            print(os.getcwd()+'/simulation.ti')
+                            sys.exit()
+                        print('do 1')
+                        call(["/usr/local/bin/python $HOME/sources/ipi/bin/i-pi input.xml &"],shell=True)
+
+                        print('!!!!!!!!!!!!!!!!! do 2, before sleep 5')
+                        time.sleep(10)
+                        print('!!!!!!!!!!!!!!!!! do 2, AFTER  sleep 5')
+                        call(["$HOME/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp"],shell=True)
+
+            # python $HOME/sources/ipi/bin/i-pi ipi_input_thermodynamic_integration_template.xml
+
+
+            # ~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp
+            sys.exit()
+
+
+        if True:
             print("##############################")
             print("# NOW GETTING anharmonic ... #")
             print("##############################")
-            hesse_vol_pos = my.get_hessefiles_vol_pos(os.getcwd()+"/fqh")
-            temperature = 900
-            for idx,i in enumerate(hesse_vol_pos):
-                hessefile = i[0]
-                volume  = i[1]
-                pos     = i[2]
-                print("->",hessefile,volume)
-                my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos)
-                sys.exit()
-            sys.exit()
-        #sys.exit()
+            hesse_vol_pos = my.load_hessefiles_volumes_positionsfiles_from_fqh_folder()
+            temperatures = [900]
+            for idx_vol,i in enumerate(hesse_vol_pos):
+                for idx_temp,temperature in enumerate(temperatures):
+                    hessefile = i[0]
+                    volume  = i[1]
+                    posfile = i[2]
+                    print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
+                    my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile)
+                    if idx_vol == 1:
+                        sys.exit()
+        sys.exit()
         #frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
         #print('frame_al.cell',frame_al.cell)
         #print('frame_al.positions',frame_al.positions)
@@ -408,6 +467,7 @@ def get_energies(args):
         print('frames.cell',frames.cell)
         print('frames.positions',frames.positions)
         #sys.exit()
+        print('os.getcwd()',os.getcwd())
         ase_structure_relaxed = my.get_evinet(ace,frames,relax_cellshape_and_volume=True,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
         #ace.get_elastic_external(atomsin=ase_structure_relaxed,verbose=ace.verbose,text="structure",get_all_constants=True)
@@ -1186,11 +1246,11 @@ def get_energies(args):
                 if repeat > 0:
                     atoms_sc,forces_sc = my.ase_repeat_structure(frames[i],repeat)
                 #print('ene',ene_DFT[idx],ace.units)
-                    ene_sc_ev = my.convert_energy(ene_DFT[idx]*repeat**3.,ace.units,"ev",frames[i])
+                    ene_sc_ev = my.convert_energy(ene_DFT[idx]*repeat**3.,ace.units,"ev",nat)
                 else:
                     atoms_sc = copy.deepcopy(frames[i])
                     forces_sc = atoms_sc.get_forces()
-                    ene_sc_ev = my.convert_energy(ene_DFT[idx],ace.units,"ev",frames[i])
+                    ene_sc_ev = my.convert_energy(ene_DFT[idx],ace.units,"ev",nat)
                 ase_write(args.inputfile+".repeated",atoms_sc,format='runner',append=True,setforces_ase_units=forces_sc,setenergy_eV=ene_sc_ev)
 
                 # statistics
@@ -1299,16 +1359,22 @@ def get_energies(args):
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
-                if idx == 60:
-                    np.savetxt("e_pot_eV_cell",ene_pot_eV_cell)
-                    np.savetxt("e_har_eV_cell",ene_har_eV_cell)
-                    np.savetxt("e_pot_hartree_cell",ene_pot_eV_cell*0.036749322)
-                    np.savetxt("e_har_hartree_cell",ene_har_eV_cell*0.036749322-2.89829817)
-                    dudl = my.get_dudl_from_energies_eV_cell(
+                if idx >= 99:
+                    #np.savetxt("e_pot_eV_cell",ene_pot_eV_cell)
+                    #np.savetxt("e_har_eV_cell",ene_har_eV_cell)
+                    #np.savetxt("e_pot_hartree_cell",ene_pot_eV_cell*0.036749322)
+                    #np.savetxt("e_har_hartree_cell",ene_har_eV_cell*0.036749322-2.89829817)
+                    dudl = fah.get_dudl_per_atom_min1_from_energies_eV_cell(
                             energies_lambda_0_eV_cell=ene_har_eV_cell,
                             energies_lambda_1_eV_cell=ene_pot_eV_cell,
-                            number_of_atoms=32)
-                    print('dudl',dudl)
+                            number_of_atoms=32,
+                            align_lambda_0_first_to_lambda_1_yes_no=True)
+                    dudlav = fah.get_dudlav_from_dudl(dudl)
+                    print('dudl')
+                    print(dudl)
+                    print('dudlav')
+                    print(dudlav)
+                    fah.get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms)
                     sys.exit('56859')
 
                 return

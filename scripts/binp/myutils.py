@@ -1543,7 +1543,7 @@ def create_READMEtxt(directory=False,add=False):
     print()
     print('written ',filepath)
     print()
-    return
+    return filepath
 
 def submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitskript=False):
     if jobdir == False:
@@ -3161,14 +3161,14 @@ def n2p2_get_scaling_and_function_data(cores=28,days=0,hours=0,minutes=5,submit_
 
     mkdir(folder)
     hier=os.getcwd()
-    create_READMEtxt()
+    readmepath = create_READMEtxt()
     os.chdir(folder)
     cp("../input.data")
     cp("../input.nn")
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,job="scaling",days=days,hours=hours,minutes=minutes,interactive=interactive)
     submitjob(submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
     #submitjob(submit=True,submit_to_que=submit_to_que,submit_to_debug_que=submit_to_debug_que,jobdir=False,submitskript=submitskript)
-    create_READMEtxt(add="submit_to_debug_que = "+str(submit_to_debug_que))
+    readmepath = create_READMEtxt(add="submit_to_debug_que = "+str(submit_to_debug_que))
     os.chdir(hier)
     return
 
@@ -3272,7 +3272,7 @@ def n2p2_make_training(cores=21,days=7,hours=0,minutes=0,submit_to_que=True,subm
 
     submitskript = n2p2_write_submit_skript(directory=False,cores=cores,nodes=1,days=days,hours=hours,minutes=minutes,job="train")
     submitjob(submit_to_que=True,submit_to_debug_que=False,jobdir=False,submitskript=submitskript)
-    create_READMEtxt()
+    readmepath = create_READMEtxt()
     return
 
 def get_latest_n2p2_pot():
@@ -3370,29 +3370,6 @@ def runner_exec(test=False):
 ##################################################################################
 ## getting positions
 ##################################################################################
-
-def get_dudl_from_energies_eV_cell(
-        energies_lambda_0_eV_cell=False,
-        energies_lambda_1_eV_cell=False,
-        number_of_atoms=0,
-        align_to_lambda_1_yes_no=True):
-    '''
-    dudl =  my.get_dudl_from_energies_eV_cell(
-            energies_lambda_0_eV_cell=ene_har_eV_cell,
-            energies_lambda_1_eV_cell=ene_har_eV_cell,
-            number_of_atoms=nat)
-    '''
-    print('energies_lambda_1_eV_cell')
-    print(energies_lambda_1_eV_cell)
-    print('energies_lambda_1_eV_cell')
-    print(energies_lambda_1_eV_cell)
-    print('number_of_atoms')
-    print(number_of_atoms)
-    #return (a[:60,2]-a[:60,1])*27.211386/31*1000
-    return (energies_lambda_1_eV_cell - energies_lambda_0_eV_cell)/(number_of_atoms-1)*1000.
-
-
-
 def folder_get_pos_forces_cell(i):
     ''' i is the folder '''
     create_dofor_POSITIONs = False
@@ -5402,15 +5379,15 @@ class ase_calculate_ene( object ):
             print('1: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
 
         logfile="-" # output to screen
-        logfile="tmp" # output to file and not to screen
+        logfile="tmpxxase" # output to file and not to screen
         if output_to_screen == True:
             logfile = '-'
         #opt = LBFGS(atoms,logfile=logfile)
         opt = FIRE(atoms,logfile=logfile,dt = 0.1)
         #opt = BFGS(atoms,logfile=logfile)
         opt.run(fmax=fmax)
-        if os.path.isfile("tmp"):
-            os.remove("tmp")
+        if os.path.isfile(logfile):
+            os.remove(logfile)
         if verbose:
             print('2: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
         return
@@ -6094,10 +6071,35 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     return atoms
 
 
-def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
+#def thermodynamic_integraton_from_fqh(ace):
+def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile):
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     #lambdas = [ 0.15, 0.5, 0.85 ]
     lambdas = [ 0.0, 1.0 ]
+    temperatures = [900]
+    steps = 100
+
+
+    #hesse_vol_pos = load_hessefiles_volumes_positionsfiles_from_fqh_folder()
+    #for idx_vol,i in enumerate(hesse_vol_pos):
+    #    for idx_temp,temperature in enumerate(temperatures):
+    #        hessefile = i[0]
+    #        volume  = i[1]
+    #        posfile = i[2]
+    #        print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
+    #print()
+    #print()
+
+
+    #for idx_vol,i in enumerate(hesse_vol_pos):
+    #    for idx_temp,temperature in enumerate(temperatures):
+    #        hessefile = i[0]
+    #        volume  = i[1]
+    #        posfile = i[2]
+    #        print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
+    #        my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile)
+    #                if idx_vol == 1:
+
     for l in lambdas:
         rand_nr = random.randint(1,99999)
         rand_nr = '1234567'
@@ -6114,14 +6116,14 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             hessefile_basename = os.path.basename(hessefile)
             shutil.copy2(hessefile, folder)
             print('hfbn',hessefile_basename)
-            shutil.copy2(ipi_inp, folder)
-            ipi_inp_basename = os.path.basename(ipi_inp)
-            print('ipi_inp',ipi_inp_basename)
-            print('pos',pos)
+            ipi_inp_basename = 'input.xml'
+            shutil.copy2(ipi_inp, folder+'/'+ipi_inp_basename)
+            print('ipi_inp_basename',ipi_inp_basename)
+            print('posfile',posfile)
             print('to folder',folder)
             print()
-            pos_basename = os.path.basename(pos)
-            frame = ase_read(pos)
+            pos_basename = os.path.basename(posfile)
+            frame = ase_read(posfile)
             ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
             ene_hartree = ene*0.036749322
             print('ene',ene,"eV")
@@ -6152,7 +6154,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             ang_to_bohr = 1.8897261
             np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
             nat = frame.get_number_of_atoms()
-            sed(folder+'/'+ipi_inp_basename,'xxx123',str(10))  # steps
+            sed(folder+'/'+ipi_inp_basename,'xxx123',str(steps))  # steps
             sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
             sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.ipi.xyz')
             sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
@@ -6172,7 +6174,8 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,pos):
             print('3rd column in simulation.ti is also independent of v_reference> -2.89829817e+00')
     return
 
-def get_hessefiles_vol_pos(folder):
+def load_hessefiles_volumes_positionsfiles_from_fqh_folder():
+    folder = os.getcwd()+"/fqh"
     paths = glob.glob(folder+'/Hessematrix_*')
     out = []
     for path in paths:
@@ -6430,7 +6433,7 @@ class ase_get_known_formats_class():
         if self.verbose: print(">> vasp.py adapted to write free energies by default.")
         return
 
-def convert_energy(ene,units_in_,units_out_,frame,verbose=False):
+def convert_energy(ene,units_in_,units_out_,nat,verbose=False):
     known = [ "hartree_pa", "ev_pa", "mev_pa", 'ev', "hartree" ]
     units_in  = units_in_.lower()
     units_out = units_out_.lower()
@@ -6464,9 +6467,9 @@ def convert_energy(ene,units_in_,units_out_,frame,verbose=False):
         print('ene (1)',ene)
 
     if len(units_in_split) == 2 and len(units_out_split) == 1:
-        ene = ene * frame.get_number_of_atoms()
+        ene = ene * nat
     elif len(units_in_split) == 1 and len(units_out_split) == 2:
-        ene = ene / frame.get_number_of_atoms()
+        ene = ene / nat
     if verbose:
         print('ene (2)',ene)
     return ene
@@ -6531,7 +6534,7 @@ if __name__ == "__main__":
         function = eval(args.execute_function)
         function()
         hier = os.path.abspath(os.getcwd())
-        create_READMEtxt(hier)
+        readmepath = create_READMEtxt(hier)
     #n2p2_check_SF_inputnn(inputnn="cursel_64.def")
     #get_number_of_atoms_as_function_of_cutoff()
     #create_al_structures_for_analysis_SOAP()

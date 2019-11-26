@@ -32,13 +32,13 @@ TageRest
 0.0  6.5    22.11.2019 compensation EPFL-open-doors Holiday park(eingetragen)
 1.0  5.5    25.11.2019 Urlaub Holiday park                      (eingetragen)
 
-1.0  5.5    23.12.2019 Weihnachten
-0.5  5.0    24.12.2019 Weihnachten
-1    4.0    27.12.2019 Weihnachten
-1    3.0    30.12.2019 Weihnachten
-0.5  2.5    31.12.2019 Weihnachten
-1    1.5    03.01.2019 Weihnachten 2019
+1.0  4.5    23.12.2019 Weihnachten                              (eingetragen)
+0.5  4.0    24.12.2019 Weihnachten                              (eingetragen)
+1    3.0    27.12.2019 Weihnachten                              (eingetragen)
+1    2.0    30.12.2019 Weihnachten                              (eingetragen)
+0.5  1.5    31.12.2019 Weihnachten                              (eingetragen)
+1    0.5    03.01.2019 Weihnachten 2019                         (eingetragen)
 
-1.5  ?.?    Skifahren
+     ?.?    Skifahren
 ----------------------------------- uebertrag xx + (14.5 days for 2020) = xx
      1.0    22.5.2020 Brueckentag Nottingham treffen

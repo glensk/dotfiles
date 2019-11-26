@@ -4,10 +4,11 @@ import argparse
 import os
 import sys
 import glob
-import utils
+import utils_rename as utils
 import shutil
 import numpy as np
 import pylab
+import myutils
 from scipy.integrate import quad
 import hesse as h
 
@@ -130,12 +131,112 @@ def write_Fah_surface(a, temps, dudlmeanfit, filename = 'Fah_surface'):
     return
 
 
+def get_dudl_per_atom_min1_from_energies_eV_cell(
+        energies_lambda_0_eV_cell=False,
+        energies_lambda_1_eV_cell=False,
+        number_of_atoms=0,
+        align_lambda_0_first_to_lambda_1_yes_no=True,
+        verbose=False):
+    '''
+    dudl =  my.get_dudl_from_energies_eV_cell(
+            energies_lambda_0_eV_cell=ene_har_eV_cell,
+            energies_lambda_1_eV_cell=ene_har_eV_cell,
+            number_of_atoms=nat)
+    '''
+    if verbose:
+        print('energies_lambda_1_eV_cell')
+        print(energies_lambda_1_eV_cell)
+        print('energies_lambda_1_eV_cell')
+        print(energies_lambda_1_eV_cell)
+        print('number_of_atoms')
+        print(number_of_atoms)
+        print('energies_lambda_0_eV_cell[0]')
+        print(energies_lambda_0_eV_cell[0])
+        print('energies_lambda_1_eV_cell[0]')
+        print(energies_lambda_1_eV_cell[0])
+
+    if align_lambda_0_first_to_lambda_1_yes_no == True:
+        d = energies_lambda_1_eV_cell[0] - energies_lambda_0_eV_cell[0]
+        if verbose:
+            print('d',d)
+        energies_lambda_0_eV_cell = energies_lambda_0_eV_cell + d
+        if verbose:
+            print('AE energies_lambda_0_eV_cell[0]')
+            print(energies_lambda_0_eV_cell[0])
+            print('AE energies_lambda_1_eV_cell[0]')
+            print(energies_lambda_1_eV_cell[0])
+    #return (a[:60,2]-a[:60,1])*27.211386/31*1000
+    dudl = (energies_lambda_1_eV_cell - energies_lambda_0_eV_cell)/(number_of_atoms-1)*1000.
+    dudl = dudl[~np.isnan(dudl)]
+    if verbose:
+        print('dudl',type(dudl))
+        print(dudl)
+    return dudl
+
+def get_dudlav_from_dudl(dudl):
+    dudlav = np.copy(dudl)
+    for idx,i in enumerate(dudlav):
+        dudlav[idx] = (dudl[:idx+1]).mean()
+    #print('dudlav')
+    #print(dudlav)
+    return dudlav
+
+def get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms,verbose=False):
+    l01 = np.loadtxt(filepath)
+    if verbose:
+        print(l01.shape)
+    l0_column = 0
+    l0 = l01[:,l0_column]
+    if verbose:
+        print(l0)
+        print(np.diff(l0))
+    if len(np.unique(np.diff(l0))) == 1:
+        l0_column = 1
+        l0 = l01[:,l0_column]
+
+    l1_column = l0_column+1
+    l1 = l01[:,l1_column]
+
+    #print('l0')
+    #print(l0)
+    #print('l1')
+    #print(l1)
+    l0 = myutils.convert_energy(l0,"hartree","eV",number_of_atoms,verbose=False)
+    l1 = myutils.convert_energy(l1,"hartree","eV",number_of_atoms,verbose=False)
+    #print('l0o')
+    #print(l0)
+
+    dudl = get_dudl_per_atom_min1_from_energies_eV_cell(
+            energies_lambda_0_eV_cell=l0,
+            energies_lambda_1_eV_cell=l1,
+            number_of_atoms=number_of_atoms,
+            align_lambda_0_first_to_lambda_1_yes_no=True)
+    #dudlav = get_dudlav_from_dudl(dudl)
+    #print('dudl')
+    #print(dudl)
+    #print('dudlav')
+    #print(dudlav)
+    #sys.exit()
+    return dudl
+
+def save_dudl_to_file(folder,dudl,filename="dudl"):
+    if os.path.isifle(folder+"/"+filename):
+        print(folder+"/dudl does already exist!;exit")
+        sys.exit()
+    #  step   time(fs)  temp(K) average       U(meV/at)    Uref          dUdL   average    offset
+    dudl = np.zeros((len(dudl)-1,3))
+    dudl[:,0] = np.arange(len(dudl))
+    dudl[:,1] = dudl
+    np.savetxt(folder+"/"+dudl)
+    return
+
+
 class ah():
     ''' anharmonic contribution to Gibbs free energy '''
     def __init__(self):
         self._verbose       = False
-        self._filestring                        = None
-        self._pwd                               = os.getcwd()
+        self._filestring    = None
+        self._pwd           = os.getcwd()
         self._dudl_cutoff_first_structures      = 50
         self._dudl_correlation_length           = 10
 
