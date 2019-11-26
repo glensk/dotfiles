@@ -36,7 +36,8 @@ def help(p = None):
     p.add_argument('-sys_ele','--sys_ele', nargs='*', default=False, help="in case no inutfile is given, define the element manually")
     p.add_argument('-sys_ncell','--sys_ncell', type=int, default=1, help="in case no inutfile is given, define how often the primitive/conventional cell is repeated")
 
-    p.add_argument('-dpm','--do_particular_myuils', required=False, type=str,default='', help="module to run")
+    p.add_argument('-dpmf','--do_particular_myuils_function', required=False, type=str,default='', help="module to run")
+    p.add_argument('-dpf','--do_particular_function', required=False, type=str,default='', help="module to run from here")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
     p.add_argument('--potpath','-p',   required=False, type=str, default="n2p2_v4ag_ppl_987654_21cores", help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
@@ -450,13 +451,22 @@ def get_energies(args):
         formation_energies(ace,args)
         sys.exit('formation_energies done! Exit')
 
-    if args.do_particular_myuils:
+    if args.do_particular_myuils_function:
         print('args.inputfile',args.inputfile)
-        print('args.do_particular_myuils',args.do_particular_myuils)
-        function = eval('my.'+args.do_particular_myuils)
+        print('args.do_particular_myuils_function',args.do_particular_myuils_function)
+        function = eval('my.'+args.do_particular_myuils_function)
         #my.get_Mg5Si6_and_other_antisites(ace)
         function(ace)
         sys.exit()
+
+    if args.do_particular_function:
+        print('args.inputfile',args.inputfile)
+        print('args.do_particular_function',args.do_particular_function)
+        function = eval(args.do_particular_function)
+        #my.get_Mg5Si6_and_other_antisites(ace)
+        function(ace)
+        sys.exit()
+
 
     ############
     ### elastic / elastic_all
@@ -720,6 +730,7 @@ def get_energies(args):
         ene_DFT          = np.empty(structures_to_calc);ene_DFT[:]  = np.nan
         ene_DFT_eV_cell  = np.empty(structures_to_calc);ene_DFT_eV_cell[:]  = np.nan
         ene_pot_eV_cell  = np.empty(structures_to_calc);ene_pot_eV_cell[:]  = np.nan
+        ene_har_eV_cell  = np.empty(structures_to_calc);ene_har_eV_cell[:]  = np.nan
         ene_DFT_m0        = np.empty(structures_to_calc);ene_DFT_m0[:]  = np.nan
         ene_pot_m0     = np.empty(structures_to_calc);ene_pot_m0[:]  = np.nan
         ene_har_m0     = np.empty(structures_to_calc);ene_har_m0[:]  = np.nan
@@ -1031,6 +1042,7 @@ def get_energies(args):
                         #print(u)
 
                         ene_har_m0[idx] = hesse.qh_energy_atom(dpos = u, h = hesse_matrix)
+                        ene_har_eV_cell[idx] = hesse.qh_energy_cell(dpos = u, h = hesse_matrix)
                         dudl_har_to_DFT[idx]   = ene_DFT_m0[idx] - ene_har_m0[idx]
                         dudl_har_to_pot[idx]   = ene_pot_m0[idx] - ene_har_m0[idx]
 
@@ -1255,18 +1267,20 @@ def get_energies(args):
                     if True: #ace.units == 'hartree':
                         aatest = aaatest[i][2]
                         print(str(i).ljust(5),
-                                'ene_DFT:',srl(ene_DFT[idx],3,9),
+                                #'ene_DFT:',srl(ene_DFT[idx],3,9),
                                 'ene_pot',srl(ene_pot[idx],3,9),
-                                'aatest:',srl(aatest,3,9),
-                                'ene_DFT_m0' ,srl(ene_DFT_m0[idx],3,9),
+                                'ene_pot_eV_cell',srl(ene_pot_eV_cell[idx],3,9),
+                                'ene_har_eV_cell',srl(ene_har_eV_cell[idx]-78.86671025,3,9),
+                                #'aatest:',srl(aatest,3,9),
+                                ##'ene_DFT_m0' ,srl(ene_DFT_m0[idx],3,9),
                                 'ene_har_m0:',srl(ene_har_m0[idx],2,9),
                                 'ene_pot_m0' ,srl(ene_pot_m0[idx],3,9),
 
-                                'dudl_pot_to_DFT',sr(dudl_pot_to_DFT[idx],2),
-                                'dudlav_pot_to_DFT',sr(dudlav_pot_to_DFT[idx],2),
+                                #'dudl_pot_to_DFT',sr(dudl_pot_to_DFT[idx],2),
+                                #'dudlav_pot_to_DFT',sr(dudlav_pot_to_DFT[idx],2),
 
-                                'dudl_har_to_DFT',  sr(dudl_har_to_DFT[idx],2),
-                                'dudlav_har_to_DFT',sr(dudlav_har_to_DFT[idx],2),
+                                #'dudl_har_to_DFT',  sr(dudl_har_to_DFT[idx],2),
+                                #'dudlav_har_to_DFT',sr(dudlav_har_to_DFT[idx],2),
 
                                 'dudl_har_to_pot',  sr(dudl_har_to_pot[idx],2),
                                 'dudlav_har_to_pot',sr(dudlav_har_to_pot[idx],2),
@@ -1286,8 +1300,18 @@ def get_energies(args):
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
-                #if idx == 60:
-                #    sys.exit('56859')
+                if idx == 60:
+                    np.savetxt("e_pot_eV_cell",ene_pot_eV_cell)
+                    np.savetxt("e_har_eV_cell",ene_har_eV_cell)
+                    np.savetxt("e_pot_hartree_cell",ene_pot_eV_cell*0.036749322)
+                    np.savetxt("e_har_hartree_cell",ene_har_eV_cell*0.036749322-2.89829817)
+                    dudl = my.get_dudl_from_energies_eV_cell(
+                            energies_lambda_0_eV_cell=ene_har_eV_cell,
+                            energies_lambda_1_eV_cell=ene_pot_eV_cell,
+                            number_of_atoms=32)
+                    print('dudl',dudl)
+                    sys.exit('56859')
+
                 return
 
 

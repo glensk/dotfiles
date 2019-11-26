@@ -1043,9 +1043,12 @@ class mypot( object ):
             self.pottype = self.pot_all_dict[self.potpath_in][1]
             self.pot     = self.pot_all_dict[self.potpath_in][2]
         except:
-            # here only a relative path or something like this has been specified ../
+            # here only a relative path or something like this has been specified as ../ or . or ./
+            print('seems like a relative path ....')
             self.potpath = os.path.abspath(self.potpath_in)
             self.pot     = os.path.basename(self.potpath_in)
+            print('self.potpath',self.potpath)
+            print('self.pot    ',self.pot)
         self.get_pottype_elements_and_atomic_energies()  # defines self.pottype if not defined
 
 
@@ -3372,6 +3375,29 @@ def runner_exec(test=False):
 ##################################################################################
 ## getting positions
 ##################################################################################
+
+def get_dudl_from_energies_eV_cell(
+        energies_lambda_0_eV_cell=False,
+        energies_lambda_1_eV_cell=False,
+        number_of_atoms=0,
+        align+):
+    '''
+    dudl =  my.get_dudl_from_energies_eV_cell(
+            energies_lambda_0_eV_cell=ene_har_eV_cell,
+            energies_lambda_1_eV_cell=ene_har_eV_cell,
+            number_of_atoms=nat)
+    '''
+    print('energies_lambda_1_eV_cell')
+    print(energies_lambda_1_eV_cell)
+    print('energies_lambda_1_eV_cell')
+    print(energies_lambda_1_eV_cell)
+    print('number_of_atoms')
+    print(number_of_atoms)
+    #return (a[:60,2]-a[:60,1])*27.211386/31*1000
+    return (energies_lambda_1_eV_cell - energies_lambda_0_eV_cell)/(number_of_atoms-1)*1000.
+
+
+
 def folder_get_pos_forces_cell(i):
     ''' i is the folder '''
     create_dofor_POSITIONs = False
@@ -3392,7 +3418,11 @@ def folder_get_pos_forces_cell(i):
     forces      = pos_forces[:,[3,4,5]]
     if not os.path.isfile(i+'/u_OUTCAR'):
         with cd(i):
-            call(["OUTCAR_ene-potential_energy_without_first_substracted.sh > u_OUTCAR"],shell=True)
+            call(["OUTCAR_ene-potential_energy.sh > u_OUTCAR"],shell=True)
+
+    if not os.path.isfile(i+'/u_OUTCAR_without_first_substracted'):
+        with cd(i):
+            call(["OUTCAR_ene-potential_energy_without_first_substracted.sh > u_OUTCAR_without_first_substracted"],shell=True)
 
     #@if create_dofor_POSITIONs == True:
     #@    with cd(i):
@@ -3420,7 +3450,7 @@ def check_vec_in_array(test,array):
     #return any(np.array_equal(x, test) for x in array)
     return any(np.allclose(x, test) for x in array)
 
-def try_to_get_from_positions_only__nat_cryst_sc_cell(positions,forces,verbose=False):
+def try_to_get_from_positions_only__nat_cryst_sc_cell(positions,forces,or_folder_to_positions=False,verbose=False):
     '''
     nat,cryst,sc,alat,cell,pos0 = try_to_get_from_positions_only__nat_cryst_sc_cell(pos,forces,verbose=False)
 
@@ -3438,15 +3468,32 @@ def try_to_get_from_positions_only__nat_cryst_sc_cell(positions,forces,verbose=F
     0.00000 2.06500 2.06500 -0.000000 0.000000 -0.000000
     0.00000 2.06500 6.19500 0.000000 -0.000000 0.000000
     '''
+    verbose = True
+    if or_folder_to_positions != False:
+        if not os.path.isfile(or_folder_to_positions):
+            sys.exit('ftp does not exist 85;Exit')
+        else:
+            positions_forces = np.loadtxt(or_folder_to_positions)
+            positions = positions_forces[:,[0,1,2]]
+            forces = positions_forces[:,[3,4,5]]
+
     #########################
     # get nat (e.g. 32 atoms)
     #########################
     f = forces
     p = positions
-    nat = 0
+
+    if verbose:
+        print('positions')
+        print(p)
+        print('forces')
+        print(f)
+    nat = 1
     for i in np.arange(len(forces)):
+        nat = i+1
         fa = np.abs(f[i]).max()
-        #print(i,fa)
+        if verbose:
+            print('fa',i,fa)
         if fa > 1e-4:
             nat = i
             break
@@ -5470,8 +5517,8 @@ class ase_calculate_ene( object ):
         dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,0.998,1.0,1.002,1.005,1.01,1.015,1.02,1.025,1.03]
         dvol_rel = np.arange(0.97,1.03,0.005)
         dvol_rel = np.arange(0.985,1.015,0.0025)
-        dvol_rel = np.arange(0.9,1.1,0.01)
-        dvol_rel = np.arange(0.80,1.20,0.01)
+        #dvol_rel = np.arange(0.9,1.1,0.01)
+        #dvol_rel = np.arange(0.80,1.20,0.01)
         #dvol_rel = np.arange(0.97,1.03,0.001)
         #dvol_rel = np.arange(0.995,1.005,0.0003)
         vol_pa = np.zeros(len(dvol_rel))

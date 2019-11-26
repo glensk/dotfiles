@@ -134,7 +134,7 @@ case $myhost in
 #    # pip install --upgrade --user ipython
     fidis) moduel load intel python/2.7.16;;
     helvetios) moduel load intel python/2.7.16;;
-    mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate
+    #mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate  -> dont need it
 esac
     # This would give me python 3 by default, quickly
     #if [ "`command -v pyenv`" != "" ]; then 

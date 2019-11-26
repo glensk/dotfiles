@@ -239,6 +239,7 @@ class get_all_disps():
             if verbose:
                 print('dofor             ('+add+'):',dofor)
                 print('self.dofor        ('+add+'):',selfdofor)
+
         if self.verbose:
             print_dofor_self_dofor(dofor,self.dofor,self.verbose,add="X")
 
@@ -273,14 +274,28 @@ class get_all_disps():
             print_dofor_self_dofor(dofor,self.dofor,self.verbose,add="Z")
 
         ####### get or check self.dofor
-        str_list = utils.common_prefix(self.folder_alldisp).split("/")
-        #print(str_list)
-        str_list = filter(None, str_list)
-        #print(str_list)
-        str_list= "/"+"/".join(str_list[:-1])
-        #print(str_list)
-        dofor = str_list
+        recheck_dofor = True
+	if type(self.dofor) == str == type(dofor):
+            if self.dofor == dofor:
+                recheck_dofor = False
 
+	verbose1 = True
+	if verbose1 == True:
+		print('xx sfd',self.folder_alldisp)
+
+        if recheck_dofor == True:
+            str_list = utils.common_prefix(self.folder_alldisp).split("/")
+	    if verbose1 == True:
+            	print('xx sfd',str_list)
+            str_list = filter(None, str_list)
+	    if verbose1 == True:
+            	print('xx sdf',str_list)
+            str_list= "/"+"/".join(str_list[:-1])
+	    if verbose1 == True:
+            	print('xx sdf',str_list)
+            dofor = str_list
+	    if verbose1 == True:
+            	print('xx dof',dofor)
 
         if self.verbose:
             print_dofor_self_dofor(dofor,self.dofor,self.verbose,add="A")
@@ -345,7 +360,23 @@ class get_all_disps():
         if self.verbose:
             print()
             for idx,i in enumerate(self.folder_alldisp):
-                print(idx,i)
+                if idx == 0 and self.sc == False:
+                    if os.path.isfile(self.folder_alldisp[0]+"/POSITIONs"):
+                        nat, cryst, self.sc, self.alat, cell, pos0 = my.try_to_get_from_positions_only__nat_cryst_sc_cell(1,1,or_folder_to_positions=self.folder_alldisp[0]+"/POSITIONs")
+                        sc = self.sc
+                        alat = self.alat
+                        if self.verbose:
+                            print('xX nat',nat)
+                            print('xX cryst',cryst)
+                            print('xX self.sc',self.sc)
+                            print('xX self.alat',self.alat)
+                            print('xX cell',cell)
+
+                        #positions_forces = np.loadtxt(self.folder_alldisp[0]+"/POSITIONs")
+                        #positions = positions_forces[:,[0,1,2]]
+                        #forces = positions_forces[:,[3,4,5]]
+                        #nat, cryst, self.sc, self.alat, cell, pos0 = my.try_to_get_from_positions_only__nat_cryst_sc_cell(positions,forces,verbose=False)
+
             print()
 
         for idx,i in enumerate(self.folder_alldisp):
@@ -361,12 +392,16 @@ class get_all_disps():
                 self.sc = sc
             else:
                 if self.sc != sc:
+                    print('sc',sc)
+                    print('self.sc',self.sc)
                     sys.exit('sc not self.sc (77); Exit')
 
             if self.alat == False:
                 self.alat = alat
             else:
                 if self.alat != alat:
+                    print('alat',alat)
+                    print('self.alat',self.alat)
                     sys.exit('alat not self.alat (77); Exit')
 
             self.nndist = self.alat/np.sqrt(2.)
@@ -391,8 +426,8 @@ class get_all_disps():
 
 
             if idx == 0:
-                self.force_all          = np.zeros((len(self.folder_alldisp),pos.shape[0],pos.shape[1]))
-                self.pos_all            = np.zeros((len(self.folder_alldisp),pos.shape[0],pos.shape[1]))
+                self.force_all          = np.zeros((len(self.folder_alldisp),4*self.sc**3,3))
+                self.pos_all            = np.zeros((len(self.folder_alldisp),4*self.sc**3,3))
 
             self.force_all[idx] = forces
             pos_ = my.center_positions_around_0(pos,self.sc,self.alat)
@@ -699,11 +734,16 @@ class get_all_disps():
             # Al (as a rule of thumb: ene std/ 2 = error in free energy)
             #############################################################
             # --- 7 displacements -----------------------------------------------
+            # displacements_/Al/2x2x2sc_4.13Ang_quer_3x3x3kp/shmall_subset/POSITIONs (== parametrization)  ( the convergence criteria seem fine, not sure why convergence so bad)
+            # LA no tox       7 displacements (                    ) (amc -e Al -v -pm 7_poly           )       ps: 0.99618  ene std: 2.2041 meV/atom  for std: 0.22204
+            # LA no tox       7 displacements (                    ) (amc -e Al -v -pm 7_morse          )       ps: 0.99772  ene std: 1.3189 meV/atom  for std: 0.33527
+
+            # displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400  (==parametrization)
             # LA no tox       7 displacements (orig from disp foler) (amc -e Al -v -pm 7_morse          )       ps: 0.99835  ene std: 0.2973 meV/atom  for std: 0.01297
             # LA no tox       7 displacements                        (amc -e Al -v -pm 7_morseprl -t1o 0)       pc: 0.99723  ene std: 0.4165 meV/atom  for std: 0.01604
             # LA with tox     7 displacements (orig from disp foler) (amc -e Al -v -pm 7_morse -t1 -0.065)      ps: 0.99927  ene std: 0.0164 meV/atom  for std: 0.00619 a_mor:1.5256625969 D_mor:0.213311082
             # LA with tox     7 displacements                        (amc -e Al -v -pm 7_morseprl       )       ps: 0.99875  ene std: 0.0883 meV/atom  for std: 0.00810
-            # POLY            7 displacements                        (amc -e Al -v -pm 7_poly        )          ps: 0.99935  ene std: 0.0190 meV/atom  for std: 0.00588  ** best (=POLY)
+	    # POLY            7 displacements                        (amc -e Al -v -pm 7_poly   ) (cd 0.88      ps: 0.99935  ene std: 0.0190 meV/atom  for std: 0.00588  ** best (=POLY)
 
             # --- SUM_run1/first_20000 ------------------------------------------
             # LA no   tox     SUM_run1/first_20000 displacements     (amc -e Al -v -pm 20000_morse)             ps: 0.99061  ene std: 3.7131 meV/atom  for std: 0.11227
@@ -733,11 +773,11 @@ class get_all_disps():
             #                                              (== amc -e Pt -f . -t1 -0.135 -alat_mor 4.1 -a_mor 1.8496052614 -D_mor 0.2504607705)
             # LA with tox     7 displacements   (amc -e Pt -f . -t1 -0.135 -alat_mor 4.1 -a_mor 1.8496 -D_mor 0.25)
             #                                                                                                   ps: 0.99883  ene std: 0.0186  meV/atom  for std: 0.01754
-            # POLY            7 displacements         (amc -e Pt -pm 7_poly)    (cd)                            ps: 0.99825  ene std: 0.4035  meV/atom  for std: 0.02261
-            # POLY            7 displacements         (amc -e Pt -pm 7_poly)    (abcd)                          ps: 0.99870  ene std: 0.3360  meV/atom  for std: 0.02021
-            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o 0.05)    (abcd)                ps: 0.99879  ene std: 0.1132  meV/atom  for std: 0.01788
-            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o 0.041)   (abcd)                ps: 0.99881  ene std: 0.1512  meV/atom  for std: 0.01788
-            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o -0.06)   (abcd) (rcut=0.84)    ps: 0.99892  ene std: 0.0410  meV/atom  for std: 0.01704  ** best (=POLY+TOX)
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly)    (cd 0.88)                       ps: 0.99825  ene std: 0.4035  meV/atom  for std: 0.02261
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly)    (abcd 0.88)                     ps: 0.99870  ene std: 0.3360  meV/atom  for std: 0.02021
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o 0.05)    (abcd 0.88)           ps: 0.99879  ene std: 0.1132  meV/atom  for std: 0.01788
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o 0.041)   (abcd 0.88)           ps: 0.99881  ene std: 0.1512  meV/atom  for std: 0.01788
+            # POLY            7 displacements         (amc -e Pt -pm 7_poly -t1o -0.06)   (abcd) (rcut=0.84)    ps: 0.99892  ene std: 0.0410  meV/atom  for std: 0.01704  ** best (=POLY+TOX)  -> cant reproduce t1o seems wrong
 
 
 
@@ -774,6 +814,9 @@ class get_all_disps():
             print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)",params_abcd)
             print("# parametrize Michaels Model ueber alle nachbarn (    c,d)",params_cd)
             params_abcd,params_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,rcut=0.84,save_parametrization=self.dofor)
+            print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)",params_abcd)
+            print("# parametrize Michaels Model ueber alle nachbarn (    c,d)",params_cd)
+            params_abcd,params_cd = my.get_michaels_paramerization(pos_all=self.pos_all,force_all=self.force_all,NN1=NN1,alat=alat,atoms=atoms,rcut=0.85355,save_parametrization=self.dofor)
             print("# parametrize Michaels Model ueber alle nachbarn (a,b,c,d)",params_abcd)
             print("# parametrize Michaels Model ueber alle nachbarn (    c,d)",params_cd)
             sys.exit('778866')

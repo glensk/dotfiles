@@ -704,10 +704,10 @@ def obtain_parametrization_I_from_michaels_polynomial(args):
 
         ################## check element and define folder
         if args.element == "Al":
-            #folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400"
+            folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.14Ang_quer_10x10x10kp_vasp4_ENCUT400"
             #folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/4x4x4sc_4.13Ang_quer_2x2x2kp_vasp4"
             #folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/3x3x3sc_4.13Ang_quer_2x2x2kp_7disp"
-            folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/2x2x2sc_4.13Ang_quer_3x3x3kp/shmall_subset"
+            #folder_parametrization = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/2x2x2sc_4.13Ang_quer_3x3x3kp/shmall_subset"
             folder_PTS_30_polycorralat = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Al/4x4x4sc_4.13Ang_quer_2x2x2kp_vasp4"
         if args.element == "Pt":
             folder_parametrization     = "/Users/glensk/Dropbox/Albert/Understanding_distributions/displacements_/Pt/3x3x3sc_4.1Ang_quer_2x2x2kp_vasp4"
@@ -726,6 +726,8 @@ def obtain_parametrization_I_from_michaels_polynomial(args):
             set_michael_poly_to0_and_use_morse()
         elif args.poly_michael.split("_")[0] == '7':
             args.folder = folder_parametrization # 7 isplacements
+        elif args.poly_michael.split("_")[0] == 'hier':
+            args.folder = args.folder # 7 isplacements
 
         ################## get parametrization
         if args.poly_michael.split("_")[1] in ['morse','morseprl']:
@@ -736,10 +738,8 @@ def obtain_parametrization_I_from_michaels_polynomial(args):
             check_for_disp_fit_parameters_morse(args,folder=folder_parametrization)
         elif args.poly_michael.split("_")[1] == 'poly':
             set_morsepar_to_zer0_and_use_micheal_poly()
-            #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.88.dat")
+            args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.88.dat")
             #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
-
-            #############
             #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.84.dat")
             args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.84.dat")
         elif args.poly_michael.split("_")[1] == 'morseprl':
@@ -765,11 +765,11 @@ def obtain_parametrization_I_from_michaels_polynomial(args):
     else:
         set_michael_poly_to0_and_use_morse()
 
-    print('args.poly_michael 	    yy-out:',args.poly_michael)
+    print('args.poly_michael        yy-out:',args.poly_michael)
     print('args.michael_poly_yes_no yy-out:',args.michael_poly_yes_no)
     print('args.poly_michael_par    yy-out:',args.poly_michael_par)
-    print('args.folder       	    yy-out:',args.folder)
-    print('args.element      	    yy-out:',args.element)
+    print('args.folder              yy-out:',args.folder)
+    print('args.element             yy-out:',args.element)
     print('args.parametrization     yy-out:',args.parametrization)
     return
 
