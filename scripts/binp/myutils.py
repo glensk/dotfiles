@@ -3380,7 +3380,7 @@ def get_dudl_from_energies_eV_cell(
         energies_lambda_0_eV_cell=False,
         energies_lambda_1_eV_cell=False,
         number_of_atoms=0,
-        align+):
+        align_to_lambda_1_yes_no=True):
     '''
     dudl =  my.get_dudl_from_energies_eV_cell(
             energies_lambda_0_eV_cell=ene_har_eV_cell,
