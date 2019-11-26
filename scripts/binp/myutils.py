@@ -693,6 +693,7 @@ class mypot( object ):
         self.atom_masses                = False # necessary for n2p2 / runner
         self.atom_masses_str            = False # necessary for n2p2 / runner
         self.atom_types                 = None # needs to be defines for runner/n2p2
+        self.atom_numbers               = None # needs to be defines for runner/n2p2
                                         # self.atom_types = {'Mg':1,'Al':2,'Si':3}
         self.lmpcmd                     = False
         self.pot_all_dict               = {}
@@ -798,25 +799,24 @@ class mypot( object ):
         #print('self.potpath',self.potpath)
         #print('self.elements',self.elements)
         #print('self.atom_energy',self.atom_energy)
-        self.atom_types_ = {}
+        self.atom_numbers = {}
         self.atom_masses = {}
         for i in self.elements:
-            self.atom_types_[i]         = my_atom.atom([i]).number[0]
+            self.atom_numbers[i]         = my_atom.atom([i]).number[0]
             self.atom_masses[i]         = my_atom.atom([i]).mass[0]
             #self.reference_volumes[i]   = my_atom.atom([i]).reference_volume[0]
-        #print('fin (1)',self.atom_types_)
         #print('fin (M)',self.atom_masses)
         list_atom_nr = []
-        for i  in self.atom_types_:
-            list_atom_nr.append(self.atom_types_[i])
-            #print(i,self.atom_types_[i])
+        for i  in self.atom_numbers:
+            list_atom_nr.append(self.atom_numbers[i])
+            #print(i,self.atom_numbers[i])
         #print('fin (2):',np.sort(np.array(list_atom_nr)))
         self.atom_types = {}
         self.atom_masses_str = []
         for idx,i in enumerate(np.sort(np.array(list_atom_nr))):
-            for j in self.atom_types_:
-                #print(idx,i,"||",j,self.atom_types_[j])
-                if i == self.atom_types_[j]:
+            for j in self.atom_numbers:
+                #print(idx,i,"||",j,self.atom_numbers[j])
+                if i == self.atom_numbers[j]:
                     self.atom_types[j] = idx+1
                     self.atom_masses_str = self.atom_masses_str+ [ "mass "+str(idx+1)+" "+str(self.atom_masses[j])]
                     #print('-->',j,self.atom_types[j],idx+1)
@@ -877,6 +877,7 @@ class mypot( object ):
             print(text,"self.atom_energy            ",self.atom_energy)
             print(text,"self.reference_volumes      ",self.reference_volumes)
             print(text,"self.atom_types             ",self.atom_types)
+            print(text,"self.atom_numbers           ",self.atom_numbers)
             print(text,"self.atom_masses            ",self.atom_masses)
             print(text,"self.atom_masses_str        ",self.atom_masses_str)
             print(text,"self.potDONE                ",self.potDONE)
@@ -2609,10 +2610,10 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     # write in.lmp (for mormal energy calculation)
     ###############################################################
     if not get_elastic_constants:
-        execute_file = 'in.lmp'
-        lammps_write_inputfile(folder=ace.pot.lammps_tmpdir,filename=execute_file,positions='pos.lmp',ace=ace)
+        lammps_in_file = 'in.lmp'
+        lammps_write_inputfile(folder=ace.pot.lammps_tmpdir,filename=lammps_in_file,positions='pos.lmp',ace=ace)
         if ace.verbose:
-            print('written ',ace.pot.lammps_tmpdir+'/'+execute_file)
+            print('written ',ace.pot.lammps_tmpdir+'/'+lammps_in_file)
     if ace.verbose > 1:
         print("written lammsp inputfile to ",ace.pot.lammps_tmpdir)
 
@@ -2626,7 +2627,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     # IF get elastic constants
     ###############################################################
     if get_elastic_constants:
-        execute_file = 'in.elastic'
+        lammps_in_file = 'in.elastic'
         if ace.verbose:
             print('written ',ace.pot.lammps_tmpdir+'/potential.mod')
         lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='potential.mod',command=lammps_ext_elastic_potential_mod(ace))
@@ -2634,7 +2635,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         cp(scripts()+'/lammps_scripts/elastic/displace.mod',ace.pot.lammps_tmpdir+'/displace.mod')
         lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='init.mod',command=lammps_ext_elastic_init_mod(ace,positions='pos.lmp'))
         if ace.verbose:
-            print('written ',ace.pot.lammps_tmpdir+'/'+execute_file)
+            print('written ',ace.pot.lammps_tmpdir+'/'+lammps_in_file)
 
     ###############################################################
     # cd to folder and run lammps
@@ -2644,8 +2645,8 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         # without SHELL no LD LIBRARY PATH
         #print('pwd',os.getcwd())
         if ace.verbose:
-            print(ace.LAMMPS_COMMAND+" < "+execute_file+" > /dev/null")
-        call([ace.LAMMPS_COMMAND+" < "+execute_file+" > /dev/null"],shell=True)
+            print(ace.LAMMPS_COMMAND+" < "+lammps_in_file+" > /dev/null")
+        call([ace.LAMMPS_COMMAND+" < "+lammps_in_file+" > /dev/null"],shell=True)
 
         ###############################################################
         # extract energy and forces
@@ -3011,9 +3012,14 @@ def n2p2_check_SF_inputnn(inputnn):
 
 def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False):
     ''' filename is path to log.fit (runner) or learning-curve.out '''
+    verbose=True
+    if verbose:
+        print('myutils.py (7) inputnn',inputnn)
     filename = n2p2_runner_get_learning_curve_filename(inputnn)
     if verbose:
-        print('learning_curve_filename:',filename)
+        print('myutils.py (7) learning_curve_filename:',filename)
+    if filename == False:
+        return False
     basename = os.path.basename(filename)  # "learning-curve.out"
     folder = os.path.abspath(filename.replace(basename,''))
     if False: #verbose:
@@ -6075,9 +6081,10 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
 def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile):
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     #lambdas = [ 0.15, 0.5, 0.85 ]
-    lambdas = [ 0.0, 1.0 ]
-    temperatures = [900]
-    steps = 100
+    #lambdas = [ 0.0, 1.0 ]
+    #temperatures = [900]
+    steps = 5000
+    #steps = 20
 
 
     #hesse_vol_pos = load_hessefiles_volumes_positionsfiles_from_fqh_folder()
@@ -6107,7 +6114,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfi
         if os.path.isdir(folder):
             sys.exit(folder+" does already exist!")
         os.makedirs(folder)
-        ipi_inp = "/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
+        ipi_inp = os.environ['HOME']+"/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
 
         with cd(folder):
             print('hessefile',hessefile)
@@ -6133,21 +6140,22 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfi
 
             ##
             if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
-                frame.write(folder+'/pos.lmp',format='lammps-runner')
+                #frame.write(folder+'/pos.lmp',format='lammps-runner')
+                # here I would need an ase object
+                ase_write(folder+'/pos.lmp',frame,format='lammps-runner',pot=ace.pot)
             elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
-                frame.write(folder+'/pos.lmp',format='lammps-data')
+#                frame.write(folder+'/pos.lmp',format='lammps-data')
+                ase_write(folder+'/pos.lmp',frame,format='lammps-data')
             else:
                 sys.exit('44321 Error: dont know how to write this lammps file')
 
-            execute_file = 'in.lmp'
+            lammps_in_file = 'in.lmp'
             ace.ipi = True
-            print('ace.nsteps1',ace.nsteps)
 
             #print('ace.ipi',ace.
             ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=2000000000,ffsocket='inet',address=False)
-            print('ace.nsteps2',ace.nsteps)
-            lammps_write_inputfile(folder=folder,filename=execute_file,positions='pos.lmp',ace=ace)
-            print('ace.nsteps3',ace.nsteps)
+            lammps_write_inputfile(folder=folder,filename=lammps_in_file,positions='pos.lmp',ace=ace)
+
 
             #print('fp',frame.positions)
             #print('fp',frame.positions.flatten())
@@ -6163,7 +6171,9 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfi
             sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
             sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
             sed(folder+'/'+ipi_inp_basename,'xxxene',str(0))
-            sed(folder+'/'+ipi_inp_basename,'md_ff',str('md_ff'))
+            timestamp = 'md_ff_'+str(int(round(time.time() * 100000)))
+            sed(folder+'/'+ipi_inp_basename,'md_ff',timestamp)
+            sed(folder+'/'+lammps_in_file,'md_ff',timestamp)
             print(folder)
             print('next thing to do: put the socket in the in.lmp!')
             print('executing this with:')

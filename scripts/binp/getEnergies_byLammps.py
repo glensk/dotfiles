@@ -377,6 +377,7 @@ def get_energies(args):
         print('args.format_in:',args.format_in)
         frames = ase_read(args.inputfile,format=args.format_in,index=":")
 
+        print('type(frames)',type(frames))
 
     if args.thermo or args.evinet or args.fqh or args.fah:
         # Al evinet: -537461.993661476416 16.579676546844 79.185555426019 2.526937653000
@@ -388,15 +389,24 @@ def get_energies(args):
 
         #if args.thermo or args.evinet or args.fqh or args.fah:
         #    if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
-        print("##############################")
-        print("# anharmonic ... #")
-        print("##############################")
-        if os.path.isdir("fah"):
+        if not os.path.isdir('fah'):
             print("##############################")
-            print("# NOW reading in anharmonic ... #")
+            print("# NOW creating anharmonic folders and calculating... #")
             print("##############################")
+            hesse_vol_pos = my.load_hessefiles_volumes_positionsfiles_from_fqh_folder()
+            temperatures = [200, 400, 600, 800, 1000 ]
+            #temperatures = [400 ]
+            for idx_vol,i in enumerate(hesse_vol_pos):
+                for idx_temp,temperature in enumerate(temperatures):
+                    hessefile = i[0]
+                    volume  = i[1]
+                    posfile = i[2]
+                    print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
+                    my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile)
+            sys.exit()
 
-        if os.path.isdir("fah"):
+
+        if os.path.isdir('fah'):
             print("##############################")
             print("# NOW running anharmonic ... #")
             print("##############################")
@@ -414,22 +424,24 @@ def get_energies(args):
                     os.chdir(fls)
                     print('os.getcwd() fls',os.getcwd())
 
-                    if True:  # read dudl
+                    if False:  # read dudl
                         dudl = fah.get_dudl_from_file_with_energies_lambda_0_1('simulation.ti',number_of_atoms=32)
                         dudlav = fah.get_dudlav_from_dudl(dudl)
                         print('dudav[-1]',dudlav[-1])
-                    if False:  # run anharmonic
+                    if True:  # run anharmonic
                         if os.path.isfile(os.getcwd()+'/simulation.ti'):
                             print('simulation.ti exists in:')
                             print(os.getcwd()+'/simulation.ti')
                             sys.exit()
                         print('do 1')
-                        call(["/usr/local/bin/python $HOME/sources/ipi/bin/i-pi input.xml &"],shell=True)
+                        #call(["/usr/local/bin/python $HOME/sources/ipi/bin/i-pi input.xml &"],shell=True)
+                        call(["python $HOME/sources/ipi/bin/i-pi input.xml &"],shell=True)
 
                         print('!!!!!!!!!!!!!!!!! do 2, before sleep 5')
-                        time.sleep(10)
+                        time.sleep(5)
                         print('!!!!!!!!!!!!!!!!! do 2, AFTER  sleep 5')
-                        call(["$HOME/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp"],shell=True)
+                        #call(["$HOME/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp"],shell=True)
+                        call(["$HOME/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_fidis < in.lmp"],shell=True)
 
             # python $HOME/sources/ipi/bin/i-pi ipi_input_thermodynamic_integration_template.xml
 
@@ -438,31 +450,16 @@ def get_energies(args):
             sys.exit()
 
 
-        if True:
-            print("##############################")
-            print("# NOW GETTING anharmonic ... #")
-            print("##############################")
-            hesse_vol_pos = my.load_hessefiles_volumes_positionsfiles_from_fqh_folder()
-            temperatures = [900]
-            for idx_vol,i in enumerate(hesse_vol_pos):
-                for idx_temp,temperature in enumerate(temperatures):
-                    hessefile = i[0]
-                    volume  = i[1]
-                    posfile = i[2]
-                    print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
-                    my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile)
-                    if idx_vol == 1:
-                        sys.exit()
-        sys.exit()
-        #frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
-        #print('frame_al.cell',frame_al.cell)
-        #print('frame_al.positions',frame_al.positions)
 
         if args.thermo: args.fqh = True
         if args.thermo: args.fah = True
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
         if args.verbose > 2:
             print('getEne(p7) reading structure ... ')
+        if type(frames) == list and len(frames) == 1:
+            print('len(frames)',len(frames))
+            frames = frames[0]
+
         print('args.format_in',args.format_in)
         print('frames.cell',frames.cell)
         print('frames.positions',frames.positions)

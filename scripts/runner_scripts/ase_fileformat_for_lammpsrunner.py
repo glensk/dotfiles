@@ -398,8 +398,10 @@ def convert_cell(cell,pos):
           return cell, pos
 
 
-def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True):
+def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True,pot=False):
     ''' atoms is the ase atoms object '''
+    if pot == False:
+        sys.exit('pot needs to be ace.pot')
     frame = atoms
     fout = fileobj
     #print('out',fout)
@@ -421,6 +423,8 @@ def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True):
     species = framework.get_atomic_numbers()
     unique_species, i_unique_species = np.unique(species, return_index=True)
     masses = framework.get_masses()
+    #print('us',unique_species)
+    #print('ma',masses)
     positions = framework.get_positions()
     lammps_indices = species.copy()
     for ii in range(len(unique_species)):
@@ -433,13 +437,15 @@ def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True):
     fout.write("LAMMPS positionsfile from: "+str(comment)+"\n")
     fout.write("\n")
     fout.write(str(len(species))+" atoms\n")
+    #print('sp',species)
+    #print('lensp',len(species))
 
     if runner is False:  # "normal"  lammps format
         fout.write(str(len(unique_species))+" atom types\n")
     elif runner is True:
         # in principle this can be automatically obtained from the nn potential,
         # for now however I am lazy
-        fout.write("3 atom types\n")
+        fout.write(str(len(pot.elements))+" atom types\n")
     else:
         sys.exit('variable runner is neigher True nor False; Exit.')
     fout.write("\n")
@@ -458,16 +464,30 @@ def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True):
     elif runner is True:
         # in principle this can be automatically obtained from the nn potential,
         # for now however I am lazy
-        fout.write("1 24.305\n")        # Mg
-        fout.write("2 26.9815385\n")    # Al
-        fout.write("3 28.085\n")        # Si
+        for idx,i in enumerate(pot.atom_masses_str):
+            fout.write(i[5:]+"\n")        # Mg
+        #fout.write("2 26.9815385\n")    # Al
+        #fout.write("3 28.085\n")        # Si
+        #print('sp',species)
         species_runner = species.copy()
-        species_runner[species_runner == 12] = 1
-        species_runner[species_runner == 13] = 2
-        species_runner[species_runner == 14] = 3
+        key_list = list(pot.atom_numbers.keys())
+        val_list = list(pot.atom_numbers.values())
+        key2_list = list(pot.atom_types.keys())
+        val2_list = list(pot.atom_types.values())
+        #print('key_list',key_list)
+        #print('val_list',val_list)
+        #print('key2_list',key2_list)
+        #print('val2_list',val2_list)
+        for i_12_13_14 in unique_species:
+            species_element = key_list[val_list.index(i_12_13_14)]
+            nr = pot.atom_types[species_element]
+            print('i',i_12_13_14,species_element,'nr',nr)
+            species_runner[species_runner == i_12_13_14] = nr
+        #species_runner[species_runner == 12] = 1
+        #species_runner[species_runner == 13] = 2
+        #species_runner[species_runner == 14] = 3
         lammps_indices = species_runner
         #print('sp',species_runner)
-
     fout.write("\n")
     fout.write("Atoms\n")
     fout.write("\n")
