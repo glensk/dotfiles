@@ -784,11 +784,9 @@ class mypot( object ):
                 for idx,i in enumerate(self.elements):
                     self.atom_energy[i] = 0 #self.elements[idx]
             else:
-                print('self.pot:',self.pot)
-                print()
                 list_pot_all()
                 print()
-                print('self.pot:',self.pot)
+                print('self.pot    :',self.pot)
                 print('self.pottype:',self.pottype)
                 sys.exit("self.pot unknown (Error 91)")
         #print('self.elements',self.elements)
@@ -820,13 +818,6 @@ class mypot( object ):
                     #print('-->',j,self.atom_types[j],idx+1)
                     #print('-->xx',self.atom_types)
                     break
-
-
-
-
-
-
-
 
         self.reference_volumes = {}
         self.atomic_numbers = {}
