@@ -21,7 +21,7 @@ myprompttime="black"
 export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
 
-echo "myhost generalrc_.sh in1:$myhost:"
+echo "myhost generalrc_.sh in1:$myhost:"  # has been loaded in ~/.bash_profile
 #######################
 # this is crucial, even if it is loaded a second time!
 #######################
@@ -42,7 +42,7 @@ export host=$host
 #echo "22onhost:$onhost"
 
 export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
-export potentials="$HOME/Dropbox/Albert/scripts/dotfiles/scripts/potentials";
+export potentials="$dotfiles/scripts/potentials";
 export MYVIMRC="$dotfiles/nvim/init.vim"
 export MYVIM="$HOME/sources/nvim/bin/nvim"
 #jecho "copy1:$copy1:"
