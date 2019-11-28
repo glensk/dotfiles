@@ -163,7 +163,8 @@ alias mu='module unload'
 # que
 ##############################
 alias qls='qls.sh -u'
-alias qstatn='qstatn -d'
+#alias qstatn='qstatn -d'
+alias qstatn='q'
 
 
 ##################################################################################

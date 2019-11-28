@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 
+from subprocess import check_output,call
 import argparse
 import os
 import sys
@@ -8,8 +11,9 @@ import utils_rename as utils
 import shutil
 import numpy as np
 import pylab
-import myutils
+import myutils as my
 from scipy.integrate import quad
+from scipy.optimize import curve_fit
 import hesse as h
 
 np.set_printoptions(suppress=True)   # display arrays withou 000000
@@ -18,12 +22,12 @@ np.set_printoptions(precision=6)    # print only 6 digist after .
 def _printred(var):
     ENDC = '\033[0m'
     red = '\033[31m'
-    print red + str(var) + ENDC
+    print(red + str(var) + ENDC)
 
 def _printgreen(var):
     ENDC = '\033[0m'
     red = '\033[32m'
-    print red + str(var) + ENDC
+    print(red + str(var) + ENDC)
 
 def find_surface_filename(sysexit = True):
     ''' '''
@@ -42,14 +46,15 @@ def find_surface_filename(sysexit = True):
         #print("Did not found any Fah surface file in current folder")
         return None
 
-def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_parameters = False):
+def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_parameters = False,verbose=False,savefit=False):
     ''' Fits tangence function to dudl vs lambda data.
-    input:
+
+        input:
         v: the volume you want to fit
         t: the temperature you want to fit
     How can we in general give n parameters to any function without having to type parameters[0], parameters[1], parameters[2], .....?
     '''
-
+    lambdas_array = np.array(lambdas_array)
     def tanFunction(x, a0, a1, a2, a3):
         return -a0*np.tan(np.pi*((1-a1)*x+a2+0.5))+a3
     def tanFunctionguess(energies_array):
@@ -60,28 +65,28 @@ def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_pa
 
     if np.isnan(lambdas_array).any() == True or np.isnan(lambdas_array).any() == True:
         a = np.array([lambdas_array, energies_array])  # this still has nans
-        print "a||:---",a
+        print("a||:---",a)
         if np.isnan(a).any() == True:
-            print "WHY:"
+            print("WHY:")
             lambdas_array, energies_array = np.ma.compress_rows(np.ma.fix_invalid(a.T)).T  #no nas
     #print "--> compressed:",lambdas_array, energies_array
     if len(energies_array) is 0: return np.nan
 
-    from scipy.optimize import curve_fit
     parameters, evinet_covariance = \
         curve_fit(tanFunction, lambdas_array, energies_array, tanFunctionguess(energies_array), maxfev=30000)
-    #jprint ";;;energies_r:",energies_array
-    #print ";;;parameters:",parameters
-    #print ";;;"
+    if verbose:
+        print('energies_array:',energies_array)
+        print('lambdas_array :',lambdas_array)
+        print('parameters    :',parameters)
 
     if parameters[1] < 0:
-        print energies_array
+        print(energies_array)
         _printred("parameter 2 is sammer 0 we might have a probleme in fitting")
         _printred("parameter 2 is sammer 0 we might have a probleme in fitting")
         _printred("parameter 2 is sammer 0 we might have a probleme in fitting")
         _printred("parameter 2 is sammer 0 we might have a probleme in fitting")
     if parameters[2] < 0:
-        print energies_array
+        print(energies_array)
         _printred("parameter 3 is sammer 0 we might have a probleme in fitting")
         _printred("parameter 3 is sammer 0 we might have a probleme in fitting")
         _printred("parameter 3 is sammer 0 we might have a probleme in fitting")
@@ -93,10 +98,15 @@ def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_pa
     fit_x_max = 1
 
     fit_x_values = np.linspace(fit_x_min, fit_x_max, points)
-    fit_y_values = tanFunction(fit_x_values, parameters[0],parameters[1],parameters[2],parameters[3])
+    fit_y_values = tanFunction(fit_x_values, *parameters)
+    fitdat = np.transpose([fit_x_values,fit_y_values])
+    if savefit:
+        np.savetxt(savefit,fitdat)
 
     # delta to fit
-    fitdeltas = tanFunction(lambdas_array, parameters[0],parameters[1],parameters[2],parameters[3]) - energies_array
+    #print('lambdas_array',lambdas_array,type(lambdas_array))
+    fitdeltas = tanFunction(lambdas_array, *parameters) - energies_array
+    #print('fitdeltas1',fitdeltas)
 
     # delta to fit max
     fitdeltasmax = abs(fitdeltas).max()
@@ -109,8 +119,8 @@ def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_pa
     return fah #,fitdeltasmax
 
 def write_Fah_surface(a, temps, dudlmeanfit, filename = 'Fah_surface'):
-    print "a    :",a
-    print "temps:",temps
+    print("a    :",a)
+    print("temps:",temps)
     anz = np.sum(np.isnan(dudlmeanfit))
     out  = np.empty([a.size * temps.size - anz, 3])
 
@@ -125,8 +135,8 @@ def write_Fah_surface(a, temps, dudlmeanfit, filename = 'Fah_surface'):
             out[i][1] = a
             out[i][2] = np.around(dudlmeanfit[ia,it], decimals=2)
             i = i+1
-    print "filename:",filename
-    print out
+    print("filename:",filename)
+    print(out)
     np.savetxt(filename,out,fmt="%.1f %.7f %.3f")
     return
 
@@ -173,7 +183,7 @@ def get_dudl_per_atom_min1_from_energies_eV_cell(
         print(dudl)
     return dudl
 
-def get_dudlav_from_dudl(dudl):
+def get_dudl_or_other_average_from_array(dudl):
     dudlav = np.copy(dudl)
     for idx,i in enumerate(dudlav):
         dudlav[idx] = (dudl[:idx+1]).mean()
@@ -181,7 +191,293 @@ def get_dudlav_from_dudl(dudl):
     #print(dudlav)
     return dudlav
 
-def get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms,verbose=False):
+def get_into_fah_folder(verbose=False):
+    hier = os.getcwd()
+    if verbose:
+        print('xx1 os.getcwd()',os.getcwd())
+        print('xx2 os.getcwd()',hier[-4:])
+        print('xx3 os.getcwd()',hier[:-4])
+
+    # in case already in fah folder
+    if hier[-4:] == '/fah':
+        #os.chdir(hier[:-4])
+        return
+
+    # in case one can directly enter fah folder
+    if os.path.isdir(hier+'/fah'):
+        os.chdir(hier+"/fah")
+        return
+
+    # in case further down in fah folder
+    if '/fah/' in hier:
+        if verbose:
+            print('kk','/fah' in hier)
+            print('kk',hier.split('/fah/')[0]+'/fah')
+        os.chdir(hier.split('/fah/')[0]+'/fah')
+        return
+
+    hier2 = os.getcwd()
+    if not os.path.isdir(hier2+'/fah'):
+        sys.exit('no fah folder found')
+    return
+
+def get_sorted_lambda_folder(verbose=False):
+    f = glob.glob("lambda*_*")
+    hier = os.getcwd()
+    if verbose:
+        print('hier',hier)
+        for i in f:
+            print(i)
+    f = utils.list_sorted(f)
+    return f
+
+def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",verbose=True):
+    ''' savefit = False or filename like avg_dudl_fit.dat '''
+    f = get_sorted_lambda_folder(verbose=False)
+
+    # das hier sollte schon das average ueber verschiedene seeds sein ...
+    l_ = []
+    dudl_mean_ = []
+    err_uncor_ = []
+    dudl_std_ = []
+    for i in f:
+        os.chdir(hier)
+        os.chdir(i)
+        ## here should be the loop over all seeds
+        try:
+            lam, dudl_mean, std_err_mean_uncorr, dudl_std =   \
+                        get_dudl_from_ipi_job(verbose=False)
+        except IOError:
+            print('nope')
+            return # returns nothing and nothing is written if not all lambdas calculated
+        l_.append(lam)
+        dudl_mean_.append(dudl_mean)
+        dudl_std_.append(dudl_std)
+        err_uncor_.append(std_err_mean_uncorr)
+        print(str(lam).ljust(7),str(dudl_mean).ljust(20),str(std_err_mean_uncorr).ljust(20),str(dudl_std).ljust(20))
+
+    if verbose:
+        print('tt l',l_)
+        print('tt dudl_mean_:',dudl_mean_)
+        print('tt err_uncor_:',err_uncor_)
+        print('tt dudl_std_ :',dudl_std_)
+    avg_dudl = np.zeros((len(l_),4))
+    avg_dudl[:,0] = l_
+    avg_dudl[:,1] = dudl_mean_
+    avg_dudl[:,2] = err_uncor_
+    avg_dudl[:,3] = dudl_std_
+    os.chdir(hier)
+
+    fit = get_dudlmeanfit(l_, dudl_mean_, return_fit = True,savefit=savefit)
+    fah = fit[0]
+    print('fah',fah)
+    np.savetxt("avg_dudl",avg_dudl,fmt='   %.2f       %.3f          %.3f             %.3f',header="lambda dudl_mean(meV/at)  err_uncor(meV/at)  stdDev(meV/at)\n# averages to Fah (using tangens):"+str(fah)+" (meV/atom)")
+    #print('fit[1]',fit[1])
+    #self.dudlmeanfit[inda,indt] = fit[0]
+    #self.dudlmeanfit_tanfit[inda,indt] = np.transpose(fit[1])
+    if os.path.isfile('Fah'):
+        os.remove('Fah')
+    f = open('Fah', "a")
+    f.write("tangens "+str(fah)+" "+str(np.array(err_uncor_).max())+" 0.0\n")
+    f.close()
+    return
+
+def fah_write_fit_input(filename='fit.input'):
+    Fahsurfaceminalat = 15
+    Fahsurfacemaxalat = 18
+    structureFactor = 1
+    sc1 = 1
+    atoms = 32
+    tmelt = 1000
+    with open(filename, "w") as f:
+        f.write('(* adjustable parameters start *)'+"\n")
+        f.write("\n")
+        f.write('FsurfFile = "Fah_surface";'+"\n")
+        f.write('type = 1                                               (*  1: T(K)  aLat(Ang/at)  F(meV/at)   *)'+"\n")
+        f.write('                                                       (*  2: T(K)  V(Ang/at)     F(meV/at)   *)'+"\n")
+        f.write('                                                       (*  3: T(K)  V(Ang/cell)   F(meV/cell) *)'+"\n")
+        f.write("\n")
+        f.write("\n")
+        f.write('min = '+str(Fahsurfaceminalat)+";                      (*  aLat or volume range (same format as Fsurf) for the 2. fit *)"+"\n")
+        f.write('max = '+str(Fahsurfacemaxalat)+";                      (*  typically: Vmin=Veq(T=0K) and Vmax=Veq(Tmelt) *)"+"\n")
+        f.write("mesh = 100;                                            (* 100 is good and should be kept *)"+"\n")
+        f.write("\n")
+        f.write("structureFactor = "+str(structureFactor)+";                                       (*  4: fcc  2: bcc  1: supercells *)"+"\n")
+        f.write("sc = "+str(sc1)+";                                                    (*  supercell, 1 for bulk *)"+"\n")
+        f.write("nAtoms = "+str(atoms)+";                                               (*  1 for bulk *)"+"\n")
+        f.write("\n")
+        f.write("fitType = \"Fvib\";                                          (*  \"Fvib\"  or  \"poly\"  fit type for 1. fit; take \"Fvib\" for Fah or Fel *)"+"\n")
+        f.write("basis[V_, T_] := {1,T, V }                                 (*  for Fah typically: \"Fvib\" and {1,T,V} *)"+"\n")
+        f.write("\n")
+        f.write("                                                           (*  for Fel typically: \"Fvib\" and {1,T, V,T V,T^2,V^2,V^3} *)"+"\n")
+        f.write("basis2[V_]:={1, V, V^2, V^3}                               (*  should be more than sufficient: {1,V,V^2,V^3} *)"+"\n")
+        f.write("\n")
+        f.write("minT = 1;                                                  (* typically 1     *)"+"\n")
+        f.write("maxT = "+str(tmelt)+";                                               (*           Tmelt *)"+"\n")
+        f.write("stepT = 2;                                                 (*           2     *)"+"\n")
+        f.write("\n")
+        f.write("useMeanFreqs=True;                                         (* if True \"mean_freqs\" file must be available; format as Fsurf, e.g. aLat(Ang) meanFreq(meV) *)"+"\n")
+        f.write("                                                           (* meanFreqs are then used in the fit formula (check fitSurface.math) *)"+"\n")
+        f.write("(* adjustable parameters end *)"+"\n")
+        f.write("\n")
+        f.write("(*<<\"~/scripts/Thermodynamics/fitSurface.math\"*)"+"\n")
+        f.write("<<\"/home/grabowski/Thermodynamics/mathematica/fitSurface.MATH\""+"\n")
+        f.close()
+    return
+
+
+def fah_get_Fah_surface():
+    get_into_fah_folder(verbose=False)
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+
+    if os.path.isfile('Fah_surface'):
+        os.remove('Fah_surface')
+    for fvt in fvta:
+        v_str = fvt.split('fah/')[-1].split("_")[0]
+        t_str = fvt.split('fah/')[-1].split("_")[1][:-1]
+        #dudl  = np.loadtxt(fvt+'/Fah')
+        fah_content = my.grep(fvt+'/Fah','tangens')[0].split()
+        fah_str = fah_content[1]
+        err_str = fah_content[2]
+        print('fvt',fvt,t_str,v_str,fah_str,err_str)
+
+        f = open('Fah_surface', "a")
+        f.write(t_str+" "+v_str+" "+fah_str+" "+err_str+"\n")
+        f.close()
+    return
+
+def fah_go_through_all_angK_folder_and_exec_function(function=False):
+    get_into_fah_folder(verbose=False)
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+    for fvt in fvta:
+        os.chdir(fvt)
+        print('os.getcwd() fvt',os.getcwd())
+        #########################################
+        # define what to do
+        #########################################
+        #get_avg_dudl_in_one_ang_K_folder_from_ipi_job()
+        function()
+    return
+
+def go_through_all_fah_jobs_and_create_joblist():
+    get_into_fah_folder(verbose=False)
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+    print('fvta',fvta)
+    sj=0
+    for fvt in fvta:
+        os.chdir(fvt)
+        print('os.getcwd() fvt',os.getcwd())
+        flsa = glob.glob(os.getcwd()+"/lambda*_*")
+        for fls in flsa:
+            os.chdir(fls)
+            print('os.getcwd() fls',os.getcwd())
+
+
+            #########################################
+            # define what to do
+            #########################################
+            submitjob = False
+            if not os.path.isfile('simulation.ti'): submitjob = True
+
+            if os.path.isfile('simulation.ti'):
+                sim = np.loadtxt('simulation.ti')
+                if len(sim) == 0:
+                    submitjob = True
+                if len(sim) != 5001:
+                    submitjob = True
+                    print('len',len(sim))
+            if submitjob:
+                sj += 1
+                print('submit!!',sj,"myutils.py -ef ipi_sart_job")
+                #call(["myutils.py -ef ipi_sart_job"],shell=True)
+
+                f = open(hier+"/joblist.dat", "a")
+                f.write(os.getcwd()+"\n")
+                f.close()
+    return
+
+def get_dudl_from_ipi_job(verbose=True):
+    ''' help '''
+    #################################################
+    # get the temperature / equilibration time
+    #################################################
+    desired_temp = int(my.grep('input.xml',"temperature units")[0].split()[2])
+    lam = float(my.grep('input.xml',"force forcefield=.*weig")[1].split("'")[3])
+    if verbose:
+        print('lambda :',lam)
+        print('desired:',desired_temp)
+
+    out = np.loadtxt('simulation.out')
+    t = out[:,3]
+    #if verbose:
+    #    print("<T>    K:",t.mean())
+    #    print("<Tstd> K:",t.std())
+
+    tall = np.where(np.logical_and(t>=desired_temp-t.std()/2, t<=desired_temp+t.std()/2))
+    equilibration = tall[0][0]
+    if verbose:
+        print('equilibration',equilibration)
+    t = t[equilibration:]
+    if verbose:
+        print("<T>    K:",t.mean())
+        print("<Tstd> K:",t.std())
+
+    #################################################
+    # get dudl
+    #################################################
+    dudl = get_dudl_from_file_with_energies_lambda_0_1(filepath=False,number_of_atoms=False,verbose=False)
+    dudl = dudl[equilibration:]
+    #if False:
+    #corr = np.correlate(dudl,dudl,mode='full')
+    #print('corr',corr)
+    #np.savetxt('corr.dat',corr)
+    #print(os.getcwd())
+    #sys.exit()
+    std_err_mean        = dudl.std()/np.sqrt(len(dudl))
+    std_err_mean_uncorr = dudl[::10].std()/np.sqrt(len(dudl[::10]))
+    if verbose:
+        print("<dudl>             (meV):",dudl.mean())
+        print("stdDev             (meV):",dudl.std())
+        print("std_err_mean       (meV):",std_err_mean)
+        print("std_err_mean_uncorr(meV):",std_err_mean_uncorr,"needs to be improved")
+    tempav = get_dudl_or_other_average_from_array(t)
+
+    #################################################
+    # get dudl std as function of time
+    #################################################
+    dudlstd = np.copy(dudl)
+    for idx,i in enumerate(dudl):
+        #print('idx',idx,dudl[:idx+1].std()/np.sqrt(idx+1))
+        dudlstd[idx] = dudl[:idx+1].std()/np.sqrt(idx+1)
+    #print('len(dudl)',len(dudl))
+    #np.savetxt('dudlstd.dat',dudlstd)
+
+
+
+    #print('t1',tempav)
+    #np.savetxt('tempav.dat',tempav)
+    #np.savetxt('temp.dat',t)
+    return lam, dudl.mean(), std_err_mean_uncorr, dudl.std()
+
+def get_dudl_from_file_with_energies_lambda_0_1(filepath=False,number_of_atoms=False,verbose=False):
+    if filepath == False:
+        if os.path.isfile('simulation.ti'): filepath = 'simulation.ti'
+    if filepath == False:
+        sys.exit('please specify the filepath!')
+
+    #print('filepath',filepath)
+    if number_of_atoms == False and filepath == 'simulation.ti':
+        f = glob.glob("Hessematrix_*")
+        if len(f) == 1:
+            h = np.loadtxt(f[0])
+            #print(h.shape)
+            number_of_atoms = h.shape[0]/3
+            #print(number_of_atoms)
+        #print('f',f)
+    if number_of_atoms == False:
+        sys.exit('please specify the number of atoms')
+
+
     l01 = np.loadtxt(filepath)
     if verbose:
         print(l01.shape)
@@ -201,8 +497,8 @@ def get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms,verbose
     #print(l0)
     #print('l1')
     #print(l1)
-    l0 = myutils.convert_energy(l0,"hartree","eV",number_of_atoms,verbose=False)
-    l1 = myutils.convert_energy(l1,"hartree","eV",number_of_atoms,verbose=False)
+    l0 = my.convert_energy(l0,"hartree","eV",number_of_atoms,verbose=False)
+    l1 = my.convert_energy(l1,"hartree","eV",number_of_atoms,verbose=False)
     #print('l0o')
     #print(l0)
 
@@ -211,11 +507,12 @@ def get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms,verbose
             energies_lambda_1_eV_cell=l1,
             number_of_atoms=number_of_atoms,
             align_lambda_0_first_to_lambda_1_yes_no=True)
-    #dudlav = get_dudlav_from_dudl(dudl)
+    #dudlav = get_dudl_or_other_average_from_array(dudl)
     #print('dudl')
     #print(dudl)
     #print('dudlav')
     #print(dudlav)
+    #np.savetxt('dudlav.dat',dudlav)
     #sys.exit()
     return dudl
 
@@ -291,15 +588,15 @@ class ah():
                         self.l
                         self.s
                         self.data filled with NaNs """
-        print "initialize_files_data ..."
+        print("initialize_files_data ...")
         self.files = utils.lsn(self._filestring)
         self.filesinfo = []
 
         atls = np.array([ utils.string_to_num_list(string) for string in self.files ])
         if self._verbose:
-            print "atls:",atls
-            print "atls.shape:",atls.shape
-            print "atls.shape[1]:",atls.shape[1]
+            print("atls:",atls)
+            print("atls.shape:",atls.shape)
+            print("atls.shape[1]:",atls.shape[1])
 
         # wir setzen a(alts) und t(temperatures) voraus, alles andere optional
         # oder kann spaeter hinzugefuegt werden
@@ -354,7 +651,7 @@ class ah():
             indt = np.nonzero(self.t == t)[0][0]  # index
             indl = np.nonzero(self.l == l)[0][0]  # index
             inds = get_inds(inda,indt,indl)
-            print "file:",file,a,t,l,s,"(ind:",inda,indt,indl,inds,")"
+            print("file:",file,a,t,l,s,"(ind:",inda,indt,indl,inds,")")
             self.filesinfo.append([file,"ind:",[inda,indt,indl,inds]])
             self.data[inda, indt, indl, inds] = dudl
         return
@@ -392,9 +689,9 @@ class ah():
             #print avg_dudl.shape
             #print "l:",l
         if verbose:
-            print "a:",self.a
-            print "t:",self.t
-            print "l:",self.l
+            print("a:",self.a)
+            print("t:",self.t)
+            print("l:",self.l)
         #if len(self.l) == 9:
         #    print type(self.l)
         #    self.l = np.array([0.0, 0.15, 0.5, 0.85, 1.0])
@@ -424,7 +721,7 @@ class ah():
         #################################################################################
         for i in avg_dudl_files:
             if verbose:
-                print "------------------>i:",i
+                print("------------------>i:",i)
             atls = utils.string_to_num_list(i)
             a = atls[0]
             t = atls[1]
@@ -440,13 +737,13 @@ class ah():
 
             for lline in avg_dudl:
                 if verbose:
-                    print "lline:",lline
+                    print("lline:",lline)
                 l = lline[0]
                 indl = np.nonzero(l == self.l)[0]
                 if verbose:
-                    print "a,inda:",a,inda
-                    print "t,indt:",t,indt
-                    print "l,indl:",l,indl
+                    print("a,inda:",a,inda)
+                    print("t,indt:",t,indt)
+                    print("l,indl:",l,indl)
                 self.dudlmean[inda,indt,indl] = lline[1]
                 self.dudlste[inda,indt,indl] = lline[2] #*2   # so we now have ste and not ste/2
                 self.dudlstd[inda,indt,indl] = lline[3]
@@ -459,7 +756,7 @@ class ah():
             ## only make a fit if we have > 3 lambda values
             if len(lambdas_array) <= 3:
                 if verbose:
-                    print "only following lambdas:",lambdas_array," therefore no fit!"
+                    print("only following lambdas:",lambdas_array," therefore no fit!")
                 if len(lambdas_array) ==1:
                     if lambdas_array[0] == 0.5:
                         #print "yes!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -468,10 +765,10 @@ class ah():
                 continue
 
             if verbose:
-                print "La;",lambdas_array
-                print "LA;",energies_array
+                print("La;",lambdas_array)
+                print("LA;",energies_array)
             if self._verbose:
-                print "i:",i,lambdas_array,type(lambdas_array),energies_array[0],type(energies_array)
+                print("i:",i,lambdas_array,type(lambdas_array),energies_array[0],type(energies_array))
             fit = get_dudlmeanfit(lambdas_array, energies_array, return_fit = True)
             self.dudlmeanfit[inda,indt] = fit[0]
             self.dudlmeanfit_tanfit[inda,indt] = np.transpose(fit[1])
@@ -479,7 +776,7 @@ class ah():
 
 
     def save_data(self):
-        print "saving data ..."
+        print("saving data ...")
         np.savez_compressed( "dudl",                \
                 files       = self.files,           \
                 data        = self.data,            \
@@ -503,7 +800,7 @@ class ah():
 
     def load_data(self):
         ''' '''
-        print "loading data ..."
+        print("loading data ...")
         var = np.load( "dudl" + ".npz" )
 
         self.files          = var['files']
@@ -526,7 +823,7 @@ class ah():
         ''' 1st index: volume / lattice constant    (self.a)
             2nd index: temperature                  (self.t)
             3rd index: lambda                       (self.s)'''
-        print "building dudls ..."
+        print("building dudls ...")
         self.dudl = np.empty((  self.a.size, \
                                 self.t.size, \
                                 self.l.size, \
@@ -653,8 +950,8 @@ class ah():
             #for indl,l in np.arange(len(self.l)):
             for indl,l in enumerate(self.l):
                 if verbose:
-                    print ""
-                    print "a:",a," l:",l
+                    print("")
+                    print("a:",a," l:",l)
                 #print "a:",self.a[a],"l:",self.l[l]
                 x = self.t
                 y = self.dudlmean[inda,:,indl]
@@ -684,10 +981,10 @@ class ah():
                 if len(x) != len(y) != len(dy):
                     sys.exit("len(x):"+str(len(x))+" is not len y:"+str(len(y)))
                 if verbose:
-                    print "x:",x
-                    print "y:",y
+                    print("x:",x)
+                    print("y:",y)
                 if len(x) != len(y):
-                    print "len x != len y !!!!!!!!! ERROR"
+                    print("len x != len y !!!!!!!!! ERROR")
                     continue
                 if len(x) == 0:
                     continue
@@ -721,7 +1018,7 @@ class ah():
         for a in np.arange(self.dudlmean.shape[0]):
             for t in np.arange(self.dudlmean.shape[1]):
                 for e in np.arange(self.dudlmean.shape[2]):
-                    print "a:",a," t:",t,self.dudlmean[a,t,e]
+                    print("a:",a," t:",t,self.dudlmean[a,t,e])
                     if np.isnan(self.dudlmean[a,t,e]) == True:
                         self.dudlmean_from_quadfit_samenans[a,t,e] = np.nan
                 #print "???",self.l, self.dudlmean_from_quadfit_samenans[a,t]
@@ -741,11 +1038,11 @@ class ah():
                 for e in np.arange(self.dudlmean.shape[2]):
                     if t != self.dudlmean.shape[1]-1:
                         self.dudlmean_from_quadfit_samenans_highestT[a,t,e] = np.nan
-                print "??? a:",a,"t:",t,self.l, self.dudlmean_from_quadfit_samenans_highestT[a,t]
-                print "??? a:",a,"t:",t, get_dudlmeanfit(self.l, self.dudlmean_from_quadfit_samenans_highestT[a,t])
-                print "!!!", np.isnan(self.dudlmean_from_quadfit_samenans_highestT[a,t])
+                print("??? a:",a,"t:",t,self.l, self.dudlmean_from_quadfit_samenans_highestT[a,t])
+                print("??? a:",a,"t:",t, get_dudlmeanfit(self.l, self.dudlmean_from_quadfit_samenans_highestT[a,t]))
+                print("!!!", np.isnan(self.dudlmean_from_quadfit_samenans_highestT[a,t]))
                 if np.isnan(get_dudlmeanfit(self.l, self.dudlmean_from_quadfit_samenans_highestT[a,t])):
-                    print "isnan!!!!!!!!!!!!!"
+                    print("isnan!!!!!!!!!!!!!")
                 self.dudlmean_from_quadfit_samenans_highestTfit[a,t] = get_dudlmeanfit(self.l, self.dudlmean_from_quadfit_samenans_highestT[a,t])
 
         return
@@ -771,7 +1068,7 @@ class ah():
         #elif t is ":":
         #    energies_array = energies_array[:]
 
-        print "energies_array:",energies_array
+        print("energies_array:",energies_array)
         return
 
 
@@ -791,7 +1088,7 @@ class ah():
         if self.surface == None:
             sys.exit("fah surface not found!")
         _printgreen("importing fah data ............................... DONE")
-        print ""
+        print("")
         return self.surface
 
 
@@ -845,28 +1142,55 @@ class ah():
         return self.surface_expr
 
 if __name__ == '__main__':
-    f = ah()
-
-
-    p = argparse.ArgumentParser(description='''help string''')
+    #f = ah()
+    string = '''
+    Examples for using this script:
+    -------------------------------
+    % fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_avg_dudl_in_one_ang_K_folder_from_ipi_job
+    % fah.py -ef go_through_all_fah_jobs_and_create_joblist
+    '''
+    p = argparse.ArgumentParser(description=string,
+            formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-ws', default=False, action='store_true',
         help='Write Fqh_surface (Fah_surface and Fah_surface_x2) start this in high folder')
+    p.add_argument('-ef','--execute_function', required=False, type=str,nargs='+',default='', help="function to run from this file.")
     p.add_argument('-lla', default=False, action='store_true',
         help='load low  avg_dUdL_fre files'),
     p.add_argument('-v', '--verbose',
                 help='verbose', action='store_true', default=False)
     args = p.parse_args()
 
+    if args.verbose:
+        my.print_args(args)
+
+    if args.execute_function:
+        print('args.execute_function',args.execute_function)
+        #sys.exit()
+        if len(args.execute_function) == 1:
+            function = eval(args.execute_function[0])
+            print('function',function)
+            function()
+        elif len(args.execute_function) == 2:
+            function = eval(args.execute_function[0])
+            argument = eval(args.execute_function[1])
+            print('function(argument)')
+            print('function',function)
+            print('argument',argument)
+            function(argument)
+        sys.exit()
+
+
+
     if args.ws:
         if args.verbose:
-            print "###################### 1"
+            print("###################### 1")
         f.import_avg_dudl_data(avg_dudl_filenames = "*Ang_*K/avg_dUdL_lowplushigh_fre", verbose = args.verbose)
 
         if args.verbose:
-            print "###################### 2"
+            print("###################### 2")
         f.get_dudl_vs_temp_folder(verbose = args.verbose)
         if args.verbose:
-            print "###################### 3"
+            print("###################### 3")
         write_Fah_surface(a = f.a, temps = f.t, dudlmeanfit = f.dudlmeanfit)
         write_Fah_surface(a = f.a, temps = f.t, dudlmeanfit = f.dudlmean_from_quadfit_samenansfit, filename = 'Fah_surface_x2')
 

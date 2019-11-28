@@ -12,6 +12,7 @@ from itertools import islice
 import h5py
 
 
+import argparse
 from copy import deepcopy
 from socket import gethostname
 import shutil
@@ -75,6 +76,7 @@ def help(p = None):
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-ef','--execute_function', required=False, type=str,default='', help="function to run")
+    p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
     return p
 
 ##################################################################################
@@ -1324,6 +1326,21 @@ def create_ipi_kmc_inputfile(jobdir,filename="input-runner.xml", nsteps=False,st
     return
     return
 
+def submitskript_1():
+    text1 = ["#!/bin/bash",""]
+    return text1
+
+def submitskript_2(nodes,ntasks,submittime_hours):
+    text2 = [
+    "#SBATCH --job-name=NNP-mpi",
+    "#SBATCH --get-user-env",
+    "#SBATCH --output=_scheduler-stdout.txt",
+    "#SBATCH --error=_scheduler-stderr.txt",
+    "#SBATCH --nodes="+str(nodes),
+    "#SBATCH --ntasks "+str(ntasks),
+    "#SBATCH --time=00-"+str(submittime_hours)+":00:00"]
+    return text2
+
 def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=False,ffsocket=False,submittime_hours=71,SBATCH=True,LOOPFOLDER=False):
     ''' time is in min
         this should be a class so that it is not necessary to shuffle
@@ -1350,18 +1367,8 @@ def create_submitskript_ipi_kmc(filepath,nodes,ntasks,lmp_par=False,ipi_inst=Fal
     check(ipi_inst,"ipi_inst",int)
     check(ffsocket,"ffsocket",str)
 
-    text1 = [
-    "#!/bin/bash",
-    ""]
-
-    text2 = [
-    "#SBATCH --job-name=NNP-mpi",
-    "#SBATCH --get-user-env",
-    "#SBATCH --output=_scheduler-stdout.txt",
-    "#SBATCH --error=_scheduler-stderr.txt",
-    "#SBATCH --nodes="+str(nodes),
-    "#SBATCH --ntasks "+str(ntasks),
-    "#SBATCH --time=00-"+str(submittime_hours)+":00:00"]
+    text1 = submitskript_1()
+    test2 = submitskript_2(nodes,ntasks,submittime_hours)
 
     hostname = gethostname()
     if hostname == 'fidis' or hostname[0] == 'f':
@@ -6184,6 +6191,40 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfi
             print('3rd column in simulation.ti is also independent of v_reference> -2.89829817e+00')
     return
 
+def ipi_submit_missing_jobs_to_que():
+    return
+
+def ipi_sart_job(inputfile="input.xml",sleep=6):
+    if not os.path.isfile('in.lmp'):
+        sys.exit('in.lmp does not exist! Exit')
+    if not os.path.isfile(inputfile):
+        sys.exit(inputfile+' does not exist! Exit')
+    host = os.environ['myhost']
+    print('host',host)
+    executable = os.environ["HOME"]+"/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_"+host
+    print('lammps executable',executable)
+    if not os.path.isfile(executable):
+        sys.exit(executable+' does not exist! Exit')
+
+    python = "python"
+    if host == 'mac': python = "/usr/local/bin/python"
+    print(python+" $HOME/sources/ipi/bin/i-pi "+inputfile+" &")
+    adress_str = grep(inputfile,"md_ff_*")[0].split()[1]
+    print('ad',adress_str)
+    filecheck = '/tmp/ipi_'+adress_str #+'='
+    print('fc',filecheck)
+    if os.path.exists(filecheck):  # here os.path.isfile did not work
+        #print('file exists ')
+        os.remove(filecheck)
+    else:
+        print('file does not exist and this is good;')
+    call([python+" $HOME/sources/ipi/bin/i-pi "+inputfile+" &"],shell=True)
+    print('now sleep for ',sleep,"(sec)")
+    time.sleep(sleep)
+    print('sleep done; now sart lammps')
+    call([executable+" < in.lmp"],shell=True)
+    return
+
 def load_hessefiles_volumes_positionsfiles_from_fqh_folder():
     folder = os.getcwd()+"/fqh"
     paths = glob.glob(folder+'/Hessematrix_*')
@@ -6535,6 +6576,29 @@ def ase_showpos(atomsc_sphere):
     print()
     return
 
+############################################################
+# math function
+############################################################
+def crosscorr(datax, datay, lag=0, wrap=False):
+    """ Lag-N cross correlation.
+    Shifted data filled with NaNs
+
+    Parameters
+    ----------
+    lag : int, default 0
+    datax, datay : pandas.Series objects of equal length
+    Returns
+    ----------
+    crosscorr : float
+    """
+    if wrap:
+        shiftedy = datay.shift(lag)
+        shiftedy.iloc[:lag] = datay.iloc[-lag:].values
+        return datax.corr(shiftedy)
+    else:
+        return datax.corr(datay.shift(lag))
+
+
 if __name__ == "__main__":
     p = help()
     args = p.parse_args()
@@ -6548,4 +6612,4 @@ if __name__ == "__main__":
     #n2p2_check_SF_inputnn(inputnn="cursel_64.def")
     #get_number_of_atoms_as_function_of_cutoff()
     #create_al_structures_for_analysis_SOAP()
-    get_Mg5Si6_and_other_antisites()
+    #get_Mg5Si6_and_other_antisites()

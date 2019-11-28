@@ -41,8 +41,8 @@ def help(p = None):
     p.add_argument('-sys_ele','--sys_ele', nargs='*', default=False, help="in case no inutfile is given, define the element manually")
     p.add_argument('-sys_ncell','--sys_ncell', type=int, default=1, help="in case no inutfile is given, define how often the primitive/conventional cell is repeated")
 
-    p.add_argument('-dpmf','--do_particular_myuils_function', required=False, type=str,default='', help="module to run")
-    p.add_argument('-dpf','--do_particular_function', required=False, type=str,default='', help="module to run from here")
+    p.add_argument('-efm','--exectue_function_myutils', required=False, type=str,default='', help="function to run from myutils.")
+    p.add_argument('-ef','--execute_function', required=False, type=str,default='', help="function to run from this file.")
     p.add_argument('-fi','--format_in', required=False, type=str,default='runner', help="ase format for reading files")
     p.add_argument('-ru','--remove_unknown_elements_from_structures'  ,action='store_true',help='Reove unknown elements (at respective atom) from the input structures')
     p.add_argument('--potpath','-p',   required=False, type=str, default="n2p2_v4ag_ppl_987654_21cores", help="In case --pot is set to setpath use --potpath Folder to point to the Folder containing the n2p2/runner potential")
@@ -434,19 +434,7 @@ def get_energies(args):
                             print(os.getcwd()+'/simulation.ti')
                             sys.exit()
                         print('do 1')
-                        #call(["/usr/local/bin/python $HOME/sources/ipi/bin/i-pi input.xml &"],shell=True)
-                        call(["python $HOME/sources/ipi/bin/i-pi input.xml &"],shell=True)
-
-                        print('!!!!!!!!!!!!!!!!! do 2, before sleep 5')
-                        time.sleep(5)
-                        print('!!!!!!!!!!!!!!!!! do 2, AFTER  sleep 5')
-                        #call(["$HOME/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp"],shell=True)
-                        call(["$HOME/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_fidis < in.lmp"],shell=True)
-
-            # python $HOME/sources/ipi/bin/i-pi ipi_input_thermodynamic_integration_template.xml
-
-
-            # ~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp
+                        my.ipi_start_job(inputfile="input.xml")
             sys.exit()
 
 
@@ -507,18 +495,18 @@ def get_energies(args):
         formation_energies(ace,args)
         sys.exit('formation_energies done! Exit')
 
-    if args.do_particular_myuils_function:
+    if args.exectue_function_myutils:
         print('args.inputfile',args.inputfile)
-        print('args.do_particular_myuils_function',args.do_particular_myuils_function)
-        function = eval('my.'+args.do_particular_myuils_function)
+        print('args.exectue_function_myutils',args.exectue_function_myutils)
+        function = eval('my.'+args.exectue_function_myutils)
         #my.get_Mg5Si6_and_other_antisites(ace)
         function(ace)
         sys.exit()
 
-    if args.do_particular_function:
+    if args.execute_function:
         print('args.inputfile',args.inputfile)
-        print('args.do_particular_function',args.do_particular_function)
-        function = eval(args.do_particular_function)
+        print('args.execute_function',args.execute_function)
+        function = eval(args.execute_function)
         #my.get_Mg5Si6_and_other_antisites(ace)
         function(ace)
         sys.exit()
