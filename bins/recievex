@@ -23,11 +23,15 @@ else
     [ "$basename" = "recievex2" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/bins/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
     [ "$basename" = "recievex2nountar" ] && address=`grep "address2=" $HOME/Dropbox/Albert/scripts/dotfiles/bins/sendx | tail -1 | sed 's|.*address2="||' | sed 's|".*||'`
     echo "address   : $address"
+    echo "filename  : $filename"
+    echo 'executing : --progress --remove-source-files -av -e ssh $address:~/exchange/$filename .'
     
     # USE RSYNC SINCE IT CAN DELETE THE FILE AFTERWARDS
     #echo "copy $address:~/.exchange/$filename ."
     # the --remove-source-files is a savety feature to ensure that not the wrong file is recieved by accident
     rsync --progress --remove-source-files -av -e ssh $address:~/.exchange/$filename . 
+    echo 'ls        : to see what is there'
+    ls
 fi
 
 [ "$basename" = "recievexnountar" ] && echo no unar && exit
