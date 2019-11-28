@@ -1,0 +1,39 @@
+Options[visualizeForces] = { ArrowheadSize -> Small, ArrowColor -> Blue, ScaleFactor -> 1. };
+
+visualizeForces[coords_, forces_, opts : OptionsPattern[]] := Graphics3D[
+{
+  Arrowheads[OptionValue[ArrowheadSize]], 
+  OptionValue[ArrowColor], 
+  Table[Arrow[{coords[[i]], coords[[i]] + OptionValue[ScaleFactor] forces[[i]]}], {i, coords // Length}]
+}]
+
+Options[visualizeAtomicStructure] = {
+  AtomRadius -> .5,
+  AtomColor -> Red,
+  Index -> False,
+  IndexColor -> Red,
+  IndexShift -> 0.1,
+  Axes -> True
+};
+
+visualizeAtomicStructure[coords_, opts : OptionsPattern[]] := Module[
+  {
+    indCol, indSh, a, b, ax = OptionValue[Axes]
+  },
+  a = {OptionValue[AtomColor], Sphere[coords, OptionValue[AtomRadius]]};
+  indSh = OptionValue[IndexShift];
+  b = Table[ Text[i, coords[[i]] + indSh {1, 1, 1}], {i, coords // Length}];
+  indCol = OptionValue[IndexColor];
+  If[OptionValue[Index],
+    Return[Graphics3D[Flatten[{a, indCol, b}, 1], Axes -> ax]],
+    Return[Graphics3D[a, Axes -> ax]]
+  ];
+];
+
+visualizeAtomicStructure[coords_, forces_, opts : OptionsPattern[{visualizeForces, visualizeAtomicStructure}]] := 
+  Show[visualizeAtomicStructure[coords, FilterRules[{opts}, Options[visualizeAtomicStructure]]], 
+       visualizeForces[coords, forces, FilterRules[{opts}, Options[visualizeForces]]]]
+
+
+visualizeAtomicStructure2D[coords_] := Graphics[
+  {PointSize[0.02], Point /@ coords, Red, Table[Text[i, coords[[i]] + 0.1 {1, 1}], {i, coords // Length}]}]

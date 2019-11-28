@@ -1,0 +1,64 @@
+
+error[str_String]:=(Print["ERROR: "<>str];Exit[];)
+
+(* check input *)
+If [structureFactor!=1 && sc!=1,
+  error["structureFactor!=1 and one of sc"];
+];
+
+Print[""]; Print[""];
+Do[ (* over baseName *)
+  baseName = baseNames[[b]];
+  st={};
+  (* check if files exist *)
+  Do[(
+    file=baseName<>ToString[aLats[[i]]];
+    If[FileExistsQ[file],
+      AppendTo[st,""],
+      AppendTo[st,"angstrom"];
+      If[!FileExistsQ[file<>st[[-1]]],error[file<>st[[-1]]<>" file not existing"]];
+      ];
+  ),{i,aLats//Length}];
+
+  (* lattice constant to volume and vice versa *)
+  aLatToV[aLat_] := (sc aLat)^3/structureFactor;
+  VToALat[V_] := (structureFactor V)^(1/3)/sc;
+
+  Do[
+  (* just in case the Fvibs have unequal length*)
+  If[i==1,
+  Ts = (Select[Import[baseName <> ToString[aLats[[1]]]<>st[[1]], "Table"],Length[#]==2&])\[Transpose] // First;];
+  Tstmp = (Select[Import[baseName <> ToString[aLats[[i]]]<>st[[1]], "Table"],Length[#]==2&])\[Transpose] // First;
+
+  If[Length[Tstmp]<=Length[Ts],Ts=Tstmp];
+  ,{i,1,Length[aLats]}];
+(*
+  Tsa = (Select[Import[baseName <> ToString[aLats[[1]]]<>st[[1]], "Table"],Length[#]==2&])\[Transpose] // First;
+  Tsb = (Select[Import[baseName <> ToString[aLats[[2]]]<>st[[1]], "Table"],Length[#]==2&])\[Transpose] // First;
+  Tsc = (Select[Import[baseName <> ToString[aLats[[3]]]<>st[[1]], "Table"],Length[#]==2&])\[Transpose] // First;
+  Print["Ts:",Length[Tsa]," ",Length[Tsb]," ",Length[Tsc]];
+  Print["ka",Length[Ts]];
+  Print["Fvibs:"];
+*)
+  Fvibs = Table[(Select[Import[baseName <> ToString[aLats[[i]]]<>st[[i]], "Table"][[1;;Length[Ts]]],Length[#]==2&])\[Transpose][[2]],{i,aLats//Length}];
+  (*Print["Fvibs transpose:",Dimensions[Fvibs],Fvibs[[1]]//Length,Fvibs[[3]]//Length];*)
+  Fvibs = s Transpose[Fvibs];
+  vols=aLatToV/@(aLats//ToExpression);
+
+  fitPoints = {vols, #}\[Transpose] & /@ Fvibs;
+  fits = Fit[#, Table[V^(i - 1), {i, fitOrder + 1}], V] & /@ fitPoints;
+
+  delta = Table[Abs[(fits[[i]]/.V->Transpose[fitPoints[[i]]][[1]])-Transpose[fitPoints[[i]]][[2]]],{i,fits//Length}]//Flatten;
+  Print[""];
+  Print["mean delta ",Mean[delta]];
+  Print["max  delta ",Max[delta]];
+  Print[""];
+
+  forExport=Flatten[{#[[1]],CoefficientList[#[[2]],V]}]&/@({Ts,fits}\[Transpose]);
+  Print[Export[baseName<>"fit_order"<>ToString[fitOrder],forExport,"Table",FieldSeparators->" "]];
+
+  forExport=Append[{vols,(fitPoints//Last)\[Transpose][[2]]-((fits//Last)/.V->vols)}\[Transpose],{Null,Null}];
+  Print[Export[baseName<>"fit_order"<>ToString[fitOrder]<>"_delta",forExport,"Table",FieldSeparators->" "]];
+,{b,baseNames//Length}];
+
+

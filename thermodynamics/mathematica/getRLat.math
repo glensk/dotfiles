@@ -1,0 +1,10 @@
+
+getRLat[vec_, cell_, eps_Real:GLOBALEPS] := Module[
+  {
+    v = (cell // Transpose // Inverse).vec
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Do[ v[[i]] = Floor[v[[i]] + eps], {i, 1, v // Length}];
+  (cell // Transpose).v
+];

@@ -1,0 +1,12 @@
+moveIntoOriginalCell[coords_, cell_] := Module[
+  {
+    movedCoords, inv = cell // Inverse
+  },
+  movedCoords = inv.coords;
+  movedCoords = FractionalPart[movedCoords];
+  movedCoords = 10^-7 + Table[1, {coords // Length}] + movedCoords;
+  movedCoords = FractionalPart[movedCoords];
+  movedCoords = cell.movedCoords;
+
+  movedCoords
+];

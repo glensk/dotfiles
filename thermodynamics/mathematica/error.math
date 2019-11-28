@@ -1,0 +1,1 @@
+error[str_String]:=(Print["ERROR: "<>str];Exit[])

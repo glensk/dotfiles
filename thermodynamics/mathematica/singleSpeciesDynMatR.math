@@ -1,0 +1,108 @@
+
+singleSpeciesDynMatR[mass_Real,cell_List,supercell_List,coordIn_List,forcesIn_List,disp_Real,
+                     reduce_Symbol:True,complete_Symbol:True,forcesZIn_List:{}] := Module[
+  {
+    dim = 3 (* dim of dynMatR *),
+    convFac = 0.0102908592752626 (* eV/[angstrom^2*u] --> hartree/[ bohrradius^2*u] *),
+    q0symmetry = True, symmetrize = True, movedAtom = 1, nrBasisAtom = 1, basis={{0,0,0}},
+
+    recipCell, invSym, dynMatR={}, rLatBox={}, rLat, tau, path,
+    mirrorXYdiag = {{0, 1, 0}, {1 , 0, 0}, {0, 0, 1}},
+    mirrorXZdiag = {{0, 0, 1}, {0 , 1, 0}, {1, 0, 0}},
+    forces=forcesIn,forcesY, forcesZ, coordY, coordZ, coordTmp, rLatTmp, tauTmp, forceTmp,
+    rLatY, rLatZ, allCoord, allForces, allRLat, index, coord
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  recipCell = calculateReciprocalCell[cell];
+  coord = centerDynMatR[coordIn, supercell, movedAtom];
+  If[q0symmetry, forces[[movedAtom, 1]] -= Sum[forces[[i]], {i, forces//Length}][[1]]];
+  If[symmetrize,
+    invSym = {{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    forces = symmetrizeDynMatR[coord, forces, invSym, 1];
+  ];
+  If[reduce, forces = reduceDynMatR[coord, forces, supercell]];
+  If[complete, {coord, forces} = completeDynMatR[coord, forces, movedAtom, "x"]];
+
+  rLat = coord; tau = coord;
+  Do[
+    rLat[[i]] = getRLat[coord[[i]], cell];
+    If[(tau[[i]] = getBoxIndex[coord[[i]]-rLat[[i]], basis]) == -1,
+      error["Tau not in basis!!  i="<>ToString[i]<>"  rLat[[i]]:"<>ToString[rLat[[i]]]<>"  basis:"<>ToString[basis]]
+    ];
+  , {i, coord//Length}];
+
+  forcesY = forces; forcesZ = forces; coordY = coord; coordZ = coord;
+
+  Do[
+    coordY[[i]] = coord[[i]] - coord[[movedAtom]];
+    coordZ[[i]] = coord[[i]] - coord[[movedAtom]];
+  , {i, coord//Length}];
+
+  Do[
+    coordY[[i]]  = mirrorXYdiag.coordY[[i]];
+    forcesY[[i]] = mirrorXYdiag.forces[[i]];
+    coordZ[[i]]  = mirrorXZdiag.coordZ[[i]];
+    forcesZ[[i]] = mirrorXZdiag.forces[[i]]
+  , {i, coord//Length}];
+
+  Do[
+    coordY[[i]] = coordY[[i]] + coord[[movedAtom]];
+    coordZ[[i]] = coordZ[[i]] + coord[[movedAtom]];
+  , {i, coord//Length}];
+
+  (* for afm case only *)
+  If[Length[forcesZIn]!=0,
+    forcesZ = forcesZIn;
+    coordZ = centerDynMatR[coordIn, supercell, movedAtom];
+    If[q0symmetry, forcesZ[[movedAtom, 1]] -= Sum[forcesZ[[i]], {i, forcesZ//Length}][[1]]];
+    If[symmetrize,
+      invSym = {{1, 0, 0}, {0, 1, 0}, {0, 0, -1}};
+      forcesZ = symmetrizeDynMatR[coordZ, forcesZ, invSym, 3];
+    ];
+    If[reduce, forcesZ = reduceDynMatR[coordZ, forcesZ, supercell]];
+    If[complete, {coordZ, forcesZ} = completeDynMatR[coordZ, forcesZ, movedAtom, "z"]];
+  ];
+
+  coordTmp = coordY; rLatTmp = rLat;
+  Do[
+    rLatTmp[[i]] = getRLat[coordTmp[[i]], cell];
+    tauTmp = getBoxIndex[coordTmp[[i]] - rLatTmp[[i]], basis];
+    If[! tauTmp == tau[[i]], error["Symmetry operation failed!"]];
+  , {i, coordTmp//Length}];
+  rLatY = rLatTmp;
+
+  coordTmp = coordZ; rLatTmp = rLat;
+  Do[
+    rLatTmp[[i]] = getRLat[coordTmp[[i]], cell];
+    tauTmp = getBoxIndex[coordTmp[[i]] - rLatTmp[[i]], basis];
+    If[! tauTmp == tau[[i]], error["Symmetry operation failed!"]];
+  , {i, coordTmp//Length}];
+  rLatZ = rLatTmp;
+
+  allCoord = {coord, coordY, coordZ};
+  allForces = {forces, forcesY, forcesZ};
+  allRLat = {rLat, rLatY, rLatZ};
+
+  Do[ Do[
+    coordTmp = allCoord[[XYZ, j]];
+    forceTmp = allForces[[XYZ, j]];
+    rLatTmp = allRLat[[XYZ, j]];
+    index = getBoxIndex[rLatTmp, rLatBox];
+
+    If[index == -1,
+      rLatBox = Append[rLatBox, rLatTmp];
+      dynMatR = Append[dynMatR, Table[0, {dim}, {dim}]];
+      index = rLatBox // Length;
+    ];
+
+    Do[
+      dynMatR[[index, 3(nrBasisAtom-1) + XYZ, 3(tau[[j]]-1) + xyz]] = forceTmp[[xyz]]/(disp*Sqrt[mass*mass]);
+    , {xyz, 3}];
+
+  , {j, allCoord[[XYZ]]//Length}], {XYZ, 3}];
+
+  dynMatR *= convFac;
+
+  {rLatBox,dynMatR}
+];

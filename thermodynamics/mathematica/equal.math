@@ -1,0 +1,1 @@
+equal[vec1_,vec2_,eps_Real:GLOBALEPS]:=Module[{bool},If[Norm[vec1-vec2]<eps, bool=True, bool=False]; bool];

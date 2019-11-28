@@ -1,0 +1,85 @@
+
+(* allAtomsIn and symOpsIn in cartesian coordinates expected *)
+(* option: "irreducibleWeights" (default) or "irreducibleStars" or "allStars" *)
+
+(* Example: 2x2x2 cubic bcc with 16 atoms
+    coordinates           "irreducibleWeights"               "irreducibleStars"                                    "allStars"
+ 1  {0, 0, 0}                                                                                                    
+ 2  {0, 0, 1}             small ouput:                       medium output:                                        large output:
+ 3  {0, 1, 0}             list of irreducible atoms          list of irreducible stars, i.e.,                      list of stars for each reducible atom, i.e.,
+ 4  {0, 1, 1}             and corresponding weights          for each irreducible atom all                         for each reducible atom the list of all
+ 5  {1, 0, 0}                                                reducible, symmetry equivalent atoms                  symmetry equivalent atoms and the
+ 6  {1, 0, 1}                                                and corresponding symmetry matrices                   corresponding symmetry matrices transforming
+ 7  {1, 1, 0}                                                transforming the irreducible atom                     the atoms into each other are given
+ 8  {1, 1, 1}                                                into the reducible one are given                    
+ 9  {0.5, 0.5, 0.5}                                                                                              
+ 10 {0.5, 0.5, 1.5}       {{1, 2, 4, 8, 9},                  {{{1}, {2, 3, 5}, {4, 6, 7}, {8},                     {{{1}, {2, 3, 5}, {3, 2, 5}, {4, 6, 7},
+ 11 {0.5, 1.5, 0.5}        {1, 3, 3, 1, 8}}                  {9, 10, 11, 12, 13, 14, 15, 16}},                     {5, 2, 3}, {6, 4, 7},{7, 4, 6}, {8},
+ 12 {0.5, 1.5, 1.5}                                          {{{{1., 0., 0.}, {0., 1., 0.}, {0., 0., 1.}}},         ...
+ 13 {1.5, 0.5, 0.5}                                           {{{1., 0., 0.}, {0., 1., 0.}, {0., 0., 1.}},         {{{{1., 0., 0.}, {0., 1., 0.}, {0., 0., 1.}}},
+ 14 {1.5, 0.5, 1.5}                                              ...                                                {{{1., 0., 0.}, {0., 1., 0.}, {0., 0., 1.}},
+ 15 {1.5, 1.5, 0.5}                                              remaining symmetry matrices }                         ...
+ 16 {1.5, 1.5, 1.5}                                                                                                    remaining symmetry matrices }
+*)
+
+getIrreducibleAtoms[allAtomsIn_List, cell_List, symOpsIn_List, option_String:"irreducibleWeights", eps_Real:GLOBALEPS] := Module[
+  {
+    allAtoms, symOps, done, Nall, k1, k2, sym, add, S1, S2,
+    irrIndMat = {}, irrSymMat= {}, allIndMat, allSymMat, irrMesh, irrWeights
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  (* transform to direct coordinates *)
+  allAtoms=toReducedCoords[allAtomsIn,cell];
+  symOps=toReducedMatrix[symOpsIn,cell];
+
+  Nall=allAtoms//Length;  done = Table[False, {Nall}];
+  Do[ (* determine the irreducible points and corresponding symmetry operations *)
+    If[! done[[i]],
+      done[[i]] = True;
+      AppendTo[irrIndMat, {i}];
+      AppendTo[irrSymMat, {IdentityMatrix[3]}];
+
+      Do[ Catch[ If[! done[[j]],
+
+        If[periodicDistance[allAtoms[[i]], {0, 0, 0}, cell, "reduced"] - (* precheck for efficiency purposes *)
+           periodicDistance[allAtoms[[j]], {0, 0, 0}, cell, "reduced"] < eps,
+          Do[
+            If[periodicEqual[allAtoms[[i]]-symOps[[s]].allAtoms[[j]],eps],
+              AppendTo[irrIndMat[[-1]], j];
+              AppendTo[irrSymMat[[-1]], symOps[[s]]];
+              done[[j]] = True; Throw[True];
+            ];
+          ,{s, symOps // Length}];
+        ];
+      ] ], {j,Nall}];
+    ];
+  ,{i,Nall}];
+
+  Switch[option,
+    "irreducibleWeights",
+      irrMesh=First/@irrIndMat; irrWeights=Length/@irrIndMat;
+      Return[{irrMesh,irrWeights}],
+
+    "irreducibleStars",
+      irrSymMat=toCartesianMatrix[#,cell]&/@irrSymMat; (* symmetry operations back to cartesian *)
+      Return[{irrIndMat,irrSymMat}],
+
+    "allStars",
+      allIndMat=allSymMat=Table[{},{Nall}];
+      Do[ (* fill up the allMatrices from the irreducible ones *)
+        k1=irrIndMat[[i,j]]; S1=irrSymMat[[i,j]];
+        Do[
+          k2=irrIndMat[[i,m]]; S2=irrSymMat[[i,m]];
+          If[k1==k2,add=PrependTo,add=AppendTo];
+          add[allIndMat[[k1]],k2]; add[allSymMat[[k1]],Inverse[S1].S2];
+        ,{m,Length[irrIndMat[[i]]]}];
+      ,{i,Length[irrIndMat]},{j,Length[irrIndMat[[i]]]}];
+
+      allSymMat=toCartesianMatrix[#,cell]&/@allSymMat; (* symmetry operations back to cartesian *)
+      Return[{allIndMat,allSymMat}],
+    _,
+      error["unkonw option "<>option<>" in getIrreducibleAtoms"]
+  ];
+];
+

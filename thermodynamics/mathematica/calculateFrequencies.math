@@ -1,0 +1,25 @@
+
+(* dynMatR in hbar (hartree/(bohrradius^2 u))^(1/2) expected 
+   rLat and kPoints either both cartesian or reduced
+   frequency output in meV *)
+
+calculateFrequencies[kPoints_, dynMatR_, rLat_] := Module[
+  {
+    eps=10.^-4,
+    dynMatK, ev, f, evec={}, freqs={}
+  }, 
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Do[
+    dynMatK = Sum[-dynMatR[[i]] Exp[I kPoints[[j]].rLat[[i]]], {i, dynMatR//Length}];
+    AppendTo[evec,Eigenvectors[dynMatK]];
+    ev=Eigenvalues[dynMatK];
+    If[Max[Abs[Im[ev]]]>eps,
+      error["dynMatK for k="<>ToString[kPoints[[j]]]<>" non Hermitian; eval="<>ToString[ev]]
+    ];
+    f=dynMatToFreq Sign[Re[ev]]Sqrt[Abs[Re[ev]]];
+    AppendTo[freqs,f];
+  ,{j, Length[kPoints]}]; 
+
+  {freqs,evec}
+];

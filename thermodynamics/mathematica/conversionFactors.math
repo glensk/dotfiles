@@ -1,0 +1,11 @@
+
+GLOBALEPS = 10.^-4 (* eps used for comparisons *)
+
+dynMatToFreq = 637.339113585464; (* hbar (hartree/(bohrradius^2 u))^(1/2) -> meV; for converting
+                                    sqrt of dynamical-matrix eigenvalues to frequencies given in energy *)
+GPaTomeVAng3 = 6.2415097;
+hartreeTomeV = 27211.383449283; (* hartree to mev *)
+
+bohrToAngstrom = 0.529177208278835; (* bohr to angstrom *)
+
+kB = 0.086173422; (* Boltzmann constant meV/K *)

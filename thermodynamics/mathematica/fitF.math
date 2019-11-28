@@ -1,0 +1,95 @@
+
+fitF[aLatsIn_,cBya_,latType_,s_,Vorder_Integer,baseIn_String,suffix_String,mag_Symbol:False]:=Module[
+  {
+    n=100,
+    min,max,d,delta,base=baseIn,structureFactor,
+    sc,sin,vols,forExport,Fs,fits,file,denseVols,fitPoints,Ts,aLats=aLatsIn//Sort
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  (* check latType *)
+  Switch[latType,
+    "bcc",             structureFactor=2; pow=3; sc=1; sin=1; If[cBya!=1,error["bcc and cBya!=1"]],
+    "fcc",             structureFactor=4; pow=3; sc=1; sin=1; If[cBya!=1,error["fcc and cBya!=1"]],
+    "hcp",             structureFactor=2; pow=3; sc=1; sin=Sin[Pi/3],
+    "aLatsAreVolumes", structureFactor=1; pow=1; sc=1; sin=1; If[cBya!=1,error["aLatsAreVolumes and cBya!=1"]],
+    _, sc=ToExpression[latType]; 
+       If[Head[sc]==Integer && 1<=sc, structureFactor=1; pow=3; sc=latType; sin=1,
+                                      error["latType not known"]];
+  ];
+
+  (* lattice constant to cBya to volume *)
+  aLatToV[aLat_] := (sc aLat)^pow cBya sin/structureFactor;
+
+  (* read in temperatures *)
+  Ts = (Select[checkImport[base<>ToString[NumberForm[aLats[[1]],50]]<>suffix],Length[#]>=2&])\[Transpose] // First;
+
+  (* read in free energies *)
+  Fs = Select[checkImport[base<>ToString[NumberForm[#,50]]<>suffix],Length[#]>=2&]&/@ aLats;
+  Fs = #[[1;;2]]&/@# &/@Fs;
+
+  (* check if temperatures match in all F files *)
+  Do[
+    If[Fs[[i,j,1]]!=Ts[[j]],error["non matching temperatures in "<>base<>ToString[aLats[[i]]]<>" at temperature "<>ToString[Ts[[j]]]]];
+    Fs[[i,j]]=Fs[[i,j,2]]; (* remove temperature *)
+  ,{i,Fs//Length},{j,Fs[[i]]//Length}];
+
+  (* check if enough free energy files for fit order *)
+  If[Vorder>=Length[aLats],error["not enough "<>base<>"* files for Vorder"]];
+
+  (* scale and transpose Fs *)
+  Fs*=s;
+  Fs = Transpose[Fs];
+
+  If[mag==True, (* transformation to magnetic moment *)
+    Do[
+      If[Ts[[i]]!=0&&Min[Norm[Fs[[i]]]]>10^(-5), Fs[[i]]=Exp[-Fs[[i]]/(kB Ts[[i]])]-1];
+    ,{i,Ts//Length}];
+    base="M_";
+  ];
+
+  vols=aLatToV/@aLats;
+  fitPoints = {vols, #}\[Transpose] & /@ Fs;
+  fits = Fit[#, Table[V^(i - 1), {i, Vorder + 1}], V] & /@ fitPoints;
+
+  outputFolder = "fit_order"<>ToString[Vorder]<>Table["_"<>ToString[aLats[[i]]],{i,aLats//Length}];
+  CreateDirectory[outputFolder]//Quiet;
+  oldDir=Directory[];
+  SetDirectory[outputFolder];
+
+  forExport=Flatten[{#[[1]],CoefficientList[#[[2]],V]}]&/@({Ts,fits}\[Transpose]);
+  Export[base<>"fit",forExport,"Table",FieldSeparators->" "];
+
+  forExport=Append[{vols,(fitPoints//Last)\[Transpose][[2]]}\[Transpose],{Null,Null}];
+  min=0.98 vols[[1]]; max=1.02 vols[[-1]]; d=(max-min)/n;
+  denseVols=Table[v,{v,min,max,d}];
+  forExport=Join[forExport,{denseVols,((fits//Last)/.V->denseVols)}\[Transpose],{Null,Null}];
+  Export[base<>ToString[Ts[[-1]]]<>"K",forExport,"Table",FieldSeparators->" "];
+
+  forExport=Append[{vols,(fitPoints//Last)\[Transpose][[2]]-((fits//Last)/.V->vols)}\[Transpose],{Null,Null}];
+  Export[base<>ToString[Ts[[-1]]]<>"K_delta",forExport,"Table",FieldSeparators->" "];
+
+  file=OpenWrite[base<>"log"];
+  WriteString[file,"\n"];
+  WriteString[file,"latType ",latType,"\n"];
+  WriteString[file,"\n"];
+  WriteString[file,"aLats ",aLats,"\n"];
+  WriteString[file,"vols  ",vols,"\n"];
+  WriteString[file,"\n"];
+  delta = Table[Abs[(fits[[i]]/.V->Transpose[fitPoints[[i]]][[1]])-Transpose[fitPoints[[i]]][[2]]],{i,fits//Length}]//Flatten;
+  WriteString[file,"mean delta ",Mean[delta],"\n"];
+  WriteString[file,"max  delta ",Max[delta],"\n"];
+  WriteString[file,"\n"];
+  WriteString[file,"files written:\n"];
+  WriteString[file,base,"fit","\n"];
+  WriteString[file,base,"log\n"];
+  WriteString[file,base<>ToString[Ts[[-1]]]<>"K","\n"];
+  WriteString[file,base<>ToString[Ts[[-1]]]<>"K_delta","\n"];
+  WriteString[file,"\n"];
+  Close[file];
+
+  Print[""];
+  FilePrint[base<>"log"];
+  SetDirectory[oldDir];
+];
+

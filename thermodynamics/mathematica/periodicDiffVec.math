@@ -1,0 +1,4 @@
+
+(* reduced coordinates expected on input;  output also in reduced coordinates *)
+periodicDiffVec[coords1_, coords2_] := If[# > 0.5, # - 1, If[# < -0.5, # + 1, #]] & /@ FractionalPart[coords1 - coords2];
+

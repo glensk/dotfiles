@@ -1,0 +1,23 @@
+isVectorInCell[vecIn_List, cell_List, eps_Real:GLOBALEPS] := Module[
+  {
+    a1 = cell[[1]], a2 = cell[[2]], a3 = cell[[3]],
+    plane1, plane2, plane3,
+    planeList, vecInPlane, v, n,
+    cellInVec = True
+  },
+  plane1 = {a1, Cross[a2,a3]/Norm[Cross[a2,a3]]};
+  plane2 = {a2, Cross[a3,a1]/Norm[Cross[a3,a1]]};
+  plane3 = {a3, Cross[a1,a2]/Norm[Cross[a1,a2]]};
+
+  planeList = {plane1, plane2, plane3};
+
+  Do[
+    v = planeList[[k, 1]];
+    n = planeList[[k, 2]];
+
+    If[n.vecIn < -eps || n.(vecIn - v) > -eps, cellInVec = False; Break[]];
+
+  ,{k, planeList//Length}];
+
+  cellInVec
+];

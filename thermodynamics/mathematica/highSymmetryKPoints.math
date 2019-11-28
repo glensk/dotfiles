@@ -1,0 +1,77 @@
+highSymmetryKPoints[recipCell_, nHighSymKPs_, type_] := Module[
+
+  {b1, b2, b3, highSymKPs, G, X, L, K, X2, H, P, N1, N2, N3, A, B, W, Z, M, R, b1Line, b2Line, b3Line, BZGraph, HSGraph, i, ind}, 
+
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  G = {0, 0, 0}; b1 = recipCell[[1]]; b2 = recipCell[[2]]; b3 = recipCell[[3]];
+
+  Switch[type,
+    "diamond", 
+       K = 1/8 (3 b1 + 3 b2 + 6 b3); X = (b2 + b3)/2; X2 = (4 K)/3; L = 1/2 (b1 + b2 + b3); W = b1/4 + b2/2 + (3 b3)/4;
+
+       {highSymKPs, i} = vectorPath[{{G, K}, {K, X2}, {X, G}, {G, L}, {L, K}, {K, W}, {W, X}, {X, W}, {W, L}}, nHighSymKPs]; 
+
+       ind={"G-->", i[[1]], "  K-->", i[[3]], "  X-->", i[[5]], "  G-->", i[[7]], "  L-->", i[[9]],
+             "  K-->", i[[11]], "  W-->", i[[13]], "  X-->", i[[15]], "  W-->", i[[17]], "  L-->", i[[18]]},
+
+    
+    "123",
+       X = b2/2; Z = b3/2; A = 1/2 (b1 + b2 + b3); M = (b1 + b2)/2; R = (b2 + b3)/2;
+
+       {highSymKPs, i} = vectorPath[{{X, G}, {G, Z}, {Z, A}, {A, G}, {G, M}, {M, R}}, nHighSymKPs]; 
+
+       ind={"X-->", i[[1]]," G-->",i[[3]]," Z-->",i[[5]]," A-->",i[[7]], " G-->", i[[9]]," M-->",i[[11]]," R-->",i[[12]]},
+    
+    (**)
+    "fcc",
+       X=(b1+b2)/2;L=1/2 (b1+b2+b3);K=1/8 (3 b1+3 b2+6 b3);X2=( 4 K)/3;
+       {highSymKPs,i}=vectorPath[{{G,X},{X2,K},{K,G},{G,L}}, nHighSymKPs];
+       ind={"G-->",i[[1]],"  X-->", i[[3]],"  K-->",i[[5]],"  G-->", i[[7]],"  L-->",i[[8]]},
+       (**)
+    (* 
+    "fcc", (* W included: *)
+       X = (b1 + b2)/2; W = 3/4 b1 + 1/2 b2 + 1/4 b3; L = 1/2 (b1 + b2 + b3); K = 1/8 (3 b1 + 3 b2 + 6 b3); X2 = (4 K)/3;
+
+       {highSymKPs, i} = vectorPath[{{G, X}, {X, W}, {W, 2 W - X}, {X2, K}, {K, G}, {G, L}}, nHighSymKPs];
+
+       ind={"G-->",i[[1]]," X-->",i[[3]]," W-->",i[[5]]," X-->",i[[7]]," K-->",i[[9]]," G-->",i[[11]]," L-->",i[[12]]},
+    *)
+
+    
+    "hcp",
+       K = b1/3 + b2/3;  M = b2/2; A = b3/2; H = (b1 + b2)/3 + b3/2;
+
+       {highSymKPs, i} = vectorPath[{{G, K}, {K, M}, {M, G}, {G, A}, {A, H}, {H, K}}, nHighSymKPs];
+
+       ind={"G-->",i[[1]]," K-->",i[[3]]," M-->",i[[5]]," G-->",i[[7]]," A-->",i[[9]]," H-->",i[[11]]," K-->",i[[12]]},
+
+
+    
+    "shearedBcc" | "bcc",
+       H = 1/2 (b1 - b2 + b3); P = 1/4 (b1 + b2 + b3); N1 = b1/2; N2 = (b1 + b2)/2;
+
+       {highSymKPs, i} = vectorPath[{{G, P}, {P, H}, {H, G}, {G, N1}}, nHighSymKPs];
+
+       ind={"G-->", i[[1]], "  P-->", i[[3]], "  H-->", i[[5]], "  G-->", i[[7]], "  N-->", i[[8]]},
+     
+
+    (*
+    "shearedBcc" | "bcc",
+       H = 1/2 (b1 - b2 + b3); P = 1/4 (b1 + b2 + b3); N1 = b1/2; N2 = (b1 + b2)/2; N3 = (b2 + b3)/2;
+
+       {highSymKPs, i} = vectorPath[{{G, N3}, {N1, G}, {G, H}, {H, P}, {P, G}}, nHighSymKPs];
+    
+       ind={"G-->", i[[1]], "  N-->", i[[3]], "  G-->", i[[5]], "  H-->", i[[7]], "  P-->", i[[9]], "  G-->", i[[10]]},
+     *)
+
+    "bainPath",
+       A = 1/2 (b1 + b2 + b3); B = (b1 + b2)/2;
+       {highSymKPs, i} = vectorPath[{{B, G}, {b2, G}, {G, A}}, nHighSymKPs],
+
+    _, Print["Type:", type, " not known."]; Exit[];
+  ]; 
+  {highSymKPs,ind}
+];
+
+

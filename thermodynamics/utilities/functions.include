@@ -1,0 +1,211 @@
+#!/bin/bash
+
+checkAndSetMath() {
+  math=/opt/Wolfram/Mathematica/10.0.2/bin/math;
+  [ ! -e "$math" ] && math=`which math`
+  [ ! -e "$math" ] && math=`which math | awk '{print $4}'`
+  [ ! -e "$math" ] && math=`tcsh -c "which math"`
+  [ ! -e "$math" ] && math=`tcsh -c "which math" | awk '{print $4}'`
+  if [ ! -e $math ]; then
+      echo which math result:`which math`
+    error "mathematica kernel not available at:
+       \033[1m$math\033[0m
+
+       if the kernel is available at another location you need to adjust the math variable in:
+       \033[1m$path/utilities/functions.include\033[0m";
+       fi
+  #math_folder=`echo \`readlink -f "$0"\` | sed 's|'\`basename $0\`'||' | sed 's|/Thermodynamics/.*|/Thermodynamics/mathematica|'`
+  #echo path:$path
+  
+  #echo "functions.include: thermodynamics: $thermodynamics"
+  math_folder=$path/mathematica
+  #echo m1: $math_folder
+  if [ ! -e "$path/mathematica" ];then
+     if [ -e "$path" ];then
+        hier=`pwd`
+        cd $path
+        cd ..
+        math_folder=`pwd`/mathematica
+        cd $hier
+     fi 
+  fi
+  #echo m2: $math_folder
+  if [ ! -e "$math_folder" ];then
+    echo "functions.include: thermodynamics: $thermodynamics"
+    echo "functions.include: you have to set the path variable correctly to the thermodynamids folder in the scripbt which was calling functions.include"
+    echo "functions.include: path: $path"
+    echo "functions.include: math_folder: $math_folder"
+    exit
+fi
+  #if [ "`whoami`" = grabowski ]; then ./refresh_ALL.sh > /dev/null; fi
+  #if [ "`whoami`" != grabowski ]; then 
+  dir=`pwd`
+  cd $math_folder; 
+  ./refresh_ALL.sh
+  cd $dir
+}
+
+error () { echo 1>&2; echo -e "\033[31m\033[1mERROR\033[0m: $1"; exit 1;
+}
+
+check() { while [ -n "$*" ]; do if [ ! -e $1 ]; then error "file/folder $1 missing"; fi; shift; done
+}
+
+checkReal() { printf "%s " "$1" | awk '/^-?[0-9]+\.?[0-9]* $/{print "ok"; exit}; /^-?\.[0-9]+ $/{print "ok";exit};
+                {print "__IF__YOU__SEE__THIS__YOU__DID__NOT__USE__checkReal__CORRECTLY__"}'
+}
+
+checkInteger() { printf "%s " "$1" | awk '/^-?[0-9]+ $/{print "ok";exit};{print "error"}'
+}
+
+get() { getParameters "$1" parameters.dat
+}
+
+getEOS() { getParameters "$1" parameters_EOS
+}
+
+getParameters() { echo `sed -nE 's/^[ ]*'$1'[ ]*=([^#]*).*/\1/p' $2`
+}
+
+getOption() { printf "%s " "$options" | awk '{for (i=1;i<=NF;i++) if ($i=="'$1'") {print "True"; exit}; print "False"}'
+}
+
+rmOption() { 
+    #echo optionsin:$options:dollar:$1:
+    optionsin=$options
+    optionstmp1=`echo "$options" | sed 's|-'"$1"' | |g'`;
+    #echo op1st:$optionstmp1:
+    optionstmp1=`echo "$optionstmp1" | sed 's|-'"$1"'$| |g'`;
+    #echo op1:$optionstmp1:dollar1:$1:
+    [ "$optionstmp1" = "$options" ] && optionstmp1=`echo "$optionstmp1" | sed 's| '"$1"'$| |g'`
+    [ "$optionstmp1" = "$options" ] && optionstmp1=`echo "$optionstmp1" | sed 's|^'"$1"' | |g'`
+    [ "$optionstmp1" = "$options" ] && optionstmp1=`echo "$optionstmp1" | sed 's| '"$1"' | |g'`
+    [ "$optionstmp1" = "$options" ] && optionstmp1=`echo "$optionstmp1" | sed 's|^'"$1"'$| |g'`
+    #echo op2:$optionstmp1:dollar1:$1:
+    #echo op3:$optionstmp1:dollar1:$1:
+    options=`echo "$optionstmp1" | sed 's|$[ ]*||'`
+}
+
+getOptionNr() { printf "%s " "$options" | wc -w | sed 's|[ ]*||'
+}
+
+getValue() { printf "%s " "$options" | sed -e 's/.*'$1' / /' -e 's/ $//' -e 's/ \+-[[:alpha:]]\+.*//' -e 's/^ \+//'
+}
+
+checkInput() { 
+  variableNameVeryUnusualToPreventOverridingInMainScript=$#
+  for (( i=1; i<=$variableNameVeryUnusualToPreventOverridingInMainScript; i++  )) do
+    if [ -z "$1" ]; then error "input missing in parameters.dat"; fi
+    if [ "$1" = "" ]; then error "input missing in parameters.dat is empty"; fi
+    shift
+  done
+}
+
+checkOptions() { 
+  # check first for multiply given options
+  # without the \+ in sed this also woks for mac
+  #n=`printf "%s" "$options" | awk '{for (i=1;i<=NF;i++) print $i}' | sed -n '/^-[[:alpha:]]\+/p' | wc -l`
+  n=`printf "%s" "$options" | awk '{for (i=1;i<=NF;i++) print $i}' | sed -n '/^-[[:alpha:]]/p' | wc -l`
+  nu=`printf "%s" "$options" | awk '{for (i=1;i<=NF;i++) print $i}' | sed -n '/^-[[:alpha:]]/p' | sort -u | wc -l`
+  if [ $n != $nu ]; then error "some option multiply used"; fi
+  # check now if given options are allowed
+  n=`printf "%s" "$1" | awk '{for (i=1;i<=NF;i++) print $i}' | sed -n '/^-[[:alpha:]]/p' | wc -l`
+  nu=`printf "%s %s" "$options" "$1" | awk '{for (i=1;i<=NF;i++) print $i}' | sed -n '/^-[[:alpha:]]/p' | sort -u | wc -l`
+  #echo n:$n: nu:$nu: na:$na: nb:$nb:
+  if [ $n != $nu ]; then error "some of the given option(s) (=$options) not available (=$1); see options with -h"; fi
+}
+
+echo2() { echo "" 1>&2;
+  while [ -n "$*" ]; do echo -e "$1" 1>&2; shift; done
+}
+
+echored() { echo -e "\033[31m\033[1m$*\033[0m"
+}
+
+echogreen() { echo -e "\033[32m\033[1m$*\033[0m"
+}
+
+echoblue() { echo -e "\033[34m\033[1m$*\033[0m"
+}
+
+details() { echo "" 1>&2; echo -e "\033[31m\033[1mDETAILS\033[0m:  \033[1m$1\033[0m"
+}
+
+usage() { echo "" 1>&2; echo -n -e "\033[31m\033[1mUSAGE\033[0m:   \033[1m$1  \033[0m"
+}
+
+printNeeded() {
+  n=1
+  while [ -n "$*" ]; do
+    option=`printf "%s" "$1" | sed 's/\(.*\)  [ ]*\(.*\)/\1/'`
+    option2=`printf "%s" "$option" | sed 's/   *//g'`
+    description=`printf "%s" "$1" | sed 's/\(.*\)\(  [ ]*.*\)/\2/'`
+    echo -e -n "\033[1m$option2\033[0m  "
+    if [ $n = 1 ]; then
+      str="Needed:  \033[1m$option\033[0m${description}\n"
+    else
+      str="$str         \033[1m$option\033[0m${description}\n"
+    fi
+    n=`expr $n + 1`
+    shift
+  done
+  echo "" 1>&2; echo "" 1>&2; echo -n -e "$str"
+  printNeeded=True
+}
+
+printOptions() {
+  if [ "$printNeeded" != True ]; then echo "" 1>&2; fi
+  echo "" 1>&2
+  if [ $# == 0 ]; then
+    echo "Options: -h    this help"
+    echo "         -help more details"
+  else
+    help1=`printf "%s" "$1" | sed 's/\(.*  [ ]*\)\(.*\)/\1/' | awk '{printf("-h");for (i=1;i<length($0)-2;i++) printf(" ")}'`
+    help2=`printf "%s" "$1" | sed 's/\(.*  [ ]*\)\(.*\)/\1/' | awk '{printf("-help");for (i=1;i<length($0)-5;i++) printf(" ")}'`
+    n=1;
+    while [ -n "$*" ]; do
+      option=`echo "$1" | sed 's/\(.*\)  [ ]*\(.*\)/\1/'`
+      description=`echo "$1" | sed 's/\(.*\)\(  [ ]*.*\)/\2/'`
+      if [ $n = 1 ]; then
+        echo -e "Options: \033[1m$option\033[0m$description" 1>&2
+      else
+        echo -e "         \033[1m$option\033[0m$description" 1>&2
+      fi
+      n=`expr $n + 1`
+      shift
+    done
+    if [ $n -gt 4 ]; then echo "" 1>&2; fi
+    echo -e "         $help1 this help"
+    echo -e "         $help2 more details"
+  fi
+  echo "" 1>&2
+}
+
+lsFullPath() {
+  while [ -n "$*" ]; do
+    fullPath=`echo $1 | sed 's|^/.*|True|'`
+    if [ "$fullPath" != True ]; then echo `pwd`/$1; else echo $1; fi
+    shift
+  done
+}
+
+getlinuxormac() {
+    lom=`uname -a | grep -o "Linux\|mac" | head -1`
+    [ "$lom" != "mac" ] && [ "$lom" != "Linux" ] && echo "are you on a Linux or on a mac OS X ?" && exit
+    echo $lom
+    
+}
+
+isnumber() {
+   [ "$1" = "" ] && echo no_number_given && exit
+    for isnumber in $*;do
+        number=`echo "$isnumber" | grep -o "[-]*[+]*[0-9.]*[0-9]*"`
+
+    #echo isnumber:$isnumber number:$number
+    [ "$number" != "$isnumber" ] && echo no1 && exit
+        [ "`echo $number | grep "[0-9]" | wc -w`" -lt "1" ] && echo no2 && exit
+        [ "`echo "$isnumber" | grep -o "[0-9.]*" | wc -w`" -gt "1" ] && echo no3 && exit
+done
+echo yes
+}
+

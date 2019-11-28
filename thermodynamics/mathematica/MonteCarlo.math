@@ -1,0 +1,33 @@
+MonteCarlo[pot_, T_, steps_, min_, max_, kB_Real: 0.086173422] := Module[
+  {
+    distribution = {},
+    pos = RandomReal[{min, max}],
+    energy,
+    trialPos,
+    trialEnergy,
+    rand
+  },
+  energy = pot[pos];
+  AppendTo[distribution, pos];
+  Print["step ", Dynamic[i]]
+  (* Print["distribution//Length ", Dynamic[distribution//Length]];*)
+
+  Do[
+    trialPos = RandomReal[{min, max}];
+    trialEnergy = pot[trialPos];
+    If[trialEnergy <= energy,
+      pos = trialPos;
+      energy = trialEnergy;
+      AppendTo[distribution, pos];
+     ,
+      rand = RandomReal[{0, 1}];
+      If[rand <= Exp[-(trialEnergy - energy)/(kB T)],
+        pos = trialPos;
+        energy = trialEnergy;
+        AppendTo[distribution, pos];
+      ];
+    ];
+  , {i, steps}];
+
+  distribution
+];

@@ -1,0 +1,22 @@
+vectorPath[vecList_, nSteps_] := Module[
+  {listSize=vecList//Length, totalLength=0, vec, NormVec, stepSize, vecPath={}, indexes={}, in},
+
+  Do[ totalLength += Norm[vecList[[i, 1]] - vecList[[i, 2]]], {i, 1, listSize}];
+  stepSize = totalLength/nSteps;
+  Do[
+    vec = vecList[[j, 2]] - vecList[[j, 1]];
+    NormVec = Norm[vec];
+    vecPath = Append[vecPath, vecList[[j, 1]]];
+    If[Length[vecPath] > 1, If[vecPath[[-1]] == vecPath[[-2]], vecPath = Most[vecPath]]];
+    indexes = Append[indexes, (vecPath // Length)];
+    in = 1/IntegerPart[NormVec/stepSize];
+    While[Norm[in vec] < NormVec,
+      vecPath = Append[vecPath, vecList[[j, 1]] + in vec];
+      in += 1/IntegerPart[NormVec/stepSize];
+    ];
+    vecPath = Append[vecPath, vecList[[j, 2]]];
+    indexes = Append[indexes, (vecPath // Length)];
+  ,{j, listSize}];
+    
+  {vecPath, indexes}
+];

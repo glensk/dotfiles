@@ -1,0 +1,20 @@
+
+zcat  -->  zgrep ".*"   zcat does not work properly on all systems (expects .Z extension sometimes)
+
+sh    -->  bash         sh is typically mapped on some other shell which might not be compatible
+                        bash enforces using the correct shell (if available)
+
+sed -r  -->  sed -E     sed -r does not work on MacOs; sed -E seems to work generally
+
+sed -i  -->             sed -i on MacOs does not work as on unix;
+        --> lom=`getlinuxormac`;[ "$lom" = "Linux" ] && add="";[ "$lom" = "mac" ] && add="'' -e"
+        --> sed -i $add     instead of sed -i  works on both
+
+
+wc -w   -->  awk '{print NF}'   wc -w left aligns in GNU but right aligns in BSD
+or
+wc -w --> wc -w | sed 's|[ ]*||g'   --> wc -w and wc -l prints not leftaligned in mac os X
+                                    --> try sed -i "s|wc -\([wlc]\)|wc -\1 \| sed 's\|[ ]\*\|\|g'|g" file
+
+source -->              keep in mind that "source filename" will not work if you dont have . in your PATH set
+                        if you use bash than "source filename" will work  

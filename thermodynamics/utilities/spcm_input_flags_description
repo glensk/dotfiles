@@ -1,0 +1,76 @@
+Description of input flags in the input file for spc (sqs) calculations
+-------------------------------------------------
+Flag    type  typicalValue  description
+-------------------------------------------------
+NPRN    int   0               Print vectors for shells if 1 or 2
+TEST    int   0               ???
+NCOL    int   0               0 default, 1 collinear magn., 
+2 non-collinear magn.
+STAT    int   1               ???
+TCLIM   int   0               ???
+nsho    int   10              ???
+LAT     int   1               ???
+IPRIM   int   0               1 Generate standard vectors 
+0 read non-standard vectors 
+HIGH    int   0               0 Calculate (2,N)-Cor.func. only
+1 calculate higher Cor.functions
+NSHC    int   10              ???
+NL      int   0               ???
+NLH     int   0               ???
+
+**********************************************************************
+LATTICE:  information for the unit and supercell                     *
+**********************************************************************
+
+A       real     1.0           Lattice parameter a.
+B       real     1.0           Lattice parameter b. 
+C       real     1.0           Lattice parameter c.
+
+BSX...  real     1.0 0.0 0.0   super cell vectors
+0.0 1.0 0.0
+0.0 0.0 1.0
+
+NQ3     int      4             number of atoms in the 3D cell (Qx,...)
+QX...   real     0.0 0.0 0.0   positions of atom is the basis cell (e.g. bcc)
+0.5 0.5 0.5 
+
+LAMDA   real     2.50000       Madelung matrix etc. (not relevant for sqs?)
+AMAX    real     4.50000       Madelung matrix etc. (not relevant for sqs?) 
+BMAX    real     4.50000       Madelung matrix etc. (not relevant for sqs?)
+
+NA NB NC int     2 2 2         multiplicity of the sc (e.g. 2x2x2 cell)
+
+NSDC    int      -6            ???
+NSDS    int      -1            ???
+NSDM    int      1             ???
+NMAXMX  int      3             ???
+TMLIM   real     1.0           ???
+
+**********************************************************************
+Species:                                                             * 
+**********************************************************************
+
+NT      int      1             ???
+NTA(IQ) int      1   1   1   1 ???
+NTO     int      1             ???
+NTAO(IQ)int      1   1   1   1 ???
+NQ3O    int      1             ???
+IQO(IQ) int      1   1   1   1 ???
+NATOM   int      2             number of different species?
+SMB(IAT)int      A   B         nomenclature of species (A,B,C,D,E)
+Concentrations on sublattices:
+0.5 0.5 real     0.25 0.25 0.5 concentrations of species A, B, C...
+
+**********************************************************************
+SQS demands for MC correlations to minimize + weights                *
+**********************************************************************
+
+nc2              nc2, nc3,     pair, tripplet etc. correlation functions
+r_max   real     3.0           maximum distance to be considered for 
+alpha   real     0.0           desired correlation function value
+weight  real     1000.0        weight for the corresponding alpha
+T_i     real     50.0          Starting T for MC simulations
+T_f     real     00.0          Final T for MC simulations
+delt_T  real     10.0          T-step for MC simulations
+"last number" int  20          Number of MC steps per atom
+

@@ -1,0 +1,1 @@
+FermiDirac[e_,T_]:=1/(Exp[e/(kB T)]+1)

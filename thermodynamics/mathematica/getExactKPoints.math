@@ -1,0 +1,16 @@
+getExactKPoints[cellBig_List, cellSmall_List, withGamma_Symbol, eps_Real:GLOBALEPS] := Module[
+  {
+    mesh = 20,
+    vecList, exactVecs = {}, shift = Table[0, {cellBig // First // Length}]
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  vecList = (#-Sum[mesh/2 cellSmall[[i]],{i,cellSmall//Length}]&)/@getMesh[mesh cellSmall,shift,mesh];
+  Do[
+    If[isVectorInCell[vecList[[i]], cellBig]&&(withGamma||Norm[vecList[[i]]]>eps),
+      exactVecs = Append[exactVecs, vecList[[i]]]
+    ];
+  ,{i,vecList//Length}];
+
+  exactVecs
+];

@@ -1,0 +1,5 @@
+(* cartesianCoords can be {x,y,z} or {{x1,y1,z1},{x2,y2,z2},...} *)
+
+toReducedCoords[cartesianCoords_List,cell_List]:=If[Depth[cartesianCoords//N]==2,
+   Inverse[Transpose[cell]].cartesianCoords,Inverse[Transpose[cell]].#&/@cartesianCoords]
+

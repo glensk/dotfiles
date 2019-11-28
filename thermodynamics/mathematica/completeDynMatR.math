@@ -1,0 +1,39 @@
+completeDynMatR[coordIn_List, forcesIn_List, movedAtom_Integer,axis_String:"x"] := Module[
+  {
+    invSymList, facList,
+    coordOut = coordNew = coordIn,
+    forcesOut = forcesNew = forcesIn,
+    vec, invVec, index
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Switch[axis,
+    "x",facList={{1, 1, -1}, {1, -1, 1}, {1, 1, 1}};
+        invSymList = {{{1, 0, 0}, {0, 1, 0}, {0, 0, -1}},
+                      {{1, 0, 0}, {0, -1, 0}, {0, 0, 1}},
+                      {{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}},
+    "z",facList={{-1, 1, 1}, {1, -1, 1}, {1, 1, 1}};
+        invSymList = {{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}},
+                      {{1, 0, 0}, {0, -1, 0}, {0, 0, 1}},
+                      {{1, 0, 0}, {0, 1, 0}, {0, 0, -1}}},
+    _,error["axis not allowed in completeDynMatR"]
+  ];
+
+  Do[
+    Do[
+      vec = coordOut[[i]];
+      invVec = invSymList[[j]].vec;
+      index = getBoxIndex[invVec, coordOut];
+
+      If[index == -1,
+        coordNew = Append[coordNew, invVec];
+        forcesNew = Append[forcesNew, facList[[j]] forcesOut[[i]]];
+      ];
+    ,{i, coordOut // Length}];
+
+    coordOut = coordNew;
+    forcesOut = forcesNew;
+  ,{j, invSymList // Length}];
+
+  {coordOut, forcesOut}
+];

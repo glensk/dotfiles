@@ -1,0 +1,5 @@
+(* pressure-volume relation; Ref: Cohen E., American Mineralogist, vol 85, p. 338, 2000 *)
+ 
+ Vinet[V_, E0_, V0_, BM_, BMder_] := 
+   E0 + (4 BM V0)/(BMder - 1)^2 - 2 V0 BM (BMder - 1)^-2 (5 + 3 BMder ((V/V0)^(1/3) - 1) - 
+            3 (V/V0)^(1/3)) Exp[-(3/2) (BMder - 1) ((V/V0)^(1/3) - 1)];

@@ -1,0 +1,18 @@
+symmetrizeStructure[strIn_, supercell_, symOps_, eps_Real:GLOBALEPS] := Module[
+  {
+    str = strIn, symStr, delta
+  },
+  Do[
+    symStr = symOps[[s]].# & /@ str;
+    Do[ Do[
+      If[periodicEqualCartesian[str[[i]], symStr[[j]], supercell, eps],
+        delta = symStr[[j]] + supercell.IntegerPart[eps + Inverse[supercell].(str[[i]] - symStr[[j]])] - str[[i]];
+        str[[i]] = delta/2 + str[[i]];
+        symStr[[j]] = -delta/2 + symStr[[j]];
+        Break[];
+      ];
+    , {j, symStr // Length}], {i, str // Length}];
+  , {s, symOps // Length}];
+
+  str
+];

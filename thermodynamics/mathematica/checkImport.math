@@ -1,0 +1,5 @@
+checkImport[file_String]:=
+(
+  If[!FileExistsQ[file],error["File "<>file<>" not found"]];
+  Import[file, "Table"]
+)

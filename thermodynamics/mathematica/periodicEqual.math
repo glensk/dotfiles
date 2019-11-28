@@ -1,0 +1,4 @@
+
+(* v in reduced coordinates *)
+periodicEqual[v_,eps_Real:GLOBALEPS] := If[Total[Abs[Round[v] - v]] < eps, Return[True], Return[False]];
+

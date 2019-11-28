@@ -1,0 +1,121 @@
+Description of input flags in the input file for kgrn calculations
+-------------------------------------------------
+Flag    type  typicalValue  description
+-------------------------------------------------
+MSGL    int
+STRT    A,B,C    A/C         A = start from atomic densities
+                             B = ??
+                             C = ?? Continuation from previous run probably
+FUNC    SCA,ASA  SCA         always set to SCA, SCA = spherical cell approximation (Ref: Comp. Mat. Sci. 18, 24 (2000))
+EXPAN   1-4      1           number of expansion centers; in most input files set to 1
+                             if larger than 1, additional .tfh files must be present (additional FOR001 lines)
+FCD     Y/N                  calculate charge density for full charge density calculations
+                             should not be set to Y if DOS is set to Y too (gives SEG fault otherwise)
+GPM     Y/N                  calculate GPM interactions
+FSM     Y/N                  fixed spin moment calculation
+                 
+                 
+**********************************************************************
+SCFP:  information for self-consistency procedure:                   *
+**********************************************************************
+NITER   int      20-40       max number of iterations
+NLIN    int      31          number of Dyson loops within an electronic iteration
+                             changing this flag should only affect convergence
+NCPA    int      7           ??
+NPRN    0/1      000000000   flag determining how much is printed
+----------------------------------------------------------------------
+FRC     N/I/S    N           calculate forces
+DOS     Y/N      N           calculate DOS
+                             should not be set to Y if FCD is set to Y too (gives SEG fault otherwise)
+OPS     Y/N      N           ?? this is set to N in all input files
+AFM     F,P,S                F = ferromagnetic, collinear magnetism
+                             S = spin spiral, non-collinear magnetism
+                             P = paramagnetic this is apparently used for nm (non-magnetic) calculations
+CRT     F/I/M    M           type of criterion for convergence for M, both TOLE and TOLEF, are considered
+STMP    A/F/N    A           way of handling the Bloch transformed slope matrices; affects only time vs. memory ratio
+                             A = array: store in memory
+                             F = file:  store in file
+                             N = no store: do not store but recalculate each time
+----------------------------------------------------------------------
+Lmaxh   int      8           maximum l used for the shape functions, almost always set to 8 (several times to 6 and 10)
+Lmaxt   int      4           ??, almost always set to 4 (several times to 3)
+NFI     int      31          probably number of mesh points in radial integrations, always set to 31
+FIXG    int      2           determines how the "f" and "g" equations are solved, always set to 2
+                             see the header of slfcfg.for for details
+SHF     int      0           some shift used if FRC=S or FRC=I, but always set to 0
+SOFC    Y/B/N    Y/B         type of soft core correction
+                             Y = ??
+                             B = ??
+                             N = no soft-core correction, use frozen core      
+----------------------------------------------------------------------
+KMSH    S/G      S           type of kp mesh
+                             S = Monkhorst-Pack mesh
+                             G = ?? Gamma centered
+IBZ     1-13                 specifies the crystal system and by this the symmetries and the irreducible BZ
+                             1-3 = cubic systems, 1 = sc (probably), 2 = fcc, 3 = bcc
+                             4 = hexagonal
+                             5,6 = tetragonal
+                             7 = trigonal
+                             9-11 = orthorhombic
+                             12-13 = monoclinic
+                             14 = triclinic
+NKX
+NKY
+NKZ     int                  kp-mesh
+FBZ     Y/N      N           calculate explicitly full BZ
+----------------------------------------------------------------------
+ZMSH    char     F/E/e       flag determining the type of Green's function integration
+                             see header of zmesh.for for details; always set to one of F/E/e
+NZ1     int      16          number of mesh points along main integration axis, mostly 16, but also 20-40 sometimes
+NZ2     int      4           second mesh, mostly 4 often 24
+NZ3     int      4           third mesh, mostly 4 often 24 (used apparently only in ZMSH=F and ZMSH=T)
+NRES    int      4           number of residues used (only) in ZMSH=F integration, mostly 4, a few times 3 and 8
+NZD     int      200/400     number of mesh points used only for ZMSH=D or d
+----------------------------------------------------------------------
+DEPTH   real     1.000       depth pf expansion on energy axis
+IMAGZ   real     0.004/0.005 magnitude of shift of integration contour into imaginary axis when integrating
+EPS     real     0.200       epsilon for Green's function integration, always set to 0.200
+ELIM    real    -1.000       start of lower contour in Green's function integration, always set to -1.000
+----------------------------------------------------------------------
+AMIX    real     0.010       charge mixing parameter, mostly 0.010, a few times 0.020, 0.005, 0.015
+VMIX    real     0.700       potential mixing parameter, mostly 0.700, a few times 0.900, 0.500
+EFMIX   real     0.900       fermi mixing parameter, mostly 0.900, often 0.700
+VMTZ    real     0.000       ??, always set to 0.000
+----------------------------------------------------------------------
+TOLE    real     1.d-06      energy criterion for electronic loop
+TOLEF   real     1.d-06      energy criterion for Fermi energy
+TOLCPA  real     1.d-06      energy criterion for CPA calculation
+TFERMI  real                 Fermi energy in K
+----------------------------------------------------------------------
+SWS     real                 average Wigner-Seitz radius in Bohr
+MMOM    real                 magnetic moment in the fixed spin moment calculations
+----------------------------------------------------------------------
+EFGS    real     0.000       start value for Fermi level (EFermi guess)
+                             mostly 0.000, sometimes 0.200 and a few times other values (also negative)
+HX      real     0.101       initial step for additional contour along real axes for finding
+                             Fermi energy (in Ry). It goes down during self-consistent calculations. Recomended value (0.1 Ry)
+                             mostly 0.101, sometimes 0.001, 0.011, 0.111, and a few other values (positive)
+NX      int      5           number of energy points on the additional contour (>=5)
+                             mostly 5, sometimes 7, 9, 11, and a few other values
+NZ0     int      16          = NZ1, mostly 16, sometimes 26, 24, 38, and a few other values
+KPOLE   0/1      0           0: check initially for the poles, and if there are no poles
+                                during self-consitent calculations it stops finding them
+                             1: all the time check the poles
+                             mostly 0, sometimes 1
+----------------------------------------------------------------------
+IQ                : sublattice index
+                  : all sublattices are counted separately, even the symmetry equivalent ones
+IT                : sublattice type index
+                  : only symmetry inequivalent sublattices are counted separately, i.e.,
+                  : sites related by symmetry get the same IT index
+                  : effectively this allows to reduce CPU time by calculating only one atom on each
+                  : symmetry related sites
+ITA               : alloy component index (>1 in case of alloys on
+                  : sublattices)
+NRM  = 1          : usual case
+     = 0          : for deep vacuum positions
+a_scr, b_scr      : on-site screened Coulomb interactions (in the case of CPA alloy)
+Teta, Phi         : the direction of magnetic moment relative z-axis; only used if AFM = S
+FXM       = Y     : fixes magnetic moment
+m                 : the value of magnetic moment or splitting
+----------------------------------------------------------------------

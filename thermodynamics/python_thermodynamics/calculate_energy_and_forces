@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import argparse
+import sys
+import numpy as np
+from argparse import ArgumentDefaultsHelpFormatter
+import pot_energy_forces
+#reload(pot_energy_forces)
+
+class parameters( object ):
+    '''Class which savec parameters'''
+    def __init__( self ):
+        self.u1nn_pottype       = 'mc1'
+        self.u1nn_potparam      = '0.271038_1.445850_2.920351_5.479453_0.304183'
+        self.u1nn_potadd        = False
+        self.u1nn_potaddparam   = False
+
+        self.u1nn_pot2type      = 'poly'
+        self.u1nn_pot2param     = '162.71222703319_-263.4857328932_180.78860116645_-68.18452477711_15.264752001650_-2.026453847315_0.1475038454772_-0.004533251810'
+        self.u1nn_pot2add       = False
+        self.u1nn_pot2addparam  = False
+
+        self.u1nn_topx          = '0.0_0.0_-0.065123968249'
+        self.u1nn_topy          = False
+        self.u1nn_topz          = False
+
+        self.u1nn_tipx          = False
+        self.u1nn_tipy          = False
+        self.u1nn_tipz          = False
+
+        self.u2nn_pottype       = False
+        self.u2nn_potparam      = False
+        self.u2nn_pot2type      = False
+        self.u2nn_pot2param     = False
+
+        self.u3nn_pottype       = False
+        self.u3nn_potparam      = False
+        self.u3nn_pot2type      = False
+        self.u3nn_pot2param     = False
+
+        self.verbose            = False
+        self.save_vecs_to_file_for_DOS = False
+
+if __name__ == '__main__':
+    pot = pot_energy_forces.pot_energy_forces_class()
+    pot.help()
+    pot.pot_run()
+
+    np.savetxt("forces",pot.forces)
+    np.savetxt("energy",np.array([pot.energy]))

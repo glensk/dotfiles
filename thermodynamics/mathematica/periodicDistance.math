@@ -1,0 +1,20 @@
+
+(* coordinates can be "cartesian" or "reduced" according to type; default is "cartesian" *)
+
+periodicDistance[coordsIn1_, coordsIn2_, cell_, type_String:"cartesian"] := Module[
+ {
+   coords1, coords2, diffVec
+ },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Switch[type,
+    "cartesian",{coords1,coords2} = toReducedCoords[{coordsIn1,coordsIn2},cell],
+    "reduced",  {coords1,coords2} = {coordsIn1,coordsIn2},
+    _,error["type not supported"]
+  ];
+
+  diffVec = periodicDiffVec[coords1, coords2];
+  diffVec = toCartesianCoords[diffVec, cell];
+  Return[Norm[diffVec]];
+];
+

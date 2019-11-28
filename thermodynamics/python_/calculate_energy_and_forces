@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+
+#################### Pt #################################################################
+# LONGITUDINAL
+al_2x2x2sc_long1nn6x6x6quer="0.221583_1.520757_2.920351_8.541780_0.196864"
+al_2x2x2sc_long1nn3x3x3quer250eV="0.238955_1.502257_2.920351"
+al_2x2x2sc_long1nn6x6x6links="0.221583 1.520757 2.920351 8.541780 0.196864"
+al_2x2x2sc_long1nn6x6x6rechts="0.447778 1.051045 2.920351 0.684528 -0.24431"
+al_2x2x2sc_long1nn3x3x3250eVlinks="0.245085_1.490270_2.920351_7.356518_0.148124"
+al_2x2x2sc_long1nn3x3x3250eVrechts="0.406758_1.143020_2.920351_0.658049_-0.18344"
+al_2x2x2sc_longbest = al_2x2x2sc_long1nn3x3x3quer250eV
+
+# TRANSVERSAL OUT X
+# et = Trans135(tfullnorm,-0.117,0.0685,-0.0186)  # 12x12x12kp
+# ft = Trans135_der(tfullnorm,-0.117,0.0685,-0.0186) # 12x12x12kp
+# jet = Trans135(tfullnorm,-0.13781,0.0794002,-0.0207742)  # 6x6x6kp
+# ft = Trans135_der(tfullnorm,-0.13781,0.0794002,-0.0207743) # 6x6x6kp
+al_2x2x2sc_tox1nn3x3x3 = "-0.14461_0.016758_-0.00815_0.001809"
+al_2x2x2sc_tox1nn3x3x3 = "-0.140863,0.0382934,-0.0164663,0.00359732,-0.000282412"
+al_2x2x2sc_tox1nn3x3x3best = "-0.14195,0.0601,-0.0158652"
+al_2x2x2sc_tox1nn6x6x6 = "-0.139693,0.0319423,-0.00787683"
+al_2x2x2sc_tox1nn6x6x6 = "-0.14080,0.037809,-0.01530,0.002592"
+
+
+# TRANSVERSAL OUT y
+al_2x2x2sc_toy1nn3x3x3 = "-0.00361,-0.03288,0.030454,-0.02202,0.005685"
+al_2x2x2sc_toy1nn6x6x6 = "0.00174,0.00459,-0.031595,0.02199,-0.0049791"
+
+# TRANSVERSAL IN
+
+
+#################### Pt #################################################################
+pt_2x2x2sc_long1nn10x10x10 = ""
+pt_2x2x2sc_tox1nn10x10x10 = "-0.254654,0.0869654,-0.00195865"
+pt_2x2x2sc_tox1nn6x6x6 = "-0.13781,0.0794002,-0.0207743"
+pt_2x2x2sc_tox1nn3x3x3 = "-0.14195,0.0601,-0.0158652"
+
+##########################################################################################
+#      START EDITNG HERE
+##########################################################################################
+##########################################################################################
+# expected files:
+#   - "cartesian_coords"        ( file wiht coordinates in cartesian coordinates)
+#   - "cell"                    ( file with the supercell coordinates )
+##########################################################################################
+# LONGITUDINAL 1 NN  (if u1nn_pot2: will be same type (m or mc1) as pot)
+u1nn_pot='mc1'
+u1nn_potparam = al_2x2x2sc_long1nn3x3x3250eVrechts
+u1nn_pot2 = al_2x2x2sc_long1nn3x3x3250eVlinks
+
+# TRANSVERSAL 1 NN
+u1nn_topx = al_2x2x2sc_tox1nn3x3x3best
+u1nn_topy = False
+u1nn_tipx = False
+u1nn_tipy = False
+
+# GENERAL STUFF:
+verbose = False #True # can be True or False
+
+##########################################################################################
+#      STOP EDITING HERE
+##########################################################################################
+
+
+
+
+
+##########################################################################################
+#      The following part of the script calculates energies and forces and outputs those
+##########################################################################################
+if __name__ == '__main__':
+    # create symlink if it does not exist
+
+    # ./hesse.py al -p m -pp 0.238955 1.502257 2.920351 -ene
+    # ./hesse.py al -p mc1 -pp 0.221583 1.520757 2.920351 8.541780 0.196864 -ene -p2 mc1 0.447778 1.051045 2.920351 0.       ...684528 -0.24432
+    import os
+    import sys
+    import argparse
+    from argparse import ArgumentDefaultsHelpFormatter
+    sys.dont_write_bytecode = True   # Important: We dont want bytecode, this could possibly save "old" parameters wich are not the current onse
+
+
+    if os.path.isfile("calculate_energy_and_forces.pyc") == True:
+        os.remove("calculate_energy_and_forces.pyc")
+    if os.path.isfile("cartesian_coords") != True:
+        sys.exit("please provide cartesian_coords file")
+    if os.path.isfile("EqCoords_direct") != True:
+        sys.exit("please provide EqCoords_direct file")
+    if os.path.isfile("hesse.py") != True:
+        sys.exit("please provide hesse.py file")
+
+    # it is necessary to create the symbolic link since importing module usually need an .py
+    script = os.path.basename(__file__)
+    scriptpy = script+".py"
+    if os.path.isfile(scriptpy) != True:
+        os.symlink(script,scriptpy)
+    if verbose == True:
+        os.system("./hesse.py al -ene -p extern -v")
+    else:
+        os.system("./hesse.py al -ene -p extern")
+    os.unlink(scriptpy)
+    if os.path.isfile("calculate_energy_and_forces.pyc") == True:
+        os.remove("calculate_energy_and_forces.pyc")

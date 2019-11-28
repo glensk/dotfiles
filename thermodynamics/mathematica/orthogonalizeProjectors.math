@@ -1,0 +1,45 @@
+(* projectors and wavefunctions are expected to be given only for a single channel
+   this means that there is typically two functions each
+   the wavefunctions are further expected to be in vasp format, i.e., to contain an r factor implicitly *)
+
+orthogonalizeProjectors[projIn_,projReciIn_,pseudoIn_,allIn_]:=Module[
+  {
+   proj=projIn,projReci=projReciIn,pseudo=pseudoIn,all=allIn,integrate,int
+  },
+
+  integrate[p_,phi_]:=Module[{interpol,integral,dat},
+    interpol=Interpolation[p];                                                (* we interpolate because projectors and wavefunctions are given on different mesh *)
+    dat=Table[{phi[[k,1]],
+               phi[[k,1]]*phi[[k,2]]*interpol[phi[[k,1]]]},{k,phi//Length}];  (* radial integration \int dr r*r*phi*proj but one r is in phi (vasp default) so   *)
+    integral=Integrate[Interpolation[dat][x],{x,phi[[1,1]],phi[[-1,1]]}];     (* we do only \int dr r*phi*proj *)
+    Return[integral];
+  ];
+
+  Do[
+    Do[
+
+      int = integrate[proj[[i]],pseudo[[j]]];
+      proj[[i]] = Table[{proj[[i,k,1]],proj[[i,k,2]]-proj[[j,k,2]]*int}
+                                                      ,{k,proj[[i]]//Length}]; (* orthogonalize current projector to all lower ones *)
+      projReci[[i]] = Table[{projReci[[i,k,1]],
+          projReci[[i,k,2]]-projReci[[j,k,2]]*int},{k,projReci[[i]]//Length}]; (* orthogonalize current reciprocal projector *)
+                                                                               (* using the real space integral *)
+      int = integrate[proj[[j]],pseudo[[i]]];
+      pseudo[[i]] = Table[{pseudo[[i,k,1]],
+                pseudo[[i,k,2]]-pseudo[[j,k,2]]*int},{k,pseudo[[i]]//Length}]; (* orthogonalize current pseudo wavefunction to all lower ones *)
+      all[[i]] = Table[{all[[i,k,1]],all[[i,k,2]]-all[[j,k,2]]*int}
+                                                       ,{k,all[[i]]//Length}]; (* rescale accordingly the all electron wavefunction *)
+
+    ,{j,i-1}];
+
+    int=integrate[proj[[i]],pseudo[[i]]];
+    proj[[i]] = {#[[1]],#[[2]]/int}&/@proj[[i]];                               (* rescale to have  <p_i|phi_i> = 1 *)
+    projReci[[i]] = {#[[1]],#[[2]]/int}&/@projReci[[i]];                       (* rescale reciprocal projector with real space integral *)
+
+    Print[i," ",int," ",integrate[proj[[i]],pseudo[[i]]]];
+
+  ,{i,proj//Length}];
+
+  {proj,projReci,pseudo,all}
+];
+

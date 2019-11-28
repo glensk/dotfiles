@@ -1,0 +1,8 @@
+&input
+ no_files=2,
+ CHG_files(1)="Ti_CHG",
+ CHG_files(2)="Ti_atomic_CHG",
+ weight(1)=1.0,
+ weight(2)=-1.0,
+ no_type=1,
+/

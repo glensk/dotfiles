@@ -146,7 +146,8 @@ esac
 # set Thermodynamics stuff
 # I currently dont use the Thermodynamics scritps
 ##############################################
-export thermodynamics="$HOME/Thermodynamics"
+#export thermodynamics="$HOME/Thermodynamics"
+export thermodynamics="$dotfiles/thermodynamics"
 export userme="glensk"
 #export convcrit=0.5
 if [ -e "$thermodynamics/utilities/" ];then

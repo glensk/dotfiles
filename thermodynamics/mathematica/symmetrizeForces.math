@@ -1,0 +1,15 @@
+symmetrizeForcesOnSite[strIn_, forcesIn_, supercell_, symOps_, fac_, eps_Real:GLOBALEPS] := Module[
+  {
+    str = strIn, symStr, symCoord, forcesAvg, forces = forcesIn
+  },
+  Do[ Do[
+    symCoord = symOps[[s]].str[[i]];
+
+    If[ periodicEqualCartesian[symCoord, str[[i]], supercell, eps], 
+      forcesAvg = (symOps[[s]].forces[[i]] + fac forces[[i]])/2;
+      forces[[i]] = forcesAvg;
+    ];
+  , {s, symOps // Length}]; , {i, str // Length}];
+
+  forces
+];

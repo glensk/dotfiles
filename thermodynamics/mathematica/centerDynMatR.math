@@ -1,0 +1,65 @@
+centerDynMatR[coordIn_List, supercell_List, movedAtom_Integer] := Module[
+  {
+    coordOut = coordIn,
+    minVec,
+    vec,
+    c1min, c2min, c3min,
+    a1 = supercell[[1]],
+    a2 = supercell[[2]],
+    a3 = supercell[[3]]
+  },
+  Do[
+    minVec = coordOut[[i]] - coordOut[[movedAtom]];
+    c1min = 0; c2min = 0; c3min = 0;
+    Do[ Do[ Do[
+
+    vec = coordOut[[i]] - coordOut[[movedAtom]] + c1*a1 + 
+    c2*a2 + c3*a3;
+
+    If[Norm[vec] < Norm[minVec],
+      minVec = vec;
+      c1min = c1;
+      c2min = c2;
+      c3min = c3;
+    ];
+    , {c3, -2, 1}] , {c2, -2, 1}] , {c1, -2, 1}];
+
+    coordOut[[i]] = coordOut[[i]] + c1min*a1 + c2min*a2 + c3min*a3;
+
+  , {i, 1, coordOut // Length}];
+
+  coordOut
+];
+
+
+
+centerDynMatR[coordIn_List, supercell_List, origin_List] := Module[
+  {
+    coordOut = coordIn,
+    minVec,
+    vec,
+    c1min, c2min, c3min,
+    a1 = supercell[[1]],
+    a2 = supercell[[2]],
+    a3 = supercell[[3]]
+  },
+  Do[
+    minVec = coordOut[[i]] - origin;
+    c1min = 0; c2min = 0; c3min = 0;
+    Do[ Do[ Do[
+      vec = coordOut[[i]] - origin + c1*a1 + c2*a2 + c3*a3;
+      If[Norm[vec] < Norm[minVec],
+        minVec = vec;
+        c1min = c1;
+        c2min = c2;
+        c3min = c3;
+      ];
+    ,{c3, -2, 1}], {c2, -2, 1}], {c1, -2, 1}];
+
+    coordOut[[i]] = coordOut[[i]] + c1min*a1 + c2min*a2 + c3min*a3;
+
+  ,{i, coordOut // Length}];
+
+  coordOut
+];
+

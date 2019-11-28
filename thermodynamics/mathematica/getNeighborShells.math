@@ -1,0 +1,66 @@
+
+getNeighborShells[cell_List, maxShell_] := getNeighborShells[cell, {{0, 0, 0}}, {1}, 1, maxShell]
+
+
+(* basisRel are the relative coordinates within cell; atomNr is the number of the atom around which the shells are constructed;
+   type can be either "shell" or "radius" and maxValue the corresponding maximum shell or radius *)
+
+getNeighborShells[cell_List, basisRel_List, species_List, atomNr_Integer, maxValue_, type_String:"shell", eps_Real:GLOBALEPS] := Module[
+  {
+  sphereCovered = False, n = 0, distList={},
+  neighborsList = {}, checkAtom, distance, notInSphere, permList, 
+  permsDone = {}
+  },
+  While[! sphereCovered,   (* at each while iteration we generate image supercells around the previous supercells; if n==0 then we take the original *)
+                           (* supercell for each newly generated supercell we run over all atoms and include them/their distances into neighborsList *)
+                           (* and distList distList is sorted at creation and is added a new distance only if the distance corresponds to a new shell; *)
+                           (* if all newly added atoms increase distList either beyond the maximum shell or the maximum radius we break the while loop *)
+    notInSphere = 0;       (* counter for checking how many atoms lie outside the maximum shell/radius *)
+    permList = Complement[Tuples[Range[-n, n], {3}], permsDone];                       (* this generates the image supercells; Complement removes the *)
+                                                                                       (* already checked previous supercells *)
+    Do[                                                                                (* run over all newly created supercells and their atoms *)
+      checkAtom = toCartesianCoords[permList[[i]],cell] + toCartesianCoords[basisRel[[j]],cell];
+      distance = Norm[toCartesianCoords[basisRel[[atomNr]],cell] - checkAtom];
+      AppendTo[neighborsList,{distance,checkAtom,species[[j]],j}];
+      Do[
+        If[Abs[distance-distList[[k]]]<eps, Break[]]; (* we break if the atom corresponds to an already included shell *)
+        If[distance>distList[[k]],                    (* or if we find the place where the new shell needs to be included (we want distList to be sorted) *)
+          If[k==Length[distList], AppendTo[distList,distance], distList=Insert[distList,distance,k+1]];
+          Break[];
+        ];
+        If[k==1,PrependTo[distList,distance];Break[]];
+      ,{k,distList//Length,1,-1}];
+
+      If[Length[distList]==0,distList={distance}];
+      Switch[type,                                   (* if we find that distList has been shift beyond the maximum value we increase the counter *)
+                                                     (* and remove the element which is beyond the maxmum value, i.e., the last one *)
+        "shell", If[Length[distList]>maxValue+1,notInSphere++;distList=Most[distList]], (* we need to take maxShell+1 because of the distance=0 *)
+                                                                                        (* of the center atom with itself*)
+        "radius",If[distList[[-1]]>maxValue,notInSphere++;distList=Most[distList]],
+        _,error["unknown type"];
+      ];
+    , {i, permList // Length}, {j, basisRel // Length}];
+    If[Length[basisRel] Length[permList] == notInSphere, sphereCovered = True]; (* we break the while loop if all newly created atoms (of all newly *)
+                                                                                (* created supercells) are lying beyond the maximum value *)
+    permsDone = Join[permsDone, permList];
+    n++;
+  ];
+
+  newNeighborsList=Table[{},{Length[distList]}];  (* distList contains now the sorted distances and only those that are below or equal to the maximum *)
+                                                  (* shell/radius; neighborsList contains all atoms that have been created so far and we therefore need *)
+                                                  (* to extract only those atoms that match their distances with the ones in distList *)
+  speciesList=Table[{},{Length[distList]}];
+  mapList=Table[{},{Length[distList]}];
+  Do[
+    Do[
+      If[Abs[neighborsList[[i,1]]-distList[[j]]]<eps,
+         AppendTo[newNeighborsList[[j]],toReducedCoords[neighborsList[[i,2]],cell]];
+         AppendTo[speciesList[[j]],neighborsList[[i,3]]];
+         AppendTo[mapList[[j]],neighborsList[[i,4]]];
+         Break[]];
+      If[neighborsList[[i,1]]>distList[[j]],Break[]];
+    ,{j,distList//Length,1,-1}];
+  ,{i,neighborsList//Length}];
+
+  {distList//Rest,Length/@(newNeighborsList//Rest),newNeighborsList//Rest,speciesList//Rest,mapList//Rest} (* return without the center atom *)
+];

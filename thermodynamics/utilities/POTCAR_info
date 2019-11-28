@@ -1,0 +1,253 @@
+
+===============================================================================================
+POTCAR_brief
+===============================================================================================
+
+ HEADER:    EATOM  EAUG  DEXC  ENMAX/MIN  LEXCH  POMASS  ZVAL  EERROR
+
+ LOCALPART: PSGMAX  PSP  PSPCOR  PSPRHO
+
+ NONLOCAL:  PSMAXN  PSPNL LPS
+
+ PAWRADIAL: NMAX  PSDMAX  QPAW  QATO  R  RHOAE  RHOPS  WPS  WAE
+
+
+
+===============================================================================================
+POTCAR_info
+===============================================================================================
+
+ local part ----------------------------> PSP(G)  ----->  POTPSC(R)  ----------------------------->  v_H[\tilde{n}_Zc]     local potential in real space
+ core charge-density (partial) ---------> PSPCOR(G)  -->  DENCOR  -------------------------------->  \tilde{n}_c           pseudized core density
+ atomic pseudo charge-density ----------> PSPRHO(G)  -->  CHTOT  --------------------------------->  \tilde{n} + \hat{n}   initial valence + augmentation start density
+
+ Non local Part
+ ---------------------------------------> DION --------------------------------------------------->  <phi_i|-1/2Laplace + v_H[n_Zc]|phi_j> - <\tilde{phi}_i|-1/2Laplace + v_H[\tilde{n}_Zc]|\tilde{phi}_j>
+ Reciprocal Space Part -----------------> PSPNL(G) ---->  QPROJ(G)/YLM(G)  ----------------------->  |\tilde{p}_i>
+ Real Space Part       -----------------> PSPRNL(R)
+  ...
+
+ PAW radial sets
+ augmentation charges (non spherical) --> QPAW  -------------------------------------------------->  q^L_ij = phi_i phi_j - phi_i phi_j
+ uccopancies in atom -------------------> QATO
+ grid ----------------------------------> R
+ aepotential ---------------------------> POTAE(R) (not used; recalculated in SET_ATOM_POT)
+ core charge-density -------------------> RHOAE(R)  ---------------------------------------------->  n_c
+ kinetic energy-density ----------------> TAUAE(R) (only for metaGGA)
+ pspotential ---------------------------> POTPS(R) (not used; recalculated in SET_ATOM_POT)
+ core charge-density (pseudized) -------> RHOPS(R)  ---------------------------------------------->  \tilde{n}_c
+
+ pseudo wavefunction -------------------> WPS(R)
+ ae wavefunction -----------------------> WAE(R)
+ ...
+
+
+===============================================================================================
+POTCAR_effect
+===============================================================================================
+
+  RPACOR no influence
+  RCORE  no influence
+  RCLOC  no influence
+  RMAX   no influence
+  RAUG   no influence
+  RDEP   no influence
+  QCUT   no influence
+  QGAM   no influence
+  POMASS no influence (only on dynamics)
+  "Description" block no influence
+
+                                          EATOM ---> TOTEN (energy offset)
+                                          EAUG ----> DENC XCENC PAWAE PAWPS
+                                          DEXC ----> PAWAE                                         
+                                          ZVAL ----> PSCENC TEWEN  (TEWEN only ZVAL)
+ Error from kinetic energy argument ----> EERROR --> EATOM
+
+ local part ----------------------------> PSP -----> XCENC denc PSCENC
+ core charge-density (partial) ---------> PSPCOR --> XCENC
+ atomic pseudo charge-density ----------> PSPRHO --> xcenc DENC  nrValenceElectrons BUT only as start density needed
+                                                                                    if convergence is achieved PSPRHO is not important
+ Non local Part
+ ---------------------------------------> LPS,NLPRO,PSRMAX(only for PSPRNL)
+ ---------------------------------------> DION
+ Reciprocal Space Part -----------------> PSPNL
+ Real Space Part       -----------------> PSPRNL
+  ...
+
+ PAW radial sets
+ ---------------------------------------> NMAX,PSDMAX --> QDEP = AUG/R^2 (augmetation charge)
+ augmentation charges (non spherical) --> QPAW
+ uccopancies in atom -------------------> QATO
+ grid ----------------------------------> R
+ core charge-density -------------------> RHOAE --> PAWAE
+ core charge-density (pseudized) -------> RHOPS --> PAWPS
+
+ pseudo wavefunction -------------------> WPS
+ ae wavefunction -----------------------> WAE
+ ...
+
+
+
+===============================================================================================
+POTCAR_details
+===============================================================================================
+
+PAW_PBE V 08Apr2002 <---------- NotUsed
+ 5.00000000000000000 <--------- NotUsed (valence)
+ parameters from PSCTR are: <-- NotUsed
+   VRHFIN =V: p6 d4 s1 <------- NotUsed
+   LEXCH  = PE -------------------------------> INFO%LEXCH ----------- type of xc
+   EATOM  =   170.8679 eV --------------------> TOTEN ---------------- energy offset
+
+   TITEL  = PAW_PBE V <-------- NotUsed
+   LULTRA =        F  <-------- NotUsed
+   IUNSCR =        1  <-------- NotUsed
+   RPACOR =    2.000  <-------- NotUsed
+   POMASS =   50.941; ZVAL   =    5.000 ------> P%POMASS & P%ZVALF  --- mass & valence
+   RCORE  =    2.700  <-------- NotUsed
+   RWIGS  =    2.500; RWIGS  =    1.323 ------> P%RWIGS  & NotUsed  --- wigner-seitz radius
+   ENMAX  =  192.543; ENMIN  =  144.408 ------> P%ENMAXA & P%ENMINA --- cutoff range
+   RCLOC  =    1.779  <-------- NotUsed
+   LCOR   =        T  <-------- NotUsed
+   LPAW   =        T  <-------- NotUsed
+   EAUG   =  358.662  ------------------------> P%EAUG ---------------- cutoff augmentation mesh
+   DEXC   =    -.034  ------------------------> P%DEXCCORE ------------ non linear core correction
+   RMAX   =    3.323  <-------- NotUsed
+   RAUG   =    1.300  <-------- NotUsed
+   RDEP   =    2.762  <-------- NotUsed
+   QCUT   =   -3.762; QGAM   =    7.524 ------> P%QOPT1 & P%QOPT2 ----- for real space projectors
+ 
+   Description               |
+     l     E      TYP  RCUT  |
+     2   .000     23  2.700  |
+     2   .000     23  2.700  |
+     0   .000     23  2.700  |- NotUsed
+     0  2.000     23  2.700  |
+     1   .000     23  2.700  |
+     1  2.000     23  2.700  |
+     3   .000      7   .000  |
+   Error from kinetic energy argument (eV)
+   NDATA  =      100
+   STEP   =   20.000   1.050
+   .................
+   . block 8x12 + 4   EERROR
+   .                  kinetic energy error as a function of cutoff
+   .   100            startCutoff=20  stepCutoff=1.05  nSteps=100 (for all POTCARs same)
+   .
+END of PSCTR-controll parameters
+
+ local part
+ 11.1111111111111111 ------------------------> P%PSGMAX --------------- max G vector for PSP,PSPCOR,PSPRHO
+   .................
+   . block 5x200      P%PSP affecs XCENC denc PSCENC
+   .                  local potential in reciprocal space
+   .  1000            as a function of G*1000/P%PSGMAX
+   .
+   .
+ gradient corrections used for XC
+ 5
+ core charge-density (partial)
+   .................
+   . block 5x200      P%PSPCOR affects XCENC
+   .                  core charge-density in reciprocal space 
+   .  1000            as a function of G*1000/P%PSGMAX
+   .
+   .
+ atomic pseudo charge-density
+   .................
+   . block 5x200      P%PSPRHO affects xcenc DENC nrValenceElectrons BUT only on startup relevant
+   .                  pseudo valence charge-density in reciprocal space 
+   .  1000            as a function of G*1000/P%PSGMAX
+   .
+   .
+
+ 22.2222222222222222 T -----------------------> P%PSMAXN & NotUsed ------------ max G vector for reciprocal projectors
+
+         |Non local Part                                                       
+         |l n 3.33333333333333333 ------------> P%LPS & P%NLPRO & P%PSRMAX ---- l of channels & nr of channels for l & max R for real space projectors
+         |20.497 -7.586 -7.586 2.744 ---------> DION -------------------------- ???
+         |
+         |             |Reciprocal Space Part
+  for -->|             |  .................
+  up to  |             |  . block 5x20       P%PSPNL
+  four   |  P%NLPRO -->|  .                  reciprocal projectors
+  l      |  times      |  .  100             as a function of G*100/P%PSMAXN
+  values |             |  .
+  0=s    |   1 or 2    |Real Space Part
+  1=p    |             |  .................
+  2=d    |             |  . block 5x20       P%PSPRNL
+  3=f    |             |  .                  real space projectors
+         |             |  .  100             as a function of G*100/P%PSMAXN
+         |             |  .
+
+ PAW radial sets
+ NMAX 4.4444444444444444 --------------------> NMAX & P%PSDMAX ---------------- nr of mesh points & max R for augmentation charge (QDEP, AUG)
+(5E20.12)                                
+ augmentation charges (non sperical)
+   .................
+   . block 5xnn   nn=3 to 8 -----------------> P%QPAW
+   . nrElements = LPS*LPS
+   .      
+ uccopancies in atom
+   .................
+   . block 5xnn   nn=3 to 8 -----------------> P%QATO
+   . nrElements = LPS*LPS
+   .      
+ grid
+   .................
+   . block 5xnn   nn=62 to 78 ---------------> P%R
+   . nrElements = NMAX*NMAX
+   .        NMAX=309 to 387
+   .      
+ aepotential
+   .................
+   . block 5xnn   nn=62 to 78 --> NotUsed
+   . nrElements = NMAX*NMAX
+   .        NMAX=309 to 387
+   .      
+ core charge-density
+   .................
+   . block 5xnn   nn=62 to 78 ---------------> P%RHOAE
+   . nrElements = NMAX*NMAX
+   .        NMAX=309 to 387
+   .      
+ kinetic energy-density
+   .................
+   . block 5xnn   nn=62 to 78 --> NotUsed
+   . nrElements = NMAX*NMAX  (only MetaGGA)
+   .        NMAX=309 to 387
+   .      
+ pspotential
+   .................
+   . block 5xnn   nn=62 to 78 --> NotUsed
+   . nrElements = NMAX*NMAX
+   .        NMAX=309 to 387
+   .      
+ core charge-density (pseudized)
+   .................
+   . block 5xnn   nn=62 to 78 ---------------> P%RHOPS
+   . nrElements = NMAX*NMAX
+   .        NMAX=309 to 387
+   .      
+           ----------------------------------------------------
+           |pseudo wavefunction
+ for ----->|  .................
+ nr of l   |  . block 5xnn   nn=62 to 78 ---------------> P%WPS
+ values    |  . nrElements = NMAX*NMAX
+ times     |  .        NMAX=309 to 387
+ P%NLPRO   |  .      
+           |ae wavefunction
+ (3 to 8)  |  .................
+           |  . block 5xnn   nn=62 to 78 ---------------> P%WAE
+           |  . nrElements = NMAX*NMAX
+           |  .        NMAX=309 to 387
+           |  .      
+
+ End of Dataset
+
+
+
+
+
+
+

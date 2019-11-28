@@ -1,0 +1,24 @@
+(* from http://www.nyu.edu/classes/tuckerman/stat.mech/lectures/lecture_13/node8.html *)
+
+getUvib[TStart_, TEnd_, TStep_, wIn_, classical_Symbol: False, kB_Real: 0.086173422] := Module[
+  {
+  lowerBound = 0.01,
+  small, neg, complex,
+  UList, w=wIn//Flatten
+  },
+  small = Select[w, 0 < Re[#] < lowerBound &];
+  neg = Select[w, Re[#] < 0 &];
+  complex = Cases[w, _Complex];
+
+  If[Length[small] > 0, Print[ToString[Length[small]] <> " freqs smaller than " <> ToString[lowerBound]]];
+  If[Length[neg] > 0, Print[ToString[Length[neg]] <> " freqs negative"]];
+  If[Length[complex] > 0, Print[ToString[Length[complex]] <> " freqs complex"]];
+
+  UList = Table[ { T,
+    If[classical,
+      Sum[kB T, {i, w//Length}],
+      Sum[w[[i]]/2 + (w[[i]] Exp[-(w[[i]]/(kB T))])/( 1 - Exp[-(w[[i]]/(kB T))]), {i, w//Length}]]
+  }, {T, TStart, TEnd, TStep}];
+
+  UList
+];

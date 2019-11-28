@@ -1,0 +1,1 @@
+Murn[V_, E0_, V0_, B0_, B0der_] := E0 + (B0 V)/(B0der (B0der - 1)) (B0der (1 - V0/V) + (V0/V)^B0der - 1);

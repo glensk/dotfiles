@@ -1,0 +1,1 @@
+getDirection[in_Integer] := Mod[(in - 1), 3] + 1;

@@ -1,0 +1,18 @@
+#!/bin/sh
+hier=`pwd`
+cp $1/{EqCoords_direct,POSCAR,dUdL,cell} .
+[ -f $1/calculate_energy_and_forces ] && cp $1/calculate_energy_and_forces .
+
+
+if [ ! -e "$1/POSITIONs" ];then
+    cd $1
+    extractPOSITIONS.sh 
+    cp POSITIONs $hier
+    cd $hier
+fi
+
+if [ ! -e "POSITIONs" ];then
+    cd $1
+    extractPOSITIONS.sh 
+    cp POSITIONs $hier
+fi

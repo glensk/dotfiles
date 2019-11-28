@@ -1,0 +1,101 @@
+################################################################################
+# Please add the following lines in your $HOME/.tcshrc file (uncommented)
+################################################################################
+# set thermodynamics=$HOME/Thermodynamics
+# if ( -e "$thermodynamics" ) then
+#     setenv thermodynamics $thermodynamics
+#     source $thermodynamics/utilities/tcshrc_add
+#     set convcrit=0.35
+#     setenv convcrit $convcrit
+# else
+#     echo "Thermodynamics folder does not exist"
+# endif
+
+
+
+######################################################################################
+# $PATH
+######################################################################################
+set path = ($thermodynamics/ti_ $path)
+set path = ($thermodynamics/vasp_analyze $path)
+set path = ($thermodynamics $path)
+set path = ($thermodynamics/python_ $path)
+set path = ($thermodynamics/python_thermodynamics $path)
+set path = ($thermodynamics/que_sge $path)
+set path = ($thermodynamics/que_sge/array_que_scripts $path)
+
+######################################################################################
+# $PYTHONPATH
+######################################################################################
+# (1) if pythonpath existst: add to pythonpath
+if ( ($?PYTHONPATH) ) then
+setenv PYTHONPATH "${PYTHONPATH}:$thermodynamics/:$thermodynamics/python/:$thermodynamics/python_thermodynamics/:/home/grabowski/python/install/lib/python2.7/site-packages"
+endif
+
+# (2) fi pythonpath does not exist: create one   ## keep this order of (1) and (2)
+if ( ! ($?PYTHONPATH) ) then
+setenv PYTHONPATH "$thermodynamics/:$thermodynamics/python:$thermodynamics/python_thermodynamics:/home/grabowski/python/install/lib/python2.7/site-packages"
+endif
+
+
+######################################################################################
+# DEFINE SUBMITHOST  AND SUBMIT related stuff
+######################################################################################
+# if convergence criterion for thermodynamc integratoin does not exist than define it
+# here it has to be defined without =
+if ( ! ($?convcrit) ) then
+setenv convcrit 0.5            
+endif
+
+setenv host `hostname`
+#echo submithost:$submithost   # test
+setenv submithost cmmd002.mpie.de
+if ( "$host" == "cmmc001" ) then
+    setenv submithost cmmc001
+    module load sphinx
+    module unload impi
+    module load impi intel mkl
+    module load mathematica/10.3.1
+    #module load grace
+    #module load python27/python/2.7
+    #module load python27/scipy/2015.10
+    module load anaconda
+endif
+if ( "$host" == "cmmc002" ) then
+    setenv submithost cmmc002
+    module load sphinx
+    module unload impi
+    module load impi intel mkl
+    module load mathematica/10.3.1
+    #module load grace
+    #module load python27/python/2.7
+    #module load python27/scipy/2015.10
+    module load anaconda
+endif
+
+######################################################################################
+# vasp_analyze stuff (OUTCAR_A.sh OUTCAR_xxx.sh ...)
+######################################################################################
+#set kkk=`find $thermodynamics/vasp_analyze -maxdepth 1 -name "*.sh" | sed -n 's|.*/||p'`
+# go give the explicit list ist faster when loading the shell and therefore preferred
+set kkk="anyList_A.sh crossprod3x3.sh dotprod3x3.sh INCAR_A.sh INCAR_ALGO.sh INCAR_change.sh INCAR_changeall-from-anylist.sh INCAR_changeall-from-here.sh INCAR_EDIFF.sh INCAR_EDIFFG.sh INCAR_ENAUG.sh INCAR_ENCUT.sh INCAR_GAMMA_LD.sh INCAR_IBRION.sh INCAR_ISIF.sh INCAR_ISMEAR.sh INCAR_ISYM.sh INCAR_NBANDS.sh INCAR_NGXF.sh INCAR_NPAR.sh INCAR_POTIM.sh INCAR_PREC.sh isgreaternull.sh isnull.sh isnumber.sh issmallernull.sh KPOINTS_cat-kp.sh KPOINTS_cat-monk-gam.sh KPOINTS_cat-shift.sh KPOINTS_changeall.sh KPOINTS_changeone.sh KPOINTS_convert_to_link.sh max.sh min.sh OUTCAR_A.sh OUTCAR_atomicmass.sh OUTCAR_bands-check.sh OUTCAR_bands-max-occupied.sh OUTCAR_cell-all-ARRAY.sh OUTCAR_cell-last-cartesian-ARRAY.sh OUTCAR_cell-last-reciprocal-ARRAY.sh OUTCAR_cores.sh OUTCAR_create_ion_energies.sh OUTCAR_create_structures.sh OUTCAR_date.sh OUTCAR_EDIFF.sh OUTCAR_EDIFFG.sh OUTCAR_elements.sh OUTCAR_ENAUG.sh OUTCAR_ENCUT.sh OUTCAR_ene-free-last.sh OUTCAR_ene-free-lastperatom.sh OUTCAR_ene-inner-ARRAY-ionicstep.sh OUTCAR_ene-inner-last.sh OUTCAR_ene-inner-lastperatom.sh OUTCAR_ene-sigma0-ARRAY-ionicstep.sh OUTCAR_ene-sigma0-firstelec.sh OUTCAR_ene-sigma0-last.sh OUTCAR_cell-last-cartesian-1-1.sh OUTCAR_ene-sigma0-lastperatom.sh OUTCAR_Fel_approx.sh OUTCAR_finished.sh OUTCAR_finishedEDIFF.sh OUTCAR_forces-all-ARRAY.sh OUTCAR_forces-all-max-perstep-ARRAY.sh OUTCAR_forces-last-ARRAY.sh OUTCAR_forces-last-max-ARRAY.sh OUTCAR_IALGO.sh OUTCAR_IBRION.sh OUTCAR_ID.sh OUTCAR_irr_kp_vstime.sh OUTCAR_irr_kpoints-2-for-RPA.sh OUTCAR_irr_kpoints.sh OUTCAR_ISIF.sh OUTCAR_ISMEAR.sh OUTCAR_ISYM.sh OUTCAR_iteration-check.sh OUTCAR_iteration-max.sh OUTCAR_iteration-maxfast.sh OUTCAR_iteration-missing.sh OUTCAR_iteration-print_path_if_none.sh OUTCAR_LREAL.sh OUTCAR_magnetization.sh OUTCAR_memory.sh OUTCAR_NBANDS.sh OUTCAR_NGX-Y-ZF.sh OUTCAR_NGX-Y-ZFd.sh OUTCAR_nodes.sh OUTCAR_nodeslist.sh OUTCAR_number_of_atoms.sh OUTCAR_positions-all-ARRAY.sh OUTCAR_positions-forces-all-ARRAY.sh OUTCAR_positions-forces-nr-ARRAY.sh OUTCAR_positions-last-ARRAY.sh OUTCAR_potcar.sh OUTCAR_PREC.sh OUTCAR_sigma.sh OUTCAR_sigmatemp.sh OUTCAR_species.sh OUTCAR_time-elec-first-.sh OUTCAR_time-elec-first-per-core.sh OUTCAR_time-elec-last.sh OUTCAR_time-elec-mean-.sh OUTCAR_time-elec-mean-plot-ARRAY.sh OUTCAR_time-elec-plot-ARRAY.sh OUTCAR_time-elec-second-.sh OUTCAR_time-elec-second-per-core.sh OUTCAR_time-hour.sh OUTCAR_time-ionic-mean-.sh OUTCAR_time-ionic-plot-ARRAY.sh OUTCAR_time-lastwrite.sh OUTCAR_time-pernode.sh OUTCAR_time-RPA-last.sh OUTCAR_time-RPA-mean-.sh OUTCAR_time-sec.sh OUTCAR_time-started.sh OUTCAR_version.sh OUTCAR_volume-all-ARRAY.sh OUTCAR_volume-last.sh OUTCAR_volume-lastexact.sh OUTCAR_volume-lastperatom.sh OUTCAR_VOSKOWN.sh POSCAR_cell_cartesian.sh POSCAR_numatoms.sh POSCAR_numatomsline.sh POSCAR_volume.sh POTCAR_convert_to_link.sh POTCAR_element.sh POTCAR_exchangecorrelationFunc.sh POTCAR_mass.sh POTCAR_massrecip.sh tbz2file.sh tripleprod3x3.sh VASP_get_INPOSPOTKPOINTS_folder-notfinished-AND-REMOVE-THIS-FOLDER.sh VASP_get_INPOSPOTKPOINTS_folder-notfinished-rm_workDir.sh VASP_get_INPOSPOTKPOINTS_folder-notfinished.sh VASP_get_INPOSPOTKPOINTS_folder.sh VASP_get_INPOSPOTKPOINTS_folder_noIteration.sh VASP_get_INPOSPOTKPOINTS_folder_noOUTCAR.sh VASP_get_INPOSPOTKPOINTS_OUTCAR-OUTCAR.gz_rm_unfinished.sh VASP_sphinx_create_all_dynmat_jobs.sh VASP_sphinx_get_sxdynmatsx.sh vasprun_create_ion_energies.sh vasprun_create_structures.sh vasprun_positions_forces_ToSphinxFormat.sh XXXCAR_link-to-basename.sh"
+complete OUTCAR_A.sh  n/1/c/
+complete OUTCAR_A.sh 'n/*/`echo $kkk `/'
+complete INCAR_A.sh 'n/*/`echo $kkk `/'
+complete KPOINTS_A.sh 'n/*/`echo $kkk `/'
+
+### submit stuff
+set h=`hostname | sed 's|\.mpie\.de||g' | sed 's|[0-9]*||g'`
+if ( "$h" == "cmmc" ) then
+  set lll=`find $thermodynamics/run_scripts -maxdepth 1 -name "*run.*" | grep -v cmmd | sed -n 's|.*/||p'`
+endif
+if ( "$h" == "cmmd" || "$h" == "cmpc" ) then
+  set lll=`find $thermodynamics/run_scripts -maxdepth 1 -name "*run.*" | grep -v cmmc | sed -n 's|.*/||p'`
+endif
+alias submit.sh $thermodynamics/submit.sh
+complete submit.sh 'n/*/`echo $lll `/'
+complete move_jobs_to_data_and_link.sh 'n/*/`echo $lll `/'
+
+# remove annoying "Directory: $cwd" printout when using cd
+unalias cwdcmd
+

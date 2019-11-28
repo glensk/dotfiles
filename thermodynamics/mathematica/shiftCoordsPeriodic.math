@@ -1,0 +1,21 @@
+
+shiftCoordsPeriodic[cartesianCoords_, shiftVec_, supercell_] := Module[
+  {newCoords, redCoords, redShiftVec, inv}
+  ,
+  newCoords = cartesianCoords;
+  redCoords = Table[0,{cartesianCoords//Length}];
+  inv = supercell // Inverse // Transpose;
+  redShiftVec = inv.shiftVec;
+
+  Do[
+    redCoords[[i]] = inv.cartesianCoords[[i]];
+    redCoords[[i]] += redShiftVec;
+    redCoords[[i]] = N[Chop[redCoords[[i]],3*10^-6]]; (* this ~ coorresponds to accuracy of VASP forces from OUTCAR*)
+    redCoords[[i]] += (10^-7 + Table[1, {redCoords[[i]] // Length}]);
+    redCoords[[i]] = FractionalPart[redCoords[[i]]];
+    newCoords[[i]] = supercell\[Transpose].redCoords[[i]];
+
+  , {i, cartesianCoords // Length}];
+
+  newCoords (* cartesian *)
+];

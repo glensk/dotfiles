@@ -1,0 +1,128 @@
+
+fitFel[aLats_List,cBya_,latType_,s_,maxSigmaIn_,
+       Tmin_,Tmax_,Tstep_,TbasisIn_List,Vorder_Integer]:=Module[
+  {
+    LARGE=10000,
+    int, Sel, Fel, fitFunc, squares,forExport,
+    startcoef, coef, aLatToV, Ts, newTList, Fels,
+    fit, dev, devs, new, vols, fits, delta,maxSigma,
+    structureFactor, sc, sin, fitPoints, Tbasis
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  (* check latType *)
+  Switch[latType,
+    "bcc",             structureFactor=2; pow=3; sc=1; sin=1; If[cBya!=1,error["bcc and cBya!=1"]],
+    "fcc",             structureFactor=4; pow=3; sc=1; sin=1; If[cBya!=1,error["fcc and cBya!=1"]],
+    "dfcc",             structureFactor=8; pow=3; sc=1; sin=1; If[cBya!=1,error["fcc and cBya!=1"]],
+    "hcp",             structureFactor=2; pow=3; sc=1; sin=Sin[Pi/3],
+    "omega",             structureFactor=3; pow=3; sc=1; sin=Sin[Pi/3],
+    "aLatsAreVolumes", structureFactor=1; pow=1; sc=1; sin=1; If[cBya!=1,error["aLatsAreVolumes and cBya!=1"]],
+    _Integer,          structureFactor=1; pow=3; sc=latType; sin=1,
+    _,error["latType not known"];
+  ];
+
+  (* the fit function along T uses the analytic formula for calculating Fel from the DOS
+     the DOS however is used only as a fitting quantity, expanded in polynomials *)
+  int[DOS_,e_,T_]=Integrate[DOS IdealElectronicEntropy[e,T],e];
+  Sel[DOS_,T_]:=int[DOS,LARGE,T]; (* this corresponds to Integrate[DOS IdealElectronicEntropy[e,T],{e,-inf,LARGE}] *)
+  Fel[DOS_,T_]:=T Sel[DOS,T];
+  Tbasis[Tin_]:=TbasisIn/.T->Tin;
+  fitFunc[T_, coef_] := Fel[ Sum[coef[[k]] Tbasis[T][[k]], {k, Tbasis[T] // Length}], T];
+
+  (* lattice constant to cBya to volume *)
+  aLatToV[aLat_] := (sc aLat)^pow cBya sin/structureFactor;
+
+  (* read in fitting temperatures *)
+  Ts = (Select[checkImport["Fel_"<>ToString[aLats[[1]]]<>"Ang"],Length[#]==2&])\[Transpose] // First;
+
+  (* generate new fin T mesh *)
+  newTList=Table[TT,{TT,Tmin,Tmax,Tstep}];
+
+  (* read in electronic free energies *)
+  Fels = Select[checkImport["Fel_"<>ToString[#]<>"Ang"],Length[#]==2&]&/@ aLats;
+
+  (* check if temperatures match in all Fel files *)
+  Do[
+    If[Fels[[i,j,1]]!=Ts[[j]],error["non matching temperatures in Fel_"<>ToString[aLats[[i]]]<>"Ang at temperature "<>ToString[Ts[[j]]]]];
+  ,{i,Fels//Length},{j,Fels[[i]]//Length}];
+
+  (* if maxSigma!="all" select only Fels below maxSigma *)
+  If[maxSigmaIn=="all",maxSigma=LARGE,maxSigma=maxSigmaIn];
+  Fels = Transpose[Select[#,(#[[1]]<=1000maxSigma/kB&)]][[2]]&/@Fels;
+  Fels2 = Fels;
+  Ts = Select[Ts,(#<=1000maxSigma/kB&)];
+
+  (* scale Fels *)
+  Fels*=s;
+  FelsBeforeFit = Transpose[Fels];
+
+  (* least squares of the fit function minus the actual fitting points *)
+  squares[i_,coef_] := Sum[(Fels[[i,j]] - fitFunc[Ts[[j]], coef])^2, {j, Fels[[i]] // Length}];
+  startcoef = Table[0.0001, {Tbasis[T] // Length}];
+  coef = Array[c, {Tbasis[T] // Length}];
+
+  outputFolder = "fit_order"<>ToString[Vorder]<>Table["_"<>ToString[aLats[[i]]],{i,aLats//Length}]<>"__"<>ToString[Ts[[1]]]<>"-"<>ToString[Ts[[-1]]];
+  CreateDirectory[outputFolder]//Quiet;
+  oldDir=Directory[];
+  SetDirectory[outputFolder];
+
+  (* here the actual fitting procedure is run *)
+  devs={};
+  Do[
+    fit = FindMinimum[ squares[i,coef], {coef // Flatten, startcoef // Flatten}\[Transpose]][[2]];
+    dev = Abs[ Fels[[i]] - (fitFunc[#,coef/.fit]&/@Ts)];
+    AppendTo[devs,{aLats[[i]],Mean[dev],Max[dev]}];
+    new = Table[fitFunc[TT,coef/.fit],{TT,Tmin,Tmax,Tstep}];
+    new2 = fitFunc[#,coef/.fit]&/@Ts;
+    Export["Fel_points_"<>ToString[aLats[[i]]]<>"Ang",Join[{Ts,Fels[[i]]}//Transpose,{Null,Null}],"Table",FieldSeparators->" "];
+    Export["Fel_fit_"<>ToString[aLats[[i]]]<>"Ang",Join[{newTList,new}//Transpose,{Null,Null}],"Table",FieldSeparators->" "];
+    Fels[[i]]=new;
+    Fels2[[i]]=new2;
+  ,{i,Fels//Length}];
+
+  (* output for the first fitting  *)
+  Print["Temperature fit:"];
+  Print["DOS based, Tbasis: ",Tbasis[T]];
+  Print[""];
+  Print["aLat(A) MeanDev(meV) MaxDev(meV)"];
+  Do[Print[devs[[i]]],{i,devs//Length}];
+  Print[""];
+  Print["Temperture fit total:"];
+  Print["mean ",Mean[Transpose[devs][[2]]]];
+  Print["max  ",Max[Transpose[devs][[3]]]];
+
+  (* now perform the second fit along the volume *)
+  vols=aLatToV/@aLats;
+  Fels = Transpose[Fels];
+  fitPoints = {vols, #}\[Transpose] & /@ Fels;
+  fits = Fit[#, Table[V^(i - 1), {i, Vorder + 1}], V] & /@ fitPoints;
+  delta = Table[Abs[(fits[[i]]/.V->Transpose[fitPoints[[i]]][[1]])-Transpose[fitPoints[[i]]][[2]]],{i,fits//Length}]//Flatten;
+
+  (* output for second fit *)
+  Print[""];
+  Print["Volume fit:"];
+  Print["polynomial, Vorder ",Vorder];
+  Print["mean ",Mean[delta]];
+  Print["max  ",Max[delta]];
+  Print[""];
+
+  (* export the central file *)
+  forExport=Flatten[{#[[1]],CoefficientList[#[[2]],V]}]&/@({newTList,fits}\[Transpose]);
+  Directory[]
+  Print[""]; Print["File written: ",Export["Fel_surface_fit",forExport,"Table",FieldSeparators->" "]];
+
+  (* for output of fit along V *)
+  Fels2 = Transpose[Fels2];
+  fitPoints = {vols, #}\[Transpose] & /@ Fels2;
+  fits = Fit[#, Table[V^(i - 1), {i, Vorder + 1}], V] & /@ fitPoints;
+  volsDense = Table[V, {V, 0.99 vols[[1]], 1.01 vols[[-1]], (1.01 vols[[-1]] - 0.99 vols[[1]])/100}];
+  Do[
+    forExport = {vols,FelsBeforeFit[[i]]}//Transpose;
+    Export["Fel_points_"<>ToString[Ts[[i]]]<>"K",Join[forExport,{Null,Null}],"Table",FieldSeparators->" "];
+    forExport = Transpose[{V,fits[[i]]}/.V->volsDense];
+    Export["Fel_fit_"<>ToString[Ts[[i]]]<>"K",Join[forExport,{Null,Null}],"Table",FieldSeparators->" "];
+  ,{i,Fels2//Length}];
+
+  SetDirectory[oldDir];
+];

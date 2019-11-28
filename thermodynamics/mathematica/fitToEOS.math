@@ -1,0 +1,90 @@
+
+fitToEOS[volumeUnit_String,energyUnit_String,file_String,latType_String,cBya_,fitType_,
+         V0StartIn_Real:0.,B0StartIn_Real:50.,B0MinIn_Real:5.,B0MaxIn_Real:4500.,
+         B0derStart_Real:4.,B0derMin_Real:.1,B0derMax_Real:50.,n_Integer:100]:=Module[
+  {
+    BohrToAngstrom=0.529177208278835, HartreeTomeV=27211.383449283, meVByAngstrom3ToGPa=0.1602176462,
+    e, shift, V0Start, EMin, EMax, EOSfit, str, eos, data, V, E0, V0,
+    B0, B0der, delta, Vmax, Vmin, B0Max, B0Min, B0Start, deltaMax, eos2
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  (* check latType *)
+  Switch[latType,
+    "sc",              structureFactor=1; sin=1; If[cBya!=1,error["sc  and cBya!=1"]],
+    "bcc",             structureFactor=2; sin=1; If[cBya!=1,error["bcc and cBya!=1"]],
+    "fcc",             structureFactor=4; sin=1; If[cBya!=1,error["fcc and cBya!=1"]],
+    "hcp",             structureFactor=2; sin=Sin[Pi/3],
+    "none",            structureFactor=0; sin=1,
+    _,error["latType not known"];
+  ];
+  (* lattice constant to cBya to volume *)
+  aLatToV[aLat_] := aLat^3 cBya sin/structureFactor;
+  VToALat[V_]:=(structureFactor V/sin/cBya)^(1/3);
+
+  (* change units of limits *)
+  B0Start=B0StartIn/meVByAngstrom3ToGPa; B0Min=B0MinIn/meVByAngstrom3ToGPa; B0Max=B0MaxIn/meVByAngstrom3ToGPa;
+
+  (* import energies *)
+  e=Import[file,"Table"]//Sort;
+
+  (* change volume unit *)
+  e=Switch[volumeUnit,
+     "Ang",{aLatToV[#[[1]]],#[[2]]}&/@e,
+     "Ang^3",{#[[1]],#[[2]]}&/@e,
+     "Bohr",{aLatToV[#[[1]]BohrToAngstrom],#[[2]]}&/@e,
+     "Bohr^3",{#[[1]]BohrToAngstrom^3,#[[2]]}&/@e,
+     _,Print["unknown volume unit"]; Abort[]
+  ];
+
+  (* change energy unit *)
+  e=Switch[energyUnit,
+     "meV",{#[[1]],#[[2]]}&/@e,
+     "eV",{#[[1]],1000#[[2]]}&/@e,
+     "Hartree",{#[[1]],HartreeTomeV #[[2]]}&/@e,
+     _,Print["unknown energy unit"]; Abort[]
+  ];
+
+  (* shift energies by minimal energy to avoid numerical instabilities for huge numbers *)
+  shift=Min[e\[Transpose][[2]]];
+  e={#[[1]], #[[2]] - shift} & /@ e;
+
+  (* get minimum and maximum energy and starting volume for fitting limits *)
+  EMin=Min[Transpose[e][[2]]]; EMax=Max[Transpose[e][[2]]];
+  If[V0StartIn==-1., V0Start = e[[1, 1]] + (e[[-1, 1]] - e[[1, 1]])/2,V0Start=V0StartIn];
+  Vmin=Min[e[[1,1]],V0Start]; Vmax=Max[e[[-1,1]],V0Start];
+
+  (* do the fitting *)
+  EOSfit = FindFit[e, {fitType[V, E0, V0, B0, B0der],
+               {-EMax<E0<EMax, Vmin<V0<Vmax, B0Min<B0<B0Max, B0derMin<B0der<B0derMax}},
+               {{E0,EMin}, {V0,V0Start}, {B0,B0Start}, {B0der,B0derStart}}, V, MaxIterations -> 1000];
+
+  (* calculate delta *)
+  delta = Transpose[e][[2]] - (fitType[#,E0,V0,B0,B0der]&/@Transpose[e][[1]]/.EOSfit);
+  deltaMax = Max[Abs[delta]];
+
+  (* prepare results output *)
+  If[latType!="none",
+    str={"E0InmeV  ","aLatInAng","V0InAng3","B0GPa    ","B0der    ","","maxDeltaInmeV"};
+    eos={E0+shift,VToALat[V0],V0,meVByAngstrom3ToGPa B0,B0der,"",deltaMax}/.EOSfit;
+    ,
+    str={"E0InmeV  ","V0InAng3","B0GPa    ","B0der    ","","maxDeltaInmeV"};
+    eos={E0+shift,V0,meVByAngstrom3ToGPa B0,B0der,"",deltaMax}/.EOSfit;
+  ];
+  eos2={E0+shift,V0,meVByAngstrom3ToGPa B0,B0der}/.EOSfit;
+  Print[];Print[#[[1]]," ",#[[2]]]&/@Transpose[{str,eos}];
+
+  (* prepare fit input/ouput/delta; shift minimum to zero *)
+  e={#[[1]], #[[2]] - E0/.EOSfit} & /@ e;
+  data=Table[{V,fitType[V,E0,V0,B0,B0der]-E0/.EOSfit},{V,0.97e[[1,1]],1.03e[[-1,1]],(e[[-1,1]]-e[[1,1]])/n}];
+  delta=Transpose[{Transpose[e][[1]],delta}];
+
+  (* export output files *)
+  Print[]; Print["Exporting files:"];
+  Print[" ",Export[ToString[fitType]<>"Fit.input",Append[e,{Null,Null}],"Table"],
+        " ",Export[ToString[fitType]<>"Fit.output",Append[data,{Null,Null}],"Table"],
+        " ",Export[ToString[fitType]<>"Fit.delta",Append[delta,{Null,Null}],"Table"]];
+  Print[" ",Export[ToString[fitType]<>"Results.dat",{str,eos}//Transpose],
+        " ",Export["E"<>ToString[fitType],{eos2,Null},"Table"]];
+];
+

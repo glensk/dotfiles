@@ -1,0 +1,11 @@
+aLats=3.74
+temps=1360
+lambdas=0.0 0.2 0.4 0.6 0.8 0.9 1.0
+nSeeds=5
+sc=2
+n=22
+cutoff=260  # eV
+kp=4
+
+refPath=/home/glensk/v/Cu-fcc-PAW_PBE/TI_Vacancy_fcc/ref_high_2x2x2sc/500eV_8x8x8kpm0_NGXF120_ED1E-5
+refPath=/home/glensk/v/PAW_PBE/Cu/ti_fcc4_vak/ref_high_2x2x2sc/500eV_8x8x8kpm0_NGXF120_ED1E-5

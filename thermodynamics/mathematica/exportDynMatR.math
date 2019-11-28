@@ -1,0 +1,11 @@
+exportDynMatR[cellType_,cell_,rLat_,dynMatR_,dynMatRFile_String] := Module[
+  {
+    forExport
+  },
+  forExport=Flatten[FlattenAt[{Flatten[#,1]&/@({dynMatR\[Transpose][[1]],rLat}\[Transpose]),
+                     dynMatR\[Transpose]//Rest},2]\[Transpose],1];
+
+  Do[PrependTo[forExport,cell[[-i]]],{i,cell//Length}];
+  PrependTo[forExport,cellType];
+  Print[Export[dynMatRFile,SetAccuracy[forExport,14],"Table"]];
+];

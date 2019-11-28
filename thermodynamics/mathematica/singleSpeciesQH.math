@@ -1,0 +1,82 @@
+
+singleSpeciesQH[mass_Real,cellType_String,sc_Integer,aLatList_List,TRange_List,flags_List,type_String:"quantum",spinType_String:"nm"] := Module[
+  {
+    nHighSymKPs=500,
+    cell, supercell, aLat, astr, coord, forces, disp, rLat, dynMatR, str="",
+    exact, mesh, Fqh, norm, typeStr, hesse, indices, kp, phonons, weights, forcesZ
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Do[
+    Print[];
+    aLat=aLatList[[a]]; astr=ToString[aLat];
+    aLat*=1.;
+    Switch[cellType,
+      "fcc", cell=fccCell[1.aLat],
+      "bcc", cell=bccCell[1.aLat],
+      _, error["cell type not known"]
+    ];
+    supercell=scCell[aLat*sc];
+    coord=aLat checkImport["coordinates"];
+    Switch[spinType,
+      "nm", forces=checkImport["forces."<>astr];forcesZ={},
+      "afm",forces=checkImport["forces."<>astr<>"_x"]; forcesZ=checkImport["forces."<>astr<>"_z"],
+      _, error["spin type not known"]
+    ];
+    disp=checkImport["disp."<>astr][[1,1]];
+
+    (* all but HesseMatrix *)
+    If[flags[[1]]||flags[[3]]||flags[[4]]||flags[[5]]||flags[[6]]||flags[[7]],
+      {rLat,dynMatR}=singleSpeciesDynMatR[mass,cell,supercell,coord,forces,disp,forcesZ];
+    ];
+    If[flags[[1]], (* DynMatR *)
+      exportDynMatR[cellType,cell,rLat,dynMatR,"DynMatR_"<>astr];
+    ];
+    If[flags[[2]], (* HesseMatrix *)
+      hesse=singleSpeciesHesseMatrix[cell,supercell,coord,forces,disp,forcesZ];
+      Print[Export["HesseMatrix_"<>astr,SetAccuracy[hesse, 14], "Table", "FieldSeparators" -> " "]];
+    ];
+    If[flags[[3]]||flags[[5]], (* ExactFreqs or FqhExact *)
+      kp=1/aLat ToExpression[checkImport["exactKP"]];
+      exact=Sort/@calculateFrequencies[kp,dynMatR,rLat][[1]];
+ 
+    ];
+    If[flags[[3]], (* ExactFreqs *)
+      Print[Export["ExactFreqs_"<>astr,Append[exact,{Null}],"Table"]];
+    ];
+    If[flags[[5]], (* FqhExact *)
+      Fqh=getFvib[TRange[[1]],TRange[[2]],TRange[[3]],exact,type];
+      Fqh={#[[1]],#[[2]]/Length[exact]}&/@Fqh; (* scale per atom *)
+      If[type=="classical",typeStr=type<>"_",typeStr=""];
+      Print[Export["Fqh_fromExactFreqs_"<>typeStr<>astr,Append[Fqh,{Null}],"Table"]];
+    ];
+    If[flags[[4]]||flags[[6]], (* MeshFreqs or FqhMesh *)
+      kp=1/aLat ToExpression[checkImport["meshKP"]];
+      mesh=Sort/@calculateFrequencies[kp,dynMatR,rLat][[1]];
+    ];
+    If[flags[[4]], (* MeshFreqs *)
+      Print[Export["MeshFreqs_"<>astr,Append[mesh,{Null}],"Table"]];
+    ];
+    If[flags[[6]], (* FqhMesh *)
+      weights=checkImport["meshWeights"]//Flatten; norm=Total[weights];
+      weights={weights,weights,weights}//Transpose; (* weights for each frequency rather than kpoint *)
+      Fqh=getFvib[TRange[[1]],TRange[[2]],TRange[[3]],mesh,weights,type];
+      Fqh={#[[1]],#[[2]]/norm}&/@Fqh; (* scale per atom *)
+      If[type=="classical",typeStr=type<>"_",typeStr=""];
+      Print[Export["Fqh_fromMeshFreqs_"<>typeStr<>astr,Append[Fqh,{Null}],"Table"]];
+    ];
+
+    If[flags[[7]], (* PhononDispersion *)
+      {phonons,indices}=phononDispersion[cellType,cell,dynMatR,rLat];
+      Print[Export["PhononDispersion_"<>astr,Append[phonons,{Null}],"Table"]];
+    ];
+  ,{a,aLatList//Length}];
+
+  If[flags[[7]],
+    Do[
+      str=str<>ToString[indices[[i]]]<>ToString[indices[[i+1]]];
+    ,{i,1,indices//Length,2}];
+    Print[];Print["indices: ",str];
+  ];
+]
+

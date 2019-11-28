@@ -1,0 +1,740 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+DOS_cut	utils.py	/^def DOS_cut(longvecnormfile, dos, nndist = False, filenamedos = False):$/;"	f
+H_plot	hesse.py	/^    def H_plot(self, temp = 0.05):$/;"	m	class:hesseclass
+H_plot	hesse.py.save	/^    def H_plot(self, temp = 0.05):$/;"	m	class:hesseclass
+LJ	hesse.py	/^def LJ(r,eps,rm):$/;"	f
+LJ	hesse.py.save	/^def LJ(r,eps,rm):$/;"	f
+LJ	pot_energy_forces.py	/^def LJ(r,eps,rm):$/;"	f
+LJ_derivative	hesse.py	/^def LJ_derivative(r,eps,rm):$/;"	f
+LJ_derivative	hesse.py.save	/^def LJ_derivative(r,eps,rm):$/;"	f
+LJ_derivative	pot_energy_forces.py	/^def LJ_derivative(r,eps,rm):$/;"	f
+ListToStr	crystal_generator.py	/^def ListToStr(varlist):$/;"	f
+M_plot	hesse.py	/^    def M_plot(self, temp = 0.05):$/;"	m	class:hesseclass
+M_plot	hesse.py.save	/^    def M_plot(self, temp = 0.05):$/;"	m	class:hesseclass
+MatrixPlot	utils.py	/^def MatrixPlot(M = None, temp = 0.05):$/;"	f
+Morse	hesse.py	/^def Morse(r,De,aa,re):$/;"	f
+Morse	hesse.py.save	/^def Morse(r,De,aa,re):$/;"	f
+Morse	pot_energy_forces.py	/^def Morse(r,De,aa,re):$/;"	f
+Morse_derivative	hesse.py	/^def Morse_derivative(r,De,aa,re):$/;"	f
+Morse_derivative	hesse.py.save	/^def Morse_derivative(r,De,aa,re):$/;"	f
+Morse_derivative	pot_energy_forces.py	/^def Morse_derivative(r,De,aa,re):$/;"	f
+NN	hesse.py	/^            NN = args.fitpotf[1]$/;"	v
+NN	hesse.py	/^        NN = False$/;"	v
+NN	hesse.py.save	/^            NN = args.fitpotf[1]$/;"	v
+NN	hesse.py.save	/^        NN = False$/;"	v
+NumericStringParser	utils.py	/^class NumericStringParser(object):$/;"	c
+R	crystal_generator.py	/^    R = np.linalg.inv(Rinv)$/;"	v
+R_2vect	utils.py	/^def R_2vect(vector_orig, vector_fin, fixed_rotation_axis = False):$/;"	f
+Rinv	crystal_generator.py	/^    Rinv = np.zeros([3,3])$/;"	v
+Trans135	hesse.py	/^def Trans135(r,a,b,c):$/;"	f
+Trans135	hesse.py.save	/^def Trans135(r,a,b,c):$/;"	f
+Trans1357	hesse.py	/^def Trans1357(r,a,b,c,d):$/;"	f
+Trans1357	hesse.py.save	/^def Trans1357(r,a,b,c,d):$/;"	f
+Trans13579	hesse.py	/^def Trans13579(r,a,b,c,d,e):$/;"	f
+Trans13579	hesse.py.save	/^def Trans13579(r,a,b,c,d,e):$/;"	f
+Trans1357911	hesse.py	/^def Trans1357911(r,a,b,c,d,e,f):$/;"	f
+Trans1357911	hesse.py.save	/^def Trans1357911(r,a,b,c,d,e,f):$/;"	f
+Trans1357911_der	hesse.py	/^def Trans1357911_der(r,a,b,c,d,e,f):$/;"	f
+Trans1357911_der	hesse.py.save	/^def Trans1357911_der(r,a,b,c,d,e,f):$/;"	f
+Trans13579_der	hesse.py	/^def Trans13579_der(r,a,b,c,d,e):$/;"	f
+Trans13579_der	hesse.py.save	/^def Trans13579_der(r,a,b,c,d,e):$/;"	f
+Trans1357_der	hesse.py	/^def Trans1357_der(r,a,b,c,d):$/;"	f
+Trans1357_der	hesse.py.save	/^def Trans1357_der(r,a,b,c,d):$/;"	f
+Trans135_der	hesse.py	/^def Trans135_der(r,a,b,c):$/;"	f
+Trans135_der	hesse.py.save	/^def Trans135_der(r,a,b,c):$/;"	f
+UNUSED_STUFF_DELETE_LATER	pot_info_startjob.py	/^    def UNUSED_STUFF_DELETE_LATER(self):$/;"	m	class:pot
+__call__	hesse.py	/^    def __call__(self, x, strip_zeros=strip_zeros):$/;"	f	function:printoptions	file:
+__call__	hesse.py.save	/^    def __call__(self, x, strip_zeros=strip_zeros):$/;"	f	function:printoptions	file:
+__call__	my_atom.py	/^    def __call__(self):$/;"	m	class:atom	file:
+__call__	my_atom.py	/^    def __call__(self):$/;"	m	class:plots	file:
+__call__	pot_energy_forces.py	/^            def __call__(self, x, strip_zeros=strip_zeros):$/;"	f	function:pot_energy_forces_class.print_parametrization.printoptions	file:
+__call__	pot_energy_forces.py	/^    def __call__(self, x, strip_zeros=strip_zeros):$/;"	f	function:printoptions	file:
+__init_	thermodynamics.py	/^    def __init_(self, surf = None):$/;"	m	class:surface	file:
+__init__	calculate_energy_and_forces	/^    def __init__( self ):$/;"	m	class:parameters
+__init__	crystal_generator.py	/^    def __init__( self ):$/;"	m	class:crystal
+__init__	crystal_generator.py	/^    def __init__( self ):$/;"	m	class:dislocation
+__init__	crystal_generator.py	/^    def __init__( self ):$/;"	m	class:remove_mapping_into_originalcell
+__init__	crystal_generator.py	/^    def __init__( self ):$/;"	m	class:supercell
+__init__	crystal_generator.py	/^    def __init__( self ):$/;"	m	class:unit_cell
+__init__	fah.py	/^    def __init__(self):$/;"	m	class:ah
+__init__	fah_dudl.py	/^    def __init__(self, filename = False):$/;"	m	class:dudl
+__init__	fel.py	/^    def __init__(self):$/;"	m	class:el
+__init__	feos.py	/^    def __init__(self):$/;"	m	class:qht
+__init__	feos.py	/^    def __init__(self, args = None):$/;"	m	class:eos
+__init__	fqh.py	/^    def __init__(self, args = None):$/;"	m	class:qh
+__init__	hesse.py	/^    def __init__( self, args = None , listin = None, H = None):$/;"	m	class:hesseclass
+__init__	hesse.py.save	/^    def __init__( self, args = None , listin = None, H = None):$/;"	m	class:hesseclass
+__init__	my_atom.py	/^    def __init__(self):$/;"	m	class:plots
+__init__	my_atom.py	/^    def __init__(self, listin = None):  # elements: [aL cU 1 3], [SI], [Ag 7]$/;"	m	class:atom
+__init__	pot.py	/^    def __init__( self ):$/;"	m	class:pot
+__init__	pot_energy_forces.py	/^    def __init__(self):$/;"	m	class:pot_energy_forces_class
+__init__	pot_info_startjob.py	/^    def __init__( self ):$/;"	m	class:pot
+__init__	pot_parametrize.py	/^    def __init__(self):$/;"	m	class:forcesneighbors
+__init__	pot_parametrize.py	/^    def __init__(self, data = False, fixzeroat = False ):$/;"	m	class:find_best_polyfit
+__init__	pot_parametrize.py	/^    def __init__(self, data = False, function = False, fixzeroat = False, weights = False ):$/;"	m	class:fit_to_func
+__init__	thermodynamics.py	/^    def __init__(self, args = None):$/;"	m	class:changehesse
+__init__	thermodynamics.py	/^    def __init__(self, args = None):$/;"	m	class:f
+__init__	thermodynamics.py	/^    def __init__(self, args = None):$/;"	m	class:fform
+__init__	thermodynamics.py	/^    def __init__(self, args = None):$/;"	m	class:fformmurn
+__init__	utils.py	/^    def __init__(self):$/;"	m	class:NumericStringParser
+__str__	fqh.py	/^    def __str__(self):$/;"	m	class:qh	file:
+_common_prefix	fqh.py	/^def _common_prefix(strings, common_suffix = False):$/;"	f
+_help	my_atom.py	/^    def _help(self):$/;"	m	class:atom
+_lsn	fqh.py	/^def _lsn(searchstring):$/;"	f
+_missing	my_atom.py	/^_missing = 0.2$/;"	v
+_printgreen	fah.py	/^def _printgreen(var):$/;"	f
+_printgreen	fel.py	/^def _printgreen(var):$/;"	f
+_printgreen	feos.py	/^def _printgreen(var):$/;"	f
+_printgreen	fqh.py	/^def _printgreen(var):$/;"	f
+_printgreen	hesse.py	/^def _printgreen(var):$/;"	f
+_printgreen	hesse.py.save	/^def _printgreen(var):$/;"	f
+_printgreen	thermodynamics.py	/^def _printgreen(var):$/;"	f
+_printred	fah.py	/^def _printred(var):$/;"	f
+_printred	fel.py	/^def _printred(var):$/;"	f
+_printred	feos.py	/^def _printred(var):$/;"	f
+_printred	fqh.py	/^def _printred(var):$/;"	f
+_printred	hesse.py	/^def _printred(var):$/;"	f
+_printred	hesse.py.save	/^def _printred(var):$/;"	f
+_printred	thermodynamics.py	/^def _printred(var):$/;"	f
+_string_to_num_list	fqh.py	/^def _string_to_num_list(string, tostring = False):$/;"	f
+_string_to_num_list	hesse.py	/^def _string_to_num_list(string, tostring = False):$/;"	f
+_string_to_num_list	hesse.py.save	/^def _string_to_num_list(string, tostring = False):$/;"	f
+_unused_read_inputdata_not_finished	thermodynamics.py	/^def _unused_read_inputdata_not_finished(filename = None):$/;"	f
+aParam	crystal_generator.py	/^    aParam = 2.855315$/;"	v
+add_transverse	hesse.py	/^                add_transverse = args.tm,$/;"	v
+add_transverse	hesse.py.save	/^                add_transverse = args.tm,$/;"	v
+ah	fah.py	/^class ah():$/;"	c
+allfolder	hesse.py	/^                allfolder=glob.glob("*Ang_*")$/;"	v
+allfolder	hesse.py.save	/^                allfolder=glob.glob("*Ang_*")$/;"	v
+anglevec	utils.py	/^def anglevec(v1,v2):$/;"	f
+anyvec_to_inplane_senkr_parallel	utils.py	/^def anyvec_to_inplane_senkr_parallel(longvec,vec0,vecs):$/;"	f
+append_row_to_2d_array	utils.py	/^def append_row_to_2d_array(inarray = False, addrow = False):$/;"	f
+args	DOS_POSITIONS_auswerten.py	/^    args = p.parse_args()$/;"	v
+args	fah.py	/^    args = p.parse_args()$/;"	v	class:ah
+args	fah_dudl.py	/^    args = p.parse_args()$/;"	v
+args	feos.py	/^    args = p.parse_args()$/;"	v	class:qht
+args	fqh.py	/^    args = p.parse_args()$/;"	v
+args	hesse.py	/^    args = p.parse_args()$/;"	v
+args	hesse.py.save	/^    args = p.parse_args()$/;"	v
+args	pot.py	/^args = p.parse_args()$/;"	v
+args	pot_energy_forces.py	/^    args = pot.help()  # this eventually starts the calculatino if option is given$/;"	v	class:pot_energy_forces_class
+args	pot_info_startjob.py	/^    args = p.parse_args()$/;"	v
+args	thermodynamics.py	/^    args = p.parse_args()$/;"	v
+atom	my_atom.py	/^    atom = atom()$/;"	v	class:atom
+atom	my_atom.py	/^class atom(object):     # advantage: once this is executed we know that everything is defined$/;"	c
+atom_8_16_24	DOS_POSITIONS_auswerten.py	/^def atom_8_16_24():$/;"	f
+atomic_covalent_radii	my_atom.py	/^atomic_covalent_radii = np.array([$/;"	v
+atomic_ground_state_magnetic_moments	my_atom.py	/^atomic_ground_state_magnetic_moments = np.array([$/;"	v
+atomic_masses	my_atom.py	/^atomic_masses = np.array([$/;"	v
+atomic_masses_ase	my_atom.py	/^atomic_masses_ase = np.array([$/;"	v
+atomic_masses_potcar	my_atom.py	/^atomic_masses_potcar = np.array([$/;"	v
+atomic_melting	my_atom.py	/^atomic_melting = atomic_melting_webelements$/;"	v
+atomic_melting_webelements	my_atom.py	/^atomic_melting_webelements = np.array([$/;"	v
+atomic_names	my_atom.py	/^atomic_names = [$/;"	v
+atomic_reference_states	my_atom.py	/^    None, #X$/;"	v
+atomic_symbols	my_atom.py	/^atomic_symbols = [$/;"	v
+atomic_z	my_atom.py	/^atomic_z = np.arange(len(atomic_symbols))$/;"	v
+bccsc	crystal_generator.py	/^    bccsc = supercell()$/;"	v
+bccunit	crystal_generator.py	/^    bccunit = unit_cell()$/;"	v
+birch	feos.py	/^def birch(V, e0=None, v0=None, b0=None, b0der=None):$/;"	f
+c	DOS_POSITIONS_auswerten.py	/^def c():$/;"	f
+calphad_free_energy	my_atom.py	/^def calphad_free_energy(listin):$/;"	f
+cellfile	hesse.py	/^            cellfile = args.hesse1nn[1],$/;"	v
+cellfile	hesse.py.save	/^            cellfile = args.hesse1nn[1],$/;"	v
+center_atoms_around_atom	crystal_generator.py	/^    def center_atoms_around_atom(self, atomnr, coordfile_cart = False, coord_cart = False, cellfile = False, cell = False, coordfile_rrel = False, coord_rrel = False):$/;"	m	class:crystal
+center_atoms_rel	crystal_generator.py	/^    def center_atoms_rel( self ):$/;"	m	class:crystal
+changehesse	thermodynamics.py	/^class changehesse:$/;"	c
+check_calculate_energy_and_forces_parameters_with_current	pot.py	/^    def check_calculate_energy_and_forces_parameters_with_current(self,calculate_energy_and_forces_path):$/;"	m	class:pot
+check_calculate_energy_and_forces_parameters_with_current	pot_info_startjob.py	/^    def check_calculate_energy_and_forces_parameters_with_current(self,calculate_energy_and_forces_path):$/;"	m	class:pot
+check_forces_sum	pot_energy_forces.py	/^    def check_forces_sum(self):$/;"	m	class:pot_energy_forces_class
+check_if_exists	pot_parametrize.py	/^        def check_if_exists(foldername, filename):$/;"	f	function:forcesneighbors.parametrize_lon
+checks_for_fcc	pot_energy_forces.py	/^    def checks_for_fcc(self):$/;"	m	class:pot_energy_forces_class
+common_prefix	utils.py	/^def common_prefix(strings, common_suffix = False):$/;"	f
+conc_to_g	thermodynamics.py	/^def conc_to_g(filename = None, revert = False):$/;"	f
+coord_transform_to_par	utils.py	/^def coord_transform_to_par(vec):$/;"	f
+coord_transform_to_quer	utils.py	/^def coord_transform_to_quer(vec):$/;"	f
+coordfile0_rrel	hesse.py	/^            coordfile0_rrel = "EqCoords_direct")$/;"	v
+coordfile0_rrel	hesse.py.save	/^            coordfile0_rrel = "EqCoords_direct")$/;"	v
+coordfile_cart	hesse.py	/^                coordfile_cart = "cartesian_coords",$/;"	v
+coordfile_cart	hesse.py.save	/^                coordfile_cart = "cartesian_coords",$/;"	v
+copyanything	thermodynamics.py	/^def copyanything(src, dst):$/;"	f
+corb	DOS_POSITIONS_auswerten.py	/^def corb():$/;"	f
+corpyslow	DOS_POSITIONS_auswerten.py	/^def corpyslow():$/;"	f
+create_calculate_energy_and_forces	pot.py	/^    def create_calculate_energy_and_forces(self):$/;"	m	class:pot
+create_calculate_energy_and_forces	pot_info_startjob.py	/^    def create_calculate_energy_and_forces(self):$/;"	m	class:pot
+create_energy_dat_from_underlying_OUTCARS	feos.py	/^def create_energy_dat_from_underlying_OUTCARS():$/;"	f
+create_job_dispdudl	pot.py	/^    def create_job_dispdudl(self):$/;"	m	class:pot
+create_job_dispdudl	pot_info_startjob.py	/^    def create_job_dispdudl(self):$/;"	m	class:pot
+create_job_parametrization	pot.py	/^        verbose = False):$/;"	f
+create_job_parametrization	pot_info_startjob.py	/^        verbose = False):$/;"	f
+create_job_tdi	pot.py	/^    def create_job_tdi(self,ls = False, execute = False, verbose = False):$/;"	m	class:pot
+create_job_tdi	pot_info_startjob.py	/^    def create_job_tdi(self,ls = False, execute = False, verbose = False):$/;"	m	class:pot
+create_self_jobpath	pot.py	/^    def create_self_jobpath(self):$/;"	m	class:pot
+create_self_jobpath	pot_info_startjob.py	/^    def create_self_jobpath(self):$/;"	m	class:pot
+create_supercell	crystal_generator.py	/^    def create_supercell( self, unit, N1, N2, N3, newsorting = False, shiftforces = False ):$/;"	m	class:supercell
+crystal	crystal_generator.py	/^    crystal = crystal()$/;"	v
+crystal	crystal_generator.py	/^class crystal( object ):$/;"	c
+cut_function_at_DOS	utils.py	/^def cut_function_at_DOS(function,DOS):$/;"	f
+d	my_atom.py	/^    d = np.array([])$/;"	v	class:atom
+dat2file	utils.py	/^def dat2file(filename, data):$/;"	f
+data	my_atom.py	/^def data(elementlistin = None):$/;"	f
+dataarray	DOS_POSITIONS_auswerten.py	/^        dataarray = std()$/;"	v
+declare_empty_arrays	pot_energy_forces.py	/^    def declare_empty_arrays(self):$/;"	m	class:pot_energy_forces_class
+deleteAtoms	crystal_generator.py	/^    def deleteAtoms( self, idnull ):$/;"	m	class:crystal
+deletefirst	DOS_POSITIONS_auswerten.py	/^deletefirst=30  # deletes first 30 structures of trajectory$/;"	v
+determine_shells	pot_energy_forces.py	/^    def determine_shells(self):$/;"	m	class:pot_energy_forces_class
+determine_tperiodicity	crystal_generator.py	/^    def determine_tperiodicity( self, unit ):$/;"	m	class:dislocation
+dirquer	hesse.py	/^                dirquer = dirquercheck[0]$/;"	v
+dirquer	hesse.py	/^            dirquer = False$/;"	v
+dirquer	hesse.py.save	/^                dirquer = dirquercheck[0]$/;"	v
+dirquer	hesse.py.save	/^            dirquer = False$/;"	v
+dirquercheck	hesse.py	/^            dirquercheck = glob.glob(searchfor)$/;"	v
+dirquercheck	hesse.py.save	/^            dirquercheck = glob.glob(searchfor)$/;"	v
+dislocation	crystal_generator.py	/^class dislocation( supercell ):$/;"	c
+dos_to_pot	pot_parametrize.py	/^def dos_to_pot(dos,tmelt):$/;"	f
+dosmax	DOS_POSITIONS_auswerten.py	/^def dosmax():$/;"	f
+dudl	DOS_POSITIONS_auswerten.py	/^def dudl():$/;"	f
+dudl	fah_dudl.py	/^class dudl( object ):$/;"	c
+dudlmean_to_dudlmeanfit	fah.py	/^    def dudlmean_to_dudlmeanfit(dudlmean = None, lambdas = None):$/;"	m	class:ah
+dudlmean_to_dudlmeanfit	fel.py	/^    def dudlmean_to_dudlmeanfit(dudlmean = None, lambdas = None):$/;"	m	class:el
+dudlnew	pot_energy_forces.py	/^    def dudlnew(self, dudlnew = False, dudlnewharmonic = False, schritte_up_to = False):$/;"	m	class:pot_energy_forces_class
+dudlposc	DOS_POSITIONS_auswerten.py	/^def dudlposc(dudlposcm = False, sb = False, se = False, verbose = False):$/;"	f
+dudlvseps	DOS_POSITIONS_auswerten.py	/^def dudlvseps():$/;"	f
+effectlontox	pot_info_startjob.py	/^def effectlontox(foldernrs, verbose = False):$/;"	f
+el	fel.py	/^class el():$/;"	c
+elements	hesse.py	/^        elements = [ "Al", "Pb", "Cu", "Rh", "Pd", "Au", "Ir", "Pt", "Au" ]$/;"	v
+elements	hesse.py	/^        elements = [ "Cu" ]$/;"	v
+elements	hesse.py.save	/^        elements = [ "Al", "Pb", "Cu", "Rh", "Pd", "Au", "Ir", "Pt", "Au" ]$/;"	v
+elements	hesse.py.save	/^        elements = [ "Cu" ]$/;"	v
+elements	pot.py	/^    elements = [                                           "Pt", "Au" ]$/;"	v	class:pot
+elements	pot.py	/^    elements = [ "Al",       "Cu", "Rh", "Pd", "Ag", "Ir", "Pt", "Au" ]$/;"	v	class:pot
+elements	pot.py	/^    elements = [ "Al", "Pb", "Cu", "Rh", "Pd", "Ag", "Ir", "Pt", "Au" ]$/;"	v	class:pot
+eneprint	hesse.py	/^        def eneprint():$/;"	f	function:get_energy_forces_pairpot
+eneprint	hesse.py.save	/^        def eneprint():$/;"	f	function:get_energy_forces_pairpot
+eos	feos.py	/^    eos = eos(args)$/;"	v	class:qht
+eos	feos.py	/^class eos(object):$/;"	c
+eval	utils.py	/^    def eval(self,num_string,parseAll=True):$/;"	m	class:NumericStringParser
+eval_dudl_pkl	pot_energy_forces.py	/^    def eval_dudl_pkl(self, pklfilename = False, getdos = False, verbose = False):$/;"	m	class:pot_energy_forces_class
+evaluateStack	utils.py	/^    def evaluateStack(self, s ):$/;"	m	class:NumericStringParser
+evaluate_pot	pot.py	/^    def evaluate_pot( self, onefolder = False ):$/;"	m	class:pot
+exportLammps	crystal_generator.py	/^    def exportLammps( self, directory, filename = None ):$/;"	m	class:crystal
+exportLammpsTriclinic	crystal_generator.py	/^    def exportLammpsTriclinic( self, directory, filename = None ):$/;"	m	class:crystal
+f	fah.py	/^    f = ah()$/;"	v	class:ah
+f	fel.py	/^    f = ah()$/;"	v	class:el
+f	thermodynamics.py	/^class f:$/;"	c
+fehlermelungforces	hesse.py	/^    def fehlermelungforces():$/;"	f	function:get_energy_forces_pairpot
+fehlermelungforces	hesse.py.save	/^    def fehlermelungforces():$/;"	f	function:get_energy_forces_pairpot
+fehlermelungforces	pot_energy_forces.py	/^        def fehlermelungforces():$/;"	f	function:pot_energy_forces_class.check_forces_sum
+fform	thermodynamics.py	/^class fform:$/;"	c
+fformmurn	thermodynamics.py	/^class fformmurn:$/;"	c
+file2dat	utils.py	/^def file2dat(filename):$/;"	f
+find_best_polyfit	pot_parametrize.py	/^class find_best_polyfit( object ):$/;"	c
+find_closest_sorted	utils.py	/^def find_closest_sorted(A, target):$/;"	f
+find_nearest	utils.py	/^    def find_nearest(array,value):$/;"	f	function:plot_find_ylim_from_xlim
+find_nearest_index	crystal_generator.py	/^        def find_nearest_index(array,value):$/;"	f	function:crystal.get_NNlist
+find_nearest_value	crystal_generator.py	/^        def find_nearest_value(array,value):$/;"	f	function:crystal.get_NNlist
+find_surface_filename	fah.py	/^def find_surface_filename(sysexit = True):$/;"	f
+find_surface_filename	fel.py	/^def find_surface_filename(sysexit = True):$/;"	f
+find_surface_filenames	fqh.py	/^    def find_surface_filenames(self, sysexit = True):$/;"	m	class:qh
+findbestpolyfit	pot_parametrize.py	/^        def findbestpolyfit(orderstry = self.ordermax, dataxminfit = False ,dataxmaxfit = False):$/;"	f	function:find_best_polyfit.polyfit
+findbestpolyfit	pot_parametrize.py	/^    def findbestpolyfit(datax,datay,zeroat,orderstry,dataxminfit,dataxmaxfit):$/;"	f	function:polyfit
+fit_fcc_alat_mean_freqs	hesse.py	/^def fit_fcc_alat_mean_freqs():$/;"	f
+fit_fcc_alat_mean_freqs	hesse.py.save	/^def fit_fcc_alat_mean_freqs():$/;"	f
+fit_surface	fqh.py	/^    def fit_surface(self, volume=None):$/;"	m	class:qh
+fit_to_energy_vs_volume_data	feos.py	/^    def fit_to_energy_vs_volume_data(self, datax, datay, points=100):$/;"	m	class:eos
+fit_to_func	pot_parametrize.py	/^class fit_to_func( object ):$/;"	c
+fit_to_function	pot_parametrize.py	/^    def fit_to_function(self):$/;"	m	class:fit_to_func
+fitdelta	hesse.py	/^        fitdelta = polyfit(*args.polyfit)$/;"	v
+fitdelta	hesse.py.save	/^        fitdelta = polyfit(*args.polyfit)$/;"	v
+forcesneighbors	pot_parametrize.py	/^class forcesneighbors( object ):$/;"	c
+fqh_atom	hesse.py	/^def fqh_atom(T, ExactFreqs = None):$/;"	f
+fqh_atom	hesse.py.save	/^def fqh_atom(T, ExactFreqs = None):$/;"	f
+fqh_cell	hesse.py	/^def fqh_cell(T, ExactFreqs = None):$/;"	f
+fqh_cell	hesse.py.save	/^def fqh_cell(T, ExactFreqs = None):$/;"	f
+fqh_fit	hesse.py	/^def fqh_fit(fqh = None, maxfev = 16000, maxdiffallowed = 0.001, verbose = False, print_diff = True):$/;"	f
+fqh_fit	hesse.py.save	/^def fqh_fit(fqh = None, maxfev = 16000, maxdiffallowed = 0.001, verbose = False, print_diff = True):$/;"	f
+fqh_fit_fun	hesse.py	/^    def fqh_fit_fun(T, a, scaling,$/;"	f	function:fqh_fit
+fqh_fit_fun	hesse.py.save	/^    def fqh_fit_fun(T, a, scaling,$/;"	f	function:fqh_fit
+fqh_interpolate	hesse.py	/^def fqh_interpolate(fqh = None):$/;"	f
+fqh_interpolate	hesse.py.save	/^def fqh_interpolate(fqh = None):$/;"	f
+fqh_surface_interpolate	hesse.py	/^def fqh_surface_interpolate(fqh = None):$/;"	f
+fqh_surface_interpolate	hesse.py.save	/^def fqh_surface_interpolate(fqh = None):$/;"	f
+from_OUTCAR_create_everything_necessary	pot_energy_forces.py	/^    def from_OUTCAR_create_everything_necessary(self):$/;"	m	class:pot_energy_forces_class
+fvib_classical	hesse.py	/^def fvib_classical(T, freqs):$/;"	f
+fvib_classical	hesse.py.save	/^def fvib_classical(T, freqs):$/;"	f
+g_to_conc	thermodynamics.py	/^def g_to_conc(filename = None,revert = False):$/;"	f
+getDOS_of_1d_array	utils.py	/^def getDOS_of_1d_array(data, normalize_to_1 = False):$/;"	f
+getRotationMatrix	crystal_generator.py	/^    def getRotationMatrix( self ):$/;"	m	class:dislocation
+getVar	utils.py	/^getVar = lambda searchList, ind: [searchList[i] for i in ind]$/;"	v
+get_NNlist	crystal_generator.py	/^    def get_NNlist(self, atom, NNschale, coordfile_cart = False, coord_cart = False, cellfile = False, cell = False, coordfile_rrel = False, coord_rrel = False, decimals = 6, verbose = False, return_NNdist = False, return_result_and_NNdist = False, return_d_NNidx=False):$/;"	m	class:crystal
+get_alats	pot.py	/^    def get_alats( self, folder ):$/;"	m	class:pot
+get_alats	pot_info_startjob.py	/^    def get_alats( self, folder ):$/;"	m	class:pot
+get_commom_part_of_filenames	utils.py	/^def get_commom_part_of_filenames(liste = None):$/;"	f
+get_data	pot_parametrize.py	/^    def get_data(self):$/;"	m	class:find_best_polyfit
+get_data	pot_parametrize.py	/^    def get_data(self):$/;"	m	class:fit_to_func
+get_dudl_vs_temp	fel.py	/^    def get_dudl_vs_temp(self):$/;"	m	class:el
+get_dudl_vs_temp_folder	fah.py	/^    def get_dudl_vs_temp_folder(self, verbose = False):$/;"	m	class:ah
+get_dudlmeanfit	fah.py	/^def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_parameters = False):$/;"	f
+get_dudls_and_averages_from_self_data	fah.py	/^    def get_dudls_and_averages_from_self_data(self):$/;"	m	class:ah
+get_dudls_and_averages_from_self_data	fel.py	/^    def get_dudls_and_averages_from_self_data(self):$/;"	m	class:el
+get_element_2x2x2sc_info	pot.py	/^    def get_element_2x2x2sc_info(self,element):$/;"	m	class:pot
+get_element_2x2x2sc_info	pot_info_startjob.py	/^    def get_element_2x2x2sc_info(self,element, sc):$/;"	m	class:pot
+get_element_from_path	my_atom.py	/^def get_element_from_path(path):$/;"	f
+get_elements	my_atom.py	/^def get_elements(listin, verbose = False, get_elements_count = False):$/;"	f
+get_elements	pot_info_startjob.py	/^    def get_elements(self, elements = False):$/;"	m	class:pot
+get_elements_list	my_atom.py	/^def get_elements_list(listin, verbose = False):$/;"	f
+get_ene_atom	hesse.py	/^    def get_ene_atom(self):$/;"	m	class:hesseclass
+get_ene_atom	hesse.py.save	/^    def get_ene_atom(self):$/;"	m	class:hesseclass
+get_ene_cell	hesse.py	/^    def get_ene_cell(self):$/;"	m	class:hesseclass
+get_ene_cell	hesse.py.save	/^    def get_ene_cell(self):$/;"	m	class:hesseclass
+get_energy_forces	hesse.py	/^def get_energy_forces($/;"	f
+get_energy_forces	hesse.py.save	/^def get_energy_forces($/;"	f
+get_energy_forces_hesse_rest	hesse.py	/^def get_energy_forces_hesse_rest(hessefile = False, hessefile1nn = False):$/;"	f
+get_energy_forces_hesse_rest	hesse.py.save	/^def get_energy_forces_hesse_rest(hessefile = False, hessefile1nn = False):$/;"	f
+get_energy_forces_pairpot	hesse.py	/^def get_energy_forces_pairpot($/;"	f
+get_energy_forces_pairpot	hesse.py.save	/^def get_energy_forces_pairpot($/;"	f
+get_eqcoords_path	pot_info_startjob.py	/^    def get_eqcoords_path(self, structure, sc, copy_to_folder = False):$/;"	m	class:pot
+get_fit_forces_to_pot	pot_parametrize.py	/^def get_fit_forces_to_pot(filename = False, NN = False, pot = False, data = False, weights = False, foldername = "", verbose = True):$/;"	f
+get_freqs	hesse.py	/^    def get_freqs(self, tol = 1e-5): #1e-8):$/;"	m	class:hesseclass
+get_freqs	hesse.py.save	/^    def get_freqs(self, tol = 1e-5): #1e-8):$/;"	m	class:hesseclass
+get_harmonic_energy_forces	pot_energy_forces.py	/^    def get_harmonic_energy_forces(self):$/;"	m	class:pot_energy_forces_class
+get_hessematrix_lj_morse	hesse.py	/^def get_hessematrix_lj_morse($/;"	f
+get_hessematrix_lj_morse	hesse.py.save	/^def get_hessematrix_lj_morse($/;"	f
+get_index_of_list	utils.py	/^def get_index_of_list(listall=None, elementslist=None):$/;"	f
+get_index_of_numpyarray	utils.py	/^def get_index_of_numpyarray(array_all_data=None,sublist=None):$/;"	f
+get_inds	fah.py	/^        def get_inds(a,t,l):$/;"	f	function:ah.import_dudl_files_data
+get_inds	fel.py	/^        def get_inds(a,t,l):$/;"	f	function:el.import_dudl_files_data
+get_job_info	pot.py	/^    def get_job_info(self,ls = False, execute = False, jobnumber = False, verbose = False):$/;"	m	class:pot
+get_job_info	pot_info_startjob.py	/^    def get_job_info(self,ls = False, execute = False, jobnumber = False, verbose = False):$/;"	m	class:pot
+get_job_name	pot.py	/^    def get_job_name(self):$/;"	m	class:pot
+get_job_number	pot.py	/^    def get_job_number(self):$/;"	m	class:pot
+get_job_number	pot_info_startjob.py	/^    def get_job_number(self):$/;"	m	class:pot
+get_lon_energy_forces	pot_energy_forces.py	/^    def get_lon_energy_forces(self):$/;"	m	class:pot_energy_forces_class
+get_lon_vec	pot_energy_forces.py	/^    def get_lon_vec(self):$/;"	m	class:pot_energy_forces_class
+get_or_load_cell	pot_energy_forces.py	/^    def get_or_load_cell(self):$/;"	m	class:pot_energy_forces_class
+get_or_load_crystal0	pot_energy_forces.py	/^    def get_or_load_crystal0(self, EqCoords_direct_path = False, cellpath = False):$/;"	m	class:pot_energy_forces_class
+get_or_load_parameters	pot_energy_forces.py	/^    def get_or_load_parameters(self):$/;"	m	class:pot_energy_forces_class
+get_or_load_parameters_lon_to_ti_depending_on_shell	pot_energy_forces.py	/^    def get_or_load_parameters_lon_to_ti_depending_on_shell(self):$/;"	m	class:pot_energy_forces_class
+get_or_load_positions	pot_energy_forces.py	/^    def get_or_load_positions(self):$/;"	m	class:pot_energy_forces_class
+get_par_lon	pot.py	/^    def get_par_lon(self, disp = False, stringadd = False, parametrization_string = False):$/;"	m	class:pot
+get_par_lon	pot_info_startjob.py	/^        def get_par_lon(self, shell = False, disp = False, stringadd = False, parametrization_string = False):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_par_lon2	pot.py	/^    def get_par_lon2(self, disp = False, stringadd = False, parametrization_string = False):$/;"	m	class:pot
+get_par_lon2	pot_info_startjob.py	/^        def get_par_lon2(self, shell = False, disp = False, stringadd = False, parametrization_string = False):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_par_lon2_add	pot_info_startjob.py	/^        def get_par_lon2_add(self, shell = False, disp = False, stringadd = False, parametrization_string = False):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_par_lon_add	pot_info_startjob.py	/^        def get_par_lon_add(self, shell = False, disp = False, stringadd = False, parametrization_string = False):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_par_tox	pot.py	/^    def get_par_tox(self, disp = False, stringadd = False, parametrization_string = False, contr = 'tox'):$/;"	m	class:pot
+get_par_tox	pot_info_startjob.py	/^        def get_par_tox(self, shell = False, disp = False, stringadd = False, parametrization_string = False, contr = 'tox'):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_par_toy	pot.py	/^    def get_par_toy(self, disp = False, stringadd = False, parametrization_string = False, contr = 'toy'):$/;"	m	class:pot
+get_par_toy	pot_info_startjob.py	/^        def get_par_toy(self, shell = False, disp = False, stringadd = False, parametrization_string = False, contr = 'toy'):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_par_toz	pot.py	/^    def get_par_toz(self, disp = False, stringadd = False, parametrization_string = False, contr = 'toz'):$/;"	m	class:pot
+get_par_toz	pot_info_startjob.py	/^        def get_par_toz(self, shell = False, disp = False, stringadd = False, parametrization_string = False, contr = 'toz'):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+get_parametrization	pot.py	/^    def get_parametrization(self, disp = False, stringadd = False, parametrization_string = False, contr = False):$/;"	m	class:pot
+get_parametrization	pot_info_startjob.py	/^    def get_parametrization(self, shell = False, contr = False, disp = False, stringadd = False, parametrization_string = False):$/;"	m	class:pot
+get_parametrization_folder	pot.py	/^    def get_parametrization_folder(self, disp = False, stringadd = False):$/;"	m	class:pot
+get_parametrization_parameters_from_file	pot.py	/^    def get_parametrization_parameters_from_file(self,filename): #,contr, parametrization_string):$/;"	m	class:pot
+get_parametrization_parameters_from_file	pot_info_startjob.py	/^    def get_parametrization_parameters_from_file(self,filename): #,contr, parametrization_string):$/;"	m	class:pot
+get_parametrizationfiles_oldpath	pot.py	/^def get_parametrizationfiles_oldpath(jobpath, folder_displacement_direction_all):$/;"	f
+get_parametrizationfiles_oldpath	pot_info_startjob.py	/^def get_parametrizationfiles_oldpath(jobpath, folder_displacement_direction_all):$/;"	f
+get_to_ti_direction_vecs_fcc	pot_energy_forces.py	/^    def get_to_ti_direction_vecs_fcc(self):$/;"	m	class:pot_energy_forces_class
+get_to_ti_energy_forces	pot_energy_forces.py	/^    def get_to_ti_energy_forces(self, contr = False):$/;"	m	class:pot_energy_forces_class
+get_to_vec	pot_energy_forces.py	/^    def get_to_vec(self):$/;"	m	class:pot_energy_forces_class
+get_toxyzf	pot.py	/^    def get_toxyzf(string='tox',toxyz=tox, infolder = False):$/;"	f	function:get_parametrizationfiles_oldpath
+get_toxyzf	pot_info_startjob.py	/^    def get_toxyzf(string='tox',toxyz=tox, infolder = False):$/;"	f	function:get_parametrizationfiles_oldpath
+getef	hesse.py	/^def getef(vecnorm,params,pot = False):$/;"	f
+getef	hesse.py.save	/^def getef(vecnorm,params,pot = False):$/;"	f
+getef	pot_energy_forces.py	/^    def getef(self, vecnorm, params, pot = False):$/;"	m	class:pot_energy_forces_class
+getefvec	hesse.py	/^def getefvec(vec,params,pot = False):$/;"	f
+getefvec	hesse.py.save	/^def getefvec(vec,params,pot = False):$/;"	f
+getefvec	pot_energy_forces.py	/^    def getefvec(self, vec, params, pot = False, vecnorm = False):$/;"	m	class:pot_energy_forces_class
+getforcepot	hesse.py	/^def getforcepot(longvec,pot,potparam,pot2 = False):$/;"	f
+getforcepot	hesse.py.save	/^def getforcepot(longvec,pot,potparam,pot2 = False):$/;"	f
+getforcepot	pot_parametrize.py	/^def getforcepot(longvec,pot,potparam,pot2 = False):$/;"	f
+getforces	pot_parametrize.py	/^    def getforces(self):$/;"	m	class:forcesneighbors
+getlongforce	pot_parametrize.py	/^                        def getlongforce(longreffolder,x,posvec,tito=False,dispdir=False,verbose=False,nnxdist=False,posvecall=False):$/;"	f	function:forcesneighbors.getforces.printatom
+getmapping	DOS_POSITIONS_auswerten.py	/^def getmapping(atoms,pos0,eqposfile='eqpos',cellfile='cell'):$/;"	f
+getpos	DOS_POSITIONS_auswerten.py	/^def getpos(schritte,pos,atoms):$/;"	f
+getpos_from_POSITIONs	pot_energy_forces.py	/^    def getpos_from_POSITIONs(self,schritte,pos,atoms):$/;"	m	class:pot_energy_forces_class
+h	hesse.py	/^    h = hesseclass(args)$/;"	v
+h	hesse.py.save	/^    h = hesseclass(args)$/;"	v
+helmholtz_free_energy	fqh.py	/^    def helmholtz_free_energy(self, v = False, fccalat = False, save = False):$/;"	m	class:qh
+help	DOS_POSITIONS_auswerten.py	/^        help='Do evaluation in every given folder; You can use wildcards (*.{}...)', default=[os.getcwd()])$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='create pos_0.0 pos_1.0 files from all lambda 0.0 and 1.0 folders')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='end with steps given')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='get dos maximum')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='get dudl vs eps')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='get std of dUdL file (e.g. DOS_POSITIONS_auswerten.py -std dUdL -f *\/lam*\/)')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='go over POSITIONS and get energy with calculate_energy_and_forces')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='go over POSITIONS and get longvec from undisplaced structure for every atom; to be used with -dudlposc')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='go over positions and get dudl')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='integrate over d')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='make 2dDOS for pos_{0,1}.0xy (use this with the -c option)')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='make atom_xxx folder including dos of 1st NN')$/;"	v
+help	DOS_POSITIONS_auswerten.py	/^        help='start with steps given')$/;"	v
+help	feos.py	/^    def help(self, p = None):$/;"	m	class:eos
+help	feos.py	/^    def help(self, p = None):$/;"	m	class:qht
+help	fqh.py	/^    def help(self, p = None):$/;"	m	class:qh
+help	hesse.py	/^def help(p = None):$/;"	f
+help	hesse.py.save	/^def help(p = None):$/;"	f
+help	pot.py	/^    help='create job')$/;"	v
+help	pot.py	/^    help='evaluate parametrizations')$/;"	v
+help	pot_energy_forces.py	/^    def help(self):$/;"	m	class:pot_energy_forces_class
+help	thermodynamics.py	/^    def help(p = None):$/;"	f
+hesse_to_hesse_1NN	hesse.py	/^def hesse_to_hesse_1NN($/;"	f
+hesse_to_hesse_1NN	hesse.py.save	/^def hesse_to_hesse_1NN($/;"	f
+hesseclass	hesse.py	/^class hesseclass( object ):$/;"	c
+hesseclass	hesse.py.save	/^class hesseclass( object ):$/;"	c
+hessefile	hesse.py	/^                hessefile = args.inputfile,$/;"	v
+hessefile	hesse.py	/^            hessefile = args.inputfile$/;"	v
+hessefile	hesse.py	/^        hessefile = False$/;"	v
+hessefile	hesse.py.save	/^                hessefile = args.inputfile,$/;"	v
+hessefile	hesse.py.save	/^            hessefile = args.inputfile$/;"	v
+hessefile	hesse.py.save	/^        hessefile = False$/;"	v
+hessefile1nn	hesse.py	/^                hessefile1nn = args.inputfile1nn,$/;"	v
+hessefile1nn	hesse.py.save	/^                hessefile1nn = args.inputfile1nn,$/;"	v
+hfilename	hesse.py	/^            hfilename = args.hesse1nn[0],$/;"	v
+hfilename	hesse.py.save	/^            hfilename = args.hesse1nn[0],$/;"	v
+hier	hesse.py	/^        hier = os.getcwd()$/;"	v
+hier	hesse.py.save	/^        hier = os.getcwd()$/;"	v
+hier	pot.py	/^    hier=os.getcwd()$/;"	v	class:pot
+hier	pot_info_startjob.py	/^    hier=os.getcwd()$/;"	v
+hrest1	hesse.py	/^                hrest1 = args.hrest1,$/;"	v
+hrest1	hesse.py.save	/^                hrest1 = args.hrest1,$/;"	v
+import_avg_dudl_data	fah.py	/^    def import_avg_dudl_data(self, avg_dudl_filenames = "*Ang_*K\/avg_dUdL_lowplushigh_fre", verbose = False):$/;"	m	class:ah
+import_avg_dudl_data	fel.py	/^    def import_avg_dudl_data(self, avg_dudl_filenames = "*Ang_*K\/avg_dUdL_lowplushigh_fre"):$/;"	m	class:el
+import_dudl_files_data	fah.py	/^    def import_dudl_files_data(self):$/;"	m	class:ah
+import_dudl_files_data	fel.py	/^    def import_dudl_files_data(self):$/;"	m	class:el
+import_energy_vs_volume_data	feos.py	/^    def import_energy_vs_volume_data(self):$/;"	m	class:eos
+import_fah_data	fah.py	/^    def import_fah_data(self, filename = None):$/;"	m	class:ah
+import_fah_data	fel.py	/^    def import_fah_data(self, filename = None):$/;"	m	class:el
+import_fqh_files	fqh.py	/^    def import_fqh_files(self, scale=None, vol_min_error=10, vol_max_error=35):$/;"	m	class:qh
+import_parameters_data	feos.py	/^    def import_parameters_data(self, filename = None):$/;"	m	class:eos
+import_surface	fah.py	/^    def import_surface(self, surface_filename = None, interpolate = False, sysexit = True):$/;"	m	class:ah
+import_surface	fel.py	/^    def import_surface(self, surface_filename = None, interpolate = False, sysexit = True):$/;"	m	class:el
+import_surface	fqh.py	/^    def import_surface(self, surface_filename = None, interpolate = True, sysexit = True):$/;"	m	class:qh
+import_surface_expr	fah.py	/^    def import_surface_expr(self, surface_filename = None, surface = None, sysexit = True):$/;"	m	class:ah
+import_surface_expr	fel.py	/^    def import_surface_expr(self, surface_filename = None, surface = None, sysexit = True):$/;"	m	class:el
+import_surface_expr	feos.py	/^    def import_surface_expr(self, filename = None, temperatures = None, convert_to_sympy = True):$/;"	m	class:eos
+import_surface_expr_sympy	fqh.py	/^    def import_surface_expr_sympy(self, surface_filename = None, surface = None, sysexit = True):$/;"	m	class:qh
+infodos	pot_parametrize.py	/^    def infodos(self, element = False, jobvorlage = False, verbose = False):$/;"	m	class:forcesneighbors
+init_variables	pot.py	/^    def init_variables( self, kpstringoptional = False ):$/;"	m	class:pot
+init_variables	pot_info_startjob.py	/^    def init_variables( self, kpstringoptional = False ):$/;"	m	class:pot
+initialize_dataframe	pot_parametrize.py	/^    def initialize_dataframe(self):$/;"	m	class:forcesneighbors
+initialize_files_data	fah.py	/^    def initialize_files_data(self):$/;"	m	class:ah
+initialize_files_data	fel.py	/^    def initialize_files_data(self):$/;"	m	class:el
+inte	DOS_POSITIONS_auswerten.py	/^def inte():$/;"	f
+intersect	utils.py	/^def intersect(a, b):$/;"	f
+inversepot	hesse.py	/^def inversepot(r,alpha,B,e):$/;"	f
+inversepot	hesse.py.save	/^def inversepot(r,alpha,B,e):$/;"	f
+inversepot	pot_energy_forces.py	/^def inversepot(r,alpha,B,e):$/;"	f
+inversepot_derivative	hesse.py	/^def inversepot_derivative(r,alpha,B,e):$/;"	f
+inversepot_derivative	hesse.py.save	/^def inversepot_derivative(r,alpha,B,e):$/;"	f
+inversepot_derivative	pot_energy_forces.py	/^def inversepot_derivative(r,alpha,B,e):$/;"	f
+is_float	utils.py	/^def is_float(s):   # "88.0" -> False  ; "88" -> True$/;"	f
+is_int	feos.py	/^def is_int(x):$/;"	f
+is_int	my_atom.py	/^    def is_int(x):$/;"	f	function:get_elements
+is_int	utils.py	/^def is_int(x):$/;"	f
+is_substr	hesse.py	/^                def is_substr(find, data):$/;"	f
+is_substr	hesse.py.save	/^                def is_substr(find, data):$/;"	f
+isfile	utils.py	/^def isfile(filename):$/;"	f
+ka	hesse.py	/^        ka = get_energy_forces_hesse_rest(hessefile = args.hrest1[0], hessefile1nn = args.hrest1[1])$/;"	v
+ka	hesse.py	/^        ka = hesse_to_hesse_1NN($/;"	v
+ka	hesse.py.save	/^        ka = get_energy_forces_hesse_rest(hessefile = args.hrest1[0], hessefile1nn = args.hrest1[1])$/;"	v
+ka	hesse.py.save	/^        ka = hesse_to_hesse_1NN($/;"	v
+lennardjones	feos.py	/^def lennardjones(r, eps=None, rm=None, convert_to_sympy = False):$/;"	f
+list_sorted	utils.py	/^def list_sorted(liste):$/;"	f
+list_to_string	hesse.py.save	/^def list_to_string(listin, digits=14):$/;"	f
+list_to_string	utils.py	/^def list_to_string(listin, digits=14):$/;"	f
+loadBccFeEdge	crystal_generator.py	/^    def loadBccFeEdge( self ):$/;"	m	class:dislocation
+loadData	pot_parametrize.py	/^    def loadData( self, indir, infname ):$/;"	m	class:forcesneighbors
+loadDatapd	pot_parametrize.py	/^    def loadDatapd(self, filename):$/;"	m	class:forcesneighbors
+loadFitpd	pot_parametrize.py	/^    def loadFitpd(self, filename):$/;"	m	class:forcesneighbors
+loadHcpOrtho	crystal_generator.py	/^    def loadHcpOrtho( self, aParam, cParam ):$/;"	m	class:unit_cell
+loadHcpOrtho_wtet	crystal_generator.py	/^    def loadHcpOrtho_wtet( self, aParam, cParam ):$/;"	m	class:unit_cell
+load_bcc_cell	crystal_generator.py	/^    def load_bcc_cell( self, aParam ):$/;"	m	class:unit_cell
+load_bcc_cell_woct	crystal_generator.py	/^    def load_bcc_cell_woct( self, aParam ):$/;"	m	class:unit_cell
+load_bcc_cell_woct2	crystal_generator.py	/^    def load_bcc_cell_woct2( self, aParam ):$/;"	m	class:unit_cell
+load_bcc_cell_wtet	crystal_generator.py	/^    def load_bcc_cell_wtet( self, aParam ):$/;"	m	class:unit_cell
+load_data	fah.py	/^    def load_data(self):$/;"	m	class:ah
+load_data	fel.py	/^    def load_data(self):$/;"	m	class:el
+load_data	fqh.py	/^    def load_data(self, filename):$/;"	m	class:qh
+load_dudl	fah_dudl.py	/^    def load_dudl(self):$/;"	m	class:dudl
+load_fcc_cell	crystal_generator.py	/^    def load_fcc_cell( self, aParam ):$/;"	m	class:unit_cell
+load_fcc_cell_woct	crystal_generator.py	/^    def load_fcc_cell_woct( self, aParam ):$/;"	m	class:unit_cell
+load_positions_cell	crystal_generator.py	/^    def load_positions_cell(self, coordfile_cart = False, coord_cart = False, cellfile = False, cell = False, coordfile_rrel = False, coord_rrel = False):$/;"	m	class:crystal
+load_sc_cell	crystal_generator.py	/^    def load_sc_cell( self, aParam ):$/;"	m	class:unit_cell
+loadforces	pot_parametrize.py	/^    def loadforces(self, folder = False, a = False):$/;"	m	class:forcesneighbors
+long_substr	hesse.py	/^                def long_substr(data):$/;"	f
+long_substr	hesse.py.save	/^                def long_substr(data):$/;"	f
+longvec	hesse.py	/^        longvec = np.array([np.nan, np.nan, np.nan])$/;"	v
+longvec	hesse.py.save	/^        longvec = np.array([np.nan, np.nan, np.nan])$/;"	v
+longvec_quer_par_force	pot_parametrize.py	/^                        def longvec_quer_par_force():$/;"	f	function:forcesneighbors.getforces.printatom
+loop_over_atoms	pot_energy_forces.py	/^    def loop_over_atoms(self):$/;"	m	class:pot_energy_forces_class
+lsn	utils.py	/^def lsn(searchstring):$/;"	f
+m	crystal_generator.py	/^    m = m\/np.linalg.norm(m)$/;"	v
+m	crystal_generator.py	/^    m = np.array([ 1, 1, 1 ])$/;"	v
+makedos	DOS_POSITIONS_auswerten.py	/^def makedos(foldername, lambd, dn, tmelt, d = None):$/;"	f
+mass	my_atom.py	/^def mass(listin):$/;"	f
+mass_potcar	my_atom.py	/^def mass_potcar(listin):$/;"	f
+mc1	hesse.py	/^def mc1(r,De,aa,re,B,A):$/;"	f
+mc1	hesse.py.save	/^def mc1(r,De,aa,re,B,A):$/;"	f
+mc1	pot_energy_forces.py	/^def mc1(r,De,aa,re,B,A):$/;"	f
+mc1_derivative	hesse.py	/^def mc1_derivative(r,De,aa,re,B,A):$/;"	f
+mc1_derivative	hesse.py.save	/^def mc1_derivative(r,De,aa,re,B,A):$/;"	f
+mc1_derivative	pot_energy_forces.py	/^def mc1_derivative(r,De,aa,re,B,A):$/;"	f
+meanFreqsFit	hesse.py	/^    def meanFreqsFit(V):$/;"	f	function:fit_fcc_alat_mean_freqs
+meanFreqsFit	hesse.py.save	/^    def meanFreqsFit(V):$/;"	f	function:fit_fcc_alat_mean_freqs
+measure_time	utils.py	/^def measure_time(process, measure = False):$/;"	f
+melting	my_atom.py	/^def melting(listin):$/;"	f
+murn	feos.py	/^def murn(V, e0=None, v0=None, b0=None, b0der=None):$/;"	f
+my_eval	utils.py	/^    def my_eval(nums,ops):$/;"	f	function:string_to_mathematical_expression_does_not_work_properly
+my_kde_bandwidth	pot.py	/^            def my_kde_bandwidth(obj, fac=fact):$/;"	f	function:pot.get_job_info
+my_kde_bandwidth	pot.py	/^        def my_kde_bandwidth(obj, fac=fact):$/;"	f	function:pot.repair_disp_dudl_folder
+my_kde_bandwidth	pot_info_startjob.py	/^            def my_kde_bandwidth(obj, fac=fact):$/;"	f	function:pot.init_variables
+my_kde_bandwidth	utils.py	/^    def my_kde_bandwidth(obj, fac=fact):$/;"	f	function:getDOS_of_1d_array
+n	crystal_generator.py	/^    n = n\/np.linalg.norm(n)$/;"	v
+n	crystal_generator.py	/^    n = np.array([ 1,-1, 0 ])$/;"	v
+n	hesse.py	/^                n = forcesneighbors()$/;"	v
+n	hesse.py.save	/^                n = forcesneighbors()$/;"	v
+name	my_atom.py	/^def name(listin):$/;"	f
+namestr	DOS_POSITIONS_auswerten.py	/^    def namestr(obj, namespace):$/;"	f	function:makedos
+nearly_equal	DOS_POSITIONS_auswerten.py	/^def nearly_equal(a,b,sig_fig=5):$/;"	f
+number	my_atom.py	/^def number(listin):$/;"	f
+number_to_string_of_certain_length	utils.py	/^def number_to_string_of_certain_length(number, digits, chars):$/;"	f
+p	feos.py	/^    p = eos().help()  # this gives the possibility to change some __init__ settings$/;"	v	class:qht
+p	feos.py	/^    p = qht().help(p)  # this gives the possibility to change some __init__ settings$/;"	v	class:qht
+p	fqh.py	/^    p = qh().help()$/;"	v
+p	hesse.py	/^    p = help()  # this gives the possibility to change some __init__ settings$/;"	v
+p	hesse.py.save	/^    p = help()  # this gives the possibility to change some __init__ settings$/;"	v
+p	thermodynamics.py	/^    p = help()  # this gives the possibility to change some __init__ settings$/;"	v
+parameters	calculate_energy_and_forces	/^class parameters( object ):$/;"	c
+parametrize_lon	pot_parametrize.py	/^    def parametrize_lon(self, up_to_shell = 3):$/;"	m	class:forcesneighbors
+parametrize_whatatom	pot_parametrize.py	/^    def parametrize_whatatom(self, shell = False, contrib = False):$/;"	m	class:forcesneighbors
+params_init	pot_info_startjob.py	/^        def params_init(self):$/;"	f	function:pot.UNUSED_STUFF_DELETE_LATER
+pars_from_pd	pot_info_startjob.py	/^    def pars_from_pd(self, *kw):$/;"	m	class:pot
+parse	utils.py	/^    def parse(x):$/;"	f	function:string_to_mathematical_expression_does_not_work_properly
+phonopy_FORCE_CONSTANTS_to_h	hesse.py	/^    def phonopy_FORCE_CONSTANTS_to_h(self, filename = "FORCE_CONSTANTS"):$/;"	m	class:hesseclass
+phonopy_FORCE_CONSTANTS_to_h	hesse.py.save	/^    def phonopy_FORCE_CONSTANTS_to_h(self, filename = "FORCE_CONSTANTS"):$/;"	m	class:hesseclass
+plot	feos.py	/^    def plot(self, plot=2):$/;"	m	class:eos
+plot_delta_to_fit	fqh.py	/^    def plot_delta_to_fit(self, draw_lines = 20):$/;"	m	class:qh
+plot_dudl_pkl	pot_energy_forces.py	/^    def plot_dudl_pkl(self, whichplot, pklfilenames = False):$/;"	m	class:pot_energy_forces_class
+plot_dudl_vs_lambda	fah.py	/^    def plot_dudl_vs_lambda(self, a, t, l):$/;"	m	class:ah
+plot_dudl_vs_lambda	fel.py	/^    def plot_dudl_vs_lambda(self, a, t, l):$/;"	m	class:el
+plot_energy_vs_volume_qh	fqh.py	/^    def plot_energy_vs_volume_qh(self, *tempin_all):$/;"	m	class:qh
+plot_find_ylim_from_xlim	utils.py	/^def plot_find_ylim_from_xlim(xyfunc, xliml,xlimr, addmargin = True):$/;"	f
+plot_lon	pot_info_startjob.py	/^    def plot_lon(self, shell = 1, out = 'd'):$/;"	m	class:pot
+plot_lon	pot_parametrize.py	/^    def plot_lon(self, shell = 1, out = 'd', nice = False):$/;"	m	class:forcesneighbors
+plot_mass_difference	my_atom.py	/^    def plot_mass_difference(self):$/;"	m	class:plots
+plot_morse	hesse.py	/^def plot_morse(parameters):$/;"	f
+plot_morse	hesse.py.save	/^def plot_morse(parameters):$/;"	f
+plot_surface	fqh.py	/^    def plot_surface(self, fignum=1, points_in_plot=50, plotpoints=False):$/;"	m	class:qh
+plots	my_atom.py	/^class plots(object):$/;"	c
+plt	fah_dudl.py	/^    def plt(self, show ):$/;"	m	class:dudl
+polyfit	pot_parametrize.py	/^    def polyfit(self):$/;"	m	class:find_best_polyfit
+polyfit	pot_parametrize.py	/^def polyfit(filename = False, zeroat = False, ordermax = False, data = False, dataxminfit= False, dataxmaxfit = False, verbose = False, verbose2=False, foldername = "", return_deltasfilename = False ):$/;"	f
+polyfit_with_fixed_points	pot_parametrize.py	/^def polyfit_with_fixed_points(n, x, y, xf, yf) :$/;"	f
+pot	calculate_energy_and_forces	/^    pot = pot_energy_forces.pot_energy_forces_class()$/;"	v
+pot	hesse.py	/^                pot=args.pot,$/;"	v
+pot	hesse.py.save	/^                pot=args.pot,$/;"	v
+pot	pot.py	/^    pot = pot()$/;"	v	class:pot
+pot	pot.py	/^class pot( object ):$/;"	c
+pot	pot_energy_forces.py	/^    pot = pot_energy_forces_class()$/;"	v	class:pot_energy_forces_class
+pot	pot_info_startjob.py	/^    pot = pot()$/;"	v
+pot	pot_info_startjob.py	/^class pot( object ):$/;"	c
+pot2	hesse.py	/^                pot2=args.pot2,$/;"	v
+pot2	hesse.py.save	/^                pot2=args.pot2,$/;"	v
+pot_energy_forces_class	pot_energy_forces.py	/^class pot_energy_forces_class( object ):$/;"	c
+pot_parametrize_function	pot_info_startjob.py	/^    def pot_parametrize_function( self ):$/;"	m	class:pot
+pot_parametrize_function_get_folder	pot_info_startjob.py	/^    def pot_parametrize_function_get_folder( self ):$/;"	m	class:pot
+pot_run	pot_energy_forces.py	/^    def pot_run(self, measure = False):$/;"	m	class:pot_energy_forces_class
+potparam	hesse.py	/^                potparam=args.potparam,$/;"	v
+potparam	hesse.py	/^        potparam = [ 0, 0, 0]$/;"	v
+potparam	hesse.py	/^        potparam = [ 0, 0]$/;"	v
+potparam	hesse.py.save	/^                potparam=args.potparam,$/;"	v
+potparam	hesse.py.save	/^        potparam = [ 0, 0, 0]$/;"	v
+potparam	hesse.py.save	/^        potparam = [ 0, 0]$/;"	v
+potprint	hesse.py	/^        def potprint(u1nn_pot2param,types = False):$/;"	f	function:get_energy_forces_pairpot
+potprint	hesse.py.save	/^        def potprint(u1nn_pot2param,types = False):$/;"	f	function:get_energy_forces_pairpot
+print_energies	pot_energy_forces.py	/^    def print_energies(self):$/;"	m	class:pot_energy_forces_class
+print_forces	pot_energy_forces.py	/^    def print_forces(self):$/;"	m	class:pot_energy_forces_class
+print_indata	pot_info_startjob.py	/^        def print_indata():$/;"	f	function:pot.get_parametrization
+print_info_loop1	pot_energy_forces.py	/^    def print_info_loop1(self):$/;"	m	class:pot_energy_forces_class
+print_info_loop2_lon_vec	pot_energy_forces.py	/^    def print_info_loop2_lon_vec(self):$/;"	m	class:pot_energy_forces_class
+print_neighbors	pot_energy_forces.py	/^    def print_neighbors(self, copy_of_crystal0_instance,copy_of_sc0_instance = False):$/;"	m	class:pot_energy_forces_class
+print_parametrization	pot_energy_forces.py	/^    def print_parametrization(self):$/;"	m	class:pot_energy_forces_class
+print_parametrizations	pot.py	/^    def print_parametrizations(self):$/;"	m	class:pot
+print_parametrizations	pot_info_startjob.py	/^    def print_parametrizations(self):$/;"	m	class:pot
+print_vecs_to_screen	hesse.py	/^    def print_vecs_to_screen():$/;"	f	function:rotate_vec0_to_vec0_original_inplane_and_getforce_current
+print_vecs_to_screen	hesse.py.save	/^    def print_vecs_to_screen():$/;"	f	function:rotate_vec0_to_vec0_original_inplane_and_getforce_current
+print_vecs_to_screen	pot_energy_forces.py	/^        def print_vecs_to_screen():$/;"	f	function:pot_energy_forces_class.rotate_vec0_to_vec0_original_inplane_and_getforce_current
+printarray	utils.py	/^def printarray(array,color=printnormal,decimals=2,prepend=False):$/;"	f
+printatom	pot_parametrize.py	/^        def printatom(atom,contr,funcalld):$/;"	f	function:forcesneighbors.getforces
+printblackbold	utils.py	/^def printblackbold(*var):$/;"	f
+printblue	utils.py	/^def printblue(*var):$/;"	f
+printelement	pot.py	/^    def printelement(self):$/;"	m	class:pot
+printelement	pot_info_startjob.py	/^    def printelement(self):$/;"	m	class:pot
+printfield	hesse.py	/^        def printfield(printforces,start,stop,color):$/;"	f	function:get_energy_forces_pairpot
+printfield	hesse.py.save	/^        def printfield(printforces,start,stop,color):$/;"	f	function:get_energy_forces_pairpot
+printfield	pot_energy_forces.py	/^        def printfield(printforces,start,stop,color):$/;"	f	function:pot_energy_forces_class.print_forces
+printgreen	utils.py	/^def printgreen(*var):$/;"	f
+printline	utils.py	/^    def printline(line,decimals=decimals,color=color,prepend=prepend):$/;"	f	function:printarray
+printnormal	utils.py	/^def printnormal(*var):$/;"	f
+printokblue	utils.py	/^def printokblue(*var):$/;"	f
+printoptions	hesse.py	/^def printoptions(strip_zeros=True, **kwargs):$/;"	f
+printoptions	hesse.py.save	/^def printoptions(strip_zeros=True, **kwargs):$/;"	f
+printoptions	pot_energy_forces.py	/^        def printoptions(strip_zeros=True, **kwargs):$/;"	f	function:pot_energy_forces_class.print_parametrization
+printoptions	pot_energy_forces.py	/^def printoptions(strip_zeros=True, **kwargs):$/;"	f
+printoutcolor	utils.py	/^def printoutcolor(red,var,ENDC):$/;"	f
+printpink	utils.py	/^def printpink(*var):$/;"	f
+printred	utils.py	/^def printred(*var):$/;"	f
+printredbold	utils.py	/^def printredbold(*var):$/;"	f
+printtmpstuff	pot_info_startjob.py	/^        def printtmpstuff():$/;"	f	function:pot.get_parametrization
+printyellow	utils.py	/^def printyellow(*var):$/;"	f
+project_vector	utils.py	/^def project_vector(vec, on_vec):$/;"	f
+pushFirst	utils.py	/^    def pushFirst(self, strg, loc, toks ):$/;"	m	class:NumericStringParser
+pushUMinus	utils.py	/^    def pushUMinus(self, strg, loc, toks ):$/;"	m	class:NumericStringParser
+qh	fqh.py	/^    qh = qh(args)$/;"	v
+qh	fqh.py	/^class qh(object):$/;"	c
+qh_energy_atom	crystal_generator.py	/^    def qh_energy_atom( self, dpos = None, h = None ):$/;"	m	class:crystal
+qh_energy_atom	hesse.py	/^def qh_energy_atom(dpos = None, h = None ):$/;"	f
+qh_energy_atom	hesse.py.save	/^def qh_energy_atom(dpos = None, h = None ):$/;"	f
+qh_energy_cell	crystal_generator.py	/^    def qh_energy_cell( self, dpos = None, h = None ):$/;"	m	class:crystal
+qh_energy_cell	hesse.py	/^def qh_energy_cell(dpos = None, h = None ):$/;"	f
+qh_energy_cell	hesse.py.save	/^def qh_energy_cell(dpos = None, h = None ):$/;"	f
+qh_forces	crystal_generator.py	/^    def qh_forces( self, dpos = None, h = None ):$/;"	m	class:crystal
+qh_forces	hesse.py	/^def qh_forces(dpos = None, h = None ):$/;"	f
+qh_forces	hesse.py.save	/^def qh_forces(dpos = None, h = None ):$/;"	f
+qht	feos.py	/^class qht(object):$/;"	c
+quadFunction	fah.py	/^        def quadFunction(x, a0):$/;"	f	function:ah.get_dudl_vs_temp_folder
+quadFunction	fel.py	/^        def quadFunction(x, a0):$/;"	f	function:el.get_dudl_vs_temp
+quadfunc	hesse.py	/^    def quadfunc(x,a,b,c):$/;"	f	function:fit_fcc_alat_mean_freqs
+quadfunc	hesse.py.save	/^    def quadfunc(x,a,b,c):$/;"	f	function:fit_fcc_alat_mean_freqs
+read_Hessematrix	crystal_generator.py	/^    def read_Hessematrix( self , hessematrixfile = "HesseMatrix_sphinx" ):$/;"	m	class:crystal
+read_Hessematrix	hesse.py	/^    def read_Hessematrix( self , hessematrixfile = "HesseMatrix_sphinx" ):$/;"	m	class:hesseclass
+read_Hessematrix	hesse.py	/^def read_Hessematrix(hessematrixfile = "HesseMatrix_sphinx" ):$/;"	f
+read_Hessematrix	hesse.py.save	/^    def read_Hessematrix( self , hessematrixfile = "HesseMatrix_sphinx" ):$/;"	m	class:hesseclass
+read_Hessematrix	hesse.py.save	/^def read_Hessematrix(hessematrixfile = "HesseMatrix_sphinx" ):$/;"	f
+read_POSCAR	crystal_generator.py	/^    def read_POSCAR( self, directory, filename = None ):$/;"	m	class:crystal
+read_POSITIONS	hesse.py	/^        def read_POSITIONS(self):  ## -> get std$/;"	f	function:hesseclass.write
+read_POSITIONS	hesse.py.save	/^        def read_POSITIONS(self):  ## -> get std$/;"	f	function:hesseclass.write
+read_lammps_input_file	crystal_generator.py	/^    def read_lammps_input_file( self, directory, filename = None ):$/;"	m	class:crystal
+read_only_certain_lines_of_file	utils.py	/^def read_only_certain_lines_of_file(filename,start,stop):$/;"	f
+read_rcar_positions	crystal_generator.py	/^    def read_rcar_positions( self, coordfile = "cartesian_coords", cellname = "cell"):$/;"	m	class:crystal
+read_rrel_positions	crystal_generator.py	/^    def read_rrel_positions( self, coordfile = "EqCoords_direct", cellname = "cell"):$/;"	m	class:crystal
+readfile	utils.py	/^def readfile(path=None, line=None, split = False):$/;"	f
+reference_state	my_atom.py	/^def reference_state(listin):$/;"	f
+reflect_atoms	crystal_generator.py	/^    def reflect_atoms( self ):$/;"	m	class:crystal
+reject_vector	utils.py	/^def reject_vector(vec, on_vec):$/;"	f
+remove_duplicates_of_2d_array	utils.py	/^def remove_duplicates_of_2d_array(inarray = False):$/;"	f
+remove_duplicates_of_2d_array_within_tolerance	utils.py	/^def remove_duplicates_of_2d_array_within_tolerance(inarray = False, deltaxmax = 1e-6, deltaymax = 1e-4):$/;"	f
+remove_mapping	crystal_generator.py	/^    def remove_mapping( self, cryst, cryst0 ):$/;"	m	class:remove_mapping_into_originalcell
+remove_mapping_into_originalcell	crystal_generator.py	/^class remove_mapping_into_originalcell( crystal ):$/;"	c
+repair_disp_dudl_folder	pot.py	/^    def repair_disp_dudl_folder():$/;"	m	class:pot
+repair_disp_dudl_folder	pot_info_startjob.py	/^    def repair_disp_dudl_folder():$/;"	m	class:pot
+repeat_supercell	pot_energy_forces.py	/^    def repeat_supercell(self):$/;"	m	class:pot_energy_forces_class
+repeat_supercell_positions_forces	pot_parametrize.py	/^    def repeat_supercell_positions_forces(self):$/;"	m	class:forcesneighbors
+replace_right	pot_parametrize.py	/^        def replace_right(source, target, replacement, replacements=None):$/;"	f	function:forcesneighbors.getforces
+return_fuctions_on_same_grid	utils.py	/^def return_fuctions_on_same_grid(f1,f2):$/;"	f
+return_function2_on_grid_of_f1	utils.py	/^def return_function2_on_grid_of_f1(f1,f2):$/;"	f
+rotate_atoms	crystal_generator.py	/^    def rotate_atoms( self, Rmatrix ):$/;"	m	class:crystal
+rotate_vec0_to_vec0_original_inplane_and_getforce_current	hesse.py	/^def rotate_vec0_to_vec0_original_inplane_and_getforce_current(vec0_curr,longvec,vec0_orig_formapping,mappedvec_orig_dir,forcefuncx,forcefuncy,forcefuncz,$/;"	f
+rotate_vec0_to_vec0_original_inplane_and_getforce_current	hesse.py.save	/^def rotate_vec0_to_vec0_original_inplane_and_getforce_current(vec0_curr,longvec,vec0_orig_formapping,mappedvec_orig_dir,forcefuncx,forcefuncy,forcefuncz,$/;"	f
+rotate_vec0_to_vec0_original_inplane_and_getforce_current	pot_energy_forces.py	/^    def rotate_vec0_to_vec0_original_inplane_and_getforce_current(self, vec0_curr,longvec,vec0_orig_formapping,mappedvec_orig_dir,forcefuncx,forcefuncy,forcefuncz,$/;"	m	class:pot_energy_forces_class
+run	feos.py	/^def run(befehl):$/;"	f
+run	utils.py	/^def run(befehl):$/;"	f
+run2	feos.py	/^def run2(command=None, dont_raise_exceptino = False):$/;"	f
+run2	utils.py	/^def run2(command=None, dont_raise_exceptino = False):$/;"	f
+saveData	pot_parametrize.py	/^    def saveData( self, outdir, outfname ):$/;"	m	class:forcesneighbors
+saveDatapd	pot_parametrize.py	/^    def saveDatapd(self, filename):$/;"	m	class:forcesneighbors
+saveFitpd	pot_parametrize.py	/^    def saveFitpd(self, filename):$/;"	m	class:forcesneighbors
+save_data	fah.py	/^    def save_data(self):$/;"	m	class:ah
+save_data	fel.py	/^    def save_data(self):$/;"	m	class:el
+save_data	fqh.py	/^    def save_data(self, filename):$/;"	m	class:qh
+save_information_of_run_add	pot_energy_forces.py	/^    def save_information_of_run_add(self,contr = False):$/;"	m	class:pot_energy_forces_class
+save_information_of_run_initialize	pot_energy_forces.py	/^    def save_information_of_run_initialize(self):$/;"	m	class:pot_energy_forces_class
+save_information_of_run_save	pot_energy_forces.py	/^    def save_information_of_run_save(self):$/;"	m	class:pot_energy_forces_class
+sc	hesse.py	/^        sc = "2x2x2"$/;"	v
+sc	hesse.py.save	/^        sc = "2x2x2"$/;"	v
+schnittmenge	utils.py	/^def schnittmenge(list1, list2):$/;"	f
+schnittmenge_several_lists	utils.py	/^def schnittmenge_several_lists(lists, verbose = False):$/;"	f
+searchfor	hesse.py	/^            searchfor = "\/Users\/glensk\/Dropbox\/Understand_distributions\/Cu\/2x2x2sc_quer_3x3x3kp_vasp4"$/;"	v
+searchfor	hesse.py	/^            searchfor = "\/Users\/glensk\/Dropbox\/Understand_distributions\/Cu\/2x2x2sc_xdir_3x3x3kp_vasp4"$/;"	v
+searchfor	hesse.py	/^            searchfor = os.getcwd()+"\/"+el+"\/2x2x2sc_"+xq+"_3x3x3kp_vasp4\/"$/;"	v
+searchfor	hesse.py	/^            searchfor = os.getcwd()+"\/"+el+"\/2x2x2sc_"+xq+"_[1-4]*kp\/"$/;"	v
+searchfor	hesse.py	/^            searchfor = os.getcwd()+"\/"+el+"\/3x3x3sc_"+xq+"_8x8x8kp\/"$/;"	v
+searchfor	hesse.py.save	/^            searchfor = "\/Users\/glensk\/Dropbox\/Understand_distributions\/Cu\/2x2x2sc_quer_3x3x3kp_vasp4"$/;"	v
+searchfor	hesse.py.save	/^            searchfor = "\/Users\/glensk\/Dropbox\/Understand_distributions\/Cu\/2x2x2sc_xdir_3x3x3kp_vasp4"$/;"	v
+searchfor	hesse.py.save	/^            searchfor = os.getcwd()+"\/"+el+"\/2x2x2sc_"+xq+"_3x3x3kp_vasp4\/"$/;"	v
+searchfor	hesse.py.save	/^            searchfor = os.getcwd()+"\/"+el+"\/2x2x2sc_"+xq+"_[1-4]*kp\/"$/;"	v
+searchfor	hesse.py.save	/^            searchfor = os.getcwd()+"\/"+el+"\/3x3x3sc_"+xq+"_8x8x8kp\/"$/;"	v
+sed	utils.py	/^def sed(filename,stringsearch,stringreplace):$/;"	f
+splinefit	utils.py	/^def splinefit(xlist,ylist, xstart, xstop, xstep):$/;"	f
+start_dispdudl	pot_info_startjob.py	/^def start_dispdudl(nndist = False):$/;"	f
+std	DOS_POSITIONS_auswerten.py	/^def std():$/;"	f
+string_add_spaces	utils.py	/^def string_add_spaces(string,chars,left = True):$/;"	f
+string_to_list	utils.py	/^def string_to_list(string):$/;"	f
+string_to_mathematical_expression	utils.py	/^def string_to_mathematical_expression(x):$/;"	f
+string_to_mathematical_expression_does_not_work_properly	utils.py	/^def string_to_mathematical_expression_does_not_work_properly(x):$/;"	f
+string_to_num_list	utils.py	/^def string_to_num_list(string, tostring = False):$/;"	f
+sum_up_forces	pot_energy_forces.py	/^    def sum_up_forces(self):$/;"	m	class:pot_energy_forces_class
+supercell	crystal_generator.py	/^class supercell( crystal ):$/;"	c
+surf	thermodynamics.py	/^            def surf(V):$/;"	f	function:f.__init__.surf_eos
+surf_ah	thermodynamics.py	/^    def surf_ah(self, ind, V): #this is general for 2nd and 3rd order surfaces$/;"	m	class:f
+surf_el	thermodynamics.py	/^    def surf_el(self, ind, V): #this is general for 2nd and 3rd order surfaces$/;"	m	class:f
+surf_eos	thermodynamics.py	/^        def surf_eos(V):  # not this! we need to add pressure$/;"	f	function:f.__init__
+surf_eos	thermodynamics.py	/^    def surf_eos(self, V):$/;"	m	class:f
+surf_eos_qh	thermodynamics.py	/^            def surf_eos_qh(V):$/;"	f	function:f.__init__.surf_eos
+surf_qh	thermodynamics.py	/^    def surf_qh(self, ind, V): # this is general for 2nd and 3rd order surfaces$/;"	m	class:f
+surface	thermodynamics.py	/^class surface:$/;"	c
+symbol	my_atom.py	/^def symbol(listin):$/;"	f
+t	crystal_generator.py	/^    t = np.cross( m, n )$/;"	v
+tanFunction	fah.py	/^    def tanFunction(x, a0, a1, a2, a3):$/;"	f	function:get_dudlmeanfit
+tanFunctionguess	fah.py	/^    def tanFunctionguess(energies_array):$/;"	f	function:get_dudlmeanfit
+timeend	utils.py	/^def timeend(measure, ts, funcname):$/;"	f
+translate_atoms_cart	crystal_generator.py	/^    def translate_atoms_cart( self, rcar_trans ):$/;"	m	class:crystal
+tryfloat	fqh.py	/^    def tryfloat(stringtest):$/;"	f	function:_string_to_num_list
+tryfloat	hesse.py	/^    def tryfloat(stringtest):$/;"	f	function:_string_to_num_list
+tryfloat	hesse.py.save	/^    def tryfloat(stringtest):$/;"	f	function:_string_to_num_list
+tryfloat	utils.py	/^    def tryfloat(stringtest):$/;"	f	function:string_to_num_list
+union	utils.py	/^def union(a, b):$/;"	f
+unique	utils.py	/^def unique(a):$/;"	f
+unit_cell	crystal_generator.py	/^class unit_cell( crystal ):$/;"	c
+updateCellDetails	crystal_generator.py	/^    def updateCellDetails( self ):$/;"	m	class:crystal
+update_rcar_from_rrel	crystal_generator.py	/^    def update_rcar_from_rrel( self ):$/;"	m	class:crystal
+update_rcar_from_xyzcar	crystal_generator.py	/^    def update_rcar_from_xyzcar( self ):$/;"	m	class:crystal
+update_rrel_from_rcar	crystal_generator.py	/^    def update_rrel_from_rcar( self ):$/;"	m	class:crystal
+update_rrel_from_xyzrel	crystal_generator.py	/^    def update_rrel_from_xyzrel( self ):$/;"	m	class:crystal
+update_xyzcar_from_rcar	crystal_generator.py	/^    def update_xyzcar_from_rcar( self ):$/;"	m	class:crystal
+update_xyzcar_from_xyzrel	crystal_generator.py	/^    def update_xyzcar_from_xyzrel( self ):$/;"	m	class:crystal
+update_xyzrel_from_rrel	crystal_generator.py	/^    def update_xyzrel_from_rrel( self ):$/;"	m	class:crystal
+update_xyzrel_from_xyzcar	crystal_generator.py	/^    def update_xyzrel_from_xyzcar( self ):$/;"	m	class:crystal
+varname	DOS_POSITIONS_auswerten.py	/^def varname(p):$/;"	f
+verbose	hesse.py	/^                verbose=args.verbose$/;"	v
+verbose	hesse.py.save	/^                verbose=args.verbose$/;"	v
+vinet	feos.py	/^def vinet(V, e0=None, v0=None, b0=None, b0der=None, convert_to_sympy = False):$/;"	f
+vinet_diff_1	feos.py	/^def vinet_diff_1(V, e0, v0, b0, b0der, convert_to_sympy = False):$/;"	f
+write	hesse.py	/^    def write(self):$/;"	m	class:hesseclass
+write	hesse.py.save	/^    def write(self):$/;"	m	class:hesseclass
+write	thermodynamics.py	/^    def write(self):$/;"	m	class:f
+write_Fah_surface	fah.py	/^def write_Fah_surface(a, temps, dudlmeanfit, filename = 'Fah_surface'):$/;"	f
+write_data	feos.py	/^    def write_data($/;"	m	class:eos
+write_ene_atom	hesse.py	/^    def write_ene_atom(self, filename = "Fqh_fromExactFreqs_peratom" ):$/;"	m	class:hesseclass
+write_ene_atom	hesse.py.save	/^    def write_ene_atom(self, filename = "Fqh_fromExactFreqs_peratom" ):$/;"	m	class:hesseclass
+write_ene_cell	hesse.py	/^    def write_ene_cell(self, filename = "Fqh_fromExactFreqs_percell" ):$/;"	m	class:hesseclass
+write_ene_cell	hesse.py.save	/^    def write_ene_cell(self, filename = "Fqh_fromExactFreqs_percell" ):$/;"	m	class:hesseclass
+write_fqh_surface_2nd	fqh.py	/^    def write_fqh_surface_2nd(self, filename = None):$/;"	m	class:qh
+write_fqh_surface_3rd	fqh.py	/^    def write_fqh_surface_3rd(self, filename = None, surface = None):$/;"	m	class:qh
+write_freqs	hesse.py	/^    def write_freqs(self, filename = 'ExactFreqs'):$/;"	m	class:hesseclass
+write_freqs	hesse.py.save	/^    def write_freqs(self, filename = 'ExactFreqs'):$/;"	m	class:hesseclass
+write_hessematrix	hesse.py	/^    def write_hessematrix(self, filename = "HesseMatrix_sphinx" ):$/;"	m	class:hesseclass
+write_hessematrix	hesse.py.save	/^    def write_hessematrix(self, filename = "HesseMatrix_sphinx" ):$/;"	m	class:hesseclass
+write_inputdata	thermodynamics.py	/^def write_inputdata(filename = None, text = None):$/;"	f
+write_inputdata	utils.py	/^def write_inputdata(filename = None, text = None):$/;"	f
+xq	hesse.py	/^        xq = "quer"$/;"	v
+xq	hesse.py	/^        xq = "xdir"$/;"	v
+xq	hesse.py.save	/^        xq = "quer"$/;"	v
+xq	hesse.py.save	/^        xq = "xdir"$/;"	v

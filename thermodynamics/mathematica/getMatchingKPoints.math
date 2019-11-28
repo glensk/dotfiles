@@ -1,0 +1,15 @@
+getMatchingKPoints[kPoints_List, exactKPoints_List] := Module[
+  { matchingValue = 0.03, kP, matchingKPoints = {}}
+  ,
+  Do[
+    kP = kPoints[[i]];
+    Do[
+      If[Norm[kP - exactKPoints[[j]]] < matchingValue,
+        matchingKPoints = Append[matchingKPoints, {i, kP}];
+        Print["Index:", i, " KPoint:", kP, " ExactKPoint:", exactKPoints[[j]]];
+      ];
+    ,{j, 1, exactKPoints // Length}];
+  ,{i, 1, kPoints // Length}];
+
+  matchingKPoints
+];

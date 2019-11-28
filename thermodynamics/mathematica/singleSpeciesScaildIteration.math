@@ -1,0 +1,102 @@
+
+singleSpeciesScaildIteration[Elem_String,T_Real,IT_Integer,disp_Real,aLat_Real,signMethod_String]:=Module[
+  {
+    hbar=1, kB=1,
+    omeg2,Q,W0,si,F,R,K,KM,Smats,NK,NR,NM,NKM,NSr,ND,Pa,Tr,CT,
+    Fk,W0s,ss,l2,Dk,PsiR,PsiRS,PsiRSS,omeg,UT,RT,dispVec,mass
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  mass==getAtomicMass[Elem];
+
+  (* input *)
+  {omeg2,Q,W0,si,F,R,K,KM,Smats}=checkImport[#,"Table"]&/@
+     {"frequencies_squared","reciprocal_amplitudes","eigenvectors_eq_structure","signs","forces",
+      "coords_eq_structure","exact_k-points","exact_k-points_mapping","real_space_symmetries"}
+
+  NR=R//Length; NK=K//Length; NM=omeg2//First//Length; (* number of atoms/exact vectors & frequencies *)
+  NKM=Table[Length[KM[[k]]],{k,NK}];                   (* number of reciprocal symmetry operations *)
+
+  (* auxiliary modules *)
+  Pa[O_,n_]:=Partition[O,n]; Tr[O_]:=Transpose[O]; CT[O_]:=ConjugateTranspose[O];
+
+  (* partition input *)
+  Q =Pa[Tr[Q] [[1]]+I Tr[Q] [[2]],NM];
+  W0=Pa[Tr[W0][[1]]+I Tr[W0][[2]],{NM,NM}];
+  si=Pa[si,NM];
+  Smats=Pa[#,{3,3}]&/@Smats;
+
+  NSr=Table[Length[Smats[[r]]],{r,NR}];         (* number of real space symmetry operations *)
+
+
+  (* Fourier transform of force *)
+  Fk=1/Sqrt[mass] Table[Sum[F[[r]]Exp[2Pi I R[[r]].K[[k]]],{r,NR}],{k,NK}];
+
+
+  (* apply signs & mass to eigenvectors *)
+  W0s=Table[si[[k]]/Abs[si[[k]]] 1/Sqrt[mass] W0[[k]],{k,NK}];
+
+
+  (* main equation; corresponds to (2.12) & (2.17):
+    (squared) frequencies from T-dependent forces and amplitudes + 1. symmetrization *)
+  l2=Table[0,{NK}];
+  Do[ Do[ ss=KM[[k,s]];  l2[[k]]+=1/Sqrt[NK] 1/NKM[[k]] W0s[[ss]].Fk[[ss]]/Q[[ss]], {s,NKM[[k]]}], {k,NK}];
+
+
+  (* mixing in of old iterations; corresponds to (2.18) *)
+  l2=Table[l2[[k]]+omeg2[[k]]*(IT-1)/IT,{k,NK}];
+
+
+  (* frequencies to dynamical matrices *)
+  Dk=Table[W0s[[k]].l2[[k]].CT[W0s[[k]]],{k,NK}];
+
+
+  (* dynamical matrices to force constant matrices *)
+  PsiR=Table[mass/NK Sum[Dk[[k]] Exp[-2Pi I R[[r]].K[[k]]],{k,NK}],{r,NR}];
+
+
+  (* 2. symmetrization among branches *)
+  PsiRS=Table[ 1/NSr[[r]] Sum[Smats[[r,s]].PsiR[[r]],{s,NSr[[r]]}],{r,NR}];
+
+
+  (* sum rule TODO *)
+  PsiRSS=PsiRS;
+
+  
+  (* back to real space forces, e.g., for phonon dispersion calculation *)
+  dispVec={disp,0,0};  F=Table[-PsiRSS[[r]].dispVec,{r,NR}];
+
+  
+  (* back to frequencies *)
+  Dk=Table[1/mass Sum[PsiRSS[[r]] Exp[2Pi I R[[r]].K[[k]]],{r,NR}],{k,NK}];
+  omeg2=Table[Eigenvalues[Dk[[k]]],{k,NK}];
+  omeg=Sqrt[omeg2];
+
+
+  (* calculate new random signs *)
+  Switch[signMethod,
+    "plusMinus",si=Table[2 RandomInteger[]-1 ,{NK},{NM}],
+    "Gauss",    si=Table[NormalDistribution[],{NK},{NM}],
+    _,error["error in signMethod"]
+  ];
+
+  
+  (* apply signs & mass to eigenvectors *)
+  W0s=Table[si[[k]]/Abs[si[[k]]] 1/Sqrt[mass] W0[[k]],{k,NK}];
+
+
+  (* main equation; corresponds to (2.8) & (2.9): T-dependent displacements in reciprocal space *)
+  Q=Table[Abs[si[[k]]] 1/ND Sqrt[hbar/Abs[omeg[[k]]] (1/2+1/(Exp[hbar Abs[omeg[[k]]]/(kB T)]-1))],{k,NK}]
+
+
+  (* Fourier transform to real space *)
+  UT=Table[1/NK Sum[1/2 Q[[k]] (W0s[[k]] Exp[2Pi I R[[r]].K[[k]]] + CT[W0s[[k]]] Exp[-2Pi I R[[r]].K[[k]]]),{k,NK}],{r,NR}];
+  UT=Re[UT]/aLat;
+  RT=R+UT;
+
+
+  (* output *)
+  Export["new_"<>#[[1]],#[[2]],"Table"]&/@
+    {{"signs",si},{"coords",RT},{"forces",F},{"frequencies_squared",omeg2},{"reciprocal_amplitudes",Q}}; 
+
+];

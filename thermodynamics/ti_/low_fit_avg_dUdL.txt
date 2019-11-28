@@ -1,0 +1,102 @@
+Fitting[avgin_]:=Module[{lin,twopoints,avg,avgplus,linplus,cubplus,tanplus,cub,linfit,cubfit,lindev,cubdev,Fahlin,Fahcub,tanFunction,tan,tanfit,tandev,tanFah,Fahtan,ta0,ta1,ta2,ta3,Fahlinpoint,Fahcubpoint,linerror,cuberror,tanerror,Fahbest,avgsym,tansym,tansymfit,tansymerror,tansymdev,tansymplus,avgsymplus,avgsymin,Fahtansym,linfitvalues,cubfitvalues,tanfitvalues,linee,cube,tane},
+
+(*gets list like avgin = {{lambda1,dUdL,error},{lambda2,dUdL,error},...},*)
+
+
+(*avgin=avgin*)
+avgsymin=Pick[avgin,Table[MemberQ[Round[avgin[[1;;-1,1]],0.001],Round[(avgin[[1;;-1,1]]-1//Abs),0.001][[l]]],{l,1,avgin//Length}]];
+
+
+avg=avgin[[1;;-1,{1,2}]];
+avgsym=avgsymin[[1;;-1,{1,2}]];
+(*
+Print["avgin: ",avgin];
+Print["avg: ",avg];
+Print["avgsymin: ",avgsymin];
+Print["avgsym: ",avgsym];
+*)
+
+avgplus=Table[{avgin[[i,1]],avgin[[i,2]]+avgin[[i,3]]},{i,1,avgin//Length}];
+avgsymplus=Table[{avgsymin[[i,1]],avgsymin[[i,2]]+avgsymin[[i,3]]},{i,1,avgsymin//Length}];
+
+lin=Fit[avg,{1,x},x];
+linplus=Fit[avgplus,{1,x},x];
+cub=Fit[avg,{1,x,x^2,x^3},x];
+cubplus=Fit[avgplus,{1,x,x^2,x^3},x];
+tanFunction[x_,a0_,a1_,a2_,a3_]:=-a0*Tan[Pi ((1-a1)x+a2+0.5)]+a3;
+
+Off[FindFit::eit];
+tan=FindFit[avg,{tanFunction[x,a0,a1,a2,a3],0<a0<100,0.<a1<1,0<a2<a1},{{a0,avgin[[1]][[2]]/2},{a1,0.49234},{a2,0.309661},{a3,-0.598074}},x];
+{b0,b1,b2,b3}={a0,a1,a2,a3}/.tan;
+tanplus=FindFit[avgplus,{tanFunction[x,a0,a1,a2,a3],0<a0<100,0.<a1<1,0<a2<a1},{{a0,b0},{a1,b1},{a2,b2},{a3,b3}},x];
+tansym=FindFit[avgsym,{tanFunction[x,a0,a1,a2,a3],0<a0<100,0.<a1<1,0<a2<a1},{{a0,b0},{a1,b1},{a2,b2},{a3,b3}},x];
+tansymplus=FindFit[avgsymplus,{tanFunction[x,a0,a1,a2,a3],0<a0<100,0.<a1<1,0<a2<a1},{{a0,b0},{a1,b1},{a2,b2},{a3,b3}},x];
+On[FindFit::eit];
+
+
+{linfit,cubfit}=Append[Table[{i,#/.x->i},{i,0,1,0.01}],{Null,Null}]&/@{lin,cub};
+tanfit=Append[Table[{i,tanFunction[i,a0,a1,a2,a3]/.tan},{i,0,1,0.01}],{Null,Null}];
+tansymfit=Append[Table[{i,tanFunction[i,a0,a1,a2,a3]/.tansym},{i,0,1,0.01}],{Null,Null}];
+
+{lindev,cubdev}=Sum[Abs[(#/.x->avg[[i,1]])-avg[[i,2]]],{i,Length[avg]}]/Length[avg]&/@{lin,cub};tandev=Sum[Abs[(tanFunction[avg[[i,1]],a0,a1,a2,a3]/.tan)-avg[[i,2]]],{i,Length[avg]}]/Length[avg];
+tansymdev=Sum[Abs[(tanFunction[avg[[i,1]],a0,a1,a2,a3]/.tansym)-avg[[i,2]]],{i,Length[avg]}]/Length[avg];
+
+
+{lin,cub}=Integrate[#,{x,0,1}]&/@{lin,cub};
+
+
+tan=Chop[NIntegrate[tanFunction[x,a0,a1,a2,a3]/.tan,{x,0,1}],10^(-3)];
+
+tansym=Chop[NIntegrate[tanFunction[x,a0,a1,a2,a3]/.tansym,{x,0,1}],10^(-3)];
+
+{linplus,cubplus}=Integrate[#,{x,0,1}]&/@{linplus,cubplus};
+
+
+	tanplus=Chop[NIntegrate[tanFunction[x,a0,a1,a2,a3]/.tanplus,{x,0,1}],10^(-3)];
+tansymplus=Chop[NIntegrate[tanFunction[x,a0,a1,a2,a3]/.tansymplus,{x,0,1}],10^(-3)];
+
+
+linerror=Round[((linplus-lin)//Abs),0.01];
+cuberror=Round[((cubplus-cub)//Abs),0.01];
+tanerror=Round[((tanplus-tan)//Abs),0.01];
+tansymerror=Round[((tansymplus-tansym)//Abs),0.01];
+
+Fahlin=Round[100{lin,linerror,lindev}]/100//N;
+Fahcub=Round[100{cub,cuberror,cubdev}]/100//N;
+Fahtan=Round[100{tan,tanerror,tandev}]/100//N;
+Fahtansym=Round[100{tansym,tansymerror,tansymdev}]/100//N;
+
+linfitvalues=Table[linfit[[j]],{j,Table[Position[linfit[[1;;-1,1]],Round[avg[[i,1]],0.01]],{i,avg//Length}]//Flatten}];
+cubfitvalues=Table[cubfit[[j]],{j,Table[Position[cubfit[[1;;-1,1]],Round[avg[[i,1]],0.01]],{i,avg//Length}]//Flatten}];
+tanfitvalues=Table[tanfit[[j]],{j,Table[Position[tanfit[[1;;-1,1]],Round[avg[[i,1]],0.01]],{i,avg//Length}]//Flatten}];
+linee=Round[((linfitvalues-avg)[[1;;-1,2]]//Abs//Total)/(avg//Length),0.001];
+cube=Round[((cubfitvalues-avg)[[1;;-1,2]]//Abs//Total)/(avg//Length),0.001];
+tane=Round[((tanfitvalues-avg)[[1;;-1,2]]//Abs//Total)/(avg//Length),0.001];
+Fahbest=Fahtan;If[cube<=tane,Fahbest=Fahcub];If[linee<=cube,Fahbest=Fahlin];
+
+(*Fahbest=Fahcub;If[Fahtan[[2]]<=Fahbest[[2]],Fahbest=Fahtan];*)
+
+
+Fahlin={"linear    ",Fahlin[[1]],Fahlin[[2]]//ToString,Fahlin[[3]]};
+Fahcub={"cubic     ",Fahcub[[1]],Fahcub[[2]]//ToString,Fahcub[[3]]};
+Fahtan={"tangens   ",Fahtan[[1]],Fahtan[[2]]//ToString,Fahtan[[3]]};
+Fahtansym={"tangenssym   ",Fahtansym[[1]],Fahtansym[[2]]//ToString,Fahtansym[[3]]};
+Fahbest={"best       ",Fahbest[[1]],Fahbest[[2]]//ToString,Fahbest[[3]]};
+
+twopoints={Select[avgin[[1;;-1]],#[[1]]<=0.5&][[-1]],Select[avgin[[1;;-1]],#[[1]]>=0.5&][[1]]};
+
+(*Print["two ",twopoints]; == {{0.4,0.72,0.27},{0.6,-3.68,0.26}};*)
+If[(twopoints//Union//Length)!=1,Fahlinpoint={"l0.5pointsnext",Round[((twopoints[[2,2]]-twopoints[[1,2]])/(twopoints[[2,1]]-twopoints[[1,1]]) (0.5-twopoints[[1,1]]))+twopoints[[1,2]],0.01]//ToString,Round[twopoints[[1;;-1,3]]//Max,0.01]//ToString};];
+If[(twopoints//Union//Length)==1,Fahlinpoint={"l0.5point",(twopoints//Union)[[1,2]]//ToString,(twopoints//Union)[[1,3]]//ToString}];
+Fahcubpoint={"l0.5fromcub",Round[cubfit[[51,2]],0.01]//ToString,Round[twopoints[[1;;-1,3]]//Max,0.01]//ToString};
+
+
+Export["fit_cubic",cubfit,"Table"];
+Export["fit_tangens",tanfit,"Table"];
+
+{Fahbest,Fahlin,Fahcub,Fahtan,Fahtansym,Fahlinpoint,Fahcubpoint}
+];
+
+in=Import["avg_in","Table"][[4;;-1,1;;3]]//ToExpression;
+Export["Fahout.dat",Fitting[in],"Table"];
+

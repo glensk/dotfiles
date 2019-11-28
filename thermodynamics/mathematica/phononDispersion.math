@@ -1,0 +1,14 @@
+phononDispersion[cellType_String,cell_List,dynMatR_List,rLat_List,nHighSymKPs_Integer:500] := Module[
+  {
+    recipCell, kPoints, phonons, indices
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  recipCell = calculateReciprocalCell[cell];
+  {kPoints,indices} = highSymmetryKPoints[recipCell, nHighSymKPs, cellType];
+  phonons = calculateFrequencies[kPoints, dynMatR, rLat][[1]];
+  phonons = Sort/@phonons;
+  Do[phonons[[i]]=Prepend[phonons[[i]],i],{i,phonons//Length}];
+
+  {phonons,indices}
+];

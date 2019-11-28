@@ -1,0 +1,23 @@
+
+shiftForcesPeriodic[forces_, coords_, shiftVec_, supercell_] := Module[
+  {newForces, newCoords, index}
+  ,
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  newCoords = shiftCoordsPeriodic[coords, shiftVec, supercell];
+  newForces = forces;
+
+  Do[
+    index = getBoxIndex[coords[[i]], newCoords];
+    If[index == -1,
+      Print[coords[[i]]];
+      Print["Periodically shifted coordinates and original coordinates are not equivalent!"];
+      Abort[];
+    ];
+
+  newForces[[index]] = forces[[i]];
+
+  ,{i, coords // Length}];
+
+  newForces
+];

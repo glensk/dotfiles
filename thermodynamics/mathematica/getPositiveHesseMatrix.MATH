@@ -1,0 +1,11 @@
+delta=0.00000001;
+h=Import["HesseMatrix","Table"];
+ev=Eigenvalues[h];
+If[Max[Abs[Im[ev]]]>delta,
+   (
+    Print["Eigenvectors imaginary; Symmetrizing HesseMatrix!"];
+    h=(ConjugateTranspose[h]-h)/2+h;
+   )];
+evec=Eigenvectors[h];
+hpos=Transpose[Abs[ev]evec].Inverse[Transpose[evec]];
+Export["PositiveHesseMatrix",hpos,"Table",FieldSeparators->" "];

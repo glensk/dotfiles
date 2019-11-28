@@ -1,0 +1,147 @@
+Print[8+8]
+(* check input *)
+If [structureFactor!=1 && (sc!=1 || nAtoms!=1),
+  Print["structureFactor!=1 and one of sc or nAtoms!=1"]; Exit[];
+];
+
+(* lattice constant to volume and vice versa *)
+aLatToV[aLat_] := (sc aLat)^3/structureFactor;
+VToALat[V_] := (structureFactor V)^(1/3)/sc;
+
+If[!FileExistsQ[FsurfFile],Print[FsurfFile<>" file does not exist!"];Exit[]];
+FsurfIn = Import[FsurfFile, "Table"];
+
+(* check format of FsurfIn *)
+Do[
+  If[Length[FsurfIn[[i]]]!=3 && Length[FsurfIn[[i]]]!=4,
+    Print["ERROR in format of "<>FsurfFile<>" (check for newlines)"];
+    Abort[];
+  ];
+,{i,FsurfIn//Length}];
+
+Switch[type,
+       1, (Fsurf={aLatToV[#[[2]]], #[[1]], #[[3]]*nAtoms, #[[4]]*nAtoms} & /@ FsurfIn; min=aLatToV[min]; max=aLatToV[max]),
+       2, (Fsurf={#[[2]]*nAtoms, #[[1]], #[[3]]*nAtoms, #[[4]]*nAtoms} & /@ FsurfIn; min*=nAtoms; max*=nAtoms),
+       3,  Fsurf={#[[2]], #[[1]], #[[3]], #[[4]]} & /@ FsurfIn,
+       _,Print["wrong type"];Exit[];
+      ];
+
+Print[9+9]
+If[useMeanFreqs==True,
+  If[!FileExistsQ["mean_freqs"],Print["useMeanFreqs=True but no mean_freqs file"];Exit[]];
+  meanFreqs=Import["mean_freqs","Table"];
+  Switch[type,
+    1,meanFreqs={aLatToV[#[[1]]],#[[2]]}&/@meanFreqs,
+    2,meanFreqs={#[[1]]*nAtoms,#[[2]]}&/@meanFreqs
+  ];
+  meanFreqsFit[V_] = Fit[meanFreqs, {1,V,V^2}, V];
+];
+
+Print[10+10]
+
+(* fitting input data to a 2dim fit *)
+startcoef = Table[0.0001, {basis[V, T] // Length}];
+coef = Array[c, {basis[V, T] // Length}];
+Fvib[\[Omega]_, T_, kB_Real: 8.617*10^-2] := kB T Log[1 - Exp[-(\[Omega]/(kB T))]];
+ (* this is the correct classical version: *)
+ (* Fvib[\[Omega]_,T_,kB_Real:8.617*10^-2]:=kB T Log[\[Omega]/(kB T)] *)
+
+(* EXPLANATION WHY MODIFIED FORMULA IS NEEDED AND WHY CLASSICAL DOES NOT WORK AND WHY NO ZERO-POINT ENERGY MUST BE REMOVED
+
+It is important that it is not directly the classical version of the quasiharmonic free energy formula that is used for fitting Fah,
+because this would give an unphysical behavior towards low T (unphysical for the anharmonic free energy). The T dependence as obtained
+from the classical quasiharmonic free energy shows at low T (typically <200K) a 'strange' behavior in that it goes first up and then down again.
+This is not what we see for the anharmonic free energy and thus the classical version cannot be used.
+
+The modified formula (Fvib[...]) does not show this 'strange' behavior. Instead its dependence is quite close to the anharmonic free energy
+dependence we typically calculate (this is basically an empirical observation from our direct DFT calculations).
+
+It is also important that the modified formula does not contain the zero-point term of the original quantum-mechanical formula,
+because the Fah we calculate is classical (due to classical MD) and thus it must go to zero for T=0K, which would not be the case
+if the zero-point vibrational energy term would be included.
+
+*)
+
+ff[e_,T_,kB_Real:8.617*10^-2]:=1/(Exp[e/(kB T)]+1)
+sel[e_,T_]:=(1 - ff[e, T]) Log[1 - ff[e, T]] + ff[e, T] Log[ff[e, T]]
+int[a_,e_,T_]=Integrate[a sel[e,T],e];
+Sel[a_,T_]:=int[a,10000,T]
+Fel[a_,T_]:=T Sel[a,T]
+
+Switch[fitType,
+  "Fvib", If[useMeanFreqs==True,
+           fitFunc[V_,T_,coef_] := nAtoms Fvib[meanFreqsFit[V] + Sum[coef[[j]] basis[V,T][[j]],{j,basis[V,T]//Length}],T] - nAtoms Fvib[meanFreqsFit[V],T]//Re,
+           fitFunc[V_,T_,coef_] := nAtoms Fvib[Sum[coef[[j]] basis[V, T][[j]], {j, basis[V, T] // Length}], T]//Re
+          ],
+  "Fel",  fitFunc[V_, T_, coef_] := nAtoms Fel[ Sum[coef[[j]] basis[V, T][[j]], {j, basis[V, T] // Length}], T],
+  "poly", fitFunc[V_, T_, coef_] := Sum[coef[[j]] basis[V, T][[j]], {j, basis[V, T] // Length}],
+  _,Print["wrong fitType"];Exit[];
+ ]; 
+squares[coef_] := Sum[(Fsurf[[i, 3]] - fitFunc[Fsurf[[i, 1]], Fsurf[[i, 2]], coef])^2, {i, Fsurf // Length}]
+fit = FindMinimum[ squares[coef], {coef // Flatten, startcoef // Flatten}\[Transpose]][[2]];
+d = Sum[Abs[ Fsurf[[i, 3]] - fitFunc[Fsurf[[i, 1]], Fsurf[[i, 2]], coef /. fit]], {i, Fsurf // Length}]/Length[Fsurf];
+If[nAtoms!=1,d={d,"per atom:",d/nAtoms}];
+Fdelta=Table[{Fsurf[[i, 2]],Fsurf[[i, 1]],Abs[ Fsurf[[i, 3]] - fitFunc[Fsurf[[i, 1]], Fsurf[[i, 2]], coef /. fit]]}, {i, Fsurf // Length}];
+dmax={0,0,0};
+Do[  If[Fdelta[[i,3]]>dmax[[3]],dmax=Fdelta[[i]]] ,{i,Fdelta//Length}];
+If[nAtoms!=1,dmax=Append[dmax,{"per atom:",dmax[[3]]/nAtoms}]];
+
+
+(* fitting 2dim Fvib fit to polynomial fit at discrete T along V to have input suited for getThermodynamics.sh *)
+volsFreqs=Table[i,{i,min,max,(max-min)/mesh}];
+forExport = Table[Null, {T, minT, maxT, stepT}];
+i = 1; deltaMax = 0;
+Do[
+ (
+   f = Fit[{volsFreqs, fitFunc[#, T, coef] /. fit & /@ volsFreqs}\[Transpose], basis2[V], V];
+   delta = Abs[(f /. V -> volsFreqs) - (fitFunc[#, T, coef] /. fit & /@ volsFreqs)] // Max;
+   If[delta > deltaMax, deltaMax = delta];
+   forExport[[i]] = {T, CoefficientList[f, V]} // Flatten;
+   While[Length[forExport[[i]]] != Length[basis2[V]] + 1, forExport[[i]] = Append[forExport[[i]], 0.]];
+   i++;
+ ), {T, minT, maxT, stepT}];
+If[nAtoms!=1,deltaMax={deltaMax,"per atom:",deltaMax/nAtoms}];
+
+Print[""];Print[""];
+Print["Input parameters:"];
+Print["type=",type,"  min=",min,"  max=",max,"  structureFactor=",structureFactor];
+Print["sc=",sc,"  nAtoms=",nAtoms,"  minT=",minT,"  maxT=",maxT,"  stepT=",stepT];
+Print[""];
+Print["1. fit: ",fitType];
+Print["1. fit coefficients:"];
+Print[fit];
+Print[""];
+Print["All deviations in meV"];
+Print["1. fit mean delta ",d];
+Print["1. fit max  delta ",dmax," <-- IMPORTANT"];
+Print["2. fit max  delta ",deltaMax];
+
+
+(* export *)
+Print[""];Print["export:"];
+Print[Export[FsurfFile<>"_fit", forExport, "Table",FieldSeparators->" "]];
+Print[Export[FsurfFile<>"_fit_delta", Fdelta, "Table",FieldSeparators->" "]];
+Print[Export[FsurfFile<>"_fit_log", {{"structureFactor ",structureFactor},{"supercell         ",sc},{"nAtoms              ",nAtoms},"","1. fit type",fitType,"","basis 1. fit",basis[V,T],"","1. fit coefficients:",fit,"","basis polynomial",basis2[V],"","volume range",{min,max,mesh},"","All deviations in meV",{"1. fit mean delta ",d},{"1. fit max  delta ",dmax},{"2. fit max  delta ",deltaMax}}, "Table"]];
+
+(* for plotting purposes export fit and actual Fah points *)
+CreateDirectory["fit_and_points_for_plotting"]//Quiet;
+oldDir=Directory[];
+SetDirectory["fit_and_points_for_plotting"];
+tt=Union[Fsurf[[All,2]]];
+Do[
+   forExport = {#[[1]],#[[3]],#[[4]]}&/@Select[Fsurf,#[[2]]==tt[[j]]&];
+   Print[Export[FsurfFile<>"_points_"<>ToString[tt[[j]]]<>"K", Join[forExport,{Null,Null}], "Table",FieldSeparators->" "]];
+   forExport = {#,fitFunc[#, tt[[j]], coef] /. fit} & /@ volsFreqs;
+   Print[Export[FsurfFile<>"_fit_"<>ToString[tt[[j]]]<>"K", Join[forExport,{Null,Null}], "Table",FieldSeparators->" "]];
+,{j,Length[tt]}];
+
+tt=Union[Fsurf[[All,1]]];
+Do[
+   forExport = {#[[2]],#[[3]],#[[4]]}&/@Select[Fsurf,#[[1]]==tt[[j]]&];
+   Print[Export[FsurfFile<>"_points_"<>ToString[tt[[j]]]<>"Ang3", Join[forExport,{Null,Null}], "Table",FieldSeparators->" "]];
+   forExport = Table[{T,fitFunc[tt[[j]], T, coef] /. fit},{T, minT, maxT, stepT}];
+   Print[Export[FsurfFile<>"_fit_"<>ToString[tt[[j]]]<>"Ang3", Join[forExport,{Null,Null}], "Table",FieldSeparators->" "]];
+,{j,Length[tt]}];
+
+SetDirectory[oldDir];
+

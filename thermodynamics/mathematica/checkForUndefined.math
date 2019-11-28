@@ -1,0 +1,15 @@
+checkForUndefined := Module[
+  {
+    c`n1, c`n2, c`n3={}
+  },
+  c`n1 = Select[Names["Global`*"],       StringFreeQ[#, "$"] &];
+  c`n2 = Select[Names["Global`*"], \[Not]StringFreeQ[#, "$"] &];
+
+  Print[""]; Print[""];
+  Do[
+    If[(\[Not]MemberQ[c`n2,c`n1[[c`i]]<>"$"]) \[And] \[Not]("checkForUndefined"==c`n1[[c`i]])  \[And] \[Not]("n"==c`n1[[c`i]]),
+      AppendTo[c`n3,c`n1[[c`i]]];
+    ];
+  ,{c`i, 1, (c`n1) // Length}];
+  Return[c`n3];
+];

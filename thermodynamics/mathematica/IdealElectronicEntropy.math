@@ -1,0 +1,8 @@
+
+IdealElectronicEntropy[e_,T_]:=Module[{Sel},
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  (*   ideal entropy = (1-f) Log(1-f) + f Log(f)     *)
+  Sel = (1 - FermiDirac[e,T]) Log[1 - FermiDirac[e,T]] + FermiDirac[e,T] Log[FermiDirac[e,T]];
+  Return[Sel];
+]

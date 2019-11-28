@@ -1,0 +1,47 @@
+Persistent QTL-B warning (not solvable by wien2k website help, happens e.g. in fcc Cu or Ag):
+ 1. Run a partial DOS calculation (see below how to do it; for the moment
+    we have to live with the QTL-B warning)
+ 2. Check the case.scf2 to find out which channel is causing the problem
+    (e.g., 'QTL-B VALUE ... L= 1' is the p channel or 'L= 2' is d channel)
+ 3. Add a second local orbital for this channel in case.in1 (remember to adjust the nr. of exceptions)
+    do the adding simply by copying the line with the first linearization energy for this channel
+ 4. Plot the partial DOS and locate the problematic channel
+ 5. Change the energy of this new orbital and the old orbital for this channel in case.in1
+    such that they are approximately at the beginning and end of the corresponding partial band
+ 6. Rerun the self-consistent calculation with these new settings
+ 7. Check if the first value in the 'QTL-B VALUE .EQ.  value ...' line decreases or increases
+    and try to adjust the two linearization energies such that the warning disappears
+
+To get (partial) electronic DOS:
+ 1. Run a usual self-consistent calculation, e.g., use createFolders_murn_wien.sh to run a murn
+    it might be here necessary to increase the energy window maximum for eigenvalue
+    determination in the case.in1 (emax value) to get nice DOS in the following steps (e.g. 4 Ry)
+    Note: 4 Ry has been therefore implemented as default in createFolders_murn_wien.sh
+ 2. Run 'x lapw2 -qtl' inside the case folder where you want the DOS
+ 3. Use /data/todorova/wien2k/configure_int_lapw to prepare a case.int file
+    follow the instructions and possibly adjust the energy limits and delta in case.int afterwards
+ 4. Use 'x tetra' to get the DOS (case.dos1 file)
+ 5. xmgrace -nxy case.dos1
+in short:
+  x lapw2 -qtl
+  /data/todorova/wien2k/configure_int_lapw
+  x tetra
+  xmgrace -nxy case.dos1
+
+Optimization of Rmt:
+ Note: Rmt turns out to be a very important parameter. In principle, which means that both bases,
+       the localized orbitals and the planewaves, are extremely well converged, the calculation
+       should be invariant to (reasonable) changes in Rmt. In practice the dependence of a calculation
+       (e.g. the energy) on Rmt is stronger. The reason is that the bases are never converged to
+       such an extent as to guarantee the invariance. It is therefore crucial to determine an
+       optimal Rmt, which can be done by using Ritz variational principle, i.e., by searching for
+       the energy minimum as function of Rmt. For this a well converged RmtKmax should be used to
+       avoid mixing both influences.
+       An Rmt of 2.5 Bohr as proposed by the wien2k initialization (if geometry allows) turns out
+       to be too larger in this respect (at least for Au so far) and a better Rmt is around 2.3 Bohr.
+ To determine optimal Rmt:
+ 1. Do a standard murn calculation with the suggested Rmt value.
+ 2. For the equilibrium lattice constant do several calculations as function of Rmt with high RmtKmax (min. 14).
+ 3. Plot energy as function of Rmt and determine minimum, which determines optimal Rmt.
+ 4. Redo the murn for the optimized Rmt.
+

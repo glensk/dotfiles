@@ -1,0 +1,29 @@
+printMolden[freqs_, elements_, coords_, vel_, file_String] := Module[{output}
+  ,
+  output = OpenWrite[file];
+  SetOptions[output, FormatType -> OutputForm];
+  lineBreak := Write[output, ""];
+  form[expr_] := NumberForm[expr, ExponentFunction -> (Null &)];
+
+  Write[output, "[Molden Format]"];
+  Write[output, "[FREQ]"];
+  Do[ Write[output, form[freqs[[i]]]], {i, 1, freqs // Length}];
+  lineBreak;
+
+  Write[output, "[FR-COORD]"];
+  Do[
+    Write[output, elements[[i]], " ", form[coords[[i, 1]]], " ", form[coords[[i, 2]]], " ", form[coords[[i, 3]]]];
+  , {i, 1, elements // Length}];
+  lineBreak;
+
+  Write[output, "[FR-NORM-COORD]"];
+  Do[
+    Write[output, i];
+    Do[
+      Write[output, form[vel[[i, j]]], " ", form[vel[[i, j + 1]]], " ", form[vel[[i, j + 2]]]];
+    ,{j, 1, vel[[i]] // Length, 3}];
+  ,{i, 1, vel // Length}];
+  lineBreak;
+
+  Close[output];
+];

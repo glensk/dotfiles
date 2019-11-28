@@ -1,0 +1,2 @@
+Morse[r_, De_, a_, re_] := De (1 - Exp[-a (r - re)])^2
+

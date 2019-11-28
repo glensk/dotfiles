@@ -1,0 +1,60 @@
+
+(* input: str and sList in CARTESIAN coordinates expected
+          eqList and sList are supposed to give the mapping between the irreducible atoms 
+          to which the forces apply and all atoms in str *)
+
+(* note: use getIrreducibleDisplacements.math to get eqList and sList *)
+
+(* functionality: calculates the full dynamical matrix from its irreducible part (given by the forces) *)
+
+(* output: the full symmetrized dynamical matrix *)
+
+getFullDynamicalMatrix[str_, cell_, forces_, eqList_, sList_] := Module[
+  {
+  d = Total[Length /@ eqList],
+  dynMat, dynMatSym,
+  s, eq, coordsNew, forcesNew, forcesTmp, forcesSumToZero, shift
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  shift = Table[Sum[forces[[i, j]], {j, forces[[i]] // Length}], {i, forces // Length}];
+  Print["Largest deviation from zero sum: ", Max[shift]];
+  Print["Min/Max of forces: ", Min[forces], " ", Max[forces]];
+  forcesSumToZero = forces;
+  Do[forcesSumToZero[[i, getAtom[eqList[[i, 1]]]]] -= shift[[i]], {i, forces // Length}];
+
+  dynMat = Table[Null, {d}, {d}];
+  (* Print["eq ", Dynamic[i], " of ", eqList // Length]; *)
+  (* Print["ineq ", Dynamic[j], " of ", Dynamic[eqList[[i]] // Length]] // Quiet; *)
+  Do[ 
+    Print["eq ",i," of ", eqList // Length];
+  Do[
+    s = sList[[i, j]];
+
+    coordsNew = s\[Transpose].# & /@ str;
+    forcesTmp = s\[Transpose].# & /@ forcesSumToZero[[i]];
+
+    forcesNew = Table[Indeterminate, {forcesTmp // Length}];
+    Do[ Do[
+      If[periodicEqualCartesian[str[[k]], coordsNew[[l]], cell],
+        forcesNew[[k]] = forcesTmp[[l]];
+        Break[];
+      ];
+    , {k, str // Length}], {l, coordsNew // Length}];
+
+    If[MemberQ[forcesNew, Indeterminate],
+      Print["Sth's wrong with the symmetry operation!!"];
+      Print[eqList[[i, j]], sList[[i, j]]];
+    ];
+
+    eq = eqList[[i, j]];
+    dynMat[[Abs[eq]]] = If[eq > 0, Flatten[forcesNew], Flatten[-forcesNew]];
+
+  , {j, eqList[[i]] // Length}], {i, eqList // Length}];
+
+  dynMatSym = (dynMat + dynMat\[Transpose])/2;
+  Print[ "largest deviation from diagonal symmetry: ", (dynMat - dynMatSym) // Max];
+  Print["Min/Max of dynMat before diagonal symmetry: ", Min[dynMat], " ", Max[dynMat]];
+
+  dynMatSym
+];

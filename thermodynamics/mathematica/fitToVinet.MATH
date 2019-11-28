@@ -1,0 +1,77 @@
+
+(*IN OUTCAR volme per cell!!! not Volume per atom*)
+(*volumecell energy*)
+(*volumecell energy*)
+(*volumecell energy*)
+(*volumecell energy*)
+
+type=3;  (*  1: angstrom vs eV   2: bohr^3 vs hartree  3: angstrom^3 vs eV 
+             4: angstrom vs meV  5: angstrom^3 vs meV  6: angstrom vs hartree *)
+file="murn.supercell";
+file="murn.in";
+file="energy.dat";
+
+
+B0Start=140; (* GPa *)
+B0derStart=4;
+
+B0Min=0.1; (* GPa *)
+B0Max=4500; (* GPa *)
+B0derMin=0.1;
+B0derMax=100;
+n=100; (* number of points in the output fit *)
+
+structureFac=2; (*wird bei type=3 NICHT benutzt *)(* 4 for fcc, 2 for bcc *)
+BohrToAngstrom=0.529177208278835;
+HartreeTomeV=27211.383449283;
+meVByAngstromToGPa=.1602176462;
+
+B0Start=B0Start/meVByAngstromToGPa;
+B0Min=B0Min/meVByAngstromToGPa;
+B0Max=B0Max/meVByAngstromToGPa;
+
+e=Import[file,"Table"]//Sort;
+e=e[[1;;-1,1;;2]];
+e=Switch[type,
+   1,{#[[1]]^3/structureFac,1000 #[[2]]}&/@e,
+   2,{#[[1]]BohrToAngstrom^3,#[[2]]HartreeTomeV}&/@e,
+   3,{#[[1]],1000 #[[2]]}&/@e,
+   4,{#[[1]]^3/structureFac,#[[2]]}&/@e,
+   5,e,
+   6,{#[[1]]^3/structureFac,#[[2]]HartreeTomeV}&/@e];
+shift=Min[e\[Transpose][[2]]];
+e={#[[1]], #[[2]] - shift} & /@ e;
+
+(* pressure-volume relation; Ref: Cohen E., American Mineralogist, \
+vol 85, p. 338, 2000 *)
+ 
+Vinet[V_, E0_, V0_, BM_, BMder_] := 
+  E0 + (4 BM V0)/(BMder - 1)^2 - 
+   2 V0 BM (BMder - 1)^-2 (5 + 3 BMder ((V/V0)^(1/3) - 1) - 
+      3 (V/V0)^(1/3)) Exp[-(3/2) (BMder - 1) ((V/V0)^(1/3) - 1)];
+
+EMin=Min[Transpose[e][[2]]];
+EMax=Max[Transpose[e][[2]]];
+V0Start = e[[1, 1]] + (e[[-1, 1]] - e[[1, 1]])/2;
+
+vinetFit = 
+  FindFit[e, {Vinet[V, E0, V0, B0, B0der], {-EMax<E0<EMax, e[[1,1]]<V0<e[[-1,1]], B0Min<B0<B0Max, B0derMin<B0der<B0derMax}},
+             {{E0,EMin}, {V0,V0Start}, {B0,B0Start}, {B0der,B0derStart}}, V, MaxIterations -> 1000];
+
+(* r[e_,n_]:=Round[n e]/n//N; *)
+r[e_,n_]:=e;
+str={"E0InmeV","aLatInAng","V0InAng3","B0GPa","B0der"};
+vinet={r[E0+shift,1000000],r[(structureFac V0)^(1/3),1000],r[V0,1000],r[meVByAngstromToGPa B0,10],r[B0der,100]}/.vinetFit;
+ovinet={r[E0+shift,1000000],r[V0,1000],r[meVByAngstromToGPa B0,10],r[B0der,100]}/.vinetFit;
+Print[(structureFac Transpose[e][[1]])^(1/3)];
+Print[str];
+Print[vinet];
+
+data=Table[{V,Vinet[V,E0,V0,B0,B0der]/.vinetFit},{V,0.97e[[1,1]],1.03e[[-1,1]],(e[[-1,1]]-e[[1,1]])/n}];
+Print["starting export..."];
+Export["VinetParameters.dat",{str,vinet}//Transpose]
+Export["VinetFit.input",e,"Table"]
+Export["VinetFit.dat",data]
+Export["EVinet.dat",{ovinet}]
+If[FileExistsQ["EVinet"],DeleteFile["EVinet"]]
+RenameFile["EVinet.dat","EVinet"];

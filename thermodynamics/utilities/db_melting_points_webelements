@@ -1,0 +1,568 @@
+# Ref:  http://www.webelements.com/
+# This can be cited with following references (see  https://en.wikipedia.org/wiki/Melting_points_of_the_elements_(data_page)
+# A.M. James and M.P. Lord in Macmillan's Chemical and Physical Data, Macmillan, London, UK, 1992.
+# G.W.C. Kaye and T.H. Laby in Tables of physical and chemical constants, Longman, London, UK, 15th edition, 1993.
+
+1 H hydrogen (H2)
+use 14.01 K −259.14 °C  −434.45 °F
+WEL 14.01 K −259.14 °C  −434.45 °F
+CRC     −259.34 °C  
+LNG     −259.35 °C  
+2 He helium
+use 0.95 K (at 2.5 MPa) −272.2 °C (at 2.5 MPa)  −458 °F (at 2.5 MPa)
+WEL 0.95 K  −272.2 °C   −458 °F
+LNG     −272.15 °C (at 25 atm)  
+3 Li lithium
+use 453.69 K    180.54 °C   356.97 °F
+WEL 453.69 K    180.54 °C   356.97 °F
+CRC     180.50 °C   
+LNG     180.54 °C   
+4 Be beryllium
+use 1560 K  1287 °C 2349 °F
+WEL 1560 K  1287 °C 2349 °F
+CRC     1287 °C 
+LNG     1287 °C 
+5 B boron
+use 2349 K  2076 °C 3769 °F
+WEL 2349 K  2076 °C 3769 °F
+CRC     2075 °C 
+LNG     2076 °C 
+6 C carbon (graphite)
+use         
+WEL  ? (3800 K)  ? (3527 °C)     ? (6381 °F)
+CRC     tp 4489 °C (at 10.3 MPa)    
+LNG     subl. (3915–4020) °C    
+6 C carbon (diamond)
+use         
+WEL  ? (3800 K)  ? (3527 °C)     ? (6381 °F)
+CRC     4440 °C (at 12.4 GPa)   
+LNG     (at 63.5 atm) 3500 °C   
+7 N nitrogen (N2)
+use 63.15 K −210.00 °C  −346.00 °F
+WEL 63.05 K −210.1 °C   −346.18 °F
+CRC     −210.00 °C  
+LNG     −210.01 °C  
+8 O oxygen (O2)
+use 54.36 K −218.79 °C  −361.82 °F
+WEL 54.8 K  −218.3 °C   −360.9 °F
+CRC     −218.79 °C  
+LNG     −218.4 °C   
+9 F fluorine (F2)
+use 53.53 K −219.62 °C  −363.32 °F
+WEL 53.53 K −219.62 °C  −363.32 °F
+CRC     tp −219.67 °C   
+LNG     −219.61 °C  
+10 Ne neon
+use 24.56 K −248.59 °C  −415.46 °F
+WEL 24.56 K −248.59 °C  −415.46 °F
+CRC     −248.59 °C  
+LNG     −248.67 °C  
+11 Na sodium
+use 370.87 K    97.72 °C    207.9 °F
+WEL 370.87 K    97.72 °C    207.9 °F
+CRC     97.80 °C    
+LNG     97.82 °C    
+12 Mg magnesium
+use 923 K   650 °C  1202 °F
+WEL 923 K   650 °C  1202 °F
+CRC     650 °C  
+LNG     651 °C  
+13 Al aluminium
+use 933.47 K    660.32 °C   1220.58 °F
+WEL 933.47 K    660.32 °C   1220.58 °F
+CRC     660.32 °C   
+LNG     660.323 °C  
+freezing point 933.473 K (660.323 °C) fixed point on ITS-90
+14 Si silicon
+use 1687 K  1414 °C 2577 °F
+WEL 1687 K  1414 °C 2577 °F
+CRC     1414 °C 
+LNG     1412 °C 
+15 P phosphorus (white)
+use 317.30 K    44.15 °C    111.47 °F
+WEL 317.3 K 44.2 °C 111.6 °F
+CRC     44.15 °C    
+LNG     44.15 °C    
+15 P phosphorus (red)
+use 870 K   597 °C  1107 °F
+CRC     tp 590 °C   
+LNG     597 °C  
+15 P phosphorus (black)
+use 883 K   610 °C  1130 °F
+CRC     610 °C  
+LNG         
+16 S sulfur (orthorhombic, alpha)
+use (trans. to beta) 368.4 K    (trans. to beta) 95.3 °C    (trans. to beta) 203.5 °F
+CRC     (trans. to mono) 95.3 °C    
+LNG     (trans. to beta) 94.5 °C    
+16 S sulfur (monoclinic, beta, trans. slowly to alpha)
+use 388.36 K    115.21 °C   239.38 °F
+WEL 388.36 K    115.21 °C   239.38 °F
+CRC     119.6 °C    
+LNG     115.21 °C   
+16 S sulfur (gamma)
+use 380.0 K 106.8 °C    224.2 °F
+LNG     106.8 °C    
+17 Cl chlorine (Cl2)
+use 171.6 K −101.5 °C   −150.7 °F
+WEL 171.6 K −101.5 °C   −150.7 °F
+CRC     −101.5 °C   
+LNG     −101.5 °C   
+18 Ar argon
+use 83.80 K −189.35 °C  −308.83 °F
+WEL 83.8 K  −189.3 °C   −308.7 °F
+CRC     −189.35 °C  
+LNG     −189.38 °C  
+19 K potassium
+use 336.53 K    63.38 °C    146.08 °F
+WEL 336.53 K    63.38 °C    146.08 °F
+CRC     63.5 °C 
+CR2     63.38 °C    
+LNG     63.38 °C    
+20 Ca calcium
+use 1115 K  842 °C  1548 °F
+WEL 1115 K  842 °C  1548 °F
+CRC     842 °C  
+LNG     842 °C  
+21 Sc scandium
+use 1814 K  1541 °C 2806 °F
+WEL 1814 K  1541 °C 2806 °F
+CRC     1541 °C 
+LNG     1541 °C 
+22 Ti titanium (hexagonal)
+use 1941 K  1668 °C 3034 °F
+WEL 1941 K  1668 °C 3034 °F
+CRC     1668 °C 
+LNG     1668 °C 
+23 V vanadium
+use 2183 K  1910 °C 3470 °F
+WEL 2183 K  1910 °C 3470 °F
+CRC     1910 °C 
+LNG     1917 °C 
+24 Cr chromium
+use 2180 K  1907 °C 3465 °F
+WEL 2180 K  1907 °C 3465 °F
+CRC     1907 °C 
+LNG     1907 °C 
+25 Mn manganese
+use 1519 K  1246 °C 2275 °F
+WEL 1519 K  1246 °C 2275 °F
+CRC     1246 °C 
+LNG     (face-centered tetragonal) 1244 °C  
+26 Fe iron
+use 1811 K  1538 °C 2800 °F
+WEL 1811 K  1538 °C 2800 °F
+CRC     1538 °C 
+LNG     1535 °C 
+27 Co cobalt
+use 1768 K  1495 °C 2723 °F
+WEL 1768 K  1495 °C 2723 °F
+CRC     1495 °C 
+LNG     1494 °C 
+28 Ni nickel
+use 1728 K  1455 °C 2651 °F
+WEL 1728 K  1455 °C 2651 °F
+CRC     1455 °C 
+LNG     1453 °C 
+29 Cu copper
+use 1357.77 K   1084.62 °C  1984.32 °F
+WEL 1357.77 K   1084.62 °C  1984.32 °F
+CRC     1084.62 °C  
+LNG     1084.62 °C  
+freezing point 1357.77 K (1084.62 °C) fixed point on ITS-90
+30 Zn zinc
+use 692.68 K    419.53 °C   787.15 °F
+WEL 692.68 K    419.53 °C   787.15 °F
+CRC     419.53 °C   
+LNG     419.527 °C  
+freezing point 692.677 K (419.527 °C) fixed point on ITS-90
+31 Ga gallium
+use 302.9146 K  29.7646 °C  85.5763 °F
+WEL 302.91 K    29.76 °C    85.57 °F
+CRC     tp 29.771 °C    
+CR2     29.76 °C    
+LNG     29.7646 °C  
+melting point 302.9146 K (29.7646 °C) fixed point on ITS-90
+32 Ge germanium
+use 1211.40 K   938.25 °C   1720.85 °F
+WEL 1211.4 K    938.3 °C    1720.9 °F
+CRC     938.25 °C   
+LNG     937.3 °C    
+33 As arsenic
+use 1090 K  817 °C  1503 °F
+WEL 1090 K  817 °C  1503 °F
+CRC     tp 817 °C (at 3.70 MPa) 
+CR2     817 °C  
+LNG     817 °C  
+34 Se selenium (hexagonal, gray)
+use 494 K   221 °C  430 °F
+WEL 494 K   221 °C  430 °F
+CRC     220.5 °C    
+CR2     221 °C  
+LNG     217 °C  
+34 Se selenium (vitreous)
+use (trans. to gray) 453 K  (trans. to gray) 180 °C (trans. to gray) 356 °F
+CRC     (trans. to gray) 180 °C 
+35 Br bromine (Br2)
+use 265.8 K −7.3 °C 19 °F
+WEL 265.8 K −7.3 °C 19 °F
+CRC     −7.2 °C 
+LNG     −7.25 °C    
+36 Kr krypton
+use 115.79 K    −157.36 °C  −251.25 °F
+WEL 115.79 K    −157.36 °C  −251.25 °F
+CRC     tp −157.38 °C (at 73.2 kPa) 
+LNG     −157.36 °C  
+37 Rb rubidium
+use 312.46 K    39.31 °C    102.76 °F
+WEL 312.46 K    39.31 °C    102.76 °F
+CRC     39.30 °C    
+CR2     39.31 °C    
+LNG     39.31 °C    
+38 Sr strontium
+use 1050 K  777 °C  1431 °F
+WEL 1050 K  777 °C  1431 °F
+CRC     777 °C  
+LNG     757 °C  
+39 Y yttrium
+use 1799 K  1526 °C 2779 °F
+WEL 1799 K  1526 °C 2779 °F
+CRC     1522 °C 
+CR2     1526 °C 
+LNG     1522 °C 
+40 Zr zirconium
+use 2128 K  1855 °C 3371 °F
+WEL 2128 K  1855 °C 3371 °F
+CRC     1855 °C 
+LNG     1852 °C 
+41 Nb niobium
+use 2750 K  2477 °C 4491 °F
+WEL 2750 K  2477 °C 4491 °F
+CRC     2477 °C 
+LNG     2468 °C 
+42 Mo molybdenum
+use 2896 K  2623 °C 4753 °F
+WEL 2896 K  2623 °C 4753 °F
+CRC     2623 °C 
+LNG     2622 °C 
+43 Tc technetium (Tc-98 ?)
+use 2430 K  2157 °C 3915 °F
+WEL 2430 K  2157 °C 3915 °F
+CRC     2157 °C 
+LNG     (Tc-98) 2157 °C 
+44 Ru ruthenium
+use 2607 K  2334 °C 4233 °F
+WEL 2607 K  2334 °C 4233 °F
+CRC     2334 °C 
+LNG     2334 °C 
+45 Rh rhodium
+use 2237 K  1964 °C 3567 °F
+WEL 2237 K  1964 °C 3567 °F
+CRC     1964 °C 
+LNG     1963 °C 
+46 Pd palladium
+use 1828.05 K   1554.9 °C   2830.82 °F
+WEL 1828.05 K   1554.9 °C   2830.82 °F
+CRC     1554.9 °C   
+LNG     1555 °C 
+47 Ag silver
+use 1234.93 K   961.78 °C   1763.2 °F
+WEL 1234.93 K   961.78 °C   1763.2 °F
+CRC     961.78 °C   
+LNG     961.78 °C   
+freezing point 1234.93 K (961.78 °C) fixed point on ITS-90
+48 Cd cadmium
+use 594.22 K    321.07 °C   609.93 °F
+WEL 594.22 K    321.07 °C   609.93 °F
+CRC     321.07 °C   
+LNG     321 °C  
+49 In indium
+use 429.75 K    156.60 °C   313.88 °F
+WEL 429.75 K    156.6 °C    313.88 °F
+CRC     156.60 °C   
+LNG     156.60 °C   
+freezing point 429.7485 K (156.5985 °C) fixed point on ITS-90
+50 Sn tin (white)
+use 505.08 K    231.93 °C   449.47 °F
+WEL 505.08 K    231.93 °C   449.47 °F
+CRC     231.93 °C   
+LNG     231.928 °C  
+freezing point 505.078 K (231.928 °C) fixed point on ITS-90
+51 Sb antimony
+use 903.78 K    630.63 °C   1167.13 °F
+WEL 903.78 K    630.63 °C   1167.13 °F
+CRC     630.63 °C   
+LNG     630.7 °C    
+52 Te tellurium
+use 722.66 K    449.51 °C   841.12 °F
+WEL 722.66 K    449.51 °C   841.12 °F
+CRC     449.51 °C   
+LNG     449.8 °C    
+53 I iodine (I2)
+use 386.85 K    113.7 °C    236.66 °F
+WEL 386.85 K    113.7 °C    236.66 °F
+CRC     113.7 °C    
+LNG     113.60 °C   
+54 Xe xenon
+use 161.4 K −111.7 °C   −169.1 °F
+WEL 161.4 K −111.7 °C   −169.1 °F
+CRC     tp −111.79 °C (at 81.6 kPa) 
+LNG     −111.8 °C   
+55 Cs caesium
+use 301.59 K    28.44 °C    83.19 °F
+WEL 301.59 K    28.44 °C    83.19 °F
+CRC     28.5 °C 
+CR2     28.44 °C    
+LNG     28.44 °C    
+56 Ba barium
+use 1000 K  727 °C  1341 °F
+WEL 1000 K  727 °C  1341 °F
+CRC     727 °C  
+LNG     726.9 °C    
+57 La lanthanum
+use 1193 K  920 °C  1688 °F
+WEL 1193 K  920 °C  1688 °F
+CRC     918 °C  
+CR2     920 °C  
+LNG     920 °C  
+58 Ce cerium
+use 1068 K  795 °C  1463 °F
+WEL 1068 K  795 °C  1463 °F
+CRC     798 °C  
+CR2     799 °C  
+LNG     795 °C  
+59 Pr praseodymium
+use 1208 K  935 °C  1715 °F
+WEL 1208 K  935 °C  1715 °F
+CRC     931 °C  
+LNG     935 °C  
+60 Nd neodymium
+use 1297 K  1024 °C 1875 °F
+WEL 1297 K  1024 °C 1875 °F
+CRC     1021 °C 
+CR2     1016 °C 
+LNG     1024 °C 
+61 Pm promethium (Pm-147 ?)
+use 1315 K  1042 °C 1908 °F
+WEL 1373 K  1100 °C 2012 °F
+CRC     1042 °C 
+LNG     (Pm-147) 1080 °C    
+62 Sm samarium
+use 1345 K  1072 °C 1962 °F
+WEL 1345 K  1072 °C 1962 °F
+CRC     1074 °C 
+CR2     1072 °C 
+LNG     1074 °C 
+63 Eu europium
+use 1099 K  826 °C  1519 °F
+WEL 1099 K  826 °C  1519 °F
+CRC     822 °C  
+LNG     822 °C  
+64 Gd gadolinium
+use 1585 K  1312 °C 2394 °F
+WEL 1585 K  1312 °C 2394 °F
+CRC     1313 °C 
+CR2     1314 °C 
+LNG     1312 °C 
+65 Tb terbium
+use 1629 K  1356 °C 2473 °F
+WEL 1629 K  1356 °C 2473 °F
+CRC     1356 °C 
+CR2     1359 °C 
+LNG     1356 °C 
+66 Dy dysprosium
+use 1680 K  1407 °C 2565 °F
+WEL 1680 K  1407 °C 2565 °F
+CRC     1412 °C 
+CR2     1411 °C 
+LNG     1412 °C 
+67 Ho holmium
+use 1734 K  1461 °C 2662 °F
+WEL 1734 K  1461 °C 2662 °F
+CRC     1474 °C 
+CR2     1472 °C 
+LNG     1474 °C 
+68 Er erbium
+use 1802 K  1529 °C 2784 °F
+WEL 1770 K  1497 °C 2727 °F
+CRC     1529 °C 
+LNG     1529 °C 
+talk    
+The Gmelin rare earths handbook lists 1522 °C and 1550 °C as two melting points given in the literature, the most recent reference [Handbook on the chemistry and physics of rare earths, vol.12 (1989)] is given with 1529 °C.
+The World Book encyclopedia from 2002 lists 1529 °C.
+69 Tm thulium
+use 1818 K  1545 °C 2813 °F
+WEL 1818 K  1545 °C 2813 °F
+CRC     1545 °C 
+LNG     1545 °C 
+70 Yb ytterbium
+use 1097 K  824 °C  1515 °F
+WEL 1097 K  824 °C  1515 °F
+CRC     819 °C  
+CR2     824 °C  
+LNG     819 °C  
+71 Lu lutetium
+use 1925 K  1652 °C 3006 °F
+WEL 1925 K  1652 °C 3006 °F
+CRC     1663 °C 
+LNG     1663 °C 
+72 Hf hafnium
+use 2506 K  2233 °C 4051 °F
+WEL 2506 K  2233 °C 4051 °F
+CRC     2233 °C 
+LNG     2227 °C 
+73 Ta tantalum
+use 3290 K  3017 °C 5463 °F
+WEL 3290 K  3017 °C 5463 °F
+CRC     3017 °C 
+LNG     2996 °C 
+74 W tungsten
+use 3695 K  3422 °C 6192 °F
+WEL 3695 K  3422 °C 6192 °F
+CRC     3422 °C 
+LNG     3387 °C 
+75 Re rhenium
+use 3459 K  3186 °C 5767 °F
+WEL 3459 K  3186 °C 5767 °F
+CRC     3186 °C 
+LNG     3180 °C 
+76 Os osmium
+use 3306 K  3033 °C 5491 °F
+WEL 3306 K  3033 °C 5491 °F
+CRC     3033 °C 
+LNG     3045 °C 
+77 Ir iridium
+use 2719 K  2446 °C 4435 °F
+WEL 2739 K  2466 °C 4471 °F
+CRC     2446 °C 
+LNG     2447 °C 
+78 Pt platinum
+use 2041.4 K    1768.3 °C   3214.9 °F
+WEL 2041.4 K    1768.3 °C   3214.9 °F
+CRC     1768.4 °C   
+LNG     1769 °C 
+79 Au gold
+use 1337.33 K   1064.18 °C  1947.52 °F
+WEL 1337.33 K   1064.18 °C  1947.52 °F
+CRC     1064.18 °C  
+LNG     1064.18 °C  
+freezing point 1337.33 K (1064.18 °C) fixed point on ITS-90
+80 Hg mercury
+use 234.32 K    −38.83 °C   −37.89 °F
+WEL 234.32 K    −38.83 °C   −37.89 °F
+CRC     tp −38.837 °C   
+LNG     −38.83 °C   
+81 Tl thallium
+use 577 K   304 °C  579 °F
+WEL 577 K   304 °C  579 °F
+CRC     304 °C  
+LNG     303.5 °C    
+82 Pb lead
+use 600.61 K    327.46 °C   621.43 °F
+WEL 600.61 K    327.46 °C   621.43 °F
+CRC     327.46 °C   
+LNG     327.43 °C   
+83 Bi bismuth
+use 544.7 K 271.5 °C    520.7 °F
+WEL 544.4 K 271.3 °C    520.3 °F
+CRC     271.40 °C   
+LNG     271.5 °C    
+84 Po polonium
+use 527 K   254 °C  489 °F
+WEL 527 K   254 °C  489 °F
+CRC     254 °C  
+LNG     254 °C  
+85 At astatine
+use 575 K   302 °C  576 °F
+WEL 575 K   302 °C  576 °F
+CRC     302 °C  
+LNG     302 °C  
+86 Rn radon
+use 202 K   −71 °C  −96 °F
+WEL 202 K   −71 °C  −96 °F
+CRC     −71 °C  
+LNG     −71 °C  
+87 Fr francium
+use 300 K   27 °C   80 °F
+CRC     27 °C   
+88 Ra radium
+use 973 K   700 °C  1292 °F
+WEL 973 K   700 °C  1292 °F
+CRC     700 °C  
+LNG     700.1 °C    
+89 Ac actinium (Ac-227 ?)
+use circa 1323 K    circa 1050 °C   circa 1922 °F
+WEL 1323 K  1050 °C 1922 °F
+CRC     1051 °C 
+LNG     (Ac-227) 1050(50) °C    
+90 Th thorium
+use 2115 K  1842 °C 3348 °F
+WEL 2115 K  1842 °C 3348 °F
+CRC     1750 °C 
+LNG     1750 °C 
+91 Pa protactinium
+use 1841 K  1568 °C 2854 °F
+WEL 1841 K  1568 °C 2854 °F
+CRC     1572 °C 
+92 U uranium
+use 1405.3 K    1132.2 °C   2070 °F
+WEL 1405.3 K    1132.2 °C   2070 °F
+CRC     1135 °C 
+LNG     1135 °C 
+93 Np neptunium
+use 917 K   644 °C  1191 °F
+WEL 910 K   637 °C  1179 °F
+CRC     644 °C  
+LNG     644 °C  
+94 Pu plutonium
+use 912.5 K 639.4 °C    1182.9 °F
+WEL 912.5 K 639.4 °C    1182.9 °F
+CRC     640 °C  
+LNG     639.5 °C    
+95 Am americium
+use 1449 K  1176 °C 2149 °F
+WEL 1449 K  1176 °C 2149 °F
+CRC     1176 °C 
+LNG     1176 °C 
+96 Cm curium (Cm-244 ?)
+use 1613 K  1340 °C 2444 °F
+WEL 1613 K  1340 °C 2444 °F
+CRC     1345 °C 
+LNG     (Cm-244) 1340 °C    
+97 Bk berkelium (alpha)
+use 1323 K  1050 °C 1922 °F
+CRC     1050 °C 
+LNG     1050 °C 
+97 Bk berkelium (beta)
+use 1259 K  986 °C  1807 °F
+WEL 1259 K  986 °C  1807 °F
+CRC     986 °C  
+LNG     986 °C  
+98 Cf californium (Cf-252 ?)
+use 1173 K  900 °C  1652 °F
+WEL 1173 K  900 °C  1652 °F
+CRC     900 °C  
+LNG     (Cf-252) 900 °C 
+99 Es einsteinium
+use 1133 K  860 °C  1580 °F
+WEL 1133 K  860 °C  1580 °F
+CRC     860 °C  
+LNG     860 °C  
+100 Fm fermium (Fm-257 ?)
+use 1800 K  1527 °C 2781 °F
+WEL 1800 K  1527 °C 2781 °F
+CRC     1527 °C 
+LNG     (Fm-257) 1527 °C    
+101 Md mendelevium
+use 1100 K  827 °C  1521 °F
+WEL 1100 K  827 °C  1521 °F
+CRC     827 °C  
+102 No nobelium
+use 1100 K  827 °C  1521 °F
+WEL 1100 K  827 °C  1521 °F
+CRC     827 °C  
+103 Lr lawrencium
+use 1900 K  1627 °C 2961 °F
+WEL 1900 K  1627 °C 2961 °F
+CRC     1627 °C 
+LNG     1627 °C 

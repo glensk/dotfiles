@@ -1,0 +1,4 @@
+
+HARDCOPY DEVICE "EPS"
+DEVICE "EPS" OP "bbox:page"
+

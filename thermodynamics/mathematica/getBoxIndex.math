@@ -1,0 +1,4 @@
+getBoxIndex[vec_, vecBox_] := Module[{index = -1},
+  Do[ If[equal[vec, vecBox[[i]]], (index = i; Break[];)], {i, vecBox // Length}];
+  index
+];

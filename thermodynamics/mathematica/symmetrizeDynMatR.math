@@ -1,0 +1,26 @@
+symmetrizeDynMatR[coord_List, forcesIn_List, invSym_List, axis_Integer] := Module[
+  {
+    forcesOut = forcesIn,
+    vec, invVec,
+    index,
+    forceAvg
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Do[
+    vec = coord[[i]];
+    invVec = invSym.vec;
+    index = getBoxIndex[invVec, coord];
+
+    If[!(index==-1) && !(i==index),
+      forceAvg=(forcesOut[[i,axis]]+forcesOut[[index,axis]])/2;
+
+      (*Print[forcesOut[[i]]," ",forcesOut[[index]]," ", forceAvg];*)
+
+      forcesOut[[i, axis]] = forceAvg;
+      forcesOut[[index, axis]] = forceAvg;
+    ];
+  ,{i, 1, coord // Length}];
+
+  forcesOut
+];

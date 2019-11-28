@@ -1,0 +1,14 @@
+getMesh[cell_List, shiftIn_List, nMesh_Integer] := Module[
+  {smallCell, mesh, shift}
+  ,
+  smallCell = Table[cell[[i]]/nMesh, {i, 3}];
+  shift = smallCell.shiftIn;
+  mesh = Table[0, {nMesh^3}, {3}];
+  Do[
+  (
+  mesh[[1+i+ j*nMesh + k*nMesh^2]] = i*smallCell[[3]] + j*smallCell[[2]] + k*smallCell[[1]] + shift;
+
+  ), {k, 0, nMesh - 1}, {j, 0, nMesh - 1}, {i, 0, nMesh - 1}];
+
+  mesh
+]

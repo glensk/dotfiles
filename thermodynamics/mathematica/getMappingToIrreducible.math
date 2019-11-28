@@ -1,0 +1,32 @@
+
+(* input:    irrKPointsIn allKPointsIn symOpsIn in CARTESIAN coordinates expected *)
+
+(* function: takes a set of irreducible coordinates and a set of all coordinates and calculates the mapping 
+             between both using the supplied symmetry operations *)
+
+(* output:   map gives for each coordinate in allKPoints the index of the corresponding irreducible coordinate
+             and the symmetry matrix relating both in cartesian coordinates *)
+
+getMappingToIrreducible[irrKPointsIn_List, allKPointsIn_List, symOpsIn_List, recipCell_List, eps_Real:GLOBALEPS] :=
+Module[
+  {
+    irrKPoints, allKPoints, symOps,
+    S = Table[Null, {allKPointsIn // Length}],
+    map = Table[Null, {allKPointsIn // Length}]
+  },
+  (* transform to direct coords *)
+  {irrKPoints,allKPoints} = toReducedCoords[#,recipCell]&/@{irrKPointsIn,allKPointsIn};
+  symOps = Append[toReducedMatrix[symOpsIn,recipCell], -IdentityMatrix[3]];
+
+  (* find symmetry mapping *)
+  Do[ Do[ (* two Do loops are needed because of the Break command *)
+      If[ periodicEqual[ allKPoints[[i]] - symOps[[k]].irrKPoints[[j]],eps],
+        S[[i]] = symOps[[k]]; map[[i]] = j; Break[];
+      ];
+  ,{j, irrKPoints // Length}, {k, symOps // Length}],{i, allKPoints // Length}];
+
+  (* back to cartesian coordinates *)
+  S = toCartesianMatrix[S,recipCell];
+  Return[{map,S}];
+];
+

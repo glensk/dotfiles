@@ -1,0 +1,7 @@
+createGraphOfCell2D[cell_, hue_Real: 1.0] := Module[
+  {
+    G = {0, 0}, c1 = cell[[1]], c2 = cell[[2]], line
+  },
+  line = Line[{G, c1, c1 + c2, c2, G}];
+  Graphics[{Hue[hue], line}]
+];

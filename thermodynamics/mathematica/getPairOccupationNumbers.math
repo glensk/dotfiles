@@ -1,0 +1,33 @@
+
+(* coords and clusters and syms in cartesian coordinates *)
+getPairOccupationNumbers[cell_,coords_,speciesIn_,clusters_,symOps_,eps_Real:GLOBALEPS]:=Module[
+  {
+    star, species, c2, S1, S2, S=Table[0,{Length[clusters]}]
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  If[Max[speciesIn]==2,species=2 speciesIn-3,species=speciesIn];       (* change into spin representation *)
+  Do[                                                                  (* for each cluster *)
+    c=clusters[[i]];                                                   
+    star=Union[#.c&/@symOps];                                          (* create the star of all symmetry equivalent clusters *)
+    Do[                                                                (* for each atom *)
+      S1=species[[j]];
+      c2=coords[[j]]+star[[s]];
+      ok=False;
+      Do[
+        If[periodicEqualCartesian[coords[[k]],c2,cell,eps],            (* if equal we found two atoms sitting on the cluster *)
+          S2=species[[k]]; ok=True; Break[];
+        ];
+      ,{k,coords//Length}];
+
+      If[!ok,error["no symmetry mapping found "<>
+        ToString[coords]<>" "<>ToString[c2]<>" "<>ToString[cell]]];
+
+      S[[i]]=S[[i]]+S1*S2/Length[star]/Length[coords];                 (* here the normed spin product is calculated *)
+
+    ,{j,coords//Length},{s,star//Length}];
+  ,{i,clusters//Length}];
+
+  Return[S]
+];
+

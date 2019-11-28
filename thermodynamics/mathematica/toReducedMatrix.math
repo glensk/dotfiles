@@ -1,0 +1,12 @@
+(* cartesianMatrix can be a single matrix or a list of matrices *)
+
+toReducedMatrix[cartesianMatrix_List,cell_List]:=Module[
+  {
+    A,Ainv
+  },
+  A=Transpose[cell]; Ainv=Inverse[A];
+  If[Depth[cartesianMatrix//N]==3,
+    Return[Ainv.cartesianMatrix.A],
+    Return[Ainv.#.A&/@cartesianMatrix]
+  ];
+];

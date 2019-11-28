@@ -1,0 +1,17 @@
+
+HARDCOPY DEVICE "EPS" 
+DEVICE "EPS" OP "bbox:page"
+PAGE SIZE 609, 471
+view   0.13, 0.085, 1.257, 0.98
+
+xaxis  tick minor ticks 0
+yaxis  tick minor ticks 0
+xaxis  label char size 1.25
+yaxis  label char size 1.25
+xaxis  ticklabel char size 1.25
+yaxis  ticklabel char size 1.25
+
+s0 line linewidth 2.5
+s1 line linewidth 2.5
+s2 line linewidth 2.5
+s3 line linewidth 2.5

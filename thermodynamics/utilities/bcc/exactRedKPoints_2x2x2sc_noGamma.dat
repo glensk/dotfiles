@@ -1,0 +1,15 @@
+0	Pi	Pi
+Pi	0	Pi
+Pi	Pi	0
+Pi	Pi	Pi
+Pi	Pi	2*Pi
+Pi	2*Pi	Pi
+Pi	2*Pi	2*Pi
+2*Pi	Pi	Pi
+2*Pi	Pi	2*Pi
+2*Pi	2*Pi	Pi
+2*Pi	2*Pi	2*Pi
+2*Pi	2*Pi	3*Pi
+2*Pi	3*Pi	2*Pi
+3*Pi	2*Pi	2*Pi
+3*Pi	3*Pi	3*Pi

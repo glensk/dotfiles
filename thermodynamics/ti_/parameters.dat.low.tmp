@@ -1,0 +1,6 @@
+aLats=4.08
+temps=934 700 500 250
+lambdas=0.0 0.15 0.5 0.85 1.0
+nSeeds=4
+cutoff=xyz
+kp=xyp

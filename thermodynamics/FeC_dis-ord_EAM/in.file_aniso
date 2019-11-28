@@ -1,0 +1,22 @@
+clear
+variable dump_file string "trj_lammps"
+
+units metal
+boundary p p p
+atom_modify sort 0 0.0
+read_data coords
+
+pair_style eam/alloy
+pair_coeff * * /home/grabowski/FeC_dis-ord/large_supercell_EAM_dis-vs-ord/BecquartFe_C.eam.alloy Fe C
+
+fix 1 all box/relax z 0.0 y 0.0 x 0.0 couple yz vmax 0.001
+
+dump dump_all all custom 50 trj_lammps id type x y z vx vy vz fx fy fz
+thermo_style custom step temp press cpu pxx pyy pzz pxy pxz pyz ke pe etotal vol lx ly lz atoms
+thermo_modify flush yes
+thermo 50
+
+minimize 1.0e-12 1.0e-13 1000 10000000
+
+variable e equal etotal
+print "energy $e"

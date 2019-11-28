@@ -1,0 +1,74 @@
+kB=8.617*10^-2;
+
+error[str_String]:=(Print["ERROR: "<>str];Exit[];)
+
+
+ff[e_,T_]:=1/(Exp[e/(kB T)]+1)
+sel[e_,T_]:=(1 - ff[e, T]) Log[1 - ff[e, T]] + ff[e, T] Log[ff[e, T]]
+int[a_,e_,T_]=Integrate[a sel[e,T],e];
+Sel[a_,T_]:=int[a,10000,T]
+Fel[a_,T_]:=T Sel[a,T]
+fitFunc[T_, coef_] := Fel[ Sum[coef[[k]] basis[T][[k]], {k, basis[T]// Length}], T]
+squares[i_,coef_] := Sum[(Fvibs[[i,j]] - fitFunc[Ts[[j]], coef])^2, {j, Fvibs[[i]] // Length}]
+startcoef = Table[0.0001, {basis[T] // Length}];
+coef = Array[c, {basis[T] // Length}];
+
+Print[""]; Print[""];
+(* check if files exist *)
+Do[(
+  file="Fel_"<>ToString[aLats[[i]]]<>"Ang";
+  If[!FileExistsQ[file],error[file<>" file not existing"]];
+),{i,aLats//Length}];
+
+(* lattice constant to volume and vice versa *)
+aLatToV[aLat_, cBya_] := (sc aLat)^3*cBya*0.866025403/structureFactor;
+
+Ts = (Select[Import["Fel_"<>ToString[aLats[[1]]]<>"Ang", "Table"],Length[#]==2&])\[Transpose] // First;
+newTList=Table[TT,{TT,Tmin,Tmax,Tstep}];
+Fvibs = Select[Import["Fel_"<>ToString[#]<>"Ang", "Table"],Length[#]==2&]&/@ aLats;
+Do[
+  If[Fvibs[[i,j,1]]!=Ts[[j]],error["non matching temperatures in Fel_"<>ToString[aLats[[i]]]<>"Ang at temperature "<>ToString[Ts[[j]]]]];
+,{i,Fvibs//Length},{j,Fvibs[[i]]//Length}];
+
+Fvibs = Transpose[Select[#,(#[[1]]<=1000maxSigma/kB&)]][[2]]&/@Fvibs;
+Ts = Select[Ts,(#<=1000maxSigma/kB&)];
+
+Fvibs*=s;
+Export["temp",Fvibs[[1]],"Table"];
+devs={};
+Do[
+  fit = FindMinimum[ squares[i,coef], {coef // Flatten, startcoef // Flatten}\[Transpose]][[2]];
+  dev = Abs[ Fvibs[[i]] - (fitFunc[#,coef/.fit]&/@Ts)];
+  AppendTo[devs,{aLats[[i]],Mean[dev],Max[dev]}];
+  new = Table[fitFunc[TT,coef/.fit],{TT,Tmin,Tmax,Tstep}];
+  Export["Fel_"<>ToString[aLats[[i]]]<>"Ang_fit",Join[{Ts,Fvibs[[i]]}//Transpose,{Null,Null},{newTList,new}//Transpose],"Table"];
+  Fvibs[[i]]=new;
+,{i,Fvibs//Length}];
+
+Print["Temperature fit:"];
+Print["DOS based, basis: ",basis[T]];
+Print[""];
+Print["aLat(A) MeanDev(meV) MaxDev(meV)"];
+Do[Print[devs[[i]]],{i,devs//Length}];
+Print[""];
+Print["Temperture fit total:"];
+Print["mean ",Mean[Transpose[devs][[2]]]];
+Print["max  ",Max[Transpose[devs][[3]]]];
+
+vols=aLatToV[#,cBya]&/@aLats;
+Print[vols]
+Fvibs = Transpose[Fvibs];
+fitPoints = {vols, #}\[Transpose] & /@ Fvibs;
+fits = Fit[#, Table[V^(i - 1), {i, fitOrder + 1}], V] & /@ fitPoints;
+
+delta = Table[Abs[(fits[[i]]/.V->Transpose[fitPoints[[i]]][[1]])-Transpose[fitPoints[[i]]][[2]]],{i,fits//Length}]//Flatten;
+Print[""];
+Print["Volume fit:"];
+Print["polynomial, order ",fitOrder];
+Print["mean ",Mean[delta]];
+Print["max  ",Max[delta]];
+Print[""];
+
+forExport=Flatten[{#[[1]],CoefficientList[#[[2]],V]}]&/@({newTList,fits}\[Transpose]);
+Print[""];
+Print["File written: ",Export["Fel_surface_fit",forExport,"Table"]];

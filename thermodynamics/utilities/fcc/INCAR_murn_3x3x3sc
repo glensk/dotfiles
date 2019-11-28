@@ -1,0 +1,28 @@
+  NPAR    =   4
+
+  ADDGRID =   .TRUE.
+
+  PREC    =   Accurate
+  ISTART  =   0             !WAVECAR:0-new,1-cont,2-samecut
+  ICHARG  =   2             !charge:1-file,2-overlapping_atom,10-const
+                                                                       
+  ENCUT   =   400
+  NBANDS  =   635
+  LREAL   =   .FALSE.
+  NELMDL  =   -5
+  EDIFF   =   1e-8
+  ALGO    =   NORMAL
+  ISMEAR  =   1
+  SIGMA   =   0.1
+
+  IBRION = 1
+  NSW    = 56
+  EDIFFG = -0.00005         !a negative value will use forces as criterion
+                                                                      
+  LWAVE   =   F
+  LCHARG  =   F
+  LVTOT   =   F
+  LELF    =   F
+NGXF=180
+NGYF=180
+NGZF=180

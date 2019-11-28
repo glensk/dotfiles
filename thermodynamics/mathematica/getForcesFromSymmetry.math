@@ -1,0 +1,27 @@
+getForcesFromSymmetry[supercell_, coordsIn_List, forcesIn_List, 
+                      symOp_List, atomIn_Integer: 1, atomOut_Integer: 1, eps_Real:GLOBALEPS] := Module[
+  {
+    coordsOut, forcesOut, forcesTmp, shiftVec
+  }
+  ,
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  coordsOut = (# - coordsIn[[atomIn]]) & /@ coordsIn;
+  coordsOut = (symOp.#) & /@ coordsOut;
+  forcesOut = (symOp.#) & /@ forcesIn;
+  coordsOut = (# + coordsIn[[atomIn]]) & /@ coordsOut;
+
+  shiftVec = coordsIn[[atomOut]] - coordsIn[[atomIn]];
+  coordsOut = shiftCoordsPeriodic[coordsOut, shiftVec, supercell];
+
+  forcesTmp = forcesOut;
+  forcesOut = Table[Indeterminate, {forcesOut // Length}];
+  
+  Do[
+    If[Norm[coordsIn[[i]] - coordsOut[[j]]] < eps, forcesOut[[i]] = forcesTmp[[j]]];
+  ,{i, 1, coordsIn // Length}, {j, 1, coordsOut // Length}];
+
+  If[MemberQ[forcesOut, Indeterminate], Print["Sth's wrong with the symmetry operation!!"]];
+
+  forcesOut
+];

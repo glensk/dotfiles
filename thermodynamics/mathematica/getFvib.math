@@ -1,0 +1,43 @@
+
+getFvib[T_?NumberQ, w_Integer, type_String: "quantum"] := getFvib[T, {w}, type]
+
+getFvib[T_?NumberQ, w_Real, type_String: "quantum"] := getFvib[T, {w}, type]
+
+getFvib[T_?NumberQ, w_List, type_String: "quantum"] := getFvib[T, T, 1, w, type][[1, 2]]
+
+getFvib[TStart_?NumberQ, TEnd_?NumberQ, TStep_?NumberQ, w_?NumberQ, type_String: "quantum"] := 
+   getFvib[TStart, TEnd, TStep, {w}, type]
+
+getFvib[TStart_?NumberQ, TEnd_?NumberQ, TStep_?NumberQ, w_List, type_String: "quantum"] := 
+  getFvib[TStart, TEnd, TStep, w, 0.w+1, type]
+
+
+
+
+getFvib[TStart_?NumberQ, TEnd_?NumberQ, TStep_?NumberQ, wIn_List,
+  weightsIn_List, type_String: "quantum"] := Module[
+  {
+    kB = 0.086173422,
+    lowerBound = 0.01,
+    small, neg, complex,
+    FList,
+    w=wIn//Flatten,
+    weights=weightsIn//Flatten
+  },
+  small = Select[w, 0 <= Re[#] < lowerBound &];
+  neg = Select[w, Re[#] < 0 &];
+  complex = Cases[w, _Complex];
+
+  If[Length[small]>0, Print["    "<>ToString[Length[small]] <> " freqs smaller than " <> ToString[lowerBound]]];
+  If[Length[neg]>0, Print["    "<>ToString[Length[neg]] <> " freqs negative"]];
+  If[Length[complex]>0, Print["    "<>ToString[Length[complex]] <> " freqs complex"]];
+
+  FList = Table[ { T,
+    If[type == "classical",
+      Sum[ weights[[i]] kB T Log[w[[i]]/(kB T)], {i, w // Length}],
+      Sum[ weights[[i]] (w[[i]]/2 + kB T Log[ 1 - Exp[-(w[[i]]/(kB T))]]), {i, w // Length}]]
+  }, {T, TStart, TEnd, TStep}];
+
+  FList
+];
+

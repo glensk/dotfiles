@@ -1,0 +1,18 @@
+ HSQDTM=3.81       eV Ang^2        hbar^2/2*m_e  (this constant is slightly wrong in constant.inc: it is 3.81001987408079 but should be 3.80998174766464492;
+                                                this is due to an error in the RYTOEV constant which is 13.605826 but which should be 13.6056919)
+                              
+ LATT_CUR%A           Ang          lattice vectors
+ LATT_CUR%B           Ang^-1       reciprocal lattice vectors WITHOUT the usual 2 pi factor
+                               
+ WDES%DATAKE       eV               kinetic energy of plane waves
+ WDES%ENMAX        eV               plane wave cutoff
+                               
+ P%POTPSC          eV               local potential in real space
+ P%PSP             eV Ang^-3        local potential in reciprocal space
+ P%RHOAE              Ang           RHOAE = rho*R^2  where rho is the charge density and R is the grid; rho has (Ang^-2) and the grid (Ang)
+ P%RHOPS              Ang           RHOPS = rho*R^2
+ P%WAE                Ang^(1/2)     WAE = phiAE*R  where phiAE is the all electron partial wavefunction and R the grid; phiAE has (Ang^-.5) and grid (Ang)
+ P%WPS                Ang^(1/2)     WPS = phiPS*R
+
+
+

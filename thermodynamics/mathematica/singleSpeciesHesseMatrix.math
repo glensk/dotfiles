@@ -1,0 +1,16 @@
+
+singleSpeciesHesseMatrix[cell_List,supercell_List,coord_List,forces_List,disp_Real,forcesZ_List:{}] := Module[
+  {
+    rLat, dynMatR, shiftedDynMat, hesse={}
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  {rLat,dynMatR}=singleSpeciesDynMatR[1.,cell,supercell,coord,forces,disp,False,False,forcesZ];
+  rLat = shiftCoordsPeriodic[rLat, {0, 0, 0}, supercell];
+  Do[
+    shiftedDynMat = shiftForcesPeriodic[-dynMatR, rLat, -rLat[[i]], supercell];
+    AppendTo[hesse, Flatten[#, 1]&/@Transpose[shiftedDynMat]];
+  ,{i, rLat//Length}];
+
+  Flatten[hesse, 1]
+];

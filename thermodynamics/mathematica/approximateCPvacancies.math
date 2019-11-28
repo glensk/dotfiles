@@ -1,0 +1,3 @@
+(* T in Kelvin, H in eV, S in kB, CVac is returned in kB *)
+
+CVac[T_, H_, S_, kB_Real: 1/11604.506] := H^2/(kB^2 T^2) Exp[-(H/(kB T)) + S]

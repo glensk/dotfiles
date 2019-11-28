@@ -1,0 +1,76 @@
+######################################################################################
+# $PATH
+######################################################################################
+#export PATH="$thermodynamics/ti_:$PATH"
+export PATH="$thermodynamics/vasp_analyze:$PATH"
+export PATH="$thermodynamics:$PATH"
+#export PATH="$thermodynamics/python:$PATH"
+#export PATH="$thermodynamics/python_:$PATH"
+#export PATH="$thermodynamics/python_thermodynamics:$PATH"
+#export PATH="$thermodynamics/que_sge:$PATH"
+#export PATH="$thermodynamics/que_sge/array_que_scripts:$PATH"
+
+
+######################################################################################
+# $PYTHONPATH
+######################################################################################
+if [[ ! -z "$PYTHONPATH" ]]; then
+    export PYTHONPATH="${PYTHONPATH}:$thermodynamics/python/"
+else
+    export PYTHONPATH=$thermodynamics/python
+fi
+export PYTHONPATH="${PYTHONPATH}:$thermodynamics/python_thermodynamics/"
+export PYTHONPATH="${PYTHONPATH}:$thermodynamics/"  # for get_DOS.py
+
+######################################################################################
+# DEFINE SUBMITHOST    
+######################################################################################
+#export submithost="cmmc001"
+##if [ `hostname` = $submithost ];then
+##    module load sge
+##    fi
+#
+#if [ `hostname` = cmmc001 ];then
+#    export submithost="cmmc001"
+#fi
+#if [ `hostname` = cmmc002 ];then
+#    export submithost="cmmc002"
+#fi
+
+######################################################################################
+# vasp_analyze stuff (OUTCAR_A.sh OUTCAR_xxx.sh ...)
+######################################################################################
+#kkk=`find $HOME/scripts/vasp_          -maxdepth 1 -name "*.sh" | xargs -n1 | sed -n 's|.*/||p'`
+#kkk=`find $thermodynamics/vasp_analyze -maxdepth 1 -name "*.sh" | xargs -n1 | sed -n 's|.*/||p'`
+#echo kkk:$kkk
+#_OUTCAR()
+#{
+#    local cur=${COMP_WORDS[COMP_CWORD]}
+#    COMPREPLY=( $(compgen -W "$kkk" -- $cur) )
+#}
+#complete -F _OUTCAR OUTCAR_A.sh
+#fi
+
+if [ "$BASH_VERSION" != "" ] || [ "$ZSH_VERSION" != "" ]; then  # this is anyhow only loaded for bash
+    #kkk=`find $thermodynamics/vasp_analyze -maxdepth 1 -name "*.sh" | xargs -n1 | sed -n 's|.*/||p'`
+    #kkk=`find $thermodynamics/vasp_analyze -maxdepth 1 -name "*.sh" | xargs -n1 | sed -n 's|.*/||p' | xargs`
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # go give the explicit list ist faster when loading the shell and therefore preferred
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    kkk="anyList_A.sh crossprod3x3.sh dotprod3x3.sh INCAR_A.sh INCAR_ALGO.sh INCAR_change.sh INCAR_changeall-from-anylist.sh INCAR_changeall-from-here.sh INCAR_EDIFF.sh INCAR_EDIFFG.sh INCAR_ENAUG.sh INCAR_ENCUT.sh INCAR_GAMMA_LD.sh INCAR_IBRION.sh INCAR_ISIF.sh INCAR_ISMEAR.sh INCAR_ISYM.sh INCAR_NBANDS.sh INCAR_NGXF.sh INCAR_NPAR.sh INCAR_POTIM.sh INCAR_PREC.sh isgreaternull.sh isnull.sh isnumber.sh issmallernull.sh KPOINTS_cat-kp.sh KPOINTS_cat-monk-gam.sh KPOINTS_cat-shift.sh KPOINTS_changeall.sh KPOINTS_changeone.sh KPOINTS_convert_to_link.sh max.sh min.sh OUTCAR_A.sh OUTCAR_atomicmass.sh OUTCAR_bands-check.sh OUTCAR_bands-max-occupied.sh OUTCAR_cell-all-ARRAY.sh OUTCAR_cell-last-cartesian-ARRAY.sh OUTCAR_cell-last-cartesian-1-1.sh OUTCAR_cell-last-reciprocal-ARRAY.sh OUTCAR_cores.sh OUTCAR_create_ion_energies.sh OUTCAR_create_structures.sh OUTCAR_date.sh OUTCAR_EDIFF.sh OUTCAR_EDIFFG.sh OUTCAR_elements.sh OUTCAR_ENAUG.sh OUTCAR_ENCUT.sh OUTCAR_ene-free-last.sh OUTCAR_ene-free-lastperatom.sh OUTCAR_ene-inner-ARRAY-ionicstep.sh OUTCAR_ene-inner-last.sh OUTCAR_ene-inner-lastperatom.sh OUTCAR_ene-sigma0-ARRAY-ionicstep.sh OUTCAR_ene-sigma0-firstelec.sh OUTCAR_ene-sigma0-last.sh OUTCAR_ene-sigma0-lastperatom.sh OUTCAR_Fel_approx.sh OUTCAR_finished.sh OUTCAR_finishedEDIFF.sh OUTCAR_forces-all-ARRAY.sh OUTCAR_forces-all-max-perstep-ARRAY.sh OUTCAR_forces-last-ARRAY.sh OUTCAR_forces-last-max-ARRAY.sh OUTCAR_IALGO.sh OUTCAR_IBRION.sh OUTCAR_ID.sh OUTCAR_irr_kp_vstime.sh OUTCAR_irr_kpoints-2-for-RPA.sh OUTCAR_irr_kpoints.sh OUTCAR_ISIF.sh OUTCAR_ISMEAR.sh OUTCAR_ISYM.sh OUTCAR_iteration-check.sh OUTCAR_iteration-max.sh OUTCAR_iteration-maxfast.sh OUTCAR_iteration-missing.sh OUTCAR_iteration-print_path_if_none.sh OUTCAR_LREAL.sh OUTCAR_magnetization.sh OUTCAR_memory.sh OUTCAR_NBANDS.sh OUTCAR_NGX-Y-ZF.sh OUTCAR_NGX-Y-ZFd.sh OUTCAR_nodes.sh OUTCAR_nodeslist.sh OUTCAR_number_of_atoms.sh OUTCAR_positions-all-ARRAY.sh OUTCAR_positions-forces-all-ARRAY.sh OUTCAR_positions-forces-nr-ARRAY.sh OUTCAR_positions-last-ARRAY.sh OUTCAR_potcar.sh OUTCAR_PREC.sh OUTCAR_sigma.sh OUTCAR_sigmatemp.sh OUTCAR_species.sh OUTCAR_time-elec-first-.sh OUTCAR_time-elec-first-per-core.sh OUTCAR_time-elec-last.sh OUTCAR_time-elec-mean-.sh OUTCAR_time-elec-mean-plot-ARRAY.sh OUTCAR_time-elec-plot-ARRAY.sh OUTCAR_time-elec-second-.sh OUTCAR_time-elec-second-per-core.sh OUTCAR_time-hour.sh OUTCAR_time-ionic-mean-.sh OUTCAR_time-ionic-plot-ARRAY.sh OUTCAR_time-lastwrite.sh OUTCAR_time-pernode.sh OUTCAR_time-RPA-last.sh OUTCAR_time-RPA-mean-.sh OUTCAR_time-sec.sh OUTCAR_time-started.sh OUTCAR_version.sh OUTCAR_volume-all-ARRAY.sh OUTCAR_volume-last.sh OUTCAR_volume-lastexact.sh OUTCAR_volume-lastperatom.sh OUTCAR_VOSKOWN.sh POSCAR_cell_cartesian.sh POSCAR_numatoms.sh POSCAR_numatomsline.sh POSCAR_volume.sh POTCAR_convert_to_link.sh POTCAR_element.sh POTCAR_exchangecorrelationFunc.sh POTCAR_mass.sh POTCAR_massrecip.sh tbz2file.sh tripleprod3x3.sh VASP_get_INPOSPOTKPOINTS_folder-notfinished-AND-REMOVE-THIS-FOLDER.sh VASP_get_INPOSPOTKPOINTS_folder-notfinished-rm_workDir.sh VASP_get_INPOSPOTKPOINTS_folder-notfinished.sh VASP_get_INPOSPOTKPOINTS_folder.sh VASP_get_INPOSPOTKPOINTS_folder_noIteration.sh VASP_get_INPOSPOTKPOINTS_folder_noOUTCAR.sh VASP_get_INPOSPOTKPOINTS_OUTCAR-OUTCAR.gz_rm_unfinished.sh VASP_sphinx_create_all_dynmat_jobs.sh VASP_sphinx_get_sxdynmatsx.sh vasprun_create_ion_energies.sh vasprun_create_structures.sh vasprun_positions_forces_ToSphinxFormat.sh XXXCAR_link-to-basename.sh"
+
+# The following 4 lines are just there to provide completion when once OUTCAR_A.sh
+# has been typed already
+    complete OUTCAR_A.sh  n/1/c/
+    complete -W "n/*/`echo $kkk `/" OUTCAR_A.sh
+    complete -W "n/*/`echo $kkk `/" INCAR_A.sh
+    complete -W "n/*/`echo $kkk `/" KPOINTS_A.sh
+    fi
+
+#### submit stuff
+#set lll=`find $thermodynamics/run_scripts -maxdepth 1 -name "*run.*" | sed -n 's|.*/||p'`
+#alias submit.sh $thermodynamics/submit.sh
+#complete submit.sh 'n/*/`echo $lll `/'
+#complete move_jobs_to_data_and_link.sh 'n/*/`echo $lll `/'
+#
+#echo done

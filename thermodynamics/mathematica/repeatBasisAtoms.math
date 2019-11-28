@@ -1,0 +1,6 @@
+repeatBasisAtoms[old_List, {n_, m_, o_}] := Module[
+  {new = {}, a}
+  ,
+  Do[ AppendTo[new, {i,j,k} + old[[a]] ], {a, old//Length}, {i,0,n-1}, {j,0,m-1}, {k,0,o-1}];
+  new
+];

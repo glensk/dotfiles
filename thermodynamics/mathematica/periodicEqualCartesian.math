@@ -1,0 +1,12 @@
+
+(* coords in cartesian coordinates expected *)
+periodicEqualCartesian[coords1_, coords2_, cell_, eps_Real:GLOBALEPS] := Module[
+  {
+    red1, red2
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  {red1,red2} = toReducedCoords[{coords1,coords2},cell];
+  periodicEqual[red1-red2,eps]
+];
+

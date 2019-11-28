@@ -1,0 +1,989 @@
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[         0,          0]
+NotebookDataLength[     37747,        988]
+NotebookOptionsPosition[     37353,        968]
+NotebookOutlinePosition[     37688,        983]
+CellTagsIndexPosition[     37645,        980]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"Fitting", "[", "avgin_", "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "lin", ",", "twopoints", ",", "avg", ",", "avgplus", ",", "linplus", 
+        ",", "cubplus", ",", "tanplus", ",", "cub", ",", "linfit", ",", 
+        "cubfit", ",", "lindev", ",", "cubdev", ",", "Fahlin", ",", "Fahcub", 
+        ",", "tanFunction", ",", "tan", ",", "tanfit", ",", "tandev", ",", 
+        "tanFah", ",", "Fahtan", ",", "ta0", ",", "ta1", ",", "ta2", ",", 
+        "ta3", ",", "Fahlinpoint", ",", "Fahcubpoint", ",", "linerror", ",", 
+        "cuberror", ",", "tanerror", ",", "Fahbest", ",", "avgsym", ",", 
+        "tansym", ",", "tansymfit", ",", "tansymerror", ",", "tansymdev", ",",
+         "tansymplus", ",", "avgsymplus", ",", "avgsymin", ",", "Fahtansym", 
+        ",", "linfitvalues", ",", "cubfitvalues", ",", "tanfitvalues", ",", 
+        "linee", ",", "cube", ",", "tane"}], "}"}], ",", 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"gets", " ", "list", " ", "like", " ", "avgin"}], " ", "=", 
+         " ", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"lambda1", ",", "dUdL", ",", "error"}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"lambda2", ",", "dUdL", ",", "error"}], "}"}], ",", 
+           "..."}], "}"}]}], ","}], "*)"}], "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{"avgin", "=", "avgin"}], "*)"}], "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"avgsymin", "=", 
+        RowBox[{"Pick", "[", 
+         RowBox[{"avgin", ",", 
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"MemberQ", "[", 
+             RowBox[{
+              RowBox[{"Round", "[", 
+               RowBox[{
+                RowBox[{"avgin", "[", 
+                 RowBox[{"[", 
+                  RowBox[{
+                   RowBox[{"1", ";;", 
+                    RowBox[{"-", "1"}]}], ",", "1"}], "]"}], "]"}], ",", 
+                "0.001"}], "]"}], ",", 
+              RowBox[{
+               RowBox[{"Round", "[", 
+                RowBox[{
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"avgin", "[", 
+                    RowBox[{"[", 
+                    RowBox[{
+                    RowBox[{"1", ";;", 
+                    RowBox[{"-", "1"}]}], ",", "1"}], "]"}], "]"}], "-", 
+                    "1"}], "//", "Abs"}], ")"}], ",", "0.001"}], "]"}], "[", 
+               RowBox[{"[", "l", "]"}], "]"}]}], "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"l", ",", "1", ",", 
+              RowBox[{"avgin", "//", "Length"}]}], "}"}]}], "]"}]}], "]"}]}], 
+       ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"avg", "=", 
+        RowBox[{"avgin", "[", 
+         RowBox[{"[", 
+          RowBox[{
+           RowBox[{"1", ";;", 
+            RowBox[{"-", "1"}]}], ",", 
+           RowBox[{"{", 
+            RowBox[{"1", ",", "2"}], "}"}]}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"avgsym", "=", 
+        RowBox[{"avgsymin", "[", 
+         RowBox[{"[", 
+          RowBox[{
+           RowBox[{"1", ";;", 
+            RowBox[{"-", "1"}]}], ",", 
+           RowBox[{"{", 
+            RowBox[{"1", ",", "2"}], "}"}]}], "]"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"(*", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<avgin: \>\"", ",", "avgin"}], "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<avg: \>\"", ",", "avg"}], "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<avgsymin: \>\"", ",", "avgsymin"}], "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<avgsym: \>\"", ",", "avgsym"}], "]"}], ";"}], 
+        "\[IndentingNewLine]", "*)"}], "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"avgplus", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"avgin", "[", 
+             RowBox[{"[", 
+              RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", 
+            RowBox[{
+             RowBox[{"avgin", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", "2"}], "]"}], "]"}], "+", 
+             RowBox[{"avgin", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", "3"}], "]"}], "]"}]}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", 
+            RowBox[{"avgin", "//", "Length"}]}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"avgsymplus", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"avgsymin", "[", 
+             RowBox[{"[", 
+              RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", 
+            RowBox[{
+             RowBox[{"avgsymin", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", "2"}], "]"}], "]"}], "+", 
+             RowBox[{"avgsymin", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", "3"}], "]"}], "]"}]}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", 
+            RowBox[{"avgsymin", "//", "Length"}]}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"lin", "=", 
+        RowBox[{"Fit", "[", 
+         RowBox[{"avg", ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "x"}], "}"}], ",", "x"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"linplus", "=", 
+        RowBox[{"Fit", "[", 
+         RowBox[{"avgplus", ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "x"}], "}"}], ",", "x"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"cub", "=", 
+        RowBox[{"Fit", "[", 
+         RowBox[{"avg", ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "x", ",", 
+            RowBox[{"x", "^", "2"}], ",", 
+            RowBox[{"x", "^", "3"}]}], "}"}], ",", "x"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"cubplus", "=", 
+        RowBox[{"Fit", "[", 
+         RowBox[{"avgplus", ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "x", ",", 
+            RowBox[{"x", "^", "2"}], ",", 
+            RowBox[{"x", "^", "3"}]}], "}"}], ",", "x"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"tanFunction", "[", 
+         RowBox[{"x_", ",", "a0_", ",", "a1_", ",", "a2_", ",", "a3_"}], 
+         "]"}], ":=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "a0"}], "*", 
+          RowBox[{"Tan", "[", 
+           RowBox[{"Pi", " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"1", "-", "a1"}], ")"}], "x"}], "+", "a2", "+", 
+              "0.5"}], ")"}]}], "]"}]}], "+", "a3"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"Off", "[", 
+        RowBox[{"FindFit", "::", "eit"}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tan", "=", 
+        RowBox[{"FindFit", "[", 
+         RowBox[{"avg", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"tanFunction", "[", 
+             RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], "]"}],
+             ",", 
+            RowBox[{"0", "<", "a0", "<", "100"}], ",", 
+            RowBox[{"0.", "<", "a1", "<", "1"}], ",", 
+            RowBox[{"0", "<", "a2", "<", "a1"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"a0", ",", "7.52492"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a1", ",", "0.49234"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a2", ",", "0.309661"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a3", ",", 
+              RowBox[{"-", "0.598074"}]}], "}"}]}], "}"}], ",", "x"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tanplus", "=", 
+        RowBox[{"FindFit", "[", 
+         RowBox[{"avgplus", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"tanFunction", "[", 
+             RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], "]"}],
+             ",", 
+            RowBox[{"0", "<", "a0", "<", "100"}], ",", 
+            RowBox[{"0.", "<", "a1", "<", "1"}], ",", 
+            RowBox[{"0", "<", "a2", "<", "a1"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"a0", ",", "7.52492"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a1", ",", "0.49234"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a2", ",", "0.309661"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a3", ",", 
+              RowBox[{"-", "0.598074"}]}], "}"}]}], "}"}], ",", "x"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tansym", "=", 
+        RowBox[{"FindFit", "[", 
+         RowBox[{"avgsym", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"tanFunction", "[", 
+             RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], "]"}],
+             ",", 
+            RowBox[{"0", "<", "a0", "<", "100"}], ",", 
+            RowBox[{"0.", "<", "a1", "<", "1"}], ",", 
+            RowBox[{"0", "<", "a2", "<", "a1"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"a0", ",", "7.52492"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a1", ",", "0.49234"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a2", ",", "0.309661"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a3", ",", 
+              RowBox[{"-", "0.598074"}]}], "}"}]}], "}"}], ",", "x"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tansymplus", "=", 
+        RowBox[{"FindFit", "[", 
+         RowBox[{"avgsymplus", ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"tanFunction", "[", 
+             RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], "]"}],
+             ",", 
+            RowBox[{"0", "<", "a0", "<", "100"}], ",", 
+            RowBox[{"0.", "<", "a1", "<", "1"}], ",", 
+            RowBox[{"0", "<", "a2", "<", "a1"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"a0", ",", "7.52492"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a1", ",", "0.49234"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a2", ",", "0.309661"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"a3", ",", 
+              RowBox[{"-", "0.598074"}]}], "}"}]}], "}"}], ",", "x"}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"On", "[", 
+        RowBox[{"FindFit", "::", "eit"}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"b0", ",", "b1", ",", "b2", ",", "b3"}], "}"}], "=", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"a0", ",", "a1", ",", "a2", ",", "a3"}], "}"}], "/.", 
+         "tan"}]}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"linfit", ",", "cubfit"}], "}"}], "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Append", "[", 
+           RowBox[{
+            RowBox[{"Table", "[", 
+             RowBox[{
+              RowBox[{"{", 
+               RowBox[{"i", ",", 
+                RowBox[{"#", "/.", 
+                 RowBox[{"x", "\[Rule]", "i"}]}]}], "}"}], ",", 
+              RowBox[{"{", 
+               RowBox[{"i", ",", "0", ",", "1", ",", "0.01"}], "}"}]}], "]"}],
+             ",", 
+            RowBox[{"{", 
+             RowBox[{"Null", ",", "Null"}], "}"}]}], "]"}], "&"}], "/@", 
+         RowBox[{"{", 
+          RowBox[{"lin", ",", "cub"}], "}"}]}]}], ";", "\[IndentingNewLine]", 
+       
+       RowBox[{"tanfit", "=", 
+        RowBox[{"Append", "[", 
+         RowBox[{
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"i", ",", 
+              RowBox[{
+               RowBox[{"tanFunction", "[", 
+                RowBox[{"i", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], 
+                "]"}], "/.", "tan"}]}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", "0", ",", "1", ",", "0.01"}], "}"}]}], "]"}], 
+          ",", 
+          RowBox[{"{", 
+           RowBox[{"Null", ",", "Null"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"tansymfit", "=", 
+        RowBox[{"Append", "[", 
+         RowBox[{
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"i", ",", 
+              RowBox[{
+               RowBox[{"tanFunction", "[", 
+                RowBox[{"i", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], 
+                "]"}], "/.", "tansym"}]}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", "0", ",", "1", ",", "0.01"}], "}"}]}], "]"}], 
+          ",", 
+          RowBox[{"{", 
+           RowBox[{"Null", ",", "Null"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"lindev", ",", "cubdev"}], "}"}], "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+           RowBox[{"Sum", "[", 
+            RowBox[{
+             RowBox[{"Abs", "[", 
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"#", "/.", 
+                 RowBox[{"x", "\[Rule]", 
+                  RowBox[{"avg", "[", 
+                   RowBox[{"[", 
+                    RowBox[{"i", ",", "1"}], "]"}], "]"}]}]}], ")"}], "-", 
+               RowBox[{"avg", "[", 
+                RowBox[{"[", 
+                 RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"i", ",", 
+               RowBox[{"Length", "[", "avg", "]"}]}], "}"}]}], "]"}], "/", 
+           RowBox[{"Length", "[", "avg", "]"}]}], "&"}], "/@", 
+         RowBox[{"{", 
+          RowBox[{"lin", ",", "cub"}], "}"}]}]}], ";", 
+       RowBox[{"tandev", "=", 
+        RowBox[{
+         RowBox[{"Sum", "[", 
+          RowBox[{
+           RowBox[{"Abs", "[", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"tanFunction", "[", 
+                RowBox[{
+                 RowBox[{"avg", "[", 
+                  RowBox[{"[", 
+                   RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", "a0", ",", 
+                 "a1", ",", "a2", ",", "a3"}], "]"}], "/.", "tan"}], ")"}], 
+             "-", 
+             RowBox[{"avg", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", 
+             RowBox[{"Length", "[", "avg", "]"}]}], "}"}]}], "]"}], "/", 
+         RowBox[{"Length", "[", "avg", "]"}]}]}], ";", "\[IndentingNewLine]", 
+       
+       RowBox[{"tansymdev", "=", 
+        RowBox[{
+         RowBox[{"Sum", "[", 
+          RowBox[{
+           RowBox[{"Abs", "[", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"tanFunction", "[", 
+                RowBox[{
+                 RowBox[{"avg", "[", 
+                  RowBox[{"[", 
+                   RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", "a0", ",", 
+                 "a1", ",", "a2", ",", "a3"}], "]"}], "/.", "tansym"}], ")"}],
+              "-", 
+             RowBox[{"avg", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", ",", "2"}], "]"}], "]"}]}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", 
+             RowBox[{"Length", "[", "avg", "]"}]}], "}"}]}], "]"}], "/", 
+         RowBox[{"Length", "[", "avg", "]"}]}]}], ";", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"lin", ",", "cub"}], "}"}], "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Integrate", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "0", ",", "1"}], "}"}]}], "]"}], "&"}], "/@", 
+         RowBox[{"{", 
+          RowBox[{"lin", ",", "cub"}], "}"}]}]}], ";", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"tan", "=", 
+        RowBox[{"Chop", "[", 
+         RowBox[{
+          RowBox[{"NIntegrate", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"tanFunction", "[", 
+              RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], 
+              "]"}], "/.", "tan"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "0", ",", "1"}], "}"}]}], "]"}], ",", 
+          RowBox[{"10", "^", 
+           RowBox[{"(", 
+            RowBox[{"-", "3"}], ")"}]}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"tansym", "=", 
+        RowBox[{"Chop", "[", 
+         RowBox[{
+          RowBox[{"NIntegrate", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"tanFunction", "[", 
+              RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], 
+              "]"}], "/.", "tansym"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "0", ",", "1"}], "}"}]}], "]"}], ",", 
+          RowBox[{"10", "^", 
+           RowBox[{"(", 
+            RowBox[{"-", "3"}], ")"}]}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"linplus", ",", "cubplus"}], "}"}], "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Integrate", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "0", ",", "1"}], "}"}]}], "]"}], "&"}], "/@", 
+         RowBox[{"{", 
+          RowBox[{"linplus", ",", "cubplus"}], "}"}]}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", "\n", "\t", 
+       RowBox[{"tanplus", "=", 
+        RowBox[{"Chop", "[", 
+         RowBox[{
+          RowBox[{"NIntegrate", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"tanFunction", "[", 
+              RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], 
+              "]"}], "/.", "tanplus"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "0", ",", "1"}], "}"}]}], "]"}], ",", 
+          RowBox[{"10", "^", 
+           RowBox[{"(", 
+            RowBox[{"-", "3"}], ")"}]}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"tansymplus", "=", 
+        RowBox[{"Chop", "[", 
+         RowBox[{
+          RowBox[{"NIntegrate", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"tanFunction", "[", 
+              RowBox[{"x", ",", "a0", ",", "a1", ",", "a2", ",", "a3"}], 
+              "]"}], "/.", "tansymplus"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "0", ",", "1"}], "}"}]}], "]"}], ",", 
+          RowBox[{"10", "^", 
+           RowBox[{"(", 
+            RowBox[{"-", "3"}], ")"}]}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"linerror", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{"linplus", "-", "lin"}], ")"}], "//", "Abs"}], ")"}], 
+          ",", "0.01"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"cuberror", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{"cubplus", "-", "cub"}], ")"}], "//", "Abs"}], ")"}], 
+          ",", "0.01"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tanerror", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{"tanplus", "-", "tan"}], ")"}], "//", "Abs"}], ")"}], 
+          ",", "0.01"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tansymerror", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{"tansymplus", "-", "tansym"}], ")"}], "//", "Abs"}], 
+           ")"}], ",", "0.01"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Fahlin", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Round", "[", 
+           RowBox[{"100", 
+            RowBox[{"{", 
+             RowBox[{"lin", ",", "linerror", ",", "lindev"}], "}"}]}], "]"}], 
+          "/", "100"}], "//", "N"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Fahcub", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Round", "[", 
+           RowBox[{"100", 
+            RowBox[{"{", 
+             RowBox[{"cub", ",", "cuberror", ",", "cubdev"}], "}"}]}], "]"}], 
+          "/", "100"}], "//", "N"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Fahtan", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Round", "[", 
+           RowBox[{"100", 
+            RowBox[{"{", 
+             RowBox[{"tan", ",", "tanerror", ",", "tandev"}], "}"}]}], "]"}], 
+          "/", "100"}], "//", "N"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Fahtansym", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Round", "[", 
+           RowBox[{"100", 
+            RowBox[{"{", 
+             RowBox[{"tansym", ",", "tansymerror", ",", "tansymdev"}], 
+             "}"}]}], "]"}], "/", "100"}], "//", "N"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"linfitvalues", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"linfit", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", 
+            RowBox[{
+             RowBox[{"Table", "[", 
+              RowBox[{
+               RowBox[{"Position", "[", 
+                RowBox[{
+                 RowBox[{"linfit", "[", 
+                  RowBox[{"[", 
+                   RowBox[{
+                    RowBox[{"1", ";;", 
+                    RowBox[{"-", "1"}]}], ",", "1"}], "]"}], "]"}], ",", 
+                 RowBox[{"Round", "[", 
+                  RowBox[{
+                   RowBox[{"avg", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", "0.01"}], 
+                  "]"}]}], "]"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"i", ",", 
+                 RowBox[{"avg", "//", "Length"}]}], "}"}]}], "]"}], "//", 
+             "Flatten"}]}], "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"cubfitvalues", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"cubfit", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", 
+            RowBox[{
+             RowBox[{"Table", "[", 
+              RowBox[{
+               RowBox[{"Position", "[", 
+                RowBox[{
+                 RowBox[{"cubfit", "[", 
+                  RowBox[{"[", 
+                   RowBox[{
+                    RowBox[{"1", ";;", 
+                    RowBox[{"-", "1"}]}], ",", "1"}], "]"}], "]"}], ",", 
+                 RowBox[{"Round", "[", 
+                  RowBox[{
+                   RowBox[{"avg", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", "0.01"}], 
+                  "]"}]}], "]"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"i", ",", 
+                 RowBox[{"avg", "//", "Length"}]}], "}"}]}], "]"}], "//", 
+             "Flatten"}]}], "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"tanfitvalues", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"tanfit", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", 
+            RowBox[{
+             RowBox[{"Table", "[", 
+              RowBox[{
+               RowBox[{"Position", "[", 
+                RowBox[{
+                 RowBox[{"tanfit", "[", 
+                  RowBox[{"[", 
+                   RowBox[{
+                    RowBox[{"1", ";;", 
+                    RowBox[{"-", "1"}]}], ",", "1"}], "]"}], "]"}], ",", 
+                 RowBox[{"Round", "[", 
+                  RowBox[{
+                   RowBox[{"avg", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"i", ",", "1"}], "]"}], "]"}], ",", "0.01"}], 
+                  "]"}]}], "]"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"i", ",", 
+                 RowBox[{"avg", "//", "Length"}]}], "}"}]}], "]"}], "//", 
+             "Flatten"}]}], "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"linee", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"linfitvalues", "-", "avg"}], ")"}], "[", 
+               RowBox[{"[", 
+                RowBox[{
+                 RowBox[{"1", ";;", 
+                  RowBox[{"-", "1"}]}], ",", "2"}], "]"}], "]"}], "//", 
+              "Abs"}], "//", "Total"}], ")"}], "/", 
+           RowBox[{"(", 
+            RowBox[{"avg", "//", "Length"}], ")"}]}], ",", "0.001"}], "]"}]}],
+        ";", "\[IndentingNewLine]", 
+       RowBox[{"cube", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"cubfitvalues", "-", "avg"}], ")"}], "[", 
+               RowBox[{"[", 
+                RowBox[{
+                 RowBox[{"1", ";;", 
+                  RowBox[{"-", "1"}]}], ",", "2"}], "]"}], "]"}], "//", 
+              "Abs"}], "//", "Total"}], ")"}], "/", 
+           RowBox[{"(", 
+            RowBox[{"avg", "//", "Length"}], ")"}]}], ",", "0.001"}], "]"}]}],
+        ";", "\[IndentingNewLine]", 
+       RowBox[{"tane", "=", 
+        RowBox[{"Round", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"tanfitvalues", "-", "avg"}], ")"}], "[", 
+               RowBox[{"[", 
+                RowBox[{
+                 RowBox[{"1", ";;", 
+                  RowBox[{"-", "1"}]}], ",", "2"}], "]"}], "]"}], "//", 
+              "Abs"}], "//", "Total"}], ")"}], "/", 
+           RowBox[{"(", 
+            RowBox[{"avg", "//", "Length"}], ")"}]}], ",", "0.001"}], "]"}]}],
+        ";", "\[IndentingNewLine]", 
+       RowBox[{"Fahbest", "=", "Fahtan"}], ";", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"cube", "\[LessEqual]", "tane"}], ",", 
+         RowBox[{"Fahbest", "=", "Fahcub"}]}], "]"}], ";", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"linee", "\[LessEqual]", "cube"}], ",", 
+         RowBox[{"Fahbest", "=", "Fahlin"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"Fahbest", "=", "Fahcub"}], ";", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"Fahtan", "[", 
+             RowBox[{"[", "2", "]"}], "]"}], "<=", 
+            RowBox[{"Fahbest", "[", 
+             RowBox[{"[", "2", "]"}], "]"}]}], ",", 
+           RowBox[{"Fahbest", "=", "Fahtan"}]}], "]"}], ";"}], "*)"}], 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"Fahlin", "=", 
+        RowBox[{"{", 
+         RowBox[{"\"\<linear    \>\"", ",", 
+          RowBox[{"Fahlin", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{
+           RowBox[{"Fahlin", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], "//", "ToString"}], ",", 
+          RowBox[{"Fahlin", "[", 
+           RowBox[{"[", "3", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Fahcub", "=", 
+        RowBox[{"{", 
+         RowBox[{"\"\<cubic     \>\"", ",", 
+          RowBox[{"Fahcub", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{
+           RowBox[{"Fahcub", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], "//", "ToString"}], ",", 
+          RowBox[{"Fahcub", "[", 
+           RowBox[{"[", "3", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Fahtan", "=", 
+        RowBox[{"{", 
+         RowBox[{"\"\<tangens   \>\"", ",", 
+          RowBox[{"Fahtan", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{
+           RowBox[{"Fahtan", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], "//", "ToString"}], ",", 
+          RowBox[{"Fahtan", "[", 
+           RowBox[{"[", "3", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Fahtansym", "=", 
+        RowBox[{"{", 
+         RowBox[{"\"\<tangenssym   \>\"", ",", 
+          RowBox[{"Fahtansym", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{
+           RowBox[{"Fahtansym", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], "//", "ToString"}], ",", 
+          RowBox[{"Fahtansym", "[", 
+           RowBox[{"[", "3", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Fahbest", "=", 
+        RowBox[{"{", 
+         RowBox[{"\"\<best       \>\"", ",", 
+          RowBox[{"Fahbest", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{
+           RowBox[{"Fahbest", "[", 
+            RowBox[{"[", "2", "]"}], "]"}], "//", "ToString"}], ",", 
+          RowBox[{"Fahbest", "[", 
+           RowBox[{"[", "3", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"twopoints", "=", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Select", "[", 
+            RowBox[{
+             RowBox[{"avgin", "[", 
+              RowBox[{"[", 
+               RowBox[{"1", ";;", 
+                RowBox[{"-", "1"}]}], "]"}], "]"}], ",", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"#", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], "<=", "0.5"}], "&"}]}], "]"}],
+            "[", 
+           RowBox[{"[", 
+            RowBox[{"-", "1"}], "]"}], "]"}], ",", 
+          RowBox[{
+           RowBox[{"Select", "[", 
+            RowBox[{
+             RowBox[{"avgin", "[", 
+              RowBox[{"[", 
+               RowBox[{"1", ";;", 
+                RowBox[{"-", "1"}]}], "]"}], "]"}], ",", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"#", "[", 
+                RowBox[{"[", "1", "]"}], "]"}], "\[GreaterEqual]", "0.5"}], 
+              "&"}]}], "]"}], "[", 
+           RowBox[{"[", "1", "]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<two \>\"", ",", "twopoints"}], "]"}], ";"}], " ", 
+          "\[Equal]", " ", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"0.4", ",", "0.72", ",", "0.27"}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"0.6", ",", 
+              RowBox[{"-", "3.68"}], ",", "0.26"}], "}"}]}], "}"}]}], ";"}], 
+        "*)"}], "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"twopoints", "//", "Union"}], "//", "Length"}], ")"}], "!=",
+           "1"}], ",", 
+         RowBox[{
+          RowBox[{"Fahlinpoint", "=", 
+           RowBox[{"{", 
+            RowBox[{"\"\<l0.5pointsnext\>\"", ",", 
+             RowBox[{
+              RowBox[{"Round", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"(", 
+                  RowBox[{
+                   FractionBox[
+                    RowBox[{
+                    RowBox[{"twopoints", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"2", ",", "2"}], "]"}], "]"}], "-", 
+                    RowBox[{"twopoints", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"1", ",", "2"}], "]"}], "]"}]}], 
+                    RowBox[{
+                    RowBox[{"twopoints", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"2", ",", "1"}], "]"}], "]"}], "-", 
+                    RowBox[{"twopoints", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"1", ",", "1"}], "]"}], "]"}]}]], " ", 
+                   RowBox[{"(", 
+                    RowBox[{"0.5", "-", 
+                    RowBox[{"twopoints", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"1", ",", "1"}], "]"}], "]"}]}], ")"}]}], ")"}], 
+                 "+", 
+                 RowBox[{"twopoints", "[", 
+                  RowBox[{"[", 
+                   RowBox[{"1", ",", "2"}], "]"}], "]"}]}], ",", "0.01"}], 
+               "]"}], "//", "ToString"}], ",", 
+             RowBox[{
+              RowBox[{"Round", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"twopoints", "[", 
+                  RowBox[{"[", 
+                   RowBox[{
+                    RowBox[{"1", ";;", 
+                    RowBox[{"-", "1"}]}], ",", "3"}], "]"}], "]"}], "//", 
+                 "Max"}], ",", "0.01"}], "]"}], "//", "ToString"}]}], "}"}]}],
+           ";"}]}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"twopoints", "//", "Union"}], "//", "Length"}], ")"}], 
+          "\[Equal]", "1"}], ",", 
+         RowBox[{"Fahlinpoint", "=", 
+          RowBox[{"{", 
+           RowBox[{"\"\<l0.5point\>\"", ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"twopoints", "//", "Union"}], ")"}], "[", 
+              RowBox[{"[", 
+               RowBox[{"1", ",", "2"}], "]"}], "]"}], "//", "ToString"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"twopoints", "//", "Union"}], ")"}], "[", 
+              RowBox[{"[", 
+               RowBox[{"1", ",", "3"}], "]"}], "]"}], "//", "ToString"}]}], 
+           "}"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Fahcubpoint", "=", 
+        RowBox[{"{", 
+         RowBox[{"\"\<l0.5fromcub\>\"", ",", 
+          RowBox[{
+           RowBox[{"Round", "[", 
+            RowBox[{
+             RowBox[{"cubfit", "[", 
+              RowBox[{"[", 
+               RowBox[{"51", ",", "2"}], "]"}], "]"}], ",", "0.01"}], "]"}], "//",
+            "ToString"}], ",", 
+          RowBox[{
+           RowBox[{"Round", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"twopoints", "[", 
+               RowBox[{"[", 
+                RowBox[{
+                 RowBox[{"1", ";;", 
+                  RowBox[{"-", "1"}]}], ",", "3"}], "]"}], "]"}], "//", 
+              "Max"}], ",", "0.01"}], "]"}], "//", "ToString"}]}], "}"}]}], 
+       ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{"\"\<fit_cubic\>\"", ",", "cubfit", ",", "\"\<Table\>\""}], 
+        "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Export", "[", 
+        RowBox[{"\"\<fit_tangens\>\"", ",", "tanfit", ",", "\"\<Table\>\""}], 
+        "]"}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{
+        "Fahbest", ",", "Fahlin", ",", "Fahcub", ",", "Fahtan", ",", 
+         "Fahtansym", ",", "Fahlinpoint", ",", "Fahcubpoint"}], "}"}]}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"in", "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Import", "[", 
+      RowBox[{"\"\<avg_in\>\"", ",", "\"\<Table\>\""}], "]"}], "[", 
+     RowBox[{"[", 
+      RowBox[{
+       RowBox[{"4", ";;", 
+        RowBox[{"-", "1"}]}], ",", 
+       RowBox[{"1", ";;", "3"}]}], "]"}], "]"}], "//", "ToExpression"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Export", "[", 
+    RowBox[{"\"\<Fahout.dat\>\"", ",", 
+     RowBox[{"Fitting", "[", "in", "]"}], ",", "\"\<Table\>\""}], "]"}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.5315059467416143`*^9, 3.5315059491628923`*^9}, {
+  3.531506086929305*^9, 3.531506153973967*^9}, {3.5315127699719143`*^9, 
+  3.531512809995611*^9}, {3.531551865888213*^9, 3.531551871671755*^9}}]
+},
+WindowSize->{1315, 671},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"8.0 for Linux x86 (64-bit) (November 7, 2010)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[400, 13, 36949, 953, 2012, "Input"]
+}
+]
+*)
+

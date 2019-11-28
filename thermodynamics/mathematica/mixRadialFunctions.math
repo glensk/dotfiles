@@ -1,0 +1,38 @@
+mixRadialFunctions[mix_Real,s1_String,s2_String,sOut_String:"out",check_Integer:0]:=Module[
+  {
+    f1,f2,f1int,f2int,nMax,newx,fnew,sum1,sum2,x1end,x2end,Xnew,xnewEnd,xoldEnd,X
+  },
+ (* If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]]; *)
+
+  f1=Import[s1,"Table"]; f2=Import[s2,"Table"];
+  (*f1=checkImport[s1]; f2=checkImport[s2];*)
+
+  If[Max[Length[f1]]>Max[Length[f2]],
+     X=Transpose[f1][[1]]; xoldEnd=f1[[-1,1]],
+     X=Transpose[f2][[1]]; xoldEnd=f2[[-1,1]]];
+
+  (* construct new x mesh *)
+  x1end=f1[[-1,1]]; x2end=f2[[-1,1]];
+  xnewEnd = (1-mix)x1end + mix x2end;
+  Xnew = (xnewEnd/xoldEnd) X;
+  
+  (* bring both functions to new x range *)
+  f1={(xnewEnd/x1end)#[[1]],#[[2]]}&/@f1;
+  f2={(xnewEnd/x2end)#[[1]],#[[2]]}&/@f2;
+
+  (* interpolate *)
+  f1int=Interpolation[f1]; f2int=Interpolation[f2];
+
+  If[check==1, (* for check==1 we do check only if flip is needed *)
+    sum1=Sum[Abs[f1int[Xnew[[i]]]+f2int[Xnew[[i]]]],{i,Xnew//Length}];
+    sum2=Sum[Abs[f1int[Xnew[[i]]]-f2int[Xnew[[i]]]],{i,Xnew//Length}];
+    If[sum2>sum1,fnew="switch",fnew=""];
+    Print[sum1," ",sum2];
+  , (* for check==0 we build the interpolation on new x mesh *)
+    fnew = Table[{Xnew[[i]],
+                  (1-mix)f1int[Xnew[[i]]] + mix f2int[Xnew[[i]]]} , {i,Xnew//Length}];
+  ];
+
+  (* export *)
+  Export[sOut,fnew,"Table"]
+];

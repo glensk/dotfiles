@@ -1,0 +1,60 @@
+
+(* input: str symOps in CARTESIAN coordinates expected *)
+
+(* functionality: takes a set of atomic coordinates (str) and calculates the set of irreducible displacements
+                  and corresponding symmetry transformations needed in order to obtain complete dynamical matrix *)
+
+(* output: the index list of irreducible displacements and corresponding symmetry matrices in cartesian coordinates
+           note that the index of the displacement is obtained from the atom number and direction=(x,y,z)=(1,2,3)
+           by nrDisp = nrAtom*3 + direction(nrDir) *)
+
+(* limitations: currently only symmorphic transformations (point group symmetries) and only a single species are supported *)
+
+getIrreducibleDisplacements[str_, cell_, symOps_, eps_Real:GLOBALEPS] := Module[
+  {
+    disp = 0.1, l = 3 (str // Length),
+    done = Table[False, {3 (str // Length)}],
+    eqList = {}, sList = {},
+    sAtom, dir1, dir2, dispAtom1, dispAtom2
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  Do[
+    If[! done[[i]],
+      done[[i]] = True;
+      AppendTo[eqList, {i}];
+      AppendTo[sList, {IdentityMatrix[3]}];
+
+      Do[ Catch[ If[!done[[j]],
+
+        If[periodicDistance[str[[getAtom[i]]], {0, 0, 0}, cell] - (* precheck for efficiency purposes *)
+           periodicDistance[str[[getAtom[j]]], {0, 0, 0}, cell] < eps,
+          Do[
+            sAtom = symOps[[s]].str[[getAtom[j]]];
+
+            If[periodicEqualCartesian[str[[getAtom[i]]], sAtom, cell, eps],
+              dir1 = getDirection[i];
+              dir2 = getDirection[j];
+              dispAtom1 = {0, 0, 0};
+              dispAtom2 = {0, 0, 0};
+              dispAtom1[[dir1]] += disp;
+              dispAtom2[[dir2]] += disp;
+
+              If[Norm[dispAtom1 - Abs[symOps[[s]].dispAtom2]] < eps,
+
+                If[(symOps[[s]].dispAtom2)[[dir1]] < 0,
+                  AppendTo[eqList[[-1]], -j], AppendTo[eqList[[-1]], j]
+                ];
+                AppendTo[sList[[-1]], symOps[[s]]];
+                done[[j]] = True;
+                Throw[True];
+              ];
+            ];
+          ,{s, symOps // Length}];
+        ];
+       ]],{j, l}];
+    ];
+  ,{i, l}];
+
+  {eqList, sList}
+];

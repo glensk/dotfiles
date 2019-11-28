@@ -1,0 +1,35 @@
+reduceDynMatR[coord_List, forcesIn_List, supercell_List, eps_Real:GLOBALEPS] := Module[
+  {
+    forcesOut = forcesIn,
+    a1 = supercell[[1]]/2,
+    a2 = supercell[[2]]/2,
+    a3 = supercell[[3]]/2,
+    plane1, plane2, plane3,
+    planeList,
+    reducedList = Table[0, {coord // Length}],
+    vecIn,
+    n,
+    printReducedList = False
+  },
+  If[!allModulesLoaded===True,Print["need ALL.math loaded!"];Abort[]];
+
+  plane1 = {a1, Cross[a2,a3]/Norm[Cross[a2,a3]]};
+  plane2 = {a2, Cross[a3,a1]/Norm[Cross[a3,a1]]};
+  plane3 = {a3, Cross[a1,a2]/Norm[Cross[a1,a2]]};
+  planeList = {plane1, plane2, plane3, -plane1, -plane2, -plane3};
+
+  Do[ Do[
+    vecIn = planeList[[i, 1]];
+    n = planeList[[i, 2]];
+
+    If[n.(vecIn - coord[[j]]) < eps,
+      forcesOut[[j]] /= 2;
+      reducedList[[j]] += 1;
+      (*Print[coord[[j]],"-->",forcesOut[[j]]];*)
+    ];
+  ,{j, 1, coord // Length}], {i, 1, planeList // Length}];
+
+  If[printReducedList, Print[reducedList, Total[reducedList]]];
+
+  forcesOut
+];
