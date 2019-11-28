@@ -235,6 +235,7 @@ alias gatehydra='sshimmer -t aglen@hydra.rzg.mpg.de     "[ -e `th.sh` ] && cd `t
 alias fidis='ssh fidis'
 alias f='ssh fidis'
 alias daint='ssh daint'
+alias ela='ssh ela'
 alias d='ssh daint'
 alias helvetios='ssh helvetios'
 alias h='ssh helvetios'

@@ -1,0 +1,6 @@
+&input
+ band_proj = .false., 
+ band_sym = .true., 
+ n_atom = 2, 
+ n_orbit = 9,
+/
