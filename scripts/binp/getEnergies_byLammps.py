@@ -7,6 +7,7 @@ from subprocess import check_output,call
 import glob,time
 import numpy as np
 import myutils as my
+import my_atom
 import fah
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
@@ -389,7 +390,7 @@ def get_energies(args):
 
         #if args.thermo or args.evinet or args.fqh or args.fah:
         #    if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
-        if not os.path.isdir('fah'):
+        if False and not os.path.isdir('fah'):
             print("##############################")
             print("# NOW creating anharmonic folders and calculating... #")
             print("##############################")
@@ -406,7 +407,7 @@ def get_energies(args):
             sys.exit()
 
 
-        if os.path.isdir('fah'):
+        if False and os.path.isdir('fah'):
             print("##############################")
             print("# NOW running anharmonic ... #")
             print("##############################")
@@ -451,6 +452,12 @@ def get_energies(args):
         print('args.format_in',args.format_in)
         print('frames.cell',frames.cell)
         print('frames.positions',frames.positions)
+        print('frames.get_atomic_numbers()',frames.get_atomic_numbers())
+        print('frames.get_atomic_numbers()',list(set(frames.get_atomic_numbers())))
+        #Tmax_elements = list(set(frames.get_atomic_numbers()))
+        #print('Tmax_elements',Tmax_elements)
+        #Tmax = my_atom.get_meltingpoint_rounded(Tmax_elements,maximum=True)
+        #print('Tmax',Tmax)
         #sys.exit()
         print('os.getcwd()',os.getcwd())
         ase_structure_relaxed = my.get_evinet(ace,frames,relax_cellshape_and_volume=True,fqh=args.fqh,fah=args.fah)

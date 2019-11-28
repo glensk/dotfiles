@@ -5846,7 +5846,9 @@ class ase_calculate_ene( object ):
             print('get_chemical_symbols()',atoms_h.get_chemical_symbols())
             print()
 
-        hes = hesse.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = True, Tmax=2000, T0shift_ev_atom = T0shift_ev_atom)
+        Tmax_elements = list(set(atoms_h.get_atomic_numbers()))
+        Tmax = my_atom.get_meltingpoint_rounded(Tmax_elements,maximum=True)
+        hes = hesse.hesseclass(listin=atoms_h.get_chemical_symbols(),H=hessematrix,show_negative_eigenvalues = True, Tmax=Tmax, T0shift_ev_atom = T0shift_ev_atom)
         print('eigenvalues',hes.freqs)
         #try:
         #    #free_ene = (hes.ene_atom[300]-hes.ene_atom[0])[1]
@@ -6062,7 +6064,8 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
             print('now fqh/termo?',os.getcwd())
             call(["cp ../../evinet/EVinet_1 EVinet"],shell=True)
             call(["cp ../Fqh_*at_cell_per_atom_Surface_3rd_order__* Fqh"],shell=True)
-            call(["$HOME/Thermodynamics/getThermodynamics.sh"],shell=True)
+            print('now gethermodynamcs.sh',os.getcwd())
+            call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
 
 
         # cd self.fqh_folder

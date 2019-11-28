@@ -1,4 +1,7 @@
 *.pyc
+*.mod
+*.o
+*.x
 tmp_assess/
 bin_unused/
 .DS_Store

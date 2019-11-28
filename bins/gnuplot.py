@@ -205,6 +205,7 @@ def gnuplot_defaults(args):
             term="x11"
         elif myhost == "mac":
             term="qt"
+        print('term',term)
         ca('set term '+term+' font "Times-New-Roman,12"')
         #ca('set term aqua font "Times-New-Roman,12"')
         #ca("set terminal x11 font \'Verdana,10\'")
@@ -400,6 +401,9 @@ def gnuplot_plot(args):
         #input = np.loadtxt(inputfile)
         from numpy import genfromtxt
         input = genfromtxt(inputfile,filling_values=99)
+        print('len(file)',len(input))
+        if len(input) == 0:
+            continue
         if len(input) > 10:
             print('input:')
             print(input[:2])

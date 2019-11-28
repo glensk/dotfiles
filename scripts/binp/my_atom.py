@@ -9,7 +9,7 @@ import math
 np.set_printoptions(suppress=True)   # display arrays withou 000000
 np.set_printoptions(precision=6)    # print only 6 digist after .
 
-atomic_symbols = [
+chemical_symbols = atomic_symbols = [
     '',  'H',  'He', 'Li', 'Be',
     'B',  'C',  'N',  'O',  'F',
     'Ne', 'Na', 'Mg', 'Al', 'Si',
@@ -31,6 +31,16 @@ atomic_symbols = [
     'Th', 'Pa', 'U',  'Np', 'Pu',
     'Am', 'Cm', 'Bk', 'Cf', 'Es',
     'Fm', 'Md', 'No', 'Lr']
+
+def get_atomic_number_from_symbol(atomic_symbol):
+    if type(atomic_symbol) == str:
+        atomic_symbol = [atomic_symbol]
+    atomic_numbers_out = []
+    for i in atomic_symbol: # can be several
+        #print(i,i in atomic_symbols,atomic_symbols.index(i))
+        atomic_numbers_out.append(atomic_symbols.index(i))
+    #print('atomic_numbers_out',atomic_numbers_out)
+    return atomic_numbers_out
 
 atomic_z = np.arange(len(atomic_symbols))
 
@@ -568,7 +578,48 @@ atomic_melting_webelements = np.array([
 atomic_melting = atomic_melting_webelements
 #['al, '1', 'cu', '3' ] --> ['al', 'cu', 'cu', 'cu']
 
+def get_meltingpoint(elements,maximum=False):
+    '''
+    import my_atom
+    my_atom.get_meltingpoint(["Al", "Si"],maximum=True)
+    '''
+    all_numbers = True
+    for i in elements:
+        #print('ee',i,type(i))
+        if type(i) == str:
+            all_numbers = False
+            break
+    print('elements   :',elements)
+    print('all_numbers:',all_numbers)
+    if all_numbers == False: # we have a list like ['Al', 'Si']
+        num = get_atomic_number_from_symbol(elements)
+    else:
+        num = elements
+    temperatures = atomic_melting[num]
+    #print('temperatures',temperatures)
+    if maximum == False:
+        return temperatures
+    else:
+        out = np.array(temperatures).max()
+        #print('out',out)
+        return out
 
+def get_meltingpoint_rounded(elements,maximum=False):
+    '''
+    import my_atom
+    my_atom.get_meltingpoint_rounded(["Al", "Si"],maximum=True)
+    '''
+    if type(elements) == str:
+        elements = [elements]
+    temp = get_meltingpoint(elements,maximum=maximum)
+
+    if type(temp) != list:
+        temp = [temp]
+    melting_rounded = [ int(math.ceil(b)) for b in temp]
+    if maximum == False:
+        return melting_rounded
+    else:
+        return melting_rounded[0]
 
 ### sensible radii for displacements;
 rmin = {};rmax = {};alatT0K = {}; alatTmelt = {};
