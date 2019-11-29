@@ -191,6 +191,128 @@ def get_dudl_or_other_average_from_array(dudl):
     #print(dudlav)
     return dudlav
 
+######### job creation ############
+def fah_create_jobs_from_fqh(ace):
+    if not os.path.isdir('fqh'):
+        sys.exit('fqh does not exist')
+    if os.path.isdir('fah'):
+        sys.exit('fah does exist already')
+    hesse_vol_pos = my.load_hessefiles_volumes_positionsfiles_from_fqh_folder()
+    print("###################################")
+    print("# NOW creating anharmonic folders #")
+    print("###################################")
+    fqhfolder = get_fqh_folder()
+    print('fqhfolder',fqhfolder)
+    Tmax = get_Tmax_from_fqh_thermo_2nd(verbose=False)
+    print('Tmax',Tmax)
+    temperatures1 = False
+    temperatures2 = False
+    for i in np.arange(100,1000,100): # [ 100, 200, ..., 1000 ]
+        temp_test = np.arange(200,Tmax+i,i)
+        if len(temp_test) >= 5 and len(temp_test) <=10:
+            temperatures = temp_test
+            break
+
+    #print('len(i)',i,temperatures,len(temperatures))
+    #temperatures = [200, 400, 600, 800, 1000 ]
+    lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
+    steps = 40000
+    steps = 9000
+    print("temperatrues",temperatures)
+    #temperatures = [400 ]
+    for idx_vol,i in enumerate(hesse_vol_pos):
+        for idx_temp,temperature in enumerate(temperatures):
+            hessefile = i[0]
+            volume  = i[1]
+            posfile = i[2]
+            print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
+            my.ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps)
+    return
+
+def go_through_all_fah_jobs_and_create_joblist():
+    ''' can create joblist if some jobs are already finished '''
+    get_into_fah_folder(verbose=False)
+    hier = os.getcwd()
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+    print('fvta',fvta)
+    sj=0
+    for fvt in fvta:
+        os.chdir(fvt)
+        print('os.getcwd() fvt',os.getcwd())
+        flsa = glob.glob(os.getcwd()+"/lambda*_*")
+        for fls in flsa:
+            os.chdir(fls)
+            print('os.getcwd() fls',os.getcwd())
+
+
+            #########################################
+            # define what to do
+            #########################################
+            submitjob = True
+
+            if os.path.isfile('simulation.ti'):
+                submitjob = False
+                sim = np.loadtxt('simulation.ti')
+                print('len simulation.ti:',len(sim))
+                if len(sim) == 0:
+                    submitjob = True
+                #if len(sim) != 5001:
+                #    submitjob = True
+                #    print('len',len(sim))
+            if submitjob:
+                sj += 1
+                print('submit!!',sj,"myutils.py -ef ipi_sart_job")
+                #call(["myutils.py -ef ipi_sart_job"],shell=True)
+
+                f = open(hier+"/joblist.dat", "a")
+                f.write(os.getcwd()+"\n")
+                f.close()
+
+    submitfile = os.environ['dotfiles']+'/scripts/i-pi-mc_scripts/submit_ipi_ti_joblist.sh'
+    if os.path.isfile(submitfile):
+        print('submitfile',submitfile,'does exist')
+        get_into_fah_folder(verbose=False)
+        shutil.copy2(submitfile,os.getcwd())
+        print('copied submitfile to fah folder; now start the job by sbatch...')
+        if os.environ['myhost'] in ['helvetios']:
+            print()
+            print()
+            print()
+            print('now submitting jobs')
+            call(["sbatch submit_ipi_ti_joblist.sh"],shell=True)
+            print()
+            print()
+            print()
+        else:
+            print('submit job by sbatch submit_ipi_ti_joblist.sh')
+    else:
+        print('submitfile',submitfile)
+        print('submitfile does not exist!')
+        print('for 32 atoms and only 150 jobs do: sbatch -p debug -t 00:59:00 submit_ipi_ti_joblist.sh')
+    return
+
+def fah_submit_job_if_on_cluster():
+    get_into_fah_folder(verbose=False)
+    hier = os.getcwd()
+
+######### job analysis ############
+def get_fqh_folder(verbose=False):
+    hier = os.getcwd()
+    get_into_fah_folder(verbose=False)
+    ahfolder = os.getcwd()
+    os.chdir(hier)
+    fqhfolder = ahfolder[:-4]+'/fqh'
+    #print('fqhfolder',fqhfolder)
+    return fqhfolder
+
+def get_Tmax_from_fqh_thermo_2nd(verbose=False):
+    fqhfolder = get_fqh_folder(verbose=False)
+    fqhsurface = fqhfolder+'/thermo_2nd/Fqh'
+    a = np.loadtxt(fqhsurface)
+    #print(a)
+    #print(int(a[-1][0]))
+    return int(a[-1][0])
+
 def get_into_fah_folder(verbose=False):
     hier = os.getcwd()
     if verbose:
@@ -217,24 +339,34 @@ def get_into_fah_folder(verbose=False):
         return
 
     hier2 = os.getcwd()
+    #print('hier2',hier2)
+    if not os.path.isdir(hier2+'/fah'):
+        if os.path.isdir(hier2+'/fqh'):
+            os.makedirs('fah')
+            os.chdir(os.getcwd()+'/fah')
+            return
+    hier2 = os.getcwd()
     if not os.path.isdir(hier2+'/fah'):
         sys.exit('no fah folder found')
     return
 
-def get_sorted_lambda_folder(verbose=False):
-    f = glob.glob("lambda*_*")
-    hier = os.getcwd()
-    if verbose:
-        print('hier',hier)
-        for i in f:
-            print(i)
-    f = utils.list_sorted(f)
-    return f
+def fah_go_through_all_angK_folder_and_exec_function(function=False):
+    get_into_fah_folder(verbose=False)
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+    for fvt in fvta:
+        os.chdir(fvt)
+        print('os.getcwd() fvt',os.getcwd())
+        #########################################
+        # define what to do
+        #########################################
+        #get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job()
+        function()
+    return
 
-def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",verbose=True):
+def get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",verbose=True):
     ''' savefit = False or filename like avg_dudl_fit.dat '''
     f = get_sorted_lambda_folder(verbose=False)
-
+    hier = os.getcwd()
     # das hier sollte schon das average ueber verschiedene seeds sein ...
     l_ = []
     dudl_mean_ = []
@@ -282,6 +414,36 @@ def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",ver
     f.close()
     return
 
+def get_sorted_lambda_folder(verbose=False):
+    f = glob.glob("lambda*_*")
+    hier = os.getcwd()
+    if verbose:
+        print('hier',hier)
+        for i in f:
+            print(i)
+    f = utils.list_sorted(f)
+    return f
+
+def fah_get_Fah_surface():
+    get_into_fah_folder(verbose=False)
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+
+    if os.path.isfile('Fah_surface'):
+        os.remove('Fah_surface')
+    for fvt in fvta:
+        v_str = fvt.split('fah/')[-1].split("_")[0]
+        t_str = fvt.split('fah/')[-1].split("_")[1][:-1]
+        #dudl  = np.loadtxt(fvt+'/Fah')
+        fah_content = my.grep(fvt+'/Fah','tangens')[0].split()
+        fah_str = fah_content[1]
+        err_str = fah_content[2]
+        print('fvt',fvt,t_str,v_str,fah_str,err_str)
+
+        f = open('Fah_surface', "a")
+        f.write(t_str+" "+v_str+" "+fah_str+" "+err_str+"\n")
+        f.close()
+    return
+
 def fah_write_fit_input(filename='fit.input'):
     Fahsurfaceminalat = 15
     Fahsurfacemaxalat = 18
@@ -323,77 +485,6 @@ def fah_write_fit_input(filename='fit.input'):
         f.write("(*<<\"~/scripts/Thermodynamics/fitSurface.math\"*)"+"\n")
         f.write("<<\"/home/grabowski/Thermodynamics/mathematica/fitSurface.MATH\""+"\n")
         f.close()
-    return
-
-
-def fah_get_Fah_surface():
-    get_into_fah_folder(verbose=False)
-    fvta = glob.glob(os.getcwd()+"/*_*K")
-
-    if os.path.isfile('Fah_surface'):
-        os.remove('Fah_surface')
-    for fvt in fvta:
-        v_str = fvt.split('fah/')[-1].split("_")[0]
-        t_str = fvt.split('fah/')[-1].split("_")[1][:-1]
-        #dudl  = np.loadtxt(fvt+'/Fah')
-        fah_content = my.grep(fvt+'/Fah','tangens')[0].split()
-        fah_str = fah_content[1]
-        err_str = fah_content[2]
-        print('fvt',fvt,t_str,v_str,fah_str,err_str)
-
-        f = open('Fah_surface', "a")
-        f.write(t_str+" "+v_str+" "+fah_str+" "+err_str+"\n")
-        f.close()
-    return
-
-def fah_go_through_all_angK_folder_and_exec_function(function=False):
-    get_into_fah_folder(verbose=False)
-    fvta = glob.glob(os.getcwd()+"/*_*K")
-    for fvt in fvta:
-        os.chdir(fvt)
-        print('os.getcwd() fvt',os.getcwd())
-        #########################################
-        # define what to do
-        #########################################
-        #get_avg_dudl_in_one_ang_K_folder_from_ipi_job()
-        function()
-    return
-
-def go_through_all_fah_jobs_and_create_joblist():
-    get_into_fah_folder(verbose=False)
-    fvta = glob.glob(os.getcwd()+"/*_*K")
-    print('fvta',fvta)
-    sj=0
-    for fvt in fvta:
-        os.chdir(fvt)
-        print('os.getcwd() fvt',os.getcwd())
-        flsa = glob.glob(os.getcwd()+"/lambda*_*")
-        for fls in flsa:
-            os.chdir(fls)
-            print('os.getcwd() fls',os.getcwd())
-
-
-            #########################################
-            # define what to do
-            #########################################
-            submitjob = False
-            if not os.path.isfile('simulation.ti'): submitjob = True
-
-            if os.path.isfile('simulation.ti'):
-                sim = np.loadtxt('simulation.ti')
-                if len(sim) == 0:
-                    submitjob = True
-                if len(sim) != 5001:
-                    submitjob = True
-                    print('len',len(sim))
-            if submitjob:
-                sj += 1
-                print('submit!!',sj,"myutils.py -ef ipi_sart_job")
-                #call(["myutils.py -ef ipi_sart_job"],shell=True)
-
-                f = open(hier+"/joblist.dat", "a")
-                f.write(os.getcwd()+"\n")
-                f.close()
     return
 
 def get_dudl_from_ipi_job(verbose=True):
@@ -451,9 +542,6 @@ def get_dudl_from_ipi_job(verbose=True):
         dudlstd[idx] = dudl[:idx+1].std()/np.sqrt(idx+1)
     #print('len(dudl)',len(dudl))
     #np.savetxt('dudlstd.dat',dudlstd)
-
-
-
     #print('t1',tempav)
     #np.savetxt('tempav.dat',tempav)
     #np.savetxt('temp.dat',t)
@@ -528,6 +616,7 @@ def save_dudl_to_file(folder,dudl,filename="dudl"):
     return
 
 
+######### old fah stuff ############
 class ah():
     ''' anharmonic contribution to Gibbs free energy '''
     def __init__(self):
@@ -1146,8 +1235,10 @@ if __name__ == '__main__':
     string = '''
     Examples for using this script:
     -------------------------------
-    % fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_avg_dudl_in_one_ang_K_folder_from_ipi_job
-    % fah.py -ef go_through_all_fah_jobs_and_create_joblist
+    % fah.py -ef fah_create_jobs_from_fqh       (step 0)
+    % fah.py -ef go_through_all_fah_jobs_and_create_joblist       (step 1)
+    % fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job   (step 2)
+    % fah.py -ef fah_get_Fah_surface (step 3)
     '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)

@@ -1,4 +1,4 @@
-<simulation mode='static' verbosity='high'>
+<simulation mode='static' verbosity='low'>
   <output prefix='simulation'>
     <!-- SELECT THE PROPERTIES THAT NEED TO BE PRINTED OUT -->
     <properties stride='1' filename='out'>  [ step, time{femtosecond}, conserved, temperature{kelvin}, kinetic_md, potential, pressure_md ] </properties>

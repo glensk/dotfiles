@@ -390,26 +390,11 @@ def get_energies(args):
 
         #if args.thermo or args.evinet or args.fqh or args.fah:
         #    if os.path.isdir('evinet'): sys.exit("Exit: Folder evinet exists already!")
-        if False and not os.path.isdir('fah'):
-            print("##############################")
-            print("# NOW creating anharmonic folders and calculating... #")
-            print("##############################")
-            hesse_vol_pos = my.load_hessefiles_volumes_positionsfiles_from_fqh_folder()
-            temperatures = [200, 400, 600, 800, 1000 ]
-            #temperatures = [400 ]
-            for idx_vol,i in enumerate(hesse_vol_pos):
-                for idx_temp,temperature in enumerate(temperatures):
-                    hessefile = i[0]
-                    volume  = i[1]
-                    posfile = i[2]
-                    print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
-                    my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile)
-            sys.exit()
-
+        #if False and not os.path.isdir('fah'):
 
         if False and os.path.isdir('fah'):
             print("##############################")
-            print("# NOW running anharmonic ... #")
+            print("# extracting anharmonic Fah_surface... #")
             print("##############################")
             hier = os.getcwd()
             print('os.getcwd()',os.getcwd())
@@ -440,6 +425,7 @@ def get_energies(args):
 
 
 
+        if args.thermo: args.evinet = True
         if args.thermo: args.fqh = True
         if args.thermo: args.fah = True
         if args.inputfile == 'POSCAR': args.format_in = "vasp"
@@ -454,18 +440,14 @@ def get_energies(args):
         print('frames.positions',frames.positions)
         print('frames.get_atomic_numbers()',frames.get_atomic_numbers())
         print('frames.get_atomic_numbers()',list(set(frames.get_atomic_numbers())))
-        #Tmax_elements = list(set(frames.get_atomic_numbers()))
-        #print('Tmax_elements',Tmax_elements)
-        #Tmax = my_atom.get_meltingpoint_rounded(Tmax_elements,maximum=True)
-        #print('Tmax',Tmax)
-        #sys.exit()
         print('os.getcwd()',os.getcwd())
-        ase_structure_relaxed = my.get_evinet(ace,frames,relax_cellshape_and_volume=True,fqh=args.fqh,fah=args.fah)
+        ase_structure_relaxed = my.get_thermo(ace,frames,relax_cellshape_and_volume=True,evinet=args.evinet,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
+
         #ace.get_elastic_external(atomsin=ase_structure_relaxed,verbose=ace.verbose,text="structure",get_all_constants=True)
         #print('ace.c44:',ace.c44,type(ace.c44))
 
-        sys.exit("Thermodynamic properties done.")
+        sys.exit("Thermodynamic properties done up to Fqh. Fah jobs created")
 
     if args.verbose > 2:
         print('getEne(p7)                           : pot defined')
@@ -1766,14 +1748,13 @@ def get_basic_NN_energies_ace(ace):
     #ace.check_frame('aaa',ace.al_fcc)
     if ace.verbose:
         print("NN 2 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
-    vinet = ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False,write_energies=False)
+    ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False,write_energies=False)
     if ace.verbose:
         print("NN 3 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     #ace.ase_relax_cellshape_and_volume_only(ace.al_fcc,verbose=False)
     #ace.check_frame('ccc',ace.al_fcc)
     #sys.exit()
     if ace.verbose:
-        print('vinet',vinet)
         print("NN 4 Al vpa @T=0K",my.ase_vpa(ace.al_fcc)) #,"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     #sys.exit('ace fcc al si dc')
         print('before too lon 12')
@@ -2029,7 +2010,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         if volumerelax: ace.ase_relax_cellshape_and_volume_only(frame)
         check = ace.check_frame('',frame=frame,verbose=False)
         #print('11 atomrelax',atomrelax,'volumerelax',volumerelax,"check",check)
-        vinet = ace.get_murn(frame,verbose=False,return_minimum_volume_frame = volumerelax, atomrelax=atomrelax,write_energies=False,printminimal=False)
+        ace.get_murn(frame,verbose=False,return_minimum_volume_frame = volumerelax, atomrelax=atomrelax,write_energies=False,printminimal=False)
         energy_NN_cell_NNrelaxed = ace.ene(frame) #,atomrelax=atomrelax,cellrelax=cellrelax)
         #print('d mg:',d["Mg"],'d si:',d["Si"],'d al:',d["Al"])
         #heat_precip_T0K         = (e - d["Mg"]*ace.eform_dilute_mg - d["Si"]*ace.eform_dilute_si - d["Al"]*ace.eform_dilute_al)/nat
