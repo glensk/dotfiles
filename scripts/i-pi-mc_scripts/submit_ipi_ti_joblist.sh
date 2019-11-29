@@ -62,3 +62,8 @@ while [ "$todo" -ge "1" ];do
 done
 echo "XX FINISHED THE LOOP"
 wait
+echo "now all jobs done"
+cd $hier
+fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job
+fah.py -ef fah_get_Fah_surface
+

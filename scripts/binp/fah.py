@@ -444,6 +444,12 @@ def fah_get_Fah_surface():
         f.close()
     return
 
+def fah_get_thermo():
+    get_into_fah_folder(verbose=False)
+    if not os.path.isfile('Fah_surface'):
+        sys.exit('no Fah_surface')
+
+
 def fah_write_fit_input(filename='fit.input'):
     Fahsurfaceminalat = 15
     Fahsurfacemaxalat = 18
@@ -1235,8 +1241,13 @@ if __name__ == '__main__':
     string = '''
     Examples for using this script:
     -------------------------------
+    # creating jobs:
+    # -----------------
     % fah.py -ef fah_create_jobs_from_fqh       (step 0)
     % fah.py -ef go_through_all_fah_jobs_and_create_joblist       (step 1)
+
+    # analyzing jobs:
+    # -----------------
     % fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job   (step 2)
     % fah.py -ef fah_get_Fah_surface (step 3)
     '''
