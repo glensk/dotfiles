@@ -112,6 +112,7 @@ case $myhost in
 #    # when pip -V made problems after : pip install --upgrade --user pip
 #    # it was however suggested to run : pip install --upgrade pip (without user)
 #    # solved by python -m pip uninstall pip
+#    # brew install rust # necessary to get carge which itself is used for viu
 
 
 #    # on mac: 

@@ -33,6 +33,7 @@ if [ "$myhost" = "mac" ];then
     # !! too much time !!! brew="$(brew --prefix coreutils)/libexec/gnubin" 
     brew="/usr/local/opt/coreutils/libexec/gnubin"   # gnu ls, wc, cp, ...
                                                 # ls needs options --  from gnubin
+    viu_cargo="$HOME/.cargo/bin"
     #phonopy="$HOME/scripts/phonons/phonopy_at_$host" is already in ~/.local/bin
     f2py="$HOME/Library/Python/2.7/bin" # f2py -c --help-fcompiler to check compiler options
     #tdep="$HOME/Dropbox/Albert/scripts/phonons/tdep-devel/bin"
@@ -59,7 +60,7 @@ if [ "$myhost" = "mac" ];then
     #setenv LD_LIBRARY_PATH '/afs/@cell/common/soft/intel/mkl/lib/intel64/'
     #setenv LD_LIBRARY_PATH "$HOME/lib:/afs/@cell/common/soft/intel/ics2013/14.0/compiler/lib/intel64:/afs/@cell/common/soft/intel/ics2013/14.0/mkl/lib/intel64/"
     
-    export PATH="$f2py:$brew:$PATH"   # brew necessary to load coreutils
+    export PATH="$f2py:$brew:$viu_cargo:$PATH"   # brew necessary to load coreutils
     export LD_LIBRARY_PATH="$ldvasp:$ldphonopylapack:$ldphonopyopenblas:$LD_LIBRARY_PATH" # lets try without ... dont know for which progs I used those
     #export C_INCLUDE_PATH="/Users/glensk/.miniconda3/include:$C_INCLUDE_PATH"  # lets try without
 fi
