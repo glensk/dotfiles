@@ -9,7 +9,7 @@ import subprocess
 
 myhost = myhostname = my.check_for_known_hosts()
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ]
+known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ,'viu']
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -49,6 +49,9 @@ branch["units"]          = False
 
 git_address["cosmo_tools"]   = "https://github.com/cosmo-epfl/cosmo-tools.git"
 branch["cosmo_tools"]    = False
+
+git_address["viu"]  = "https://github.com/atanunq/viu.git"
+branch["viu"]       = False
 
 git_address["cosmo-tools"]   = git_address["cosmo_tools"]
 branch["cosmo-tools"]    = branch["cosmo_tools"]
@@ -164,6 +167,7 @@ def install_(args,known):
         elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
         elif args.install in ['ncdu']: install_ncdu(args)
         elif args.install in ['eigen']: install_eigen(args)
+        elif args.install in ['viu']: install_viu(args)
         else: git_clone(args)  # ipi_cosmo, aiia-alloy, mlip, ....
 
         # not working yet
@@ -172,6 +176,11 @@ def install_(args,known):
     print("DONE")
     return
 
+def install_viu(args):
+    git_clone(args,specify_depth = True)
+    os.chdir(args.install_folder)
+    subprocess.call(["cargo install --path ."],shell=True)
+    return
 
 def git_clone(args,specify_depth = True,checkout=False):
     do = ["git","clone"]
