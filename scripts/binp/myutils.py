@@ -11,7 +11,7 @@ import my_atom
 from itertools import islice
 import h5py
 
-
+import fah as fah_
 import argparse
 from copy import deepcopy
 from socket import gethostname
@@ -4570,7 +4570,7 @@ class ase_calculate_ene( object ):
             constraint = False
         elif volumerelax == True and atomrelax == False and cellshaperelax == False:
             print('before murn')
-            vinet = self.get_murn(atoms,verbose=False,return_minimum_volume_frame=True)
+            self.get_murn(atoms,verbose=False,return_minimum_volume_frame=True)
             print('after murn')
             #constraint = ExpCellFilter(atoms, hydrostatic_strain=True) does not work
         elif atomrelax == False and cellshaperelax == True:
@@ -5469,14 +5469,15 @@ class ase_calculate_ene( object ):
             return_minimum_volume_frame=False,
             return_frame_with_volume_per_atom=False,
             atomrelax=False,
-            write_energies=False,
-            write_Fqh_files=False,
-            write_Fah_folder=False,
+            write_evinet=False,
+            write_fqh=False,
             get_to_minvol_first=True,
             printminimal=True):
         ''' the murn will never change the atomsobject
         return_frame_with_volume_per_atom : volume can be specified and he frame scaled
         '''
+        if write_evinet and os.path.isdir('evinet'):
+            sys.exit('evinet folder already exists')
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         if return_minimum_volume_frame == True or type(return_frame_with_volume_per_atom) != bool:
@@ -5499,16 +5500,25 @@ class ase_calculate_ene( object ):
             self.ase_relax_atomic_positions_only(atoms_murn,fmax=0.0001,verbose=False)
             if verbose: self.check_frame('get_murn 2 atfer atomrelax only',frame=atoms_murn)
 
-        dvol_rel=[0.97,0.975,0.98,0.985,0.99,0.995,0.998,1.0,1.002,1.005,1.01,1.015,1.02,1.025,1.03]
-        dvol_rel = np.arange(0.97,1.03,0.005)
-        dvol_rel = np.arange(0.985,1.015,0.0025)
-        #dvol_rel = np.arange(0.9,1.1,0.01)
-        #dvol_rel = np.arange(0.80,1.20,0.01)
-        #dvol_rel = np.arange(0.97,1.03,0.001)
-        #dvol_rel = np.arange(0.995,1.005,0.0003)
-        vol_pa = np.zeros(len(dvol_rel))
-        ene_pa = np.zeros(len(dvol_rel))
+        if write_evinet == False and write_fqh == False:
+            return
 
+        ### only get here if either write_evinet or write_fqh
+        # range for eos!
+        # the range for volume expansion until melting has to be larger!
+        if write_evinet == True:
+            alat_rel=[0.97,0.975,0.98,0.985,0.99,0.995,0.998,1.0,1.002,1.005,1.01,1.015,1.02,1.025,1.03]
+            alat_rel = np.arange(0.97,1.03,0.005)
+            alat_rel = np.arange(0.985,1.015,0.0025)
+            alat_rel = np.arange(0.99,1.015,0.0025)  # otherwise repulsive part too strong
+            alat_rel = np.arange(0.9865,1.015,0.0025)  # seems most symmetric for cu
+        if write_evinet == False and write_fqh != False:
+            print('getting volume range for Fqh, V0 (T=0K) - V0*1.1 (T=Tmelt) seems good for Cu and Al')
+            alat_rel = np.arange(0.965,1.036,0.005)
+            print('alat_rel',alat_rel)
+
+        vol_pa = np.zeros(len(alat_rel))
+        ene_pa = np.zeros(len(alat_rel))
 
         cell_ref = atoms_murn.get_cell()
         cell_ref_vol_pa = atoms_murn.get_volume()/atoms_murn.get_number_of_atoms()
@@ -5521,7 +5531,7 @@ class ase_calculate_ene( object ):
         print('vol cell:',atoms_murn.get_volume())
         print('vol cell/pa:',atoms_murn.get_volume()/nat)
 
-        for idx,i in enumerate(dvol_rel):
+        for idx,i in enumerate(alat_rel):
             if verbose > 2:
                 print('000 idx:',idx,'i:',i)
             atoms_murn_loop.set_cell(cell_ref*i,scale_atoms=True)
@@ -5563,12 +5573,12 @@ class ase_calculate_ene( object ):
                 print('333 ene',ene) #,ene2)
             vol_pa[idx] = vol/nat
             ene_pa[idx] = ene/nat
-            if write_Fqh_files and dvol_rel[idx] >= 0.999:
-                #print('write_Fqh_files: idx:',idx,'i:',i,'dvol_rel:',dvol_rel[idx])
+            if write_fqh and alat_rel[idx] >= 0.999:
+                #print('write_fqh: idx:',idx,'i:',i,'alat_rel:',alat_rel[idx])
                 print('now phonopy')
                 #self.get_fh_phonopy(atomsin=atoms_murn_loop)
                 #sys.exit('phonopy 77 done')
-                self.get_fh(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=write_Fqh_files)
+                self.get_fh_onevolume(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_fqh=write_fqh)
             if verbose > 2:
                 print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
             if verbose:
@@ -5582,17 +5592,20 @@ class ase_calculate_ene( object ):
             cell = atoms_murn.get_cell()
             pos = atoms_murn.get_positions()[1]/cell[0,0]
             print("---1-->>",pos)
-        if write_energies:
-            #print('we1')
-            if type(write_energies) == bool:
-                print('we2')
-                print('vol_pa',vol_pa)
-                print('ene_pa',ene_pa)
+        if write_evinet:
+            hier = os.getcwd()
+            #print('hier1',os.getcwd())
+            if not os.path.isdir('evinet'):
+                os.mkdir("evinet")
+            os.chdir("evinet")
+            print('vol_pa',vol_pa)
+            print('ene_pa',ene_pa)
 
-                write_energies      = "energy_eV_per_atom_vs_ang3_per_atom.dat"
-                write_energies_cell = "energy_eV_per_cell_vs_ang3_per_cell.dat"
-            np.savetxt(write_energies,np.transpose([vol_pa,ene_pa]))
+            write_energies_atom = "energy_eV_per_atom_vs_ang3_per_atom.dat"
+            write_energies_cell = "energy_eV_per_cell_vs_ang3_per_cell.dat"
+            np.savetxt(write_energies_atom,np.transpose([vol_pa,ene_pa]))
             np.savetxt(write_energies_cell,np.transpose([vol_pa*nat,ene_pa*nat]))
+            os.chdir(hier)
         if verbose > 1:
             print('loop done')
 
@@ -5633,7 +5646,12 @@ class ase_calculate_ene( object ):
             cell = atoms_murn.get_cell()
             pos = atoms_murn.get_positions()[1]/cell[0,0]
             print("---2-->>",pos)
-        return vinet
+        if type(write_evinet) == bool:
+            hier = os.getcwd()
+            os.chdir("evinet")
+            vinet.write_data()
+            print('vinet.parameters:',vinet.parameters)
+            os.chdir(hier)
 
     def get_fh_phonopy(self,atomsin=False):
         ''' the function will never change the atomsobject '''
@@ -5676,7 +5694,7 @@ class ase_calculate_ene( object ):
 
         return
 
-    def get_fh(self,atomsin=False,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=False):
+    def get_fh_onevolume(self,atomsin=False,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_fqh=False):
         ''' the function will never change the atomsobject
         atomrelax: in most cases it is desirable to relax the atomic positions
         in few cases we might be tempted to assess the free energy for particular positions (e.g. to check weather the DFT equilibrium position is the stable position of a NN)
@@ -5859,17 +5877,21 @@ class ase_calculate_ene( object ):
         #if debug and type(free_ene) != str:
         #    hes.write_ene_atom()
         #if try_readfile:
-        if write_Fqh:
+        if write_fqh:
             #try_readfile = "Ni"
             vol = atoms_h.get_volume()/atoms_h.get_number_of_atoms()
             volstr = "_"+str(vol)
             folder = "Fqh_"+str(rep)+"x"+str(rep)+"x"+str(rep)
-            self.fqh_folder = write_Fqh+"/fqh"
             if True: #hes.has_negative_eigenvalues == False:
                 # write in any case, if it has negative eigenvalues so be it
                 #hes.write_hessematrix(try_readfile+"_hessematrix"+volstr)
+                print('os.getcwd xx',os.getcwd())
+                print('write_fqh',write_fqh)
+                self.fqh_folder = "fqh"
+                print('self.fqh_folder',self.fqh_folder)  # folder+fqh
                 if not os.path.isdir(self.fqh_folder):
                     os.makedirs(self.fqh_folder)
+                # here we are now in the fqh folder
                 hes.write_hessematrix(self.fqh_folder+"/Hessematrix"+volstr)
                 if hes.has_negative_eigenvalues == False:
                     # only write for ground state
@@ -5988,7 +6010,12 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False
     return frames_out, frames
 
 
-def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
+def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,fah=False):
+    ''' only one of evinet, fqh, fah can be true at one time '''
+
+    #################################
+    ## show what we have to deal with
+    #################################
     print('atoms.cell (angstrom) before relaxing cellshape and volume:')
     print(atoms.cell)
     print('atoms.positions before relaxing cellshape and volume:')
@@ -6007,19 +6034,14 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     print()
 
 
-    print("#############################")
-    print("# NOW GETTING Evinet ... first without Fqh to see if EVinet is working#")
-    print("#############################")
-    os.mkdir("evinet")
-    with cd("evinet"):
-        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=True,write_Fqh_files=False,atomrelax=True)
-        print('vinet.parameters:',vinet.parameters)
-        vinet.write_data()
+    print("####################################################################")
+    print("# GETTING Evinet ... first without Fqh to see if EVinet is working #")
+    print("# make this in anycase to relaxe the system fully ...              #")
+    print("####################################################################")
+    ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_evinet=evinet,write_fqh=False,atomrelax=True)
     #print('atoms vol',atoms.get_volume())
 
     if fqh:
-        print()
-        print()
         print("#############################")
         print("# NOW GETTING Fqh_files .. .#")
         print("#############################")
@@ -6053,19 +6075,23 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         print("# fqh from manual displacements (in get_murn() )... #")
         print("#############################")
         print('oscwd',os.getcwd())
-        vinet = ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_energies=False,write_Fqh_files=os.getcwd())
+        ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_evinet=False,write_fqh=fqh)
         print('ace.fqh_folder',ace.fqh_folder)
         print('osggg11 tmp3?',os.getcwd())
         with cd("fqh"):
             call(["fqh.py -i Fqh_*at_cell_per_atom* -wqh1 -wqh2 -wqh3"],shell=True)
         print('osggg222 tmp3',os.getcwd())
-        os.mkdir("fqh/thermo")
-        with cd("fqh/thermo"):
-            print('now fqh/termo?',os.getcwd())
-            call(["cp ../../evinet/EVinet_1 EVinet"],shell=True)
-            call(["cp ../Fqh_*at_cell_per_atom_Surface_3rd_order__* Fqh"],shell=True)
-            print('now gethermodynamcs.sh',os.getcwd())
-            call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
+        hier = os.getcwd()
+        for i in ["1st","2nd","3rd"]:
+            os.chdir(hier)
+            os.mkdir("fqh/thermo_"+str(i))
+            with cd("fqh/thermo_"+str(i)):
+                print('now fqh/termo_'+str(i),os.getcwd())
+                call(["cp ../../evinet/EVinet_1 EVinet"],shell=True)
+                call(["cp ../Fqh_*at_cell_per_atom_Surface_"+i+"_order__* Fqh"],shell=True)
+                print('now gethermodynamcs.sh',os.getcwd())
+                call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
+
 
 
         # cd self.fqh_folder
@@ -6076,47 +6102,16 @@ def get_evinet(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         # ~/Thermodynamics/getThermodynamics.sh
 
     if fah:
-        print()
-        print()
         print("##############################")
-        print("# NOW GETTING anharmonic ... #")
+        print("# creating anharmonic jobs ... #")
         print("##############################")
-
-
-        #ace.get_fh(atomsin=atoms,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_Fqh=True)
+        fah_.fah_create_jobs_from_fqh(ace)
+        fah_.go_through_all_fah_jobs_and_create_joblist()
     return atoms
 
 
 #def thermodynamic_integraton_from_fqh(ace):
-def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile):
-    lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
-    #lambdas = [ 0.15, 0.5, 0.85 ]
-    #lambdas = [ 0.0, 1.0 ]
-    #temperatures = [900]
-    steps = 5000
-    #steps = 20
-
-
-    #hesse_vol_pos = load_hessefiles_volumes_positionsfiles_from_fqh_folder()
-    #for idx_vol,i in enumerate(hesse_vol_pos):
-    #    for idx_temp,temperature in enumerate(temperatures):
-    #        hessefile = i[0]
-    #        volume  = i[1]
-    #        posfile = i[2]
-    #        print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
-    #print()
-    #print()
-
-
-    #for idx_vol,i in enumerate(hesse_vol_pos):
-    #    for idx_temp,temperature in enumerate(temperatures):
-    #        hessefile = i[0]
-    #        volume  = i[1]
-    #        posfile = i[2]
-    #        print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
-    #        my.ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfile)
-    #                if idx_vol == 1:
-
+def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps):
     for l in lambdas:
         rand_nr = random.randint(1,99999)
         rand_nr = '1234567'
@@ -6141,10 +6136,11 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfi
             print()
             pos_basename = os.path.basename(posfile)
             frame = ase_read(posfile)
-            ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
-            ene_hartree = ene*0.036749322
-            print('ene',ene,"eV")
-            print('ene_hartree',ene_hartree,"hartree")
+            if False:   # this stuff is not used
+                ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
+                ene_hartree = ene*0.036749322
+                print('ene',ene,"eV")
+                print('ene_hartree',ene_hartree,"hartree")
             ase_write(folder+"/pos.ipi.xyz",frame,format='ipi')
             #ase_write(folder+"/pos.lmp",frame,format='lammps-data')
 
@@ -6187,7 +6183,7 @@ def ipi_thermodynamic_integraton_from_fqh(ace,volume,temperature,hessefile,posfi
             print(folder)
             print('next thing to do: put the socket in the in.lmp!')
             print('executing this with:')
-            print('python $HOME/sources/ipi/bin/i-pi ipi_input_thermodynamic_integration_template.xml')
+            print('python $HOME/sources/ipi/bin/i-pi input.xml')
             print('~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp')
             print()
             print('gives simulation.ti which has in 3rd column the total energy for the nn; independent of how lambdas are defined.')
