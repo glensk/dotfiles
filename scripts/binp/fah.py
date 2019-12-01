@@ -448,6 +448,7 @@ def fah_get_thermo():
     get_into_fah_folder(verbose=False)
     if not os.path.isfile('Fah_surface'):
         sys.exit('no Fah_surface')
+    os.chdir(thermo)
 
 
 def fah_write_fit_input(filename='fit.input'):
