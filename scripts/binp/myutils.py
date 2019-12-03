@@ -2093,8 +2093,10 @@ def create_al_structures_for_analysis_SOAP():
             qwrite(f111,f111n,frame,"1NN_Si__1NN_Si__1NN_Mg")
     return
 
-def make_nice_scatterplot(df,tags=None,x="a",y="b",color=None,symbols=False):
-    ''' make_nice_scatterplot(dataframe,tags=None,x="a",y="b",color=range(ntot))
+def make_nice_2D_scatterplot(df,tags=None,x="a",y="b",color=None,symbols=False):
+    ''' this is a 2D scatter plot
+
+        make_nice_scatterplot(dataframe,tags=None,x="a",y="b",color=range(ntot))
         df is a pandas dataframe e.g.
         df = pd.DataFrame(projs) # where projs is a numpy array
         df.columns = ["a","b"]
