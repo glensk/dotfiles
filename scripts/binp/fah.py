@@ -4,7 +4,9 @@ from __future__ import print_function
 
 from subprocess import check_output,call
 import argparse
-import os
+import os,shutil,random,time
+from ase.io import read as ase_read
+from ase.io import write as ase_write
 import sys
 import glob
 import utils_rename as utils
@@ -213,11 +215,15 @@ def fah_create_jobs_from_fqh(ace):
             temperatures = temp_test
             break
 
+    # extend temperature range
+    temperatures = np.concatenate((np.array([25, 50,100,150]),temperatures))
+
     #print('len(i)',i,temperatures,len(temperatures))
     #temperatures = [200, 400, 600, 800, 1000 ]
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     steps = 40000
     steps = 9000
+    steps = 90000
     print("temperatrues",temperatures)
     #temperatures = [400 ]
     for idx_vol,i in enumerate(hesse_vol_pos):
@@ -226,8 +232,90 @@ def fah_create_jobs_from_fqh(ace):
             volume  = i[1]
             posfile = i[2]
             print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
-            my.ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps)
+            ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps)
     return
+
+def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps):
+    seeds=2
+    for l in lambdas:
+        for rn in np.arange(seeds):
+            rand_nr = random.randint(1,99999)
+            #rand_nr = '1234567'
+            folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K/lambda"+str(l)+"_"+str(rand_nr)
+            if os.path.isdir(folder):
+                sys.exit(folder+" does already exist!")
+            os.makedirs(folder)
+            ipi_inp = os.environ['HOME']+"/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
+
+            with my.cd(folder):
+                print('hessefile',hessefile)
+                print('to folder',folder)
+                print()
+                hessefile_basename = os.path.basename(hessefile)
+                shutil.copy2(hessefile, folder)
+                print('hfbn',hessefile_basename)
+                ipi_inp_basename = 'input.xml'
+                shutil.copy2(ipi_inp, folder+'/'+ipi_inp_basename)
+                print('ipi_inp_basename',ipi_inp_basename)
+                print('posfile',posfile)
+                print('to folder',folder)
+                print()
+                pos_basename = os.path.basename(posfile)
+                frame = ase_read(posfile)
+                if False:   # this stuff is not used
+                    ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
+                    ene_hartree = ene*0.036749322
+                    print('ene',ene,"eV")
+                    print('ene_hartree',ene_hartree,"hartree")
+                ase_write(folder+"/pos.ipi.xyz",frame,format='ipi')
+                #ase_write(folder+"/pos.lmp",frame,format='lammps-data')
+
+                ##
+                if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
+                    #frame.write(folder+'/pos.lmp',format='lammps-runner')
+                    # here I would need an ase object
+                    ase_write(folder+'/pos.lmp',frame,format='lammps-runner',pot=ace.pot)
+                elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
+#                    frame.write(folder+'/pos.lmp',format='lammps-data')
+                    ase_write(folder+'/pos.lmp',frame,format='lammps-data')
+                else:
+                    sys.exit('44321 Error: dont know how to write this lammps file')
+
+                lammps_in_file = 'in.lmp'
+                ace.ipi = True
+
+                #print('ace.ipi',ace.
+                ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=2000000000,ffsocket='inet',address=False)
+                my.lammps_write_inputfile(folder=folder,filename=lammps_in_file,positions='pos.lmp',ace=ace)
+
+
+                #print('fp',frame.positions)
+                #print('fp',frame.positions.flatten())
+                ang_to_bohr = 1.8897261
+                np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+                nat = frame.get_number_of_atoms()
+                my.sed(folder+'/'+ipi_inp_basename,'xxx123',str(steps))  # steps
+                my.sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
+                my.sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.ipi.xyz')
+                my.sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
+                my.sed(folder+'/'+ipi_inp_basename,'xxx1.0',str(l))
+                my.sed(folder+'/'+ipi_inp_basename,'xxx0.0',str(1.-l))
+                my.sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
+                my.sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
+                my.sed(folder+'/'+ipi_inp_basename,'xxxene',str(0))
+                timestamp = 'md_ff_'+str(int(round(time.time() * 100000)))
+                my.sed(folder+'/'+ipi_inp_basename,'md_ff',timestamp)
+                my.sed(folder+'/'+lammps_in_file,'md_ff',timestamp)
+                print(folder)
+                print('next thing to do: put the socket in the in.lmp!')
+                print('executing this with:')
+                print('python $HOME/sources/ipi/bin/i-pi input.xml')
+                print('~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp')
+                print()
+                print('gives simulation.ti which has in 3rd column the total energy for the nn; independent of how lambdas are defined.')
+                print('3rd column in simulation.ti is also independent of v_reference> -2.89829817e+00')
+    return
+
 
 def go_through_all_fah_jobs_and_create_joblist():
     ''' can create joblist if some jobs are already finished '''
@@ -304,6 +392,15 @@ def get_fqh_folder(verbose=False):
     fqhfolder = ahfolder[:-4]+'/fqh'
     #print('fqhfolder',fqhfolder)
     return fqhfolder
+
+def get_evinet_folder(verbose=False):
+    hier = os.getcwd()
+    get_into_fah_folder(verbose=False)
+    ahfolder = os.getcwd()
+    os.chdir(hier)
+    evinetfolder = ahfolder[:-4]+'/evinet'
+    #print('evinetfolder',evinetfolder)
+    return evinetfolder
 
 def get_Tmax_from_fqh_thermo_2nd(verbose=False):
     fqhfolder = get_fqh_folder(verbose=False)
@@ -448,49 +545,102 @@ def fah_get_thermo():
     get_into_fah_folder(verbose=False)
     if not os.path.isfile('Fah_surface'):
         sys.exit('no Fah_surface')
-    os.chdir(thermo)
+    Fah_surface = np.loadtxt('Fah_surface')
+    #Tmax = Fah_surface[:,0].max()
+    Tmax = get_Tmax_from_fqh_thermo_2nd(verbose=False)
+    Vmin = Fah_surface[:,1].min()
+    Vmax = Fah_surface[:,1].max()
+    print('Tmax',Tmax)
+    print('Vmin',Vmin)
+    print('Vmax',Vmax)
+    fqh = get_fqh_folder(verbose=False)
+    evinet = get_evinet_folder(verbose=False)
+    print('fqh',fqh)
+    print('evinet',evinet)
+
+    # interpolate the Fah_surface
+    foldername='thermo'
+    if os.path.isdir(foldername):
+        shutil.rmtree(foldername)
+    os.mkdir(foldername)
+    os.chdir(foldername)
+    fah_write_fit_input(Vmin,Vmax,Tmax,for_atoms=1,filename='fit.input')
+    call(["cp ../Fah_surface Fah_surface"],shell=True)
+    call(['[ "`command -v wolframscript`" = "" ] && module load mathematica; wolframscript -file fit.input'],shell=True)
+    with open('Fah_surface_fit') as f:
+        first_line = f.readline()
+    print('first line')
+    print(first_line)
+
+    f = open('Fah_surface_fit','r')
+    temp = f.read()
+    f.close()
+    os.remove("Fah_surface_fit")
+    f = open('Fah_surface_fit', 'w')
+    f.write("0"+first_line[1:])
+    f.write(temp)
+    f.close()
+
+    #call(["wolframscript -file fit.input"],shell=True) # execute mathematica
+    # helvetios: module load mathematica
 
 
-def fah_write_fit_input(filename='fit.input'):
-    Fahsurfaceminalat = 15
-    Fahsurfacemaxalat = 18
+    hier = os.getcwd()
+    for i in ["1st","2nd","3rd"]:
+        os.chdir(hier)
+        os.mkdir("thermo_"+str(i))
+        with my.cd("thermo_"+str(i)):
+            print('now termo_'+str(i),os.getcwd())
+            call(["cp "+evinet+"/EVinet_1 EVinet"],shell=True)
+            call(["cp "+fqh+"/Fqh_*at_cell_per_atom_Surface_"+i+"_order__* Fqh"],shell=True)
+            call(["cp ../Fah_surface_fit Fah"],shell=True)
+            print('now gethermodynamcs.sh',os.getcwd())
+            call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
+
+    return
+
+def fah_write_fit_input(Vmin,Vmax,Tmax,for_atoms=1,filename='fit.input'):
+    Fahsurfaceminalat = Vmin
+    Fahsurfacemaxalat = Vmax
     structureFactor = 1
     sc1 = 1
-    atoms = 32
-    tmelt = 1000
+    tmelt = Tmax
     with open(filename, "w") as f:
         f.write('(* adjustable parameters start *)'+"\n")
         f.write("\n")
         f.write('FsurfFile = "Fah_surface";'+"\n")
-        f.write('type = 1                                               (*  1: T(K)  aLat(Ang/at)  F(meV/at)   *)'+"\n")
-        f.write('                                                       (*  2: T(K)  V(Ang/at)     F(meV/at)   *)'+"\n")
-        f.write('                                                       (*  3: T(K)  V(Ang/cell)   F(meV/cell) *)'+"\n")
+        f.write('type = 2                           (*  1: T(K)  aLat(Ang/at)  F(meV/at)   *)'+"\n")
+        f.write('                                   (*  2: T(K)  V(Ang/at)     F(meV/at)   *)'+"\n")
+        f.write('                                   (*  3: T(K)  V(Ang/cell)   F(meV/cell) *)'+"\n")
         f.write("\n")
         f.write("\n")
-        f.write('min = '+str(Fahsurfaceminalat)+";                      (*  aLat or volume range (same format as Fsurf) for the 2. fit *)"+"\n")
-        f.write('max = '+str(Fahsurfacemaxalat)+";                      (*  typically: Vmin=Veq(T=0K) and Vmax=Veq(Tmelt) *)"+"\n")
-        f.write("mesh = 100;                                            (* 100 is good and should be kept *)"+"\n")
+        f.write('min = '+str(Fahsurfaceminalat)+";  (*  aLat or volume range (same format as Fsurf) for the 2. fit *)"+"\n")
+        f.write('max = '+str(Fahsurfacemaxalat)+";  (*  typically: Vmin=Veq(T=0K) and Vmax=Veq(Tmelt) *)"+"\n")
+        f.write("mesh = 100;                        (* 100 is good and should be kept *)"+"\n")
+        f.write("\n");
+        f.write("structureFactor = "+str(structureFactor)+";  (*  4: fcc  2: bcc  1: supercells *)"+"\n")
+        f.write("sc = "+str(sc1)+";                           (*  supercell, 1 for bulk *)"+"\n")
+        f.write("nAtoms = "+str(for_atoms)+";                     (*  1 for bulk *)"+"\n")
         f.write("\n")
-        f.write("structureFactor = "+str(structureFactor)+";                                       (*  4: fcc  2: bcc  1: supercells *)"+"\n")
-        f.write("sc = "+str(sc1)+";                                                    (*  supercell, 1 for bulk *)"+"\n")
-        f.write("nAtoms = "+str(atoms)+";                                               (*  1 for bulk *)"+"\n")
+        f.write("fitType = \"Fvib\";     (*  \"Fvib\"  or  \"poly\"  fit type for 1. fit; take \"Fvib\" for Fah or Fel *)"+"\n")
+        #f.write("basis[V_, T_] := {1,T, V }      (*  for Fah typically: \"Fvib\" and {1,T,V} *)"+"\n")
+        f.write("basis[V_, T_] := {1,T,T^2,T^3,V,V^2,V^3}      (*  for Fah typically: \"Fvib\" and {1,T,V} *)"+"\n")
         f.write("\n")
-        f.write("fitType = \"Fvib\";                                          (*  \"Fvib\"  or  \"poly\"  fit type for 1. fit; take \"Fvib\" for Fah or Fel *)"+"\n")
-        f.write("basis[V_, T_] := {1,T, V }                                 (*  for Fah typically: \"Fvib\" and {1,T,V} *)"+"\n")
+        f.write("                                (*  for Fel typically: \"Fvib\" and {1,T, V,T V,T^2,V^2,V^3} *)"+"\n")
+        f.write("basis2[V_]:={1, V, V^2, V^3}    (*  should be more than sufficient: {1,V,V^2,V^3} *)"+"\n")
         f.write("\n")
-        f.write("                                                           (*  for Fel typically: \"Fvib\" and {1,T, V,T V,T^2,V^2,V^3} *)"+"\n")
-        f.write("basis2[V_]:={1, V, V^2, V^3}                               (*  should be more than sufficient: {1,V,V^2,V^3} *)"+"\n")
+        f.write("minT = 1;                       (* typically 1     *)"+"\n")
+        f.write("maxT = "+str(tmelt)+";          (*           Tmelt *)"+"\n")
+        f.write("stepT = 1;                      (*           2     *)"+"\n")
         f.write("\n")
-        f.write("minT = 1;                                                  (* typically 1     *)"+"\n")
-        f.write("maxT = "+str(tmelt)+";                                               (*           Tmelt *)"+"\n")
-        f.write("stepT = 2;                                                 (*           2     *)"+"\n")
-        f.write("\n")
-        f.write("useMeanFreqs=True;                                         (* if True \"mean_freqs\" file must be available; format as Fsurf, e.g. aLat(Ang) meanFreq(meV) *)"+"\n")
-        f.write("                                                           (* meanFreqs are then used in the fit formula (check fitSurface.math) *)"+"\n")
+        f.write("useMeanFreqs=False;              (* if True \"mean_freqs\" file must be available; format as Fsurf, e.g. aLat(Ang) meanFreq(meV) *)"+"\n")
+        f.write("                                (* meanFreqs are then used in the fit formula (check fitSurface.math) *)"+"\n")
         f.write("(* adjustable parameters end *)"+"\n")
         f.write("\n")
         f.write("(*<<\"~/scripts/Thermodynamics/fitSurface.math\"*)"+"\n")
-        f.write("<<\"/home/grabowski/Thermodynamics/mathematica/fitSurface.MATH\""+"\n")
+        thermodynamics = os.environ['thermodynamics'];
+        print('thermodynamics:',thermodynamics)
+        f.write("<<\""+thermodynamics+"/mathematica/fitSurface.MATH\""+"\n")
         f.close()
     return
 
@@ -1251,6 +1401,7 @@ if __name__ == '__main__':
     # -----------------
     % fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job   (step 2)
     % fah.py -ef fah_get_Fah_surface (step 3)
+    % fah.py -ef fah_get_thermo (step 4)
     '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)

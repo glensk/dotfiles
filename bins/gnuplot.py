@@ -289,7 +289,7 @@ def ca(text,newline = True,verbose=False):
     #print('c inside2:',c)
     return c
 
-def gnuplot_plotline(inputfile,using=False,columns_tot=1):
+def gnuplot_plotline(inputfile,using=False,columns_tot=1,linestyle=False):
     verbosity_level = 2
     if args.verbose > verbosity_level:
         print('--> inputfile        :',inputfile)
@@ -300,13 +300,16 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1):
     if args.verbose > verbosity_level:
         print('--> xx using          ',using)
         print('--> xx pl (in)        ',pl)
-    if args.line_style == "line":
-        pladd = "\""+inputfile+"\" using "+using+" with line"
-    if args.line_style == "linespoints":
-        pladd = "\""+inputfile+"\" using "+using+" with linespoints"
-    if args.line_style == "points":
-        #pladd = "\""+inputfile+"\" using "+using+" with points"
-        pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
+    if linestyle == False:
+        if args.line_style == "line":
+            pladd = "\""+inputfile+"\" using "+using+" with line"
+        if args.line_style == "linespoints":
+            pladd = "\""+inputfile+"\" using "+using+" with linespoints"
+        if args.line_style == "points":
+            #pladd = "\""+inputfile+"\" using "+using+" with points"
+            pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
+    elif linestyle == 'points':
+            pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
 
     # legend
     if columns_tot == 1:
@@ -408,6 +411,8 @@ def gnuplot_plot(args):
             print('input:')
             print(input[:2])
             print(input[-2:])
+        if len(input) < 10:
+            linestyle='points'
         if args.verbose > verbosity_level+1:
             print('input',input)
         if args.verbose > verbosity_level:
@@ -429,7 +434,7 @@ def gnuplot_plot(args):
                 print('## args.xmax',args.xmax)
                 print('## args.ymin',args.ymin)
                 print('## args.ymax',args.ymax)
-            text = gnuplot_plotline(inputfile,using = using,columns_tot = 1)
+            text = gnuplot_plotline(inputfile,using = using,columns_tot = 1,linestyle=False)
             ca(text)
             if args.verbose > verbosity_level:
                 print("## @@@@@@@@@@@@@@@@@ one column (end) @@@@@@@@@@@@@@@@@@@@@@@@")

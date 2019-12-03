@@ -6094,13 +6094,6 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
 
 
 
-        # cd self.fqh_folder
-        # fqh.py -i Fqh_*at_cell_per_atom* -wqh3 -wqh2 -v
-        # mcd thermo
-        # cp ../../EVinet_1 EVinet
-        # cp ../Fqh_*at_cell_per_Surface_3rd_* Fqh
-        # ~/Thermodynamics/getThermodynamics.sh
-
     if fah:
         print("##############################")
         print("# creating anharmonic jobs ... #")

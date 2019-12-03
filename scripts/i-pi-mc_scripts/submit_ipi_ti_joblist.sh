@@ -6,7 +6,7 @@
 #SBATCH --error=_scheduler-stderr.txt
 #SBATCH --nodes=1
 #SBATCH --ntasks 36
-#SBATCH --time=00-20:29:00
+#SBATCH --time=00-40:29:00
 
 set +e
 #export LD_LIBRARY_PATH=
@@ -56,7 +56,7 @@ while [ "$todo" -ge "1" ];do
         sleep 1.0
         cd $hier
     else
-        sleep 30 
+        sleep 50 
         echo 'XX sleeping 30 sec'
     fi
 done
@@ -66,4 +66,4 @@ echo "now all jobs done"
 cd $hier
 fah.py -ef fah_go_through_all_angK_folder_and_exec_function get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job
 fah.py -ef fah_get_Fah_surface
-
+fah.py -ef fah_get_thermo

@@ -4,7 +4,7 @@
     <properties stride='1' filename='out'>  [ step, time{femtosecond}, conserved, temperature{kelvin}, kinetic_md, potential, pressure_md ] </properties>
     <properties stride='1' filename='ti'>  [ step, pot_component_raw(0), pot_component_raw(1)] </properties>
     <!-- <trajectory stride='100' filename='pos'> positions </trajectory> -->
-    <trajectory stride='1' filename='pos'> positions </trajectory>
+    <!-- <trajectory stride='1' filename='pos'> positions </trajectory>   -->
   </output>
   <total_steps> xxx123 </total_steps>
   <!-- SELECT THE RANDOM NUMBER SEED TO HAVE REPRODUCIBLE SIMULATIONS -->
