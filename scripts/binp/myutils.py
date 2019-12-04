@@ -2093,60 +2093,7 @@ def create_al_structures_for_analysis_SOAP():
             qwrite(f111,f111n,frame,"1NN_Si__1NN_Si__1NN_Mg")
     return
 
-def make_nice_2D_scatterplot(df,tags=None,x="a",y="b",color=None,symbols=False):
-    ''' this is a 2D scatter plot
 
-        make_nice_scatterplot(dataframe,tags=None,x="a",y="b",color=range(ntot))
-        df is a pandas dataframe e.g.
-        df = pd.DataFrame(projs) # where projs is a numpy array
-        df.columns = ["a","b"]
-        make_nice_scatterplot(df,tags=tags,x="a",y="b",color=range(ntot))
-
-        or:
-        x = np.arange(len(rd))
-        y = rd  # error in KMC structures
-        color = np.log(fd)
-        from myutils import make_nice_scatterplot as sp
-        dfa = np.array([x,y]).T
-        import pandas as pd
-        df = pd.DataFrame(dfa)
-        df.columns = ["struct","error"]
-        sp(df,x="struct",y="error",color=color)
-
-        example in: fps_correlation_scatterplot.ipynb
-
-
-    '''
-    import plotly.graph_objects as go
-    fig = go.Figure(data=go.Scatter(x=df[x],
-                                    y=df[y],
-                                    mode='markers',
-                                    text=tags,
-                                    marker=dict(
-                                        size=5,
-                                        color=color, #set color equal to a variable
-                                        colorscale='Viridis', # one of plotly colorscales
-                                        showscale=True
-                                    )
-                                    )) # hover text goes here
-    if symbols != False:
-    	fig['data'][0]['marker']['symbol'] = 'triangle-left'
-    size = 400
-    fig.update_layout(
-        autosize=False,
-        width=size,
-        height=size*0.5,
-        margin=go.layout.Margin(
-            l=0,
-            r=0,
-            b=0,
-            t=0,
-            pad=0
-       ),
-        #paper_bgcolor="LightSteelBlue",
-    )
-    fig.show()
-    return
 
 ##################################################################################
 ## parametrize foces
@@ -6568,6 +6515,11 @@ def ase_showpos(atomsc_sphere):
     for idx,i in enumerate(atomsc_sphere.get_positions()):
         print(str(idx).ljust(5),atomsc_sphere.get_chemical_symbols()[idx].ljust(4),i)
     print()
+    return
+
+
+def fakefun():
+    print('4')
     return
 
 ############################################################
