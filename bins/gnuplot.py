@@ -289,7 +289,7 @@ def ca(text,newline = True,verbose=False):
     #print('c inside2:',c)
     return c
 
-def gnuplot_plotline(inputfile,using=False,columns_tot=1,linestyle=False):
+def gnuplot_plotline(inputfile,using=False,columns_tot=1,inputshape=False):
     verbosity_level = 2
     if args.verbose > verbosity_level:
         print('--> inputfile        :',inputfile)
@@ -297,10 +297,12 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1,linestyle=False):
     global pl
     if pl == "": pl = "plot "
 
-    if args.verbose > verbosity_level:
+    if True: #args.verbose > verbosity_level:
+        print('--> inputshape        ',inputshape)
+        #print('--> linestyle         ',linestyle)
         print('--> xx using          ',using)
         print('--> xx pl (in)        ',pl)
-    if linestyle == False:
+    if inputshape[0] > 10:
         if args.line_style == "line":
             pladd = "\""+inputfile+"\" using "+using+" with line"
         if args.line_style == "linespoints":
@@ -308,8 +310,8 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1,linestyle=False):
         if args.line_style == "points":
             #pladd = "\""+inputfile+"\" using "+using+" with points"
             pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
-    elif linestyle == 'points':
-            pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
+    elif inputshape[0] < 10:
+            pladd = "\""+inputfile+"\" using "+using+" w p pt 27" # ls 2"
 
     # legend
     if columns_tot == 1:
@@ -394,6 +396,8 @@ def gnuplot_plot(args):
     # go over all inputfiles
     ###############################################
     for idx,inputfile in enumerate(args.inputfile):
+        print()
+        print('----------------------------------------------')
         if idx == 0:
             set_args_defaults(args,inputfile)
             gnuplot_defaults(args)
@@ -415,7 +419,7 @@ def gnuplot_plot(args):
             linestyle='points'
         if args.verbose > verbosity_level+1:
             print('input',input)
-        if args.verbose > verbosity_level:
+        if True: #args.verbose > verbosity_level:
             print('%% input.shape',input.shape)
             print('%% len(input.shape)',len(input.shape))
         if len(input.shape) == 1:
@@ -434,7 +438,7 @@ def gnuplot_plot(args):
                 print('## args.xmax',args.xmax)
                 print('## args.ymin',args.ymin)
                 print('## args.ymax',args.ymax)
-            text = gnuplot_plotline(inputfile,using = using,columns_tot = 1,linestyle=False)
+            text = gnuplot_plotline(inputfile,using = using,columns_tot = 1,inputshape=input.shape)
             ca(text)
             if args.verbose > verbosity_level:
                 print("## @@@@@@@@@@@@@@@@@ one column (end) @@@@@@@@@@@@@@@@@@@@@@@@")
@@ -502,7 +506,7 @@ def gnuplot_plot(args):
                     print('##xx args.xlabel',args.xlabel)
                 gnuplot_defaults_labels(args)
                 text =  gnuplot_plotline(inputfile,using = using,\
-                        columns_tot = columns)
+                        columns_tot = columns,inputshape=input.shape)
                 if args.verbose > verbosity_level:
                     print('## text:',text)
                 ca(text)
