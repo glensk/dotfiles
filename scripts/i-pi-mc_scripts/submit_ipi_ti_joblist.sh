@@ -6,7 +6,7 @@
 #SBATCH --error=_scheduler-stderr.txt
 #SBATCH --nodes=1
 #SBATCH --ntasks 36
-#SBATCH --time=00-40:29:00
+#SBATCH --time=00-60:29:00
 
 set +e
 #export LD_LIBRARY_PATH=
