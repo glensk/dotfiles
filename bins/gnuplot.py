@@ -299,6 +299,7 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1,inputshape=False):
 
     if True: #args.verbose > verbosity_level:
         print('--> inputshape        ',inputshape)
+        print('--> inputshape[0]     ',inputshape[0])
         #print('--> linestyle         ',linestyle)
         print('--> xx using          ',using)
         print('--> xx pl (in)        ',pl)
@@ -310,7 +311,7 @@ def gnuplot_plotline(inputfile,using=False,columns_tot=1,inputshape=False):
         if args.line_style == "points":
             #pladd = "\""+inputfile+"\" using "+using+" with points"
             pladd = "\""+inputfile+"\" using "+using+" w p pt 7" # ls 2"
-    elif inputshape[0] < 10:
+    elif inputshape[0] <= 10:
             pladd = "\""+inputfile+"\" using "+using+" w p pt 27" # ls 2"
 
     # legend
