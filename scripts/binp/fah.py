@@ -472,14 +472,15 @@ def get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.
     l_ = []
     dudl_mean_ = []
     err_uncor_ = []
+    err_ = []
     dudl_std_ = []
+    t_mean_= []
     for i in f:
         os.chdir(hier)
         os.chdir(i)
         ## here should be the loop over all seeds
         try:
-            lam, dudl_mean, std_err_mean_uncorr, dudl_std =   \
-                        get_dudl_from_ipi_job(verbose=False)
+            lam, dudl_mean, std_err_mean_uncorr,std_err_mean, dudl_std, t_mean = get_dudl_from_ipi_job(verbose=False)
         except IOError:
             print('nope')
             return # returns nothing and nothing is written if not all lambdas calculated
@@ -487,6 +488,10 @@ def get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.
         dudl_mean_.append(dudl_mean)
         dudl_std_.append(dudl_std)
         err_uncor_.append(std_err_mean_uncorr)
+        err_.append(std_err_mean)
+        t_mean_.append(t_mean)
+
+        ## print to screen
         print(str(lam).ljust(7),str(dudl_mean).ljust(20),str(std_err_mean_uncorr).ljust(20),str(dudl_std).ljust(20))
 
     if verbose:
@@ -494,11 +499,13 @@ def get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.
         print('tt dudl_mean_:',dudl_mean_)
         print('tt err_uncor_:',err_uncor_)
         print('tt dudl_std_ :',dudl_std_)
-    avg_dudl = np.zeros((len(l_),4))
+    avg_dudl = np.zeros((len(l_),6))
     avg_dudl[:,0] = l_
     avg_dudl[:,1] = dudl_mean_
     avg_dudl[:,2] = err_uncor_
-    avg_dudl[:,3] = dudl_std_
+    avg_dudl[:,3] = err_
+    avg_dudl[:,4] = dudl_std_
+    avg_dudl[:,5] = t_mean_
     os.chdir(hier)
 
     fit = get_dudlmeanfit(l_, dudl_mean_, return_fit = True,savefit=savefit)
@@ -850,16 +857,17 @@ def get_dudl_from_ipi_job(verbose=True):
     #################################################
     # get dudl std as function of time
     #################################################
-    dudlstd = np.copy(dudl)
-    for idx,i in enumerate(dudl):
-        #print('idx',idx,dudl[:idx+1].std()/np.sqrt(idx+1))
-        dudlstd[idx] = dudl[:idx+1].std()/np.sqrt(idx+1)
+    if False: # currently not used
+        dudlstd = np.copy(dudl)
+        for idx,i in enumerate(dudl):
+            #print('idx',idx,dudl[:idx+1].std()/np.sqrt(idx+1))
+            dudlstd[idx] = dudl[:idx+1].std()/np.sqrt(idx+1)
     #print('len(dudl)',len(dudl))
     #np.savetxt('dudlstd.dat',dudlstd)
     #print('t1',tempav)
     #np.savetxt('tempav.dat',tempav)
     #np.savetxt('temp.dat',t)
-    return lam, dudl.mean(), std_err_mean_uncorr, dudl.std()
+    return lam, dudl.mean(), std_err_mean_uncorr,std_err_mean, dudl.std(), t.mean()
 
 def get_dudl_from_file_with_energies_lambda_0_1(filepath=False,number_of_atoms=False,verbose=False):
     if filepath == False:
