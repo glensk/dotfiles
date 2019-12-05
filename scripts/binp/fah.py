@@ -511,7 +511,7 @@ def get_Fah_and_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.
     fit = get_dudlmeanfit(l_, dudl_mean_, return_fit = True,savefit=savefit)
     fah = fit[0]
     print('fah',fah)
-    np.savetxt("avg_dudl",avg_dudl,fmt='   %.2f       %.3f          %.3f             %.3f',header="lambda dudl_mean(meV/at)  err_uncor(meV/at)  err(meV/at) stdDev(meV/at) <T>(K)\n# averages to Fah (using tangens):"+str(fah)+" (meV/atom)")
+    np.savetxt("avg_dudl",avg_dudl,fmt='   %.2f       %.3f          %.3f             %.3f        %.3f       %.3f',header="lambda dudl_mean(meV/at)  err_uncor(meV/at)  err(meV/at) stdDev(meV/at) <T>(K)\n# averages to Fah (using tangens):"+str(fah)+" (meV/atom)")
     #print('fit[1]',fit[1])
     #self.dudlmeanfit[inda,indt] = fit[0]
     #self.dudlmeanfit_tanfit[inda,indt] = np.transpose(fit[1])
