@@ -1,5 +1,6 @@
-print('ipython_config.py start ...')
+print('~/.ipython/profile_default/ipython_config.py start ...')
 c = get_config()
+print('loading autoreload (reloading modules when executing script)')
 c.InteractiveShellApp.extensions = ['autoreload']
 # lines of code to run at IPython startup.
 c.TerminalIPythonApp.exec_lines = ['%autoreload 2']

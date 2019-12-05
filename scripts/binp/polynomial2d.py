@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 import warnings
 import numpy as np
-import sys
+import sys,os
 import myplotutils as myp
 import myutils as my
 np.set_printoptions(suppress=True)   # display arrays withou 000000
@@ -231,15 +231,65 @@ def polyval2d(x, y, c):
         raise ValueError("c must be a squared 2-dim array.")
     return polyval2d(x, y, c)
 
+def polyfit2dbetter_DOES_NOT_WORK(x, y, z, kx=3, ky=3, order=None):
+    '''
+    Two dimensional polynomial fitting by least squares.
+    Fits the functional form f(x,y) = z.
 
-def xyz_line_to_XYZ(x,y,z):
-    #np.set_printoptions(precision=4)
-    #np.set_printoptions(suppress=False)
-    my.fakefun()
-    sys.exit()
-    print('x',x)
-    print('y',y)
-    print('z',z)
+    Notes
+    -----
+    Resultant fit can be plotted with:
+    np.polynomial.polynomial.polygrid2d(x, y, soln.reshape((kx+1, ky+1)))
+
+    Parameters
+    ----------
+    x, y: array-like, 1d
+        x and y coordinates.
+    z: np.ndarray, 2d
+        Surface to fit.
+    kx, ky: int, default is 3
+        Polynomial order in x and y, respectively.
+    order: int or None, default is None
+        If None, all coefficients up to maxiumum kx, ky, ie. up to and including x^kx*y^ky, are considered.
+        If int, coefficients up to a maximum of kx+ky <= order are considered.
+
+    Returns
+    -------
+    Return paramters from np.linalg.lstsq.
+
+    soln: np.ndarray
+        Array of polynomial coefficients.
+    residuals: np.ndarray
+    rank: int
+    s: np.ndarray
+
+    '''
+
+    # grid coords
+    #x, y = np.meshgrid(x, y)
+    # coefficient array, up to x^kx, y^ky
+    coeffs = np.ones((kx+1, ky+1))
+
+    # solve array
+    a = np.zeros((coeffs.size, x.size))
+
+    # for each coefficient produce array x^i, y^j
+    for index, (j, i) in enumerate(np.ndindex(coeffs.shape)):
+        # do not include powers greater than order
+        if order is not None and i + j > order:
+            arr = np.zeros_like(x)
+        else:
+            arr = coeffs[i, j] * x**i * y**j
+        a[index] = arr.flatten()
+
+    # do leastsq fitting and return leastsq result
+    return np.linalg.lstsq(a.T, np.ravel(z), rcond=None)
+
+def lmfit2d(x,y,z,verbose=False):
+    if verbose:
+        print('x',x)
+        print('y',y)
+        print('z',z)
     if x.ndim != 1:
         raise ValueError("x must be 1-dim.")
     if y.ndim != 1:
@@ -251,86 +301,184 @@ def xyz_line_to_XYZ(x,y,z):
         print('y.size',y.size)
         print('z.size',z.size)
         raise ValueError("x, y, and z must have the same size.")
-    xx,yy,zz = myp.xyz_line_to_xyz_unique(x=x,y=y,z=z,data=None)
-    sys.exit('k777')
-    print('xx')
-    print(xx)
-    print('yy')
-    print(yy)
-    print('zz')
-    print(zz)
-    # diese x, y, und z sind wowas wie die unique elements!
-    if False:
-        x = np.array([100,100,200])
-        y = np.array([11.1,11.2,11.3])
-        z = np.array([0.1,0.2,0.3])
-
     data = np.zeros((len(x),3))
     data[:,0] = x
     data[:,1] = y
     data[:,2] = z
-    print('data')
-    print(data)
-    X, Y = np.meshgrid(xx, yy, copy=False)
-    Z = X**2 + Y**2
-    #Z = np.zero(np.shape(X))
-    print('X')
-    print(X)
-    print('Y')
-    print(Y)
-    print('Z')
-    print(Z)
 
-    X = X.flatten()
-    Y = Y.flatten()
-    B = Z.flatten()
-    print('X',len(X))
-    print('x',len(x))
-    print(X)
-    print(x)
-    print('Y',len(Y))
-    print(Y)
-    print('B',len(Z))
-    print(B)
-    sys.exit('k888')
-    A = np.array([X*0+1, X, Y, X**2, X**2*Y, X**2*Y**2, Y**2, X*Y**2, X*Y]).T
-    coeff, r, rank, s = np.linalg.lstsq(A, B,rcond=None)
+    if True:
+        all1v = np.unique(data[:,1])
+        for v in all1v:
+            data = np.append(data, [[0, v, 0]], axis=0)
+    #print('data')
+    #print(data)
+    #sys.exit()
 
-    def poly2Dreco(X, Y, c):
-        return (c[0] + X*c[1] + Y*c[2] + X**2*c[3] + X**2*Y*c[4] + X**2*Y**2*c[5] +
-           Y**2*c[6] + X*Y**2*c[7] + X*Y*c[8])
+    def exp1(x,y):
+        return x*0+1, x,       y,       x**2,       x**2*y,       x**2*y**2,       y**2,       x*y**2,       x*y
 
-    print('done')
-    print('coeff')
-    print(coeff)
-    out = poly2Dreco(X, Y, coeff)
-    print('out')
-    print(out)
+    def exp1sw(x,y):
+        return x*0+1, y,       x**2,       y**2,       x**2*y,       x**2*y**2,       x,       x*y**2,       x*y
 
-    # make 2d plots
-    if False:
-        for idv,v in enumerate(np.unique(y)):
-            allt = np.arange(0,x.max()+1,1)
-            allz = polynomial2d.polyval2d(allt,v,c)
-            #for idt,t in enumerate(np.arange(0,xgrid.max()+1,1)):
-            #    z = polynomial2d.polyval2d(t,v,c)
-            #    print(v,t,z)
-            np.savetxt("out_new_"+str(v)+'fit.dat',np.array([allt,allz]).T)
-            ka = data[np.where(data[:,1]==v)[0]][:,[0,2]]
+    def exp2(x,y):
+        return x,  y,  x**2,       x**2*y,       x**2*y**2,       y**2,       x*y**2,       x*y
+
+    def exp2ca(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17):
+        x = xy[:,0]
+        y = xy[:,1]
+        return c1*x**0*y**1 + \
+               c2*x**0*y**2 + \
+               c3*x**1*y**0 + \
+               c4*x**1*y**1 + \
+               c5*x**1*y**2 + \
+               c6*x**2*y**0 + \
+               c7*x**2*y**1 + \
+               c8*x**2*y**2 + \
+               c9 *x**3*y**0 + \
+               c10*x**3*y**1 + \
+               c11*x**3*y**2 + \
+               c12*x**3*y**3 + \
+               c13*x**4*y**0 + \
+               c14*x**4*y**1 + \
+               c15*x**4*y**2 + \
+               c16*x**4*y**3 + \
+               c17*x**4*y**4 + \
+               0
+
+    #def exp2c(xy,c):
+    #    x = xy[:,0]
+    #    y = xy[:,1]
+    #    return x*c[0] + y*c[1] + c[2]*x**2 + c[3]*x**2*y+c[4]*x**2*y**2+c[5]*y**2+c[6]*x*y**2+c[7]*x*y
+
+    #def exp3(x,y):
+    #    return x,y,x**2,x**3,x**2*y,x**2*y**2,y**2, y**3,x*y**2,x*y
+
+    if True:
+        from lmfit import Model,minimize
+        func = exp2ca
+        model = Model(func)
+        parameter_names = model.param_names
+        independent_variable = model.independent_vars
+        #print('parameter_names',parameter_names)
+        #print('independent_variable',independent_variable)
+        #print('parameter_names',type(parameter_names))
+        for i in parameter_names: model.set_param_hint(i ,value=1)
+        result = model.fit(data[:, 2], xy=data[:, 0:2])
+        print(result.fit_report())
+        #print('vgl (obtained by fit)',result.best_values)
+        coef_lmfit = []
+        for i in parameter_names: coef_lmfit.append(result.best_values.get(i))
+        print('coef_lmfit',coef_lmfit)
+        #print()
+        #print(result.best_fit)
+        diffmax = np.abs(result.best_fit-data[:,2]).max()
+        print('diffmax',diffmax)
+        print('888',data[0,0:2])
+        denset = np.arange(0,x.max()+1,1)
+        all1v = np.unique(data[:,1])
+        for v in all1v:
+            densev = np.repeat(v,len(denset))
+            dd = np.array([denset,densev]).T
+            out2dense = func(dd,*coef_lmfit)
+            #print(out2dense)
+            np.savetxt("out_OUTLMdense_"+str(v)+'dat.dat',out2dense)
+        #print(exp2c(np.array([data[0,0:2]]),*coef_lmfit)[0])
+    return
+
+def oldfit_lstsq():
+    expuse = exp2
+    def expression(x,y,exprr,coefs=None):
+        if len(x) != len(y):
+            print('len(x)',len(x))
+            print('len(y)',len(y))
+            sys.exit('lenx not leny')
+        expr = exprr(x,y)
+        #print('expr[0] :(corr)',expr[0].shape)
+        if coefs is None:
+            Amatrix = np.array(expr).T
+            return Amatrix
+        else:
+            Aresult = np.sum(np.array(expr).T*coefs,axis=1)
+            return Aresult
+
+    coeff2, r2, rank2, s2 = np.linalg.lstsq(expression(x,y,expuse), z,rcond=None)
+    print('----------'*3)
+    print('len(coeff2)',len(coeff2))
+    print('r2         ',r2)
+    #print('rank2      ',rank2)
+    #print('s2         ',s2)
+
+    denset = np.arange(0,x.max()+1,1)
+    all1v = np.unique(data[:,1])
+    for v in all1v:
+        out2dense = expression(denset, np.repeat(v,len(denset)), expuse, coeff2)
+        np.savetxt("out_OUT2dense_"+str(v)+'dat.dat',out2dense)
+
+    # get diffs
+    def get_diffmax(data,expuse,coeff2):
+        diffmax = 0
+        for i in data:
+            #print('i[0]',i[0],i[1],expuse(i[0],i[1]))
+            fah_fit = expression(np.array([i[0]]), np.array([i[1]]), expuse, coeff2)[0]
+            diff = np.abs(fah_fit-i[2])
+            if diff > diffmax:
+                diffmax = diff
+            #print(i[0],i[1],'fah_fit',fah_fit,i[2],fah_fit-i[2])
+        return diffmax
+
+    diffmax = get_diffmax(data,expuse,coeff2)
+    print('diffmax',diffmax)
+    print('----------'*3)
+
+
+    #def expression(x,y,exprr,coefs=None):
+
+    def save_v_lines_from2darray(usearray=None,string=None):
+        if usearray is None:
+            sys.exit('provide usearray1 and string')
+        if string is None:
+            sys.exit('provide usearray2 and string')
+        if type(string) != str:
+            sys.exit('has tobe a sring')
+        all1t = np.unique(usearray[:,0])
+        all1v = np.unique(usearray[:,1])
+        for v in all1v:
+            ka = usearray[np.where(usearray[:,1]==v)[0]][:,[0,2]]
             arr = ka[ka[:,0].argsort()]
-            np.savetxt("out_new_"+str(v)+'dat.dat',arr)
+            np.savetxt("out_"+string+"_"+str(v)+'dat.dat',arr)
+        return
 
+    save_v_lines_from2darray(usearray=data,string='data')
+    #save_v_lines_from2darray(usearray=OUT1,string='OUT1')
+    #save_v_lines_from2darray(usearray=OUT2,string='OUT2')
+    #X,Y,Z = myp.xyz_line_to_xyz_unique(x=x,y=y,z=z,data=None)
+    #print('X')
+    #print(X)
+    #print(X[0])
+    #print('Y')
+    #print(Y)
+    #print(Y[:,0])
+    #kx=3
+    #ky=3
+    #soln,ka,kb,kc = polyfit2dbetter(X, Y, Z, kx=kx, ky=ky, order=None)
+    #fitted_surf = np.polynomial.polynomial.polygrid2d(X, Y, soln.reshape((kx+1,ky+1)))
+    #print('xxxcoefs',soln)
+    #print('xxxcoefs',fitted_surf)
     return
 
 if __name__ == "__main__":
-    my.fakefun()
-    sys.exit()
     np.set_printoptions(precision=4)
-    data = G = np.loadtxt("/Users/glensk/Downloads/cu/fah/thermo/Fah_surface")[:,[0,1,2]]
-    x = xline = t = data[:,0];
-    y = yline = v = data[:,1];
-    z = zline = e = data[:,2];
-    xyz_line_to_XYZ(x=x,y=y,z=z)
+    filepath = "/Users/glensk/Downloads/cu/fah/thermo/Fah_surface"
+    data = np.loadtxt(filepath)[:,[0,1,2]]
+    print(filepath)
+    print(os.path.basename(filepath))
+    print(os.path.dirname(filepath))
+    sys.exit()
+    x = data[:,0];
+    y = data[:,1];
+    z = data[:,2];
+    lmfit2d(x=x,y=y,z=z)
+    sys.exit('6789')
     df1 = myp.xyz_line_to_dataframe(x=x,y=y,z=z+0,xlabel="temp",ylabel='vol',zlabel='fah')
 
     # Build figure

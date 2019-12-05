@@ -6517,11 +6517,9 @@ def ase_showpos(atomsc_sphere):
     print()
     return
 
-
 def fakefun():
-    print('4')
+    print('dd')
     return
-
 ############################################################
 # math function
 ############################################################

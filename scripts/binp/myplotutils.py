@@ -4,7 +4,7 @@ from __future__ import print_function
 import numpy as np
 import pandas as pd
 import os,sys,argparse
-
+import myutils as my
 #def help(p = None):
 #    string = ''' helptext '''
 #    p = argparse.ArgumentParser(description=string,
@@ -55,6 +55,8 @@ def xyz_line_to_xyz_unique(x=False,y=None,z=None,data=None):
     xunique = np.unique(x)
     yunique = np.unique(y)
     X, Y = np.meshgrid(xunique, yunique, copy=False)
+    Z = np.copy(X)
+
     zz = np.zeros((len(xunique),len(yunique)))
     #xx = np.zeros((len(xunique),len(yunique)))
     for idx,i in enumerate(data):
@@ -62,20 +64,32 @@ def xyz_line_to_xyz_unique(x=False,y=None,z=None,data=None):
         yidx=np.where(data[idx,1]==yunique)[0][0]
         zz[xidx,yidx]=data[idx,2]
         #xx[xidx,yidx]=data[idx,2]
-        print('-->',data[idx],xidx,yidx)
+        print('-->',data[idx],'xidx',xidx,'yidx',yidx)
+    print('X.shape',X.shape)
+    print('-----------')
+    for idx,i in enumerate(np.arange(X.shape[0])):
+        for idy,j in enumerate(np.arange(Y.shape[1])):
+            xval = X[idx,idy]
+            yval = Y[idx,idy]
+            data_idx=np.where(data[idx,0]==xunique)[0][0]
+            out = data[(data[:,0] == xval) & (data[:,1] == yval)][0]
+            print('idx',idx,'idy',idy,'xval',xval,'yval',yval,'out',out)
+            Z[idx,idy] = out[2]
     print('X')
     print(X)
     print('Y')
     print(Y)
     print('zz')
     print(zz)
-    sys.exit('tt')
-    return xunique,yunique,zz
+    print('Z')
+    print(Z)
+    #return xunique,yunique,zz
+    return X,Y,Z
 
 ##########################################################
 # make plots
 ##########################################################
-def polyfit2d(x, y, z, kx=3, ky=3, order=None):
+def polyfit2dbetter(x, y, z, kx=3, ky=3, order=None):
     '''
     Two dimensional polynomial fitting by least squares.
     Fits the functional form f(x,y) = z.

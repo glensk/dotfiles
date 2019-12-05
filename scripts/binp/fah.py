@@ -193,7 +193,9 @@ def get_dudl_or_other_average_from_array(dudl):
     #print(dudlav)
     return dudlav
 
+###################################
 ######### job creation ############
+###################################
 def fah_create_jobs_from_fqh(ace):
     if not os.path.isdir('fqh'):
         sys.exit('fqh does not exist')
@@ -383,7 +385,9 @@ def fah_submit_job_if_on_cluster():
     get_into_fah_folder(verbose=False)
     hier = os.getcwd()
 
+###################################
 ######### job analysis ############
+###################################
 def get_fqh_folder(verbose=False):
     hier = os.getcwd()
     get_into_fah_folder(verbose=False)
@@ -541,11 +545,164 @@ def fah_get_Fah_surface():
         f.close()
     return
 
+
+def fit_fah_surface_lmfit2d(x=None,y=None,z=None,verbose=False):
+    if x is None and y is None and z is None and os.path.isfile("Fah_surface"):
+        print('reading Fah_surface')
+        data = np.loadtxt('Fah_surface')[:,[0,1,2]]
+        x = data[:,0];
+        y = data[:,1];
+        z = data[:,2];
+    if verbose:
+        print('x',x)
+        print('y',y)
+        print('z',z)
+    if x.ndim != 1:
+        raise ValueError("x must be 1-dim.")
+    if y.ndim != 1:
+        raise ValueError("y must be 1-dim.")
+    if z.ndim != 1:
+        raise ValueError("z must be 1-dim.")
+    if x.size != y.size or x.size != z.size:
+        print('x.size',x.size)
+        print('y.size',y.size)
+        print('z.size',z.size)
+        raise ValueError("x, y, and z must have the same size.")
+    data = np.zeros((len(x),3))
+    data[:,0] = x
+    data[:,1] = y
+    data[:,2] = z
+
+    # add points at T=0K having fah = 0 mev/atom
+    if True:
+        all1v = np.unique(data[:,1])
+        for v in all1v:
+            data = np.append(data, [[0, v, 0]], axis=0)
+    #print('data')
+    #print(data)
+    #sys.exit()
+
+    #def exp1(x,y):
+    #    return x*0+1, x,       y,       x**2,       x**2*y,       x**2*y**2,       y**2,       x*y**2,       x*y
+
+    #def exp1sw(x,y):
+    #    return x*0+1, y,       x**2,       y**2,       x**2*y,       x**2*y**2,       x,       x*y**2,       x*y
+
+    #def exp2(x,y):
+    #    return x,  y,  x**2,       x**2*y,       x**2*y**2,       y**2,       x*y**2,       x*y
+
+    def exp17coef(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17):
+        x = xy[:,0]
+        y = xy[:,1]
+        return c1 *x**0*y**1 + \
+               c2 *x**0*y**2 + \
+               c3 *x**1*y**0 + \
+               c4 *x**1*y**1 + \
+               c5 *x**1*y**2 + \
+               c6 *x**2*y**0 + \
+               c7 *x**2*y**1 + \
+               c8 *x**2*y**2 + \
+               c9 *x**3*y**0 + \
+               c10*x**3*y**1 + \
+               c11*x**3*y**2 + \
+               c12*x**3*y**3 + \
+               c13*x**4*y**0 + \
+               c14*x**4*y**1 + \
+               c15*x**4*y**2 + \
+               c16*x**4*y**3 + \
+               c17*x**4*y**4 + \
+               0
+
+
+    #################################
+    #####  fit the surface ##########
+    #################################
+    from lmfit import Model,minimize
+    func = exp17coef
+    model = Model(func)
+    parameter_names = model.param_names
+    independent_variable = model.independent_vars
+    #print('parameter_names',parameter_names)
+    #print('independent_variable',independent_variable)
+    #print('parameter_names',type(parameter_names))
+    for i in parameter_names: model.set_param_hint(i ,value=1)
+    result = model.fit(data[:, 2], xy=data[:, 0:2])
+    print(result.fit_report())
+    #print('vgl (obtained by fit)',result.best_values)
+    coef_lmfit = []
+    for i in parameter_names: coef_lmfit.append(result.best_values.get(i))
+    print('coef_lmfit',coef_lmfit)
+    #print()
+    #print(result.best_fit)
+    diffmax = np.abs(result.best_fit-data[:,2]).max()
+    print('diffmax',diffmax)
+    #print('888',data[0,0:2])
+
+    #################################
+    #####  print comparision curves #
+    #################################
+
+    #######################
+    # a) save original data
+    #######################
+    folder = "Fah_surface_analyze"
+    if os.path.isdir(folder):
+        shutil.rmtree(folder)
+    os.mkdir(folder)
+    def save_v_lines_from2darray(usearray=None,string=None,folder=None):
+        if usearray is None:
+            sys.exit('provide usearray1 and string')
+        if string is None:
+            sys.exit('provide usearray2 and string')
+        if folder is None:
+            sys.exit('provide folder')
+        if type(string) != str:
+            sys.exit('has tobe a sring')
+        all1t = np.unique(usearray[:,0])
+        all1v = np.unique(usearray[:,1])
+        for v in all1v:
+            ka = usearray[np.where(usearray[:,1]==v)[0]][:,[0,2]]
+            arr = ka[ka[:,0].argsort()]
+            np.savetxt(folder+"/out_ang3_vs_temp_"+string+"_"+str(v)+'.dat',arr)
+        for t in all1t:
+            ka = usearray[np.where(usearray[:,0]==t)[0]][:,[1,2]]
+            arr = ka[ka[:,0].argsort()]
+            #np.savetxt(folder+"/out_"+string+"_"+str(int(t))+'_K_vs_vol.dat',arr)
+            np.savetxt(folder+"/out_temp_vs_ang3_"+string+"_"+str(int(t))+'.dat',arr)
+        return
+    save_v_lines_from2darray(usearray=data,string='data',folder=folder)
+
+    #######################
+    # b) save fitted data
+    #######################
+    denset = np.arange(0,x.max()+1,1)
+    densev = np.arange(y.min(),y.max(),0.1)
+    all1v = np.unique(data[:,1])
+    all1t = np.unique(data[:,0])
+    string="fit"
+    for v in all1v:
+        densev = np.repeat(v,len(denset))
+        dd = np.array([denset,densev]).T
+        arr = func(dd,*coef_lmfit)
+        np.savetxt(folder+"/out_ang3_vs_temp_"+string+"_"+str(v)+'.dat',arr)
+    for t in all1t:
+        denset = np.repeat(t,len(densev))
+        dd = np.array([densev,denset]).T
+        arr = func(dd,*coef_lmfit)
+        np.savetxt(folder+"/out_temp_vs_ang3_"+string+"_"+str(int(t))+'.dat',arr)
+    return
+
 def fah_get_thermo():
     get_into_fah_folder(verbose=False)
     if not os.path.isfile('Fah_surface'):
         sys.exit('no Fah_surface')
-    Fah_surface = np.loadtxt('Fah_surface')
+    Fah_surface = np.loadtxt('Fah_surface')[:,[0,1,2]]  # temp, vol, fah
+
+    x = Fah_surface[:,0]
+    y = Fah_surface[:,1]
+    z = Fah_surface[:,2]
+    fit_fah_surface_lmfit2d(x=x,y=y,z=z)
+
     #Tmax = Fah_surface[:,0].max()
     Tmax = get_Tmax_from_fqh_thermo_2nd(verbose=False)
     Vmin = Fah_surface[:,1].min()
