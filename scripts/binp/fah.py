@@ -660,8 +660,6 @@ def get_avg_dudl_fit_and_Fah_from_avg_dudl(verbose=True):
     f.close()
     return
 
-
-
 def fah_get_Fah_surface():
     get_into_fah_folder(verbose=False)
     fvta = glob.glob(os.getcwd()+"/*_*K")
@@ -681,7 +679,6 @@ def fah_get_Fah_surface():
         f.write(t_str+" "+v_str+" "+fah_str+" "+err_str+"\n")
         f.close()
     return
-
 
 def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
     if x is None and y is None and z is None and os.path.isfile("Fah_surface"):
@@ -713,7 +710,7 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
     data[:,3] = err
 
     # add points at T=0K having fah = 0 mev/atom
-    if True:
+    if False:
         all1v = np.unique(data[:,1])
         for v in all1v:
             data = np.append(data, [[0, v, 0, 0]], axis=0)
