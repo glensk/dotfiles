@@ -6047,8 +6047,8 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         print("##############################")
         print("# creating anharmonic jobs ... #")
         print("##############################")
-        fah_.fah_create_jobs_from_fqh(ace)
-        fah_.go_through_all_fah_jobs_and_create_joblist()
+        fah_.fah_create_jobs_and_joblist_from_fqh(ace)
+        fah_.fah_submit_ipi_ti_job()
     return atoms
 
 
@@ -6135,7 +6135,7 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
 def ipi_submit_missing_jobs_to_que():
     return
 
-def ipi_sart_job(inputfile="input.xml",sleep=6):
+def ipi_start_job(inputfile="input.xml",sleep=6):
     if not os.path.isfile('in.lmp'):
         sys.exit('in.lmp does not exist! Exit')
     if not os.path.isfile(inputfile):
@@ -6162,8 +6162,11 @@ def ipi_sart_job(inputfile="input.xml",sleep=6):
     call([python+" $HOME/sources/ipi/bin/i-pi "+inputfile+" &"],shell=True)
     print('now sleep for ',sleep,"(sec)")
     time.sleep(sleep)
-    print('sleep done; now sart lammps')
+    time_now = datetime.now()
+    print('sleep done; now sart lammps',time_now)
     call([executable+" < in.lmp"],shell=True)
+    time_now = datetime.now()
+    print('job done',time_now)
     return
 
 def load_hessefiles_volumes_positionsfiles_from_fqh_folder():

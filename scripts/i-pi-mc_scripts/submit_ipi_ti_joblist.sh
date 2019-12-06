@@ -15,8 +15,6 @@ set +e
 #export LD_LIBRARY_PATH=/home/glensk/sources/n2p2//lib:${LD_LIBRARY_PATH} # necessary for n2p2
 #export OMP_NUM_THREADS=2
 
-#myutils.py -ef ipi_sart_job
-#fah.py -ef go_through_all_fah_jobs
 
 hier=`pwd`
 echo "hier:$hier"
@@ -50,7 +48,7 @@ while [ "$todo" -ge "1" ];do
         # actually the cpu2 never gets beyond 84% even if too many jobs submitted;
         # the last jobs just "wait" until others are done; seems to be ok strategy
         cd $nextjob
-        myutils.py -ef ipi_sart_job &
+        ipi_start_job.py -ef ipi_start_job &
         sed '1d' $hier/joblist_tmp.dat > tmpfile; mv tmpfile $hier/joblist_tmp.dat # POSIX
         echo "XX started $nextjob"
         sleep 1.0
