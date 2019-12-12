@@ -5821,8 +5821,6 @@ class ase_calculate_ene( object ):
         #ase_write("POSCAR_ka",atoms_h,format='vasp')
         #sys.exit()
 
-        return atoms_sc
-
 
 
         if debug:

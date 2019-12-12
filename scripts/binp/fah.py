@@ -650,7 +650,6 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 my.sed(folder+'/'+lammps_in_file,'md_ff',timestamp)
                 #print(folder)
                 joblist.append(folder)
-                sys.exit('777777000000')
 
     get_into_fah_folder(verbose=False)
     f = open("joblist.dat", "a")
@@ -1227,6 +1226,7 @@ def get_dudl_from_ipi_job(verbose=False):
     # get dudl
     #################################################
     dudl = get_dudl_from_file_with_energies_lambda_0_1(filepath=False,number_of_atoms=False,verbose=False)
+    np.savetxt('dudl.dat',dudl)
     dudl = dudl[equilibration:]
     #if False:
     #corr = np.correlate(dudl,dudl,mode='full')
