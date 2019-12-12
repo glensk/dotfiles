@@ -541,7 +541,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     #steps = 90000
     seeds = 2
 
-    if False:
+    if True:
         lambdas = [ 0.0, 1.0 ]
         steps = 5
         seeds = 1
@@ -606,7 +606,8 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                     ene_hartree = ene*0.036749322
                     print('ene',ene,"eV")
                     print('ene_hartree',ene_hartree,"hartree")
-                ase_write(folder+"/pos.ipi.xyz",frame,format='ipi')
+                #ase_write(folder+"/pos.ipi.xyz",frame,format='ipi')
+                ase_write(folder+"/pos.ipi.xyz",frame,format='ipi',write_x_reference=folder+"/x_reference.data")
                 #ase_write(folder+"/pos.lmp",frame,format='lammps-data')
 
                 ##
@@ -631,10 +632,10 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
 
                 #print('fp',frame.positions)
                 #print('fp',frame.positions.flatten())
-                ang_to_bohr = 1.8897261
+                #ang_to_bohr = 1.8897261
                 #print('frame.positions[:3]',frame.positions[:3])
                 #print('frame.positions[:3]*atb',frame.positions[:3]*ang_to_bohr)
-                np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+                #np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
                 nat = frame.get_number_of_atoms()
                 my.sed(folder+'/'+ipi_inp_basename,'xxx123',str(steps))  # steps
                 my.sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
@@ -1191,7 +1192,7 @@ def fah_write_fit_input(Vmin,Vmax,Tmax,for_atoms=1,filename='fit.input'):
         f.close()
     return
 
-def get_dudl_from_ipi_job(verbose=False):
+def get_dudl_from_ipi_job(verbose=True):
     ''' help '''
     if os.path.isfile('results.pickle'):
         with open('results.pickle', 'rb') as f:
@@ -1209,11 +1210,12 @@ def get_dudl_from_ipi_job(verbose=False):
 
     out = np.loadtxt('simulation.out')
     t = out[:,3]
-    #if verbose:
-    #    print("<T>    K:",t.mean())
-    #    print("<Tstd> K:",t.std())
+    if verbose:
+        print("<T>    K:",t.mean())
+        print("<Tstd> K:",t.std())
 
     tall = np.where(np.logical_and(t>=desired_temp-t.std()/2, t<=desired_temp+t.std()/2))
+
     equilibration = tall[0][0]
     if verbose:
         print('equilibration',equilibration)
@@ -1256,7 +1258,7 @@ def get_dudl_from_ipi_job(verbose=False):
     #print('t1',tempav)
     #np.savetxt('tempav.dat',tempav)
     #np.savetxt('temp.dat',t)
-    #print('RESULT',lam, dudl.mean(), std_err_mean_uncorr,std_err_mean, dudl.std(), t.mean())
+    print('RESULT',lam, dudl.mean(), std_err_mean_uncorr,std_err_mean, dudl.std(), t.mean())
     with open('results.pickle', 'wb') as f:
         pickle.dump([lam, dudl.mean(), std_err_mean_uncorr,std_err_mean, dudl.std(), t.mean()],f)
     return lam, dudl.mean(), std_err_mean_uncorr,std_err_mean, dudl.std(), t.mean()

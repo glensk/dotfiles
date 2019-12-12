@@ -5500,7 +5500,7 @@ class ase_calculate_ene( object ):
             print('atoms_murn_loop.cell (1)',atoms_murn_loop.cell)
             print('atoms_murn_loop.pos  (1)',atoms_murn_loop.positions)
             print('atoms_murn_loop nat  (1)',atoms_murn_loop.get_number_of_atoms())
-            if True: # this all seems to work
+            if False: # this all seems to work
                 atoms_murn_loop = ase_repeat_cell(atoms_murn_loop,2,2,2)
                 atoms_murn_loop.write(self.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
                 ase_write(self.pot.lammps_tmpdir+'pos.lmp2',atoms_murn_loop,format='lammps-data')
@@ -6323,16 +6323,28 @@ class ase_get_known_formats_class():
             if self.verbose: print(">> ERROR, formats.py does not know",typ)
             return False
 
-    def copy(self):
+    def copy_if_necessary(self):
         scripts = os.environ['scripts']
         from_ = scripts+"/runner_scripts/ase_fileformat_for_"
         to = os.path.dirname(ase.io.__file__)+"/"
+        import filecmp
         for ff in self.my_formats_filenames:
             #print('copying ',from_+ff,'to',to+ff)
-            if self.verbose:
+            needcopy = filecmp.cmp(from_+ff,to+ff)
+            #if self.verbose:
+            #    print('copying ',from_+ff)
+            #    print('                    to',to+ff)
+            #    print('seem equal?',needcopy)
+            if needcopy == False:
+                print()
+                print('copying!!!')
+                shutil.copyfile(from_+ff,to+ff)
                 print('copying ',from_+ff)
                 print('                    to',to+ff)
-            shutil.copyfile(from_+ff,to+ff)
+                print('seem equal?',needcopy)
+                print()
+                #sys.exit()
+        #sys.exit()
 
     def adapt_formatspy(self,writeformatspy = False):
         # check if formatspy exist
@@ -6388,12 +6400,22 @@ class ase_get_known_formats_class():
     def check_if_default_formats_known(self,copy_and_adapt_formatspy_anyhow=False):
         self.get_all_known_formats()
         if self.verbose: print(">> formats.py", self.formatspy)
-        for i in self.my_formats_shall:
+        for idx,i in enumerate(self.my_formats_shall):
             if self.check_if_format_in_know_formats(i) == False: self.needcopy_since_missing = True
+            #filename = self.my_formats_filenames[idx]
+
+        #import filecmp
+        #for i in self.my_formats_filenames: # = [ "runner.py","lammpsrunner.py","lammpsdata.py","ipi.py", "quippy.py" ]
+        #    # make diff
+        #    f1 =
+        #    f2 =
+        #    print(filecmp.cmp(f1,f2))
+        self.copy_if_necessary()
+        #sys.exit('88')
 
         if self.needcopy_since_missing == True or copy_and_adapt_formatspy_anyhow == True: # only in this case copy stuff and add to formats.py
             self.verbose = True
-            self.copy()
+            self.copy_if_necessary()
             self.adapt_formatspy(writeformatspy = copy_and_adapt_formatspy_anyhow)
 
         #################################################

@@ -110,7 +110,7 @@ def read_ipi(fileobj, index):
 
 
 #def simple_write_xyz(fileobj, images, comment=''):
-def write_ipi(fileobj, images, comment=''): #,convert_ang_to_bohrradius=False):
+def write_ipi(fileobj, images, comment='',write_x_reference=False): #,convert_ang_to_bohrradius=False):
     #print('convert_ang_to_bohrradius',convert_ang_to_bohrradius)
     if len(images) != 1:
          sys.exit('you can only give write_ipi one frame at a time!')
@@ -123,13 +123,19 @@ def write_ipi(fileobj, images, comment=''): #,convert_ang_to_bohrradius=False):
     #    atb = 1.8897261
     #    laa[0:3] = laa[0:3]*atb
     comment = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+" Step: 4  Bead: 0 positions{angstrom} cell{angstrom}"
-    if False:  # for cu_theta_prime (checked with adp) this seems not to do what it is supposed to do.  But without it, this seems to be better
+    if True:  # for cu_theta_prime (checked with adp) this seems not to do what it is supposed to do.  But without it, this seems to be better
+        # nope, acutally this is correct for theta_prime, just that x_refecrece for harmonic has to be taken from this positions.
         newcell, newpos = convert_cell(frame.cell, frame.positions)
         frame.set_cell(newcell)
         frame.set_positions(newpos)
+        if type(write_x_reference) == str:
+            ang_to_bohr = 1.8897261
+            np.savetxt(write_x_reference,frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+
 
     natoms = len(symbols)
     #for atoms in images:
     fileobj.write('%d\n%s\n' % (natoms, comment))
     for s, (x, y, z) in zip(symbols, frame.positions):
         fileobj.write('%-2s %16.8f %16.8f %16.8f\n' % (s, x, y, z))
+    return
