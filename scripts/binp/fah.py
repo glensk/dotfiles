@@ -537,11 +537,11 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     #temperatures = [200, 400, 600, 800, 1000 ]
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     steps = 40000
-    steps = 9000
-    steps = 90000
-    seeds = 3
+    steps = 20000
+    #steps = 90000
+    seeds = 2
 
-    if True:
+    if False:
         lambdas = [ 0.0, 1.0 ]
         steps = 5
         seeds = 1
