@@ -541,7 +541,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     #steps = 90000
     seeds = 2
 
-    if True:
+    if False:
         lambdas = [ 0.0, 1.0 ]
         steps = 5
         seeds = 1
