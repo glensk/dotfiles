@@ -540,6 +540,12 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     steps = 9000
     steps = 90000
     seeds = 3
+
+    if True:
+        lambdas = [ 0.0, 1.0 ]
+        steps = 5
+        seeds = 1
+        temperatures = [ 200 ]
     print("temperatrues",temperatures)
     #temperatures = [400 ]
 
@@ -560,7 +566,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
             volume  = i[1]
             posfile = i[2]
             print("->",hessefile,'vol',volume,'T:',temperature) #, posfile',posfile)
-            joblist = ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps)
+            joblist = ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps,seeds=seeds)
     return
 
 def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps,seeds=3):
@@ -591,6 +597,10 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 print()
                 pos_basename = os.path.basename(posfile)
                 frame = ase_read(posfile)
+                print('frame.pos',frame.positions[:3])
+                print('frame.cell',frame.positions[:3])
+                ase_write(folder+"/pos.extxyz",frame,format='extxyz')
+                ase_write(folder+"/pos.POSCAR",frame,format='vasp')
                 if False:   # this stuff is not used
                     ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
                     ene_hartree = ene*0.036749322
@@ -608,7 +618,8 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
 #                    frame.write(folder+'/pos.lmp',format='lammps-data')
                     ase_write(folder+'/pos.lmp',frame,format='lammps-data')
                 else:
-                    sys.exit('44321 Error: dont know how to write this lammps file')
+                    ase_write(folder+'/pos.lmp',frame,format='lammps-data')
+                    #sys.exit('44321 Error: dont know how to write this lammps file')
 
                 lammps_in_file = 'in.lmp'
                 ace.ipi = True
@@ -621,6 +632,8 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 #print('fp',frame.positions)
                 #print('fp',frame.positions.flatten())
                 ang_to_bohr = 1.8897261
+                #print('frame.positions[:3]',frame.positions[:3])
+                #print('frame.positions[:3]*atb',frame.positions[:3]*ang_to_bohr)
                 np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
                 nat = frame.get_number_of_atoms()
                 my.sed(folder+'/'+ipi_inp_basename,'xxx123',str(steps))  # steps
@@ -637,6 +650,7 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 my.sed(folder+'/'+lammps_in_file,'md_ff',timestamp)
                 #print(folder)
                 joblist.append(folder)
+                sys.exit('777777000000')
 
     get_into_fah_folder(verbose=False)
     f = open("joblist.dat", "a")

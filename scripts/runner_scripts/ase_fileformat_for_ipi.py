@@ -115,6 +115,7 @@ def write_ipi(fileobj, images, comment=''): #,convert_ang_to_bohrradius=False):
     if len(images) != 1:
          sys.exit('you can only give write_ipi one frame at a time!')
     frame = images[0].copy()
+    print('frame.pos',frame.positions)
 
     symbols = frame.get_chemical_symbols()
     laa = frame.get_cell_lengths_and_angles()
@@ -122,9 +123,10 @@ def write_ipi(fileobj, images, comment=''): #,convert_ang_to_bohrradius=False):
     #    atb = 1.8897261
     #    laa[0:3] = laa[0:3]*atb
     comment = '# CELL(abcABC):   '+str(laa[0])+"  "+str(laa[1])+"  "+str(laa[2])+"  "+str(round(laa[3]))+"  "+str(round(laa[4]))+"  "+str(round(laa[5]))+" Step: 4  Bead: 0 positions{angstrom} cell{angstrom}"
-    newcell, newpos = convert_cell(frame.cell, frame.positions)
-    frame.set_cell(newcell)
-    frame.set_positions(newpos)
+    if False:  # for cu_theta_prime (checked with adp) this seems not to do what it is supposed to do.  But without it, this seems to be better
+        newcell, newpos = convert_cell(frame.cell, frame.positions)
+        frame.set_cell(newcell)
+        frame.set_positions(newpos)
 
     natoms = len(symbols)
     #for atoms in images:

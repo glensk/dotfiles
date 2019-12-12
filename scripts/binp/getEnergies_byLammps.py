@@ -369,7 +369,7 @@ def get_energies(args):
             for idx,i in enumerate(frames.positions):
                 print('before relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx])
             print('relaxing the structure ...')
-        ace.ase_relax_atomic_positions_only(frames,fmax=0.0001,verbose=False)
+        ace.ase_relax_atomic_positions_only(frames,fmax=0.0001,verbose=args.verbose)
         if args.verbose:
             for idx,i in enumerate(frames.positions):
                 print('after relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx],frames.get_forces()[idx])

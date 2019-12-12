@@ -309,10 +309,14 @@ def qh_forces(dpos = None, h = None ):
 def qh_energy_cell(dpos = None, h = None ):
     ''' returns : energy in eV/cell
         dpos    : Angstrom
-        h       : atomic units (as sphinx, ipi, ...)
+        h       : eV/angstrom (when,e.g. used read_Hessematrix)
+
+        returns : energy in hartree
+        dpos    : bohrradius
+        h       : atomic units (as sphinx, ipi, ...) (without changing units)
     '''
     f = qh_forces( dpos = dpos, h = h )
-    e = -np.dot(np.ndarray.flatten(dpos),np.ndarray.flatten(f))/2.
+    e = -np.dot(np.ndarray.flatten(dpos),np.ndarray.flatten(f))*0.5
     if e < 1e-8 and e > -1e-8:
         e = 0
     return e

@@ -2559,8 +2559,10 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner',pot=ace.pot)
     elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
         atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
+    elif ace.pot.pottype in [ 'adp' ]:
+        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
     else:
-        sys.exit('44321 Error: dont know how to write this lammps file')
+        sys.exit('44323 Error: dont know how to write this lammps file')
     if ace.verbose:
         print('written ',ace.pot.lammps_tmpdir+'/pos.lmp')
     ###############################################################
@@ -5334,15 +5336,19 @@ class ase_calculate_ene( object ):
                 print('get_calculator (Y1): lmpcmds = self.lmpcmd    :',self.lmpcmd)
                 print('get_calculator (Y2): atom_types=self.atom_types:',self.atom_types)
             asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=self.keep_alive)
+            if self.verbose > 1:
+                print('now asecalcLAMMPS defined')
             atoms.set_calculator(asecalcLAMMPS)
+            if self.verbose > 1:
+                print('now with calculator')
         return
 
     def ase_relax_atomic_positions_only(self,atoms,fmax=0.0001,verbose=False,output_to_screen=False):
         ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
         self.keep_alive = True
         self.get_calculator(atoms)
-
-        if verbose:
+        print('sssss')
+        if False: #verbose:
             print('1: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
 
         logfile="-" # output to screen
@@ -5488,7 +5494,26 @@ class ase_calculate_ene( object ):
         for idx,i in enumerate(alat_rel):
             if verbose > 2:
                 print('000 idx:',idx,'i:',i)
+            atoms_murn_loop = atoms_murn.copy()  # in case cell is repeated
             atoms_murn_loop.set_cell(cell_ref*i,scale_atoms=True)
+
+            print('atoms_murn_loop.cell (1)',atoms_murn_loop.cell)
+            print('atoms_murn_loop.pos  (1)',atoms_murn_loop.positions)
+            print('atoms_murn_loop nat  (1)',atoms_murn_loop.get_number_of_atoms())
+            if True: # this all seems to work
+                atoms_murn_loop = ase_repeat_cell(atoms_murn_loop,2,2,2)
+                atoms_murn_loop.write(self.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
+                ase_write(self.pot.lammps_tmpdir+'pos.lmp2',atoms_murn_loop,format='lammps-data')
+                ase_write(self.pot.lammps_tmpdir+'pos.POSCAR',atoms_murn_loop,format='vasp')
+                ase_write(self.pot.lammps_tmpdir+'pos.extxyz',atoms_murn_loop,format='extxyz')
+                ang_to_bohr = 1.8897261
+                np.savetxt(self.pot.lammps_tmpdir+"/x_reference.data",atoms_murn_loop.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
+                ase_write(self.pot.lammps_tmpdir+"/pos.ipi.xyz",atoms_murn_loop,format='ipi')
+            print('atoms_murn_loop.cell (2)',atoms_murn_loop.cell)
+            print('atoms_murn_loop nat  (2)',atoms_murn_loop.get_number_of_atoms())
+            #print('atoms_murn_loop.pos  (2)',atoms_murn_loop.positions)
+            nat = atoms_murn_loop.get_number_of_atoms()  # in case stuff is repeated
+
             if verbose > 2:
                 print('111 cell',atoms_murn_loop.get_cell())
             #print('111 cell',atoms_murn_loop.get_cell())
@@ -5503,14 +5528,14 @@ class ase_calculate_ene( object ):
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
-            #print('ene_ev ase',ene_ev)
-            #print('ene    ase',ene)
-
+            print('ene_ev ase',ene_ev)
+            print('ene    ase',ene)
+            print('self.lammps',self.lammps)
             if self.lammps == True:
                 ene_ev_cell, ene = lammps_ext_calc(atoms_murn_loop,self)
                 ene_ev = ene_ev_cell
                 ene = ene_ev_cell
-                #print('ene_ev lmp',ene_ev)
+                print('ene_ev_cell (lmpammps external):',ene_ev_cell)
                 #print('ene    lmp',ene)
             print('idx!!',idx,np.round(i,2),np.round(vol,2),'vpa',np.round(vol_per_atom,2),'ref',cell_ref_vol_pa,'v/vo',percent,'ene_pa',ene/nat)
             #if printminimal == True:
@@ -5538,14 +5563,18 @@ class ase_calculate_ene( object ):
             ene_pa[idx] = ene/nat
             if write_fqh and alat_rel[idx] >= 0.999:
                 #print('write_fqh: idx:',idx,'i:',i,'alat_rel:',alat_rel[idx])
-                print('now phonopy')
+                print('now phonopy (not yet)')
                 #self.get_fh_phonopy(atomsin=atoms_murn_loop)
                 #sys.exit('phonopy 77 done')
                 self.get_fh_onevolume(atomsin=atoms_murn_loop,disp=0.03,debug=False,try_readfile=False,atomrelax=True,write_fqh=write_fqh)
             if verbose > 2:
                 print('idx:',str(idx).ljust(3),'i:',str(i).ljust(10),'vol:',str(vol).ljust(10),'ene:',ene)
             if verbose:
-                stress = atoms_murn_loop.get_stress()[:3]
+                stress = 0
+                if self.lammps == True:  # external calculation
+                    stress = 0
+                else:
+                    stress = atoms_murn_loop.get_stress()[:3]
                 print('i',str(i).ljust(5),'vol/nat',str(round(vol/nat,7)).ljust(10),'ene/nat',str(ene/nat).ljust(19),stress)
 
 
@@ -5581,9 +5610,12 @@ class ase_calculate_ene( object ):
         if printminimal == True:
             print('vol_pa',vol_pa)
             print('ene_pa',ene_pa)
+        for idx,i in enumerate(vol_pa):
+            print(idx,vol_pa[idx],ene_pa[idx])
+
         vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
         #self.eos = vinet.parameters
-        if verbose > 1:
+        if True: #verbose > 1:
             print('pars',vinet.parameters)
         if verbose: self.check_frame('get_murn 4 before min vol ret   ',frame=atoms_murn)
         #if return_minimum_volume_frame == True or type(return_frame_with_volume_per_atom) != bool:
@@ -5609,12 +5641,15 @@ class ase_calculate_ene( object ):
             cell = atoms_murn.get_cell()
             pos = atoms_murn.get_positions()[1]/cell[0,0]
             print("---2-->>",pos)
-        if type(write_evinet) == bool:
+        #if type(write_evinet) == bool:
+        if write_evinet == True: # this shoul never (over) write the Evinet file in case write_evinet == False
             hier = os.getcwd()
             os.chdir("evinet")
             vinet.write_data()
             print('vinet.parameters:',vinet.parameters)
             os.chdir(hier)
+
+        return
 
     def get_fh_phonopy(self,atomsin=False):
         ''' the function will never change the atomsobject '''
@@ -5759,9 +5794,9 @@ class ase_calculate_ene( object ):
         # a) defaut cellsize, or take the defined one
         #################################
         nat = atoms_h.get_number_of_atoms()
-        print('self.fqh_atoms_max:',self.fqh_atoms_max)
-        print('self.supercell    :',self.fqh_supercell)
-        print('number of atoms   :',nat)
+        print('self.fqh_atoms_max (1):',self.fqh_atoms_max)
+        print('self.supercell     (1):',self.fqh_supercell)
+        print('number of atoms    (1):',nat)
         if self.fqh_supercell is not None:
             rep = self.fqh_supercell
             print('rep from fqh_supercell',rep)
@@ -5785,6 +5820,9 @@ class ase_calculate_ene( object ):
         print('rep',rep,'nat',nat)
         #ase_write("POSCAR_ka",atoms_h,format='vasp')
         #sys.exit()
+
+        return atoms_sc
+
 
 
         if debug:
@@ -5906,6 +5944,12 @@ class ase_calculate_ene( object ):
         ## b) follow kmc_submit_inputdata_to_aiida.sh
         return
 
+def ase_repeat_cell(atoms,r1,r2,r3):
+    ''' this should never change the original ase object'''
+    atoms_sc = atoms.copy()
+    atoms_sc *= (r1,r2,r3)
+    return atoms_sc
+
 def ase_vpa(atoms):
     return atoms.get_volume()/atoms.get_number_of_atoms()
 def ase_epa(atoms):
@@ -6004,6 +6048,9 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     print("# make this in anycase to relaxe the system fully ...              #")
     print("####################################################################")
     ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_evinet=evinet,write_fqh=False,atomrelax=True)
+
+    # now evinet needs to be set to False! otherwise the evinet/Evinet_1 file is overwritten with fqh volume range (only pos volumes) which is wrong!
+    evinet = False
     #print('atoms vol',atoms.get_volume())
 
     if fqh:
@@ -6067,88 +6114,6 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         fah_.fah_submit_ipi_ti_job()
     return atoms
 
-
-#def thermodynamic_integraton_from_fqh(ace):
-def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posfile,lambdas,steps):
-    for l in lambdas:
-        rand_nr = random.randint(1,99999)
-        rand_nr = '1234567'
-        folder = os.getcwd()+"/fah/"+str(volume)+"_"+str(temperature)+"K/lambda"+str(l)+"_"+str(rand_nr)
-        if os.path.isdir(folder):
-            sys.exit(folder+" does already exist!")
-        os.makedirs(folder)
-        ipi_inp = os.environ['HOME']+"/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
-
-        with cd(folder):
-            if False:
-                print('hessefile',hessefile)
-                print('to folder',folder)
-                print()
-            hessefile_basename = os.path.basename(hessefile)
-            shutil.copy2(hessefile, folder)
-            ipi_inp_basename = 'input.xml'
-            shutil.copy2(ipi_inp, folder+'/'+ipi_inp_basename)
-            if False:
-                print('hfbn',hessefile_basename)
-                print('ipi_inp_basename',ipi_inp_basename)
-                print('posfile',posfile)
-                print('to folder',folder)
-                print()
-            pos_basename = os.path.basename(posfile)
-            frame = ase_read(posfile)
-            if False:   # this stuff is not used
-                ene = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
-                ene_hartree = ene*0.036749322
-                print('ene',ene,"eV")
-                print('ene_hartree',ene_hartree,"hartree")
-            ase_write(folder+"/pos.ipi.xyz",frame,format='ipi')
-            #ase_write(folder+"/pos.lmp",frame,format='lammps-data')
-
-            ##
-            if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
-                #frame.write(folder+'/pos.lmp',format='lammps-runner')
-                # here I would need an ase object
-                ase_write(folder+'/pos.lmp',frame,format='lammps-runner',pot=ace.pot)
-            elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
-#                frame.write(folder+'/pos.lmp',format='lammps-data')
-                ase_write(folder+'/pos.lmp',frame,format='lammps-data')
-            else:
-                sys.exit('44321 Error: dont know how to write this lammps file')
-
-            lammps_in_file = 'in.lmp'
-            ace.ipi = True
-
-            #print('ace.ipi',ace.
-            ace.pot_get_and_ase_lmp_cmd(kmc=False,temp=False,nsteps=2000000000,ffsocket='inet',address=False)
-            lammps_write_inputfile(folder=folder,filename=lammps_in_file,positions='pos.lmp',ace=ace)
-
-
-            #print('fp',frame.positions)
-            #print('fp',frame.positions.flatten())
-            ang_to_bohr = 1.8897261
-            np.savetxt(folder+"/x_reference.data",frame.positions.flatten()*ang_to_bohr,newline=" ",fmt="%3.15f")
-            nat = frame.get_number_of_atoms()
-            sed(folder+'/'+ipi_inp_basename,'xxx123',str(steps))  # steps
-            sed(folder+'/'+ipi_inp_basename,'hessian.data',hessefile_basename)
-            sed(folder+'/'+ipi_inp_basename,'init.xyz','pos.ipi.xyz')
-            sed(folder+'/'+ipi_inp_basename,'xxx600',str(temperature))
-            sed(folder+'/'+ipi_inp_basename,'xxx1.0',str(l))
-            sed(folder+'/'+ipi_inp_basename,'xxx0.0',str(1.-l))
-            sed(folder+'/'+ipi_inp_basename,'96,96',str(nat*3)+","+str(nat*3))
-            sed(folder+'/'+ipi_inp_basename,'32342',str(rand_nr))
-            sed(folder+'/'+ipi_inp_basename,'xxxene',str(0))
-            timestamp = 'md_ff_'+str(int(round(time.time() * 100000)))
-            sed(folder+'/'+ipi_inp_basename,'md_ff',timestamp)
-            sed(folder+'/'+lammps_in_file,'md_ff',timestamp)
-            print(folder)
-            print('next thing to do: put the socket in the in.lmp!')
-            print('executing this with:')
-            print('python $HOME/sources/ipi/bin/i-pi input.xml')
-            print('~/Dropbox/Albert/scripts/dotfiles/scripts/executables/lmp_mac < in.lmp')
-            print()
-            print('gives simulation.ti which has in 3rd column the total energy for the nn; independent of how lambdas are defined.')
-            print('3rd column in simulation.ti is also independent of v_reference> -2.89829817e+00')
-    return
 
 def ipi_submit_missing_jobs_to_que():
     return
