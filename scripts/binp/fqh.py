@@ -243,20 +243,23 @@ class qh(object):
         "FvibSupercell_perAtom_[0-9]*", \
         #"FvibSupercell_perAtom_[0-9]*", \
         "FvibSupercell_[0-9]*" \
+        "Fqh_*" \
         ]
 
         ############################################################################
         # get self.files (inputfiles)
         ############################################################################
+        print('self.files (0)',self.files)
         if self.files == None:
             if self._filessearchstring != None: # specified "Fqh_from_xyz*"
                 self.files = _lsn(self._filessearchstring)
 
+            print('self.files (1)',self.files)
             if self._filessearchstring == None: # no searchstring specified ("Fqh_from_xyz*")
                 #_printred("You didn't sepcify files to import. Trying default names of Fqh files:")
                 for files in possible_filenames:
                     filenames = _lsn(files)
-                    #print "filenames:",filenames,"len:",len(filenames)
+                    print "filenames:",filenames,"len:",len(filenames)
                     if filenames == None:
                         sys.exit("No filenames specified")
                     if len(filenames) is not 0:
@@ -289,10 +292,14 @@ class qh(object):
         # check if files exist
         #########################################################################
 
-        #for i in self.files:
-        #    print i
+        for i in self.files:
+            print('A',i)
         self.files = [f for f in self.files if '_fit_' not in f]
+        for i in self.files:
+            print('B',i)
         self.files = [f for f in self.files if '_Surface_' not in f]
+        for i in self.files:
+            print('C',i)
         #print ""
         for i in self.files:
             print(i)
@@ -316,7 +323,9 @@ class qh(object):
         # get suffix of files ( volumes )
         #########################################################################
         self._filessearchstring_suffix = ""
+        print('self.files',self.files)
         for i in self.files:
+            #print('i',i)
             suffix = i[len(self._filessearchstring_common):]
             #print('suffix',suffix,len(suffix),'files',len(self.files),suffix[:10])
             pos_dot = len(suffix)
@@ -333,10 +342,10 @@ class qh(object):
             self._filessearchstring_suffix = self._filessearchstring_suffix + "_" + suffix
 
         if self.files == None:
-            sys.exit("No Fqh files found")
+            sys.exit("No Fqh files found (1)")
 
         if len(self.files) == 0:
-            sys.exit("No Fqh files found")
+            sys.exit("No Fqh files found (2)")
 
         # get self.directory
         if len(self.files) >= 1:

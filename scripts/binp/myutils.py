@@ -2552,10 +2552,11 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="START LAMMPS EXTERNALLY")
     atoms.set_calculator(None)
-
+    if ace.verbose > 2:
+        print('ace.pot.pottype',ace.pot.pottype)
 
     if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
-        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner')
+        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner',pot=ace.pot)
     elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
         atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
     else:
@@ -2611,9 +2612,10 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             print('pwd',os.getcwd())
             ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
             ene=float(ene)
+            ene_ev_cell = deepcopy(ene)
             #print('ene',ene,'lammps in eV')
             #print('ace units',ace.units)
-            print('ace.units.lower()',ace.units.lower())
+            #print('ace.units.lower()',ace.units.lower())
             if ace.units.lower() == 'ev':
                 pass
             elif ace.units.lower() == 'hartree':
@@ -2661,7 +2663,9 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
 
     if ace.verbose: # > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="LAMMPS EXTERNALLY")
-    return ene
+    #print('eneneee',ene_ev_cell,ene)
+    #sys.exit()
+    return ene_ev_cell, ene
 
 ##################################################################################
 ## phonons / phonopy
@@ -4264,6 +4268,7 @@ class ase_calculate_ene( object ):
         self.nsteps         = 0
         self.verbose        = verbose
         self.atoms          = False          # ase atoms object (frame)
+        self.lammps         = False          # do the calculation by lammps externally and not by ace.
         if self.verbose:
             print('>> ase_calculate_ene: initializing mypot .... to self.pot')
         self.pot            = mypot(potpath_in,use_epoch = use_epoch,verbose = self.verbose)
@@ -4946,7 +4951,7 @@ class ase_calculate_ene( object ):
         #print('frame cell',frame.get_cell())
         #ase_write('pos.runner',frame,format='runner')
         #print('-------------- lammps_ext_calc -----------')
-        ene_pot_lmp = lammps_ext_calc(frame,self,get_elastic_constants=get_all_constants)
+        ene_ev_cell, ene_pot_lmp = lammps_ext_calc(frame,self,get_elastic_constants=get_all_constants)
         #print('ene_pot_lmp...kk',ene_pot_lmp)
         #sys.exit('88')
 
@@ -5498,6 +5503,15 @@ class ase_calculate_ene( object ):
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
+            #print('ene_ev ase',ene_ev)
+            #print('ene    ase',ene)
+
+            if self.lammps == True:
+                ene_ev_cell, ene = lammps_ext_calc(atoms_murn_loop,self)
+                ene_ev = ene_ev_cell
+                ene = ene_ev_cell
+                #print('ene_ev lmp',ene_ev)
+                #print('ene    lmp',ene)
             print('idx!!',idx,np.round(i,2),np.round(vol,2),'vpa',np.round(vol_per_atom,2),'ref',cell_ref_vol_pa,'v/vo',percent,'ene_pa',ene/nat)
             #if printminimal == True:
             if verbose:
@@ -5769,6 +5783,8 @@ class ase_calculate_ene( object ):
         atoms_h *= (rep,rep,rep)
         nat = atoms_h.get_number_of_atoms()
         print('rep',rep,'nat',nat)
+        #ase_write("POSCAR_ka",atoms_h,format='vasp')
+        #sys.exit()
 
 
         if debug:
@@ -6064,18 +6080,20 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
         ipi_inp = os.environ['HOME']+"/Dropbox/Albert/scripts/dotfiles/scripts/i-pi-mc_scripts/ipi_input_thermodynamic_integration_template.xml"
 
         with cd(folder):
-            print('hessefile',hessefile)
-            print('to folder',folder)
-            print()
+            if False:
+                print('hessefile',hessefile)
+                print('to folder',folder)
+                print()
             hessefile_basename = os.path.basename(hessefile)
             shutil.copy2(hessefile, folder)
-            print('hfbn',hessefile_basename)
             ipi_inp_basename = 'input.xml'
             shutil.copy2(ipi_inp, folder+'/'+ipi_inp_basename)
-            print('ipi_inp_basename',ipi_inp_basename)
-            print('posfile',posfile)
-            print('to folder',folder)
-            print()
+            if False:
+                print('hfbn',hessefile_basename)
+                print('ipi_inp_basename',ipi_inp_basename)
+                print('posfile',posfile)
+                print('to folder',folder)
+                print()
             pos_basename = os.path.basename(posfile)
             frame = ase_read(posfile)
             if False:   # this stuff is not used

@@ -311,6 +311,7 @@ def get_energies(args):
             fah_atoms_max = args.fah_atoms_max,
             fah_supercell = args.fah_supercell,
             verbose=verbose)
+    ace.lammps = args.lmp
     ### get the potential
     print('getEne(p2)                           : ace.pot_get_and_ase_lmp_cmd()')
     ace.pot_get_and_ase_lmp_cmd()  # just to have lmpcmd defined in case ...
@@ -534,6 +535,7 @@ def get_energies(args):
                         geopt=geopt,
                         elastic=args.elastic,
                         verbose=verbose)
+                ace.lammps = args.lmp
                 #print('now getting the lmp cmd')
                 ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
                 c44 = get_elastic_constants_al_ext(ace)
@@ -696,6 +698,7 @@ def get_energies(args):
                             geopt=geopt,
                             elastic=args.elastic,
                             verbose=args.verbose)
+            ace.lammps = args.lmp
             ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
             sys.exit('666666666666666')
             if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:

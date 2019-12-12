@@ -49,99 +49,6 @@ def find_surface_filename(sysexit = True):
         #print("Did not found any Fah surface file in current folder")
         return None
 
-def tanFunction(x, a0, a1, a2, a3):
-    return -a0*np.tan(np.pi*((1-a1)*x+a2+0.5))+a3
-
-def linfunc(x, a0,a1):
-    return a0+a1*x
-
-def quadfunc(x, a0,a1,a2):
-    return a0+a1*x+a2*x**2
-
-def qubefunc(x, a0,a1,a2,a3_):
-    return a0+a1*x+a2*x**2.+a3_*x**3.
-
-def lmfit_fit_tangens_lin_best(l,fah):
-    chisqr = 999999999999
-    lu = np.unique(l)
-    verbose = True
-    if verbose:
-        print('lu',lu,'len',len(lu))
-        print('fah',fah)
-        print('fah[0]',fah[0])
-        print()
-    if len(lu) <= 2:
-        tryfunc = [linfunc]
-    if len(lu) <= 3:
-        tryfunc = [linfunc,quadfunc]
-    if len(lu) >= 4:
-        tryfunc = [linfunc,quadfunc,qubefunc,tanFunction]
-    for func in tryfunc:
-        model = Model(func)
-        parameter_names = model.param_names
-        independent_variable = model.independent_vars
-        #print('parameter_names',parameter_names)
-        #print('independent_variable',independent_variable)
-        #print('parameter_names',type(parameter_names))
-        #if parameter_names == ['a0', 'a1', 'a2', 'a3']:
-        if func == tanFunction:
-            #print('setting hints tanFunction')
-            funcname='tanFunction'
-            model.set_param_hint('a0' ,value=fah[0])
-            model.set_param_hint('a1' ,value=0.5,min=0)
-            model.set_param_hint('a2' ,value=0.3,min=0)
-            model.set_param_hint('a3' ,value=-0.6)
-        else:
-            for i in parameter_names:
-                model.set_param_hint(i ,value=1)
-                funcname=parameter_names
-
-        #elif parameter_names == ['a0', 'a1']:
-        #    #print('setting hints linfunc')
-        #    funcname='linfunc'
-        #    model.set_param_hint('a0' ,value=fah[0])
-        #    model.set_param_hint('a1' ,value=-1)
-        #elif parameter_names == ['a0', 'a1', 'a2','a3']:
-        #    funcname='quadfunc'
-        #    #print('setting hints quadfunc')
-        #    model.set_param_hint('a0' ,value=fah[0])
-        #    model.set_param_hint('a1' ,value=-1)
-        #    model.set_param_hint('a2' ,value=0.1)
-
-        #print('l',l)
-        #print('fah',fah)
-        #z = np.polyfit(l, fah, 1)
-        #print('z',z)
-        result = model.fit(fah, x=l)
-        print(result.fit_report())
-        #print('chisqr:',result.chisqr)
-        #print('vgl (obtained by fit)',result.best_values)
-        coef_lmfit = []
-        for i in parameter_names: coef_lmfit.append(result.best_values.get(i))
-        #print('coef_lmfit',coef_lmfit)
-        #print()
-        #print(result.best_fit)
-        diffmax = np.abs(result.best_fit-fah).max()
-        #if result.chisqr < chisqr:
-        #    chisqr = result.chisqr
-        #    saving = True
-        if result.chisqr < chisqr:
-            chisqr = result.chisqr
-            #print('calc xx',coef_lmfit,'func',func)
-            #fah = quad(func, 0, 1, args=(coef_lmfit[0],coef_lmfit[1]))[0]
-            fahout = quad(func, 0, 1, args=tuple(coef_lmfit))[0]
-            if verbose:
-                print(str(funcname).ljust(25),'chisqr:',np.round(result.chisqr,6),'diffmax',np.round(diffmax,4),'fah',np.round(fahout,4))
-            #print('c',chisqr,diffmax)
-            #print(result.fit_report())
-            #print('diffmax',diffmax)
-            #print('888',data[0,0:2])
-            xfit = np.arange(0,101)/100.
-            yfit = func(xfit,*coef_lmfit)
-            np.savetxt('avg_dudl_fit_best.dat',np.array([xfit,yfit]).T)
-    #print('done')
-    return fahout,chisqr
-
 def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_parameters = False,verbose=False,savefit=False):
     ''' Fits tangence function to dudl vs lambda data.
 
@@ -214,6 +121,200 @@ def get_dudlmeanfit(lambdas_array, energies_array, return_fit = False, return_pa
         return fah, [fit_x_values,fit_y_values], parameters
     return fah #,fitdeltasmax
 
+
+##############################################
+## newstuff
+##############################################
+def tanFunction(x, a0, a1, a2, a3):
+    return -a0*np.tan(np.pi*((1-a1)*x+a2+0.5))+a3
+
+def linfunc(x, a0,a1):
+    return a0+a1*x
+
+def quadfunc(x, a0,a1,a2):
+    return a0+a1*x+a2*x**2
+
+def qubefunc(x, a0,a1,a2,a3_):
+    return a0+a1*x+a2*x**2.+a3_*x**3.
+
+
+def exp12coef(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12):
+    x = xy[:,0]
+    y = xy[:,1]
+    return c1 *x**0*y**1 + \
+           c2 *x**0*y**2 + \
+           c3 *x**1*y**0 + \
+           c4 *x**1*y**1 + \
+           c5 *x**1*y**2 + \
+           c6 *x**2*y**0 + \
+           c7 *x**2*y**1 + \
+           c8 *x**2*y**2 + \
+           c9 *x**3*y**0 + \
+           c10*x**3*y**1 + \
+           c11*x**3*y**2 + \
+           c12*x**3*y**3 + \
+           0
+
+def exp17coef(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17):
+    x = xy[:,0]
+    y = xy[:,1]
+    return c1 *x**0*y**1 + \
+           c2 *x**0*y**2 + \
+           c3 *x**1*y**0 + \
+           c4 *x**1*y**1 + \
+           c5 *x**1*y**2 + \
+           c6 *x**2*y**0 + \
+           c7 *x**2*y**1 + \
+           c8 *x**2*y**2 + \
+           c9 *x**3*y**0 + \
+           c10*x**3*y**1 + \
+           c11*x**3*y**2 + \
+           c12*x**3*y**3 + \
+           c13*x**4*y**0 + \
+           c14*x**4*y**1 + \
+           c15*x**4*y**2 + \
+           c16*x**4*y**3 + \
+           c17*x**4*y**4 + \
+           0
+
+
+def exp17coef_free(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17):
+    x = xy[:,0]
+    y = xy[:,1]
+    return c1 *x**0*y**1 + \
+           c2 *x**0*y**2 + \
+           c3 *x**1*y**0 + \
+           c4 *x**1*y**1 + \
+           c5 *x**1*y**2 + \
+           c6 *x**2*y**0 + \
+           c7 *x**2*y**1 + \
+           c8 *x**2*y**2 + \
+           c9 *x**3*y**0 + \
+           c10*x**3*y**1 + \
+           c11*x**3*y**2 + \
+           c12*x**3*y**3 + \
+           c13*x**4*y**0 + \
+           c14*x**4*y**1 + \
+           c15*x**c16*y**c17 + \
+           0
+
+def exp15coef(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15):
+    x = xy[:,0]
+    y = xy[:,1]
+    return c1 *x**0*y**1 + \
+           c2 *x**0*y**2 + \
+           c3 *x**1*y**0 + \
+           c4 *x**1*y**1 + \
+           c5 *x**1*y**2 + \
+           c6 *x**2*y**0 + \
+           c7 *x**2*y**1 + \
+           c8 *x**2*y**2 + \
+           c9 *x**3*y**0 + \
+           c10*x**3*y**1 + \
+           c11*x**3*y**2 + \
+           c12*x**3*y**3 + \
+           c13*x**c14*y**c15 + \
+           0
+
+def exp23coef(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23):
+    x = xy[:,0]
+    y = xy[:,1]
+    return c1 *x**0*y**1 + \
+           c2 *x**0*y**2 + \
+           c3 *x**1*y**0 + \
+           c4 *x**1*y**1 + \
+           c5 *x**1*y**2 + \
+           c6 *x**2*y**0 + \
+           c7 *x**2*y**1 + \
+           c8 *x**2*y**2 + \
+           c9 *x**3*y**0 + \
+           c10*x**3*y**1 + \
+           c11*x**3*y**2 + \
+           c12*x**3*y**3 + \
+           c13*x**4*y**0 + \
+           c14*x**4*y**1 + \
+           c15*x**4*y**2 + \
+           c16*x**4*y**3 + \
+           c17*x**4*y**4 + \
+           c18*x**5*y**0 + \
+           c19*x**5*y**1 + \
+           c20*x**5*y**2 + \
+           c21*x**5*y**3 + \
+           c22*x**5*y**4 + \
+           c23*x**5*y**5 + \
+           0
+
+
+def lmfit_fit_tangens_lin_best(l,fah):
+    chisqr = 999999999999
+    lu = np.unique(l)
+    verbose = False
+    if verbose:
+        print('lu',lu,'len',len(lu))
+        print('fah',fah)
+        print('fah[0]',fah[0])
+        print()
+    if len(lu) <= 2:
+        tryfunc = [linfunc]
+    if len(lu) <= 3:
+        tryfunc = [linfunc,quadfunc]
+    if len(lu) >= 4:
+        tryfunc = [linfunc,quadfunc,qubefunc,tanFunction]
+    for func in tryfunc:
+        model = Model(func)
+        parameter_names = model.param_names
+        independent_variable = model.independent_vars
+        #print('parameter_names',parameter_names)
+        #print('independent_variable',independent_variable)
+        #print('parameter_names',type(parameter_names))
+        #if parameter_names == ['a0', 'a1', 'a2', 'a3']:
+        if func == tanFunction:
+            #print('setting hints tanFunction')
+            funcname='tanFunction'
+            model.set_param_hint('a0' ,value=fah[0])
+            model.set_param_hint('a1' ,value=0.5,min=0,max=2)  # otherwise period is greater 1
+            model.set_param_hint('a2' ,value=0.3)
+            model.set_param_hint('a3' ,value=-0.6)
+        else:
+            for i in parameter_names:
+                model.set_param_hint(i ,value=1)
+                funcname=parameter_names
+
+        result = model.fit(fah, x=l)
+        #except Warning:
+        #    sys.exit('had idtw, continue to nextfunc')
+        #print(result.fit_report())
+        #print('chisqr:',result.chisqr)
+        #print('vgl (obtained by fit)',result.best_values)
+        coef_lmfit = []
+        for i in parameter_names: coef_lmfit.append(result.best_values.get(i))
+        #print('coef_lmfit',coef_lmfit)
+        #print()
+        #print(result.best_fit)
+        diffmax = np.abs(result.best_fit-fah).max()
+        #if result.chisqr < chisqr:
+        #    chisqr = result.chisqr
+        #    saving = True
+        if result.chisqr < chisqr:
+            try:
+                fahout = quad(func, 0, 1, args=tuple(coef_lmfit))[0]
+            except IntegraionWarning:
+                sys.exit('war')
+            chisqr = result.chisqr
+            #print('calc xx',coef_lmfit,'func',func)
+            #fah = quad(func, 0, 1, args=(coef_lmfit[0],coef_lmfit[1]))[0]
+            if verbose:
+                print(str(funcname).ljust(25),'chisqr:',np.round(result.chisqr,6),'diffmax',np.round(diffmax,4),'fah',np.round(fahout,4))
+            #print('c',chisqr,diffmax)
+            #print(result.fit_report())
+            #print('diffmax',diffmax)
+            #print('888',data[0,0:2])
+            xfit = np.arange(0,101)/100.
+            yfit = func(xfit,*coef_lmfit)
+            np.savetxt('avg_dudl_fit_best.dat',np.array([xfit,yfit]).T)
+    print('done',fahout,chisqr)
+    return fahout,chisqr
+
 def write_Fah_surface(a, temps, dudlmeanfit, filename = 'Fah_surface'):
     print("a    :",a)
     print("temps:",temps)
@@ -235,7 +336,6 @@ def write_Fah_surface(a, temps, dudlmeanfit, filename = 'Fah_surface'):
     print(out)
     np.savetxt(filename,out,fmt="%.1f %.7f %.3f")
     return
-
 
 def get_dudl_per_atom_min1_from_energies_eV_cell(
         energies_lambda_0_eV_cell=False,
@@ -309,6 +409,9 @@ def get_fqh_folder(verbose=False):
     fqhfolder = ahfolder[:-4]+'/fqh'
     #print('fqhfolder',fqhfolder)
     return fqhfolder
+
+def get_fah_folder(verbose=False):
+    return get_into_fah_folder(verbose=verbose,only_return_path = True)
 
 def get_evinet_folder(verbose=False):
     hier = os.getcwd()
@@ -425,7 +528,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
             break
 
     # extend temperature range
-    temperatures = np.concatenate((np.array([3, 10, 25, 100]),temperatures))
+    temperatures = np.concatenate((np.array([3]),temperatures))
 
     # just the low temperatures
     #temperatures = np.array([3,6,12,18])
@@ -436,7 +539,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     steps = 40000
     steps = 9000
     steps = 90000
-    seeds = 4
+    seeds = 3
     print("temperatrues",temperatures)
     #temperatures = [400 ]
 
@@ -628,11 +731,11 @@ def get_avg_dudl_and_fit_and_Fah_in_all_ang_K_folder():
             function2=get_avg_dudl_fit_and_Fah_from_avg_dudl)
     return
 
-
 def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",verbose=False):
     ''' help '''
     f = get_sorted_lambda_folder(verbose=verbose)
     hier = os.getcwd()
+    print(hier)
     # das hier sollte schon das average ueber verschiedene seeds sein ...
     l_ = []
     dudl_mean_ = []
@@ -647,7 +750,7 @@ def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",ver
         try:
             lam, dudl_mean, std_err_mean_uncorr,std_err_mean, dudl_std, t_mean = get_dudl_from_ipi_job(verbose=verbose)
         except IOError:
-            print('nope')
+            print('nope',i)
             return # returns nothing and nothing is written if not all lambdas calculated
         l_.append(lam)
         dudl_mean_.append(dudl_mean)
@@ -679,6 +782,17 @@ def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",ver
 
 def get_avg_dudl_fit_and_Fah_from_avg_dudl(verbose=True):
     #print('avg_dudl file in ',os.getcwd())
+    if not os.path.isfile('avg_dudl'):
+        print('Error/Warning: no avg_dudl in '+os.getcwd())
+        fahfolder =  get_fah_folder(verbose=False)
+        if not os.path.isfile(fahfolder+'/joblist_missing.dat'):
+            f = open(fahfolder+'/joblist_missing.dat', "a")
+            f.close()
+        f = open(fahfolder+'/joblist_missing.dat', "a")
+        f.write(os.getcwd()+"\n")
+        f.close()
+        return
+
     avg_dudl=np.loadtxt("avg_dudl")
     hier = os.getcwd()
     l_         = avg_dudl[:,0]
@@ -723,6 +837,7 @@ def fah_get_Fah_surface():
         f = open('Fah_surface', "a")
         f.write(t_str+" "+v_str+" "+fah_str+" "+err_str+"\n")
         f.close()
+    print('Fah_surface written')
     return
 
 def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
@@ -730,26 +845,38 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
     if x is None and y is None and z is None and os.path.isfile("Fah_surface"):
         print('reading Fah_surface')
         data = np.loadtxt('Fah_surface')[:,[0,1,2,3]]
+        print('data.shape (0)',data.shape)
         x = data[:,0];
         y = data[:,1];
         z = data[:,2];
         err = data[:,3];
+        print('x.shape',x.shape)
+        print('y.shape',y.shape)
+        print('z.shape',z.shape)
+        print('err.shape',err.shape)
     if verbose:
         print('x',x)
         print('y',y)
         print('z',z)
+    if err is None:
+        sys.exit('give the error/std')
     if x.ndim != 1:
         raise ValueError("x must be 1-dim.")
     if y.ndim != 1:
         raise ValueError("y must be 1-dim.")
     if z.ndim != 1:
         raise ValueError("z must be 1-dim.")
-    if x.size != y.size or x.size != z.size:
+    if err.ndim != 1:
+        raise ValueError("err must be 1-dim.")
+    if x.size != y.size or x.size != z.size or x.size != err.size:
         print('x.size',x.size)
         print('y.size',y.size)
         print('z.size',z.size)
-        raise ValueError("x, y, and z must have the same size.")
+        print('err.size',err.size)
+        raise ValueError("x, y, z and err must have the same size.")
     data = np.zeros((len(x),4))
+    print('len(x)',len(x))
+    print('data.shape (0)',data.shape)
     data[:,0] = x
     data[:,1] = y
     data[:,2] = z
@@ -758,7 +885,17 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
     # add points at T=0K having fah = 0 mev/atom
     # currently put the T=0K points in, for theta, this is necessary since lowest temperature was 200K. for Cu, this might ...
     # ... not be exact, but still ok.
-    if True:
+
+    # if we have data below
+    # if Tmin = 3K no!
+    # if Tmin = 25K on the edge  --> yes
+    # if Tmin = 50K yes
+    if x.min() > 24:
+        # nope, this does not go to zero, at least not for small cells.
+        # cu 2x2x2sc: diff = 0.18 meV
+        # cu 3x3x3sc: diff = 0.05 meV
+        # cu 4x4x4sc: diff = 0.02 meV
+
         all1v = np.unique(data[:,1])
         for v in all1v:
             data = np.append(data, [[0, v, 0, 0]], axis=0)
@@ -766,72 +903,14 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
     #print(data)
     #sys.exit()
 
-    #def exp1(x,y):
-    #    return x*0+1, x,       y,       x**2,       x**2*y,       x**2*y**2,       y**2,       x*y**2,       x*y
-
-    #def exp1sw(x,y):
-    #    return x*0+1, y,       x**2,       y**2,       x**2*y,       x**2*y**2,       x,       x*y**2,       x*y
-
-    #def exp2(x,y):
-    #    return x,  y,  x**2,       x**2*y,       x**2*y**2,       y**2,       x*y**2,       x*y
-
-    def exp17coef(xy,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17):
-        x = xy[:,0]
-        y = xy[:,1]
-        return c1 *x**0*y**1 + \
-               c2 *x**0*y**2 + \
-               c3 *x**1*y**0 + \
-               c4 *x**1*y**1 + \
-               c5 *x**1*y**2 + \
-               c6 *x**2*y**0 + \
-               c7 *x**2*y**1 + \
-               c8 *x**2*y**2 + \
-               c9 *x**3*y**0 + \
-               c10*x**3*y**1 + \
-               c11*x**3*y**2 + \
-               c12*x**3*y**3 + \
-               c13*x**4*y**0 + \
-               c14*x**4*y**1 + \
-               c15*x**4*y**2 + \
-               c16*x**4*y**3 + \
-               c17*x**4*y**4 + \
-               0
-
-
-    #################################
-    #####  fit the surface ##########
-    #################################
-    func = exp17coef
-    model = Model(func)
-    parameter_names = model.param_names
-    independent_variable = model.independent_vars
-    #print('parameter_names',parameter_names)
-    #print('independent_variable',independent_variable)
-    #print('parameter_names',type(parameter_names))
-    for i in parameter_names: model.set_param_hint(i ,value=1)
-    result = model.fit(data[:, 2], xy=data[:, 0:2])
-    #print(result.fit_report())
-    #print('vgl (obtained by fit)',result.best_values)
-    coef_lmfit = []
-    for i in parameter_names: coef_lmfit.append(result.best_values.get(i))
-    #print('coef_lmfit',coef_lmfit)
-    #print()
-    #print(result.best_fit)
-    diffmax = np.abs(result.best_fit-data[:,2]).max()
-    print('diffmax',diffmax,'(meV/atom)')
-    #print('888',data[0,0:2])
-
-    #################################
-    #####  print comparision curves #
-    #################################
-
     #######################
     # a) save original data
     #######################
-    folder = "Fah_surface_analyze"
+    folder = "Fah_surfacefit"
     if os.path.isdir(folder):
         shutil.rmtree(folder)
     os.mkdir(folder)
+
     def save_v_lines_from2darray(usearray=None,string=None,folder=None):
         if usearray is None:
             sys.exit('provide usearray1 and string')
@@ -855,31 +934,141 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False):
         return
     save_v_lines_from2darray(usearray=data,string='data',folder=folder)
 
+    #################################
+    #####  fit the surface ##########
+    #################################
+    func = exp17coef
+    #func = exp17coef_free  # works less well
+    #func = exp15coef  # works less well
+    #func = exp23coef
+    model = Model(func)
+    parameter_names = model.param_names
+    independent_variable = model.independent_vars
+    #print('parameter_names',parameter_names)
+    #print('independent_variable',independent_variable)
+    #print('parameter_names',type(parameter_names))
+    for i in parameter_names: model.set_param_hint(i ,value=1)
+    #model.set_param_hint('c15' ,value=0,min = -1,max = 1)
+    #model.set_param_hint('c16' ,value=0,min = -1,max = 1)
+    #model.set_param_hint('c17' ,value=0,min = -1,max = 1)
+
+    weights = np.copy(data[:,3])
+    print('weights.shape (0)',weights.shape)
+    print('data[:, 2].shape',data[:, 2].shape)
+    print('data[:, 0:2].shape',data[:, 0:2].shape)
+    if weights.shape != data[:,2].shape:
+        sys.exit('diff shapes in weights and data')
+    for idx,i in enumerate(weights):
+        #print('idx',idx,i)
+        if weights[idx] == 0:
+            #print('is0',weights[weights > 0].min())
+            weights[idx] = weights[weights > 0].min()
+    weights = np.sqrt(1./weights)
+
+    # data[:,2] are the energies (anharmonic correction)
+    # xy = data[:, 0:2] are the corresponding sampled volumes and temperatures
+    print('weights.shape',weights.shape)
+    result = model.fit(data[:, 2], xy=data[:, 0:2],weights=weights)
+    print(result.fit_report())
+    #print('vgl (obtained by fit)',result.best_values)
+    coef_lmfit_2d = []
+    for i in parameter_names: coef_lmfit_2d.append(result.best_values.get(i))
+    #print('coef_lmfit_2d',coef_lmfit_2d)
+    #print()
+    #print(result.best_fit)
+    diffmax = np.abs(result.best_fit-data[:,2]).max()
+    print('diffmax',diffmax,'(meV/atom)')
+    #sys.exit()
+    #print('888',data[0,0:2])
+
+    #################################
+    #####  print comparision curves #
+    #################################
+
+
     #######################
     # b) save fitted data
     #######################
-    denset = np.arange(0,x.max()+1,1)
+    Tmax = get_Tmax_from_fqh_thermo_2nd(verbose=False)
+    #denset = np.arange(0,x.max()+1,1)
+    denset = np.arange(0,Tmax+1,1)
     densev = np.arange(y.min(),y.max(),0.1)
     all1v = np.unique(data[:,1])
     all1t = np.unique(data[:,0])
-    string="fit"
+    string="lmfitsurf"
     for v in all1v:
         densev = np.repeat(v,len(denset))
         dd = np.array([denset,densev]).T
-        yfit = func(dd,*coef_lmfit)
-        np.savetxt(folder+"/out_ang3_vs_temp_"+string+"_"+str(v)+'.dat',yfit)
+        if v == all1v[-1]:
+            print('dd')
+            print(dd)
+        yfit = func(dd,*coef_lmfit_2d)
+        dd = np.array([dd[:,0],yfit]).T
+        np.savetxt(folder+"/out_ang3_vs_temp_"+string+"_"+str(v)+'.dat',dd,fmt='%.0f %.8f')
+        ## ! this data should be fitted to the usual surface we encounter
+        #print(folder+"/out_ang3_vs_temp_"+string+"_"+str(v)+'.dat')
     for t in all1t:
+        densev = np.linspace(y.min(),y.max(),100)
         denset = np.repeat(t,len(densev))
-        dd = np.array([densev,denset]).T
-        yfit = func(dd,*coef_lmfit)
-        np.savetxt(folder+"/out_temp_vs_ang3_"+string+"_"+str(int(t))+'.dat',yfit)
+        dd = np.array([denset,densev]).T
+        yfit = func(dd,*coef_lmfit_2d)
+        dd = np.array([dd[:,1],yfit]).T
+        np.savetxt(folder+"/out_temp_vs_ang3_"+string+"_"+str(int(t))+'.dat',dd,fmt='%.18e %.8f')
+
+    print('fitting the surface ...')
+    evinet = get_evinet_folder(verbose=False)
+    fqh = get_fqh_folder(verbose=False)
+    fah = get_fah_folder(verbose=False)
+    print('fqh',fqh)
+    print('evinet',evinet)
+    with my.cd(folder):
+        call(["fqh.py -i out_ang3_vs_temp_lmfitsurf* -wqh1 -wqh2 -wqh3"],shell=True)
+
+        # get thermo
+        hier = os.getcwd()
+        for i in ["1st","2nd","3rd"]:
+            os.chdir(hier)
+            os.mkdir("thermo_"+str(i))
+            with my.cd("thermo_"+str(i)):
+                print('now termo_'+str(i),os.getcwd())
+                call(["cp "+evinet+"/EVinet_1 EVinet"],shell=True)
+                Fqh_surf_file = fqh+"/Fqh_*at_cell_per_atom_Surface_"+i+"_order__*"
+		Fqh_surf_file = glob.glob(Fqh_surf_file)[0]
+		Fqh_surf_file = os.path.abspath(Fqh_surf_file)
+                Fah_surf_file = "../out_ang3_vs_temp_lmfitsurf_Surface_"+i+"_order__*"
+		Fah_surf_file = glob.glob(Fah_surf_file)[0]
+		Fah_surf_file = os.path.abspath(Fah_surf_file)
+                call(["cp "+Fqh_surf_file+" Fqh"],shell=True)
+                call(["cp "+Fah_surf_file+" Fah"],shell=True)
+                print('now gethermodynamcs.sh',os.getcwd())
+                call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
+
+    # check fitted surface by fqhvs the full surface fitted using 19 coeff
+    Fah_surf_fit = np.loadtxt(Fah_surf_file)
+    print(Fah_surf_fit)
+    for t in all1t:
+        densev = np.linspace(y.min(),y.max(),100)
+        denset = np.repeat(t,len(densev))
+        #print('t',t)
+        tidx = np.where(Fah_surf_fit[:,0] == t)[0]
+        if len(tidx) > 0:
+            #print('t',t,'tidx',tidx)
+            tidxx = tidx[0]
+            #print('t',t,'tidx',tidx)
+            #tidx = 1357
+            coefs = c = Fah_surf_fit[tidxx]
+            #print(c[1]*v**0. + c[2]*v**1. + c[3]*v**2. + c[4]*v**3.)
+            p = np.poly1d(coefs[1:][::-1])
+            dd = np.array([densev,p(densev)]).T
+            np.savetxt(folder+"/out_temp_vs_ang3_check_"+str(int(t))+'.dat',dd,fmt='%.18e %.8f')
+
     return
 
-def fah_get_thermo():
+def fah_get_thermo_old():
     get_into_fah_folder(verbose=False)
     if not os.path.isfile('Fah_surface'):
         sys.exit('no Fah_surface')
-    Fah_surface = np.loadtxt('Fah_surface')[:,[0,1,2]]  # temp, vol, fah
+    Fah_surface = np.loadtxt('Fah_surface')[:,[0,1,2,3]]  # temp, vol, fah
 
     x = Fah_surface[:,0]
     y = Fah_surface[:,1]
@@ -905,9 +1094,13 @@ def fah_get_thermo():
         shutil.rmtree(foldername)
     os.mkdir(foldername)
     os.chdir(foldername)
+
+
     fah_write_fit_input(Vmin,Vmax,Tmax,for_atoms=1,filename='fit.input')
     call(["cp ../Fah_surface Fah_surface"],shell=True)
     call(['[ "`command -v wolframscript`" = "" ] && module load mathematica; wolframscript -file fit.input'],shell=True)
+
+
     with open('Fah_surface_fit') as f:
         first_line = f.readline()
     print('first line')
@@ -1771,7 +1964,6 @@ if __name__ == '__main__':
     %
     % fah.py -ef fah_get_Fah_surface (step 3)
     % fah.py -ef fit_fah_surface_lmfit2d (step 4)
-    % fah.py -ef fah_get_thermo (step 4)
     '''
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
