@@ -402,8 +402,12 @@ def get_sorted_lambda_folder(verbose=False):
     return f
 
 def get_fqh_folder(verbose=False):
+    #hier = os.getcwd()
+    #get_into_fah_folder(verbose=False)
+    #ahfolder = os.getcwd()
+    #os.chdir(hier)
     ahfolder = get_fah_folder(verbose=False)
-    #print('ah',ahfolder)
+    print('ah',ahfolder)
     fqhfolder = ahfolder[:-4]+'/fqh'
     #print('fqhfolder',fqhfolder)
     return fqhfolder
@@ -412,10 +416,14 @@ def get_fah_folder(verbose=False):
     return get_into_fah_folder(verbose=verbose,only_return_path = True)
 
 def get_evinet_folder(verbose=False):
+    #hier = os.getcwd()
+    #get_into_fah_folder(verbose=False)
+    #ahfolder = os.getcwd()
+    #os.chdir(hier)
     ahfolder = get_fah_folder(verbose=False)
-    #print('ahx',ahfolder)
+    print('ahx',ahfolder)
     evinetfolder = ahfolder[:-4]+'/evinet'
-    #print('ahe',evinetfolder)
+    print('ahy',evinetfolder)
     #print('evinetfolder',evinetfolder)
     return evinetfolder
 
@@ -428,7 +436,7 @@ def get_Tmax_from_fqh_thermo_2nd(verbose=False):
     return int(a[-1][0])
 
 def get_into_fah_folder(verbose=False,only_return_path = False):
-    #verbose = True
+    verbose = True
     hier = os.getcwd()
     if verbose:
         print()
@@ -445,7 +453,7 @@ def get_into_fah_folder(verbose=False,only_return_path = False):
 
     # in case already in fah / fqh folder
     if hier[-4:] in ['/fah','/fqh']:
-        fahfolder = hier[:-4]+'/fah'
+        fahfolder = hier[-4:]+'/fah'
         print('fff',fahfolder)
         return returnfunc(fahfolder,only_return_path=only_return_path)
 
@@ -901,7 +909,7 @@ def make_fqh_thermos_again():
     for i in ["1st","2nd","3rd"]:
         os.chdir(fqhfolder)
         os.mkdir("thermo_"+str(i))
-        with my.cd("thermo_"+str(i)):
+        with cd("thermo_"+str(i)):
             print('now termo_'+str(i),os.getcwd())
             call(["cp "+evinetfolder+"/EVinet_1 EVinet"],shell=True)
             call(["cp "+fqhfolder+"/Fqh_*at_cell_per_atom_Surface_"+i+"_order__* Fqh"],shell=True)
@@ -960,7 +968,7 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=Fa
     #print()
     #print(data)
 
-    #uptoT = 1001
+    uptoT = 1001
     if uptoT != False:
         data = data[np.where(data[:,0] <= uptoT)]
         x = data[:,0];
@@ -1437,36 +1445,6 @@ def fah_make_all_analysis():
     print('fah_get_Fah_surface()')
     fah_get_Fah_surface()
     fit_fah_surface_lmfit2d()
-    return
-
-
-############# otherstuff ##########
-def dudlfile_get_std(filename="out_dudl.dat"):
-    a = np.loadtxt(filename)
-    DFT = a[:,4]
-    DFT_eV_cell = DFT/1000*31
-    print()
-    print('DFT.mean()',DFT.mean())
-    print('DFT_eV_cell.mean()',DFT_eV_cell.mean())
-    la = a[:,5]
-    la_eV_cell = la/1000*31
-    print('la.mean()',la.mean())
-    print('la_eV_cell.mean()',la_eV_cell.mean())
-    print()
-
-    print('DFT (meV/at1) --- DFT_eV_cell (eV/cell)**')
-    for idx,i in enumerate(DFT):
-        print(str(DFT[idx]).ljust(16),str(DFT_eV_cell[idx]).ljust(16))
-    print('la (meV/at1)  --- la_eV_cell (eV/cell)**')
-    for idx,i in enumerate(la):
-        print(str(la[idx]).ljust(16),str(la_eV_cell[idx]).ljust(16))
-    print('DFT-la (meV/at1) --- DFT_eV_cell-la_eV_cell (eV/cell)**')
-    for idx,i in enumerate(DFT):
-        print(str(DFT[idx]-la[idx]).ljust(16),str(DFT_eV_cell[idx]-la_eV_cell[idx]).ljust(16))
-    print()
-    std = np.std(DFT-la,ddof=1)
-    std_eV_cell = np.std(DFT_eV_cell-la_eV_cell,ddof=1)
-    print("enestd:",np.round(std,4),"meV/atom_m1 (="+str(np.round(std_eV_cell,4)),"eV/cell)");
     return
 
 ######### old fah stuff ############

@@ -6088,19 +6088,21 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         ace.get_murn(atoms,verbose=ace.verbose,return_minimum_volume_frame=True,write_evinet=False,write_fqh=fqh)
         print('ace.fqh_folder',ace.fqh_folder)
         print('osggg11 tmp3?',os.getcwd())
+        import fah
         with cd("fqh"):
-            call(["fqh.py -i Fqh_*at_cell_per_atom* -wqh1 -wqh2 -wqh3"],shell=True)
-        print('osggg222 tmp3',os.getcwd())
-        hier = os.getcwd()
-        for i in ["1st","2nd","3rd"]:
-            os.chdir(hier)
-            os.mkdir("fqh/thermo_"+str(i))
-            with cd("fqh/thermo_"+str(i)):
-                print('now fqh/termo_'+str(i),os.getcwd())
-                call(["cp ../../evinet/EVinet_1 EVinet"],shell=True)
-                call(["cp ../Fqh_*at_cell_per_atom_Surface_"+i+"_order__* Fqh"],shell=True)
-                print('now gethermodynamcs.sh',os.getcwd())
-                call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
+            fah.make_fqh_thermos_again()
+        #    call(["fqh.py -i Fqh_*at_cell_per_atom* -wqh1 -wqh2 -wqh3"],shell=True)
+        #print('osggg222 tmp3',os.getcwd())
+        #hier = os.getcwd()
+        #for i in ["1st","2nd","3rd"]:
+        #    os.chdir(hier)
+        #    os.mkdir("fqh/thermo_"+str(i))
+        #    with cd("fqh/thermo_"+str(i)):
+        #        print('now fqh/termo_'+str(i),os.getcwd())
+        #        call(["cp ../../evinet/EVinet_1 EVinet"],shell=True)
+        #        call(["cp ../Fqh_*at_cell_per_atom_Surface_"+i+"_order__* Fqh"],shell=True)
+        #        print('now gethermodynamcs.sh',os.getcwd())
+        #        call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
 
 
 
