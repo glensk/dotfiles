@@ -1,0 +1,231 @@
+Script started on Tue Jan  7 16:10:03 2020
+... zsh start
+myhost generalrc_.sh in1:mac:
+myhost generalrc_.sh in2:mac:
+]6;1;bg;red;brightness;255]6;1;bg;green;brightness;0]6;1;bg;blue;brightness;255]6;1;bg;red;brightness;255]6;1;bg;green;brightness;0]6;1;bg;blue;brightness;255... zsh loaded
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34maiida-alloy_notebooks[0m/  [1;34mnvim[0m/                  [1;34mtmux[0m/
+[1;34matomsk_myexamples[0m/      [1;34mother_dotfiles[0m/        [1;34mvim[0m/
+[1;34mbash[0m/                   [1;34mpycharm[0m/               [1;34mxmgrace[0m/
+[1;34mbins[0m/                   [1;34mscreen[0m/                [1;34mxmodmap[0m/
+[1;34mcompletions_fpath[0m/      [1;34mscripts[0m/               [1;34mzsh[0m/
+[1;34mcron[0m/                   [1;34msnippets[0m/              [01;32mANMERKUNG_important_commands[0m*
+[1;34mfonts_matplotlib[0m/       [1;34msources[0m/               [01;32mANMERKUNG_mac_fresh_install[0m*
+[1;34mfortigateclient[0m/        [1;34mssh[0m/                   [01;32mfortigate_client_backup.sconf[0m*
+[1;34mgeneralrc[0m/              [1;34msubversion[0m/            [01;32mterminal_colors[0m*
+[1;34mgit[0m/                    [1;34mtcsh[0m/                  [01;32mterminal_ubuntu[0m*
+[1;34mipython[0m/                [1;34mterminator[0m/            [00mtypescript[0m
+[1;34mmac_sudolikeaboss[0m/      [1;34mterminator-solarized[0m/  [01;32mv.cleanup.v.sh[0m*
+[1;34mmac_textexpander[0m/       [1;34mterminfo[0m/
+[1;34mnotes[0m/                  [1;34mthermodynamics[0m/
+[0m[27m[24m[J[35m16:10:04[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles[00m 
+%[K[?2004h[1m[31mc[0m[39m[38;5;239md binp[39m[0m[32mc[32md[39m[39m [39m[4ms[24m[38;5;239mm[38;5;239ma[38;5;239ml[38;5;239ml_subset_seven_disp[39m[22D[4ms[39m[4mc[24m[38;5;239mr[38;5;239mi[38;5;239mp[38;5;239mt[38;5;239ms[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [21D[4mc[39m[4mr[24m[4mr[39m[4mi[24m[4mi[39m[4mp[24m[24ms[24mc[24mr[24mi[24mp[39mb[39m s[?2004l
+cd: no such file or directory: scripbs
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:14[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles[00m 
+%[K[?2004h[1m[31mc[0m[39m[38;5;239md scripbs[39m[9D[0m[32mc[32md[39m[39m [39m[4ms[24m[4ms[39m[4mc[24m[4mc[39m[4mr[24m[4mr[39m[4mi[24m[24ms[24mc[24mr[24mi[39mp[39mt[39ms[1m/[0m[38;5;239mqe-aiida[39m[8D[8D[4ms[4mc[4mr[4mi[4mp[4mt[4ms[24m[0m [39m [39m [39m [39m [39m [39m [39m [39m [9D[?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34mbinp[0m/             [1;34mlammps_makefiles[0m/  [1;34mpython_thermodynamics[0m/  [1;34mtests[0m/
+[1;34mexecutables[0m/      [1;34mlammps_scripts[0m/    [1;34mqe-aiida[0m/               [01;32mREADME.txt[0m*
+[1;34mi-pi-mc_scripts[0m/  [1;34mpotentials[0m/        [1;34mrunner_scripts[0m/         [01;32msource_to_add_to_path.sh[0m*
+[0m[27m[24m[J[35m16:10:17[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts[00m 
+%[K[?2004h[1m[31mc[0m[39m[38;5;239md scripts[39m[9D[1m[31mc[0m[39m[39m [38;5;239m1[38;5;239m5[38;5;239m.[38;5;239m0[38;5;239m2[38;5;239m0[38;5;239m8[38;5;239m1[38;5;239m87801_200K[39m[18D[39m[4mb[24m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [17D[4mb[4mi[24m[4mi[4mn[24m[4mn[4mp[24m[?2004l
+zsh: command not found: j
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:20[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts[00m 
+%[K[?2004h[1m[31mc[0m[39m[38;5;239m binp[39m[0m[32mc[32md[39m[38;5;239m [38;5;239ms[38;5;239mc[38;5;239mr[38;5;239mipts[39m[8D[39m [39m[4mb[24m[38;5;239mi[38;5;239mn[38;5;239mp[39m[39m [39m [39m [4mb[39m[4mi[24m[4mi[39m[4mn[24m[4mn[39m[4mp[24m[24mb[24mi[24mn[24mpu[4mb[4mi[4mn[4mp[24m [?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34mold[0m/
+[1;34m__pycache__[0m/
+[01;32mCurSel.py[0m*
+[01;32mCurSel-integral.py[0m*
+[01;32mCurSel-integral-remove.remove_zeros.sh[0m*
+[01;32mCurSel-integral_natascha.py[0m*
+[01;32mDOS_POSITIONS_auswerten.py[0m*
+[01;32mLINK_exec.sh[0m*
+[01;32mQEtoRunner.py[0m*
+[01;32maiida_install.sh[0m*
+[01;32maiida_submit_runnerfile.py[0m*
+[01;32maiida_utils.py[0m*
+[01;32mal6xxx_kmc.py[0m*
+[01;32margparse_md_code.py[0m*
+[01;32mchange.py[0m*
+[01;32mconvert_fileformats.py[0m*
+[01;32mcphere.sh[0m*
+[01;32mcreateFolders_kmc.py[0m*
+[01;32mcrystal_generator.py[0m*
+[01;32mcurlib.py[0m*
+[01;32mdaniel_lmprun.py[0m*
+[01;32mdaniel_strainstuff.py[0m*
+[01;32mfah.py[0m*
+[00mfah.pyc[0m
+[01;32mfah_dudl.py[0m*
+[01;32mfel.py[0m*
+[01;32mfeos.py[0m*
+[01;32mfeos.py.bak[0m*
+[01;32mfps_considering_oldstruct.py[0m*
+[01;32mfqh.py[0m*
+[01;32mframe_selector.py[0m*
+[01;32mgetEnergies_byLammps.py[0m*
+[01;32mget_parametrization_for_displacementfolder.py[0m*
+[00mget_parametrization_for_displacementfolder.pyc[0m
+[01;32mhesse.py[0m*
+[00mhesse.pyc[0m
+[01;32minstall_git.py[0m*
+[01;32minstall_quantum_espresso.sh[0m*
+[01;32minstall_upate_pip.py[0m*
+[01;32miolib.py[0m*
+[01;32mipi2extxyz.py[0m*
+[01;32mipi2libatom.py[0m*
+[01;32mipi_start_job.py[0m*
+[04;36mkmc_createFolders.py[0m@
+[04;36mkmc_fps_considering_oldstruct.py[0m@
+[01;32mkmc_gather_all_xyz_to_kmc_allstruct.data.py[0m*
+[01;32mkmc_get_vacancy_radius_vs_time.sh[0m*
+[40;31;01mkmc_submit_inputdata_to_aiida.sh[0m@
+[01;32mkmc_tarfiles_fromhere.sh[0m*
+[01;32mlmprun.py[0m*
+[01;32mmassedit.py[0m*
+[01;32mmd_long_tox.c[0m*
+[01;32mmyplotutils.py[0m*
+[00mmyplotutils.pyc[0m
+[01;32mmysoap.py[0m*
+[01;32mmyutils.py[0m*
+[00mmyutils.pyc[0m
+[01;32mmy_atom.py[0m*
+[00mmy_atom.pyc[0m
+[01;32mn2p2_create_jobs.py[0m*
+[01;32mn2p2_create_testfolder_random_seed_in_test_fraction_xxx_folder.sh[0m*
+[01;32mn2p2_crete_random_seed_jobs_from_thisfolder.sh[0m*
+[01;32mn2p2_get_potential_folder_from_nr.py[0m*
+[01;32mn2p2_get_scaling_and_function_data.py[0m*
+[01;32mn2p2_get_training_on_fidis.py[0m*
+[01;32mn2p2_submit_inputdata_to_aiida.sh[0m*
+[01;32mn2p2_tarfolder_for_scale_train.sh[0m*
+[01;32mn2p2_train_fraction_vs_test_accuracy.py[0m*
+[01;32mphonon_lifetimes.py[0m*
+[01;32mpolynomial2d.py[0m*
+[00mpolynomial2d.pyc[0m
+[01;32mpot.py[0m*
+[01;32mpot_energy_forces.py[0m*
+[01;32mpot_info_startjob.py[0m*
+[01;32mpot_parametrize.py[0m*
+[01;32mqubus_interpolate.py[0m*
+[01;32mqubus_map_vecs_to_first_quadrant_and_back.py[0m*
+[01;32mrunner_get_potential_folder_from_nr.py[0m*
+[01;32mrunner_restart_training_from_folder.py[0m*
+[01;32mrunner_run_mode1.py[0m*
+[01;32mrunner_run_mode1_make_fps.py[0m*
+[01;32mrunner_run_mode1_make_fps.sh[0m*
+[01;32msflib.py[0m*
+[01;32msplineStuff.py[0m*
+[01;32msplineStuffqubus.py[0m*
+[01;32msubmit-ipi-kmc.sh[0m*
+[01;32msubmit_scaling_debug.sh[0m*
+[01;32msubmit_training.sh[0m*
+[01;32msubmit_training_debug.sh[0m*
+[01;32msymfun_gen.py[0m*
+[01;32mtemplate.py[0m*
+[01;32mthermodynamics.py[0m*
+[01;32mutils_rename.py[0m*
+[00mutils_rename.pyc[0m
+[01;32mxyz2runner.sh[0m*
+[00m:w[0m
+[0m[27m[24m[J[35m16:10:23[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
+%[K[?2004h[32mr[39m[38;5;239mm ~/Downloads/bild*[39m[19D[32mr[32mm[39m[39m [39m[4m:[24m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [16D[4m:[4mw[24m[?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:25[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
+%[K[?2004h[4ml[24m[38;5;239ms[39m[24m[32ml[32ms[39m[?2004l
+[0m[1;34mold[0m/
+[1;34m__pycache__[0m/
+[01;32mCurSel.py[0m*
+[01;32mCurSel-integral.py[0m*
+[01;32mCurSel-integral-remove.remove_zeros.sh[0m*
+[01;32mCurSel-integral_natascha.py[0m*
+[01;32mDOS_POSITIONS_auswerten.py[0m*
+[01;32mLINK_exec.sh[0m*
+[01;32mQEtoRunner.py[0m*
+[01;32maiida_install.sh[0m*
+[01;32maiida_submit_runnerfile.py[0m*
+[01;32maiida_utils.py[0m*
+[01;32mal6xxx_kmc.py[0m*
+[01;32margparse_md_code.py[0m*
+[01;32mchange.py[0m*
+[01;32mconvert_fileformats.py[0m*
+[01;32mcphere.sh[0m*
+[01;32mcreateFolders_kmc.py[0m*
+[01;32mcrystal_generator.py[0m*
+[01;32mcurlib.py[0m*
+[01;32mdaniel_lmprun.py[0m*
+[01;32mdaniel_strainstuff.py[0m*
+[01;32mfah.py[0m*
+[00mfah.pyc[0m
+[01;32mfah_dudl.py[0m*
+[01;32mfel.py[0m*
+[01;32mfeos.py[0m*
+[01;32mfeos.py.bak[0m*
+[01;32mfps_considering_oldstruct.py[0m*
+[01;32mfqh.py[0m*
+[01;32mframe_selector.py[0m*
+[01;32mgetEnergies_byLammps.py[0m*
+[01;32mget_parametrization_for_displacementfolder.py[0m*
+[00mget_parametrization_for_displacementfolder.pyc[0m
+[01;32mhesse.py[0m*
+[00mhesse.pyc[0m
+[01;32minstall_git.py[0m*
+[01;32minstall_quantum_espresso.sh[0m*
+[01;32minstall_upate_pip.py[0m*
+[01;32miolib.py[0m*
+[01;32mipi2extxyz.py[0m*
+[01;32mipi2libatom.py[0m*
+[01;32mipi_start_job.py[0m*
+[04;36mkmc_createFolders.py[0m@
+[04;36mkmc_fps_considering_oldstruct.py[0m@
+[01;32mkmc_gather_all_xyz_to_kmc_allstruct.data.py[0m*
+[01;32mkmc_get_vacancy_radius_vs_time.sh[0m*
+[40;31;01mkmc_submit_inputdata_to_aiida.sh[0m@
+[01;32mkmc_tarfiles_fromhere.sh[0m*
+[01;32mlmprun.py[0m*
+[01;32mmassedit.py[0m*
+[01;32mmd_long_tox.c[0m*
+[01;32mmyplotutils.py[0m*
+[00mmyplotutils.pyc[0m
+[01;32mmysoap.py[0m*
+[01;32mmyutils.py[0m*
+[00mmyutils.pyc[0m
+[01;32mmy_atom.py[0m*
+[00mmy_atom.pyc[0m
+[01;32mn2p2_create_jobs.py[0m*
+[01;32mn2p2_create_testfolder_random_seed_in_test_fraction_xxx_folder.sh[0m*
+[01;32mn2p2_crete_random_seed_jobs_from_thisfolder.sh[0m*
+[01;32mn2p2_get_potential_folder_from_nr.py[0m*
+[01;32mn2p2_get_scaling_and_function_data.py[0m*
+[01;32mn2p2_get_training_on_fidis.py[0m*
+[01;32mn2p2_submit_inputdata_to_aiida.sh[0m*
+[01;32mn2p2_tarfolder_for_scale_train.sh[0m*
+[01;32mn2p2_train_fraction_vs_test_accuracy.py[0m*
+[01;32mphonon_lifetimes.py[0m*
+[01;32mpolynomial2d.py[0m*
+[00mpolynomial2d.pyc[0m
+[01;32mpot.py[0m*
+[01;32mpot_energy_forces.py[0m*
+[01;32mpot_info_startjob.py[0m*
+[01;32mpot_parametrize.py[0m*
+[01;32mqubus_interpolate.py[0m*
+[01;32mqubus_map_vecs_to_first_quadrant_and_back.py[0m*
+[01;32mrunner_get_potential_folder_from_nr.py[0m*
+[01;32mrunner_restart_training_from_folder.py[0m*
+[01;32mrunner_run_mode1.py[0m*
+[01;32mrunner_run_mode1_make_fps.py[0m*
+[01;32mrunner_run_mode1_make_fps.sh[0m*
+[01;32msflib.py[0m*
+[01;32msplineStuff.py[0m*
+[01;32msplineStuffqubus.py[0m*
+[01;32msubmit-ipi-kmc.sh[0m*
+[01;32msubmit_scaling_debug.sh[0m*
+[01;32msubmit_training.sh[0m*
+[01;32msubmit_training_debug.sh[0m*
+[01;32msymfun_gen.py[0m*
+[01;32mtemplate.py[0m*
+[01;32mthermodynamics.py[0m*
+[01;32mutils_rename.py[0m*
+[00mutils_rename.pyc[0m
+[01;32mxyz2runner.sh[0m*
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:26[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
+%[K[?2004h[32mg[39m[38;5;239mu[39m[32mg[32mu[39m[?2004l
+/Users/glensk/Dropbox/Albert/scripts/dotfiles
+#################################
