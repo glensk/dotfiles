@@ -228,4 +228,506 @@ zsh: command not found: j
 [1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:26[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
 %[K[?2004h[32mg[39m[38;5;239mu[39m[32mg[32mu[39m[?2004l
 /Users/glensk/Dropbox/Albert/scripts/dotfiles
-#################################
+#######################################
+#### check for files > 100MB ##########
+#######################################
+#######################################
+#### git add -A -v ####################
+#######################################
+
+remove 'scripts/binp/:w'
+add 'typescript'
+
+#######################################
+#### git commit -a -m Tue Jan 7 16:10:27 CET 2020 ########
+#######################################
+
+[master feae74c3] Tue Jan  7 16:10:27 CET 2020
+ 2 files changed, 231 insertions(+), 2139 deletions(-)
+ delete mode 100644 scripts/binp/:w
+ create mode 100644 typescript
+
+#######################################
+#### git pull (here it often wants a message)
+#######################################
+
+Already up to date.
+
+#######################################
+#### git push #########################
+#######################################
+
+Enumerating objects: 8, done.
+Counting objects:  12% (1/8)   Counting objects:  25% (2/8)   Counting objects:  37% (3/8)   Counting objects:  50% (4/8)   Counting objects:  62% (5/8)   Counting objects:  75% (6/8)   Counting objects:  87% (7/8)   Counting objects: 100% (8/8)   Counting objects: 100% (8/8), done.
+Delta compression using up to 4 threads.
+Compressing objects:  20% (1/5)   Compressing objects:  40% (2/5)   Compressing objects:  60% (3/5)   Compressing objects:  80% (4/5)   Compressing objects: 100% (5/5)   Compressing objects: 100% (5/5), done.
+Writing objects:  20% (1/5)   Writing objects:  40% (2/5)   Writing objects:  60% (3/5)   Writing objects:  80% (4/5)   Writing objects: 100% (5/5)   Writing objects: 100% (5/5), 2.57 KiB | 2.57 MiB/s, done.
+Total 5 (delta 3), reused 0 (delta 0)
+remote: Resolving deltas:   0% (0/3)[Kremote: Resolving deltas:  33% (1/3)[Kremote: Resolving deltas:  66% (2/3)[Kremote: Resolving deltas: 100% (3/3)[Kremote: Resolving deltas: 100% (3/3), completed with 3 local objects.[K
+To https://github.com/glensk/dotfiles.git
+   e6e7cc5c..feae74c3  master -> master
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:32[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
+%[K[?2004h[4ml[24m[38;5;239ms[39m[24m[32ml[32ms[39m[?2004l
+[0m[1;34mold[0m/
+[1;34m__pycache__[0m/
+[01;32mCurSel.py[0m*
+[01;32mCurSel-integral.py[0m*
+[01;32mCurSel-integral-remove.remove_zeros.sh[0m*
+[01;32mCurSel-integral_natascha.py[0m*
+[01;32mDOS_POSITIONS_auswerten.py[0m*
+[01;32mLINK_exec.sh[0m*
+[01;32mQEtoRunner.py[0m*
+[01;32maiida_install.sh[0m*
+[01;32maiida_submit_runnerfile.py[0m*
+[01;32maiida_utils.py[0m*
+[01;32mal6xxx_kmc.py[0m*
+[01;32margparse_md_code.py[0m*
+[01;32mchange.py[0m*
+[01;32mconvert_fileformats.py[0m*
+[01;32mcphere.sh[0m*
+[01;32mcreateFolders_kmc.py[0m*
+[01;32mcrystal_generator.py[0m*
+[01;32mcurlib.py[0m*
+[01;32mdaniel_lmprun.py[0m*
+[01;32mdaniel_strainstuff.py[0m*
+[01;32mfah.py[0m*
+[00mfah.pyc[0m
+[01;32mfah_dudl.py[0m*
+[01;32mfel.py[0m*
+[01;32mfeos.py[0m*
+[01;32mfeos.py.bak[0m*
+[01;32mfps_considering_oldstruct.py[0m*
+[01;32mfqh.py[0m*
+[01;32mframe_selector.py[0m*
+[01;32mgetEnergies_byLammps.py[0m*
+[01;32mget_parametrization_for_displacementfolder.py[0m*
+[00mget_parametrization_for_displacementfolder.pyc[0m
+[01;32mhesse.py[0m*
+[00mhesse.pyc[0m
+[01;32minstall_git.py[0m*
+[01;32minstall_quantum_espresso.sh[0m*
+[01;32minstall_upate_pip.py[0m*
+[01;32miolib.py[0m*
+[01;32mipi2extxyz.py[0m*
+[01;32mipi2libatom.py[0m*
+[01;32mipi_start_job.py[0m*
+[04;36mkmc_createFolders.py[0m@
+[04;36mkmc_fps_considering_oldstruct.py[0m@
+[01;32mkmc_gather_all_xyz_to_kmc_allstruct.data.py[0m*
+[01;32mkmc_get_vacancy_radius_vs_time.sh[0m*
+[40;31;01mkmc_submit_inputdata_to_aiida.sh[0m@
+[01;32mkmc_tarfiles_fromhere.sh[0m*
+[01;32mlmprun.py[0m*
+[01;32mmassedit.py[0m*
+[01;32mmd_long_tox.c[0m*
+[01;32mmyplotutils.py[0m*
+[00mmyplotutils.pyc[0m
+[01;32mmysoap.py[0m*
+[01;32mmyutils.py[0m*
+[00mmyutils.pyc[0m
+[01;32mmy_atom.py[0m*
+[00mmy_atom.pyc[0m
+[01;32mn2p2_create_jobs.py[0m*
+[01;32mn2p2_create_testfolder_random_seed_in_test_fraction_xxx_folder.sh[0m*
+[01;32mn2p2_crete_random_seed_jobs_from_thisfolder.sh[0m*
+[01;32mn2p2_get_potential_folder_from_nr.py[0m*
+[01;32mn2p2_get_scaling_and_function_data.py[0m*
+[01;32mn2p2_get_training_on_fidis.py[0m*
+[01;32mn2p2_submit_inputdata_to_aiida.sh[0m*
+[01;32mn2p2_tarfolder_for_scale_train.sh[0m*
+[01;32mn2p2_train_fraction_vs_test_accuracy.py[0m*
+[01;32mphonon_lifetimes.py[0m*
+[01;32mpolynomial2d.py[0m*
+[00mpolynomial2d.pyc[0m
+[01;32mpot.py[0m*
+[01;32mpot_energy_forces.py[0m*
+[01;32mpot_info_startjob.py[0m*
+[01;32mpot_parametrize.py[0m*
+[01;32mqubus_interpolate.py[0m*
+[01;32mqubus_map_vecs_to_first_quadrant_and_back.py[0m*
+[01;32mrunner_get_potential_folder_from_nr.py[0m*
+[01;32mrunner_restart_training_from_folder.py[0m*
+[01;32mrunner_run_mode1.py[0m*
+[01;32mrunner_run_mode1_make_fps.py[0m*
+[01;32mrunner_run_mode1_make_fps.sh[0m*
+[01;32msflib.py[0m*
+[01;32msplineStuff.py[0m*
+[01;32msplineStuffqubus.py[0m*
+[01;32msubmit-ipi-kmc.sh[0m*
+[01;32msubmit_scaling_debug.sh[0m*
+[01;32msubmit_training.sh[0m*
+[01;32msubmit_training_debug.sh[0m*
+[01;32msymfun_gen.py[0m*
+[01;32mtemplate.py[0m*
+[01;32mthermodynamics.py[0m*
+[01;32mutils_rename.py[0m*
+[00mutils_rename.pyc[0m
+[01;32mxyz2runner.sh[0m*
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:10:37[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
+%[K[?2004h[1m[31mc[0m[39m[38;5;239md binp[39m[0m[39m[4mc[39m[4mo[24m[38;5;239ms[38;5;239mm[38;5;239mo[38;5;239mp[38;5;239mc[39m[24m[1m[31mc[24m[1m[31mo[1m[31ms[0m[39m[1m[31ms[1m[31mm[0m[39m[1m[31mm[1m[31mp[0m[39m[39m [39m [1m[31mm[0m[39m[0m[38;5;239mo[38;5;239mpc[39m[1m[31mm[1m[31mo[0m[39m[1m[31mo[1m[31mp[0m[39m[0m[32mc[0m[32mo[0m[32ms[0m[32mm[0m[32mo[0m[32mp[32mc[39m[?2004l
+Warning: No xauth data; using fake authentication data for X11 forwarding.
+Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 4.15.0-46-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+ * Canonical Livepatch is available for installation.
+   - Reduce system reboots and improve kernel security. Activate at:
+     https://ubuntu.com/livepatch
+
+153 packages can be updated.
+72 updates are security updates.
+
+
+Your current Hardware Enablement Stack (HWE) is going out of support
+on 2023-04-30.  After this date security updates for critical parts (kernel
+and graphics stack) of your system will no longer be available.
+
+For more information, please see:
+http://wiki.ubuntu.com/1604_HWE_EOL
+
+To upgrade to a supported (or longer-supported) configuration:
+
+* Upgrade from Ubuntu 16.04 LTS to Ubuntu 18.04 LTS by running:
+sudo do-release-upgrade -p
+
+OR
+
+* Switch to the current security-supported stack by running:
+sudo apt-get install libwayland-egl1-mesa-hwe-18.04 xserver-xorg-hwe-18.04
+
+and reboot your system.
+Last login: Tue Jan  7 15:39:17 2020 from 128.179.130.237
+... .bash_profile start
+... zsh start
+myhost generalrc_.sh in1:cosmopc:
+myhost generalrc_.sh in2:cosmopc:
+]6;1;bg;red;brightness;0]6;1;bg;green;brightness;255]6;1;bg;blue;brightness;0]6;1;bg;red;brightness;0]6;1;bg;green;brightness;255]6;1;bg;blue;brightness;0... zsh loaded
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34m5x5x5_n2p2_v1ag_1000K_1Vac_3Mg_3Si__0.8pctVac_2.4pctMg_2.4pctSi_10.0rcut[0m/
+[1;34mDownloads[0m/
+[1;34mPictures[0m/
+[1;34mTEST_RUNNER_VS_n2p2[0m/
+[1;34mTEST_RUNNER_VS_n2p2_5000_vs_4998[0m/
+[1;34mTEST_RUNNER_VS_n2p2_make_runnerinput_equal_n2p2[0m/
+[1;34maiida[0m/
+[1;34maiida_backup_20190327[0m/
+[1;34mase_in_site_packages[0m/
+[1;34mcode[0m/
+[1;34mminiconda3[0m/
+[1;34msources[0m/
+[1;34mtmp[0m/
+[1;34mtmp2[0m/
+[1;34mtmp3[0m/
+[00mBetaPrime_structures_relax.input.data[0m
+[04;36mDropbox[0m@
+[00mOQMD-Distorted_scf[0m
+[01;95mREADME_2019-03-11_17:04.txt[0m
+[00maiida_al6xxx_test.psql[0m
+[00maiida_exported_group_BetaPrime_structures_relax.input.data[0m
+[00mbase_computers_code.aiida[0m
+[00mconfig.json~[0m
+[00mconfig.json[0m
+[04;36mgoogle_drive[0m@
+[04;36mscripts[0m@
+[04;36mv[0m@
+[0m[27m[24m[J[35m16:14:37[00m [32mglensk@cosmopc15[00m [32m/home/glensk[00m 
+%[K[?1h=[?2004h[32md[39m[32md[32mo[39m[32md[32mo[32mt[39m[?1l>[?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34maiida-alloy_notebooks[0m/  [1;34mnotes[0m/                 [1;34mterminfo[0m/
+[1;34matomsk_myexamples[0m/      [1;34mnvim[0m/                  [1;34mtmux[0m/
+[1;34mbash[0m/                   [1;34mother_dotfiles[0m/        [1;34mvim[0m/
+[1;34mbins[0m/                   [1;34mpycharm[0m/               [1;34mxmgrace[0m/
+[1;34mcompletions_fpath[0m/      [1;34mscreen[0m/                [1;34mxmodmap[0m/
+[1;34mcron[0m/                   [1;34mscripts[0m/               [1;34mzsh[0m/
+[1;34mfonts_matplotlib[0m/       [1;34msnippets[0m/              [01;32mANMERKUNG_important_commands[0m*
+[1;34mfortigateclient[0m/        [1;34msources[0m/               [01;32mANMERKUNG_mac_fresh_install[0m*
+[1;34mgeneralrc[0m/              [1;34mssh[0m/                   [01;32mfortigate_client_backup.sconf[0m*
+[1;34mgit[0m/                    [1;34msubversion[0m/            [01;32mterminal_colors[0m*
+[1;34mipython[0m/                [1;34mtcsh[0m/                  [01;32mterminal_ubuntu[0m*
+[1;34mmac_sudolikeaboss[0m/      [1;34mterminator[0m/            [01;32mv.cleanup.v.sh[0m*
+[1;34mmac_textexpander[0m/       [1;34mterminator-solarized[0m/
+[0m[27m[24m[J[35m16:15:22[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles[00m 
+%[K[?1h=[?2004h[4mp[24m[38;5;239motcurr[39m[24m[32mp[32mo[39m[32mp[32mo[32mt[39m[39m [39m [39m [39m [?1l>[?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34maiida_get_structures[0m/
+[1;34maiida_get_structures_new[0m/
+[1;34maiida_get_structures_new_repeated[0m/
+[1;34mfiles_n2p2[0m/
+[1;34mn2p2_daniel_al_cu_2019_09_09[0m/
+[1;34mn2p2_v1ag[0m/
+[1;34mn2p2_v2ag[0m/
+[1;34mn2p2_v2ag_10_10[0m/
+[1;34mn2p2_v2ag_14_14[0m/
+[1;34mn2p2_v2ag_few_c44[0m/
+[1;34mn2p2_v2ag_many_c44[0m/
+[1;34mn2p2_v2ag_old[0m/
+[1;34mn2p2_v3ag_4998_new[0m/
+[1;34mn2p2_v3ag_5000[0m/
+[1;34mn2p2_v3ag_5000_highstrain_c44_16nodes[0m/
+[1;34mn2p2_v3ag_5000_highstrain_c44_24nodes[0m/
+[1;34mn2p2_v3ag_5000_new[0m/
+[1;34mn2p2_v3ag_5000_new_1414_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_1616_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_1818_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_2020_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_2222_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_2424_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_2626_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_2828_new_atomene[0m/
+[1;34mn2p2_v3ag_5000_new_3232_new_atomene[0m/
+[1;34mn2p2_v3ag_c44_upto0.1[0m/
+[1;34mn2p2_v3ag_repeated_1616_21cores[0m/
+[1;34mn2p2_v3ag_repeated_1616_28cores[0m/
+[1;34mn2p2_v3ag_repeated_2424_14cores[0m/
+[1;34mn2p2_v3ag_repeated_2424_21cores[0m/
+[1;34mn2p2_v3ag_repeated_2424_28cores[0m/
+[1;34mn2p2_v3ag_ttl_seed1[0m/
+[1;34mn2p2_v3ag_ttl_seed2[0m/
+[1;34mn2p2_v3ag_ttl_seed2_redo_1616[0m/
+[1;34mn2p2_v3ag_ttl_seed2_redo_2020[0m/
+[1;34mn2p2_v3ag_ttl_seed2_redo_2424[0m/
+[1;34mn2p2_v3ag_ttl_seed3[0m/
+[1;34mn2p2_v4ag_ppl_8765_21cores[0m/
+[1;34mn2p2_v4ag_ppl_8765_28cores[0m/
+[1;34mn2p2_v4ag_ppl_12345_21cores[0m/
+[1;34mn2p2_v4ag_ppl_12345_28cores[0m/
+[1;34mn2p2_v4ag_ppl_654911_21cores[0m/
+[1;34mn2p2_v4ag_ppl_654911_28cores[0m/
+[1;34mn2p2_v4ag_ppl_987654_21cores[0m/
+[1;34mn2p2_v4ag_ppl_987654_28cores[0m/
+[1;34mn2p2_v4ag_ttl_8765_21cores[0m/
+[1;34mn2p2_v4ag_ttl_12345_21cores[0m/
+[1;34mn2p2_v4ag_ttl_654911_21cores[0m/
+[1;34mn2p2_v4ag_ttl_987654_21cores[0m/
+[1;34mpots_uncomplete[0m/
+[1;34mquantum_espresso[0m/
+[1;34mrunner_4998_21_1[0m/
+[1;34mrunner_4998_21_2[0m/
+[1;34mrunner_4998_21_3[0m/
+[1;34mrunner_ni_natascha_20181130[0m/
+[1;34mrunner_v0_16[0m/
+[1;34mrunner_v0_32[0m/
+[1;34mrunner_v0_64[0m/
+[1;34mrunner_v0_64_ag_1[0m/
+[1;34mrunner_v0_64_ag_2_tmp[0m/
+[1;34mrunner_v0_v1dg[0m/
+[1;34mrunner_v0_v2dg[0m/
+[1;34mrunner_v3ag_4998_1[0m/
+[1;34mrunner_v3ag_4998_2[0m/
+[1;34mrunner_v3ag_4998_3[0m/
+[1;34mrunner_v3ag_5000_7650_1[0m/
+[1;34mrunner_v3ag_5000_7650_2[0m/
+[1;34mrunner_v3ag_5000_7650_new_input_data_1[0m/
+[1;34mrunner_v3ag_5000_7650_new_input_data_2[0m/
+[1;34mrunner_v3ag_5000_46489_1[0m/
+[1;34mrunner_v3ag_5000_46489_2[0m/
+[1;34mrunner_v3ag_5000_46489_3[0m/
+[1;34mrunner_v3ag_5000_46489_4[0m/
+[1;34mrunner_v3ag_5020_tmp[0m/
+[1;34mrunner_v3ag_5037_tmp[0m/
+[1;34mrunner_v4ag_5000_scale_sf[0m/
+[00mANMERKUNG.current.pot[0m
+[01;95mANMERKUNG.txt[0m
+[01;91mc44_comp_NN_vs_DFT.agr[0m
+[01;91mcomparison_formation_energies.agr[0m
+[01;33mcomparison_formation_energies.pdf[0m
+[01;32meam_Al-LEA.eam.alloy[0m*
+[00meam_Al.eam.alloy_cutoff5_seed_914702_std_1.05861[0m
+[00meam_Al.eam.alloy_cutoff6_seed_127519_std_0.715638[0m
+[01;32meam_Cu-lifang.eam.alloy[0m*
+[00meam_Ni-Al-Mishin-2009.eam.alloy[0m
+[01;32mget_origsubmit.sh[0m*
+[01;32mlearning_curve_to_Eteset_Etrain.py[0m*
+[00mtmp[0m
+[00mtmp2[0m
+[0m[27m[24m[J[35m16:15:24[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials[00m 
+%[K[?1h=[?2004h[7m[4maiida_get_structures_new/[27m[24m[25D[27m[4ma[27m[4mi[27m[4mi[27m[4md[27m[4ma[27m[4m_[27m[4mg[27m[4me[27m[4mt[27m[4m_[27m[4ms[27m[4mt[27m[4mr[27m[4mu[27m[4mc[27m[4mt[27m[4mu[27m[4mr[27m[4me[27m[4ms[27m[4m_[27m[4mn[27m[4me[27m[4mw[27m[4m/[24m[?1l>[?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[1;34mc1[0m/
+[1;34mc44[0m/
+[1;34mcheck_al33_interstitial_structures[0m/
+[1;34mcxx_check[0m/
+[1;34mcxx_check_volcons[0m/
+[1;34mcxx_check_volcons_wide_range_V0DFT[0m/
+[1;34melastic_all_smallstrain_143struct[0m/
+[1;34mkette_see_cutoff_effect[0m/
+[1;34mmurn[0m/
+[1;34mresults_antisites[0m/
+[1;34mresults_antisites_new[0m/
+[01;95mANMERKUNG.antisites.txt[0m
+[01;95mANMERKUNG.txt[0m
+[01;95mREADME_2019-04-18_14:41.txt[0m
+[01;95mREADME_2019-04-18_15:56.txt[0m
+[01;95mREADME_2019-04-18_15:57.txt[0m
+[01;95mREADME_2019-04-18_16:04.txt[0m
+[01;95mREADME_2019-04-18_16:12.txt[0m
+[01;95mREADME_2019-05-08_11:36.txt[0m
+[01;95mREADME_2019-10-21_10:55.txt[0m
+[01;95mREADME_2019-10-21_10:57.txt[0m
+[01;95mREADME_2019-10-21_10:58.txt[0m
+[01;95mREADME_2019-10-21_11:12.txt[0m
+[01;95mREADME_2019-10-21_11:13.txt[0m
+[01;95mREADME_2019-10-21_11:16.txt[0m
+[01;95mREADME_2019-10-22_12:42.txt[0m
+[01;95mREADME_2019-10-22_12:43.txt[0m
+[01;95mREADME_2019-10-23_08:31.txt[0m
+[01;95mREADME_2019-10-23_08:32.txt[0m
+[00maiida_exported_group_Al6xxxDB_structures_calc__all_steps.input.data[0m
+[00maiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2.input.data[0m
+[00maiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic.input.data[0m
+[00maiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain.input.data[0m[K
+[00maiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.data[0m
+[00maiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.dataNN_relaxed_Mg9Si5_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+[00maiida_exported_group_BetaPrime_vc-relaxed__all_steps.input.dataNN_relaxed_Mg9Si5_runner_v3ag_4998_1.runner[0m[K
+[00maiida_exported_group_KMC57.data[0m
+[00maiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.data[0m
+[00maiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.dataNN_relaxed_Mg4Al3Si4_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+[00maiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.dataNN_relaxed_Mg4Al3Si4_runner_v3ag_4998_1.runner[0m[K
+[00maiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data[0m
+[00maiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.dataNN_relaxed_Mg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+[00maiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.dataNN_relaxed_Mg5Al2Si4_runner_v3ag_4998_1.runner[0m[K
+[00maiida_exported_group_NN_relaxed_Mg5Si6_n2p2_v2ag_calc__all_steps.input.data[0m
+[00maiida_exported_group_NN_relaxed_Mg5Si6_n2p2_v2ag_calc__all_steps.input.dataNN_relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+[00maiida_exported_group_NN_relaxed_Mg5Si6_n2p2_v2ag_calc__all_steps.input.dataNN_relaxed_Mg5Si6_runner_v3ag_4998_1.runner[0m[K
+[00maiida_exported_group_SimpleAlDeformations_scf__all_steps.input.data[0m
+[00maiida_exported_group_from_KMC3_remaining21.data.group_calc__all_steps.input.data[0m
+[00maiida_exported_group_kmc_1000K_4_calc__all_steps.input.data[0m
+[00maiida_exported_group_mg9si5_stable_phonons_v2_atomrelax.runner.group_calc__all_steps.input.data[0m[K
+[00maiida_exported_group_mg9si5_stable_phonons_v2_atomrelax_cellrelax.runner.group_calc__all_steps.input.data[0m[K
+[00maiida_exported_group_mg9si5_stable_phonons_v2_atomrelax_cellrelax_minimahopping.runner.group_calc__all_steps.input.data[0m[K
+[00maiida_exported_group_out_34and2786.runner.group_calc__all_steps.input.data[0m
+[00maiida_exported_group_out_antisitesMg4Al3Si4.runner_calc__all_steps.input.data[0m
+[00maiida_exported_group_out_antisitesMg5Al2Si4.runner_calc__all_steps.input.data[0m
+[00maiida_exported_group_out_antisitesMg5Al2Si4.runner_calc__all_steps.input.dataNN_relaxed_Mg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+[00maiida_exported_group_out_antisitesMg5Si6.runner_calc__all_steps.input.data[0m
+[00maiida_exported_group_out_antisitesMg5Si6.runner_calc__all_steps.input.dataNN_relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+[00maiida_exported_group_out_antisitesMg5Si6.runner_calc__all_steps.input.dataNN_relaxed_Mg5Si6_runner_v3ag_4998_1.runner[0m[K
+[00maiida_exported_group_out_antisites_repMg4Al3Si4_NEW.runner_calc__all_steps.input.data[0m
+[00maiida_exported_group_out_antisites_repMg5Al2Si4_NEW.runner_calc__all_steps.input.data[0m
+[00maiida_exported_group_out_antisites_repMg5Si6_NEW.runner_calc__all_steps.input.data[0m
+[00maiida_exported_group_v1ag_fps3134_first20_calc__all_steps.input.data[0m
+[00mene_vs_strain_DFT.dat[0m
+[00mene_vs_strain_DFT_wo.dat[0m
+[04;36minput_5000.data[0m@
+[0m[27m[24m[J[35m16:15:40[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new[00m 
+%[K[?1h=[?2004hl[32ml[32ml[39m[38;5;239m -rtl[39m[39m [38;5;239m [1m[31ml[0m[39m[38;5;239ms[39m[39m [39m [39m [39m [39m [0m[39m [39m [1m[31ml[0m[39m[38;5;239ms[39m[0m[32ml[32ml[39m[38;5;239m -rtl[39m[39m [39m-[39mr[39mt[39ml [38;5;239minput*[39m[39m[7m[4ma[39m[7m[4mi[39m[7m[4mi[39m[7m[4md[39m[7m[4ma[39m[7m[4m_[7m[4mexported_group_out_antisites[27m[24m[34D[27m[24ma[27m[24mi[27m[24mi[27m[24md[27m[24ma[27m[24m_[27m[24me[27m[24mx[27m[24mp[27m[24mo[27m[24mr[27m[24mt[27m[24me[27m[24md[27m[24m_[27m[24mg[27m[24mr[27m[24mo[27m[24mu[27m[24mp[27m[24m_[27m[24mo[27m[24mu[27m[24mt[27m[24m_[27m[24ma[27m[24mn[27m[24mt[27m[24mi[27m[24ms[27m[24mi[27m[24mt[27m[24me[27m[24ms[34m*[39m[?1l>[?2004l
+-rw-r--r-- 1 glensk cosmo   2947 Oct 22 12:50 [0m[00maiida_exported_group_out_antisitesMg5Si6.runner_calc__all_steps.input.dataNN_relaxed_Mg5Si6_runner_v3ag_4998_1.runner[0m[K
+-rw-r--r-- 1 glensk cosmo   2947 Oct 22 12:50 [00maiida_exported_group_out_antisitesMg5Si6.runner_calc__all_steps.input.dataNN_relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+-rw-r--r-- 1 glensk cosmo 105905 Oct 22 12:50 [00maiida_exported_group_out_antisitesMg5Si6.runner_calc__all_steps.input.data[0m[K
+-rw-r--r-- 1 glensk cosmo   2947 Oct 22 12:50 [00maiida_exported_group_out_antisitesMg5Al2Si4.runner_calc__all_steps.input.dataNN_relaxed_Mg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner[0m[K
+-rw-r--r-- 1 glensk cosmo 105956 Oct 22 12:50 [00maiida_exported_group_out_antisitesMg5Al2Si4.runner_calc__all_steps.input.data[0m[K
+-rw-r--r-- 1 glensk cosmo 105955 Oct 22 12:50 [00maiida_exported_group_out_antisitesMg4Al3Si4.runner_calc__all_steps.input.data[0m[K
+-rw-r--r-- 1 glensk cosmo 291260 Oct 23 08:31 [00maiida_exported_group_out_antisites_repMg4Al3Si4_NEW.runner_calc__all_steps.input.data[0m[K
+-rw-r--r-- 1 glensk cosmo 291613 Oct 23 08:31 [00maiida_exported_group_out_antisites_repMg5Al2Si4_NEW.runner_calc__all_steps.input.data[0m[K
+-rw-r--r-- 1 glensk cosmo 291545 Oct 23 08:32 [00maiida_exported_group_out_antisites_repMg5Si6_NEW.runner_calc__all_steps.input.data[0m[K
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m16:15:52[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new[00m 
+%[K[?1h=[?2004h[4ma[24m[38;5;239miida_get_structures_new/[39m[24D[4ma[39m[4mi[24m[4ma[4mi[39m[4mi[24m[24m[1m[31ma[24m[1m[31mi[24m[1m[31mi[1m[31ma[0m[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [21D[1m[31ma[1m[31m_[0m[39m[1m[31m_[1m[31ma[0m[39m[1m[31m_[0m[39m[0m[39m [1m[31ma[0m[39m[0m[39m [0m[39m[4ma[0m[39m[4mi[0m[39m[4mi[24m[0m[38;5;239md[38;5;239ma_get_structures_new/[39m[22D[24m[1m[31ma[24m[1m[31mi[24m[1m[31mi[1m[31ma[0m[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [21D[1m[31ma[1m[31m_[0m[39m[1m[31ma[0m[39m[0m[39m [0m[39m[4ma[0m[39m[4mi[0m[39m[4mi[24m[0m[38;5;239md[38;5;239ma_get_structures_new/[39m[22D[4mi[39m[4md[24m[24m[32ma[24m[32mi[24m[32mi[24m[32md[32ma[39m[39m[4ma[39m[4mi[39m[4mi[39m[4md[39m[4ma[39m[4m_[24m[24m[1m[31ma[24m[1m[31mi[24m[1m[31mi[24m[1m[31md[24m[1m[31ma[24m[1m[31m_[1m[31ma[0m[39m[38;5;239mc[38;5;239mt[38;5;239mi[38;5;239mv[38;5;239ma[38;5;239mt[38;5;239me[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [18D[1m[31ma[1m[31mv[0m[39m[39m [39m [39m [39m [39m [39m [1m[31ma[0m[39m[0m[38;5;239mc[38;5;239mtivate[39m[1m[31ma[1m[31mc[0m[39m[8D[0m[39ma[0m[39mi[0m[39mi[0m[39md[0m[39ma[0m[39m_[0m[39ma[0m[39mc[39mt[39mi[39mv[39ma[39mt[39me [15D[32ma[32mi[32mi[32md[32ma[32m_[32ma[32mc[32mt[32mi[32mv[32ma[32mt[32me[39m[1C[?1l>[?2004l
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J(aiida) [35m17:24:39[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new[00m 
+%[K[?1h=[?2004h[32mv[39m[38;5;239merdi import OQMD-Distorted_scf[39m[30D[1m[31mv[1m[31me[0m[39m[1m[31mv[1m[31me[1m[31mr[0m[39m[1m[31mr[1m[31md[0m[39m[0m[32mv[0m[32me[0m[32mr[0m[32md[32mi[39m[39m [39mg[38;5;239mr[38;5;239mo[38;5;239mu[38;5;239mp[38;5;239m [38;5;239ml[38;5;239mi[38;5;239ms[38;5;239mt[38;5;239m [38;5;239m-[38;5;239mA[39m[39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [39m [24D[39mr[39mo[39mp[38;5;239m [38;5;239ml[38;5;239mi[38;5;239ms[38;5;239mt[39m[39m [39m [39m [39m [9D[38;5;239mu[38;5;239mp[38;5;239m [38;5;239ml[38;5;239mi[38;5;239ms[38;5;239mt -A[39m[10D[39mu[39mp[39m [39ml[39mi[39ms[39mt[39m [39m-[39mA[?1l>[?2004l
+-/|\-/|\-/|\-[22m  PK  Name                                                                                               User
+----  -------------------------------------------------------------------------------------------------  -----------------------
+   2  kmc_1000K_1                                                                                        albert.glensk@gmail.com
+   3  click_test                                                                                         daniel.marchand@epfl.ch
+   4  twoatom_threerandom1_calc1                                                                         daniel.marchand@epfl.ch
+   6  Al6xxxDB_passingsubset                                                                             daniel.marchand@epfl.ch
+   8  single_twoatom_struct                                                                              albert.glensk@gmail.com
+   9  test_disc_io_k-points                                                                              albert.glensk@gmail.com
+  10  kmc_1000K_1_calc                                                                                   albert.glensk@gmail.com
+  11  kmc_1000K_2                                                                                        albert.glensk@gmail.com
+  12  kmc_1000K_2_calc                                                                                   albert.glensk@gmail.com
+  13  kmc_1000K_3                                                                                        albert.glensk@gmail.com
+  14  kmc_1000K_4                                                                                        albert.glensk@gmail.com
+  15  kmc_1000K_4_calc                                                                                   albert.glensk@gmail.com
+  17  Al6xxxDB_structures_calc                                                                           daniel.marchand@epfl.ch
+  19  single_twoatom_struct_test                                                                         albert.glensk@gmail.com
+  20  4x4x4_repeated_struct_4717                                                                         albert.glensk@gmail.com
+  21  4x4x4_repeated_struct_4717_calc                                                                    albert.glensk@gmail.com
+  22  v1ag_fps3134_first20                                                                               albert.glensk@gmail.com
+  23  v1ag_fps3134_first20_calc                                                                          albert.glensk@gmail.com
+  24  BetaPrime_structures_scf                                                                           daniel.marchand@epfl.ch
+  26  out_34and2786.runner.group                                                                         albert.glensk@gmail.com
+  27  out_34and2786.runner.group_calc                                                                    albert.glensk@gmail.com
+  28  from_KMC3_remaining21.data.group                                                                   albert.glensk@gmail.com
+  29  from_KMC3_remaining21.data.group_calc                                                              albert.glensk@gmail.com
+  30  BetaPrime_structures_relax                                                                         daniel.marchand@epfl.ch
+  32  mg9si5_stable_phonons_v2_atomrelax_cellrelax.runner.group                                          albert.glensk@gmail.com
+  33  mg9si5_stable_phonons_v2_atomrelax_cellrelax.runner.group_calc                                     albert.glensk@gmail.com
+  34  mg9si5_stable_phonons_v2_atomrelax.runner.group                                                    albert.glensk@gmail.com
+  35  mg9si5_stable_phonons_v2_atomrelax.runner.group_calc                                               albert.glensk@gmail.com
+  36  mg9si5_stable_phonons_v2_atomrelax_cellrelax_minimahopping.runner.group                            albert.glensk@gmail.com
+  37  mg9si5_stable_phonons_v2_atomrelax_cellrelax_minimahopping.runner.group_calc                       albert.glensk@gmail.com
+  38  BetaPrime_vc-relaxed                                                                               daniel.marchand@epfl.ch
+  40  NN_relaxed_Mg5Si6_n2p2_v2ag                                                                        albert.glensk@gmail.com
+  41  NN_relaxed_Mg5Si6_n2p2_v2ag_calc                                                                   albert.glensk@gmail.com
+  42  NN_relaxed_Mg4Al3Si4_n2p2_v2ag                                                                     albert.glensk@gmail.com
+  43  NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc                                                                albert.glensk@gmail.com
+  44  NN_relaxed_Mg5Al2Si4_n2p2_v2ag                                                                     albert.glensk@gmail.com
+  45  NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc                                                                albert.glensk@gmail.com
+  46  al_fcc.runner                                                                                      albert.glensk@gmail.com
+  47  mg_hcp.runner                                                                                      albert.glensk@gmail.com
+  48  al_fcc.runner_calc                                                                                 albert.glensk@gmail.com
+  49  si_dc.runner                                                                                       albert.glensk@gmail.com
+  50  si_dc.runner_calc                                                                                  albert.glensk@gmail.com
+  51  mg_hcp.runner_calc                                                                                 albert.glensk@gmail.com
+  52  SimpleAlDeformations_scf                                                                           daniel.marchand@epfl.ch
+  54  c44                                                                                                albert.glensk@gmail.com
+  55  c44_runner.data                                                                                    albert.glensk@gmail.com
+  56  c44_runner.data_calc                                                                               albert.glensk@gmail.com
+  57  c1_runner.data                                                                                     albert.glensk@gmail.com
+  58  c1_runner.data_calc                                                                                albert.glensk@gmail.com
+  59  elastic_all_runner.data                                                                            albert.glensk@gmail.com
+  60  elastic_all_runner.data_calc                                                                       albert.glensk@gmail.com
+  61  out_murn.runner                                                                                    albert.glensk@gmail.com
+  62  out_murn.runner_calc                                                                               albert.glensk@gmail.com
+  63  POSCAR_out40.runner                                                                                albert.glensk@gmail.com
+  64  POSCAR_out40.runner_calc                                                                           albert.glensk@gmail.com
+  65  out_c_check.runner                                                                                 albert.glensk@gmail.com
+  66  out_c_check.runner_calc                                                                            albert.glensk@gmail.com
+  67  out_c_check_vol_cons.runner                                                                        albert.glensk@gmail.com
+  68  out_c_check_vol_cons.runner_calc                                                                   albert.glensk@gmail.com
+  69  out_c_check_vol_cons_widerange_DFTV0.runner                                                        albert.glensk@gmail.com
+  70  out_c_check_vol_cons_widerange_DFTV0.runner_calc                                                   albert.glensk@gmail.com
+  71  out_antisitesMg4Al3Si4.runner                                                                      albert.glensk@gmail.com
+  72  out_antisitesMg4Al3Si4.runner_calc                                                                 albert.glensk@gmail.com
+  73  out_antisitesMg5Si6.runner                                                                         albert.glensk@gmail.com
+  74  out_antisitesMg5Al2Si4.runner                                                                      albert.glensk@gmail.com
+  75  out_antisitesMg5Si6.runner_calc                                                                    albert.glensk@gmail.com
+  76  out_antisitesMg5Al2Si4.runner_calc                                                                 albert.glensk@gmail.com
+  77  out_antisites_repMg4Al3Si4.runner                                                                  albert.glensk@gmail.com
+  78  out_antisites_repMg4Al3Si4.runner_calc                                                             albert.glensk@gmail.com
+  79  out_antisites_repMg5Al2Si4.runner                                                                  albert.glensk@gmail.com
+  80  out_antisites_repMg5Al2Si4.runner_calc                                                             albert.glensk@gmail.com
+  81  out_antisites_repMg5Si6.runner                                                                     albert.glensk@gmail.com
+  82  out_antisites_repMg5Si6.runner_calc                                                                albert.glensk@gmail.com
+  83  out_antisites_repMg4Al3Si4_NEW.runner                                                              albert.glensk@gmail.com
+  84  out_antisites_repMg4Al3Si4_NEW.runner_calc                                                         albert.glensk@gmail.com
+  85  out_antisites_repMg5Al2Si4_NEW.runner                                                              albert.glensk@gmail.com
+  86  out_antisites_repMg5Al2Si4_NEW.runner_calc                                                         albert.glensk@gmail.com
+  87  out_antisites_repMg5Si6_NEW.runner                                                                 albert.glensk@gmail.com
+  88  out_antisites_repMg5Si6_NEW.runner_calc                                                            albert.glensk@gmail.com
+  89  antisites_repMg4Al3Si4_n2p2_v4ag_ppl_987654_21cores.runner                                         albert.glensk@gmail.com
+  90  antisites_repMg4Al3Si4_n2p2_v4ag_ppl_987654_21cores.runner_calc                                    albert.glensk@gmail.com
+  91  antisites_repMg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner                                         albert.glensk@gmail.com
+  92  antisites_repMg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner_calc                                    albert.glensk@gmail.com
+  93  antisites_repMg5Si6_n2p2_v4ag_ppl_987654_21cores.runner                                            albert.glensk@gmail.com
+  94  antisites_repMg5Si6_n2p2_v4ag_ppl_987654_21cores.runner_calc                                       albert.glensk@gmail.com
+  95  relaxed_Mg4Al3Si4_n2p2_v4ag_ppl_987654_21cores.runner                                              albert.glensk@gmail.com
+  96  relaxed_Mg4Al3Si4_n2p2_v4ag_ppl_987654_21cores.runner_calc                                         albert.glensk@gmail.com
+  97  relaxed_Mg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner                                              albert.glensk@gmail.com
+  98  relaxed_Mg5Al2Si4_n2p2_v4ag_ppl_987654_21cores.runner_calc                                         albert.glensk@gmail.com
+  99  relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner                                                 albert.glensk@gmail.com
+ 100  relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores.runner_calc                                            albert.glensk@gmail.com
+ 102  relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores_2.runner                                               albert.glensk@gmail.com
+ 103  relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores_2.runner_calc                                          albert.glensk@gmail.com
+ 104  relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores_3.runner                                               albert.glensk@gmail.com
+ 105  relaxed_Mg5Si6_n2p2_v4ag_ppl_987654_21cores_3.runner_calc                                          albert.glensk@gmail.com
+ 106  RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data       albert.glensk@gmail.com
+ 107  RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc  albert.glensk@gmail.com
+ 108  RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Si6_n2p2_v2ag_calc__all_steps.input.data          albert.glensk@gmail.com
+ 109  RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Si6_n2p2_v2ag_calc__all_steps.input.data_calc     albert.glensk@gmail.com
+ 110  RELAXED_fully_aiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.data       albert.glensk@gmail.com
+ 111  RELAXED_fully_aiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.data_calc  albert.glensk@gmail.com
+ 112  out_reference_rep.runner                                                                           albert.glensk@gmail.com
+ 113  out_reference_rep.runner_calc                                                                      albert.glensk@gmail.com
+ 114  OQMD-Distorted_scf                                                                                 daniel.marchand@epfl.ch[0m
+[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J(aiida) [35m17:24:59[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new[00m 
+%[K[?1h=[?2004h

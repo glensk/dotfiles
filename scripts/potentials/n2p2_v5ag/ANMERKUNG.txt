@@ -1,0 +1,46 @@
+###########################
+### started with 5000 from gulio and removed 2 bad structures.
+added 143 elastic calculations for c44
+added 10cxx highstraing calculations
+###########################
+--> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain.input.data
+
+%grep -c begin aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain.input.data
+5151
+
+###########################
+### add referece structures (22*3)
+###########################
+cat aiida_exported_group_out_antisites_rep{Mg4Al3Si4,...AND THE TWO OTHERS}_NEW.runner_calc__all_steps.input.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+%grep -c begin aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+5217
+
+###########################
+### add antisites reference
+###########################
+17:42:05 glensk@mac /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new
+%tail -30 aiida_exported_group_NN_relaxed_Mg4Al3Si4_n2p2_v2ag_calc__all_steps.input.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+17:42:28 glensk@mac /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new
+%tail -30 aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+17:43:11 glensk@mac /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new
+%tail -30 aiida_exported_group_NN_relaxed_Mg5Si6_n2p2_v2ag_calc__all_steps.input.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+17:43:50 glensk@mac /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new
+
+grep -c begin aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+5220
+
+###########################
+### add KMC structures 57+17+20
+###########################
+cat aiida_exported_group_KMC57.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+cat aiida_exported_group_from_KMC3_remaining21.data.group_calc__all_steps.input.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+cat aiida_exported_group_kmc_1000K_4_calc__all_steps.input.data >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+
+--> 5314 structures
+
+###########################
+### add daniels OQMC distorted structures  (do this in the end) == 181 struct
+###########################
+cat OQMD-Distorted_scf >> aiida_exported_group_Al6xxxDB_structures_calc__all_steps_minus2_143elastic_10cxx_highstrain_antisites_repNEW.input.data
+
+--> 5495 structures

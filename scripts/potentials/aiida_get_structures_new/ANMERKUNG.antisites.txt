@@ -1,2 +1,7 @@
 from 
 /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/tests/Al-Mg-Si/antisites
+
+for the Antisite calculations, the results are in:
+/Users/glensk/Dropbox/Albert/proj/2019_EPFL/2019_Bill_results/2019_10_30_antisites
+
+
