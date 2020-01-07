@@ -129,25 +129,25 @@ myhost_get() {
         "cmmd") echo "cmmd" && return;;
         "cosmopc") echo "cosmopc" && return;;
     esac
-    daint_fidis="${host:0:5}"
-    #echo daint_fidis: $daint_fidis
-    case $daint_fidis in
+    first_five="${host:0:5}"
+    #echo first_five: $first_five
+    case $first_five in
         "daint") echo "daint" && return;;
         "fidis") echo "fidis" && return;;
     esac
     
-    cosmopc_="${host:0:7}"
-    case $cosmopc_ in
+    first_seven="${host:0:7}"
+    case $first_seven in
         "cosmopc") echo "cosmopc" && return;;
     esac
 
-    firstletter="${host:0:1}"
-    remain="${host:1:999}"
+    first_letter="${host:0:1}"
+    remaining_letter="${host:1:999}"
     re='^[0-9]+$'
-    #echo firstletter $firstletter
-    #echo remain $remain
-    if [[ $remain =~ $re ]];then # remaining is an integer
-        case $firstletter in
+    #echo first_letter $first_letter
+    #echo remaining_letter $remaining_letter
+    if [[ $remaining_letter =~ $re ]];then # remaining is an integer
+        case $first_letter in
             "h") echo "helvetios" && return;;
             "f") echo "fidis" && return;;
             "g") echo "fidis" && return;;
