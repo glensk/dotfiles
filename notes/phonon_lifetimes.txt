@@ -1,0 +1,21 @@
+from omnifocus:
+---------------------
+
+latex writing:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_63_Michaels_korrekturen_version_paper_09_August_2018/version_27_Feb2019
+
+Fig 2b:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_46_pic_freq_lifetime_convergence
+
+
+cd /cmmc/ptmp/aglen/Understand_phonon_lifetimes/check_0_DFT_RUNS_Al/low_4x4x4sc_250eV_2x2x2kp_EDIFF1E-2__4.14Ang_900K_GGA/SUM_run_1
+
+Parametrization LA:
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_62_LA_POSITIONs/ANMERKUNG.txt
+
+Plots supplement: 
+/Users/glensk/Dropbox/Albert/proj/proj_current/__2017.01_phonon_linewidth_al/check_65_make_pictures_supplement
+
+
+
+only tox was optimized while the LA parametrization was not optimal (LA morse was taken from 2x2x2 displacemetns)

@@ -313,7 +313,9 @@ def help(p = None):
     p.add_argument('-D_mor',   '--D_mor', required=False,
        help='morse parameter for well depth (default = False); value for al 0.27', type=float, default=False)
     p.add_argument('-t1',   '--t1', required=False,
-       help='linear constant in transversal direction out of plane (default = 0.00)', type=float, default=False)
+       help='linear constant in transversal direction out of plane (first shell; default = 0.00)', type=float, default=0.0)
+    p.add_argument('-t2',   '--t2', required=False,
+       help='linear constant in transversal direction inplane (first shell; default = 0.00)', type=float, default=0.0)
     p.add_argument('-t1o',   '--t1overwrite', required=False,
        help='linear constant in transversal direction out of plane (default = 0.00)', type=float, default=False)
        #help='linear constant in transversal direction out of plane (default = -0.65)', type=float, default=-0.65)
@@ -681,13 +683,23 @@ def obtain_parametrization_H_from_p_variable(args):
     print_parameters(args,idx="(H)")
     return
 
-def set_morsepar_to_zer0_and_use_micheal_poly():
+def set_morsepar_to_zer0_and_use_micheal_poly(args,filename):
     args.michael_poly_yes_no = 1
     args.D_mor      = 0.0
     args.a_mor      = 0.0
     args.alat_mor   = 0.0
-    args.t1         = 0.0
-    return
+    #args.t1         = 0.0 #args.poly_michael_par[5]
+    print('LOADING',filename)
+    args.poly_michael_par = np.loadtxt(filename)
+    #args.poly_michael_par[:4] = args.poly_michael_par[:4]*-1
+    print('len:',len(args.poly_michael_par))
+
+    if len(args.poly_michael_par) < 17:
+        print(args.poly_michael_par)
+        ##sys.exit('wrong format for '+filename+' only '+str(len(args.poly_michael_par))+' entries but has to be 17!')
+    args.t1 = args.poly_michael_par[5]
+
+    return args
 
 def set_michael_poly_to0_and_use_morse():
     args.poly_michael_par = [0.0,0.0,0.0,0.0,0.01]
@@ -726,8 +738,9 @@ def obtain_parametrization_I_from_michaels_polynomial(args):
             set_michael_poly_to0_and_use_morse()
         elif args.poly_michael.split("_")[0] == '7':
             args.folder = folder_parametrization # 7 isplacements
-        elif args.poly_michael.split("_")[0] == 'hier':
+        elif args.poly_michael.split("_")[0] in ['hier','hierpoly','hiermorse']:
             args.folder = args.folder # 7 isplacements
+            folder_parametrization = args.folder
 
         ################## get parametrization
         if args.poly_michael.split("_")[1] in ['morse','morseprl']:
@@ -737,18 +750,39 @@ def obtain_parametrization_I_from_michaels_polynomial(args):
             # get D_mor a_mor from disp_fit.parameters_morse.dat
             check_for_disp_fit_parameters_morse(args,folder=folder_parametrization)
         elif args.poly_michael.split("_")[1] == 'poly':
-            set_morsepar_to_zer0_and_use_micheal_poly()
-            args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.88.dat")
-            #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
-            #args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.84.dat")
-            args.poly_michael_par = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.84.dat")
+            filename = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.88.dat")
+            #filename = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
+            #filename = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_abcd_rcut0.84.dat")
+            filename = np.loadtxt(folder_parametrization+"/disp_fit.parameters.poly_cd_rcut0.84.dat")
+            args = set_morsepar_to_zer0_and_use_micheal_poly(args,filename)
         elif args.poly_michael.split("_")[1] == 'morseprl':
             args.parametrization = "prl2019_900K"
         elif args.poly_michael.split("_")[1] == 'polycorralat':
-            set_morsepar_to_zer0_and_use_micheal_poly()
-            args.poly_michael_par = np.loadtxt(folder_PTS_30_polycorralat+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
+            filename = np.loadtxt(folder_PTS_30_polycorralat+"/disp_fit.parameters.poly_cd_rcut0.88.dat")
+            args = set_morsepar_to_zer0_and_use_micheal_poly(args,filename)
         else:
-            sys.exit('second part not known')
+            print('apm',args.poly_michael[:9])
+            if args.poly_michael[:9] == 'hierpoly_':
+                filename = args.poly_michael[9:]
+                print('filename (1xx):',filename)
+                if os.path.isfile(folder_parametrization+'/'+filename):
+                    args = set_morsepar_to_zer0_and_use_micheal_poly(args,folder_parametrization+"/"+filename)
+                else:
+                    print('not found',folder_parametrization+'/'+filename)
+                    sys.exit('sec part not found (1xx)')
+            elif args.poly_michael[:10] == 'hiermorse_':
+                filename = args.poly_michael[10:]
+                print('filename (2xx):',filename)
+                if os.path.isfile(folder_parametrization+'/'+filename):
+                    #args = set_morsepar_to_zer0_and_use_micheal_poly(args.poly_michael)
+                    set_michael_poly_to0_and_use_morse()
+                else:
+                    print('not found',folder_parametrization+'/'+filename)
+                    sys.exit('sec part not found (2xx)')
+            elif os.path.isfile(args.poly_michael):
+                args = set_morsepar_to_zer0_and_use_micheal_poly(args,args.poly_michael)
+            else:
+                sys.exit('second part not known')
 
         if args.element == "Al":
             #############################################
@@ -969,11 +1003,13 @@ def prepare_input_file(file_orig,file_comp,args):
         print('COMPILING (0) with args.t1               :',args.t1)
         print()
         print('COMPILING (0) with args.michael_poly_yes_no:',args.michael_poly_yes_no)
-        print('COMPILING (0) with args.poly_michael_par[0]  :',args.poly_michael_par[0])
-        print('COMPILING (0) with args.poly_michael_par[1]  :',args.poly_michael_par[1])
-        print('COMPILING (0) with args.poly_michael_par[2]  :',args.poly_michael_par[2])
-        print('COMPILING (0) with args.poly_michael_par[3]  :',args.poly_michael_par[3])
-        print('COMPILING (0) with args.poly_michael_par[4]  :',args.poly_michael_par[4])
+        print('COMPILING (0) with args.poly_michael_par[0]  aa:',args.poly_michael_par[0])
+        print('COMPILING (0) with args.poly_michael_par[1]  bb:',args.poly_michael_par[1])
+        print('COMPILING (0) with args.poly_michael_par[2]  cc:',args.poly_michael_par[2])
+        print('COMPILING (0) with args.poly_michael_par[3]  dd:',args.poly_michael_par[3])
+        print('COMPILING (0) with args.poly_michael_par[4]  ee:',args.poly_michael_par[4])
+        print('COMPILING (0) with args.poly_michael_par[5]  t1:',args.poly_michael_par[5])
+        print('COMPILING (0) with args.poly_michael_par[17] :',args.poly_michael_par[17])
 
 
 
@@ -988,7 +1024,9 @@ def prepare_input_file(file_orig,file_comp,args):
     change_file(file_comp,'^#define poly_bb.*','#define poly_bb ('+str(args.poly_michael_par[1])+")")
     change_file(file_comp,'^#define poly_cc.*','#define poly_cc ('+str(args.poly_michael_par[2])+")")
     change_file(file_comp,'^#define poly_dd.*','#define poly_dd ('+str(args.poly_michael_par[3])+")")
-    change_file(file_comp,'^#define poly_rcut.*','#define poly_rcut ('+str(args.poly_michael_par[4])+")")
+    change_file(file_comp,'^#define poly_ee.*','#define poly_ee ('+str(args.poly_michael_par[4])+")")
+    change_file(file_comp,'^#define ktr_tox.*','#define ktr_tox ('+str(args.poly_michael_par[5])+")")
+    change_file(file_comp,'^#define poly_rcut.*','#define poly_rcut ('+str(args.poly_michael_par[17])+")")
     if type(args.t1) == bool:
         args.t1 = 0.0
     if type(args.t1overwrite) != bool:

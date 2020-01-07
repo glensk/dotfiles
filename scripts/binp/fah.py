@@ -1339,6 +1339,36 @@ def fah_make_all_analysis():
     fit_fah_surface_lmfit2d()
     return
 
+
+############# otherstuff ##########
+def dudlfile_get_std(filename="out_dudl.dat"):
+    a = np.loadtxt(filename)
+    DFT = a[:,4]
+    DFT_eV_cell = DFT/1000*31
+    print()
+    print('DFT.mean()',DFT.mean())
+    print('DFT_eV_cell.mean()',DFT_eV_cell.mean())
+    la = a[:,5]
+    la_eV_cell = la/1000*31
+    print('la.mean()',la.mean())
+    print('la_eV_cell.mean()',la_eV_cell.mean())
+    print()
+
+    print('DFT (meV/at1) --- DFT_eV_cell (eV/cell)**')
+    for idx,i in enumerate(DFT):
+        print(str(DFT[idx]).ljust(16),str(DFT_eV_cell[idx]).ljust(16))
+    print('la (meV/at1)  --- la_eV_cell (eV/cell)**')
+    for idx,i in enumerate(la):
+        print(str(la[idx]).ljust(16),str(la_eV_cell[idx]).ljust(16))
+    print('DFT-la (meV/at1) --- DFT_eV_cell-la_eV_cell (eV/cell)**')
+    for idx,i in enumerate(DFT):
+        print(str(DFT[idx]-la[idx]).ljust(16),str(DFT_eV_cell[idx]-la_eV_cell[idx]).ljust(16))
+    print()
+    std = np.std(DFT-la,ddof=1)
+    std_eV_cell = np.std(DFT_eV_cell-la_eV_cell,ddof=1)
+    print("enestd:",np.round(std,4),"meV/atom_m1 (="+str(np.round(std_eV_cell,4)),"eV/cell)");
+    return
+
 ######### old fah stuff ############
 class ah():
     ''' anharmonic contribution to Gibbs free energy '''

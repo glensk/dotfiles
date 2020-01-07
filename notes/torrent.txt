@@ -1,0 +1,20 @@
+--> installed by: brew install transmission
+
+https://transmissionbt.com/download/
+
+########################################################################
+This formula only installs the command line utilities.
+
+Transmission.app can be downloaded directly from the website:
+  https://www.transmissionbt.com/
+
+Alternatively, install with Homebrew Cask:
+  brew cask install transmission
+
+To have launchd start transmission-cli now and restart at login:
+  brew services start transmission-cli
+Or, if you don't want/need a background service you can just run:
+  transmission-daemon --foreground
+==> Summary
+🍺  /usr/local/Cellar/transmission-cli/2.94_2: 83 files, 3.2MB
+########################################################################
