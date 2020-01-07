@@ -19,7 +19,7 @@
 #define alat_morse    (4.13)     // if alat = 4.07 but morse is
 #define a_mor         (1.432673)	   // m^-1 a  Morese parameter
 #define D_mor         (0.279300)	   // J    D  Morse parameter
-#define ktr_tox       (-0.09)	   //N/m	transversale kraftkonstante
+#define ktr_tox       (-0.00)	   //N/m	transversale kraftkonstante
 
 #define michael_poly_yes_no 1
 // for polynomial: a + b*r**(-1) + c*r**(-2) + d*r**(-3)
@@ -42,6 +42,7 @@
 #define poly_bb            (51.786965651529364)
 #define poly_cc            (-43.70836806717401)
 #define poly_dd            (12.296391796377739)
+#define poly_ee            (0.0)
 #define poly_rcut          (0.88)
 
 //////////////////////////// end definitions //////////////////////////////
@@ -66,7 +67,7 @@
 #define a0_alat_lattice (a0/alat_lattice)
 #define da0_alat_lattice (1./a0_alat_lattice)
 #define req ((alat_lattice/sqrt(2.))/da0_alat_lattice)
-#define poly_0 (-(poly_dd/(2.*poly_rcut*poly_rcut)) - poly_cc/poly_rcut + poly_aa*poly_rcut + poly_bb*log(poly_rcut))
+//#define poly_0 (-(poly_dd/(2.*poly_rcut*poly_rcut)) - poly_cc/poly_rcut + poly_aa*poly_rcut + poly_bb*log(poly_rcut))
 #define a_par (a_mor*1e10)	            // m^-1 a  Morese parameter
 #define D_par (D_mor*1.602176e-19)	    // J    D  Morse parameter
 #define r0_mor (alat_morse/sqrt(2))	    // m    r0 Morse parameter for a = 4.14/sqrt(2)
@@ -876,8 +877,10 @@ void write_dudl(int step, FILE *file_out_dudl,FILE *file_out_dudl_av,int read_he
     //double temperature_av=temperature_sum/step;
     //if (step==0){temperature_av=temperature_sum;};
     double urefclassical_av=1.5*0.086173423*temperature_av*(atoms/(atoms-1.)); // 3/2 kB T   * (32/31)
+    //printf("step: %-10d in  u_la_av: %8.4f\n",step,u_la_av);
     u_la_av   = getaverage(u_la_av,step,u_la);
     u_dft_av  = getaverage(u_dft_av,step,u_dft);
+    //printf("step: %-10d out u_la_av: %8.4f\n",step,u_la_av);
 
     dudl_dft_la        = u_dft - u_la;
 	if (read_uoutcar==0){dudl_dft_la=0;}
@@ -885,24 +888,27 @@ void write_dudl(int step, FILE *file_out_dudl,FILE *file_out_dudl_av,int read_he
     dudl[step].dudl_dft_la = dudl_dft_la;
 
     dudl_dft_la_av   = getaverage(dudl_dft_la_av,step,dudl_dft_la);
+    //printf("step: %-10d dudl_dft_la_av: %8.4f\n",step,dudl_dft_la_av);
 
     // calculation of the variance and standard deviation
     double sum_var_la=0;
     double sum_var_harm=0;
-    double tmp;
+    double diff;
     int j;
-    for (j=1;j<step;j++) {
-        tmp=(dudl[j].dudl_dft_la - dudl_dft_la_av);
-        sum_var_la += tmp*tmp;
+    for (j=0;j<=step;j++) {
+        diff=(dudl[j].dudl_dft_la - dudl_dft_la_av);
+        sum_var_la += diff*diff;
+        printf("step--:%-10d j:%-10d dudl[j]:%8.4f diff:%8.4f diff**2:%8.4f sqrt(sum_var_la):%8.4f\n",step,j,dudl[j].dudl_dft_la,diff,diff*diff,sqrt(sum_var_la/step));
         if (read_hesse==1) {
-            tmp=(dudl[j].dudl_dft_harm - dudl_dft_harm_av);
-            sum_var_harm += tmp*tmp;
+            diff=(dudl[j].dudl_dft_harm - dudl_dft_harm_av);
+            sum_var_harm += diff*diff;
         } else {
             sum_var_harm = 0;
         }
     }
-    dudl[step].dudl_dft_la_std      = sqrt(sum_var_la/(step-0.9999));
-    dudl[step].dudl_dft_harm_std    = sqrt(sum_var_harm/(step-0.9999));
+    //printf("step: %-10d sum_var_la: %8.4f\n",step,sum_var_la);
+    dudl[step].dudl_dft_la_std      = sqrt(sum_var_la/(step)); //-0.9999));    is equivalent to michaels code
+    dudl[step].dudl_dft_harm_std    = sqrt(sum_var_harm/(step)); //-0.9999));
 
     if (read_hesse==1) {
         u_harm_av = getaverage(u_harm_av,step,u_harm);
@@ -916,7 +922,7 @@ void write_dudl(int step, FILE *file_out_dudl,FILE *file_out_dudl_av,int read_he
         dudl_dft_harm_av = 0;
     }
 
-    fprintf(file_out_dudl,   "%-10d  %8.2f   %8.2f  %8.1f     %8.2f      %8.2f     %8.2f\n",\
+    fprintf(file_out_dudl,   "%-10d  %8.4f   %8.4f  %8.1f     %8.4f      %8.4f     %8.2f\n",\
             step,\
             dudl_dft_la,\
             dudl_dft_harm,\
@@ -929,7 +935,7 @@ void write_dudl(int step, FILE *file_out_dudl,FILE *file_out_dudl_av,int read_he
     //printf("p:step\n");
     //
     //leave the %8.5f %8.5 for the forces! (was necessary in LA case once)
-    fprintf(file_out_dudl_av,"%-8d %8.4f   %8.2f     %8.2f  %8.2f     %8.1f  %8.2f %8.2f %8.2f %8.2f %8.5f %8.5f\n",\
+    fprintf(file_out_dudl_av,"%-8d %8.4f   %8.4f     %8.2f  %8.2f     %8.1f  %8.2f %8.2f %8.2f %8.2f %8.5f %8.5f\n",\
             step,\
             dudl[step].dudl_dft_la_std,\
             dudl_dft_la_av,\
@@ -1716,21 +1722,21 @@ struct twodouble{
 
 struct twodouble michaelpoly3_forces_energy(double r) {
     struct twodouble f_e;
-    double rang,rrel,fpoly,fevang,fxpoly,fypoly,fzpoly,eev1,eev2;
+    double rang,rrel,force,fevang,fxpoly,fypoly,fzpoly,eev1,eev2,a1,a2,a3,a4;
     ///////////////////////////
     // polynomial forces
     ///////////////////////////
-    rang    = r*da0_alat_lattice;
+    rang = r*da0_alat_lattice;
     rrel = rang/alat_lattice;
     //fevang= aa + bb*rang**(-1) + cc*rang**(-2) + dd*rang**(-3);
     // this force is positive defined for positive r (as is the poly)
-    fevang= poly_aa + poly_bb/rrel + poly_cc/(rrel*rrel) + poly_dd/(rrel*rrel*rrel);
-    fpoly = fevang/faktor_force;
-    f_e.v1 = fpoly;
+    fevang= -(poly_aa + poly_bb/rrel + poly_cc/(rrel*rrel) + poly_dd/(rrel*rrel*rrel));  // seems that the - sign is necessary here to be consistent with michaels definition
+    force = fevang/faktor_force;
+    f_e.v1 = force;   // this is the force which is given further
     // this can be commented in to get he saparate poly forces
-    //fxpoly = (x/r)*fpoly;  // doing this saves 20% of computational time
-    //fypoly = (y/r)*fpoly;  // doing this saves 20% of computational time
-    //fzpoly = (z/r)*fpoly;  // doing this saves 20% of computational time
+    //fxpoly = (x/r)*force;  // doing this saves 20% of computational time
+    //fypoly = (y/r)*force;  // doing this saves 20% of computational time
+    //fzpoly = (z/r)*force;  // doing this saves 20% of computational time
     //forcepoly[ind1].x+=fxpoly;	//in N
 	//forcepoly[ind2].x-=fxpoly;
 	//forcepoly[ind1].y+=fypoly;
@@ -1738,9 +1744,27 @@ struct twodouble michaelpoly3_forces_energy(double r) {
 	//forcepoly[ind1].z+=fzpoly;
 	//forcepoly[ind2].z-=fzpoly;
     //eev_eq = -(dd/(2.*rrel*rrel)) - cc/rrel + aa*rrel + bb*log(rrel); //- 17.1065183970574175;
-    eev1 = -(poly_dd/(2.*rrel*rrel)) - poly_cc/rrel + poly_aa*rrel + poly_bb*log(rrel) - poly_0;
-    eev2 = eev1*-alat_lattice/faktor_energy_cell;
+    //a1 = -(0.5*poly_dd/(rrel*rrel));
+    //a2 = - poly_cc/rrel;
+    //a3 = poly_aa*rrel;
+    //a4 = poly_bb*log(rrel);
+	//printf("\n");
+	//printf("----------\n");
+    //printf("### aa) a1,a2,a3,a4 %2.5f %2.5f %2.5f %2.5f SUM %2.5f\n",a3,a2,a1,a4,a1+a2+a3+a4);
+    //a1 = a1*faktor_energy_atom*-alat_lattice/faktor_energy_cell;
+    //a2 = a2*faktor_energy_atom*-alat_lattice/faktor_energy_cell;
+    //a3 = a3*faktor_energy_atom*-alat_lattice/faktor_energy_cell;
+    //a4 = a4*faktor_energy_atom*-alat_lattice/faktor_energy_cell;
+    //printf("### bb) a1,a2,a3,a4 %2.5f %2.5f %2.5f %2.5f SUM %2.5f\n",a3,a2,a1,a4,a1+a2+a3+a4);
+    eev1 = -(0.5*poly_dd/(rrel*rrel)) - poly_cc/rrel + poly_aa*rrel + poly_bb*log(rrel); // - poly_0;
+    //eev2 = eev1*-alat_lattice/faktor_energy_cell;
+    eev2 = eev1*alat_lattice/faktor_energy_cell;
+	//printf("--> eev1 (the real eev1 in eV/angstrom) %2.16f \n",eev1);
+    // written to out_positions_forces.dat: forces: force[j].z/1.602176e-9
+    // with forces[j] = fx = (x/r)*f;  # where f = eev2
     f_e.v2 = eev2;
+	//printf("--> eev2 %2.16f \n",eev2);
+	//printf("--> eev2*-alat_lattice! %2.16f \n",eev2*-alat_lattice);
 	//if (D_par*dumm1*dumm1*faktor_energy_atom > 0.3) {exit(1);};
 	//
 	// can be commented in
@@ -1748,24 +1772,36 @@ struct twodouble michaelpoly3_forces_energy(double r) {
 	//
 	//
 		    // reassign
-		    //f = fpoly;
+		    //f = force;
 		    //u_la+=eev2;
 		    // SOME ANALYSIS (can be commented in)
 		    // SOME ANALYSIS (can be commented in)
 		    // SOME ANALYSIS (can be commented in)
-		    //if (f*f*faktor_force*faktor_force > faktor_analysis) {
+            //double faktor_analysis;
+	        ////faktor_analysis = 4.8;
+		    ////if (f*f*faktor_force*faktor_force > faktor_analysis) {
             //    //req = (alat_lattice/sqrt(2.))/da0_alat_lattice;
-		    //    printf("\n");
-            //    printf("--> rm: %5.10f (in    angstrom = rang)\n",rang);
-            //    printf("--> rm: %5.10f (in    angstrom = rrel)\n",rrel);
-            //    printf("-->drm: %5.10f (r-req angstrom)\n",(r-req)*da0_alat_lattice);
-            //    printf("--> fp: %5.10f (in eV/angstrom)\n",f*faktor_force);
-            //    printf("\n");
+            //    //if (rang < 2.8991378) {
+            //    if (rang < 5.3) {
+            //    printf("--> rangxx         : %5.10f (in    angstrom)\n",rang);
+            //    printf("--> r*da0_alat...  : %5.10f (in    angstrom)\n",r*da0_alat_lattice);
+            //    printf("--> req*da0_alat...: %5.10f (in    angstrom)\n",req*da0_alat_lattice);
+            //    printf("--> (r-req)*da0_...: %5.10f (r-req angstrom)\n",(r-req)*da0_alat_lattice);
+            //    printf("--> rrel           : %5.10f (in rel coords)\n",rrel);
+            //    double f_ev_ang;
+            //    f_ev_ang = force/1.602e-9;
+            //    printf("--> force/1.602e-9 : %5.10f (in eV/angsrom)\n",f_ev_ang);
+            //    printf("--> force/1.602e-9 in x-dir in case of displacement along (110): %5.10f (in eV/angsrom)\n",sqrt(f_ev_ang*f_ev_ang/2));
 		    //    printf("--> eev1 %2.16f \n",eev1);
 		    //    printf("--> eev2 %2.16f \n",eev2);
 		    //    printf("--> eev1*-alat_lattice! %2.16f \n",eev1*-alat_lattice);
 		    //    printf("--> eev2*-alat_lattice! %2.16f \n",eev2*-alat_lattice);
+		    //    printf("--> eev2*faktor_energy_atom %2.16f \n",eev2*faktor_energy_atom);
+		    //    printf("--> a1,a2,a3,a4 %2.5f %2.5f %2.5f %2.5f \n",a1,a2,a3,a4);
 		    //    printf("--> ep: %2.16f (in eV for this bond = Poly energy)\n",eev2*faktor_energy_cell);
+            //    };
+                //printf("--> fp: %5.10f (in eV/angstrom)\n",f*faktor_force);
+            //    printf("\n");
 		    //    //printf("--> ep: %2.16f (in eV for this bond = Morse energy)\n",D_par*dumm1*dumm1*faktor_energy_cell);
 		    //    //
 		    //    // eev1*-alat_lattice = 0.894 != eev2*faktor_energy_cell
@@ -1909,6 +1945,8 @@ void calculate_forces_energy_la_from_simplelist(double dt,int verbose) {
     double x,y,z,r,f,e,fx,fy,fz;
     struct twodouble f_e;
     set_forces_energy_zero();
+    //printf("\n");
+    //printf("new step\n");
     for (i=0;i<atoms*20;i++) {  // Max 40 neighbors
         ind1=nn1[i].at1;
         ind2=nn1[i].at2;
@@ -1945,6 +1983,7 @@ void calculate_forces_energy_la_from_simplelist(double dt,int verbose) {
         fx = (x/r)*f;  // doing this saves 20% of computational time
         fy = (y/r)*f;  // doing this saves 20% of computational time
         fz = (z/r)*f;  // doing this saves 20% of computational time
+        //printf("--fx: %5.10f",fx/1.602176e-9);
 
         ////// calculate forces explicitly for writing out
         force[ind1].x+=fx;	//in N
@@ -1973,7 +2012,7 @@ void calculate_forces_energy_la_from_simplelist(double dt,int verbose) {
     u_la=u_la+u_la_tox;
 }
 
-void calculate_forces_energy_la(double dt,int verbose) {
+void calculate_forces_energy_la_NOW_USE_FROM_SIMPLELIST(double dt,int verbose) {
     // dies funktioniert zur zeit nur wenn interne coordinated von der init(T)
     // genutzt werden und nicht bei readpos generell (was es aber soll!)
 	int i,j,i1,i2,i3,j1,j2,j3,steps,ind1,ind2;
@@ -2631,7 +2670,7 @@ void preequilibration_if_no_readpos(double dt, int read_pos,FILE *file_out_temp,
         printf("... preequilibration start (depending on cellsize...) using %d steps on timestep of 1fs or below: %2.16f\n",preeq,dt_preeq);
         for (i=0;i<preeq;i++) {
 
-            calculate_forces_energy_la(dt_preeq,0);
+            calculate_forces_energy_la_from_simplelist(dt_preeq,0);
             if (read_hesse==1) {calculate_forces_energy_hesse(hessemat);}
             if (evolve_md_on_hesse==1) {forcesharm_to_velocities(dt_preeq);}
             else {forces_to_velocities(dt_preeq);}
@@ -2914,6 +2953,9 @@ int main(int argc,char *argv[]){
             printf("/////      MODEL: poly_bb %3.8f \n",poly_bb);
             printf("/////      MODEL: poly_cc %3.8f \n",poly_cc);
             printf("/////      MODEL: poly_dd %3.8f \n",poly_dd);
+            printf("/////      MODEL: poly_ee %3.8f \n",poly_ee);
+            printf("/////      MODEL:   ktr_tox %3.8f \n",ktr_tox);
+            printf("/////      MODEL: poly_rcut %3.8f \n",poly_rcut);
         };
         if (michael_poly_yes_no == 0) {
             if (ktr_tox == 0.0)   {printf("/////      MODEL:LA       \n");};
@@ -2925,14 +2967,15 @@ int main(int argc,char *argv[]){
         write_out_analyze_positions_distances_from_equilibrium_xyzmean();};
 
         printf("Energy std (DFT-H)   : %6.4f meV/atom (works in general )\n",dudl[zeitschritte-1].dudl_dft_harm_std);
-        printf("Energy std (DFT-LA)  : %6.4f meV/atom (works in general lon and tox)\n",dudl[zeitschritte-1].dudl_dft_la_std);
+        printf("Energy std (DFT-LA)  : %6.6f meV/atom (works in general lon and tox, eq. to michael)\n",dudl[zeitschritte-1].dudl_dft_la_std);
         printf("\n");
         //printf("Forces std <DFT-H>   : %6.3f (eV/A) delta angle degree: \n",sqrt(fdudl_dft_harm_av*1000.));
         printf("Forces std <DFT-H>   : %6.5f (eV/A)\n",sqrt(fdiff_dft_harm_av));
-        printf("Forces std <DFT-LA>  : %6.5f (eV/A)\n",sqrt(fdiff_dft_la_av));
+        printf("Forces std <DFT-LA>  : %6.6f (eV/A) (ddof = 0)\n",sqrt(fdiff_dft_la_av));
+        printf("Forces std <DFT-LA>  : %6.6f (eV/A) (ddof = 1)\n",sqrt(fdiff_dft_la_av));
         printf("Forces std <DFT>     : %6.5f (eV/A) (this inly considers DFT forces)\n",sqrt(fstd_dft));
         printf("Forces std <LA>      : %6.5f (eV/A) (this only considers LA  forces)\n",sqrt(fstd_la));
-        printf("pearson correlation F: %6.5f (between LA and DFT)\n",fcov_dft_la/(sqrt(fstd_dft)*sqrt(fstd_la)));
+        printf("pearson correlation F: %6.6f (between LA and DFT)\n",fcov_dft_la/(sqrt(fstd_dft)*sqrt(fstd_la)));
         printf("\n");
         printf("Energy dudl (DFT-H)  : %6.4f meV/atom (works in general )\n",dudl_dft_harm_av);
         printf("Energy dudl (DFT-LA) : %6.4f meV/atom (works in general lon and tox)\n",dudl_dft_la_av);
@@ -2996,7 +3039,7 @@ int main(int argc,char *argv[]){
             //printf("\n");
             //printf("----> i: %d %d\n",i,zeitschritte);
 
-            calculate_forces_energy_la(dt,verbose);
+            calculate_forces_energy_la_from_simplelist(dt,verbose);
             //printf("----> j:\n");
             //if (read_hesse==1) {calculate_forces_energy_hesse(hessemat);}
             if (evolve_md_on_hesse==1) {forcesharm_to_velocities(dt);}

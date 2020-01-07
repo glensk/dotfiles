@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import myutils
+import os
+from subprocess import check_output,call
+from datetime import datetime as datetime   # datetime.datetime.now()
 
 # lammps_pos_to_sum.py bcc 6 3.253 4 4 4 50   # dominiques job; 6sc ; timestep 1fs; jeden 50 schritt ausgegeben; 3.253 alat;
 # nun versucht mit ~/Thermodynamics/python_thermodynamics/phonon_lifetimes.py -s bcc -n 6 -dt 50 -a 3.253 -fftpy
@@ -24,10 +26,51 @@ import myutils
 ##########################################################################################
 import argparse
 import textwrap
-import future
+#import future
 #from argparse import ArgumentDefaultsHelpFormatter
 class MyDescriptiveError(Exception):
     pass
+
+
+def create_READMEtxt(directory=False,add=False):
+    ''' wiretes a README.txt file '''
+    if directory == False:
+        directory = os.getcwd()
+    # get sha
+    pwd = os.getcwd()
+    os.chdir(os.environ['scripts'])
+    sha = check_output(["git","rev-parse","master"]).decode('utf-8')
+    os.chdir(pwd)
+
+    # get time
+    time_now = datetime.now()
+
+    # name of RADME
+    filepath = directory+'/README_'+time_now.strftime("%Y-%m-%d_%H:%M:%S")+'.txt'
+
+    # write README.txt
+    strout=os.path.basename(sys.argv[0])+" "+" ".join(sys.argv[1:])
+    with open(filepath, "w") as text_file:
+        text_file.write("# using https://github.com/glensk/dotfiles/trunk/scripts\n")
+        text_file.write("# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts\n")
+        text_file.write("# used sha: "+sha) #+"\n")
+        text_file.write("# execution time: "+str(time.time() - start_time)+" seconds.")
+        text_file.write("\n")
+        if add:
+            print('add')
+            print(type(add))
+            if type(add) == str:
+                text_file.write(add+"\n")
+            elif type(add) == list:
+                for i in add:
+                    text_file.write(i+"\n")
+        text_file.write("\n")
+        text_file.write(strout+"\n")
+
+    print()
+    print('written ',filepath)
+    print()
+    return filepath
 
 def my_exit():
     raise MyDescriptiveError()
@@ -10990,7 +11033,7 @@ if __name__ == '__main__':
     print()
 
     ### make README
-    myutils.create_READMEtxt(os.getcwd())
+    create_READMEtxt(os.getcwd())
 
     for idxfolder,folder_in in enumerate(folder_all):
         os.chdir(folder_in)
