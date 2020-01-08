@@ -3084,11 +3084,15 @@ def n2p2_runner_job_finished(inputnn):
         return False
     return False
 
-def n2p2_runner_get_bestteste_idx(inputnn):
-    #print('inputnn',inputnn)
+def n2p2_runner_get_bestteste_idx(inputnn,verbose=False):
+    if verbose:
+        print('inputnn',inputnn)
     job_finished = n2p2_runner_job_finished(inputnn)
+    if verbose:
+        print('job_finished',job_finished)
     best_testsete_file = inputnn.replace('input.nn', 'best_testsete')
-    #print('best_testsete_file',best_testsete_file)
+    if verbose:
+        print('best_testsete_file',best_testsete_file)
     if os.path.isfile(best_testsete_file):
         best_testsete = int(np.loadtxt(best_testsete_file))
         #print('from best_testsete_file',best_testsete_file)
@@ -3096,7 +3100,9 @@ def n2p2_runner_get_bestteste_idx(inputnn):
     else:
         #print('from lc')
         learning_curve = lc = n2p2_runner_get_learning_curve(inputnn)
-        if lc == False:
+        if verbose:
+            print('lc',lc)
+        if type(lc) == bool:
             return False
         best_testsete = np.argmin(lc[:,2])
         if job_finished:

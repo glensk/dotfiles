@@ -700,7 +700,6 @@ def get_energies(args):
                             verbose=args.verbose)
             ace.lammps = args.lmp
             ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
-            sys.exit('666666666666666')
             if args.testkmc or args.testkmc_b or args.testkmc_l or args.testkmc_a:
                 kmc_file = kmc_folder+"/ene_std_epoch_"+str(use_epoch)+".dat"
                 if os.path.isfile(kmc_file):
@@ -1007,8 +1006,12 @@ def get_energies(args):
                 f_tmp = copy.deepcopy(frames[i])
                 f_atoms = f_tmp.get_number_of_atoms()
                 ene_DFT[idx],ene_DFT_eV_cell[idx] = my.ase_enepot(frames[i],units=ace.units)
-                #print('ene_DFT        ',ene_DFT[idx])
-                #print('ene_DFT_eV_cell',ene_DFT_eV_cell[idx])
+                # this is only of interest for thermodynamic integration.
+                if verbose > 2: #be_very_verbose:
+                    print('ene_DFT        ',idx,ene_DFT[idx])
+                    print('ene_DFT_eV_cell[idx]',idx,ene_DFT_eV_cell[idx])
+                    print('ene_DFT_eV_cell[0]',idx,ene_DFT_eV_cell[0])
+                print('idxxx',idx,f_atoms)
                 ene_DFT_m0[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
                 #sys.exit()
                 if verbose > 2: #be_very_verbose:
@@ -1062,7 +1065,17 @@ def get_energies(args):
                     ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
                     ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
                     dudl_pot_to_DFT[idx]   = ene_DFT_m0[idx] - ene_pot_m0[idx]
-                    dudlav_pot_to_DFT[idx] = np.mean(dudl_pot_to_DFT[:idx])
+                    print('vor',idx)
+                    #print('vv0',ene_pot_eV_cell)
+                    #print('vv1',ene_DFT_m0) # first element is 0
+                    #print('vv2',ene_pot_m0) # first element is 0
+                    #print('vv',dudl_pot_to_DFT)
+                    #sys.exit()
+                    if idx == 0:
+                        dudlav_pot_to_DFT[idx] = 0
+                    else:
+                        dudlav_pot_to_DFT[idx] = np.mean(dudl_pot_to_DFT[:idx])
+                    print('nach',idx)
                     #print('ene_pot_m0   ',ene_pot_m0[idx])
                     if args.get_harmonic_energy:
                         #print('hm')
