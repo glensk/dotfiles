@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 4693cc751f810076dfc97c1f7aa653c26c349e4a
+# execution time: 0.0172989368439 seconds.
+
+getEnergies_byLammps.py --units meV_pa -p n2p2_v5ag_ppl_98765_21cores -i ../OQMD-Distorted_scf -fi runner -v

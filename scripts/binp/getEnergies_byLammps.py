@@ -868,7 +868,7 @@ def get_energies(args):
                     sys.exit()
             except:
                 all_comment = ""
-            if verbose: # > 1:
+            if verbose > 1:
                 print('idxuu (11)',idx,'uuid:',uuid)
             if debug:
                 print('iii',i)
@@ -1014,7 +1014,10 @@ def get_energies(args):
                     print('ene_DFT_eV_cell[idx]',idx,ene_DFT_eV_cell[idx])
                     print('ene_DFT_eV_cell[0]',idx,ene_DFT_eV_cell[0])
                 #print('idxxx',idx,f_atoms)
-                ene_DFT_m0[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
+                if f_atoms > 1:
+                    ene_DFT_m0[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
+                else:
+                    ene_DFT_m0[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms)*1000.
                 #sys.exit()
                 if verbose > 2: #be_very_verbose:
                     my.show_ase_atoms_content(frames[i],showfirst=3,comment = "STAT2")
@@ -1065,7 +1068,10 @@ def get_energies(args):
                     f_tmp = copy.deepcopy(atoms_tmp)
                     f_atoms = f_tmp.get_number_of_atoms()
                     ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
-                    ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
+                    if f_atoms > 1:
+                        ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
+                    else:
+                        ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms)*1000.
                     dudl_pot_to_DFT[idx]   = ene_DFT_m0[idx] - ene_pot_m0[idx]
                     #print('vv0',ene_pot_eV_cell)
                     #print('vv1',ene_DFT_m0) # first element is 0
@@ -1369,7 +1375,7 @@ def get_energies(args):
                         print(dudlav)
                         fah.get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms)
                 return
-            if verbose: # > 1:
+            if verbose > 1:
                 print('idxuu (88)',idx,'uuid:',uuid)
             if idx in range(0,structures_to_calc,printevery):
                 printhere()

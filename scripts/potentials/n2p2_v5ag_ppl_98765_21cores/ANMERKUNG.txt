@@ -45,4 +45,4 @@ cat OQMD-Distorted_scf >> aiida_exported_group_Al6xxxDB_structures_calc__all_ste
 
 --> 5495 structures
 
-removed from daniels OQMC data: 5556d592-7d33-44b3-ad32-be232e82fb2b which had only one al atom.
+removed from daniels OQMC data: 5556d592-7d33-44b3-ad32-be232e82fb2b which had only one al atom and 451e8afd-e2a6-444b-b99a-fef23661f11c
