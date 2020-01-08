@@ -868,13 +868,15 @@ def get_energies(args):
                     sys.exit()
             except:
                 all_comment = ""
+            if verbose: # > 1:
+                print('idxuu (11)',idx,'uuid:',uuid)
             if debug:
                 print('iii',i)
             ana_atoms_ = frames[i].get_number_of_atoms()
             if debug:
                 print('ama_atoms_',ana_atoms_)
             if verbose > 2:
-                print('i',i,'ana_atoms',ana_atoms_)
+                print('i',i,'ana_atoms',ana_atoms_,'uuid',uuid)
             try:
                 DFT_forces = frames[i].get_forces()
                 for_DFTmax_ = np.abs(DFT_forces).max()
@@ -1011,7 +1013,7 @@ def get_energies(args):
                     print('ene_DFT        ',idx,ene_DFT[idx])
                     print('ene_DFT_eV_cell[idx]',idx,ene_DFT_eV_cell[idx])
                     print('ene_DFT_eV_cell[0]',idx,ene_DFT_eV_cell[0])
-                print('idxxx',idx,f_atoms)
+                #print('idxxx',idx,f_atoms)
                 ene_DFT_m0[idx] = (ene_DFT_eV_cell[idx] - ene_DFT_eV_cell[0])/(f_atoms-1.)*1000.
                 #sys.exit()
                 if verbose > 2: #be_very_verbose:
@@ -1065,7 +1067,6 @@ def get_energies(args):
                     ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
                     ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
                     dudl_pot_to_DFT[idx]   = ene_DFT_m0[idx] - ene_pot_m0[idx]
-                    print('vor',idx)
                     #print('vv0',ene_pot_eV_cell)
                     #print('vv1',ene_DFT_m0) # first element is 0
                     #print('vv2',ene_pot_m0) # first element is 0
@@ -1075,7 +1076,6 @@ def get_energies(args):
                         dudlav_pot_to_DFT[idx] = 0
                     else:
                         dudlav_pot_to_DFT[idx] = np.mean(dudl_pot_to_DFT[:idx])
-                    print('nach',idx)
                     #print('ene_pot_m0   ',ene_pot_m0[idx])
                     if args.get_harmonic_energy:
                         #print('hm')
@@ -1198,14 +1198,14 @@ def get_energies(args):
                 print("AAcc lmp")
             if lmp == True:  ### ene from lammps (by writing lammps files)
                 atoms_tmp = copy.deepcopy(frames[i])  # for other instances, since atoms change when geoopt
-                ene_pot_lmp[idx] = my.lammps_ext_calc(atoms_tmp,ace)
-                if verbose:
+                ene_pot_lmp_eV_cell,ene_pot_lmp[idx] = my.lammps_ext_calc(atoms_tmp,ace)
+                if verbose > 2:
                     print("ENE DFT   :",i,ene_DFT[idx],ace.units)
                     print("ENE ase   :",i,ene_pot_ase[idx],ace.units)
                     print("ENE lammps:",i,ene_pot_lmp[idx],ace.units)
                     print("--------------------------------------")
                 ene_diff_lam_ase[idx] = ene_pot_ase[idx] - ene_pot_lmp[idx]
-                if verbose:
+                if verbose > 2:
                     print("DIFF      :",i,ene_diff_lam_ase[idx],ace.units)
                     print("--------------------------------------")
                     print("--------------------------------------")
@@ -1359,17 +1359,18 @@ def get_energies(args):
                             energies_lambda_1_eV_cell=ene_pot_eV_cell,
                             number_of_atoms=32,
                             align_lambda_0_first_to_lambda_1_yes_no=True)
-                    dudlav = fah.get_dudlav_from_dudl(dudl)
-                    print('dudl')
-                    print(dudl)
-                    print('dudlav')
-                    print(dudlav)
-                    fah.get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms)
-                    sys.exit('56859')
-
+                    #print('dudl')
+                    #print(dudl)
+                    if len(dudl) > 0:
+                        dudlav = fah.get_dudlav_from_dudl(dudl)
+                        print('dudl')
+                        print(dudl)
+                        print('dudlav')
+                        print(dudlav)
+                        fah.get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms)
                 return
-
-
+            if verbose: # > 1:
+                print('idxuu (88)',idx,'uuid:',uuid)
             if idx in range(0,structures_to_calc,printevery):
                 printhere()
                 printed = True

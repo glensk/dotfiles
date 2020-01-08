@@ -2519,12 +2519,11 @@ def get_LAMMPS_executable(exit=True,verbose=False):
 
 def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ''' atoms is an ase atoms object which can hold several frames, or just one'''
-
     ###############################################################
     # find LAMMPS executable
     ###############################################################
-    if ace.verbose:
-        print("get_elastic_constants",get_elastic_constants)
+    if ace.verbose > 2:
+        print("lammps_ext_calc (1): get_elastic_constants",get_elastic_constants)
 
     ###############################################################
     # make ace.pot.lammps_tmpdir (/home/glensk/._tmp_lammps/)
@@ -2544,7 +2543,8 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         except Exception as e:
             print(e)
 
-    print('doing the calculation in lammps, externally, in ace.pot.lammps_tmpdir',ace.pot.lammps_tmpdir)
+    if ace.verbose > 2:
+        print('lammps_ext_calc (2) doing the calculation in lammps, externally, in ace.pot.lammps_tmpdir',ace.pot.lammps_tmpdir)
 
     ###############################################################
     # write input structure (pos.lmp)
@@ -2563,18 +2563,18 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
     else:
         sys.exit('44323 Error: dont know how to write this lammps file')
-    if ace.verbose:
-        print('written ',ace.pot.lammps_tmpdir+'/pos.lmp')
+    if ace.verbose > 2:
+        print('lammps_ext_calc (3) written ',ace.pot.lammps_tmpdir+'/pos.lmp')
     ###############################################################
     # write in.lmp (for mormal energy calculation)
     ###############################################################
     if not get_elastic_constants:
         lammps_in_file = 'in.lmp'
         lammps_write_inputfile(folder=ace.pot.lammps_tmpdir,filename=lammps_in_file,positions='pos.lmp',ace=ace)
-        if ace.verbose:
-            print('written ',ace.pot.lammps_tmpdir+'/'+lammps_in_file)
-    if ace.verbose > 1:
-        print("written lammsp inputfile to ",ace.pot.lammps_tmpdir)
+        if ace.verbose > 2:
+            print('written (77) ',ace.pot.lammps_tmpdir+'/'+lammps_in_file)
+    if ace.verbose > 2:
+        print("lammps_ext_calc (4) written lammsp inputfile to ",ace.pot.lammps_tmpdir)
 
     ### calculate with lammps (trigger externally)
     ene = False
@@ -2587,32 +2587,37 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
     ###############################################################
     if get_elastic_constants:
         lammps_in_file = 'in.elastic'
-        if ace.verbose:
+        if ace.verbose > 2:
             print('written ',ace.pot.lammps_tmpdir+'/potential.mod')
         lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='potential.mod',command=lammps_ext_elastic_potential_mod(ace))
         cp(scripts()+'/lammps_scripts/elastic/in.elastic',ace.pot.lammps_tmpdir+'/in.elastic')
         cp(scripts()+'/lammps_scripts/elastic/displace.mod',ace.pot.lammps_tmpdir+'/displace.mod')
         lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='init.mod',command=lammps_ext_elastic_init_mod(ace,positions='pos.lmp'))
-        if ace.verbose:
+        if ace.verbose > 2:
             print('written ',ace.pot.lammps_tmpdir+'/'+lammps_in_file)
 
     ###############################################################
     # cd to folder and run lammps
     ###############################################################
+    if ace.verbose > 2:
+        print('lammps_ext_calc (5) cd ..')
     with cd(ace.pot.lammps_tmpdir):  # this cd's savely into folder
         # RUN LAMMPS
         # without SHELL no LD LIBRARY PATH
         #print('pwd',os.getcwd())
-        if ace.verbose:
-            print(ace.LAMMPS_COMMAND+" < "+lammps_in_file+" > /dev/null")
+        if ace.verbose > 2:
+            print('lammps_ext_calc (6)',ace.LAMMPS_COMMAND+" < "+lammps_in_file+" > /dev/null")
         call([ace.LAMMPS_COMMAND+" < "+lammps_in_file+" > /dev/null"],shell=True)
 
         ###############################################################
         # extract energy and forces
         ###############################################################
         if not get_elastic_constants:
-            print('pwd',os.getcwd())
+            if ace.verbose > 2:
+                print('lammps_ext_calc (7) pwd',os.getcwd())
             ene = check_output(["tail -300 log.lammps | grep -A 1 \"Step Temp E_pai\" | tail -1 | awk '{print $3}'"],shell=True).strip()
+            if ace.verbose > 2:
+                print('lammps_ext_calc (8) ene from grep:',ene,'(eV/cell)')
             ene=float(ene)
             ene_ev_cell = deepcopy(ene)
             #print('ene',ene,'lammps in eV')
@@ -2663,7 +2668,9 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             #sys.exit('ec')
             ene = ace.elastic_constants
 
-    if ace.verbose: # > 2:
+    if ace.verbose > 2:
+        print('lammps_ext_calc (9) ene final:',ene,"chosen units")
+    if ace.verbose > 2:
         show_ase_atoms_content(atoms,showfirst=10,comment="LAMMPS EXTERNALLY")
     #print('eneneee',ene_ev_cell,ene)
     #sys.exit()
@@ -4865,8 +4872,6 @@ class ase_calculate_ene( object ):
             print("UUA vol:",atoms.get_volume())
             print("UUA vpa:",atoms.get_volume()/atoms.get_number_of_atoms())
 
-        if self.verbose > 1:
-            print('ZZ done243')
 
         if self.verbose > 1:
             print('ZZ done236')
@@ -4875,7 +4880,12 @@ class ase_calculate_ene( object ):
         # calculate the energy
         ######################################################
         #print('atxxx',atoms)
+        ene1 = atoms.get_potential_energy()
+        if self.verbose > 1:
+            print('ZZ done237',ene1)
         ene,ene_ev_tot = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        if self.verbose > 1:
+            print('ZZ done238')
         #print('self.units:',self.units,'ene pot',ene,'ene_ev_tot',ene_ev_tot)
         #print('jo')
         if print_minimization_to_screen:
@@ -6488,12 +6498,12 @@ def show_ase_atoms_content(atoms,showfirst=10,comment = ""):
     print('## atoms')
     print(atoms)
     print('## atoms.get_number_of_atoms()',atoms.get_number_of_atoms())
-    #print(atoms.positions)
+    print('atoms.get_positions[fistsome]')
     print(atoms.get_positions()[:showfirst])
     print('## elements get_chemical_symbols()')
     print(atoms.get_chemical_symbols()) #[:showfirst])
     print(list(set(atoms.get_chemical_symbols())))
-    print('## atoms.cell')
+    print('## atoms.cell (in angstrom)')
     print(atoms.cell)
     print('## aa.get_cell_lengths_and_angles()')
     print(atoms.get_cell_lengths_and_angles())

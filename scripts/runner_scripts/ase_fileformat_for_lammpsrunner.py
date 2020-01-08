@@ -481,7 +481,7 @@ def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True,pot
         for i_12_13_14 in unique_species:
             species_element = key_list[val_list.index(i_12_13_14)]
             nr = pot.atom_types[species_element]
-            print('i',i_12_13_14,species_element,'nr',nr)
+            #print('i',i_12_13_14,species_element,'nr',nr)
             species_runner[species_runner == i_12_13_14] = nr
         #species_runner[species_runner == 12] = 1
         #species_runner[species_runner == 13] = 2
