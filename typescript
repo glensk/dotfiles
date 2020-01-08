@@ -730,4 +730,7 @@ myhost generalrc_.sh in2:cosmopc:
  113  out_reference_rep.runner_calc                                                                      albert.glensk@gmail.com
  114  OQMD-Distorted_scf                                                                                 daniel.marchand@epfl.ch[0m
 [1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J(aiida) [35m17:24:59[00m [32mglensk@cosmopc15[00m [32m/local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new[00m 
-%[K[?1h=[?2004h
+%[K[?1h=[?2004h[32me[39m[38;5;239mxit[39m[32me[32mx[39m[1m[31me[1m[31mx[1m[31mi[0m[39m[0m[32me[0m[32mx[0m[32mi[32mt[39m[?1l>[?2004l
+Connection to cosmopc15.epfl.ch closed.
+]6;1;bg;red;brightness;255]6;1;bg;green;brightness;0]6;1;bg;blue;brightness;255[1m[7m%[27m[1m[0m                                                                                         [0m[27m[24m[J[35m18:12:42[00m [35mglensk@mac[00m [35m/Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/binp[00m 
+%[K[?2004h[1m[31m,[0m[39m[1m[31m,[1m[31m,[0m[39m
