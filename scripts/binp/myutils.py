@@ -1042,11 +1042,11 @@ class mypot( object ):
             self.pot     = self.pot_all_dict[self.potpath_in][2]
         except:
             # here only a relative path or something like this has been specified as ../ or . or ./
-            print('seems like a relative path ....')
+            #print('seems like a relative path ....')
             self.potpath = os.path.abspath(self.potpath_in)
             self.pot     = os.path.basename(self.potpath_in)
-            print('self.potpath',self.potpath)
-            print('self.pot    ',self.pot)
+            #print('self.potpath',self.potpath)
+            #print('self.pot    ',self.pot)
         self.get_pottype_elements_and_atomic_energies()  # defines self.pottype if not defined
 
 
@@ -2982,10 +2982,10 @@ def n2p2_check_SF_inputnn(inputnn):
 def n2p2_runner_get_learning_curve(inputnn,only_get_filename=False,verbose=False):
     ''' filename is path to log.fit (runner) or learning-curve.out '''
     verbose=True
-    if verbose:
+    if verbose > 2:
         print('myutils.py (7) inputnn',inputnn)
     filename = n2p2_runner_get_learning_curve_filename(inputnn)
-    if verbose:
+    if verbose > 2:
         print('myutils.py (7) learning_curve_filename:',filename)
     if filename == False:
         return False
@@ -4151,20 +4151,29 @@ def ase_enepot(atoms,units='eV',verbose=False):
     if verbose > 1:
         print('ene eV',ene,"(not per atom)")
     units_split = units.split("_")
-    #print('us',units_split,units_split[1])
-    if units_split[0].lower() == 'ev':
+    einheit = units_split[0].lower()
+    #print('us1  :',units_split) #,units_split[1])
+    #print('uslen:',len(units_split)) #,units_split[1])
+    #print('einheit1:',einheit)
+    if len(units_split) > 2:
+        print('us',units_split) #,units_split[1])
+        sys.exit('len of units should not be > 2!')
+    #print('einheit',einheit)
+    #print('ene1 (eV)',ene)
+    if einheit == 'ev':
         ene_units = ene
-    elif units_split[0].lower() == 'mev':
+    elif einheit == 'mev':
         ene_units = ene*1000.
-    elif units_split[0] == "hartree" or units_split[0] == "Hartree":
+    elif einheit == "hartree":
         ene_units = ene/aseunits.Hartree
+    #print('ene_units (in einheit)',einheit,ene_units)
 
     if len(units_split) == 2:
         if units_split[1] == 'pa':
-            ene_units = ene/atoms.get_number_of_atoms()
+            ene_units = ene_units/atoms.get_number_of_atoms()
         else:
             sys.exit("energy can not have this units (ending must be pa, eV_pa or hartree_pa)")
-    #print('ene2:',ene)
+    #print('ene_units (in einheit)',einheit,ene_units)
     return ene_units, ene
 
 def ase_get_chemical_symbols_to_number_of_species(atoms,known_elements_by_pot=[]):
