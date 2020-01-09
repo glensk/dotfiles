@@ -6263,6 +6263,7 @@ def get_Mg5Si6_and_other_antisites(ace):
     return
 
 def ase_repeat_structure(atoms,repeat):
+    ''' only repeats cubically; e.g. repeat = 2 repeats the cell 2x2x2'''
     atomsc = atoms.repeat(repeat)
     cell_o = atoms.get_cell()
     cell_n = cell_o * repeat
@@ -6308,6 +6309,33 @@ def ase_repeat_structure(atoms,repeat):
     #print(atomsc.get_positions()[:5])
     #sys.exit()
     return atomsc,for_n
+
+def ase_repeat_structure_using_listrepeat(atoms,ene_DFT,givenunits,listrepeat=[[1,1,5], [2,3,4], [4,12,3], [13,70,2]]):
+    ''' listrepeat = [ [2,3,4], [4,12,3], [13,70,2]] means that
+    structures having 1     atoms will be repeated 5^3 times == 5x5x5 = 125 times (125 atoms)
+    structures having 2-3   atoms will be repeated 4^3 times == 4x4x4 = 64 times  (128-192 atoms)
+    structures having 4-12  atoms will be repeated 3^3 times == 3x3x3 = 27 times  (108-324 atoms)
+    structures having 13-70 atoms will be repeated 2^3 times == 2x2x2 = 8 times   (104-560 atoms)
+    you can specify different listrepeats to make this more fine grained
+    ene_DFT is the DFT energy of the cell
+    '''
+    nat = atoms.get_number_of_atoms()
+    repeat = 0
+    if nat == 1: repeat = 5         # *125  at = 125
+    for rp in listrepeat:
+        if rp[0] <= nat <= rp[1]: repeat = rp[2]
+    #if 2 <= nat <= 3: repeat = 4    # *64   at = 124 - 256
+    #if 4 <= nat <= 10: repeat = 3    # *27   at = 135 - 270
+    #if 11 <= nat <= 40: repeat = 2   # *8    at = 99 -
+    #if nat > 40: reppeat = False
+    if repeat > 0:
+        atoms_sc,forces_sc = my.ase_repeat_structure(atoms,repeat)
+        ene_sc_ev = my.convert_energy(ene_DFT*repeat**3.,givenunits,"ev",nat)
+    else:
+        atoms_sc = copy.deepcopy(atoms)
+        forces_sc = atoms_sc.get_forces()
+        ene_sc_ev = my.convert_energy(ene_DFT,givenunits,"ev",nat)
+    return atoms_sc, forces_sc, ene_sc_ev
 
 class ase_get_known_formats_class():
     """

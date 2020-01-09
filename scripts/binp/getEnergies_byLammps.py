@@ -1224,29 +1224,7 @@ def get_energies(args):
 
             ### write runner output
             if args.write_runner_repeated:
-                nat = frames[i].get_number_of_atoms()
-                listrepeat = [ [2,3,4], [4,10,3], [11,40,2] ]
-                listrepeat = [ [2,4,2] ]          # memorize_symfunc_results on
-                listrepeat = [ [2,4,3], [5,10,2]] # memorize_symfunc_results off
-                listrepeat = [ [2,3,4], [4,12,3], [13,36,2]] # memorize_symfunc_results off, minatoms 44
-                listrepeat = [ [2,3,4], [4,12,3], [13,70,2]] # memorize_symfunc_results off, minatoms 108
-                #listrepeat = [ [2,2,5], [3,4,4], [5,12,3], [13,70,2]] # memorize_symfunc_results off, minatoms 108
-                repeat = 0
-                if nat == 1: repeat = 5         # *125  at = 125
-                for rp in listrepeat:
-                    if rp[0] <= nat <= rp[1]: repeat = rp[2]
-                #if 2 <= nat <= 3: repeat = 4    # *64   at = 124 - 256
-                #if 4 <= nat <= 10: repeat = 3    # *27   at = 135 - 270
-                #if 11 <= nat <= 40: repeat = 2   # *8    at = 99 -
-                #if nat > 40: reppeat = False
-                if repeat > 0:
-                    atoms_sc,forces_sc = my.ase_repeat_structure(frames[i],repeat)
-                #print('ene',ene_DFT[idx],ace.units)
-                    ene_sc_ev = my.convert_energy(ene_DFT[idx]*repeat**3.,ace.units,"ev",nat)
-                else:
-                    atoms_sc = copy.deepcopy(frames[i])
-                    forces_sc = atoms_sc.get_forces()
-                    ene_sc_ev = my.convert_energy(ene_DFT[idx],ace.units,"ev",nat)
+                atoms_sc, forces_sc, ene_sc_ev = my.ase_repeat_structure_using_listrepeat(frames[i],ene_DFT[idx],ace.units,listrepeat=[[1,1,5],[2,3,4], [4,12,3], [13,70,2]])
                 ase_write(args.inputfile+".repeated",atoms_sc,format='runner',append=True,setforces_ase_units=forces_sc,setenergy_eV=ene_sc_ev)
 
                 # statistics
