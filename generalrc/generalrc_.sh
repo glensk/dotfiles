@@ -125,6 +125,8 @@ case $myhost in
 #    # pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
 #    # pip install --upgrade --user sklearn  # necessary for andreas soap stuff
 #    # pip install --upgrade --user plotly_express # to make nice scatterplots
+#    # pip install --upgrade --user pathlib # necessary for pip install ipython2 
+#    # pip install --upgrade --user ipython2 
 #
 #    fidis)     source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 #    helvetios) source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
@@ -137,10 +139,10 @@ case $myhost in
     helvetios) moduel load intel python/2.7.16;;
     #mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate  -> dont need it
 esac
-    # This would give me python 3 by default, quickly
-    #if [ "`command -v pyenv`" != "" ]; then 
-    #    eval "$(pyenv init -)"   # this loads python 3.7.5
-    #fi
+    # This would give me python 3 by default, quickly; uncomment it to get python2 by default
+    if [ "`command -v pyenv`" != "" ]; then 
+        eval "$(pyenv init -)"   # this loads python 3.7.5
+    fi
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
 ##############################################
