@@ -273,7 +273,8 @@ def get_energies(args):
 
 
     if args.pick_c44:
-        args.units = "meV_pa"
+        if args.units != "meV_pa":
+            sys.exit('for pick_c44 units have to be in meV_pa')
         args.verbose = True
 
 
@@ -303,7 +304,7 @@ def get_energies(args):
     print('getEne(p1) args.potepoch             :',args.potepoch)
     ace = ase_calculate_ene(potpath_in=args.potpath,
             use_epoch=args.potepoch,
-            units=units,
+            units=args.units,
             geopt=geopt,
             elastic=args.elastic,
             fqh_atoms_max = args.fqh_atoms_max,
@@ -531,7 +532,7 @@ def get_energies(args):
                 ace = ase_calculate_ene(
                         potpath_in=args.potpath,
                         use_epoch=epoch,
-                        units=units,
+                        units=args.units,
                         geopt=geopt,
                         elastic=args.elastic,
                         verbose=verbose)
@@ -694,7 +695,7 @@ def get_energies(args):
             # the ase_calculate_ene(...) changes the used epoch since mypot(...) is called
             ace = ase_calculate_ene(potpath_in=args.potpath,
                             use_epoch=use_epoch,
-                            units=units,
+                            units=args.units,
                             geopt=geopt,
                             elastic=args.elastic,
                             verbose=args.verbose)
@@ -735,7 +736,9 @@ def get_energies(args):
         print('ase                          :',args.ase)
         print('lmp                          :',args.lmp)
         print()
-        print('units                        :',args.units)
+        print('args.units                   :',args.units)
+        print('ace.units                    :',ace.units)
+
         print('geopt                        :',args.geopt)
         print()
         print('verbose                      :',args.verbose)
@@ -820,7 +823,6 @@ def get_energies(args):
         else:
             print('ace units',ace.units.split("_"),ace.units.split("_")[0].lower())
             sys.exit('ace units not known')
-
 
         #if True: #verbose > 1:
         #    print('kk',ace.pot.atom_energy)
@@ -1007,7 +1009,8 @@ def get_energies(args):
                     print("DD before ene_DFT")
                 f_tmp = copy.deepcopy(frames[i])
                 f_atoms = f_tmp.get_number_of_atoms()
-                ene_DFT[idx],ene_DFT_eV_cell[idx] = my.ase_enepot(frames[i],units=ace.units)
+                ene_DFT[idx],ene_DFT_eV_cell[idx] = my.ase_enepot(frames[i],units=args.units,verbose=True)
+                #print('ene_DFTxyz        ',idx,ene_DFT[idx])
                 # this is only of interest for thermodynamic integration.
                 if verbose > 2: #be_very_verbose:
                     print('ene_DFT        ',idx,ene_DFT[idx])
@@ -1252,14 +1255,6 @@ def get_energies(args):
             ene_diff_abs[idx] = np.abs(ene_DFT[idx]-ene_pot[idx])
             ene_mean[idx] = ene_diff[:idx+1].mean()
 
-            #NN_forces = frames[i].get_forces()
-            #forces_diff = DFT_forces - NN_forces
-            #print('nnn88')
-            #print(DFT_forces[:5])
-            #print()
-            #print(NN_forces[:5])
-            #sys.exit()
-
             if idx == 0:
                 ene_std[idx] = 0.
                 ene_ste[idx] = 0.
@@ -1275,6 +1270,7 @@ def get_energies(args):
 
             def printhere():
                 show = 4
+		#print('ace.units',ace.units)
                 # enough for meV_pa
                 if ace.units == "mev_pa":
                     show = 3
