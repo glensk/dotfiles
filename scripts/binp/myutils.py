@@ -22,11 +22,9 @@ from datetime import datetime as datetime   # datetime.datetime.now()
 import ase
 from ase import Atoms
 from ase.build import bulk as ase_build_bulk
-from ase.constraints import StrainFilter
 from ase.neighborlist import NeighborList, neighbor_list, NewPrimitiveNeighborList
-from ase.constraints import ExpCellFilter
 from ase.spacegroup import crystal
-from ase.constraints import StrainFilter
+from ase.constraints import StrainFilter, ExpCellFilter, UnitCellFilter
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase.optimize import BFGS
@@ -1893,8 +1891,8 @@ def create_al_sphere(a0=4.05,matrix_element="Al",cubic=True,ncell=4,nvac=1,cutof
     atomsc_sphere = ase_get_atoms(atomsc_fakevac,np.append(NN,[vacidx]))
     return atomsc_sphere
 
-def analyze_accuracy_of_filling_cell_with_Al(ace,ncell=3,nsi=3,nmg=3,nvac=1,a0=4.05,cubic=True,create_fake_vacancy=True):
-    atoms = get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="Al",cubic=cubic,create_fake_vacancy=create_fake_vacancy,whichcell="fcc",normal_ordering=True)
+def analyze_accuracy_of_filling_cell_with_Al(ace,ncell=3,nsi=3,nmg=3,nvac=1,a0=4.05,create_fake_vacancy=True):
+    atoms = get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi,nmg,nvac,a0,matrix_element="Al",cell='cubic',create_fake_vacancy=create_fake_vacancy,crystal_structure="fcc",normal_ordering=True)
     ele_list = atoms.get_chemical_symbols()
     print(ele_list,type(ele_list))
     import random
@@ -3645,7 +3643,7 @@ def load_POSITIONs_to_ase_frames(folder,matrix_element="Al"):
 
     #print('pos0')
     #print(pos0)
-    bulk = get_ase_atoms_object_kmc_al_si_mg_vac(sc,a0=alat,matrix_element=matrix_element,cubic=True,create_fake_vacancy=False,whichcell=cryst,normal_ordering=True,pos0=pos0,verbose=False)
+    bulk = get_ase_atoms_object_kmc_al_si_mg_vac(sc,a0=alat,matrix_element=matrix_element,cell='cubic',create_fake_vacancy=False,crystal_structure=cryst,normal_ordering=True,pos0=pos0,verbose=False)
     #print('bulk')
     #print(bulk.positions[:3])
     #print(bulk.cell)
@@ -3760,7 +3758,7 @@ def get_all_1NN_dist_vec_from_POSITIONs(folder,matrix_element="Al",verbose=False
     return NN1_distances,NN1,frames
 
 
-def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matrix_element="Al",cubic=False,create_fake_vacancy=False,whichcell="fcc",normal_ordering=True,pos0=False,verbose=False):
+def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matrix_element="Al",cell='cubic',create_fake_vacancy=False,crystal_structure="fcc",normal_ordering=True,pos0=False,verbose=False):
     """Creating bulk systems.
 
         Crystal structure and lattice constant(s) will be guessed if not
@@ -3782,16 +3780,29 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matr
         orthorhombic: bool
             Construct orthorhombic unit cell instead of primitive cell
             which is the default.
-        cubic: bool
-            Construct cubic unit cell if possible.
+        cell: {cubic, primitive, orthorhombic}
+            Construct cubic unit cell
     """
-    #print('whichcell:',whichcell)
+    ###################################################
+    # define the cell: cubic, primitive, orthorhombic
+    ###################################################
+    if cell not in [ 'cubic', 'primitive', 'orthorhombic' ]:
+        sys.exit('cell has to be one of: cubic, primitive, orthorhombic')
+    cubic = orthorhombic = primitive = False
+    if cell == 'cubic': cubic = True
+    if cell == 'orthorhombic': orthorhombic = True
+
+    ##########################################################################
+    # define the crystal structure: sc, fcc, bcc, hcp, diamond, zincblende,
+    # rocksalt, cesiumchloride, fluorite or wurtzite.
+    ##########################################################################
+    #print('crystal_structure:',crystal_structure)
     defect = False
     defect_element = False
-    if "_" in whichcell:
-        #print('yes _',whichcell.split("_"))
-        defect    = whichcell.split("_")[1]  # dilute, vac, ...
-        whichcell = whichcell.split("_")[0]
+    if "_" in crystal_structure:
+        #print('yes _',crystal_structure.split("_"))
+        defect    = crystal_structure.split("_")[1]  # dilute, vac, ...
+        crystal_structure = crystal_structure.split("_")[0]
         #print('me',matrix_element)
         if defect == 'dilute' and len(matrix_element) != 2:
             sys.exit('please provide two matrix elements, first = matrix, second is the solute atom type')
@@ -3804,7 +3815,7 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matr
 
     if verbose:
         print('defect',defect)
-        print('whichcell',whichcell)
+        print('crystal_structure',crystal_structure)
         print('matrix_element',matrix_element)
         print('defect_element',defect_element)
 
@@ -3815,20 +3826,20 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matr
         #print('state',state['symmetry'])
         #print('state',state['a'])
         a0 = state['a']
-    if whichcell == "fcc":
-        atom = ase_build_bulk(matrix_element,crystalstructure='fcc',a=a0,cubic=cubic)
-    elif whichcell == "hcp":
+    if crystal_structure == "fcc":
+        atom = ase_build_bulk(matrix_element,crystalstructure='fcc',a=a0,cubic=cubic,orthorhombic=orthorhombic)
+    elif crystal_structure == "hcp":
         a = 3.21
         c = 5.21
         atom = crystal(matrix_element, [(1./3., 2./3., 3./4.)], spacegroup=194, cellpar=[a, a, c, 90, 90, 120])
-    elif whichcell == "dc":
+    elif crystal_structure == "dc":
         #a = 5.47
         atom = crystal(matrix_element, [(0,0,0)], spacegroup=227, cellpar=[a0, a0, a0, 90, 90, 90])
-    elif whichcell == "bcc":
-        atom = ase_build_bulk(matrix_element,crystalstructure='bcc',a=a0,cubic=cubic)
+    elif crystal_structure == "bcc":
+        atom = ase_build_bulk(matrix_element,crystalstructure='bcc',a=a0,cubic=cubic,orthorhombic=orthorhombic)
 
     else:
-        sys.exti("whichcell: "+str(whichcell)+" has to be in fcc/hcp/dc/bcc")
+        sys.exti("crystal_structure: "+str(crystal_structure)+" has to be in fcc/hcp/dc/bcc")
 
     atomsc = atom.repeat(ncell)
     number_of_atoms = atomsc.get_number_of_atoms()
@@ -5390,6 +5401,73 @@ class ase_calculate_ene( object ):
             print('2: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
         return
 
+
+    def ase_relax_volume_only_from_murn_roughly(self,atoms,verbose=False):
+        atoms.wrap()
+        # probably not necessary since this is set up when necessary
+        self.keep_alive = True
+        self.get_calculator(atoms)
+
+        alat_rel = np.arange(0.9865,1.015,0.0025)  # seems most symmetric for cu
+        alat_rel = np.array([0.9865,1-0.007,1,1+0.007,1.015]) # 4 values enough for quick estimate
+        cell_ref = atoms.get_cell()
+        nat = atoms.get_number_of_atoms()  # in case stuff is repeated
+        cell_ref_vol_pa = atoms.get_volume()/nat
+        vol_pa = np.zeros(len(alat_rel))
+        ene_pa = np.zeros(len(alat_rel))
+        for idx,i in enumerate(alat_rel):
+            atoms_murn_loop = atoms.copy()  # in case cell is repeated
+            atoms_murn_loop.set_cell(cell_ref*i,scale_atoms=True)
+            vol=atoms_murn_loop.get_volume()
+            vol_per_atom = vol/atoms_murn_loop.get_number_of_atoms()
+            self.get_calculator(atoms_murn_loop)
+            percent = np.round(vol_per_atom/cell_ref_vol_pa,2)
+            ene = atoms_murn_loop.get_potential_energy()
+            if self.lammps == True:
+                ene, ene_pa = lammps_ext_calc(atoms_murn_loop,self)
+            print('idx!!',idx,'i:',np.round(i,2),np.round(vol,2),'vpa',np.round(vol_per_atom,2),'ref',cell_ref_vol_pa,'v/vo',percent,'ene_pa',ene/nat,'ene',ene)
+            vol_pa[idx] = vol/nat
+            ene_pa[idx] = ene/nat
+
+        from feos import eos
+        vinet = eos()
+        data=np.transpose([vol_pa,ene_pa])
+        vinet.fit_to_energy_vs_volume_data(datax=vol_pa,datay=ene_pa)
+        print('pars',vinet.parameters)
+        if True: # scale volume
+            print('adapt atoms in')
+            atomsin = atoms.copy()
+            # old
+            volume_in  = ase_vpa(atomsin)
+            volume_out = vinet.parameters[1]
+            #if type(return_frame_with_volume_per_atom) != bool:
+            #    volume_out = return_frame_with_volume_per_atom
+            volume_scale = (volume_out/volume_in)**(1./3.)
+            print('volume_in   (calc)',volume_in)
+            print('volume_out  (calc)',volume_out)
+            ##print('scale',volume_scale)
+            atoms.set_cell(atomsin.get_cell()*volume_scale,scale_atoms=True)
+            print('atomsout vol:',atoms.get_volume()/atoms.get_number_of_atoms())
+            if volume_in/volume_out > 1.05 or volume_in/volume_out < 0.96:
+                self.ase_relax_volume_only_from_murn_roughly(atoms,verbose=self.verbose)
+        return
+
+    def ase_relax_volume_only(self,atoms,verbose=False):
+        self.keep_alive = True
+        self.get_calculator(atoms)
+        #if False: # this works but is quite slow! better do manually
+        sf = UnitCellFilter(atoms,hydrostatic_strain=True)
+        logfile="-" # output to screen
+        #logfile="tmp" # output to file and not to screen
+        opt = FIRE(sf,logfile=logfile)
+        #from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
+        #opt = SciPyFminCG(sf,logfile=logfile)
+        opt.run()
+        if os.path.isfile("tmp"):
+            os.remove("tmp")
+        if verbose > 1: self.check_frame('ase_relax_volume_only out',frame=atoms)
+        return
+
     def ase_relax_cellshape_and_volume_only(self,atoms,verbose=False):
         ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
         self.keep_alive = True
@@ -6050,19 +6128,33 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     #################################
     print('atoms.cell (angstrom) before relaxing cellshape and volume:')
     print(atoms.cell)
-    print('atoms.positions before relaxing cellshape and volume:')
-    print('in angstrom')
-    for idx,i in enumerate(atoms.positions):
+    print('atoms.volume/nat before relaxation:',atoms.get_volume()/atoms.get_number_of_atoms())
+    print('atoms.positions before relaxing cellshape and volume (first 4) in angstrom:')
+    #for idx,i in enumerate(atoms.positions):
+    for idx,i in enumerate(np.arange(4)):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
     print()
+    ace.ase_relax_volume_only_from_murn_roughly(atoms,verbose=ace.verbose) # necessary for bcc primitive cells which might have a bad starting guess
+    ace.ase_relax_volume_only(atoms,verbose=ace.verbose)
     ace.ase_relax_cellshape_and_volume_only(atoms,verbose=ace.verbose)
     print('atoms.cell after relaxing cellshape and volume:')
     print(atoms.cell)
-    print('atoms.positions after relaxing cellshape and volume:')
-    for idx,i in enumerate(atoms.positions):
+    print('atoms.volume/nat after relaxation:',atoms.get_volume()/atoms.get_number_of_atoms())
+
+    print('atoms.positions after relaxing cellshape and volume (first 4) in angstrom:')
+    #for idx,i in enumerate(atoms.positions):
+    for idx,i in enumerate(np.arange(4)):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
     print('atoms.volume:',atoms.get_volume())
     print('atoms.volume/nat:',atoms.get_volume()/atoms.get_number_of_atoms())
+    print('a 125 atom bcc cell will relax to fcc if this is thre ground state!, this is great since we than have a 125 atom fcc cell (maybe also possible to do this with smaller cells?)')
+    ase_write("POSCAR_eq",atoms,format='vasp')
+    ase_write("POSCAR_eq_dir",atoms,format='vasp',direct=True)
+    print('atoms.positions')
+    print(atoms.positions)
+    print()
+    print(atoms.get_forces())
+    sys.exit('4444444444444')
     print()
 
 

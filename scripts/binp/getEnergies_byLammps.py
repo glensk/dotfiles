@@ -38,9 +38,10 @@ def help(p = None):
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
-    p.add_argument('-sys','--sys', choices=[ "fcc", "bcc", "dc", 'hcp', 'fcc_vac', 'fcc_dilute' ], default=False, help="in case no inutfile is given, define the system manually")
-    p.add_argument('-sys_ele','--sys_ele', nargs='*', default=False, help="in case no inutfile is given, define the element manually")
+    p.add_argument('-sys','--sys', choices=[ "fcc", "bcc", "dc", 'hcp', 'fcc_vac', 'fcc_dilute' ], default=False, help="crystal_structure; can be set in case no inputfile is specified, define the system manually")
+    p.add_argument('-sys_ele','--sys_ele', nargs='*', default=False, help="in case no inputfile is given, define the element manually")
     p.add_argument('-sys_ncell','--sys_ncell', type=int, default=1, help="in case no inutfile is given, define how often the primitive/conventional cell is repeated")
+    p.add_argument('--sys_cell','-sys_cell',choices = ['cubic','primitive','orthorhombic'],default='cubic',help='Which crystal structure to use')
 
     p.add_argument('-efm','--exectue_function_myutils', required=False, type=str,default='', help="function to run from myutils.")
     p.add_argument('-ef','--execute_function', required=False, type=str,default='', help="function to run from this file.")
@@ -358,11 +359,11 @@ def get_energies(args):
     #print('len sys_ele',args.sys_ele,len(args.sys_ele))
     if args.inputfile == False and args.sys != False and args.sys_ele != False:
         if args.sys in [ 'fcc', 'bcc', 'hcp', 'dc' ] and len(args.sys_ele) == 1:
-            frames = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=args.sys_ncell,nsi=0,nmg=0,nvac=0,matrix_element=args.sys_ele[0],a0=False,cubic=True,create_fake_vacancy=False,whichcell=args.sys)
+            frames = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=args.sys_ncell,nsi=0,nmg=0,nvac=0,matrix_element=args.sys_ele[0],a0=False,cell=args.sys_cell,create_fake_vacancy=False,crystal_structure=args.sys)
         elif args.sys in [ 'fcc_dilute' ] and len(args.sys_ele) == 1:
             sys.exit('please specify 2 elements using -sys_ele e.g. -sys_ele Al Si')
         elif args.sys in [ 'fcc_dilute' ] and len(args.sys_ele) == 2:
-            frames = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=args.sys_ncell,nsi=0,nmg=0,nvac=0,matrix_element=args.sys_ele,a0=False,cubic=True,create_fake_vacancy=False,whichcell=args.sys,verbose=args.verbose)
+            frames = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=args.sys_ncell,nsi=0,nmg=0,nvac=0,matrix_element=args.sys_ele,a0=False,cell=args.sys_cell,create_fake_vacancy=False,crystal_structure=args.sys,verbose=args.verbose)
         if args.verbose:
             print('created structure from given input!')
             print('cell')
@@ -443,6 +444,9 @@ def get_energies(args):
         print('frames.get_atomic_numbers()',frames.get_atomic_numbers())
         print('frames.get_atomic_numbers()',list(set(frames.get_atomic_numbers())))
         print('os.getcwd()',os.getcwd())
+        ace.get_calculator(frames)
+        print('forces',frames.get_forces())
+        sys.exit()
         ase_structure_relaxed = my.get_thermo(ace,frames,relax_cellshape_and_volume=True,evinet=args.evinet,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
 
@@ -1555,7 +1559,7 @@ def get_dilute_formation_energy(matrix_element="Al",text="dilute formation energ
                 print('read frame path:',frame_path)
             frame_al_xx = ase_read(frame_path,format="runner")
         else:
-            frame_al_xx = my.get_ase_atoms_object_kmc_al_si_mg_vac(matrix_element=matrix_element,ncell=sc,nsi=nsi,nmg=nmg,nvac=nvac,a0=(vpa*4.)**(1./3.),cubic=True)
+            frame_al_xx = my.get_ase_atoms_object_kmc_al_si_mg_vac(matrix_element=matrix_element,ncell=sc,nsi=nsi,nmg=nmg,nvac=nvac,a0=(vpa*4.)**(1./3.),cell='cubic')
             # here, we want to work in he constant pressure approach
             # for this we need to relax atomic positions && volume
             ace.ase_relax_cellshape_volume_positions(frame_al_xx,verbose=False)
@@ -1682,7 +1686,7 @@ def get_dilute_formation_energy(matrix_element="Al",text="dilute formation energ
 
 def get_al_fcc_equilibrium(ace):
     print('# get_al_fcc_equilibrium ...')
-    frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,matrix_element="Al",whichcell="fcc")
+    frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cell='cubic', create_fake_vacancy=False,matrix_element="Al",crystal_structure="fcc")
     ace.ase_relax_cellshape_and_volume_only(frame_al,verbose=False)
     ace.al_fcc = frame_al
     ace.al_fcc_ene_pa = ace.ene(frame_al)/frame_al.get_number_of_atoms()
@@ -1697,7 +1701,7 @@ def get_al_fcc_equilibrium(ace):
 
 def get_mg_hcp_equilibrium(ace):
     print('# get_mg_hcp_equilibrium ...')
-    frame_mg = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=0,cubic=False,create_fake_vacancy=False,matrix_element="Mg",whichcell="hcp")
+    frame_mg = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=0,cell='cubic',create_fake_vacancy=False,matrix_element="Mg",crystal_structure="hcp")
     ace.ase_relax_cellshape_and_volume_only(frame_mg,verbose=False)
     ace.mg_hcp        = frame_mg
     ace.mg_hcp_ene_pa = ace.ene(frame_mg)/frame_mg.get_number_of_atoms()
@@ -1710,7 +1714,7 @@ def get_mg_hcp_equilibrium(ace):
 
 def get_si_dc_equilibrium(ace):
     print('# get_si_dc_equilibrium(ace)...')
-    frame_si = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=0,cubic=False,create_fake_vacancy=False,matrix_element="Si",whichcell="dc",)
+    frame_si = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=0,cell='cubic',create_fake_vacancy=False,matrix_element="Si",crystal_structure="dc",)
     ace.ase_relax_cellshape_and_volume_only(frame_si,verbose=False)
     ace.si_dc = frame_si
     #print('frame_si.c',frame_si.positions)
@@ -1792,7 +1796,7 @@ def get_dilute_si_mg_f(ace):
             print(idx,ka.get_chemical_symbols()[idx],ka.positions[idx])
 
         print('... get struct dilute si for the NN')
-    #struct_dilute_si_NN = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=sc,nsi=0,nmg=0,nvac=0,matrix_element=["Al","Si"], a0=False,cubic=True,create_fake_vacancy=False,whichcell="fcc_dilute",verbose=False)
+    #struct_dilute_si_NN = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=sc,nsi=0,nmg=0,nvac=0,matrix_element=["Al","Si"], a0=False,cubic=True,create_fake_vacancy=False,crystal_structure="fcc_dilute",verbose=False)
     #ace.ase_relax_atomic_positions_only(struct_dilute_si_NN,fmax=0.0001,verbose=False)
     #if False:
     #    print('... get struct dilute si has ene',my.ase_enepot(struct_dilute_si_NN,units=ace.units))
@@ -1801,7 +1805,7 @@ def get_dilute_si_mg_f(ace):
 
 
 
-    #struct_dilute_mg_NN = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=sc,nsi=0,nmg=0,nvac=0,matrix_element=["Al","Mg"], a0=False,cubic=True,create_fake_vacancy=False,whichcell="fcc_dilute",verbose=False)
+    #struct_dilute_mg_NN = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=sc,nsi=0,nmg=0,nvac=0,matrix_element=["Al","Mg"], a0=False,cubic=True,create_fake_vacancy=False,crystal_structure="fcc_dilute",verbose=False)
     #ace.ase_relax_atomic_positions_only(struct_dilute_mg_NN,fmax=0.0001,verbose=False)
     #if False:
     #    print('... get struct dilute mg has ene',my.ase_enepot(struct_dilute_mg_NN,units=ace.units))
@@ -2580,7 +2584,7 @@ def get_elastic_constants_al_ext(ace):
         print('ace.c44:',ace.pot.c44_al,type(ace.pot.c44_al))
     else:
         ace.elastic_relax = True
-        frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
+        frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cell='cubic',create_fake_vacancy=False,crystal_structure="fcc")
         ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
         print('ace.c44:',ace.c44,type(ace.c44))
         #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
@@ -2590,7 +2594,7 @@ def get_elastic_constants_al_ext(ace):
 
 def get_elastic_constants_al_from_ene(ace):
     ace.elastic_relax = True
-    frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cubic=True,create_fake_vacancy=False,whichcell="fcc")
+    frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cell='cubic',create_fake_vacancy=False,crystal_structure="fcc")
     ace.get_elastic(frame_al,verbose=ace.verbose)
     sys.exit()
 
