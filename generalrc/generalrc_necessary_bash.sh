@@ -1,5 +1,34 @@
 #!/bin/sh
 
+iterm2_get_window_number () {
+    #echo $ITERM_SESSION_ID 
+    echo "${ITERM_SESSION_ID:1:1}" | awk '{print $1+1}'
+}
+
+iterm2_set_window_name () {
+    window_nr=`iterm2_get_window_number`
+    export ITERM2_WINDOW$window_nr\_NAME="$*"
+    rm -f $HOME/.iterm2_windowname_$window_nr && echo "$*" > $HOME/.iterm2_windowname_$window_nr
+}
+
+iterm2_get_window_name() {
+    window_nr=`iterm2_get_window_number`
+    name=`cat $HOME/.iterm2_windowname_$window_nr`
+    echo $name
+}
+
+iterm2_write_window_name () {
+    window_nr=`iterm2_get_window_number`
+    [ "$1" != "" ] && iterm2_set_window_name "$*"
+    name=`iterm2_get_window_name`
+    export AWS_PROFILE="$name"
+}
+
+README_timestamp () {
+    timestamp=`python -c 'from datetime import datetime;time_now = datetime.now();print(time_now.strftime("%Y-%m-%d_%H:%M:%S"))'`
+    echo $timestamp
+}
+
 
 #setenv () {
 #    if [ "x$1" = "x" ] ; then
