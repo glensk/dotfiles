@@ -7,7 +7,7 @@ import myutils as my
 import subprocess
 
 
-myhost = myhostname = my.check_for_known_hosts()
+myhost = myhostname = os.environ["myhost"]
 #known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
 known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ,'viu']
 # git clone https://github.com/glensk/i-pi.git

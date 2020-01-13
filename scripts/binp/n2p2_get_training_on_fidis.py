@@ -20,7 +20,7 @@ if __name__ == '__main__':
     args = p.parse_args()
     if args.cores == False:
         args.cores = 21
-        myhost = my.check_for_known_hosts()
+        myhost = os.environ['myhost']
         if myhost in [ "fidis", "helvetios" ]:
             args.cores = 21
         elif myhost == 'daint':

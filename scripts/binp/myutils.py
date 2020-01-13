@@ -198,23 +198,6 @@ def print_args(args):
     print('########################################## argparse values (end  ) #########')
     return
 
-def check_for_known_hosts(exit=False):
-    hostname = gethostname()   # fidis, helvetios, daint105, h332, g037, f221
-    known_hosts =  ['fidis','helvetios', "daint", 'mac', 'cosmopc' ]
-    for i in known_hosts:
-        if i in hostname: return i
-    if hostname[0] == 'h' and is_int(hostname[1:]) == True:
-        return 'helvetios'
-    if hostname[0] in ['g','f'] and is_int(hostname[1:]) == True:
-        return 'fidis'
-
-    # if not known host
-    if exit == True:
-        print("known hosts:",known_hosts)
-        sys.exit(hostname+" is not in the list of known hosts!")
-    else:
-        return False
-
 def sed(file,str_find,str_replace):
     # from scripts folder
     import massedit
@@ -533,8 +516,7 @@ def q(verbose=False):
     cores=[]
     runtime=[]
     path=[]
-
-    host = check_for_known_hosts(exit=False)
+    host = os.environ["myhost"]
     if host == False:
         return id,stat,path
     out=check_output(['q'])
@@ -3155,7 +3137,7 @@ def n2p2_write_submit_skript(directory=False,nodes=1,cores=28,job=False,interact
     ''' wiretes a submit_n2p2_{get_scaling,training}.sh file '''
     if job not in ["scaling","train"]:
         sys.exit('job has to be one of nnp-XXX jobs as "train, scaling, ..."')
-    myhost = check_for_known_hosts(exit=True)
+    myhost = os.environ["myhost"]
     cores_per_node = 28
     if myhost in [ "fidis", "helvetios"]:
         cores_per_node = 28

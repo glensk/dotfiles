@@ -99,7 +99,9 @@ def createjob(args):
     scripts = mu.scripts()
     mypot = mu.mypot(pot)
     if submit is True or submitdebug is True:
-        mu.check_for_known_hosts()
+        hostcheck =  os.environ["myhost"]
+        if hostcheck == "":
+            sys.exit('host unknown 87')
 
 
     ##### here only chck if the potential can be set up. (in.lmp)

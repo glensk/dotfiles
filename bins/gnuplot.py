@@ -4,7 +4,8 @@ from __future__ import print_function
 import numpy as np
 import os,sys,argparse,re,socket
 from subprocess import call
-from myutils import check_for_known_hosts
+from socket import gethostname
+#from myutils import check_for_known_hosts
 
 def help(p = None):
     string = '''
@@ -195,7 +196,7 @@ def gnuplot_defaults(args):
         #ca('set term x11 font "Times-New-Roman,12"')
         #hostname = os.environ['myhost']
         #print('hostname',hostname)
-        myhost = check_for_known_hosts(exit=False)
+        myhost = os.environ["myhost"]
         print('myhost',myhost)
         #sys.exit()
         term="x11"

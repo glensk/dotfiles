@@ -1333,6 +1333,10 @@ def get_energies(args):
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+                    #print('sss',
+                    if ene_diff_abs[idx] > 60:
+                        print('uuid:',uuid)
+
                 if idx >= 99:
                     #np.savetxt("e_pot_eV_cell",ene_pot_eV_cell)
                     #np.savetxt("e_har_eV_cell",ene_har_eV_cell)
