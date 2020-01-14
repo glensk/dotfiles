@@ -217,6 +217,7 @@ bindkey "^[u" backward-delete-char
 
 
 bindkey -e   # Emacs mode; necessary for cmd+; and cmd+' to go to beginning/end of line
+#bindkey -v   # vi mode
 # bind UP and DOWN arrow keys this has to be for zsh-history-substring-search so
 # that cmd+; or cmd+' still jumps to beginning or end of line
 zmodload zsh/terminfo
