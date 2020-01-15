@@ -21,7 +21,7 @@ iterm2_write_window_name () {
     window_nr=`iterm2_get_window_number`
     [ "$1" != "" ] && iterm2_set_window_name "$*"
     name=`iterm2_get_window_name`
-    export AWS_PROFILE="$name"
+    [ "$name" != "" ] && export AWS_PROFILE="$name"
 }
 
 README_timestamp () {
