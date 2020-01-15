@@ -2616,6 +2616,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
                 sys.exit('units '+ace.units+' unknown! Exit!')
             #print('ene out',ene,ace.units)
         else:
+            # get_elastic_constants == True
             ace.elastic_constants = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True).strip()
             #ace.elastic_constants_ = elastic_constants = check_output(["tail -300 log.lammps | grep \"^Elastic Constant\""],shell=True)
             co = check_output(["tail -300 log.lammps | grep \"^Elastic Constant C44\" | sed 's|.*= ||' | sed 's|GPa.*||'"],shell=True)
@@ -2647,6 +2648,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
             #print('ec',elastic_constants.split(" "))
             #sys.exit('ec')
             ene = ace.elastic_constants
+            ene_ev_cell = deepcopy(ene)
 
     if ace.verbose > 2:
         print('lammps_ext_calc (9) ene final:',ene,"chosen units")
@@ -4961,6 +4963,7 @@ class ase_calculate_ene( object ):
         #print('5x')
         if verbose:
             print('frame cell::',frame.get_cell())
+            print('frame nat ::',frame.get_number_of_atoms())
             print('verbose   ::',verbose)
         if self.elastic_relax == True:
             self.ase_relax_cellshape_and_volume_only(frame,verbose=verbose)
@@ -6136,7 +6139,6 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     print(atoms.positions)
     print()
     print(atoms.get_forces())
-    sys.exit('4444444444444')
     print()
 
 
