@@ -25,7 +25,7 @@ iterm2_write_window_name () {
 }
 
 README_timestamp () {
-    timestamp=`python -c 'from datetime import datetime;time_now = datetime.now();print(time_now.strftime("%Y-%m-%d_%H:%M:%S"))'`
+    timestamp=`date +"%Y-%m-%d_%H:%M:%S"`
     echo $timestamp
 }
 

@@ -23,3 +23,9 @@ for i in `seq $1`;do
     fi
 done
 
+# make a README
+ts=`date +"%Y-%m-%d_%H:%M:%S"`
+fn=README_$ts.txt
+touch $fn
+echo `pwd` >> $fn
+echo "`basename $0` $*" >> $fn
