@@ -30,6 +30,8 @@ def help(p = None):
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammps-runner
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -evinet
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -fqh
+    %
+    % getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet -v # calculates c44 for al (TABLE I. Kobayashi)
 
 
 
@@ -446,14 +448,13 @@ def get_energies(args):
         print('os.getcwd()',os.getcwd())
         ace.get_calculator(frames)
         print('forces',frames.get_forces())
-        sys.exit()
         ase_structure_relaxed = my.get_thermo(ace,frames,relax_cellshape_and_volume=True,evinet=args.evinet,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
 
         #ace.get_elastic_external(atomsin=ase_structure_relaxed,verbose=ace.verbose,text="structure",get_all_constants=True)
         #print('ace.c44:',ace.c44,type(ace.c44))
-
-        sys.exit("Thermodynamic properties done up to Fqh. Fah jobs created")
+        print('done evinet')
+        #sys.exit("Thermodynamic properties done up to Fqh. Fah jobs created")
 
     if args.verbose > 2:
         print('getEne(p7)                           : pot defined')
@@ -511,7 +512,7 @@ def get_energies(args):
     ### elastic / elastic_all
     ############
     if args.elastic:
-        get_elastic_constants_al_ext(ace)
+        get_elastic_constants_al_ext(ace,frames)
         sys.exit('get_elastic_constants_al_ext done! Exit')
 
     if args.elastic_all:  # this does not need to initialize potential
@@ -1753,7 +1754,7 @@ def get_basic_NN_energies_ace(ace):
     #ace.check_frame('aaa',ace.al_fcc)
     if ace.verbose:
         print("NN 2 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
-    ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False,write_energies=False)
+    ace.get_murn(ace.al_fcc,verbose=False,return_minimum_volume_frame = False, atomrelax=False)
     if ace.verbose:
         print("NN 3 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))
     #ace.ase_relax_cellshape_and_volume_only(ace.al_fcc,verbose=False)
@@ -2015,7 +2016,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         if volumerelax: ace.ase_relax_cellshape_and_volume_only(frame)
         check = ace.check_frame('',frame=frame,verbose=False)
         #print('11 atomrelax',atomrelax,'volumerelax',volumerelax,"check",check)
-        ace.get_murn(frame,verbose=False,return_minimum_volume_frame = volumerelax, atomrelax=atomrelax,write_energies=False,printminimal=False)
+        ace.get_murn(frame,verbose=False,return_minimum_volume_frame = volumerelax, atomrelax=atomrelax,printminimal=False)
         energy_NN_cell_NNrelaxed = ace.ene(frame) #,atomrelax=atomrelax,cellrelax=cellrelax)
         #print('d mg:',d["Mg"],'d si:',d["Si"],'d al:',d["Al"])
         #heat_precip_T0K         = (e - d["Mg"]*ace.eform_dilute_mg - d["Si"]*ace.eform_dilute_si - d["Al"]*ace.eform_dilute_al)/nat
@@ -2580,7 +2581,7 @@ def formation_energies(ace,args):
 
 
 
-def get_elastic_constants_al_ext(ace):
+def get_elastic_constants_al_ext(ace,frames):
     ace.elastic = True
     #get_basic_NN_energies_ace(ace)
     #get_al_fcc_equilibrium(ace)
@@ -2588,7 +2589,7 @@ def get_elastic_constants_al_ext(ace):
         print('ace.c44:',ace.pot.c44_al,type(ace.pot.c44_al))
     else:
         ace.elastic_relax = True
-        frame_al = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=1,nsi=0,nmg=0,nvac=0,a0=4.045,cell='cubic',create_fake_vacancy=False,crystal_structure="fcc")
+        frame_al = frames
         ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
         print('ace.c44:',ace.c44,type(ace.c44))
         #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
