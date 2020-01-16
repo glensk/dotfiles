@@ -32,6 +32,8 @@ def help(p = None):
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -fqh
     %
     % getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet -v # calculates c44 for al (TABLE I. Kobayashi)
+    % getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV  # get formation energies
+
 
 
 
@@ -90,6 +92,8 @@ def help(p = None):
     p.add_argument('--analyze_kmc_number_1NN_2NN_post','-akmc_post',action='store_true',help='make analysis from KMC_analyze')
 
     p.add_argument('--pick_concentration_al','-pcal',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcal 1.0')
+    p.add_argument('--pick_concentration_mg','-pcmg',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcmg 1.0')
+    p.add_argument('--pick_concentration_si','-pcsi',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcsi 1.0')
     p.add_argument('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
     p.add_argument('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
     p.add_argument('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
@@ -754,6 +758,8 @@ def get_energies(args):
         print('write_runner                 :',args.write_runner)
         print('write_runner_repeated        :',args.write_runner_repeated)
         print('--pick_concentration_al      :',args.pick_concentration_al)
+        print('--pick_concentration_mg      :',args.pick_concentration_mg)
+        print('--pick_concentration_si      :',args.pick_concentration_si)
         print('--pick_atoms_al              :',args.pick_atoms_al)
         print('--pick_number_of_atoms       :',args.pick_number_of_atoms)
         print('--pick_forcesmax             :',args.pick_forcesmax)
@@ -913,6 +919,10 @@ def get_energies(args):
             if args.pick_number_of_atoms >= 0 and ana_atoms_ != args.pick_number_of_atoms:
                 continue
             if args.pick_concentration_al >= 0 and d["Al"] != args.pick_concentration_al:
+                continue
+            if args.pick_concentration_si >= 0 and d["Si"] != args.pick_concentration_si:
+                continue
+            if args.pick_concentration_mg >= 0 and d["Mg"] != args.pick_concentration_mg:
                 continue
             if type(args.pick_uuid) == list and uuid not in args.pick_uuid:
                 continue
@@ -1972,6 +1982,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
             print(my.printred("DFT")+" energy precipitate (eV)",eDFT,"containing:",d)
             print(my.printred("DFT")+" energy eform_dilute_mg (eV)",ace.fDFT_dilute_mg,"times",d["Mg"])
             print(my.printred("DFT")+" energy eform_dilute_si (eV)",ace.fDFT_dilute_si,"times",d["Si"])
+            print(my.printred("DFT")+" energy eform_dilute_al (eV)",ace.fDFT_dilute_al,"times",d["Al"])
             print(my.printred("DFT: divide everything by       "+str(nat)+" to get to the DFT formation energy of "+str(heat_precip_T0K_DFT)+" eV"))
 
         # write DFT@DFT
@@ -1982,16 +1993,29 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         f.close()
         if formula_unit != False:
             eform = heat_precip_T0K_DFT*formula_unit
+            sys.exit()
             #print('eform DFT per formula unit:',np.round(eform,3))
             f=open(ace.written_summary[0]+"_per_formula_unit.dat", "a+")
             print('wirttein to',ace.written_summary[0]+"_per_formula_unit.dat")
             f.write(str(conz)+"   "+str(eform)+" "+text.replace(" ", "_")+"\n")
             f.close()
-
+    print('bef el')
+    get_elastic_constants_al_ext(ace,frame)
+    print('aft el')
+    sys.exit()
 
     # write NN@DFT
     print('-->>',energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.E_SS_Mg - d["Si"]*ace.E_SS_Si - d["Al"]*ace.E_SS_Al)
     heat_precip_T0K_NN_unrelaxed  = (energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.E_SS_Mg - d["Si"]*ace.E_SS_Si - d["Al"]*ace.E_SS_Al)/nat
+
+    if ace.verbose:
+        show_energy_diff_DFT_NN(frame,eDFT,e,text,units="eV")
+        print(my.printred("NN@DFT")+" energy precipitate (eV)",energy_NN_cell_unrelaxed_or_DFTrelaxed,"containing:",d)
+        print(my.printred("NN@DFT")+" energy eform_dilute_mg (eV)",ace.E_SS_Mg,"times",d["Mg"])
+        print(my.printred("NN@DFT")+" energy eform_dilute_si (eV)",ace.E_SS_Si,"times",d["Si"])
+        print(my.printred("NN@DFT")+" energy eform_dilute_al (eV)",ace.E_SS_Al,"times",d["Al"])
+        print(my.printred("NN@DFT: divide everything by       "+str(nat)+" to get to the NN@DFT formation energy of "+str(heat_precip_T0K_NN_unrelaxed)+" eV"))
+
     print_compare_ene_vs_DFT(my.printred("@fixed   pos: NN "+text+" @0K"),heat_precip_T0K_NN_unrelaxed,heat_precip_T0K_DFT,False,"-",check="",verbose=ace.verbose,formula_unit=formula_unit)
     #print('heat_precip_T0K_NN_unrelaxed',heat_precip_T0K_NN_unrelaxed)
     if ace.verbose:
@@ -2025,6 +2049,16 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
             print(my.printred('NN ace.E_SS_Mg'),ace.E_SS_Mg)
             print(my.printred('NN ace.E_SS_Si'),ace.E_SS_Si)
         heat_precip_T0K         = (energy_NN_cell_NNrelaxed - d["Mg"]*ace.E_SS_Mg - d["Si"]*ace.E_SS_Si - d["Al"]*ace.E_SS_Al)/nat
+
+        if ace.verbose:
+            show_energy_diff_DFT_NN(frame,eDFT,e,text,units="eV")
+            print(my.printred("NN@NNrelaxed")+" energy precipitate (eV)",energy_NN_cell_NNrelaxed,"containing:",d)
+            print(my.printred("NN@NNrelaxed")+" energy eform_dilute_mg (eV)",ace.E_SS_Mg,"times",d["Mg"])
+            print(my.printred("NN@NNrelaxed")+" energy eform_dilute_si (eV)",ace.E_SS_Si,"times",d["Si"])
+            print(my.printred("NN@NNrelaxed")+" energy eform_dilute_al (eV)",ace.E_SS_Al,"times",d["Al"])
+            print(my.printred("NN@NNrelaxed: divide everything by       "+str(nat)+" to get to the NN@NNrelaxed formation energy of "+str(heat_precip_T0K)+" eV"))
+
+
         print_compare_ene_vs_DFT(my.printred("@fixed   pos: NN "+text+" @0K"),heat_precip_T0K,False,False,"-",check="",verbose=ace.verbose,formula_unit=formula_unit)
         if ace.verbose:
             print('appending to',ace.written_summary[2])
