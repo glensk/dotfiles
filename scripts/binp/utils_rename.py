@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+
 import os
 import numpy as np
 import sys
@@ -23,7 +23,7 @@ def timeend(measure, ts, funcname):
         t2 = datetime.datetime.now()
         #print datetime.timedelta
         toutms = round(float(str(t2-ts).split("0:00:0")[1])*1000,2)
-        print toutms,"ms",printblue(funcname)
+        print((toutms,"ms",printblue(funcname)))
 
 def measure_time(process, measure = False):
     if measure == True:
@@ -34,7 +34,7 @@ def measure_time(process, measure = False):
     if measure == True:
         funcname = inspect.stack()[1][4][0].split("(")[1]
         #print round((time.time()-t1)*1000,2), "milli seconds wall time",printblue(funcname)
-        print datetime.datetime.now()-ts2, "datetime time",printblue(funcname)
+        print(datetime.datetime.now()-ts2, "datetime time",printblue(funcname))
         #print "  ",time.clock() - ts0, "seconds process time"
         #print "  ",time.time() - ts1, "seconds wall time"
     return
@@ -51,7 +51,7 @@ def project_vector(vec, on_vec):
     on_vec: vec is projected on on_vec"""
     verbose = False
     if verbose:
-        print ""
+        print("")
     u = vec
     s = on_vec
     if type(u) != np.ndarray:
@@ -63,10 +63,10 @@ def project_vector(vec, on_vec):
     for i in np.arange(s.size):
         s[i] = float(s[i])
     if verbose:
-        print "u            :",u
-        print "s            :",s
-        print "np.dot(u,s)  :",np.dot(u,s)
-        print "np.dot(s,s)  :",np.dot(s,s)
+        print("u            :",u)
+        print("s            :",s)
+        print("np.dot(u,s)  :",np.dot(u,s))
+        print("np.dot(s,s)  :",np.dot(s,s))
     tol = 1e-13
     #if abs(u[0]) <= tol and abs(u[1]) <= tol and abs(u[2]) <= tol and abs(s[0]) <= tol and abs(s[1]) <= tol and abs(s[2]) <= tol:
     #    return 0.0
@@ -106,11 +106,11 @@ def reject_vector(vec, on_vec):
     b = a1 = on_vec
     adir = lvec = vec
     if False:
-        print "b             :",b
-        print "adir          :",adir
-        print "np(linalg.norm(b)*np.linalg.norm(adir):",(np.linalg.norm(b)*np.linalg.norm(adir))
+        print("b             :",b)
+        print("adir          :",adir)
+        print("np(linalg.norm(b)*np.linalg.norm(adir):",(np.linalg.norm(b)*np.linalg.norm(adir)))
         #print "np.dot(b,adir):",np.dot(b,np.transpose(adir))
-        print "np.dot(b,adir):",np.dot(adir,np.transpose(b))
+        print("np.dot(b,adir):",np.dot(adir,np.transpose(b)))
     cosalpha = np.dot(b,adir)/(np.linalg.norm(b)*np.linalg.norm(adir))
     anormforlength = a1/cosalpha
     alength = np.linalg.norm(anormforlength)
@@ -118,15 +118,15 @@ def reject_vector(vec, on_vec):
     a2 = a - a1
     a2length = np.linalg.norm(a2)
     if False:
-        print "b = a1 = on_vec  :",b
-        print "adir = lvec = vec:",vec
-        print "cosalpha         :", cosalpha
-        print "anormforlength   :",anormforlength
-        print "alength          :",alength
-        print "a                :",a
-        print "a2               :",a2
-        print "a2length         :",a2length
-        print "alength*cosalpha :",alength*cosalpha
+        print("b = a1 = on_vec  :",b)
+        print("adir = lvec = vec:",vec)
+        print("cosalpha         :", cosalpha)
+        print("anormforlength   :",anormforlength)
+        print("alength          :",alength)
+        print("a                :",a)
+        print("a2               :",a2)
+        print("a2length         :",a2length)
+        print("alength*cosalpha :",alength*cosalpha)
     return a2
 
 def anglevec(v1,v2):
@@ -164,12 +164,12 @@ def R_2vect(vector_orig, vector_fin, fixed_rotation_axis = False):
     """
     verbose = False
     if verbose:
-        print "vector_orig:",vector_orig
-        print "vector_fin:",vector_fin
+        print("vector_orig:",vector_orig)
+        print("vector_fin:",vector_fin)
     R = np.zeros((3,3))
     R[:] = np.nan
     if verbose:
-        print "R:",R
+        print("R:",R)
 
     # Convert the vectors to unit vectors.
 
@@ -178,16 +178,16 @@ def R_2vect(vector_orig, vector_fin, fixed_rotation_axis = False):
     try:
         vector_orig = vector_orig / np.linalg.norm(vector_orig)
     except RuntimeWarning:
-        print "vector_orig:",vector_orig
-        print "np.linalg.norm(vector_orig):",np.linalg.norm(vector_orig)
-        print "R:"
-        print R
+        print("vector_orig:",vector_orig)
+        print("np.linalg.norm(vector_orig):",np.linalg.norm(vector_orig))
+        print("R:")
+        print(R)
 
     vector_orig = vector_orig / np.linalg.norm(vector_orig)
     vector_fin = vector_fin / np.linalg.norm(vector_fin)
     if verbose:
-        print "vector_orig:",vector_orig
-        print "vector_fin:",vector_fin
+        print("vector_orig:",vector_orig)
+        print("vector_fin:",vector_fin)
 
     # The rotation axis (normalised).
     axis = np.cross(vector_orig, vector_fin)
@@ -211,7 +211,7 @@ def R_2vect(vector_orig, vector_fin, fixed_rotation_axis = False):
     #angle = math.acos(np.dot(vector_orig, vector_fin))
     angle =  anglevec(vector_orig, vector_fin)
     if verbose:
-        print "angle:",angle
+        print("angle:",angle)
 
     ## Trig functions (only need to do this maths once!).
     ca = math.cos(angle)
@@ -264,9 +264,9 @@ def anyvec_to_inplane_senkr_parallel(longvec,vec0,vecs):
         '''
     dot = np.dot(np.array(vec0),np.array(vecs))
     if dot != 0.0:
-        print "vec0:",vec0
-        print "vecs:",vecs
-        print "dot:",dot
+        print("vec0:",vec0)
+        print("vecs:",vecs)
+        print("dot:",dot)
         sys.exit("vectors vec0 and vecs are not perpedicular")
 
     perpendicular = project_vector(reject_vector(longvec, vec0),vecs)
@@ -398,10 +398,10 @@ def append_row_to_2d_array(inarray = False, addrow = False):
         try:
             inarray = np.vstack([inarray, addrow])
         except ValueError:
-            print "inarray:",inarray
-            print printred("inarray.shape",inarray.shape)
-            print "----------------------"
-            print "addrow:",addrow,type(addrow)
+            print("inarray:",inarray)
+            print(printred("inarray.shape",inarray.shape))
+            print("----------------------")
+            print("addrow:",addrow,type(addrow))
             #print printred(" addrow.shape",addrow.shape)
             inarray = np.vstack([inarray, addrow])
     #print ">>> out1   :",inarray,inarray.shape,len(inarray.shape)
@@ -419,7 +419,7 @@ def append_row_to_2d_array(inarray = False, addrow = False):
 def write_inputdata(filename = None, text = None):
     ''' append text to filename '''
     if filename == None:
-        print "No output written since no filename"
+        print("No output written since no filename")
         return
     if text == None:
         text = ""
@@ -446,10 +446,10 @@ def sort_list_to_sortlist(liste = False, sortlist = False):
             outlist.append(folder)
     if len(liste) != len(outlist):
         for i in liste:
-            print i
-        print ''
+            print(i)
+        print('')
         for i in outlist:
-            print i
+            print(i)
         sys.exit('len liste is not len outlist')
     return outlist
 
@@ -608,7 +608,7 @@ def string_to_mathematical_expression_does_not_work_properly(x):
         num_out = []   #this holds the non-operators that are found in the string (left to right)
         buff = []
         for c in x:  #examine 1 character at a time
-            print "c:",c
+            print("c:",c)
             if c in operators:
                 #found an operator.  Everything we've accumulated in `buff` is
                 #a single "number". Join it together and put it in `num_out`.
@@ -640,13 +640,13 @@ def string_to_mathematical_expression_does_not_work_properly(x):
             while any(o in ops for o in op):        #Operator with this precedence level exists
                 idx,oo = next((i,o) for i,o in enumerate(ops) if o in op) #Next operator with this precedence
                 ops.pop(idx)                        #remove this operator from the operator list
-                print "ind:",ind,"idx:",idx #"nnn:",nums[ind:idx+2]
-                values = map(float,nums[idx:idx+2]) #here I just assume float for everything
+                print("ind:",ind,"idx:",idx) #"nnn:",nums[ind:idx+2]
+                values = list(map(float,nums[idx:idx+2])) #here I just assume float for everything
                 value = op_dict[oo](*values)
                 nums[idx:idx+2] = [value]           #clear out those indices
 
         return nums[0]
-    print "parse(x):",parse(x)
+    print("parse(x):",parse(x))
     return my_eval(*parse(x))
 
 
@@ -850,12 +850,12 @@ def schnittmenge_several_lists(lists, verbose = False):
         l1 = schnittmenge
         l2 = i
         if verbose:
-            print "i:",ind,"l1:",l1
-            print "i:",ind,"l2:",l2
+            print("i:",ind,"l1:",l1)
+            print("i:",ind,"l2:",l2)
         schnittmenge = [val for val in l1 if val in l2]
         if verbose:
-            print "i:",ind,"schn:",schnittmenge
-            print "------------"*10
+            print("i:",ind,"schn:",schnittmenge)
+            print("------------"*10)
         #schnittmenge = [val for val in li] if val in schnittmenge]
     return schnittmenge
 
@@ -962,7 +962,7 @@ def return_functions_on_same_grid(f1,f2,verbose=True):
         if lencheck > lenmax:
             lenmax = lencheck
         if verbose == True:
-            print "mmintmp,mmaxtmp:",mmintmp,mmaxtmp
+            print("mmintmp,mmaxtmp:",mmintmp,mmaxtmp)
         if type(mmin) == bool:
             mmin = mmintmp
         if type(mmax) == bool:
@@ -973,8 +973,8 @@ def return_functions_on_same_grid(f1,f2,verbose=True):
         if mmaxtmp < mmax:
             mmax = mmaxtmp
     if verbose == True:
-        print "mmin,mmax:",mmin,mmax
-        print "lenmax:",lenmax
+        print("mmin,mmax:",mmin,mmax)
+        print("lenmax:",lenmax)
     #liste = np.arange(len(*functions))
     #print "liste:",liste
     xvalues = np.linspace(mmin,mmax,lenmax)
@@ -1018,15 +1018,15 @@ def return_functions_on_same_grid(f1,f2,verbose=True):
     ylist = functionsout[0][:,1]
     xlistb = functionsout[1][:,0]
     ylistb = functionsout[1][:,1]
-    print "xlist:"
-    print type(xlist)
-    print "y;"
-    print type(ylist)
-    print type(f1[:,0])
-    print type(f1[:,1])
+    print("xlist:")
+    print(type(xlist))
+    print("y;")
+    print(type(ylist))
+    print(type(f1[:,0]))
+    print(type(f1[:,1]))
     from scipy.interpolate import UnivariateSpline
     s = UnivariateSpline(f1[:,0], f1[:,1], s=1)
-    print "s:",s
+    print("s:",s)
     ys = s(xs)
 
 
@@ -1132,7 +1132,7 @@ def MatrixPlot(M = None, temp = 0.05):
     plt.grid(True)
     #plt.imshow(M, interpolation='nearest')
     plt.colorbar()   # makes the bar showing the vales
-    print "a colormap would be great ...."
+    print("a colormap would be great ....")
     #plt.clim([-temp,temp])  # this is not good for matrix np.array(([1,2],[3,4]))
 
 def read_only_certain_lines_of_file(filename,start,stop):
@@ -1189,7 +1189,7 @@ def run(befehl):
 
 def readfile(path=None, line=None, split = False):
     if path is None:
-        print "i was called from: " + str(which_function_calledme())
+        print("i was called from: " + str(which_function_calledme()))
         exit(error="Please specify path")
     import os
     if os.path.isfile(path) != True:
@@ -1308,7 +1308,7 @@ def printarray(array,color=printnormal,decimals=2,prepend=False):
         return color(strout)
 
     for i in array:
-        print printline(i,color=color)
+        print(printline(i,color=color))
 
 
 def plot_find_ylim_from_xlim(xyfunc, xliml,xlimr, addmargin = True):

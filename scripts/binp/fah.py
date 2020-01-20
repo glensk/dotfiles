@@ -1128,15 +1128,14 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=Fa
                 print('fqh',fqh)
                 print('i',i,i[:3])
                 Fqh_surf_file = fqh+"/Fqh_*at_cell_per_atom_Surface_"+i[:3]+"_order__*"
-		Fqh_surf_file = glob.glob(Fqh_surf_file)[0]
-		Fqh_surf_file = os.path.abspath(Fqh_surf_file)
-
+                Fqh_surf_file = glob.glob(Fqh_surf_file)[0]
+                Fqh_surf_file = os.path.abspath(Fqh_surf_file)
                 Fah_surf_file = "../out_ang3_vs_temp_lmfitsurf_Surface_"+i+"_order__*"
                 if len(i) > 4:
                     Fah_surf_file = "../../surface_out_order_"+str(i[-1])
 
-		Fah_surf_file = glob.glob(Fah_surf_file)[0]
-		Fah_surf_file = os.path.abspath(Fah_surf_file)
+                Fah_surf_file = glob.glob(Fah_surf_file)[0]
+                Fah_surf_file = os.path.abspath(Fah_surf_file)
                 call(["cp "+Fqh_surf_file+" Fqh"],shell=True)
                 call(["cp "+Fah_surf_file+" Fah"],shell=True)
                 print('now gethermodynamcs.sh',os.getcwd())

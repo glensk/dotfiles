@@ -16,6 +16,7 @@ import argparse
 from copy import deepcopy
 from socket import gethostname
 import shutil
+from tempfile import mkstemp
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 
@@ -192,17 +193,75 @@ def print_args(args):
     ''' prints arguments from argparse '''
     keys = args.__dict__.keys()
     values = args.__dict__.values()
+    #print('keys',keys)
+    #print('values',values)
     print('########################################## argparse values (begin) #########')
     for idx,i in enumerate(keys):
-        print("#",str(keys[idx]).ljust(35),str(values[idx]).ljust(20),str(type(values[idx])).ljust(15),"#")
+        #print('aaaaaaaa',idx)
+        #print('kkkkkkkk',list(keys)[idx])
+        #print('kkkkkkkk',list(values)[idx])
+        #sys.exit()
+        print("#",str(list(keys)[idx]).ljust(35),str(list(values)[idx]).ljust(20),str(type(list(values)[idx])).ljust(15),"#")
     print('########################################## argparse values (end  ) #########')
     return
 
-def sed(file,str_find,str_replace):
-    # from scripts folder
-    import massedit
-    massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
+#def sed(file,str_find,str_replace):
+#    # from scripts folder
+#    import massedit
+#    massedit.edit_files([file], ["re.sub('"+str_find+"', '"+str_replace+"', line)"],dry_run=False)
+#    return
+
+
+def sed(source,pattern, replace, dest=None, count=0):
+    """Reads a source file and writes the destination file.
+
+    In each line, replaces pattern with replace.
+
+    Args:
+        pattern (str): pattern to match (can be re.pattern)
+        replace (str): replacement str
+        source  (str): input filename
+        count (int): number of occurrences to replace
+        dest (str):   destination filename, if not given, source will be over written.
+    """
+
+    fin = open(source, 'r')
+    num_replaced = count
+
+    if dest:
+        fout = open(dest, 'w')
+    else:
+        fd, name = mkstemp()
+        fout = open(name, 'w')
+    idx=0
+    for line in fin:
+        #print('line',idx,":"+line+":")
+        out = re.sub(pattern, replace, line)
+        #print('out ',idx,out)
+        #print('pat',pattern)
+        #print('rep',replace)
+        #print()
+        fout.write(out)
+
+        #if idx > 760:
+        #    sys.exit('hha445')
+        if out != line:
+            num_replaced += 1
+        if count and num_replaced > count:
+            break
+    try:
+        fout.writelines(fin.readlines())
+    except Exception as E:
+        raise E
+
+    fin.close()
+    fout.close()
+
+    if not dest:
+        shutil.move(name, source)
     return
+
+
 
 def get_absdir_from_relative_filepath(filepath):
     print('fp',filepath)
@@ -438,13 +497,13 @@ def file_len_linecount(fname):
             pass
     return i
 
-def scripts():
-    ''' return environment variable scripts '''
-    scripts = os.environ['scripts']
-    if not os.path.isdir(scripts):
-        print('scripts:',scripts)
-        sys.exit('scripts variable is not defined or is not an existing folder')
-    return scripts
+#def scripts():
+#    ''' return environment variable scripts '''
+#    scripts = os.environ['scripts']
+#    if not os.path.isdir(scripts):
+#        print('scripts:',scripts)
+#        sys.exit('scripts variable is not defined or is not an existing folder')
+#    return scripts
 
 def test_and_return_environment_var_path(var,path=False,exit=True):
     variable = os.environ[var]
@@ -580,7 +639,6 @@ def get_atomc_energy_from_dicts(dict_atomic_species_structure,dict_atom_energies
     '''
     out = 0
     for atom_species in dict_atomic_species_structure:
-	#print('asxxx',atom_species)
         atom_energy = dict_atom_energies[atom_species]
         en = dict_atomic_species_structure[atom_species]*atom_energy
         out += en
@@ -684,7 +742,7 @@ class mypot( object ):
 
     def get_pot_all(self):
         if len(self.pot_all_dict) == 0:
-            scripts = os.environ['scripts']
+            scripts = os.environ['SCRIPTS']
             home = os.environ['HOME']
             p1 = scripts+'/potentials/'
             p2 = home+'/sources/lammps/potentials/'
@@ -1499,7 +1557,7 @@ def create_READMEtxt(directory=False,add=False):
         directory = os.getcwd()
     # get sha
     pwd = os.getcwd()
-    os.chdir(os.environ['scripts'])
+    os.chdir(os.environ['SCRIPTS'])
     sha = check_output(["git","rev-parse","master"]).decode('utf-8')
     os.chdir(pwd)
 
@@ -2476,7 +2534,7 @@ def lammps_ext_elastic_potential_mod(ace):
     return command
 
 def get_LAMMPS_executable(exit=True,verbose=False):
-    SCR = os.environ["scripts"]
+    SCR = os.environ["SCRIPTS"]
     onhost = gethostname()
     if verbose:
         print('SCR',SCR)
@@ -4355,7 +4413,7 @@ class ase_calculate_ene( object ):
         return command
 
     def lammps_command_potential_eam_alloy(self,pair_style="eam/alloy"):
-	''' pair_style eam/alloy or adp '''
+        ''' pair_style eam/alloy or adp '''
         ## This should acutally be the elements of the structure ....
         out = ""
         for idx,i in enumerate(self.pot.elements):
@@ -5317,7 +5375,7 @@ class ase_calculate_ene( object ):
 
 
     def get_calculator(self,atoms):
-	''' here it would be good to have the pot values... '''
+        ''' here it would be good to have the pot values... '''
         #print('hhhhhhhhhhhh',self.pot.pottype)
         #print('hhhhhhhhhhhh in ',self.lmpcmd)
         #if self.pot.pottype in [ 'eam', 'eam-alloy' ]:
@@ -6455,27 +6513,25 @@ class ase_get_known_formats_class():
             return False
 
     def copy_if_necessary(self):
-        scripts = os.environ['scripts']
+        #scripts = os.environ['scripts']
+        scripts = os.environ['SCRIPTS']  # needs to be capitalized in python 3.x
         from_ = scripts+"/runner_scripts/ase_fileformat_for_"
         to = os.path.dirname(ase.io.__file__)+"/"
         import filecmp
         for ff in self.my_formats_filenames:
-            #print('copying ',from_+ff,'to',to+ff)
-            needcopy = filecmp.cmp(from_+ff,to+ff)
+            #print('copying ',from_+ff,'to (7666)',to+ff)
+            if os.path.isfile(from_+ff) and os.path.isfile(to+ff):
+                seemsequal = filecmp.cmp(from_+ff,to+ff)
+            else:
+                seemsequal = False
+            #print('seemsequal',seemsequal)
             #if self.verbose:
             #    print('copying ',from_+ff)
             #    print('                    to',to+ff)
-            #    print('seem equal?',needcopy)
-            if needcopy == False:
-                print()
-                print('copying!!!')
+            #    print('seem equal?',seemsequal)
+            if seemsequal == False:
+                print('copying ',from_+ff,'to (7666)',to+ff)
                 shutil.copyfile(from_+ff,to+ff)
-                print('copying ',from_+ff)
-                print('                    to',to+ff)
-                print('seem equal?',needcopy)
-                print()
-                #sys.exit()
-        #sys.exit()
 
     def adapt_formatspy(self,writeformatspy = False):
         # check if formatspy exist
@@ -6485,24 +6541,46 @@ class ase_get_known_formats_class():
 
         f = open(self.formatspy, "r")
         contents = f.readlines()
+        contents_before = contents.copy()
         f.close()
-        insert=0
+        insert1=0
         insert2=0
+        format_new = False
         for idx,i in enumerate(contents):
             #print('i',idx,i)
             #print("|"+i[:20]+"|")
             if i[:20] == "    'abinit': ('ABIN":
-                insert = idx
+                insert1 = idx
             if i[:30] == "    'lammps-data': 'lammpsdata":
                 insert2 = idx
+        print('insert1a',insert1)
+        print('insert2a',insert2)
+        if insert1 == 0 or insert1 == 0:
+            format_new = True
+            for idx,i in enumerate(contents):
+                if i[:10] == "F('abinit'":
+                    insert1 = idx
+                if i[:15] == "F('lammps-data'":
+                    insert2 = idx
 
+        print('insert1b',insert1)
+        print('insert2b',insert2)
+        if insert1 == 0 or insert1 == 0:
+            print('insert1',insert1)
+            print('insert2',insert2)
+            sys.exit('did not find inserts 98')
+        print('insert1c',insert1)
+        print('insert2c',insert2)
         for fo in [ 'runner', 'ipi', 'quippy' ]:
             if fo in self.all_known_formats_ase:
                 if self.verbose:
                     print(fo.ljust(14)+'format are already added in formats.py (of ase).')
             else:
                 print(fo.ljust(14)+'format NOT KNOWN in formats.py (of ase, WILL BE ADDED).')
-                contents.insert(insert, "    '"+fo+"': ('"+fo+" input file', '+F'),\n")
+                if format_new == False:
+                    contents.insert(insert1, "    '"+fo+"': ('"+fo+" input file', '+F'),\n")
+                else:
+                    contents.insert(insert1, "F('"+fo+"', '"+fo+" input file', '+F'),\n")
                 writeformatspy = True
 
 
@@ -6510,8 +6588,11 @@ class ase_get_known_formats_class():
             if self.verbose:
                 print('lammps-runner format are already added in formats.py (of ase).')
         else:
-            contents.insert(insert, "    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
-            contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
+            if format_new == False:
+                contents.insert(insert1,"    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
+                contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
+            else:
+                contents.insert(insert1,"F('lammps-runner', 'LAMMPS data input file for n2p2 or runner', '1F', module='lammpsrunner'),\n")
             writeformatspy = True
 
         if writeformatspy == True:
@@ -6530,6 +6611,7 @@ class ase_get_known_formats_class():
 
     def check_if_default_formats_known(self,copy_and_adapt_formatspy_anyhow=False):
         self.get_all_known_formats()
+        #print('needcopy_since_missing',self.needcopy_since_missing)
         if self.verbose: print(">> formats.py", self.formatspy)
         for idx,i in enumerate(self.my_formats_shall):
             if self.check_if_format_in_know_formats(i) == False: self.needcopy_since_missing = True
@@ -6541,25 +6623,32 @@ class ase_get_known_formats_class():
         #    f1 =
         #    f2 =
         #    print(filecmp.cmp(f1,f2))
+        #print('needcopy_since_missing',self.needcopy_since_missing)
         self.copy_if_necessary()
         #sys.exit('88')
 
         if self.needcopy_since_missing == True or copy_and_adapt_formatspy_anyhow == True: # only in this case copy stuff and add to formats.py
-            self.verbose = True
+        #    self.verbose = True
             self.copy_if_necessary()
             self.adapt_formatspy(writeformatspy = copy_and_adapt_formatspy_anyhow)
 
         #################################################
-        # check if vasp-out format writes free energies
+        # check if vasp-out format writes (rather reads) free energies -> makes force_consistent=False --> force_consistent=True
         vaspout = grep(self.vasp_out,'force_consistent=')
         #print('vo',vaspout)
-        vo = vaspout[0].split("force_consistent=")
-        #print('vo',vo)
-        #print('vo[1]',vo[1])
-        if vo[1][:5] == "False":
-            print('make vasp.out write free energies by default (not sigma->0 energies)')
-            sed(self.vasp_out,"force_consistent=False","force_consistent=True")
-        if self.verbose: print(">> vasp.py adapted to write free energies by default.")
+        #print('vo len',len(vaspout))
+        if len(vaspout) > 0: # old version
+            vo = vaspout[0].split("force_consistent=")
+            #print('vo',vo)
+            #print('vo[1]',vo[1])
+            if vo[1][:5] == "False":
+                print('make vasp.out write free energies by default (not sigma->0 energies)')
+                sed(self.vasp_out,"force_consistent=False","force_consistent=True")
+            if self.verbose: print(">> vasp.py adapted to write free energies by default.")
+        else:
+            #print('ss',self.vasp_out)
+            sed(self.vasp_out,"energy = free_energy \+ de","energy = free_energy #+ de # since I always want the free energy")
+            if self.verbose: print(">> vasp.py adapted to write free energies by default.")
         return
 
 def convert_energy(ene,units_in_,units_out_,nat,verbose=False):

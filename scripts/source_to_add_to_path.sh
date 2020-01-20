@@ -3,14 +3,16 @@
 # check if BASH or ZSH
 if [ "$ZSH_VERSION" != "" ];then
     #echo zsh
-    SCR="$( cd "$(dirname "$0")" ; pwd -P )"
+    scripts="$( cd "$(dirname "$0")" ; pwd -P )"
 else
     #echo bash
-    SCR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+    scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 fi
-#echo SCR:$SCR
+#export scripts="$scripts"
+export scripts="$scripts" #$scripts
+export SCRIPTS="$scripts" #$scripts
 #myhost=`$dotfiles/aliases/myhost.py`  # takes too long!
-_python_thermodynamics="$SCR/python_thermodynamics/"
+_python_thermodynamics="$scripts/python_thermodynamics/"
 #_ase_lammps="$HOME/sources/lammps_source_cosmo" # not necessary when added the _lammps_source/src to $LD_LIBRARY_PATH
 _n2p2_lib="$HOME/sources/n2p2/lib"
 _ipi_source="$HOME/sources/ipi/"
@@ -60,21 +62,20 @@ if [ "$myhost" = "daint" ];then
     export EIGEN_ROOT="$HOME/sources/eigen/"
 fi
 
-#export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
-#if [ -e $SCR/executables/lmp_$onhost\_par ];then  # dont use "$SCR/ex..." quotes on fidis --> will not work
+#export LAMMPS_COMMAND="$scripts/executables/lmp_$onhost"
+#if [ -e $scripts/executables/lmp_$onhost\_par ];then  # dont use "$scripts/ex..." quotes on fidis --> will not work
 #    #echo 'does yes'
-#    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost\_par"
+#    export LAMMPS_COMMAND="$scripts/executables/lmp_$onhost\_par"
 #else
 #    #echo 'does not'
-#    export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+#    export LAMMPS_COMMAND="$scripts/executables/lmp_$onhost"
 #fi
 # @@ on fidis this can do runner and n2p2
-export LAMMPS_COMMAND="$SCR/executables/lmp_$onhost"
+export LAMMPS_COMMAND="$scripts/executables/lmp_$onhost"
 export IPI_COMMAND="$HOME/sources/ipi/bin/i-pi"
 export IPI_COMMAND_PLAY="$HOME/sources/ipi_play/bin/i-pi"
 export N2P2_PATH="$HOME/sources/n2p2/"
-export scripts=$SCR
-export ESPRESSO_PSEUDO=$SCR/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
+export ESPRESSO_PSEUDO=$scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
 export OMP_NUM_THREADS=1
 
 # for vmd (seems ok to define this on mac with downloaded/installed vmd)
