@@ -112,6 +112,7 @@ def help(p = None):
     p.add_argument('-ghe','--get_harmonic_energy',   help='get the harmonic energy', action='count', default=False)
     p.add_argument('-d','--debug',   help='verbose', action='count', default=False)
     p.add_argument('-v','--verbose', help='verbose', action='count', default=False)
+    p.add_argument('-uuid','--uuid', help='show uuid of structure', action='count', default=False)
     return p
 
 
@@ -1368,7 +1369,7 @@ def get_energies(args):
                         print(dudlav)
                         fah.get_dudl_from_file_with_energies_lambda_0_1(filepath,number_of_atoms)
                 return
-            if verbose > 1:
+            if verbose > 1 or args.uuid:
                 print('idxuu (88)',idx,'uuid:',uuid)
             if idx in range(0,structures_to_calc,printevery):
                 printhere()
