@@ -95,6 +95,8 @@ def help(p = None):
     p.add_argument('--pick_concentration_mg','-pcmg',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcmg 1.0')
     p.add_argument('--pick_concentration_si','-pcsi',default=-1.,type=float,help='only consider structures with particular concentration of element, e.g. -pcsi 1.0')
     p.add_argument('--pick_atoms_al','-paal',default=-1.,type=float,help='only consider structures with particular number of al atoms, e.g. -paal 106 (e.v. 106 of 108)')
+    p.add_argument('--pick_atoms_mg','-pamg',default=-1.,type=float,help='only consider structures with particular number of mg atoms, e.g. -pamg 106 (e.v. 106 of 108)')
+    p.add_argument('--pick_atoms_si','-pasi',default=-1.,type=float,help='only consider structures with particular number of si atoms, e.g. -pasi 106 (e.v. 106 of 108)')
     p.add_argument('--pick_number_of_atoms','-pnat',default=-1.,type=float,help='only consider structures with particular number of atoms, e.g. -pnat 107')
     p.add_argument('--pick_forcesmax','-pfm',default=-1.,type=float,help='only consider structures with particular max force, e.g. -pfm 0')
     p.add_argument('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
@@ -762,6 +764,8 @@ def get_energies(args):
         print('--pick_concentration_mg      :',args.pick_concentration_mg)
         print('--pick_concentration_si      :',args.pick_concentration_si)
         print('--pick_atoms_al              :',args.pick_atoms_al)
+        print('--pick_atoms_mg              :',args.pick_atoms_mg)
+        print('--pick_atoms_si              :',args.pick_atoms_si)
         print('--pick_number_of_atoms       :',args.pick_number_of_atoms)
         print('--pick_forcesmax             :',args.pick_forcesmax)
         print('--pick_cellshape             :',args.pick_cellshape)
@@ -893,6 +897,9 @@ def get_energies(args):
                 print('i',i,'ana_atoms',ana_atoms_,'uuid',uuid)
             try:
                 DFT_forces = frames[i].get_forces()
+                #print('DFT_forces')
+                #print(DFT_forces)
+                #sys.exit()
                 for_DFTmax_ = np.abs(DFT_forces).max()
             except RuntimeError:
                 for_DFTmax_ = -9999
@@ -929,6 +936,10 @@ def get_energies(args):
                 continue
             if args.pick_atoms_al >= 0 and n["Al"] != args.pick_atoms_al:
                 continue
+            if args.pick_atoms_mg >= 0 and n["Mg"] != args.pick_atoms_mg:
+                continue
+            if args.pick_atoms_si >= 0 and n["Si"] != args.pick_atoms_si:
+                continue
             if args.pick_forcesmax >=0 and for_DFTmax_ > args.pick_forcesmax:
                 continue
             if args.pick_cellshape >= 0 and cellshape not in ["Q"]:
@@ -956,6 +967,9 @@ def get_energies(args):
             #    print('frames[i].positions')
             #    print(frames[i].positions)
 
+            #print('DFT_forces')
+            #print(DFT_forces)
+            #sys.exit()
             if calc_analysis: ### analysis stuff
                 ana_atoms[idx] = ana_atoms_
                 for_DFTmax[idx] = for_DFTmax_
@@ -1290,11 +1304,13 @@ def get_energies(args):
                 # enough for meV_pa
                 if ace.units == "mev_pa":
                     show = 3
-                elif ace.units == "hartree":
+                elif ace.units.lower() == "hartree":
+                    show = 6
+                elif ace.units.lower() == "ev":
                     show = 6
 
                 fmt_one = '%16.'+str(show)+'f'
-                fmt_one = '%10.'+str(show)+'f'
+                fmt_one = '%13.'+str(show)+'f'
                 fmt_after_atms=' '.join([fmt_one]*8)   # add here if a new entry
                 ka3="%5.0f %5.0f / %6.0f "+cellshape+" "+fmt_one+" [%4.0f %4.0f %4.0f %4.0f] "+fmt_after_atms+" "+added
 
@@ -1344,7 +1360,11 @@ def get_energies(args):
                     ene_DFT[idx],
                     ene_pot[idx],
                     ene_pot_wo_atomic[idx],
-                    for_DFTmax[idx],ene_pot_ase[idx]-ene_pot_ase_geop[idx],ana_vol_pa[idx],ana_dist_min[idx],ana_VOL_diff_norm[idx]))
+                    for_DFTmax[idx],
+                    ene_pot_ase[idx]-ene_pot_ase_geop[idx],
+                    ana_vol_pa[idx],
+                    ana_dist_min[idx],
+                    ana_VOL_diff_norm[idx]),"ABC")
                     #print('sss',
                     if ene_diff_abs[idx] > 60:
                         print('uuid:',uuid)
@@ -1476,9 +1496,9 @@ def get_energies(args):
 def printhead(structures_to_calc,ace_units):
     print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
-    print('#                         ('+ace_units+')                        ('+ace_units+')    ('+ace_units+')                                  ('+ace_units+')')
-    print('#                         (DFT-ref)                                            ene_wo_atomic  forces   (if geopt)  Vol per')
-    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]   ene_DFT     ene_pot                 DFTmax    E-E_geopt   atom')
+    print('#                         ('+ace_units+')                                ('+ace_units+')       ('+ace_units+')                  ('+ace_units+')     (eV/Ang)')
+    print('#                         (DFT-ref)                                                    ene_pot_wo_..      forces      (if geopt)     Vol per atom    min at dist   VOL_diff_norm')
+    print('#   i   idx /    from       diff  [atms   Si   Mg   Al]     ene_DFT       ene_pot      .._wo_atomic       DFTmax       E-E_geopt        (Ang^3)      (Angstrom)     (Ang^3)')
     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------')
     return
 
