@@ -102,7 +102,7 @@ def help(p = None):
     p.add_argument('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
     p.add_argument('--pick_c44','-pc44'         ,action='store_true',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
     p.add_argument('--pick_amount_1NN','-pa_1NN',action='store_true',default=False,required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
-    p.add_argument('--pick_uuid','-pa_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
+    p.add_argument('--pick_uuid','-pa_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine uuis that will be calculated.')
 
     p.add_argument('--write_runner','-wr',  action='store_true',help='default: runner.out')
     p.add_argument('--write_runner_repeated','-wrr',  action='store_true',help='default: runner_repeated.out')
