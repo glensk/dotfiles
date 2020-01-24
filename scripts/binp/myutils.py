@@ -36,14 +36,14 @@ from ase.optimize.basin import BasinHopping
 from ase.optimize.minimahopping import MinimaHopping
 from ase import units as aseunits
 from ase.calculators.singlepoint import SinglePointCalculator
-
-from phonopy import Phonopy
-from phonopy.structure.atoms import PhonopyAtoms
-
 try:
     from ase.calculators.lammpslib import LAMMPSlib
 except ImportError:
     print("ERROR when importing LAMMPSlib ... possibly you have to change your (conda/aiida) environment")
+
+from phonopy import Phonopy
+from phonopy.structure.atoms import PhonopyAtoms
+
 
 
 #try:  # not in aiida ase
