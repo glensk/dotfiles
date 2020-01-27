@@ -22,6 +22,7 @@ from datetime import datetime as datetime   # datetime.datetime.now()
 
 import ase
 from ase import Atoms
+from ase import Atom
 from ase.build import bulk as ase_build_bulk
 from ase.neighborlist import NeighborList, neighbor_list, NewPrimitiveNeighborList
 from ase.spacegroup import crystal
@@ -3843,13 +3844,19 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matr
     defect_element = False
     if "_" in crystal_structure:
         #print('yes _',crystal_structure.split("_"))
-        defect    = crystal_structure.split("_")[1]  # dilute, vac, ...
+        defect    = crystal_structure.split("_")[1]  # dilute, vac, selfinterstitial ...
         crystal_structure = crystal_structure.split("_")[0]
         #print('me',matrix_element)
-        if defect == 'dilute' and len(matrix_element) != 2:
+        if defect == 'dilute' and type(matrix_element) != list and len(matrix_element) != 2:
+            print('matrix_element:',matrix_element)
+            print('type(matrix_element):',type(matrix_element))
+            print('len(matrix_element):',len(matrix_element))
             sys.exit('please provide two matrix elements, first = matrix, second is the solute atom type')
-        elif defect == 'vac' and len(matrix_element) != 1:
-            sys.extit('please provide only one matrix element')
+        elif defect in [ 'vac', 'selfinterstitial' ] and type(matrix_element) != str:
+            print('matrix_element:',matrix_element)
+            print('type(matrix_element):',type(matrix_element))
+            print('len(matrix_element):',len(matrix_element))
+            sys.exit('Error, myutils: please provide only one matrix element')
 
         if defect == 'dilute':
             defect_element = matrix_element[1]
@@ -3887,12 +3894,19 @@ def get_ase_atoms_object_kmc_al_si_mg_vac(ncell,nsi=0,nmg=0,nvac=0,a0=False,matr
     number_of_atoms = atomsc.get_number_of_atoms()
     nal = number_of_atoms - nsi - nmg
 
-    if defect == "dilute":
-        atomsc[0].symbol = defect_element
+    print('kk')
+    print(atomsc.positions)
+    if defect != False:
+        if defect == "dilute":
+            atomsc[0].symbol = defect_element
+        elif defect == 'vac':
+            del atomsc[0]
+        elif defect == 'selfinterstitial':
+            atomsc.append(Atom(matrix_element,(a0/2., 0, 0)))
 
-    if defect == 'vac':
-        del atomsc[0]
-
+    #print('kki')
+    #print(atomsc.positions)
+    #sys.exit()
 
     #for i in np.arange(nmg):
     #    atomsc[i].symbol = 'Mg'
@@ -5426,7 +5440,7 @@ class ase_calculate_ene( object ):
         ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
         self.keep_alive = True
         self.get_calculator(atoms)
-        print('sssss')
+        #print('sssss')
         if False: #verbose:
             print('1: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
 
@@ -5671,6 +5685,17 @@ class ase_calculate_ene( object ):
                 print('222 vol',atoms_murn_loop.get_volume())
             #ene = self.ene(atoms_murn_loop)                         # works
             #ene = self.ene_new(atoms_murn_loop)                         # works
+
+            ########################################
+            # for vacancies, self interstitials we need a geometry relaxation here
+            # for highly symmetric structures this will not affect the result
+            ########################################
+            #print('volume',atoms_murn_loop.get_volume())
+            #print('p1    :',atoms_murn_loop.positions[0])
+            self.ase_relax_atomic_positions_only(atoms_murn_loop,fmax=0.0001,verbose=False,output_to_screen=False)
+            #print('volume',atoms_murn_loop.get_volume())
+            #print('p1    :',atoms_murn_loop.positions[0])
+            #sys.exit()
             ene = self.ene_allfix(atoms_murn_loop)                       # works
             ene_ev = atoms_murn_loop.get_potential_energy()
             ene = atoms_murn_loop.get_potential_energy()
