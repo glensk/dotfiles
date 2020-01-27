@@ -30,6 +30,10 @@ def help(p = None):
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammps-runner
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -evinet
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -fqh
+    % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc_vac -sys_ele Al -fqh
+    % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc_selfinterstitial -sys_ele Al -fqh
+    % getEnergies_byLammps.py -p n2p2_v5ag_ppl_98765_21cores -sys fcc_selfinterstitial -sys_ele Al -sys_ncell 2
+
     %
     % getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet -v # calculates c44 for al (TABLE I. Kobayashi)
     % getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV  # get formation energies
@@ -42,7 +46,7 @@ def help(p = None):
     p = argparse.ArgumentParser(description=string,
             formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument('-i', '--inputfile', required=False, type=str,default=False, help="input files containing structures that will be imported by ase")
-    p.add_argument('-sys','--sys', choices=[ "fcc", "bcc", "dc", 'hcp', 'fcc_vac', 'fcc_dilute' ], default=False, help="crystal_structure; can be set in case no inputfile is specified, define the system manually")
+    p.add_argument('-sys','--sys', choices=[ "fcc", "bcc", "dc", 'hcp', 'fcc_vac', 'fcc_dilute', 'fcc_selfinterstitial' ], default=False, help="crystal_structure; can be set in case no inputfile is specified, define the system manually")
     p.add_argument('-sys_ele','--sys_ele', nargs='*', default=False, help="in case no inputfile is given, define the element manually")
     p.add_argument('-sys_ncell','--sys_ncell', type=int, default=1, help="in case no inutfile is given, define how often the primitive/conventional cell is repeated")
     p.add_argument('--sys_cell','-sys_cell',choices = ['cubic','primitive','orthorhombic'],default='cubic',help='Which crystal structure to use')
@@ -364,10 +368,8 @@ def get_energies(args):
         if args.test_this_script:
             args.structures_idx = ":3"
 
-    #print('args.sys',args.sys)
-    #print('len sys_ele',args.sys_ele,len(args.sys_ele))
     if args.inputfile == False and args.sys != False and args.sys_ele != False:
-        if args.sys in [ 'fcc', 'bcc', 'hcp', 'dc' ] and len(args.sys_ele) == 1:
+        if args.sys in [ 'fcc', 'bcc', 'hcp', 'dc', 'fcc_selfinterstitial' ] and len(args.sys_ele) == 1:
             frames = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=args.sys_ncell,nsi=0,nmg=0,nvac=0,matrix_element=args.sys_ele[0],a0=False,cell=args.sys_cell,create_fake_vacancy=False,crystal_structure=args.sys)
         elif args.sys in [ 'fcc_dilute' ] and len(args.sys_ele) == 1:
             sys.exit('please specify 2 elements using -sys_ele e.g. -sys_ele Al Si')
@@ -1424,7 +1426,9 @@ def get_energies(args):
             ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
             ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
             ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
+            ene_DFT_wo_atomic_form = mysavetxt(ene_DFT_wo_atomic-17736.263712621,"ene_DFT_wo_atomic_form",units,save=True)
             ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
+            ene_pot_wo_atomic_form = mysavetxt(ene_pot_wo_atomic-17736.263712621,"ene_pot_wo_atomic_form",units,save=True)
 
             if args.write_analysis_full:
                 ene_DFT         = mysavetxt(ene_DFT,"ene_DFT.npy",units,save=True)
