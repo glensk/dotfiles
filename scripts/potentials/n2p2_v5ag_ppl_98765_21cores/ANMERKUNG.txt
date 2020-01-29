@@ -1,5 +1,5 @@
 ###########################
-### started with 5000 from gulio and removed 2 bad structures.
+### started with 5000 from gulio and removed 2 bad structures. (a8ed0448-d650-4489-b45d-2a8e03409904 fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c antisites al)
 added 143 elastic calculations for c44
 added 10cxx highstraing calculations
 ###########################
