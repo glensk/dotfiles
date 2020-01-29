@@ -9,7 +9,6 @@ import glob,random #,pathlib
 #from my_atom import #atom as my_atom
 import my_atom
 from itertools import islice
-import h5py
 
 import fah as fah_
 import argparse
@@ -3753,6 +3752,7 @@ def get_all_1NN_dist_vec_from_POSITIONs(folder,matrix_element="Al",verbose=False
     cryst = frames[0].info['cryst']
 
     print('cryst',cryst)
+    import h5py
     if os.path.isfile(folder+'/POSITIONs.distances.h5'):
         print('found',folder+'/POSITIONs.distances.h5')
         h5f = h5py.File(folder+'/POSITIONs.distances.h5','r')
@@ -4206,7 +4206,14 @@ def ase_enepot(atoms,units='eV',verbose=False):
         # in the case of of an ace calculations, it calculates the energy      -> get_stress() CAN     be obtained.
         #print('before')
         ene = atoms.get_potential_energy()
-        #print('ene1:',ene,'atoms.info',atoms.info)
+        if False:
+            print('ene1:',ene,'atoms.info',atoms.info)
+            forces = atoms.get_forces()
+            print('pos')
+            print(atoms.get_positions())
+            print('forces --> this are the NN/EAM forces')
+            print(forces)
+        #sys.exit()
         #uuid = atoms.info["comment"]
         #print('uuid',uuid)
         #stress = atoms.get_stress()
