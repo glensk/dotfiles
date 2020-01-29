@@ -95,7 +95,6 @@ tab-color $mypromptpath
 # lets see weather we can survive without conda
 # on mac: install stuff with easy_install / pip / brew
 # on fidis: might be necessary to install click somehow but for now lets try without;
-# fidis: pip install --install-option="--prefix=$HOME/.local" click
 ##############################################
 # s3 goo zsh_set
 # s1 CONDA autojump AFTER_CONDA
@@ -135,6 +134,9 @@ case $myhost in
 #    # module load intel python/2.7.16
 #    # pip install --upgrade --user 'ase<3.18.0'  # since since version 3.18.0 ase supports only python 3
 #    # pip install --upgrade --user ipython
+#    # on fidis: pip install --install-option="--prefix=$HOME/.local" click # on some version)
+#    # on fidis: pip install --install-option="--prefix=$HOME/.local" lmfit
+#    # on fidis: pip install --install-option="--prefix=$HOME/.local" phonopy
     fidis) moduel load intel python/2.7.16;;
     helvetios) moduel load intel python/2.7.16;;
     #mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate  -> dont need it

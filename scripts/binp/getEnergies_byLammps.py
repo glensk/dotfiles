@@ -8,24 +8,18 @@ from subprocess import check_output,call
 #import click
 import glob,time
 import numpy as np
-end = timeit.timeit()
-print('time0, before myutils',end - start)
+print('time0, for standardimports',timeit.timeit() - start); start = timeit.timeit()
 
 # check those imports
-start = timeit.timeit()
 import myutils as my
-end = timeit.timeit()
-print('time1, after  myutils',end - start)
+print('time1, for myutils',timeit.timeit() - start); start = timeit.timeit()
 
-start = timeit.timeit()
 import fah
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase import units as aseunits
-end = timeit.timeit()
-print('time2, after  imports',end - start)
-start = timeit.timeit()
+print('time1, for ase_calc...',timeit.timeit() - start); start = timeit.timeit()
 
 def help(p = None):
     string = '''
@@ -135,8 +129,7 @@ def help(p = None):
     p.add_argument('-uuid','--uuid', help='show uuid of structure', action='count', default=False)
     return p
 
-end = timeit.timeit()
-print('time3, after  help:  ',end - start)
+print('time3, after help  ...',timeit.timeit() - start); start = timeit.timeit()
 
 def get_energies(args):
     ''' this is a script which computes for a given set of structures the energies
@@ -150,9 +143,7 @@ def get_energies(args):
     ##############################################################
     ase_formats = my.ase_get_known_formats_class(verbose=args.verbose)
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
-    start = timeit.timeit()
-    print('time0 ase_formats',end-start)
-    start = timeit.timeit()
+    print('time00 after ase_formats_check...',timeit.timeit() - start); start = timeit.timeit()
 
 
     #dudl = fah.get_dudl_from_file_with_energies_lambda_0_1('../simulation.ti',number_of_atoms=32)
@@ -195,8 +186,6 @@ def get_energies(args):
         my.list_pot_all()
         sys.exit()
 
-    start = timeit.timeit()
-    print('time1 show availp',end-start)
     ##################################
     # create the README
     ##################################
@@ -410,11 +399,23 @@ def get_energies(args):
                 print('after relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx],frames.get_forces()[idx])
     if args.inputfile != False:
         my.check_isfile_or_isfiles([args.inputfile],verbose=args.verbose)
+        print('########################################################')
         print('args.inputfile:',args.inputfile)
         print('args.format_in:',args.format_in)
+        print('########################################################')
         frames = ase_read(args.inputfile,format=args.format_in,index=":")
-
         print('type(frames)',type(frames))
+        print('len(frames)',len(frames))
+        DFT_FORCES_EV_ANG = []
+        DFT_ENERGIES_EV_CELL = []
+        print('getting DFT data')
+        for idx,i in enumerate(frames):
+            #print(frames[idx].get_forces())
+            DFT_FORCES_EV_ANG.append(frames[idx].get_forces())
+            DFT_ENERGIES_EV_CELL.append(frames[idx].get_potential_energy())
+        print('getting DFT data DONE!')
+        POT_FORCES_EV_ANG = np.copy(DFT_FORCES_EV_ANG)
+        POT_ENERGIES_EV_CELL = np.copy(DFT_ENERGIES_EV_CELL)
 
     if args.thermo or args.evinet or args.fqh or args.fah:
         # Al evinet: -537461.993661476416 16.579676546844 79.185555426019 2.526937653000
@@ -896,6 +897,7 @@ def get_energies(args):
         min_at = 100000
         min_at_id = 0
         min_at_orig = 0
+        print('range(structures_to_calc)',range(structures_to_calc))
         for idx,i in enumerate(range(structures_to_calc)):
             try:
                 all_comment = frames[i].info['comment']
@@ -1063,7 +1065,12 @@ def get_energies(args):
                     print("DD before ene_DFT")
                 f_tmp = copy.deepcopy(frames[i])
                 f_atoms = f_tmp.get_number_of_atoms()
+                #print()
+                #print('iiiiiiiiidx',idx)
                 ene_DFT[idx],ene_DFT_eV_cell[idx] = my.ase_enepot(frames[i],units=args.units,verbose=True)
+                #print('DFT_FORCES_EV_ANG')
+                #print(DFT_FORCES_EV_ANG[idx])
+                #sys.exit('23k4')
                 #print('ene_DFTxyz        ',idx,ene_DFT[idx])
                 # this is only of interest for thermodynamic integration.
                 if verbose > 2: #be_very_verbose:
@@ -1125,6 +1132,13 @@ def get_energies(args):
                     f_tmp = copy.deepcopy(atoms_tmp)
                     f_atoms = f_tmp.get_number_of_atoms()
                     ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
+                    POT_ENERGIES_EV_CELL[idx] = ene_pot_eV_cell[idx]
+                    POT_FORCES_EV_ANG[idx] = atoms_tmp.get_forces()
+                    #print('compare enes')
+                    #print(DFT_ENERGIES_EV_CELL[idx],POT_ENERGIES_EV_CELL[idx])
+                    #print('compare forces')
+                    #print([DFT_FORCES_EV_ANG[idx]-POT_FORCES_EV_ANG[idx]])
+                    #print('78uj00')
                     if f_atoms > 1:
                         ene_pot_m0[idx] = (ene_pot_eV_cell[idx] - ene_pot_eV_cell[0])/(f_atoms-1.)*1000.
                     else:
@@ -1437,6 +1451,28 @@ def get_energies(args):
         if args.write_analysis_full:
             np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
+        if args.write_analysis:
+            # get RMSE FORCES
+            #print('range',range(structures_to_calc))
+            #print('list',[range(structures_to_calc)])
+            indexes = range(structures_to_calc)
+            sum_atoms = 0
+            aa = []
+            for idx,x in enumerate(indexes):
+                aa = aa + list(np.abs(DFT_FORCES_EV_ANG[x]-POT_FORCES_EV_ANG[x]).flatten())
+                #print(aa)
+                #print('--')
+                #print('aa.mean()',np.array(aa).mean())
+                mean = np.array(aa).mean()
+                #print('aa.mean()',np.abs(np.array(aa)))
+                #print('aa.rmse()',np.sqrt(np.mean((np.abs(np.array(aa)))**2)))
+                rmse = np.sqrt(np.mean(np.array(aa)**2.))
+            print('mean',mean)
+            print('rmse',rmse)
+            np.savetxt("RMSE_FORCES.dat",np.array([rmse]),fmt='%.5f')
+            #np.savetxt("for_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
+            #np.savetxt("for_diff_DFT_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
+
         if args.write_runner:
             print('out.runner written')
 
@@ -1487,7 +1523,7 @@ def get_energies(args):
                     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
                     ### write analyze.csv
                     try:
-                        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+args.pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
+                        np.savetxt("ene_all.npy",ene_all,header=units+"\n"+"DFT\t\t"+ase.pot+"\t|diff|\t\t<|diff|>",fmt=' '.join(['%i'] + ['%.10e']*(ene_all.shape[1]-1)))
                     except IndexError:
                         print('len',len(ene_DFT))
                         print(ene_DFT.shape)
@@ -2733,12 +2769,9 @@ def test3_do(ace):
 if __name__ == "__main__":
     start = timeit.timeit()
     p = help()
-    end = timeit.timeit()
-    print('timex',end - start)
-    start = timeit.timeit()
+    print('__main__ after p = help',timeit.timeit()-start); start = timeit.timeit()
     args = p.parse_args()
-    end = timeit.timeit()
-    print('timey',end - start)
+    print('__main__ after parsing help',timeit.timeit()-start)
     if args.verbose:
         my.print_args(args)
     get_energies(args)
