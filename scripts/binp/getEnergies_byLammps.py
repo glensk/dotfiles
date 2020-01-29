@@ -1452,7 +1452,7 @@ def get_energies(args):
             np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
 
         if args.write_analysis:
-            # get RMSE FORCES
+            print('get RMSE FORCES ...')
             #print('range',range(structures_to_calc))
             #print('list',[range(structures_to_calc)])
             indexes = range(structures_to_calc)
@@ -1463,11 +1463,11 @@ def get_energies(args):
                 #print(aa)
                 #print('--')
                 #print('aa.mean()',np.array(aa).mean())
-                mean = np.array(aa).mean()
+                #mean = np.array(aa).mean()
                 #print('aa.mean()',np.abs(np.array(aa)))
                 #print('aa.rmse()',np.sqrt(np.mean((np.abs(np.array(aa)))**2)))
-                rmse = np.sqrt(np.mean(np.array(aa)**2.))
-            print('mean',mean)
+            rmse = np.sqrt(np.mean(np.array(aa)**2.))
+            #print('mean',mean)
             print('rmse',rmse)
             np.savetxt("RMSE_FORCES.dat",np.array([rmse]),fmt='%.5f')
             #np.savetxt("for_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])

@@ -334,7 +334,8 @@ def column_scale_y(column_index,gocolumns,args):
         print("## column_scale_y: column_index:",column_index)
         print("## column_scale_y: gocolumns   :",gocolumns,type(gocolumns))
         print("## column_scale_y: args.scale_y:",args.scale_y,type(args.scale_y))
-    if isinstance(args.scale_y, (int, long, float, complex)):
+    #if isinstance(args.scale_y, (int, long, float, complex)):  # not working with python 3.7
+    if isinstance(args.scale_y, (int, float, complex)):
         return args.scale_y
     elif type(args.scale_y) == list:
         return args.scale_y[column_index]
