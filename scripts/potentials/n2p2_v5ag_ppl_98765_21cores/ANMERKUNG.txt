@@ -1,5 +1,5 @@
 ###########################
-### started with 5000 from gulio and removed 2 bad structures.
+### started with 5000 from gulio and removed 2 bad structures.  -> discussed with bill, mail from 28.januar 2020
 added 143 elastic calculations for c44
 added 10cxx highstraing calculations
 ###########################

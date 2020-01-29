@@ -37,6 +37,7 @@ def help(p = None):
     %
     % getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet -v # calculates c44 for al (TABLE I. Kobayashi)
     % getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV  # get formation energies
+    % getEnergies_byLammps.py  -p Al_zhou.eam.alloy  -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet
 
 
 
@@ -1352,15 +1353,27 @@ def get_energies(args):
                     else:
                         print(str(i).ljust(5),ene_diff_abs[idx])
                 else:
-                    print(ka3 % (
+                    ka = (ene_DFT[idx]+537462.536751423380)*33/1000
+                    if ka > 7.5:
+                        print('idxuu (77)',idx,'uuid:',uuid)
+                        print(ka3 % (
                     i,
                     idx,
                     structures_to_calc,
                     ene_diff_abs[idx],
                     frames[i].get_number_of_atoms(),
                     at_si,at_mg,at_al,
-                    ene_DFT[idx],
-                    ene_pot[idx],
+                    (ene_DFT[idx]+537462.536751423380)*33/1000,
+                    (ene_pot[idx]+537462.536751423380)*33/1000,
+                    #(ene_DFT[idx]+537463)*33/1000,
+                    #(ene_pot[idx]+537463)*33/1000,
+                    #(ene_DFT[idx]+537460)*33/1000,
+                    #(ene_pot[idx]+537460)*33/1000,
+                    #(ene_DFT[idx]+537462.536751423380)*33/1000,
+                    #(ene_pot[idx]+3579.989020373443)*33/1000, # zhou
+                    #(ene_pot[idx]+2380.290192865874)*33/1000,
+                    #ene_DFT[idx],
+                    #ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],
                     ene_pot_ase[idx]-ene_pot_ase_geop[idx],
@@ -1368,7 +1381,7 @@ def get_energies(args):
                     ana_dist_min[idx],
                     ana_VOL_diff_norm[idx]),"ABC")
                     #print('sss',
-                    if ene_diff_abs[idx] > 60:
+                    if ene_diff_abs[idx] > 60 and False:
                         print('uuid:',uuid)
 
                 if idx >= 99:
