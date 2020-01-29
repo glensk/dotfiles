@@ -1,18 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+import timeit
+start = timeit.timeit()
 import sys,os,copy,argparse,shutil
 from subprocess import check_output,call
 #import click
 import glob,time
 import numpy as np
+end = timeit.timeit()
+print('time0, before myutils',end - start)
+
+# check those imports
+start = timeit.timeit()
 import myutils as my
-import my_atom
+end = timeit.timeit()
+print('time1, after  myutils',end - start)
+
+start = timeit.timeit()
 import fah
 from myutils import ase_calculate_ene #as ace
 from ase.io import read as ase_read
 from ase.io import write as ase_write
 from ase import units as aseunits
+end = timeit.timeit()
+print('time2, after  imports',end - start)
+start = timeit.timeit()
 
 def help(p = None):
     string = '''
@@ -122,18 +135,24 @@ def help(p = None):
     p.add_argument('-uuid','--uuid', help='show uuid of structure', action='count', default=False)
     return p
 
+end = timeit.timeit()
+print('time3, after  help:  ',end - start)
 
 def get_energies(args):
     ''' this is a script which computes for a given set of structures the energies
     for a given potential.
 
     '''
+    start = timeit.timeit()
     ##############################################################
     ### check if ase runner/quippy/lammpps-data formats are known
     ### use -v (verbose) option to see known formats
     ##############################################################
     ase_formats = my.ase_get_known_formats_class(verbose=args.verbose)
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
+    start = timeit.timeit()
+    print('time0 ase_formats',end-start)
+    start = timeit.timeit()
 
 
     #dudl = fah.get_dudl_from_file_with_energies_lambda_0_1('../simulation.ti',number_of_atoms=32)
@@ -176,6 +195,8 @@ def get_energies(args):
         my.list_pot_all()
         sys.exit()
 
+    start = timeit.timeit()
+    print('time1 show availp',end-start)
     ##################################
     # create the README
     ##################################
@@ -1353,18 +1374,18 @@ def get_energies(args):
                     else:
                         print(str(i).ljust(5),ene_diff_abs[idx])
                 else:
-                    ka = (ene_DFT[idx]+537462.536751423380)*33/1000
-                    if ka > 7.5:
-                        print('idxuu (77)',idx,'uuid:',uuid)
-                        print(ka3 % (
+                    #ka = (ene_DFT[idx]+537462.536751423380)*33/1000
+                    #if ka > 7.5:
+                    #    print('idxuu (77)',idx,'uuid:',uuid)
+                    print(ka3 % (
                     i,
                     idx,
                     structures_to_calc,
                     ene_diff_abs[idx],
                     frames[i].get_number_of_atoms(),
                     at_si,at_mg,at_al,
-                    (ene_DFT[idx]+537462.536751423380)*33/1000,
-                    (ene_pot[idx]+537462.536751423380)*33/1000,
+                    #(ene_DFT[idx]+537462.536751423380)*33/1000,
+                    #(ene_pot[idx]+537462.536751423380)*33/1000,
                     #(ene_DFT[idx]+537463)*33/1000,
                     #(ene_pot[idx]+537463)*33/1000,
                     #(ene_DFT[idx]+537460)*33/1000,
@@ -1372,8 +1393,8 @@ def get_energies(args):
                     #(ene_DFT[idx]+537462.536751423380)*33/1000,
                     #(ene_pot[idx]+3579.989020373443)*33/1000, # zhou
                     #(ene_pot[idx]+2380.290192865874)*33/1000,
-                    #ene_DFT[idx],
-                    #ene_pot[idx],
+                    ene_DFT[idx],
+                    ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],
                     ene_pot_ase[idx]-ene_pot_ase_geop[idx],
@@ -2710,8 +2731,14 @@ def test3_do(ace):
     print('done kk')
 
 if __name__ == "__main__":
+    start = timeit.timeit()
     p = help()
+    end = timeit.timeit()
+    print('timex',end - start)
+    start = timeit.timeit()
     args = p.parse_args()
+    end = timeit.timeit()
+    print('timey',end - start)
     if args.verbose:
         my.print_args(args)
     get_energies(args)
