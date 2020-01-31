@@ -1098,13 +1098,16 @@ class mypot( object ):
             print('PPk self.pot       ',self.pot)
 
         if self.pottype in [ "runner", "n2p2" ]:
-            checkfiles = [ "input.nn", "scaling.data"] #, "weights.012.data", "weights.013.data", "weights.014.data" ]
-            for i in self.atomic_numbers:
-                filename = "weights."+(str(self.atomic_numbers[i]).zfill(3))+".data"
-                checkfiles += [filename]
+            checkfiles = [ "input.nn", "scaling.data"]
+            # add to checkfiles: "weights.012.data", "weights.013.data", "weights.014.data"
+            if False:
+                for i in self.atomic_numbers:
+                    filename = "weights."+(str(self.atomic_numbers[i]).zfill(3))+".data"
+                    checkfiles += [filename]
 
             for i in checkfiles:
                 if not os.path.isfile(self.potpath+"/"+i):
+                    print('checked for:',self.potpath+"/"+i)
                     sys.exit(self.potpath+"/"+i+" does not exist! (3)")
 
             self.inputnn     = isfiledir(self.potpath+"/input.nn",exit=True)
@@ -1167,6 +1170,15 @@ class mypot( object ):
             # if no epoch to use specified, use whatever is available
             #print('useepo',self.use_epoch,type(self.use_epoch))
             #print('linked',self.potepoch_linked,type(self.potepoch_linked))
+            if self.potepoch_linked == False and self.use_epoch == False:
+                self.potpath_work = self.use_epoch = self.potepoch_all[-1]
+                self.potpath_work = self.pot_tmpdir
+            print('self.use_epoch',self.use_epoch)
+            print('self.potpath_work',self.potpath_work)
+            print('self.potepoch_linked',self.potepoch_linked)
+            print('self.potepoch_using',self.potepoch_using)
+            print('self.potpath',self.potpath)
+            print('self.potepoch_linked',self.potepoch_linked)
             if self.use_epoch == False:
                 self.potpath_work   = self.potpath
                 self.potepoch_using  = self.potepoch_linked
