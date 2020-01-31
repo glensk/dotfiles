@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: c5829f9440246a208b4bd4428418adc734978630
+# execution time: 0.176693916321 seconds.
+
+getEnergies_byLammps.py -p .. -i /home/glensk/Dropbox/Albert/scripts/dotfiles//scripts/potentials/aiida_get_structures_new/OQMD-Distorted_scf --units meV_pa -wrd --pick_uuid a8ed0448-d650-4489-b45d-2a8e03409904 fe48fbcf-837e-4c2a-9ed4-c7b1e307ba2c be696773-63f8-41a5-95fc-5269c6a6a7ee 36381798-b900-490a-9747-acbf5035785d be696773-63f8-41a5-95fc-5269c6a6a7ee a50a0b59-f05f-4e67-8964-2c8da4a48c9c 6374fed7-831b-49c5-908d-2e43a6611b40 7984dd56-c844-43b6-b0db-86460954bc27 27210361-b6fd-468a-9a66-11b2134db53d 92ebe112-8063-4210-991b-d84b3dc376aa 463007af-3d89-4d33-a69a-b1b3719153ab 2b15f6c7-e68e-4878-b20b-82a3e18eec09 430ae5eb-72a3-4af9-9c53-41a7d6dda319 92ebe112-8063-4210-991b-d84b3dc376aa 7bddd94c-5bb1-4560-977c-18a3c07eeb8b e5e41abe-4213-4951-a51f-20c0081d59f3 e449045c-c124-4d3c-b284-43d3a27079e4 82392303-5289-4128-85be-63f0431bd284 e449045c-c124-4d3c-b284-43d3a27079e4 171318e0-1db1-4d96-b24d-116c9c6987eb
