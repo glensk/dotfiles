@@ -46,6 +46,10 @@ def help(p = None):
     % getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV  # get formation energies
     % getEnergies_byLammps.py  -p Al_zhou.eam.alloy  -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet
 
+    % for paper:
+        evinet (a,B,B'): getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
+
+
 
 
 
