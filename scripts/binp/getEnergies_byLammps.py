@@ -49,6 +49,9 @@ def help(p = None):
     % for paper:
         evinet (a,B,B')   : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
         elastic constants : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea
+        heats of solute/vac formation: getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV
+        formation energies AlXMgYSiZ : getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV
+
 
 
 
@@ -1894,7 +1897,7 @@ def get_si_dc_equilibrium(ace):
 
 def get_basic_NN_energies_ace(ace):
     print('######## get_basic_NN_energies_ace #############')
-    scripts = my.scripts()
+    scripts = os.environ['scripts']
     tests = scripts+'/tests/'
     ace.savefolder = tests+'/Al-Mg-Si/save_'+ace.pot.pot+"/"
     if not os.path.isdir(ace.savefolder):
@@ -1937,7 +1940,7 @@ def get_basic_NN_energies_ace(ace):
 def get_dilute_si_mg_f(ace):
     print("######## get_dilute_si_mg_f #############")
 
-    scripts = my.scripts()
+    scripts = os.environ['scripts']
     tests = scripts+'/tests/'
     bprime = tests+'/Al-Mg-Si/Mg9Si5_beta_prime/dilute_structures_and_beta_prime.input.data'
 
@@ -2049,6 +2052,9 @@ def get_dilute_si_mg_f(ace):
     print_compare_ene_vs_DFT('formation_energy dilute mg (1Mg in bulk Al) 3x3x3',ace.eform_dilute_mg-ace.mg_hcp_ene_pa,"-", '-',"-")
     print_compare_ene_vs_DFT('formation_energy dilute si (1Si in bulk Al) 4x4x4',ace.E_SS_Si-ace.si_dc_ene_pa ,"-", '-',"-")
     print_compare_ene_vs_DFT('formation_energy dilute mg (1Mg in bulk Al) 4x4x4',ace.E_SS_Mg-ace.mg_hcp_ene_pa,"-", '-',"-")
+    np.savetxt("heat_of_formation_si_4x4x4.dat",np.array([ace.E_SS_Si-ace.si_dc_ene_pa]),fmt='%1.4f')
+    np.savetxt("heat_of_formation_mg_4x4x4.dat",np.array([ace.E_SS_Mg-ace.mg_hcp_ene_pa]),fmt='%1.4f')
+    np.savetxt("heat_of_formation_vac_3x3x3.dat",np.array([ace.E_SS_vac]),fmt='%1.4f')
     print()
 
     #print('ace.si_dc_ene_pa',ace.si_dc_ene_pa)
@@ -2143,9 +2149,9 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         f=open(ace.written_summary[0], "a+")
         f.write(str(conz)+"   "+str(heat_precip_T0K_DFT)+" "+text.replace(" ", "_")+"\n")
         f.close()
+
         if formula_unit != False:
             eform = heat_precip_T0K_DFT*formula_unit
-            sys.exit()
             #print('eform DFT per formula unit:',np.round(eform,3))
             f=open(ace.written_summary[0]+"_per_formula_unit.dat", "a+")
             print('wirttein to',ace.written_summary[0]+"_per_formula_unit.dat")
@@ -2154,7 +2160,6 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
     print('bef el')
     get_elastic_constants_al_ext(ace,frame)
     print('aft el')
-    sys.exit()
 
     # write NN@DFT
     print('-->>',energy_NN_cell_unrelaxed_or_DFTrelaxed - d["Mg"]*ace.E_SS_Mg - d["Si"]*ace.E_SS_Si - d["Al"]*ace.E_SS_Al)
@@ -2468,9 +2473,10 @@ def test_antisites(ace):
     print('  86 out_antisites_repMg5Al2Si4_NEW.runner_calc  albert.glensk@gmail.com')
     print('  87 out_antisites_repMg5Si6_NEW.runner          albert.glensk@gmail.com')
     print('  88 out_antisites_repMg5Si6_NEW.runner_calc     albert.glensk@gmail.com')
-    phase =  "Mg4Al3Si4" # done
-    phase =  "Mg5Al2Si4" # done
-    phase = "Mg5Si6" # done
+
+    #phase =  "Mg4Al3Si4" # done
+    #phase =  "Mg5Al2Si4" # done
+    #phase = "Mg5Si6" # done
 
 
     potpath_using = ace.pot.potpath+"/epoch_"+str(ace.pot.potepoch_using)
