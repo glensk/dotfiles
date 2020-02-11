@@ -114,9 +114,10 @@ def help(p = None):
     p.add_argument('--pick_cellshape','-pcs',default=-1.,type=float,help='only consider structures with particular cellshape, e.g. -pfm 0')
     p.add_argument('--pick_c44','-pc44'         ,action='store_true',default=False,required=False,help='only consider structures which are candidates for c44 calculations')
     p.add_argument('--pick_amount_1NN','-pa_1NN',action='store_true',default=False,required=False,help='detrmine the amount of Si,Mg,Al in 1NN shell around vacancy')
-    p.add_argument('--pick_uuid','-pa_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine uuis that will be calculated.')
+    p.add_argument('--pick_uuid','-pick_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine uuis that will be calculated.')
 
-    p.add_argument('--write_runner','-wr',  action='store_true',help='default: runner.out')
+    p.add_argument('--write_runner','-wr'    ,  action='store_true',help='write runnerfile from calculated structures using chosen pot; default filename out: runner.out')
+    p.add_argument('--write_runner_DFT','-wrd', action='store_true',help='write runnerfile with selected input structures (e.g. DFT); default filename out: runner_DFT.out')
     p.add_argument('--write_runner_repeated','-wrr',  action='store_true',help='default: runner_repeated.out')
     p.add_argument('--write_forces','-wf',  action='store_true',help='write forces.out of particular strucuture')
     p.add_argument('--write_forcesx','-wfx',action='store_true',help='write forcesx.out of particular strucuture')
@@ -400,8 +401,8 @@ def get_energies(args):
     if args.inputfile != False:
         my.check_isfile_or_isfiles([args.inputfile],verbose=args.verbose)
         print('########################################################')
-        print('args.inputfile:',args.inputfile)
-        print('args.format_in:',args.format_in)
+        print('XXX args.inputfile:',args.inputfile)
+        print('XXX args.format_in:',args.format_in)
         print('########################################################')
         frames = ase_read(args.inputfile,format=args.format_in,index=":")
         print('type(frames)',type(frames))
@@ -682,8 +683,8 @@ def get_energies(args):
         print('getEne (23): reading args.inputfile ...  :',args.inputfile)
         if args.inputfile[-6:] == 'extxyz': args.format_in = "extxyz"
         if args.inputfile[-6:] == 'gz': sys.exit("this need to be unzipped first, otherwise takes too long with ase")
-        print('getEne (23): args.format_in ...          :',args.format_in)
-        print('getEne (23): args.structures_idx ...     :',args.structures_idx)
+        print('YYY getEne (23): args.format_in ...          :',args.format_in)
+        print('YYY getEne (23): args.structures_idx ...     :',args.structures_idx)
         #print('try with guessing')
         frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
 
@@ -898,6 +899,10 @@ def get_energies(args):
         min_at_id = 0
         min_at_orig = 0
         print('range(structures_to_calc)',range(structures_to_calc))
+
+        ################################################################
+        # begin main loop
+        ################################################################
         for idx,i in enumerate(range(structures_to_calc)):
             try:
                 all_comment = frames[i].info['comment']
@@ -996,6 +1001,29 @@ def get_energies(args):
             #print('DFT_forces')
             #print(DFT_forces)
             #sys.exit()
+            if args.write_runner_DFT:
+                try:
+                    addedstr
+                except NameError:
+                    addedstr = 0
+
+                ase_write("out_selected_uuid.runner",frames[i],format='runner',append=True)
+                addedstr += 1
+                print('added +1',addedstr,uuid,idx,i)
+                args.pick_uuid.remove(uuid)
+                try:
+                    args.pick_uuid.remove(uuid)
+                except ValueError:
+                    pass
+                try:
+                    args.pick_uuid.remove(uuid)
+                except ValueError:
+                    pass
+                if idx == 175: #range(structures_to_calc)[-1]:
+                    for i in args.pick_uuid:
+                        sys.stdout.write(i+" ")
+                    sys.exit()
+                continue
             if calc_analysis: ### analysis stuff
                 ana_atoms[idx] = ana_atoms_
                 for_DFTmax[idx] = for_DFTmax_
@@ -1458,8 +1486,10 @@ def get_energies(args):
             indexes = range(structures_to_calc)
             sum_atoms = 0
             aa = []
+            bb = []
             for idx,x in enumerate(indexes):
                 aa = aa + list(np.abs(DFT_FORCES_EV_ANG[x]-POT_FORCES_EV_ANG[x]).flatten())
+                bb = bb + list(np.abs(DFT_ENERGIES_EV_CELL[x]-POT_ENERGIES_EV_CELL[x]).flatten())
                 #print(aa)
                 #print('--')
                 #print('aa.mean()',np.array(aa).mean())
@@ -1467,8 +1497,12 @@ def get_energies(args):
                 #print('aa.mean()',np.abs(np.array(aa)))
                 #print('aa.rmse()',np.sqrt(np.mean((np.abs(np.array(aa)))**2)))
             rmse = np.sqrt(np.mean(np.array(aa)**2.))
+            std = np.array(aa).std()
+            rmse_e = np.sqrt(np.mean(np.array(bb)**2.))
             #print('mean',mean)
-            print('rmse',rmse)
+            print('rmse for',rmse)
+            print('std  for',std)
+            print('rmse_e',rmse_e)
             np.savetxt("RMSE_FORCES.dat",np.array([rmse]),fmt='%.5f')
             #np.savetxt("for_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
             #np.savetxt("for_diff_DFT_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
@@ -1494,7 +1528,7 @@ def get_energies(args):
         if args.write_analysis_full or args.write_analysis:
             ene_diff        = mysavetxt(ene_diff,"ene_diff.npy",units,save=True)
             ene_diff_abs    = mysavetxt(ene_diff_abs,"ene_diff_abs.npy",units,save=True)
-            ene_std         = mysavetxt(ene_std,"ene_std.npy",units,save=True)
+            ene_std         = mysavetxt(ene_std,"ene_std_rmse.npy",units,save=True)
             ene_DFT_wo_atomic = mysavetxt(ene_DFT_wo_atomic,"ene_DFT_wo_atomic",units,save=True)
             ene_DFT_wo_atomic_form = mysavetxt(ene_DFT_wo_atomic-17736.263712621,"ene_DFT_wo_atomic_form",units,save=True)
             ene_pot_wo_atomic = mysavetxt(ene_pot_wo_atomic,"ene_pot_wo_atomic",units,save=True)
@@ -1518,7 +1552,7 @@ def get_energies(args):
                     np.savetxt("ene_pot.npy",ene_pot,header=units)
                     np.savetxt("ene_diff.npy",ene_diff,header=units)
                     np.savetxt("ene_diff_abs.npy",ene_diff_abs,header=units)
-                    np.savetxt("ene_std.npy",ene_std,header=units)
+                    np.savetxt("ene_std_rmse.npy",ene_std,header=units)
 
                     ene_all = np.transpose([range(len(ene_DFT)),ene_DFT,ene_pot,ene_diff_abs,ene_std])
                     ### write analyze.csv
