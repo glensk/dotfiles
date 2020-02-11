@@ -6,6 +6,7 @@ for f in $ff;do
     echo $f
     cd $f
         #getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
+        #getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea
     cd $hier
 done
 

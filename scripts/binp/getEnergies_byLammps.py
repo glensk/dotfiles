@@ -47,7 +47,9 @@ def help(p = None):
     % getEnergies_byLammps.py  -p Al_zhou.eam.alloy  -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet
 
     % for paper:
-        evinet (a,B,B'): getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
+        evinet (a,B,B')   : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
+        elastic constants : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea
+
 
 
 
@@ -387,6 +389,7 @@ def get_energies(args):
         if args.test_this_script:
             args.structures_idx = ":3"
 
+    print('392')
     if args.inputfile == False and args.sys != False and args.sys_ele != False:
         if args.sys in [ 'fcc', 'bcc', 'hcp', 'dc', 'fcc_selfinterstitial' ] and len(args.sys_ele) == 1:
             frames = my.get_ase_atoms_object_kmc_al_si_mg_vac(ncell=args.sys_ncell,nsi=0,nmg=0,nvac=0,matrix_element=args.sys_ele[0],a0=False,cell=args.sys_cell,create_fake_vacancy=False,crystal_structure=args.sys)
@@ -401,10 +404,13 @@ def get_energies(args):
             for idx,i in enumerate(frames.positions):
                 print('before relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx])
             print('relaxing the structure ...')
+        print('406')
         ace.ase_relax_atomic_positions_only(frames,fmax=0.0001,verbose=args.verbose)
         if args.verbose:
             for idx,i in enumerate(frames.positions):
                 print('after relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx],frames.get_forces()[idx])
+
+    print('410')
     if args.inputfile != False:
         my.check_isfile_or_isfiles([args.inputfile],verbose=args.verbose)
         print('########################################################')
@@ -425,6 +431,7 @@ def get_energies(args):
         POT_FORCES_EV_ANG = np.copy(DFT_FORCES_EV_ANG)
         POT_ENERGIES_EV_CELL = np.copy(DFT_ENERGIES_EV_CELL)
 
+    print('430')
     if args.thermo or args.evinet or args.fqh or args.fah:
         # Al evinet: -537461.993661476416 16.579676546844 79.185555426019 2.526937653000
         # Si evinet: -155368.146177827992 20.424692587262 89.078642917550 4.110638394285
@@ -495,7 +502,7 @@ def get_energies(args):
         #print('ace.c44:',ace.c44,type(ace.c44))
         print('done evinet')
         #sys.exit("Thermodynamic properties done up to Fqh. Fah jobs created")
-
+    print('501')
     if args.verbose > 2:
         print('getEne(p7)                           : pot defined')
 
@@ -565,10 +572,13 @@ def get_energies(args):
         writeanew = False
         goover = ace.pot.potepoch_all
         goover = np.arange(1,goover[-1]+1)
+        if args.potepoch != False:
+            goover = np.array([args.potepoch])
+        goover = np.array([ace.pot.use_epoch])
         print('goover',goover)
         count = 0
         for epoch in goover: #ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
-            print()
+            print('ELASTIC_ALL',elastic_all)
             if epoch in elastic_all[:,0]:
                 print('epoch',str(epoch).ljust(5),'from file')
             else:
@@ -584,7 +594,7 @@ def get_energies(args):
                 ace.lammps = args.lmp
                 #print('now getting the lmp cmd')
                 ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
-                c44 = get_elastic_constants_al_ext(ace)
+                c44 = get_elastic_constants_al_ext(ace,frames)
                 writeanew = True
                 #elastic_all.append([epoch,np.float(c44)])
                 #print('epoch',str(epoch).ljust(5),c44)
@@ -2768,6 +2778,10 @@ def get_elastic_constants_al_ext(ace,frames):
         frame_al = frames
         ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
         print('ace.c44:',ace.c44,type(ace.c44))
+        print('ace.elastic_constants:',ace.elastic_constants)
+        file1 = open("elastic_constants_Al_fcc.txt","w")
+        file1.write(ace.elastic_constants)
+        file1.close()
         #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
         #if not os.path.isfile(filename):
         #    np.savetxt(filename,np.array([np.float(ace.c44)]))

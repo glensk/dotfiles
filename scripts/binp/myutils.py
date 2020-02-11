@@ -2640,8 +2640,8 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         if ace.verbose > 2:
             print('written ',ace.pot.lammps_tmpdir+'/potential.mod')
         lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='potential.mod',command=lammps_ext_elastic_potential_mod(ace))
-        cp(scripts()+'/lammps_scripts/elastic/in.elastic',ace.pot.lammps_tmpdir+'/in.elastic')
-        cp(scripts()+'/lammps_scripts/elastic/displace.mod',ace.pot.lammps_tmpdir+'/displace.mod')
+        cp(os.environ['scripts']+'/lammps_scripts/elastic/in.elastic',ace.pot.lammps_tmpdir+'/in.elastic')
+        cp(os.environ['scripts']+'/lammps_scripts/elastic/displace.mod',ace.pot.lammps_tmpdir+'/displace.mod')
         lammps_write_inputfile_from_command(folder=ace.pot.lammps_tmpdir,filename='init.mod',command=lammps_ext_elastic_init_mod(ace,positions='pos.lmp'))
         if ace.verbose > 2:
             print('written ',ace.pot.lammps_tmpdir+'/'+lammps_in_file)
