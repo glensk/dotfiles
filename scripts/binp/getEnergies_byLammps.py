@@ -315,10 +315,13 @@ def get_energies(args):
     ##############################################################
     if 'LD_LIBRARY_PATH' not in os.environ:
         os.environ['LD_LIBRARY_PATH'] = os.environ['HOME']+'/sources/lammps/src'
-    print('getEne(0) LD_LIBRARY_PATH            :',os.environ['LD_LIBRARY_PATH'])
+    print('getEne(0.1) LD_LIBRARY_PATH            :',os.environ['LD_LIBRARY_PATH'])
     from lammps import lammps
+    print('getEne(0.2) imported lammps')
     lammps()
+    print('getEne(0.3) lammps')
     os.remove("log.lammps")
+    print('getEne(0.4) check if lammps woring with ase done')
 
 
     ##############################################################
@@ -1419,6 +1422,12 @@ def get_energies(args):
                     #ka = (ene_DFT[idx]+537462.536751423380)*33/1000
                     #if ka > 7.5:
                     #    print('idxuu (77)',idx,'uuid:',uuid)
+                    if True:
+                        if d["Al"] == 1: # == concentration_al
+                            ene_pot_wo_atomic[idx] = (ene_pot[idx]+537462.536751423380)*n["Al"]/1000
+                        else:
+                            ene_pot_wo_atomic[idx] = (ene_DFT[idx]-ene_pot[idx])
+
                     print(ka3 % (
                     i,
                     idx,
@@ -1426,8 +1435,8 @@ def get_energies(args):
                     ene_diff_abs[idx],
                     frames[i].get_number_of_atoms(),
                     at_si,at_mg,at_al,
-                    #(ene_DFT[idx]+537462.536751423380)*33/1000,
-                    #(ene_pot[idx]+537462.536751423380)*33/1000,
+                    (ene_DFT[idx]+537462.536751423380)*33/1000,
+                    (ene_pot[idx]+537462.536751423380)*33/1000,
                     #(ene_DFT[idx]+537463)*33/1000,
                     #(ene_pot[idx]+537463)*33/1000,
                     #(ene_DFT[idx]+537460)*33/1000,
@@ -1435,8 +1444,8 @@ def get_energies(args):
                     #(ene_DFT[idx]+537462.536751423380)*33/1000,
                     #(ene_pot[idx]+3579.989020373443)*33/1000, # zhou
                     #(ene_pot[idx]+2380.290192865874)*33/1000,
-                    ene_DFT[idx],
-                    ene_pot[idx],
+                    #ene_DFT[idx],
+                    #ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],
                     ene_pot_ase[idx]-ene_pot_ase_geop[idx],
