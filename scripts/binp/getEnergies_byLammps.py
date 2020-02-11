@@ -2486,7 +2486,7 @@ def test_antisites(ace):
         ######################################
         ## get the antisites
         ######################################
-        print('------- antisites ----------')
+        print('------- antisites (read or calculate) ----------')
         read_antisites = "aiida_exported_group_out_antisites_rep"+phase+"_NEW.runner_calc__all_steps.input.data"
         # read_antisites = xxx
         antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites)
@@ -2501,9 +2501,18 @@ def test_antisites(ace):
         # read_orig_phase = xxx
 
         read_orig_phase_fullpath = False
+        potentialpath = os.environ['potentials']
+        print('potentialpath',potentialpath)
+        print('potpath_using',potpath_using)
         if True:
-            read_orig_phase_fullpath = "/home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
-            read_orig_phase_fullpath = potpath_using+"/export/aiida_exported_group_out_reference_rep"+phase+".runner_calc__all_steps.input.data"
+            read_orig_phase_fullpath = potentialpath+"/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
+            print('read_orig_phase_fullpath',read_orig_phase_fullpath)
+            print('os.path.ispath(read_orig_phase_fullpath)',os.path.isfile(read_orig_phase_fullpath))
+            print()
+            #read_orig_phase_fullpath = potpath_using+"/export/aiida_exported_group_out_reference_rep"+phase+".runner_calc__all_steps.input.data"
+            #print('read_orig_phase_fullpath',read_orig_phase_fullpath)
+            #print('os.path.ispath(read_orig_phase_fullpath)',os.path.isfile(read_orig_phase_fullpath))
+
         origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read=read_orig_phase,read_fullpath=read_orig_phase_fullpath,whichstruct=-1)
         print('type(origphase_relaxed)',type(origphase_relaxed))
         print('type(origphase_initial)',type(origphase_initial))
