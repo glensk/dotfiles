@@ -979,6 +979,21 @@ def get_energies(args):
                 continue
             if args.pick_concentration_al >= 0 and d["Al"] != args.pick_concentration_al:
                 continue
+            #print('conz Al',d["Al"],'atoms Al',n["Al"])
+            #print('conz Si',d["Si"],'atoms Si',n["Si"])
+            #print('conz Mg',d["Mg"],'atoms Mg',n["Mg"])
+
+            look_for_particular_structurs = False
+            if look_for_particular_structurs:
+                found = False
+                #if d["Mg"] > 0 and d["Si"] > 0 and d["Mg"]/d["Si"] == 5./6. and d["Al"] == 0:  # look for Mg5Si6
+                #if d["Mg"] > 0 and d["Si"] > 0 and d["Al"] > 0 and d["Mg"]/d["Si"] == 5./4. and d["Mg"]/d["Al"] == 5./2.:  # look for Mg5Al2Si4
+                if d["Mg"] > 0 and d["Si"] > 0 and d["Al"] > 0 and d["Mg"] == d["Si"] and d["Mg"]/d["Al"] == 4./3.:  # look for Mg4Al3Si4
+                    found = True
+                if found == False:
+                    continue
+
+
             if args.pick_concentration_si >= 0 and d["Si"] != args.pick_concentration_si:
                 continue
             if args.pick_concentration_mg >= 0 and d["Mg"] != args.pick_concentration_mg:
@@ -2529,15 +2544,15 @@ def test_antisites(ace):
         origphase_initial_ene_dft,kb_ = my.ase_enepot(origphase_initial,units='eV')
         max_dft_forces = np.abs(origphase_initial.get_forces()).max()
         max_dft_forces = np.round(max_dft_forces,5)
-        print('origphase_initial_ene_dft:',origphase_initial_ene_dft,'max_dft_forces',max_dft_forces)
+        print('(77) origphase_initial_ene_dft:',origphase_initial_ene_dft,'max_dft_forces',max_dft_forces)
 
         origphase_initial_ene_nn      = ace.ene(origphase_initial) #.copy())
         max_nn_forces = np.abs(origphase_initial.get_forces()).max()
-        print('origphase_initial_ene_nn :',origphase_initial_ene_nn ,'max_nn_forces ',max_nn_forces)
+        print('(88) origphase_initial_ene_nn :',origphase_initial_ene_nn ,'max_nn_forces ',max_nn_forces)
 
         origphase_relaxed_ene_nn      = ace.ene(origphase_relaxed) #.copy())
         max_nn_forces = np.abs(origphase_relaxed.get_forces()).max()
-        print('origphase_relaxed_ene_nn :',origphase_relaxed_ene_nn ,'max_nn_forces ',max_nn_forces)
+        print('(99) origphase_relaxed_ene_nn :',origphase_relaxed_ene_nn ,'max_nn_forces ',max_nn_forces)
 
         if False:
             # DEL!!origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
@@ -2560,7 +2575,7 @@ def test_antisites(ace):
             #print(origphase_relaxed_nn.get_forces())
 
         d = my.ase_get_chemical_symbols_to_number_of_species(origphase_initial,known_elements_by_pot=["Al","Mg","Si"])
-        print('origphase',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
+        print('11origphase',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
         #print()
         #print()
         out = []
@@ -2575,20 +2590,21 @@ def test_antisites(ace):
             max_dft_forces = np.abs(antisite_initiali.get_forces()).max()
             max_dft_forces = np.round(max_dft_forces,5)
             max_dft_forces2 = np.round(max_dft_forces,2)
-            print('antisite_initiali_ene_dft:',antisite_initiali_ene_dft,'max_dft_forces',max_dft_forces)
+            print('(22)antisite_initiali_ene_dft:',antisite_initiali_ene_dft,'max_dft_forces',max_dft_forces)
 
             antisite_initiali_ene_nn  = ace.ene(antisite_initiali) #.copy())
             max_nn_forces = np.abs(antisite_initiali.get_forces()).max()
             #max_nn_forces = np.round(max_nn_forces,5)
-            print('antisite_initiali_ene_nn :',antisite_initiali_ene_nn ,'max_nn_forces ',max_nn_forces)
+            print('(33)antisite_initiali_ene_nn :',antisite_initiali_ene_nn ,'max_nn_forces ',max_nn_forces)
 
-            check_forces = 0.00011
-            if max_nn_forces > check_forces:
-                sys.exit('max forces > '+str(check_forces))
+            #check_forces = 0.00011
+            #if max_nn_forces > check_forces:
+            #    sys.exit('max forces > '+str(check_forces))
+
             antisite_relaxedi_ene_nn  = ace.ene(antisite_relaxedi_by_nn.copy())
             max_nn_forces0 = np.abs(antisite_relaxedi_by_nn.get_forces()).max()
             #max_nn_forces0 = np.round(max_nn_forces0,5)
-            print('antisite_relaxedi_ene_nn :',antisite_relaxedi_ene_nn ,'max_nn_forces0',max_nn_forces0)
+            print('(44)antisite_relaxedi_ene_nn :',antisite_relaxedi_ene_nn ,'max_nn_forces0',max_nn_forces0)
 
             antisite_nat = i.get_number_of_atoms()
             #print('ace.E_SS_Al',ace.E_SS_Al)
@@ -2636,6 +2652,7 @@ def test_antisites(ace):
             #print("Eform_initial_nn :",Eform_initial_nn)
             #print("Eform_relaxed_dft:",Eform_relaxed_dft)
             #print("Eform_initial_dft:",Eform_initial_dft)
+            print('al_d',al_d,mg_d,si_d)
             print('from to:',text1,text2,
                     Eform_relaxed_nn,Eform_initial_nn,
                     Eform_relaxed_dft,Eform_initial_dft)
