@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: dc6d84e072ce4ea7b82707add6a2d1924c5bf103
+# execution time: 0.122154951096 seconds.
+
+getEnergies_byLammps.py -p .. -i ../../aiida_get_structures_new/aiida_exported_group_Al6xxxDB_structures_calc__all_steps.input.data -v --pick_atoms_al 33 --units meV_pa

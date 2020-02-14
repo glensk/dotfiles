@@ -1460,6 +1460,11 @@ def get_energies(args):
                         else:
                             ene_pot_wo_atomic[idx] = (ene_DFT[idx]-ene_pot[idx])
 
+                    f= open("interstitials_NN_vs_DFT.txt","a+")
+                    #f.write("%3.6f %3.6f\n" % (1,2))
+                    f.write("%3.6f %3.6f\n" % ((ene_DFT[idx]+537462.536751423380)*33/1000,(ene_pot[idx]+537462.536751423380)*33/1000))
+                    f.close()
+
                     print(ka3 % (
                     i,
                     idx,
@@ -1469,6 +1474,8 @@ def get_energies(args):
                     at_si,at_mg,at_al,
                     (ene_DFT[idx]+537462.536751423380)*33/1000,
                     (ene_pot[idx]+537462.536751423380)*33/1000,
+
+
                     #(ene_DFT[idx]+537463)*33/1000,
                     #(ene_pot[idx]+537463)*33/1000,
                     #(ene_DFT[idx]+537460)*33/1000,
@@ -1643,7 +1650,7 @@ def get_energies(args):
 
 
 def printhead(structures_to_calc,ace_units):
-    print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
+    #print('structures_to_calc[:3]:',range(structures_to_calc)[:3],'...',range(structures_to_calc)[-3:])
     print()
     print('#                         ('+ace_units+')                                ('+ace_units+')       ('+ace_units+')                  ('+ace_units+')     (eV/Ang)')
     print('#                         (DFT-ref)                                                    ene_pot_wo_..      forces      (if geopt)     Vol per atom    min at dist   VOL_diff_norm')
