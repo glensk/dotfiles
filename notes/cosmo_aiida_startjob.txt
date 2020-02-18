@@ -1,0 +1,366 @@
+aiida_submit_runnerfile.py -cm scf -i Danieles_Giofres_DB2.runner
+...
+...
+...
+loading dataset: Danieles_Giofres_DB2.runner to group: Danieles_Giofres_DB2.runner
+written  /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new/README_2020-02-13_18:15.txt
+launching job ...
+submitting to --code_node 114134
+('xx dryrun', False, False, False, False)
+('intern code_node:', u'114134')
+Preparing to launch uuid: cb300b49-cc74-4381-aa4e-06636ed6cc46 (pk: 153568)
+WorkChain: uuid: 695cc19b-a4ac-4aae-8bca-558f62fff9f1 (pk: 153581) submitted
+timing: 13.3119440079s
+Preparing to launch uuid: 6420b826-00b6-48a8-a989-fd7af3b1e7a4 (pk: 153567)
+WorkChain: uuid: bc0f8645-4de5-4a12-acad-a55aa78f8b94 (pk: 153593) submitted
+timing: 3.9800798893s
+Preparing to launch uuid: e0ceb521-d31b-4a96-8786-7e24da300419 (pk: 153566)
+WorkChain: uuid: cfe4c257-2f20-4b02-8d14-d03e64d729b2 (pk: 153605) submitted
+timing: 3.57945609093s
+Preparing to launch uuid: 680ed5f1-dcf2-4d36-9291-416a3418405c (pk: 153565)
+WorkChain: uuid: 9c488735-c11f-44b2-8da1-4ea5905418ff (pk: 153617) submitted
+timing: 3.6063990593s
+Preparing to launch uuid: 90eb2231-a925-4abc-8a29-755a0c8334eb (pk: 153564)
+WorkChain: uuid: 9b9ef67e-96c1-469e-9cc4-058878f93353 (pk: 153629) submitted
+timing: 3.75599193573s
+Preparing to launch uuid: a3ec468b-b032-491c-9346-7dddbfade2bd (pk: 153563)
+WorkChain: uuid: 80a4c18a-7765-432e-aa2e-d297e86c7632 (pk: 153641) submitted
+timing: 3.56293392181s
+Preparing to launch uuid: 0f354bb6-35eb-4813-a49c-454d2e3af38f (pk: 153562)
+WorkChain: uuid: db860ba3-a0e1-4073-b250-9170e7a9e6b2 (pk: 153653) submitted
+timing: 3.78108906746s
+Preparing to launch uuid: cfe2c089-2906-473e-8f29-30d0d9d1e7b0 (pk: 153561)
+WorkChain: uuid: 9d7830ce-36cf-4bc4-8c80-10dbeb3b08f1 (pk: 153665) submitted
+timing: 3.50701785088s
+Preparing to launch uuid: 40916588-6748-43e3-a349-abe13ccd9e2b (pk: 153560)
+WorkChain: uuid: 81309be8-80d9-4fab-b5d8-af6d335cf073 (pk: 153677) submitted
+timing: 3.38161206245s
+Preparing to launch uuid: fc406785-3e2c-436c-973f-0ca46d2f9166 (pk: 153559)
+WorkChain: uuid: 0e5cf855-64c6-4e32-b557-0c60ca2b896d (pk: 153689) submitted
+timing: 3.64039993286s
+Preparing to launch uuid: 068a202f-c55e-49a5-bfc9-5b58fa43c29f (pk: 153558)
+WorkChain: uuid: b4a6dee8-823f-4092-8cbc-4ab0123e3e8e (pk: 153701) submitted
+timing: 3.5558450222s
+Preparing to launch uuid: 67af2b23-43d3-42cb-aee2-4d7af91f46e1 (pk: 153557)
+WorkChain: uuid: e3f38a7f-890e-4ad0-863a-a0bca98f14f8 (pk: 153713) submitted
+timing: 3.78711700439s
+Preparing to launch uuid: fb304bd8-5a58-40c0-b889-6d348a70820c (pk: 153556)
+WorkChain: uuid: 31c1e304-469e-408c-bfdf-787d07ed8479 (pk: 153725) submitted
+timing: 3.64688611031s
+Preparing to launch uuid: 3b177168-5174-4d21-80b1-2bb7618efe35 (pk: 153555)
+WorkChain: uuid: 5b205ddd-4d56-41c9-9d59-3a8fad37d97f (pk: 153737) submitted
+timing: 3.75567603111s
+Preparing to launch uuid: 5edd8e0c-e8a7-4378-819a-ea8355f26d3f (pk: 153554)
+WorkChain: uuid: 0e55f5a1-62c7-4dfb-8ffd-3231bd9c8414 (pk: 153749) submitted
+timing: 3.57242512703s
+Preparing to launch uuid: e0f48013-f52f-40b8-aab0-174aa3878ec9 (pk: 153553)
+WorkChain: uuid: ceba9b15-f12b-4157-8641-a56106a2514d (pk: 153761) submitted
+timing: 3.59745001793s
+Preparing to launch uuid: 0a32e013-0895-43bd-abcf-819594fcc3c3 (pk: 153552)
+WorkChain: uuid: e0a666c2-533c-4700-8b6b-818e59d40654 (pk: 153773) submitted
+timing: 3.68089413643s
+Preparing to launch uuid: 5c2369a6-6eb5-4c1e-82a2-43d8a2145850 (pk: 153551)
+WorkChain: uuid: 25a7028a-da89-431f-aba3-d59e6bd1a0dc (pk: 153785) submitted
+timing: 3.61368298531s
+Preparing to launch uuid: ab60ac3a-ef1d-472c-a98d-2851c52aaaa1 (pk: 153550)
+WorkChain: uuid: 4042d538-5a5d-4b97-a71e-0f89a85da5b5 (pk: 153797) submitted
+timing: 3.78697609901s
+Preparing to launch uuid: 9b2c162f-4fb9-4a2f-b349-d92680e66c34 (pk: 153549)
+WorkChain: uuid: b0e78bf7-57c3-402d-a457-4ec4c9524700 (pk: 153809) submitted
+timing: 3.48075485229s
+Preparing to launch uuid: 8379b0d4-0c19-46a0-9ca7-7884d735b5ee (pk: 153548)
+WorkChain: uuid: b8576637-6211-43da-87a5-6330455b6d4b (pk: 153821) submitted
+timing: 3.68046498299s
+Preparing to launch uuid: 36c6692a-e68a-44aa-b514-1150ae811801 (pk: 153547)
+WorkChain: uuid: f6e5f839-e19a-4dc7-adbd-c5a9e618fdfb (pk: 153833) submitted
+timing: 3.34565806389s
+Preparing to launch uuid: 137a85fa-adc9-4120-835d-665416538452 (pk: 153546)
+WorkChain: uuid: 57ff3796-aa96-48b5-b129-f0376c9ad8c2 (pk: 153845) submitted
+timing: 3.64742708206s
+Preparing to launch uuid: 39a11e4c-7e73-435e-97ad-9860a6814796 (pk: 153545)
+WorkChain: uuid: 7fa066f2-b6aa-4fc8-ab3e-625582594897 (pk: 153857) submitted
+timing: 3.60565900803s
+Preparing to launch uuid: 2eca3fd3-1edc-4244-8b8f-216a5d7d3be0 (pk: 153544)
+WorkChain: uuid: c3b15072-8fb5-4415-93bc-363984af74a9 (pk: 153869) submitted
+timing: 3.5904109478s
+Preparing to launch uuid: d2d2a21b-e1da-4f38-9612-8b5ac8e8be80 (pk: 153543)
+WorkChain: uuid: 2859d2fb-c61d-4704-adf2-3abb59b7f65e (pk: 153881) submitted
+timing: 3.76434397697s
+Preparing to launch uuid: e83d0fe1-d5b1-4bad-b34e-6c81b3414b07 (pk: 153542)
+WorkChain: uuid: 1e68c2ab-33c0-47d5-bfcd-e842d244ca96 (pk: 153893) submitted
+timing: 3.57200407982s
+Preparing to launch uuid: 262ce4fc-db39-4961-999b-627a8a9ad6f6 (pk: 153541)
+WorkChain: uuid: 8026ec81-d7e4-435f-8400-e03598f8fb94 (pk: 153905) submitted
+timing: 3.49672794342s
+Preparing to launch uuid: f84d0d64-c0c7-47c1-84ac-9552c6b78ecd (pk: 153540)
+WorkChain: uuid: 0fef25aa-d180-44d7-b929-8b12dc1f42a3 (pk: 153917) submitted
+timing: 3.6975710392s
+Preparing to launch uuid: 5cc38e95-48f3-42b7-a948-576521f5a42b (pk: 153539)
+WorkChain: uuid: 82d7fd8d-627b-46dd-9bc0-10541d47db0f (pk: 153929) submitted
+timing: 3.51426100731s
+Preparing to launch uuid: d2a27060-2f75-4772-b796-84e9fc733afc (pk: 153538)
+WorkChain: uuid: f583d2ab-6902-466f-a1f4-bbd30216fc7f (pk: 153941) submitted
+timing: 3.65543985367s
+Preparing to launch uuid: da4a9b30-3ede-42d2-8413-e6b9226fd631 (pk: 153537)
+WorkChain: uuid: f154dd9f-dc7f-459c-8af3-2cd9832ceb30 (pk: 153953) submitted
+timing: 3.52182912827s
+Preparing to launch uuid: 8d1c37ce-d765-4f40-bda5-dd06414cd95d (pk: 153536)
+WorkChain: uuid: 9bdfaf7c-7d0c-45f2-9b72-24b742e8a356 (pk: 153965) submitted
+timing: 3.620677948s
+Preparing to launch uuid: a8eee64b-3b21-47c8-be8d-358c99346275 (pk: 153535)
+WorkChain: uuid: ab53a5d6-daa8-46a7-bd43-b55373a0ba7f (pk: 153977) submitted
+timing: 3.58895087242s
+Preparing to launch uuid: 55e48311-e696-40b0-936e-5d2fa9fcc799 (pk: 153534)
+WorkChain: uuid: 7d71a4c8-a127-4205-b1c9-683d16339a25 (pk: 153989) submitted
+timing: 3.50726890564s
+Preparing to launch uuid: 8f75016e-09d9-4058-8c12-91464c8cdb5c (pk: 153533)
+WorkChain: uuid: c94ef030-3be6-4a24-b64f-64b82841b25c (pk: 154001) submitted
+timing: 3.47344398499s
+Preparing to launch uuid: e12bf956-55e0-4d91-b133-d3f4cfe66176 (pk: 153532)
+WorkChain: uuid: 7159dd36-5118-4a9f-8855-fc2f2e8876a6 (pk: 154013) submitted
+timing: 3.50711798668s
+Preparing to launch uuid: 2e737979-9310-43cc-b838-97d1220477f4 (pk: 153531)
+WorkChain: uuid: a1b670f4-773a-418b-a186-c98d08862623 (pk: 154025) submitted
+timing: 3.37380099297s
+Preparing to launch uuid: 7fcd5ef9-1c05-4f29-ac7e-0142d677e93e (pk: 153530)
+WorkChain: uuid: e46a6308-38a7-4e7b-b010-c9d60bdd13b5 (pk: 154037) submitted
+timing: 3.43161487579s
+Preparing to launch uuid: c7f12dd8-4a55-41fd-a09e-f9c4f99597e5 (pk: 153529)
+WorkChain: uuid: 3ce49fff-b875-4273-9af8-f96f361edbd1 (pk: 154049) submitted
+timing: 3.3907020092s
+Preparing to launch uuid: a83fae34-6419-4c50-a731-0fb91399f1ca (pk: 153528)
+WorkChain: uuid: 90164682-e6f9-448e-9924-2dae676357de (pk: 154061) submitted
+timing: 3.3075530529s
+Preparing to launch uuid: 84e31778-c8fb-430d-adcb-c415d1038abd (pk: 153527)
+WorkChain: uuid: add33d81-1191-40b5-8585-72fef3adc186 (pk: 154073) submitted
+timing: 3.57346391678s
+Preparing to launch uuid: 4fb9f908-5391-4bcc-a319-74227b52d926 (pk: 153526)
+WorkChain: uuid: 498fe265-09ec-4b77-868e-8dfdb5ee25a2 (pk: 154085) submitted
+timing: 3.30720996857s
+Preparing to launch uuid: 6d7ae27f-7c2c-496a-8996-a467bbb6a340 (pk: 153525)
+WorkChain: uuid: 05129bd2-808f-424d-b97a-4a300b424713 (pk: 154097) submitted
+timing: 3.38105201721s
+Preparing to launch uuid: ebd52385-81a0-49ae-850c-bf95c9371bd7 (pk: 153524)
+WorkChain: uuid: 15e801af-cae5-40b0-9cf1-2e1de0ea218c (pk: 154109) submitted
+timing: 3.51341485977s
+Preparing to launch uuid: 265ce387-f791-4b5b-94eb-133913f099e6 (pk: 153523)
+WorkChain: uuid: 8153c6fd-469e-4ccd-8531-66d8b0dfd86a (pk: 154121) submitted
+timing: 3.47227907181s
+Preparing to launch uuid: b1d2ff29-31b9-4d85-a960-a91ead60ac79 (pk: 153522)
+WorkChain: uuid: ae88cf08-8ae7-4e6a-ba0c-7f5d6c68d53d (pk: 154133) submitted
+timing: 3.61512303352s
+Preparing to launch uuid: 2e3f52f5-3545-468b-ab20-5d4fdbd023b5 (pk: 153521)
+WorkChain: uuid: 2cbc5e97-699a-431f-855c-7acf9f82948f (pk: 154145) submitted
+timing: 3.43977189064s
+Preparing to launch uuid: 6461c93f-cdf3-4b59-883b-d30cf7980898 (pk: 153520)
+WorkChain: uuid: c7ac6322-c901-4125-b8d8-c7fee32a0a73 (pk: 154157) submitted
+timing: 3.51427602768s
+Preparing to launch uuid: 1c3d1c55-b1a6-4412-9316-bffe15249bd3 (pk: 153519)
+WorkChain: uuid: 4deaf783-6981-4135-98cf-ce7595bbc490 (pk: 154169) submitted
+timing: 3.43946194649s
+Preparing to launch uuid: 1a99f9a0-cd41-4752-9e0a-c1b67c1ca0eb (pk: 153518)
+WorkChain: uuid: d27d34a3-9238-4d77-8a5e-569aba61eecf (pk: 154181) submitted
+timing: 3.5805118084s
+Preparing to launch uuid: 38e65c26-8d38-45c6-8f11-f552b860acca (pk: 153517)
+WorkChain: uuid: e797b5bf-49b8-4e5c-ba7c-081b3262e9d1 (pk: 154193) submitted
+timing: 3.38062095642s
+Preparing to launch uuid: 2564f832-9579-41e2-9ad2-3253c63793b9 (pk: 153516)
+WorkChain: uuid: ee8c0929-5bda-40f9-a682-6cc06930584c (pk: 154205) submitted
+timing: 3.55557394028s
+Preparing to launch uuid: 79b9afbd-9e30-4bb2-8f21-af6f460c62e1 (pk: 153515)
+WorkChain: uuid: 21b22561-af86-46a7-89f8-642ecd5c64a5 (pk: 154217) submitted
+timing: 3.53066706657s
+Preparing to launch uuid: 7464878f-6f3d-44c1-a142-bceb12309d3c (pk: 153514)
+WorkChain: uuid: 99bddad3-81e8-42e5-aef8-51d32a33cdce (pk: 154229) submitted
+timing: 3.30731701851s
+Preparing to launch uuid: d003221d-d246-4b7a-b417-bbd139008094 (pk: 153513)
+WorkChain: uuid: 77771c8a-c159-498c-b8a9-eb0462e4a656 (pk: 154241) submitted
+timing: 3.4323182106s
+Preparing to launch uuid: 6eab330c-f940-42ce-9ebf-1fbb857ef60e (pk: 153512)
+WorkChain: uuid: 91c250cf-afbd-4d3c-88dd-446cefbd6e1a (pk: 154253) submitted
+timing: 3.34888720512s
+Preparing to launch uuid: d3351cba-536e-4aeb-aa79-a683170a52ef (pk: 153511)
+WorkChain: uuid: 4d5c5f16-2bb4-4f5b-897c-bdd86811e49b (pk: 154265) submitted
+timing: 3.45721411705s
+Preparing to launch uuid: 88b6d68c-0c1d-42fe-832e-f0b2dc1104c1 (pk: 153510)
+WorkChain: uuid: c6e78f9a-9c52-4d3c-aed7-e219db40be79 (pk: 154277) submitted
+timing: 3.28226399422s
+Preparing to launch uuid: 8c14ac93-5b46-4328-98bd-115110c01842 (pk: 153509)
+WorkChain: uuid: 3589d8cf-038a-4fdb-ac96-8052a6c7b558 (pk: 154289) submitted
+timing: 3.30672907829s
+Preparing to launch uuid: 683c761c-3f8e-4040-bec3-026d6f8c72d6 (pk: 153508)
+WorkChain: uuid: 2155dd1d-3dd7-4bff-826b-f4c5e7dcf79e (pk: 154301) submitted
+timing: 3.48235416412s
+Preparing to launch uuid: 01c8fce7-589c-489f-afb2-48f59c7503a3 (pk: 153507)
+WorkChain: uuid: 9e67c687-6371-4902-8ec5-ed8e12988f59 (pk: 154313) submitted
+timing: 3.45683598518s
+Preparing to launch uuid: be5400c3-39b3-4059-993d-400210d8fe9b (pk: 153506)
+WorkChain: uuid: 74d3b596-3a28-4b6d-bba1-7a923e73e702 (pk: 154325) submitted
+timing: 3.29827404022s
+Preparing to launch uuid: b42164ee-f880-4e87-86ee-705bb4d50fa6 (pk: 153505)
+WorkChain: uuid: d1f0b541-24a3-4742-93e4-02e684d5bfa0 (pk: 154337) submitted
+timing: 3.33220791817s
+Preparing to launch uuid: 66873e89-1135-4b5e-9681-08324157dd47 (pk: 153504)
+WorkChain: uuid: 9a778607-a856-4d27-969f-3aeb0da7622f (pk: 154349) submitted
+timing: 3.37330102921s
+Preparing to launch uuid: a5171584-5a1b-49e2-b06c-018eeb6fe6aa (pk: 153503)
+WorkChain: uuid: cda8f6b6-41a6-4809-b6db-abda4eac0998 (pk: 154361) submitted
+timing: 3.54833388329s
+Preparing to launch uuid: f5c012f8-b593-4d19-92dd-86cfaf556f05 (pk: 153502)
+WorkChain: uuid: 74b70996-77f2-4700-a7b9-ab0155cb7638 (pk: 154373) submitted
+timing: 3.44833993912s
+Preparing to launch uuid: 7c12d498-6596-4eb8-a120-a68976037fda (pk: 153501)
+WorkChain: uuid: 4ec59d1c-2b44-476c-9084-182390a654c3 (pk: 154385) submitted
+timing: 3.73786306381s
+Preparing to launch uuid: 7b1ae941-4360-47d6-a540-7402950f439b (pk: 153500)
+WorkChain: uuid: 78e0a495-b58d-46c6-85a1-70c65dbe1dae (pk: 154397) submitted
+timing: 3.68735289574s
+Preparing to launch uuid: 331ff353-e8d5-4474-84bc-d088ca4b0cbe (pk: 153499)
+WorkChain: uuid: 7f001900-f542-4c1f-a5ca-5520eb4c7aed (pk: 154409) submitted
+timing: 3.76216483116s
+Preparing to launch uuid: 4cec430a-8cbe-4fc1-b0cf-58f2871b69d4 (pk: 153498)
+WorkChain: uuid: 5ed69afb-e1a3-4b59-b009-d31d76084895 (pk: 154421) submitted
+timing: 3.68111085892s
+Preparing to launch uuid: 33b4f9ef-4c15-4051-b895-492086137277 (pk: 153497)
+WorkChain: uuid: f0803b88-7e45-47cf-a117-56fd4b0b5c41 (pk: 154433) submitted
+timing: 3.47246909142s
+Preparing to launch uuid: e099d39a-68c9-45ae-996e-e5489bc39786 (pk: 153496)
+WorkChain: uuid: b05e45a0-ff77-4213-b59d-da8ff6805b87 (pk: 154445) submitted
+timing: 3.5807299614s
+Preparing to launch uuid: e7fc7b61-4380-4544-b038-dc5aad3edc0a (pk: 153495)
+WorkChain: uuid: 62f717f2-1040-4ca9-98fb-bc17905cf7f2 (pk: 154457) submitted
+timing: 3.92179703712s
+Preparing to launch uuid: e60a8800-7fda-4382-8261-ae1f25734569 (pk: 153494)
+WorkChain: uuid: 5add44e2-9fff-4592-b10a-60814e4ef8f8 (pk: 154469) submitted
+timing: 3.48943209648s
+Preparing to launch uuid: 13532f56-5432-486b-9bed-6a35b557b33e (pk: 153493)
+WorkChain: uuid: 81504181-46f5-4f17-8965-bdc2d29d8382 (pk: 154481) submitted
+timing: 3.66466212273s
+Preparing to launch uuid: bf08155f-7029-4a83-855b-5b928faa5b9e (pk: 153492)
+WorkChain: uuid: dbd27d78-b50f-431f-8778-82f6536c04d3 (pk: 154493) submitted
+timing: 3.47207689285s
+Preparing to launch uuid: 7de699fb-516e-47c0-820d-087c19cdaea8 (pk: 153491)
+WorkChain: uuid: ad2bd631-87b7-49b6-b763-ee8c05de7c8b (pk: 154505) submitted
+timing: 3.62217712402s
+Preparing to launch uuid: 129815f2-a926-44cd-8424-9474808af593 (pk: 153490)
+WorkChain: uuid: 1e06a19f-72cd-478f-980d-26c553e117b7 (pk: 154517) submitted
+timing: 3.49811506271s
+Preparing to launch uuid: bcf6acfd-c734-4305-b697-8fa440cfe785 (pk: 153489)
+WorkChain: uuid: 0780c374-6448-4059-b015-dc4a2f5c3582 (pk: 154529) submitted
+timing: 3.45722603798s
+Preparing to launch uuid: 2cd51c67-66f8-4701-b837-24ad5399acd6 (pk: 153488)
+WorkChain: uuid: 0c537f07-2983-4b1e-bdc3-0eb59417dd6e (pk: 154541) submitted
+timing: 3.62344503403s
+Preparing to launch uuid: 89e37002-a21b-4b56-9827-6b14f3ef2952 (pk: 153487)
+WorkChain: uuid: f2d3a10b-c8e3-466f-9212-8c8f6a1bb886 (pk: 154553) submitted
+timing: 3.87340188026s
+Preparing to launch uuid: 5a736436-a776-4b06-a719-b8d5fe7c396a (pk: 153486)
+WorkChain: uuid: 3912a769-8cf6-408e-9b6d-1468549757df (pk: 154565) submitted
+timing: 3.64856505394s
+Preparing to launch uuid: fd57c7e9-70a9-4581-80bb-584551e44008 (pk: 153485)
+WorkChain: uuid: 083b55b7-922d-4b2f-a894-31aca30bee2c (pk: 154577) submitted
+timing: 3.55656003952s
+Preparing to launch uuid: ebcd47f6-2189-4f4b-9ab1-abfef963a363 (pk: 153484)
+WorkChain: uuid: 2746aa99-d531-4df5-b79f-c4d9b76acbf7 (pk: 154589) submitted
+timing: 3.50698709488s
+Preparing to launch uuid: c172952f-88da-4239-a54d-27b2f8aa72b6 (pk: 153483)
+WorkChain: uuid: db73cf1b-eede-4518-a761-383cb23ad1c5 (pk: 154601) submitted
+timing: 3.5981760025s
+Preparing to launch uuid: 80195266-184c-482a-a855-e0ea655e5b2c (pk: 153482)
+WorkChain: uuid: 4e761a26-39cc-4dd7-afd4-2ae4cea16b97 (pk: 154613) submitted
+timing: 3.5823700428s
+Preparing to launch uuid: 32be479e-40de-403e-a376-cf1dea57990c (pk: 153481)
+WorkChain: uuid: 4b9b1ac7-62b9-4fb9-8120-e636160ac5f3 (pk: 154625) submitted
+timing: 3.50644302368s
+Preparing to launch uuid: 34e543b6-229e-4865-b66e-9844ee237c4b (pk: 153480)
+WorkChain: uuid: 8a1fe694-e476-4fe8-b0bd-e7ff4c3d5f31 (pk: 154637) submitted
+timing: 3.59069180489s
+Preparing to launch uuid: df291dd8-bf7d-44f8-839c-03803923312b (pk: 153479)
+WorkChain: uuid: e61873d0-52d7-4b38-a043-5bbcbf1d1460 (pk: 154649) submitted
+timing: 3.59008097649s
+Preparing to launch uuid: a59b51fb-3e3d-40c8-963d-19869657ae75 (pk: 153478)
+WorkChain: uuid: c9a87cee-0805-46a8-a9d8-d9220a83388f (pk: 154661) submitted
+timing: 3.63145518303s
+Preparing to launch uuid: 66468835-ef50-4771-a55f-66a7e93d6b6b (pk: 153477)
+WorkChain: uuid: 9f9582bb-d219-4d91-ac2f-dbb4d888ae75 (pk: 154673) submitted
+timing: 3.48215103149s
+Preparing to launch uuid: 9bd06389-e403-495f-8f4a-8a517a6fddd4 (pk: 153476)
+WorkChain: uuid: 9025bf08-6efe-4ef9-bfd5-859b06f36809 (pk: 154685) submitted
+timing: 3.48204112053s
+Preparing to launch uuid: 330db741-5087-4d53-9398-5adec94c178a (pk: 153475)
+WorkChain: uuid: 6a4c48fb-6470-4291-af51-35f157c24961 (pk: 154697) submitted
+timing: 3.67379212379s
+Preparing to launch uuid: 3173de1d-2ca5-4165-bb47-5380b5dc2d9e (pk: 153474)
+WorkChain: uuid: 25f67ae2-78f4-4f49-a83a-77fb9158e374 (pk: 154709) submitted
+timing: 3.59064888954s
+Preparing to launch uuid: e60bd3fc-2723-4d87-ba3c-482c6ecb394b (pk: 153473)
+WorkChain: uuid: 8de69d33-72ad-45b9-83c6-9e493602abc4 (pk: 154721) submitted
+timing: 3.89844894409s
+Preparing to launch uuid: 0147f486-e78b-4ae8-ae71-25dbb012f213 (pk: 153472)
+WorkChain: uuid: a4b336ab-160a-4dbb-94d5-14e5a961ef81 (pk: 154733) submitted
+timing: 3.60662603378s
+Preparing to launch uuid: 47df6361-a97f-4f66-9a05-a8f6ffcadf18 (pk: 153471)
+WorkChain: uuid: 5deefd93-c29b-4a11-8153-597b5fa99a74 (pk: 154745) submitted
+timing: 3.61556100845s
+Preparing to launch uuid: 89d0f0b7-43d9-4e24-af0a-da008c3cc164 (pk: 153470)
+WorkChain: uuid: f151f680-359d-4e30-ad92-82b849aeda57 (pk: 154757) submitted
+timing: 3.69151091576s
+Preparing to launch uuid: 8eee73d3-0161-4793-a0d2-a841a021bd64 (pk: 153469)
+WorkChain: uuid: e4720b1d-8105-415f-a6ba-7d9efa2da63c (pk: 154769) submitted
+timing: 3.5574119091s
+Preparing to launch uuid: 49c53dd8-d5f9-40a8-90db-5f43dc214a28 (pk: 153468)
+WorkChain: uuid: 78d80cf7-27bb-4ae8-a011-ccd47a7e163f (pk: 154781) submitted
+timing: 3.6911239624s
+Preparing to launch uuid: 085c1d52-1762-4b11-9b6a-4779613c954f (pk: 153467)
+WorkChain: uuid: af68e4cc-a101-4ffe-9965-962e851b7bed (pk: 154793) submitted
+timing: 3.59143686295s
+Preparing to launch uuid: 08792a39-f78b-4bb1-ab58-80b0b6e202a1 (pk: 153466)
+WorkChain: uuid: f0251d26-065d-404b-820a-1663320ccf44 (pk: 154805) submitted
+timing: 3.66572594643s
+Preparing to launch uuid: 4538146f-0ef3-4631-9243-8344dd029462 (pk: 153465)
+WorkChain: uuid: 559eb4fc-0fd6-45cf-af5b-6c1f0cf3f453 (pk: 154817) submitted
+timing: 3.68174099922s
+Preparing to launch uuid: a6958a17-4232-479b-93bd-d00d7d2c96bb (pk: 153464)
+WorkChain: uuid: ab85a47d-f84f-4499-89d4-72b09afa2daf (pk: 154829) submitted
+timing: 3.79894089699s
+Preparing to launch uuid: 80565afd-53ef-433c-b123-2187699dd5d9 (pk: 153463)
+WorkChain: uuid: a5822cd1-ec57-4d14-9eb4-36b923ad0c6f (pk: 154841) submitted
+timing: 3.58248901367s
+Preparing to launch uuid: b7a55f90-43dd-4ca0-ad71-c2b90fbf4e2f (pk: 153462)
+WorkChain: uuid: 5de23250-f94f-4585-8096-17dab7d6cd3c (pk: 154853) submitted
+timing: 3.6986989975s
+Preparing to launch uuid: b7247717-5f86-4bf6-867b-8ea206c75186 (pk: 153461)
+WorkChain: uuid: a59ece2d-d0d9-4503-90b5-d4333a633636 (pk: 154865) submitted
+timing: 3.53191494942s
+Preparing to launch uuid: 97d41080-3ede-4f98-a014-ddb61c5e4cfc (pk: 153460)
+WorkChain: uuid: 2b08555c-b35f-4a8e-b3c2-c82fd45e88c4 (pk: 154877) submitted
+timing: 3.55649089813s
+Preparing to launch uuid: d0526430-235e-40fd-a4a9-d4aa7fe24330 (pk: 153459)
+WorkChain: uuid: 4d4404f2-a05a-4a18-a409-c63605567a27 (pk: 154889) submitted
+timing: 3.79853487015s
+Preparing to launch uuid: 129a2a07-0f9c-4b41-95dd-f22304cdad0e (pk: 153458)
+WorkChain: uuid: 74959279-ab49-483a-8599-41a0cdc4e18a (pk: 154901) submitted
+timing: 3.54865694046s
+Preparing to launch uuid: deea71c4-943a-4224-af84-1b5ce0753dd7 (pk: 153457)
+WorkChain: uuid: e622382e-5aa4-4e30-8b2b-0a2e66490723 (pk: 154913) submitted
+timing: 3.64007902145s
+Preparing to launch uuid: 3c24613f-a10d-4dcd-b9f3-26548abd29d9 (pk: 153456)
+WorkChain: uuid: 05715988-dc04-4eab-be8e-2b0c9806c40b (pk: 154925) submitted
+timing: 3.83222293854s
+Preparing to launch uuid: d6b62691-be2d-421d-a75f-a52b6d1630d1 (pk: 153455)
+WorkChain: uuid: 000a87a5-8cfd-49e8-97cc-2bd962ad7df5 (pk: 154937) submitted
+timing: 3.66589593887s
+Preparing to launch uuid: 27d7c836-10ea-457c-a357-c548c2ed5ebb (pk: 153454)
+WorkChain: uuid: 047ed61d-5102-48ff-aeb7-4cd70441ba96 (pk: 154949) submitted
+timing: 3.43215107918s
+Preparing to launch uuid: 85001409-18c6-48af-8926-83fa3933be32 (pk: 153453)
+WorkChain: uuid: 19803bef-4381-4c7a-aa50-e1215d8c6d99 (pk: 154961) submitted
+timing: 3.69837093353s
+Preparing to launch uuid: 338aa980-caed-4b37-8ae1-b26170302592 (pk: 153452)
+WorkChain: uuid: 43311d02-5ce7-42eb-a55e-1e19d12c4aea (pk: 154973) submitted
+timing: 3.59100699425s
+Preparing to launch uuid: f274fe71-b1ac-4e5d-a151-7c8da65db12a (pk: 153451)
+WorkChain: uuid: 6b79ea36-e0d4-451b-931f-8800ebe24635 (pk: 154985) submitted
+timing: 3.74041700363s
+written  /local/scratch/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new/README_2020-02-13_18:22.txt
+
