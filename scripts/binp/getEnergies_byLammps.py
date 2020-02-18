@@ -51,6 +51,12 @@ def help(p = None):
         elastic constants : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea
         heats of solute/vac formation: getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV
         formation energies AlXMgYSiZ : getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV
+        antisite form energies       : getEnergies_byLammps.py -p .. -v --units eV --formation_energies beta2antisites
+        interstitials                : getEnergies_byLammps.py -p .. -i ../../aiida_get_structures_new/aiida_exported_group_Al6xxxDB_structures_calc__all_steps.input.data -v --pick_atoms_al 33 --units meV_pa --interstitial_form
+
+        notes on antisites:
+        readpath /home/glensk/Dropbox/Albert/scripts/dotfiles//scripts/potentials/aiida_get_structures_new/aiida_exported_group_out_antisites_repMg4Al3Si4_NEW.runner_calc__all_steps.input.data   # DFT antisites
+        savepath /scratch/glensk/2020_retrain_almgsi/zeroth20/random_seed_16560/epoch_False/RELAXED_fully_aiida_exported_group_out_antisites_repMg4Al3Si4_NEW.runner_calc__all_steps.input.data   # relaxed antisites
 
 
 
@@ -77,6 +83,7 @@ def help(p = None):
     p.add_argument('--potepoch','-pe',  required=False, type=int, default=False, help="use particular epoch of the potential")
     p.add_argument('--structures_idx','-idx',default=':',help='which structures to calculate, use ":" for all structues (default), ":3" for structures [0,1,2] etc. (python notation)')
     p.add_argument('--units','-u',choices = ['eV','meV_pa','eV_pa','hartree','hartree_pa'],default='hartree_pa',help='In which units should the output be given')
+    p.add_argument('--interstitial_form','-interstitial_form' ,action='store_true',help='write interstitials_NN_vs_DFT.txt',default=False)
     p.add_argument('--geopt','-g'               ,action='store_true',help='make a geometry optimization of the atoms.')
     p.add_argument('--elastic','-e'             ,action='store_true',help='calculate elastic constants with given potential for Al (externally by lammps).')
     p.add_argument('--thermo','-thermo'         ,action='store_true',help='calculate free energy surface.')
@@ -1460,10 +1467,12 @@ def get_energies(args):
                         else:
                             ene_pot_wo_atomic[idx] = (ene_DFT[idx]-ene_pot[idx])
 
-                    f= open("interstitials_NN_vs_DFT.txt","a+")
-                    #f.write("%3.6f %3.6f\n" % (1,2))
-                    f.write("%3.6f %3.6f\n" % ((ene_DFT[idx]+537462.536751423380)*33/1000,(ene_pot[idx]+537462.536751423380)*33/1000))
-                    f.close()
+                    # interstitials
+                    if args.interstitial_form:
+                        f= open("interstitials_NN_vs_DFT.txt","a+")
+                        #f.write("%3.6f %3.6f\n" % (1,2))
+                        f.write("%3.6f %3.6f\n" % ((ene_DFT[idx]+537462.536751423380)*33/1000,(ene_pot[idx]+537462.536751423380)*33/1000))
+                        f.close()
 
                     print(ka3 % (
                     i,
@@ -2504,14 +2513,18 @@ def test_antisites(ace):
     potpath_using = ace.pot.potpath+"/epoch_"+str(ace.pot.potepoch_using)
 
     doit = [ "Mg4Al3Si4", "Mg5Al2Si4", "Mg5Si6" ]
+    doit = [ "Mg4Al3Si4"] #, "Mg5Al2Si4", "Mg5Si6" ]
     for phase in doit:
         ######################################
         ## get the antisites
         ######################################
         print('------- antisites (read or calculate) ----------')
         read_antisites = "aiida_exported_group_out_antisites_rep"+phase+"_NEW.runner_calc__all_steps.input.data"
-        # read_antisites = xxx
-        antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites)
+
+        # read_antisites = xxx  (and relax)
+        #antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites)
+        antisite_initial = ase_read(readpath,index=whichstruct,format="runner")
+        antisite_relaxed = ase_read(readpath,index=whichstruct,format="runner")
         print('type(antisite_relaxed_by_nn:',type(antisite_relaxed_by_nn))
         print('type(antisite_initial_by_nn:',type(antisite_initial))
 
@@ -2582,7 +2595,7 @@ def test_antisites(ace):
             #print(origphase_relaxed_nn.get_forces())
 
         d = my.ase_get_chemical_symbols_to_number_of_species(origphase_initial,known_elements_by_pot=["Al","Mg","Si"])
-        print('11origphase',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"])
+        print('11origphase --->',"Al:",d["Al"],"Mg:",d["Mg"],"Si:",d["Si"],'totl number of atoms:',d["Al"]+d["Mg"]+d["Si"])
         #print()
         #print()
         out = []
@@ -2627,14 +2640,22 @@ def test_antisites(ace):
             al_orig = d["Al"]*f
             mg_orig = d["Mg"]*f
             si_orig = d["Si"]*f
+            print('f',f)
+            print('xxx al_orig',al_orig,al_antisite)
+            print('xxx mg_orig',mg_orig,mg_antisite)
+            print('xxx si_orig',si_orig,si_antisite)
+            print('xxx sum_orig',al_orig+mg_orig+si_orig)
+            print('xxx sum_anti',al_antisite+mg_antisite+si_antisite)
+            sys.eixt()
+
             al_d = al_antisite - al_orig
             mg_d = mg_antisite - mg_orig
             si_d = si_antisite - si_orig
             print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"],'antisite_relaxed_ene_nn   :') #,antisite_relaxedi_ene_nn)
             print('antisite phase     :',"Al:",dd["Al"],"Mg:",dd["Mg"],"Si:",dd["Si"],'antisite_ene_nn_diff      :') #,antisite_relaxedi_ene_nn-orig_relaxed_nn_ene_nn*f)
-            #print('al_d',al_d,-al_d*ace.E_SS_Al)
-            #print('mg_d',mg_d,-mg_d*ace.E_SS_Mg)
-            #print('si_d',si_d,-si_d*ace.E_SS_Si)
+            print('al_d',al_d,'al_orig',al_orig,-al_d*ace.E_SS_Al)
+            print('mg_d',mg_d,'mg_orig',mg_orig,-mg_d*ace.E_SS_Mg)
+            print('si_d',si_d,'si_orig',si_orig,-si_d*ace.E_SS_Si)
             if al_d == -1 : text1 = "Al->"
             if mg_d == -1 : text1 = "Mg->"
             if si_d == -1 : text1 = "Si->"
@@ -2660,9 +2681,10 @@ def test_antisites(ace):
             #print("Eform_relaxed_dft:",Eform_relaxed_dft)
             #print("Eform_initial_dft:",Eform_initial_dft)
             print('al_d',al_d,mg_d,si_d)
-            print('from to:',text1,text2,
-                    Eform_relaxed_nn,Eform_initial_nn,
-                    Eform_relaxed_dft,Eform_initial_dft)
+            #print('from to:',text1,text2,
+            #        Eform_relaxed_nn,Eform_initial_nn,
+            #        Eform_relaxed_dft,Eform_initial_dft)
+            #out.append([idx,Eform_relaxed_nn,Eform_initial_nn,Eform_relaxed_dft,Eform_initial_dft,text1+text2])
             out.append([idx,Eform_relaxed_nn,Eform_initial_nn,Eform_relaxed_dft,Eform_initial_dft,text1+text2])
             #print('out',out)
             #if idx == 3:
