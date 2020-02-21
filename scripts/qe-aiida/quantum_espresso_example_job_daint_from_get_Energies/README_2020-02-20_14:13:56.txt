@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 82aa7272a3dd92de8000e21829ecc6c77a56f690
+# execution time: 0.009067058563232422 seconds.
+
+createFolders_quantumespresso_from_inputfile.py out.espresso-in_0

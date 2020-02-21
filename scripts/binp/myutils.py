@@ -1171,8 +1171,12 @@ class mypot( object ):
             #print('useepo',self.use_epoch,type(self.use_epoch))
             #print('linked',self.potepoch_linked,type(self.potepoch_linked))
             if self.potepoch_linked == False and self.use_epoch == False:
-                self.potpath_work = self.use_epoch = self.potepoch_all[-1]
-                self.potpath_work = self.pot_tmpdir
+                print('self.potepoch_all',self.potepoch_all)
+                if self.pottype == 'n2p2':
+                    self.potpath_work = self.use_epoch = self.potepoch_all[-1]
+                    self.potpath_work = self.pot_tmpdir
+                elif self.pottype == 'runner':
+                    self.potpath_work = self.pot_tmpdir
             print('self.use_epoch',self.use_epoch)
             print('self.potpath_work',self.potpath_work)
             print('self.potepoch_linked',self.potepoch_linked)
@@ -1216,31 +1220,6 @@ class mypot( object ):
                     fa += [fa_]
                     fb += [fb_]
 
-                #f12 = self.potpath+"/weights.012."+epstr+".out"
-                #f13 = self.potpath+"/weights.013."+epstr+".out"
-                #f14 = self.potpath+"/weights.014."+epstr+".out"
-
-                #f12a = self.potpath+"/../_weights/weights.012."+epstr+".out"
-                #f13a = self.potpath+"/../_weights/weights.013."+epstr+".out"
-                #f14a = self.potpath+"/../_weights/weights.014."+epstr+".out"
-
-                #f12b = self.potpath+"/../weights.012."+epstr+".out"
-                #f13b = self.potpath+"/../weights.013."+epstr+".out"
-                #f14b = self.potpath+"/../weights.014."+epstr+".out"
-                #if not os.path.isfile(f[0]): f[0] = fa[0]
-                #if not os.path.isfile(f[1]): f[1] = fa[1]
-                #if not os.path.isfile(f[2]): f[2] = fa[2]
-                #if not os.path.isfile(f[0]): f[0] = fb[0]
-                #if not os.path.isfile(f[1]): f[1] = fb[1]
-                #if not os.path.isfile(f[2]): f[2] = fb[2]
-                #if not os.path.isfile(f[0]): sys.exit(f[0]+" does not exist! (65)")
-                #if not os.path.isfile(f[1]): sys.exit(f[1]+" does not exist! (66)")
-                #if not os.path.isfile(f[2]): sys.exit(f[2]+" does not exist! (67)")
-
-
-                #for ff in [f12,f13,f14]:
-                #    if not os.path.isfile(ff):
-                #        sys.exit(ff+" does not exist! (65)")
                 for idx,i in enumerate(f):
                     if self.verbose:
                         print('copying',i,'to',self.pot_tmpdir+'/'+wfn[idx])
@@ -6516,13 +6495,13 @@ def ase_repeat_structure_using_listrepeat(atoms,ene_DFT,givenunits,listrepeat=[[
     #if 11 <= nat <= 40: repeat = 2   # *8    at = 99 -
     #if nat > 40: reppeat = False
     if repeat > 0:
-        atoms_sc,forces_sc = my.ase_repeat_structure(atoms,repeat)
-        ene_sc_ev = my.convert_energy(ene_DFT*repeat**3.,givenunits,"ev",nat)
+        atoms_sc,forces_sc = ase_repeat_structure(atoms,repeat)
+        ene_sc_ev = convert_energy(ene_DFT*repeat**3.,givenunits,"ev",nat)
     else:
         atoms_sc = copy.deepcopy(atoms)
         forces_sc = atoms_sc.get_forces()
         ene_sc_ev = my.convert_energy(ene_DFT,givenunits,"ev",nat)
-    return atoms_sc, forces_sc, ene_sc_ev
+    return atoms_sc, forces_sc, ene_sc_ev, repeat
 
 class ase_get_known_formats_class():
     """

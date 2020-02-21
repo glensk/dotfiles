@@ -1,0 +1,67 @@
+&CONTROL
+  calculation = 'scf'
+  outdir = './out/'
+  prefix = 'aiida'
+  pseudo_dir = '/users/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy'
+  tprnfor = .true.             	! calculate the pressure of the cell
+  tstress = .true.
+  verbosity = 'high'
+  wf_collect = .true.
+  etot_conv_thr = 2.5d-4    ! EDIFFG positive atomic units
+  forc_conv_thr = 2.0d-5
+/
+&SYSTEM
+  degauss =   4.4100000000d-02  ! SIGMA in Rydberg  so, 0.60001101eV
+  ecutrho = 400                 ! AUGMENTATION charges
+  ecutwfc =  40                 ! ENCUT in Rydberg, so 544eV
+  ibrav = 0                     ! no symmetry
+   nat              = 22
+   ntyp             = 3
+  occupations = 'smearing'      ! using smearing 
+  smearing = 'mp'               ! methfessel paxton
+  nosym= .true. 		! no symmetry
+/
+&ELECTRONS
+  conv_thr =   1.0000000000d-12   	! EDIFF
+  mixing_beta =   4.0000000000d-01      ! MIXING
+  mixing_mode = 'local-TF'                 ! MIXING
+/
+&IONS
+  !press_conv_thr = 0.05                 ! just for volume relaxations
+/
+ATOMIC_SPECIES
+Al 26.9815385 Al.pbe-n-kjpaw_psl.1.0.0.UPF
+Mg 24.305 Mg.pbe-n-kjpaw_psl.0.3.0.UPF
+Si 28.085 Si.pbe-n-rrkjus_psl.1.0.0.UPF
+
+K_POINTS automatic
+6 20 13 0 0 0
+CELL_PARAMETERS angstrom
+14.11229523441606 0.00000000000000 -3.84880798363246
+0.00000000000000 4.05703339504001 0.00000000000000
+0.00000000000000 0.00000000000000 6.76748700520616
+
+ATOMIC_POSITIONS angstrom
+Al 0.0198997090 0.0000000000 4.6113475815 
+Mg 1.0358045927 2.0285166975 -0.0860309850 
+Mg 2.1679559509 2.0285166975 3.4468640249 
+Mg 4.9280622587 0.0000000000 3.8515327171 
+Mg 6.0601644034 0.0000000000 0.6170301527 
+Si 0.8235494968 0.0000000000 2.1123119088 
+Si 2.5858112100 0.0000000000 5.3748841492 
+Al 3.1099575328 0.0000000000 1.1685238246 
+Al 3.9859738917 2.0285166975 -0.6376802350 
+Si 4.5101091018 2.0285166975 1.9233840027 
+Si 6.2724279661 2.0285166975 -1.5813624838 
+Al 7.0760295988 2.0285166975 2.6870909655 
+Mg 8.0919736415 0.0000000000 -2.0099325231 
+Mg 9.2242699943 0.0000000000 1.5223893879 
+Mg 11.9840577375 2.0285166975 1.9271617988 
+Mg 13.1162815929 2.0285166975 -1.3078969308 
+Si 7.8796820324 2.0285166975 0.1880373008 
+Si 9.6417802299 2.0285166975 3.4506280624 
+Al 10.1661916705 2.0285166975 -0.7557417874 
+Al 11.0420259924 0.0000000000 -2.5622622949 
+Si 11.5664310829 0.0000000000 -0.0012065240 
+Si 13.3285927816 0.0000000000 -3.5059027387 
+

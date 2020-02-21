@@ -50,8 +50,13 @@ def adapt_ase_qe_file(
         print('verbose',verbose)
 
     # checks
-    submit_file = my.scripts()+"/qe-aiida/aiida_submitskripts/submit-aiida-qe.sh"
-    settings_file = my.scripts()+"/qe-aiida/aiida_submitskripts/aiida.in.top"
+    #scripts = os.environ['scripts']
+    #print('scripts',scripts)
+    scripts = os.environ['SCRIPTS']
+    print('SCRIPTS',scripts)
+    submit_file   = scripts+"/qe-aiida/aiida_submitskripts/submit-aiida-qe.sh"
+    #settings_file = scripts+"/qe-aiida/aiida_submitskripts/aiida.in.top"   aiida.settings.almgsi
+    settings_file = scripts+"/qe-aiida/aiida_submitskripts/aiida.settings.almgsi"
     my.check_isfile_or_isfiles([submit_file,settings_file],["submit_file","settings_file"])
     for positionsfile_ase in ase_positionsfiles:
         my.check_isfile_or_isfiles([positionsfile_ase],["positionsfile_ase"])
@@ -78,9 +83,13 @@ def adapt_ase_qe_file(
         f = open(positionsfile_ase,"r")
         positions = f.readlines()
         f.close()
+        #print('positions')
+        #print(positions)
+        #sys.exit()
 
         # read in the ase structure
         ase_structure = ase.io.read(positionsfile_ase, format="espresso-in")
+        #ase_structure = ase.io.read(positionsfile_ase, format="runner")
 
         # k-points
         kpoint_density = 80
@@ -157,7 +166,9 @@ def adapt_ase_qe_file(
         #########################
         for idx,line in enumerate(settings):
             if line[:15] == "  pseudo_dir = ":
-                settings[idx] = "  pseudo_dir = '"+espresso_pseudo+"'\n"
+                espresso_pseudo_daint = espresso_pseudo.replace("Users", "users").replace('glensk','aglensk')
+                #settings[idx] = "  pseudo_dir = '"+espresso_pseudo+"'\n"
+                settings[idx] = "  pseudo_dir = '"+espresso_pseudo_daint+"'\n"
             if line[:15] == "  calculation =":
                 settings[idx] = "  calculation = '"+calculation+"'\n"
             if line[:15] == "  forc_conv_thr":
@@ -186,7 +197,7 @@ def adapt_ase_qe_file(
         ###############################################
         # submit
         ###############################################
-        my.submitjob(submit=submit,submitdebug=submitdebug,jobdir=dirname,submitskript="submit.sh")
+        #my.submitjob(submit=submit,submitdebug=submitdebug,jobdir=dirname,submitskript="submit.sh")
 
     return
 

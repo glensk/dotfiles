@@ -61,7 +61,11 @@ def help(p = None):
 
 
 
-
+    # creating of structures for quantum-espresso
+    # 1) getEnergies_byLammps.py -p runner_v3ag_4998_3 -i /Users/glensk/Dropbox/Albert/scripts/dotfiles//scripts/potentials/aiida_get_structures_new/OQMD-Distorted_scf --units hartree -we
+    # 2) createFolders_quantumespresso_from_inputfile.py out.espresso-in_*
+    # 3) for every foler sbatch submit.sh
+    # 4) getEnergies_byLammps.py -p runner_v3ag_4998_3 -i aiida.out -fi espresso-out --units hartree -wr
 
 
 
@@ -133,6 +137,7 @@ def help(p = None):
     p.add_argument('--pick_uuid','-pick_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine uuis that will be calculated.')
 
     p.add_argument('--write_runner','-wr'    ,  action='store_true',help='write runnerfile from calculated structures using chosen pot; default filename out: runner.out')
+    p.add_argument('--write_espresso_job','-we'    ,  action='store_true',help='write inputjobs for quantum espresso to be started on daint, instead of aiida.')
     p.add_argument('--write_runner_DFT','-wrd', action='store_true',help='write runnerfile with selected input structures (e.g. DFT); default filename out: runner_DFT.out')
     p.add_argument('--write_runner_repeated','-wrr',  action='store_true',help='default: runner_repeated.out')
     p.add_argument('--write_forces','-wf',  action='store_true',help='write forces.out of particular strucuture')
@@ -435,8 +440,16 @@ def get_energies(args):
         print('getting DFT data')
         for idx,i in enumerate(frames):
             #print(frames[idx].get_forces())
-            DFT_FORCES_EV_ANG.append(frames[idx].get_forces())
-            DFT_ENERGIES_EV_CELL.append(frames[idx].get_potential_energy())
+            try:
+                forces_thisstruct = frames[idx].get_forces()
+            except RuntimeError:
+                forces_thisstruct = False
+            DFT_FORCES_EV_ANG.append(forces_thisstruct)
+            try:
+                ene_thisstruct = frames[idx].get_potential_energy()
+            except RuntimeError:
+                ene_thisstruct = False
+            DFT_ENERGIES_EV_CELL.append(ene_thisstruct)
         print('getting DFT data DONE!')
         POT_FORCES_EV_ANG = np.copy(DFT_FORCES_EV_ANG)
         POT_ENERGIES_EV_CELL = np.copy(DFT_ENERGIES_EV_CELL)
@@ -714,6 +727,9 @@ def get_energies(args):
         print('YYY getEne (23): args.structures_idx ...     :',args.structures_idx)
         #print('try with guessing')
         frames = ase_read(args.inputfile,index=args.structures_idx,format=args.format_in)
+        #print('fc')
+        #print(frames[0].cell)
+        #sys.exit()
 
         try:
             a = frames[0].cell     # this is just minimal check weather
@@ -1203,7 +1219,18 @@ def get_energies(args):
                     f_atoms = f_tmp.get_number_of_atoms()
                     ene_pot_ase[idx],ene_pot_eV_cell[idx] = ace.ene(atoms_tmp,debug=debug,return_both=True)
                     POT_ENERGIES_EV_CELL[idx] = ene_pot_eV_cell[idx]
-                    POT_FORCES_EV_ANG[idx] = atoms_tmp.get_forces()
+                    #print('att')
+                    #print(atoms_tmp.positions)
+                    forces_thisstruct = atoms_tmp.get_forces()
+                    #print('fff')
+                    #print(forces_thisstruct)
+                    #print('kkk')
+                    #print(POT_FORCES_EV_ANG)
+                    #print('idx',idx)
+                    try:
+                        POT_FORCES_EV_ANG[idx] = forces_thisstruct
+                    except ValueError:
+                        pass
                     #print('compare enes')
                     #print(DFT_ENERGIES_EV_CELL[idx],POT_ENERGIES_EV_CELL[idx])
                     #print('compare forces')
@@ -1362,14 +1389,27 @@ def get_energies(args):
             ### write runner output
             if args.write_runner:
                 ase_write("out.runner",frames[i],format='runner',append=True)
+            if args.write_espresso_job:
+                ase_write("out.espresso-in_"+str(idx),frames[i],format='espresso-in')
+                # execute:
+                # /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/qe-aiida/aiida_submitskripts/createFolders_quantumespresso_from_inputfile.py out.espresso-in -vv
+                #scripts = os.environ['SCRIPTS']
+                #execu=scripts+'/qe-aiida/aiida_submitskripts/createFolders_quantumespresso_from_inputfile.py out.espresso-in_'+str(idx)
+
+
 
             ### write runner output
             if args.write_runner_repeated:
-                atoms_sc, forces_sc, ene_sc_ev = my.ase_repeat_structure_using_listrepeat(frames[i],ene_DFT[idx],ace.units,listrepeat=[[1,1,5],[2,3,4], [4,12,3], [13,70,2]])
+                ace.get_calculator(frames[i])
+                listrepeat = [[1,1,5],[2,3,4], [4,12,3], [13,70,2]]
+                listrepeat = [[1,1,5],[2,3,2], [4,12,2], [13,70,2]]
+                atoms_sc, forces_sc, ene_sc_ev, repeat = my.ase_repeat_structure_using_listrepeat(frames[i],ene_DFT[idx],ace.units,listrepeat=listrepeat)
                 ase_write(args.inputfile+".repeated",atoms_sc,format='runner',append=True,setforces_ase_units=forces_sc,setenergy_eV=ene_sc_ev)
+                ase_write(args.inputfile+".repeated_aiida",atoms_sc,format='espresso-in')
 
                 # statistics
                 nat_new = atoms_sc.get_number_of_atoms()
+                nat = "ka"
                 if nat_new > max_at:
                     max_at = nat_new
                     max_at_orig = nat
@@ -1481,8 +1521,8 @@ def get_energies(args):
                     ene_diff_abs[idx],
                     frames[i].get_number_of_atoms(),
                     at_si,at_mg,at_al,
-                    (ene_DFT[idx]+537462.536751423380)*33/1000,
-                    (ene_pot[idx]+537462.536751423380)*33/1000,
+                    #(ene_DFT[idx]+537462.536751423380)*33/1000,
+                    #(ene_pot[idx]+537462.536751423380)*33/1000,
 
 
                     #(ene_DFT[idx]+537463)*33/1000,
@@ -1492,8 +1532,8 @@ def get_energies(args):
                     #(ene_DFT[idx]+537462.536751423380)*33/1000,
                     #(ene_pot[idx]+3579.989020373443)*33/1000, # zhou
                     #(ene_pot[idx]+2380.290192865874)*33/1000,
-                    #ene_DFT[idx],
-                    #ene_pot[idx],
+                    ene_DFT[idx],
+                    ene_pot[idx],
                     ene_pot_wo_atomic[idx],
                     for_DFTmax[idx],
                     ene_pot_ase[idx]-ene_pot_ase_geop[idx],

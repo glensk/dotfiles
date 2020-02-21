@@ -1,0 +1,67 @@
+&CONTROL
+  calculation = 'scf'
+  outdir = './out/'
+  prefix = 'aiida'
+  pseudo_dir = '/users/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy'
+  tprnfor = .true.             	! calculate the pressure of the cell
+  tstress = .true.
+  verbosity = 'high'
+  wf_collect = .true.
+  etot_conv_thr = 2.5d-4    ! EDIFFG positive atomic units
+  forc_conv_thr = 2.0d-5
+/
+&SYSTEM
+  degauss =   4.4100000000d-02  ! SIGMA in Rydberg  so, 0.60001101eV
+  ecutrho = 400                 ! AUGMENTATION charges
+  ecutwfc =  40                 ! ENCUT in Rydberg, so 544eV
+  ibrav = 0                     ! no symmetry
+   nat              = 22
+   ntyp             = 3
+  occupations = 'smearing'      ! using smearing 
+  smearing = 'mp'               ! methfessel paxton
+  nosym= .true. 		! no symmetry
+/
+&ELECTRONS
+  conv_thr =   1.0000000000d-12   	! EDIFF
+  mixing_beta =   4.0000000000d-01      ! MIXING
+  mixing_mode = 'local-TF'                 ! MIXING
+/
+&IONS
+  !press_conv_thr = 0.05                 ! just for volume relaxations
+/
+ATOMIC_SPECIES
+Mg 24.305 Mg.pbe-n-kjpaw_psl.0.3.0.UPF
+Si 28.085 Si.pbe-n-rrkjus_psl.1.0.0.UPF
+Al 26.9815385 Al.pbe-n-kjpaw_psl.1.0.0.UPF
+
+K_POINTS automatic
+6 20 13 0 0 0
+CELL_PARAMETERS angstrom
+14.74014494437047 0.00000000000000 -4.22319927257474
+0.00000000000000 4.05429490297534 0.00341848478024
+0.00000000000000 0.00202727789367 6.83716800193879
+
+ATOMIC_POSITIONS angstrom
+Mg 0.0206188608 0.0020288654 6.7521583289 
+Mg 1.1171904601 2.0279594739 2.0585236912 
+Mg 2.3025643454 2.0290866214 5.5083135369 
+Mg 5.1091673381 4.0543827464 -0.9478193562 
+Mg 6.2944359171 4.0555109522 2.5021271259 
+Si 0.8724602880 0.0020987168 4.1711393478 
+Si 2.7570026835 4.0546330472 0.6557251779 
+Al 3.2162110249 0.0016478578 3.2194670523 
+Al 4.1954047688 2.0275266070 1.3376218731 
+Si 4.6546760823 2.0288368497 3.9047737654 
+Si 6.5391475680 2.0270757480 0.3860427128 
+Mg 7.3910509089 2.0291734064 4.6422139590 
+Mg 8.4873092353 0.0008181080 -0.0549180109 
+Mg 9.6724905001 0.0019426095 3.3949670867 
+Mg 12.4793855986 2.0272318553 -3.0610911925 
+Mg 13.6644620863 2.0283574152 0.3889515999 
+Si 8.2426145181 2.0292437870 2.0610071199 
+Si 10.1273966308 2.0274848020 -1.4574783945 
+Al 10.5863938306 2.0287929280 1.1096253427 
+Al 11.5653663783 4.0546764397 -0.7723172051 
+Si 12.0244260210 0.0016901920 1.7913595805 
+Si 13.9091382823 4.0542261099 -1.7236053180 
+
