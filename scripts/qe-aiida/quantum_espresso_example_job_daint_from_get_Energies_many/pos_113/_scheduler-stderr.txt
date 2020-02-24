@@ -1,0 +1,34 @@
+Currently Loaded Modulefiles:
+  1) modules/3.2.11.3(default)
+  2) udreg/2.3.2-7.0.1.1_3.9__g8175d3d.ari
+  3) ugni/6.0.14.0-7.0.1.1_7.10__ge78e5b0.ari
+  4) dmapp/7.1.1-7.0.1.1_4.8__g38cf134.ari
+  5) gni-headers/5.0.12.0-7.0.1.1_6.7__g3b1768f.ari
+  6) xpmem/2.2.19-7.0.1.1_3.7__gdcf436c.ari
+  7) job/2.2.4-7.0.1.1_3.8__g36b56f4.ari
+  8) dvs/2.12_2.2.151-7.0.1.1_5.6__g7eb5e703
+  9) alps/6.6.56-7.0.1.1_4.10__g2e60a7e4.ari
+ 10) cray-mpich/7.7.10(default)
+ 11) slurm/19.05.3-2
+ 12) xalt/2.7.24
+ 13) Base-opts/2.4.139-7.0.1.1_4.6__gbb799dd.ari
+ 14) daint-mc
+ 15) intel/19.0.1.144
+ 16) craype-broadwell
+ 17) craype-network-aries
+ 18) craype/2.6.1(default)
+ 19) cray-libsci/19.06.1(default)
+ 20) pmi/5.0.14(default)
+ 21) atp/2.1.3(default)
+ 22) rca/2.2.20-7.0.1.1_4.9__g8e3fb5b.ari
+ 23) perftools-base/7.1.1(default)
+ 24) PrgEnv-intel/6.0.5
+ 25) cdt/19.10
+ 26) CrayIntel/.19.10
+ 27) QuantumESPRESSO/6.4.1-CrayIntel-19.10
+head: cannot open '/etc/issue' for reading: No such file or directory
+slurmstepd: error: Detected 1 oom-kill event(s) in step 20441521.0 cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.
+srun: error: nid01642: tasks 0-6,8-35: Out Of Memory
+srun: Terminating job step 20441521.0
+slurmstepd: error: *** STEP 20441521.0 ON nid01642 CANCELLED AT 2020-02-22T07:53:46 ***
+slurmstepd: error: Detected 1 oom-kill event(s) in step 20441521.batch cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.

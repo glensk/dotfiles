@@ -1,0 +1,32 @@
+
+SLURM_JOBID        = 20441547
+SLURM_JOB_NODELIST = nid01221
+SLURM_NNODES       = 1
+SLURM_SUBMIT_DIR   = /scratch/snx3000/aglensk/qe_DB2/quantum_espresso_example_job_daint_from_get_Energies_many_2/pos_13
+
+system info:
+ Linux nid01221 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
+ 
+
+work dir:
+ /scratch/snx3000/aglensk/qe_DB2/quantum_espresso_example_job_daint_from_get_Energies_many_2/pos_13 
+
+ESPRESSO_PSEUDO      = /scratch/snx3000/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
+ 
+Batch Job Summary Report for Job "submit.sh" (20441547) on daint
+-----------------------------------------------------------------------------------------------------
+             Submit            Eligible               Start                 End    Elapsed  Timelimit 
+------------------- ------------------- ------------------- ------------------- ---------- ---------- 
+2020-02-20T23:18:24 2020-02-20T23:18:24 2020-02-22T08:31:31 2020-02-22T08:48:35   00:17:04 1-00:00:00 
+-----------------------------------------------------------------------------------------------------
+Username    Account     Partition   NNodes   Energy
+----------  ----------  ----------  ------  --------------
+aglensk     mr23        normal           1        0 joules
+ 
+This job did not utilize any GPUs
+ 
+----------------------------------------------------------
+Scratch File System        Files       Quota
+--------------------  ----------  ----------
+/scratch/snx3000           19985     1000000
+ 
