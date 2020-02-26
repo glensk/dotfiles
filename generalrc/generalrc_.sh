@@ -137,8 +137,8 @@ case $myhost in
 #    # on fidis: pip install --install-option="--prefix=$HOME/.local" click # on some version)
 #    # on fidis: pip install --install-option="--prefix=$HOME/.local" lmfit
 #    # on fidis: pip install --install-option="--prefix=$HOME/.local" phonopy
-    fidis) moduel load intel python;; #/2.7.16;;
-    helvetios) moduel load intel python/2.7.16;;
+    fidis) moduel load intel python;; #/2.7.16;; fidis&helvetios shoudl be the same
+    helvetios) moduel load intel python;; #/2.7.16;; fidis&helvetios same
     #mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate  -> dont need it
 esac
     # This would give me python 3 by default, quickly; uncomment it to get python2 by default

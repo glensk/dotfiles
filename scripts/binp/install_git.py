@@ -299,11 +299,15 @@ def install_lammps(args):
     '''
     print('myhostname',myhostname)
     print('hostname',hostname)
+    pythonver=False
+    pythonname=False
     if myhostname == 'fidis':
         serialfidis = 'fidis'
         ser_or_par = "par"
-        pythonver='python/2.7.16'
+        #pythonver='python/2.7.16'
+        #pythonname='py2.7.16'
         pythonver='python/3.7.3'
+        pythonname='py3.7.3'
     elif myhostname == 'mac':
         serialfidis = 'serial'
         ser_or_par  = "ser"
@@ -313,12 +317,18 @@ def install_lammps(args):
     print('serialfidis',serialfidis)
     print('serialfidis',ser_or_par)
     print('scripts',scripts)
+    if pythonver == False:
+        sys.exit('define pyhtonversion!!')
+    if pythonname== False:
+        sys.exit('define pyhtonversion name !!')
 
     #    git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
     #    extension = [ "runner" ]
     if args.install in [ 'lammps']:  # this is thre preferred way and tries to install both, lammps and runner
 
         n2p2_folder=args.sources_folder+"/n2p2"
+        if not os.path.isdir(n2p2_folder):
+            sys.exit('CAN NOT INSTALL with n2p2, not found in sources')
         if os.path.isdir(n2p2_folder):
             #extension = [ "n2p2" ]
             extension = [ "n2p2", "runner" ] # this is thre preferred way and tries to install both, lammps and runner (e.g. on fidis)
@@ -330,6 +340,11 @@ def install_lammps(args):
 
         #if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
     print('extension:',extension)
+    install_folder_orig = args.install_folder
+    args.install_folder = args.install_folder+"_"+pythonname
+    print('args.install_folder',args.install_folder)
+    print('install_folder_orig',install_folder_orig)
+    os.symlink(args.install_folder, install_folder_orig)
     git_clone(args,specify_depth = True)
 
     os.chdir(args.install_folder)
@@ -375,7 +390,7 @@ def install_lammps(args):
             my.cp(scripts+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
 
         print("module load ... && make fidis")
-        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make fidis",os.getcwd())
+        bash_command("source $MODULESHOME/init/bash && module purge && module load git intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make fidis",os.getcwd())
         print()
 
 
@@ -434,7 +449,7 @@ def install_lammps(args):
     os.chdir(args.install_folder+"/src")
     print()
     if hostname == 'fidis':
-        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+        bash_command("source $MODULESHOME/init/bash && module purge && module load git intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make mode=shlib fidis",os.getcwd())
     else:
         bash_command("make mode=shlib "+serialfidis,os.getcwd())
     print()
@@ -466,16 +481,15 @@ def install_n2p2(args):
     '''
     see https://compphysvienna.github.io/n2p2/ for more details
     '''
-    subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
-    os.chdir(args.install_folder)
-    subprocess.call(["git","branch"])
-    os.chdir("src")
-    print('pwd aa:',os.getcwd())
-    #my.cp("makefile","makefile.back")
-    #my.cp("makefile.intel","makefile.intel.back")
-    #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
+    pythonver=False
+    pythonname=False
     if myhostname in ["fidis", "helvetios"]:
+        #pythonver='python/2.7.16'
+        #pythonname='py2.7.16'
+
+        pythonver='python/3.7.3'
+        pythonname='py3.7.3'
         COMP="intel"
         GSL_ROOT = "GSL_ROOT"
         PROJECT_CC = "icpc # or icc"
@@ -528,6 +542,26 @@ def install_n2p2(args):
         # on mac now EIGEN_ROOT and GSL_ROOT are defined in $scripts/source_to_add_to_path.sh by miniconda
         #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"   # miniconda
         #EIGEN = /Users/glensk/miniconda2/   # miniconda
+
+    if pythonver == False:
+        sys.exit('define python version to work with')
+
+    ############################################
+    # download
+    ############################################
+    install_folder_orig = args.install_folder
+    args.install_folder = args.install_folder+"_"+pythonname
+    print('args.install_folder',args.install_folder)
+    print('install_folder_orig',install_folder_orig)
+    os.symlink(args.install_folder, install_folder_orig)
+    subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
+    os.chdir(args.install_folder)
+    subprocess.call(["git","branch"])
+    os.chdir("src")
+    print('pwd aa:',os.getcwd())
+    #my.cp("makefile","makefile.back")
+    #my.cp("makefile.intel","makefile.intel.back")
+    #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
     # makefile
     my.sed("makefile","^COMP=.*","COMP="+COMP)
