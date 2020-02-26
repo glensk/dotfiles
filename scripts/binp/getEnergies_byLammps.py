@@ -34,7 +34,7 @@ def help(p = None):
     % getEnergies_byLammps.py -i $dotfiles/scripts/potentials/runner_v3ag_5000/input.data -p runner_v3ag_5000 -pc44
     % getEnergies_byLammps.py -p . -e
     % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.ipi -fi ipi -ru
-    % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammps-runner
+    % getEnergies_byLammps.py -p runner_v3ag_5000_46489_2 --units meV_pa -i ../data.runnerformat.lmp -fi lammpsrunner
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -evinet
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc -sys_ele Al -fqh
     % getEnergies_byLammps.py -p runner_v3ag_4998_3 -sys fcc_vac -sys_ele Al -fqh
@@ -68,6 +68,11 @@ def help(p = None):
     # 4) getEnergies_byLammps.py -p runner_v3ag_4998_3 -i aiida.out -fi espresso-out --units hartree -wr
 
 
+    # theta/theta' phase transition:
+    # getEnergies_byLammps.py --units meV_pa -p n2p2_alcu_v2dm_11 -i POSCAR_ThetaPrime -fi vasp -thermo --fqh_atoms_max 4 --fah_atoms_max 4
+
+    # normal test to calc energies of structures
+    # getEnergies_byLammps.py -i $potentials/aiida_get_structures_new/aiida_exported_group_Al6xxxDB_structures_calc__all_steps.input.data -p n2p2_v4ag_ppl_987654_28cores -vv
 
     '''
     p = argparse.ArgumentParser(description=string,
@@ -515,9 +520,9 @@ def get_energies(args):
         print('frames.positions',frames.positions)
         print('frames.get_atomic_numbers()',frames.get_atomic_numbers())
         print('frames.get_atomic_numbers()',list(set(frames.get_atomic_numbers())))
-        print('os.getcwd()',os.getcwd())
+        print('os.getcwd() BEFORE GET CALCULATOR',os.getcwd())
         ace.get_calculator(frames)
-        print('forces',frames.get_forces())
+        print('forces YYY',frames.get_forces())
         ase_structure_relaxed = my.get_thermo(ace,frames,relax_cellshape_and_volume=True,evinet=args.evinet,fqh=args.fqh,fah=args.fah)
         print('nat ase_structure_relaxed',ase_structure_relaxed.get_number_of_atoms())
 
@@ -1974,14 +1979,14 @@ def get_basic_NN_energies_ace(ace):
     if not os.path.isdir(ace.savefolder):
         my.mkdir(ace.savefolder)
 
-    #ase_write('pos_si.lmp',frame_si,format='lammps-runner')
+    #ase_write('pos_si.lmp',frame_si,format='lammpsrunner')
     get_al_fcc_equilibrium(ace)
     get_mg_hcp_equilibrium(ace)
     get_si_dc_equilibrium(ace)
     ace.free_ene_formation_dilute_mg_ = False
     ace.free_ene_formation_dilute_si_ = False
     #ene_pot_lmp = my.lammps_ext_calc(ace.al_fcc,ace)
-    #ase_write('pos_al.lmp',ace.al_fcc,format='lammps-runner')
+    #ase_write('pos_al.lmp',ace.al_fcc,format='lammpsrunner')
     #get_vpa(
     if ace.verbose:
         print("NN 1 Al vpa @T=0K",my.ase_vpa(ace.al_fcc),"(==alat)",(ace.al_fcc_vol_pa*4.)**(1./3.))

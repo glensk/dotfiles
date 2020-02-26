@@ -527,8 +527,8 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
             temperatures = temp_test
             break
 
-    # extend temperature range
-    temperatures = np.concatenate((np.array([3]),temperatures))
+    # extend temperature range to include 1,2,3 Kelvin ... nope
+    #temperatures = np.concatenate((np.array([3]),temperatures))
 
     # just the low temperatures
     #temperatures = np.array([3,6,12,18])
@@ -594,11 +594,10 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 print('ipi_inp_basename',ipi_inp_basename)
                 print('posfile',posfile)
                 print('to folder',folder)
-                print()
                 pos_basename = os.path.basename(posfile)
                 frame = ase_read(posfile)
-                print('frame.pos',frame.positions[:3])
-                print('frame.cell',frame.positions[:3])
+                #print('frame.pos',frame.positions[:3])
+                #print('frame.cell',frame.positions[:3])
                 ase_write(folder+"/pos.extxyz",frame,format='extxyz')
                 ase_write(folder+"/pos.POSCAR",frame,format='vasp')
                 if False:   # this stuff is not used
@@ -612,9 +611,9 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
 
                 ##
                 if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
-                    #frame.write(folder+'/pos.lmp',format='lammps-runner')
+                    #frame.write(folder+'/pos.lmp',format='lammpsrunner')
                     # here I would need an ase object
-                    ase_write(folder+'/pos.lmp',frame,format='lammps-runner',pot=ace.pot)
+                    ase_write(folder+'/pos.lmp',frame,format='lammpsrunner',pot=ace.pot)
                 elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
 #                    frame.write(folder+'/pos.lmp',format='lammps-data')
                     ase_write(folder+'/pos.lmp',frame,format='lammps-data')
@@ -749,7 +748,7 @@ def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",ver
     ''' help '''
     f = get_sorted_lambda_folder(verbose=verbose)
     hier = os.getcwd()
-    print(hier)
+    print('hierxx99',hier)
     # das hier sollte schon das average ueber verschiedene seeds sein ...
     l_ = []
     dudl_mean_ = []
@@ -759,6 +758,7 @@ def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",ver
     t_mean_= []
     desired_steps_= []
     obtained_steps_= []
+    print('fxx99',f)
     for i in f:
         os.chdir(hier)
         os.chdir(i)
@@ -779,7 +779,7 @@ def get_avg_dudl_in_one_ang_K_folder_from_ipi_job(savefit="avg_dudl_fit.dat",ver
         obtained_steps_.append(obtained_steps)
 
         ## print to screen
-        if False: #verbose:
+        if True: #verbose:
             print(str(lam).ljust(7),str(dudl_mean).ljust(20),str(std_err_mean_uncorr).ljust(20),str(dudl_std).ljust(20))
 
     if verbose:
@@ -895,16 +895,23 @@ def fah_fit_surface(func,coef_lmfit_2d,temperatures,y,filename=False,order=3):
 
 def make_fqh_thermos_again():
     fqhfolder = get_fqh_folder(verbose=False)
-    print('fqh',fqhfolder)
+    print('fqhfolder',fqhfolder)
     os.chdir(fqhfolder)
     evinetfolder = get_evinet_folder(verbose=False)
     for i in ["1st","2nd","3rd"]:
         os.chdir(fqhfolder)
+        thdir = "thermo_"+str(i)
         os.mkdir("thermo_"+str(i))
         with my.cd("thermo_"+str(i)):
             print('now termo_'+str(i),os.getcwd())
+            globsurffile = fqhfolder+"/Fqh_*at_cell_per_atom_Surface_"+i+"_order__*"
+            print('globsurffile',globsurffile)
+            surffile = glob.glob(globsurffile)
+            print('surffile',surffile)
+            if len(surffile) != 1:
+                sys.exit("did not found fqh surffile")
             call(["cp "+evinetfolder+"/EVinet_1 EVinet"],shell=True)
-            call(["cp "+fqhfolder+"/Fqh_*at_cell_per_atom_Surface_"+i+"_order__* Fqh"],shell=True)
+            call(["cp "+surffile[0]+" Fqh"],shell=True)
             print('now gethermodynamcs.sh',os.getcwd())
             call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
     return
@@ -2104,8 +2111,12 @@ if __name__ == '__main__':
     % fah.py -ef fah_go_through_all_angK_folder_and_exec_function fah_get_avg_dudl_and_fit_and_Fah_in_one_ang_K_folder
 
     % or (in one particular ang_K folder):
+    % ------------------------------------
     %      fah.py -ef get_avg_dudl_in_one_ang_K_folder_from_ipi_job
     %      fah.py -ef get_avg_dudl_fit_and_Fah_from_avg_dudl
+    %
+    % or (in one particular lambda folder):
+    % ------------------------------------
     %
     % fah.py -ef fah_get_Fah_surface (step 3)
     % fah.py -ef fit_fah_surface_lmfit2d (step 4)

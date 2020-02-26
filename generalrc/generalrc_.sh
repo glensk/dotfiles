@@ -137,7 +137,7 @@ case $myhost in
 #    # on fidis: pip install --install-option="--prefix=$HOME/.local" click # on some version)
 #    # on fidis: pip install --install-option="--prefix=$HOME/.local" lmfit
 #    # on fidis: pip install --install-option="--prefix=$HOME/.local" phonopy
-    fidis) moduel load intel python/2.7.16;;
+    fidis) moduel load intel python;; #/2.7.16;;
     helvetios) moduel load intel python/2.7.16;;
     #mac) source ~/.virtualenvs/aiida/bin/activate;; # aiida activate  -> dont need it
 esac

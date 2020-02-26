@@ -7,7 +7,7 @@ from ase.calculators.lammpslib import unit_convert
 from ase.utils import basestring
 
 
-def read_lammps_runner(fileobj, Z_of_type=None, style='full', sort_by_id=False,
+def read_lammpsrunner(fileobj, Z_of_type=None, style='full', sort_by_id=False,
                      units="metal"):
     """Method which reads a LAMMPS data file.
 
@@ -398,7 +398,7 @@ def convert_cell(cell,pos):
           return cell, pos
 
 
-def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True,pot=False):
+def write_lammpsrunner(fileobj, atoms,comment=None,append=False,runner=True,pot=False):
     ''' atoms is the ase atoms object '''
     if pot == False:
         sys.exit('pot needs to be ace.pot')

@@ -259,17 +259,15 @@ class qh(object):
                 #_printred("You didn't sepcify files to import. Trying default names of Fqh files:")
                 for files in possible_filenames:
                     filenames = _lsn(files)
-                    print "filenames:",filenames,"len:",len(filenames)
+                    print("filenames:",filenames,"len:",len(filenames))
                     if filenames == None:
                         sys.exit("No filenames specified")
                     if len(filenames) is not 0:
                         self._filessearchstring = files
                         #_printgreen("   found : "+files)
-                        #print ""
                         _printgreen("import_fqh_files: .............................................")
                         self.files = filenames
                         break
-                    #print "   trying:",files
 
                 if self.files == None:
                     print("No Fqh files found; trying Yaml files;")
@@ -277,14 +275,11 @@ class qh(object):
                     import yaml
                     #with open(filenames[0]) as f:
                     #    stream = yaml.load(f)
-                    #print "st:",stream
                     if len(filenames) == 0:
                         sys.exit("No Fqh_xxx files or thermal_properties*.yaml files found")
                     stream = open(filenames[0],'r')
                     ka = yaml.load(stream)
                     print("done")
-                    #print "fl:::",filenames
-                    #print stream
                     #stream = open('thermal_properties-1.yaml','r')
                     #print yaml.load(stream)
 
@@ -300,7 +295,6 @@ class qh(object):
         self.files = [f for f in self.files if '_Surface_' not in f]
         for i in self.files:
             print('C',i)
-        #print ""
         for i in self.files:
             print(i)
         for i in self.files:
