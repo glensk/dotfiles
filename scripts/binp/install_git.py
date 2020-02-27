@@ -304,10 +304,10 @@ def install_lammps(args):
     if myhostname == 'fidis':
         serialfidis = 'fidis'
         ser_or_par = "par"
-        #pythonver='python/2.7.16'
-        #pythonname='py2.7.16'
-        pythonver='python/3.7.3'
-        pythonname='py3.7.3'
+        pythonver='python/2.7.16'
+        pythonname='py2.7.16'
+        #pythonver='python/3.7.3'
+        #pythonname='py3.7.3'
     elif myhostname == 'mac':
         serialfidis = 'serial'
         ser_or_par  = "ser"
@@ -344,6 +344,15 @@ def install_lammps(args):
     args.install_folder = args.install_folder+"_"+pythonname
     print('args.install_folder',args.install_folder)
     print('install_folder_orig',install_folder_orig)
+    if os.path.isdir(args.install_folder):
+        sys.exit('folder '+args.install_folder+' does already exist!')
+    if os.path.isdir(install_folder_orig):
+        sys.exit('folder '+install_folder_orig+' does already exist!')
+    if os.path.islink(install_folder_orig):
+        sys.exit('unlink '+install_folder_orig)
+
+
+
     os.symlink(args.install_folder, install_folder_orig)
     git_clone(args,specify_depth = True)
 
@@ -485,11 +494,11 @@ def install_n2p2(args):
     pythonver=False
     pythonname=False
     if myhostname in ["fidis", "helvetios"]:
-        #pythonver='python/2.7.16'
-        #pythonname='py2.7.16'
+        pythonver='python/2.7.16'
+        pythonname='py2.7.16'
 
-        pythonver='python/3.7.3'
-        pythonname='py3.7.3'
+        #pythonver='python/3.7.3'
+        #pythonname='py3.7.3'
         COMP="intel"
         GSL_ROOT = "GSL_ROOT"
         PROJECT_CC = "icpc # or icc"
@@ -553,6 +562,13 @@ def install_n2p2(args):
     args.install_folder = args.install_folder+"_"+pythonname
     print('args.install_folder',args.install_folder)
     print('install_folder_orig',install_folder_orig)
+    if os.path.isdir(args.install_folder):
+        sys.exit('folder '+args.install_folder+' does already exist!')
+    if os.path.isdir(install_folder_orig):
+        sys.exit('folder '+install_folder_orig+' does already exist!')
+    if os.path.islink(install_folder_orig):
+        sys.exit('unlink '+install_folder_orig)
+
     os.symlink(args.install_folder, install_folder_orig)
     subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
     os.chdir(args.install_folder)
@@ -615,9 +631,9 @@ def install_n2p2(args):
     # module load on fidis
     print("*****cc",os.getcwd())
     if myhostname in ['fidis',"helvetios"]:
-        bash_command("module load intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
+        bash_command("module purge && module load intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
     if myhostname == 'daint':
-        bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
+        bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module purge && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
         # with cray:
 	#
         # module load daint-mc && module unload cray-libsci && module load GSL/2.5-CrayCCE-18.08 cray-python/2.7.15.1 cray-fftw
