@@ -1,0 +1,17 @@
+%grep "PWSCF        :" */aiida.out
+ownjob_2nodes_mk12/aiida.out:     PWSCF        :   1m15.82s CPU   2m 8.13s WALL
+ownjob_2nodes_mk18/aiida.out:     PWSCF        :   1m11.59s CPU   1m52.48s WALL
+ownjob_2nodes_mk2/aiida.out:     PWSCF        :   4m12.92s CPU  10m27.69s WALL
+ownjob_2nodes_mk36/aiida.out:     PWSCF        :   1m 3.43s CPU   1m42.49s WALL
+ownjob_2nodes_mk4/aiida.out:     PWSCF        :   2m18.03s CPU  10m46.49s WALL
+ownjob_2nodes_mk72/aiida.out:     PWSCF        :   1m 9.81s CPU   1m54.23s WALL
+ownjob_2nodes_mk8/aiida.out:     PWSCF        :   1m30.20s CPU   7m50.15s WALL
+ownjob_2nodes_mk9/aiida.out:     PWSCF        :   1m30.70s CPU   2m17.69s WALL
+ownjob_mk12/aiida.out:     PWSCF        :   1m44.05s CPU   2m28.06s WALL
+ownjob_mk18/aiida.out:     PWSCF        :   1m45.36s CPU   2m27.60s WALL
+ownjob_mk2/aiida.out:     PWSCF        :   4m23.30s CPU  10m35.32s WALL
+ownjob_mk36/aiida.out:     PWSCF        :   1m43.43s CPU   2m25.55s WALL
+ownjob_mk4/aiida.out:     PWSCF        :   2m43.80s CPU   8m48.08s WALL
+ownjob_mk6/aiida.out:     PWSCF        :   1m59.14s CPU   2m51.24s WALL
+ownjob_mk9/aiida.out:     PWSCF        :   1m54.19s CPU   2m39.35s WALL
+
