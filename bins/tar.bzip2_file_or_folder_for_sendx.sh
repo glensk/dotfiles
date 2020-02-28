@@ -13,18 +13,20 @@ if ([ "$lbzip2" = "" ] && [ ! -e "$HOME/.local/bin/lbzip2" ]);then
     echo "##################### installing lbzip2 #################"
     echo "lbzip2:$lbzip2: (if empty will be installed)"
     echo "##################### installing lbzip2 #################"
-    hier=`pwd`
-    [ ! -e "$HOME/sources" ] && mkdir $HOME/sources
-    [ ! -e "$HOME/.local" ] && mkdir $HOME/.local
-    cd $HOME/sources
-    echo "wget ...."
-    wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz
-    tar -xvf lbzip2-2.5.tar.gz
-    cd lbzip2-2.5/
-    ./configure --prefix="$HOME/.local"
-    make
-    make install
-    cd $hier
+    install_git.py -i lbzip2-2.5
+
+    #hier=`pwd`
+    #[ ! -e "$HOME/sources" ] && mkdir $HOME/sources
+    #[ ! -e "$HOME/.local" ] && mkdir $HOME/.local
+    #cd $HOME/sources
+    #echo "wget ...."
+    #wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz
+    #tar -xvf lbzip2-2.5.tar.gz
+    #cd lbzip2-2.5/
+    #./configure --prefix="$HOME/.local"
+    #make
+    #make install
+    #cd $hier
 fi
 lbzip2=`command -v lbzip2`
 if ([ "$lbzip2" = "" ] && [ -e "$HOME/.local/bin/lbzip2" ]);then

@@ -904,7 +904,7 @@ def make_fqh_thermos_again():
     print('fqhfolder',fqhfolder)
     os.chdir(fqhfolder)
     evinetfolder = get_evinet_folder(verbose=False)
-    for i in ["1st","2nd","3rd"]:
+    for i in ["1st","2nd","3rd"]:  # in fqh folder
         os.chdir(fqhfolder)
         thdir = "thermo_"+str(i)
         os.mkdir("thermo_"+str(i))
@@ -923,6 +923,7 @@ def make_fqh_thermos_again():
     return
 
 def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=False):
+    ''' x = Temperatrue, y = volume/atom, z=fah '''
     get_into_fah_folder(verbose=False)
     if x is None and y is None and z is None and os.path.isfile("Fah_surface"):
         print('reading Fah_surface')
@@ -935,9 +936,9 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=Fa
         #print(data[dd])
         #sys.exit()
         print('data.shape (0)',data.shape)
-        x = data[:,0];
-        y = data[:,1];
-        z = data[:,2];
+        x = data[:,0];  # temperature
+        y = data[:,1];  # volume per atom
+        z = data[:,2];  # fah
         err = data[:,3];
         print('x.shape',x.shape)
         print('y.shape',y.shape)
@@ -994,10 +995,17 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=Fa
         # cu 2x2x2sc: diff = 0.18 meV
         # cu 3x3x3sc: diff = 0.05 meV
         # cu 4x4x4sc: diff = 0.02 meV
+        #
+        # but seems ok for larger cells! for POSCAR_ThetaPrime the
+        # differences are large for 3atom cell, and 0 for 81 atoms cell.
 
         all1v = np.unique(data[:,1])
         for v in all1v:
             data = np.append(data, [[0, v, 0, 0]], axis=0)
+        x = data[:,0];
+        y = data[:,1];
+        z = data[:,2];
+        err = data[:,3];
     #print('data')
     #print(data)
     #sys.exit()
@@ -1132,7 +1140,7 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=Fa
 
         # get thermo
         hier = os.getcwd()
-        for i in ["1st","2nd","3rd", "3rd_new3", "3rd_new4" ]:
+        for i in ["1st","2nd","3rd", "3rd_new3", "3rd_new4" ]: # in fah/Fah_surfacefit folder
             os.chdir(hier)
             os.mkdir("thermo_"+str(i))
             with my.cd("thermo_"+str(i)):
@@ -1172,7 +1180,6 @@ def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=Fa
             p = np.poly1d(coefs[1:][::-1])
             dd = np.array([densev,p(densev)]).T
             np.savetxt(folder+"/out_temp_vs_ang3_final_"+str(int(t))+'.dat',dd,fmt='%.18e %.8f')
-
     return
 
 def fah_get_thermo_old():
@@ -1449,6 +1456,7 @@ def fah_make_all_analysis():
     print('fah_get_Fah_surface()')
     fah_get_Fah_surface()
     fit_fah_surface_lmfit2d()
+    fit_fah_surface_lmfit2d(uptoT=1200)
     return
 
 

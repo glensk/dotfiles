@@ -213,6 +213,8 @@ class qh(object):
             help='Write analysis plots')
         p.add_argument('-v', '--verbose',
             help='be more verbose', action='store_true', default=False)
+        p.add_argument('-q', '--quickanalysis',
+            help='quick analysis fqh  & evinet', action='store_true', default=False)
         p.add_argument('-ie',
             help='ignore error due to volume range',
             action='store_true', default=False)
@@ -1093,10 +1095,45 @@ class qh(object):
 
 
 if __name__ == '__main__':
+    # %head Fqh_32at_cell_per_atom_Surface_1st_order__16.6315_16.8822_17.1354_17.3912_17.6494_17.9103_18.1737_18.4396_e1_v1
+    # 0 114.425456223140 -4.550048118149
+    # 1 114.425456223140 -4.550048118149
+    # 2 114.425456223140 -4.550048118149
+    # 3 114.425456223140 -4.550048118149
+    # --> (ouput in mev/atom), example for al
+    # 114.425456223140-4.550048118149*16.631514793360534 = 38.751263636
+    # 114.425456223140-4.550048118149*18.43965773972576  = 30.524126225
+
     p = qh().help()
     args = p.parse_args()
     my.create_READMEtxt(os.getcwd())
     qh = qh(args)
+
+
+    Fqh_surf_1 = "Fqh_32at_cell_per_atom_Surface_1st_order__16.6315_16.8822_17.1354_17.3912_17.6494_17.9103_18.1737_18.4396_e1_v1"
+    volumes = np.arange(16.6,18.4,0.1)
+    fqh_ene = np.zeros(len(volumes))
+    evinet = np.loadtxt('../evinet/EVinet_1')
+    import feos
+    vi = feos.eos()
+    T = 0
+    vi.e0 = evient[0]
+    vi.v0 = evient[1]
+    vi.b0 = evient[2]
+    vi.b0der = evient[3]
+    vi.parameters = [vi.e0, vi.v0, vi.b0, vi.b0der]
+    add = feos.vinet(V, *vi.parameters, convert_to_sympy=convert_to_sympy)
+    if args.quickanalysis == 1:
+        fqh = np.loadtxt(Fqh_surf_1)
+        print(fqh)
+        Temperature = idx = fqh[:,0]
+        for vidx,v in enumerate(volumes):
+            fqh_ene[vidx] = fqh[T,1] + fqh[T,2]*v
+        np.savetxt("fqh_ene_"+str(T)+"K",np.transpose([volumes,fqh_ene]))
+        sys.exit()
+
+
+
     if args.ih != False:
         print(args.ih)
         from . import hesse

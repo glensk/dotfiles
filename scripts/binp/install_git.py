@@ -283,19 +283,25 @@ def install_notes(args):
 def install_lbzip(args):
     ''' works on fidis
         works on mac (also not necessary, since alredy installed)
+        $dotfiles/sources/lbzip2-2.5.tar.gz
     '''
-    git_clone(args,specify_depth = True)
-    os.chdir(args.install_folder)
-    print('pwd',os.getcwd())
+    #os.chdir(args.install_folder)
+    #print('pwd',os.getcwd())
+    # not available anymore
     #address="http://archive.lbzip2.org/lbzip2-2.5.tar.gz"
     #print("wget "+address)
     #subprocess.call(["wget",adress])
-    #subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
+    subprocess.call(["cp $dotfiles/sources/lbzip2-2.5.tar.gz ."],shell=True)  # to be able to copy/paste seamlessly
+    subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
+
+
+    #git_clone(args,specify_depth = True)
     home = os.environ["HOME"]
+    #dotfiles = os.environ["dotfiles"]
     print('HOME:',home)
     print('!! pwd NOW',os.getcwd())
-    #with my.cd("lbzip2-2.5/"):
-    if True:
+    #with my.cd(home+'/sources/'):
+    with my.cd("lbzip2-2.5/"):
         print('configure ....')
         subprocess.call(['./configure','--prefix='+home+'/.local'])
         print('make ....')
