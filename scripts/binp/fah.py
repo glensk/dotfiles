@@ -541,6 +541,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     #steps = 4000
     #steps = 90000
     seeds = 2
+    temperatures = np.array([5,30])
 
     if False:
         lambdas = [ 0.0, 1.0 ]
@@ -2100,28 +2101,28 @@ if __name__ == '__main__':
     Examples for using this script:
     -------------------------------
     # creating jobs:
-    # -----------------
+    # ------------------------------------------------------------
     % fah.py -ef fah_create_jobs_and_joblist_from_fqh (step 0)
     % fah.py -ef fah_submit_ipi_ti_job
 
-    # analyzing jobs:
-    # -----------------
+    # analyzing jobs: (this creates also joblist_missing.dat)
+    # ------------------------------------------------------------
     % fah.py -ef fah_make_all_analysis
     %
     % or if for particular folder:
-    % ----------------------------
+    # ------------------------------------------------------------
 
     % fah.py -ef get_avg_dudl_and_fit_and_Fah_in_all_ang_K_folder
     % or:
     % fah.py -ef fah_go_through_all_angK_folder_and_exec_function fah_get_avg_dudl_and_fit_and_Fah_in_one_ang_K_folder
 
     % or (in one particular ang_K folder):
-    % ------------------------------------
+    # ------------------------------------------------------------
     %      fah.py -ef get_avg_dudl_in_one_ang_K_folder_from_ipi_job
     %      fah.py -ef get_avg_dudl_fit_and_Fah_from_avg_dudl
     %
     % or (in one particular lambda folder):
-    % ------------------------------------
+    # ------------------------------------------------------------
     %
     % fah.py -ef fah_get_Fah_surface (step 3)
     % fah.py -ef fit_fah_surface_lmfit2d (step 4)

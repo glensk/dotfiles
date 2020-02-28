@@ -72,7 +72,7 @@ def help(p = None):
     # getEnergies_byLammps.py --units meV_pa -p n2p2_alcu_v2dm_11 -i POSCAR_ThetaPrime -fi vasp -thermo --fqh_atoms_max 4 --fah_atoms_max 4
 
     # normal test to calc energies of structures
-    # getEnergies_byLammps.py -i $potentials/aiida_get_structures_new/aiida_exported_group_Al6xxxDB_structures_calc__all_steps.input.data -p n2p2_v4ag_ppl_987654_28cores -vv
+    # getEnergies_byLammps.py -i $nninp -p n2p2_v4ag_ppl_987654_28cores -vv
 
     '''
     p = argparse.ArgumentParser(description=string,
@@ -1063,6 +1063,10 @@ def get_energies(args):
 
             #print('DFT_forces')
             #print(DFT_forces)
+            print('cell')
+            print(cell)
+            print('pos')
+            print(pos)
             #sys.exit()
             if args.write_runner_DFT:
                 try:

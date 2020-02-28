@@ -11,7 +11,7 @@ hostname = myhost = myhostname = os.environ["myhost"]
 scripts = os.environ["scripts"]
 #scripts = os.environ["scripts"]
 
-known = ["massedit","ipi","ipi_cosmo","eigen", "n2p2","lammps", "lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ,'viu']
+known = ["massedit","ipi","ipi_cosmo","eigen", "n2p2","lammps", "lbzip","lbzip2-2.5","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ,'viu']
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -50,6 +50,9 @@ branch['n2p2']           = 'develop' # this branch is necessary to get scaling.d
 
 git_address["units"]         = "http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"
 branch["units"]          = False
+
+git_address["lbzip2-2.5"]     = "https://github.com/kjn/lbzip2.git"
+branch["lbzip2-2.5"]          = False
 
 git_address["cosmo_tools"]   = "https://github.com/cosmo-epfl/cosmo-tools.git"
 branch["cosmo_tools"]    = False
@@ -162,7 +165,7 @@ def install_(args,known):
         if args.install   in ['atomsk']                 : install_atomsk(args)
         elif args.install in ['miniconda','miniconda2','miniconda3'] : install_miniconda(args)
         elif args.install in ['nvim']                   : install_nvim(args)
-        elif args.install in ['lbzip','lbzip2']         : install_lbzip(args)
+        elif args.install in ['lbzip2-2.5']         : install_lbzip(args)
         elif args.install in ['n2p2','n2p2_cray']       : install_n2p2(args)
         elif args.install in ['n2p2_edo']               : install_n2p2_edo_easybuild(args)
         elif args.install in ['vmd']                    : install_vmd(args)
@@ -281,13 +284,18 @@ def install_lbzip(args):
     ''' works on fidis
         works on mac (also not necessary, since alredy installed)
     '''
+    git_clone(args,specify_depth = True)
+    os.chdir(args.install_folder)
     print('pwd',os.getcwd())
-    print("wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz")
-    subprocess.call(["wget","http://archive.lbzip2.org/lbzip2-2.5.tar.gz"])
-    subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
+    #address="http://archive.lbzip2.org/lbzip2-2.5.tar.gz"
+    #print("wget "+address)
+    #subprocess.call(["wget",adress])
+    #subprocess.call(["tar","-xvf","lbzip2-2.5.tar.gz"])
     home = os.environ["HOME"]
     print('HOME:',home)
-    with my.cd("lbzip2-2.5/"):
+    print('!! pwd NOW',os.getcwd())
+    #with my.cd("lbzip2-2.5/"):
+    if True:
         print('configure ....')
         subprocess.call(['./configure','--prefix='+home+'/.local'])
         print('make ....')

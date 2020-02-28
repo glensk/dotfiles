@@ -4213,7 +4213,7 @@ def ase_enepot(atoms,units='eV',verbose=False):
         this gives the DFT energy if no calculator is attached
         and the NN/eam energy if a corresponding (lammps) calculator is attached
     '''
-    print('verbose:',verbose)
+    #print('verbose:',verbose)
     #print('now in ene')
     #print('ac',atoms.cell)
     try:

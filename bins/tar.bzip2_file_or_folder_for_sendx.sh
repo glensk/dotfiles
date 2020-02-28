@@ -17,6 +17,7 @@ if ([ "$lbzip2" = "" ] && [ ! -e "$HOME/.local/bin/lbzip2" ]);then
     [ ! -e "$HOME/sources" ] && mkdir $HOME/sources
     [ ! -e "$HOME/.local" ] && mkdir $HOME/.local
     cd $HOME/sources
+    echo "wget ...."
     wget http://archive.lbzip2.org/lbzip2-2.5.tar.gz
     tar -xvf lbzip2-2.5.tar.gz
     cd lbzip2-2.5/
