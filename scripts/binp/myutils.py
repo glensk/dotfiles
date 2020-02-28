@@ -7,15 +7,17 @@ import filecmp
 import numpy as np
 import glob,random #,pathlib
 #from my_atom import #atom as my_atom
+import massedit
 import my_atom
 from itertools import islice
 
 import fah as fah_
 import argparse
 from copy import deepcopy
+import copy
 from socket import gethostname
 import shutil
-from tempfile import mkstemp
+#from tempfile import mkstemp,TemporaryFile()
 from subprocess import check_output,call
 from datetime import datetime as datetime   # datetime.datetime.now()
 
@@ -224,16 +226,32 @@ def sed(source,pattern, replace, dest=None, count=0):
         count (int): number of occurrences to replace
         dest (str):   destination filename, if not given, source will be over written.
     """
+    #import psutil
+    #proc = psutil.Process()
+    #print('source',source)
+    #print('pattern',pattern)
+    #print('replace',replace)
+    if dest == None:
+        filenames = [source]
+        massedit.edit_files(filenames, ["re.sub(r'"+pattern+"', '"+replace+"', line)"], dry_run=False)
+        return
+    else:
+        sys.exit('think about this again!')
 
+
+    #print("INNN:",proc.open_files())
+    #print('dest',dest)
     fin = open(source, 'r')
     num_replaced = count
 
     if dest:
         fout = open(dest, 'w')
     else:
-        fd, name = mkstemp()
-        fout = open(name, 'w')
+        fout, name = mkstemp()
+        #fout = tempfile.TemporaryFile()
+        #fout = open(name, 'w')
     idx=0
+
     for line in fin:
         #print('line',idx,":"+line+":")
         out = re.sub(pattern, replace, line)
@@ -249,13 +267,17 @@ def sed(source,pattern, replace, dest=None, count=0):
             num_replaced += 1
         if count and num_replaced > count:
             break
+
     try:
         fout.writelines(fin.readlines())
+        fin.close()
+        fout.close()
     except Exception as E:
         raise E
 
     fin.close()
     fout.close()
+    print("OUTTTT:",proc.open_files())
 
     if not dest:
         shutil.move(name, source)
@@ -1172,9 +1194,11 @@ class mypot( object ):
             #print('linked',self.potepoch_linked,type(self.potepoch_linked))
             if self.potepoch_linked == False and self.use_epoch == False:
                 print('self.potepoch_all',self.potepoch_all)
-                if self.pottype == 'n2p2':
+                if self.pottype == 'n2p2' and len(self.potepoch_all) > 0:
                     self.potpath_work = self.use_epoch = self.potepoch_all[-1]
                     self.potpath_work = self.pot_tmpdir
+                elif self.pottype == 'n2p2' and len(self.potepoch_all) == 0:
+                    self.potpath_work = self.potpath
                 elif self.pottype == 'runner':
                     self.potpath_work = self.pot_tmpdir
             print('self.use_epoch',self.use_epoch)
@@ -2585,7 +2609,7 @@ def lammps_ext_calc(atoms,ace,get_elastic_constants=False):
         print('ace.pot.pottype',ace.pot.pottype)
 
     if ace.pot.pottype in [ 'runner' , 'n2p2' ]:
-        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-runner',pot=ace.pot)
+        atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammpsrunner',pot=ace.pot)
     elif ace.pot.pottype in [ 'eam', 'eam-alloy' ]:
         atoms.write(ace.pot.lammps_tmpdir+'pos.lmp',format='lammps-data')
     elif ace.pot.pottype in [ 'adp' ]:
@@ -4189,14 +4213,17 @@ def ase_enepot(atoms,units='eV',verbose=False):
         this gives the DFT energy if no calculator is attached
         and the NN/eam energy if a corresponding (lammps) calculator is attached
     '''
-
+    print('verbose:',verbose)
     #print('now in ene')
     #print('ac',atoms.cell)
     try:
         # in the case of "DFT"                 , it just retrieves the energy  -> get_stress() can NOT be obtained.
         # in the case of of an ace calculations, it calculates the energy      -> get_stress() CAN     be obtained.
-        #print('before')
+        if verbose > 2:
+            print('before XXX')
         ene = atoms.get_potential_energy()
+        if verbose > 2:
+            print('after XXX')
         if False:
             print('ene1:',ene,'atoms.info',atoms.info)
             forces = atoms.get_forces()
@@ -4739,12 +4766,14 @@ class ase_calculate_ene( object ):
 
         if self.verbose > 1:
             print('ZZ done2')
-            print('ZZ self.units',self.units)
+            print('ZZ self.units1',self.units)
         ######################################################
         # calculate the energy
         ######################################################
         #print('atxxx',atoms)
         ene,ene_ev_tot = ase_enepot(atoms,units=self.units,verbose=self.verbose)
+        if self.verbose > 1:
+            print('ZZ self.units2',self.units)
         if print_minimization_to_screen:
             print('atoms')
             print(atoms.get_positions()[:3])
@@ -5418,7 +5447,7 @@ class ase_calculate_ene( object ):
 
         if self.verbose > 1:
             for i in self.lmpcmd:
-                print("lmpcmds    :",i)
+                print("lmpcmds_88  :",i)
             print("get_calculator: atom_types :",self.atom_types)
             print("get_calculator: keep_alive :",self.keep_alive)
             print("structure/atoms types      :",atoms.get_chemical_symbols())
@@ -5428,7 +5457,7 @@ class ase_calculate_ene( object ):
                 print('get_calculator (Y2): atom_types=self.atom_types:',self.atom_types)
             asecalcLAMMPS = LAMMPSlib(lmpcmds=self.lmpcmd, atom_types=self.atom_types,keep_alive=self.keep_alive)
             if self.verbose > 1:
-                print('now asecalcLAMMPS defined')
+                print('now asecalcLAMMPS defined',asecalcLAMMPS)
             atoms.set_calculator(asecalcLAMMPS)
             if self.verbose > 1:
                 print('now with calculator')
@@ -6197,7 +6226,10 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
     print('atoms.volume/nat before relaxation:',atoms.get_volume()/atoms.get_number_of_atoms())
     print('atoms.positions before relaxing cellshape and volume (first 4) in angstrom:')
     #for idx,i in enumerate(atoms.positions):
-    for idx,i in enumerate(np.arange(4)):
+    natshow = atoms.get_number_of_atoms()
+    if natshow > 4:natshow = 4
+
+    for idx,i in enumerate(np.arange(natshow)):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
     print()
     ace.ase_relax_volume_only_from_murn_roughly(atoms,verbose=ace.verbose) # necessary for bcc primitive cells which might have a bad starting guess
@@ -6209,14 +6241,14 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
 
     print('atoms.positions after relaxing cellshape and volume (first 4) in angstrom:')
     #for idx,i in enumerate(atoms.positions):
-    for idx,i in enumerate(np.arange(4)):
+    for idx,i in enumerate(np.arange(natshow)):
         print(idx,atoms.get_chemical_symbols()[idx],atoms.positions[idx])
     print('atoms.volume:',atoms.get_volume())
     print('atoms.volume/nat:',atoms.get_volume()/atoms.get_number_of_atoms())
     print('a 125 atom bcc cell will relax to fcc if this is thre ground state!, this is great since we than have a 125 atom fcc cell (maybe also possible to do this with smaller cells?)')
     ase_write("POSCAR_eq",atoms,format='vasp')
     ase_write("POSCAR_eq_dir",atoms,format='vasp',direct=True)
-    print('atoms.positions')
+    print('atoms.positions XXX')
     print(atoms.positions)
     print()
     print(atoms.get_forces())
@@ -6272,6 +6304,7 @@ def get_thermo(ace,atoms,relax_cellshape_and_volume=True,evinet=True,fqh=False,f
         print('osggg11 tmp3?',os.getcwd())
         import fah
         with cd("fqh"):
+            call(["fqh.py -i Fqh_*at_cell_per_atom_* -wqh1 -wqh2 -wqh3"],shell=True)
             fah.make_fqh_thermos_again()
         #    call(["fqh.py -i Fqh_*at_cell_per_atom* -wqh1 -wqh2 -wqh3"],shell=True)
         #print('osggg222 tmp3',os.getcwd())
@@ -6512,7 +6545,7 @@ class ase_get_known_formats_class():
         self.vasp_out               = os.path.dirname(ase.io.__file__)+"/vasp.py"
         self.all_known_formats      = []
         self.all_known_formats_ase  = False
-        self.my_formats_shall       = [ 'runner',   'lammps-runner', 'lammps-data'   ,'ipi'   , 'quippy'    ]
+        self.my_formats_shall       = [ 'runner',   'lammpsrunner', 'lammps-data'   ,'ipi'   , 'quippy'    ]
         self.my_formats_filenames   = [ "runner.py","lammpsrunner.py","lammpsdata.py","ipi.py", "quippy.py" ]
         self.my_formats_is          = []
         self.verbose                = verbose
@@ -6561,11 +6594,12 @@ class ase_get_known_formats_class():
         if not os.path.isfile(self.formatspy):
             print('formatspy',self.formatspy)
             sys.exit('did not find '+str(self.formatspy))
-
+        print('adapting self.formatspy',self.formatspy)
         f = open(self.formatspy, "r")
         contents = f.readlines()
-        contents_before = contents.copy()
+        contents_before = copy.copy(contents) # contents.copy() only works with python > 3.0
         f.close()
+
         insert1=0
         insert2=0
         format_new = False
@@ -6607,15 +6641,15 @@ class ase_get_known_formats_class():
                 writeformatspy = True
 
 
-        if 'lammps-runner' in self.all_known_formats_ase:
+        if 'lammpsrunner' in self.all_known_formats_ase:
             if self.verbose:
-                print('lammps-runner format are already added in formats.py (of ase).')
+                print('lammpsrunner format are already added in formats.py (of ase).')
         else:
             if format_new == False:
-                contents.insert(insert1,"    'lammps-runner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
-                contents.insert(insert2,"    'lammps-runner': 'lammpsrunner',\n")
+                contents.insert(insert1,"    'lammpsrunner': ('LAMMPS data input file for n2p2 or runner', '1F'),\n")
+                contents.insert(insert2,"    'lammpsrunner': 'lammpsrunner',\n")
             else:
-                contents.insert(insert1,"F('lammps-runner', 'LAMMPS data input file for n2p2 or runner', '1F', module='lammpsrunner'),\n")
+                contents.insert(insert1,"F('lammpsrunner', 'LAMMPS data input file for n2p2 or runner', '1F', module='lammpsrunner'),\n")
             writeformatspy = True
 
         if writeformatspy == True:

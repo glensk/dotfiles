@@ -831,7 +831,7 @@ class hesseclass( object ):
                 print("self.M.shape:",self.M.shape)
 
         elif len(self.mass) == self.atoms:
-            self.M = np.zeros((self.atoms*3,self.atoms*3))
+            self.M = np.zeros((int(self.atoms*3),int(self.atoms*3)))
             for zeile,mass1 in enumerate(self.mass):
                 for spalte,mass2 in enumerate(self.mass):
                     self.M[zeile*3,spalte*3:spalte*3+3] = mass1*mass2

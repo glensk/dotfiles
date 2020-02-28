@@ -7,9 +7,11 @@ import myutils as my
 import subprocess
 
 
-myhost = myhostname = os.environ["myhost"]
-#known = ["ipi","ipi_cosmo","n2p2","lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy" ]
-known = ["ipi","ipi_cosmo","eigen", "n2p2","lammps", "lammps_runner", "lammps_n2p2","lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ,'viu']
+hostname = myhost = myhostname = os.environ["myhost"]
+scripts = os.environ["scripts"]
+#scripts = os.environ["scripts"]
+
+known = ["massedit","ipi","ipi_cosmo","eigen", "n2p2","lammps", "lbzip","lbzip2","atomsk", "vmd", "aiida-alloy", 'units', "cosmo_tools", "cosmo-tools", 'mlip','miniconda2', 'miniconda3', 'notes', 'ncdu', 'n2p2_edo', 'nvim','n2p2_cray' ,'viu']
 # git clone https://github.com/glensk/i-pi.git
 # create pull request
 # i-pi/tools/py/mux-positions.py
@@ -37,9 +39,6 @@ branch['aiida-alloy']   = False
 
 git_address["lammps"]        = "https://github.com/lammps/lammps.git";               branch["lammps"]        = False   # this is the preferred way
 git_address["lammps_n2p2"]   = "https://github.com/lammps/lammps.git";               branch["lammps_n2p2"]   = False
-#git_address["lammps_runner"] = "https://github.com/cosmo-epfl/lammps.git";           branch["lammps_runner"] = False
-#git_address["lammps_runner"] = "https://github.com/glensk/lammps.git";               branch["lammps_runner"] = False
-git_address["lammps_runner"] = "https://github.com/lammps/lammps.git";               branch["lammps_runner"] = False
 
 git_address["n2p2"]          = "https://github.com/CompPhysVienna/n2p2.git";
 branch['n2p2']           = 'develop' # this branch is necessary to get scaling.data (or function.data... one of both)
@@ -164,7 +163,7 @@ def install_(args,known):
         elif args.install in ['vmd']                    : install_vmd(args)
         elif args.install in ['units']                  : install_units(args)
         elif args.install in ['notes']                  : install_notes(args)
-        elif args.install in ['lammps','lammps_n2p2','lammps_runner']    : install_lammps(args)
+        elif args.install in ['lammps']    : install_lammps(args)
         elif args.install in ['ncdu']: install_ncdu(args)
         elif args.install in ['eigen']: install_eigen(args)
         elif args.install in ['viu']: install_viu(args)
@@ -298,25 +297,38 @@ def install_lammps(args):
         mac     : works for runner
         cosmopc : works for runner
     '''
+    print('myhostname',myhostname)
+    print('hostname',hostname)
+    pythonver=False
+    pythonname=False
     if myhostname == 'fidis':
         serialfidis = 'fidis'
         ser_or_par = "par"
+        pythonver='python/2.7.16'
+        pythonname='py2.7.16'
+        #pythonver='python/3.7.3'
+        #pythonname='py3.7.3'
     elif myhostname == 'mac':
         serialfidis = 'serial'
         ser_or_par  = "ser"
     else:
         serialfidis = 'serial'
         ser_or_par = "ser"
+    print('serialfidis',serialfidis)
+    print('serialfidis',ser_or_par)
+    print('scripts',scripts)
+    if pythonver == False:
+        sys.exit('define pyhtonversion!!')
+    if pythonname== False:
+        sys.exit('define pyhtonversion name !!')
 
-
-
-    #if args.install in ["lammps_runner"]:
     #    git_clone(args,specify_depth = False,checkout="runner-lammps")  # like this it is 405 MB; do without depth or runner-lammps branch wont be there;
     #    extension = [ "runner" ]
-    if args.install in [ 'lammps', "lammps_n2p2" ,"lammps_runner"]:  # this is thre preferred way and tries to install both, lammps and runner
-        git_clone(args,specify_depth = True)
+    if args.install in [ 'lammps']:  # this is thre preferred way and tries to install both, lammps and runner
 
         n2p2_folder=args.sources_folder+"/n2p2"
+        if not os.path.isdir(n2p2_folder):
+            sys.exit('CAN NOT INSTALL with n2p2, not found in sources')
         if os.path.isdir(n2p2_folder):
             #extension = [ "n2p2" ]
             extension = [ "n2p2", "runner" ] # this is thre preferred way and tries to install both, lammps and runner (e.g. on fidis)
@@ -328,6 +340,21 @@ def install_lammps(args):
 
         #if not os.path.isdir(n2p2_folder): sys.exit("please downlaod is enough? or need to install? n2p2 first")
     print('extension:',extension)
+    install_folder_orig = args.install_folder
+    args.install_folder = args.install_folder+"_"+pythonname
+    print('args.install_folder',args.install_folder)
+    print('install_folder_orig',install_folder_orig)
+    if os.path.isdir(args.install_folder):
+        sys.exit('folder '+args.install_folder+' does already exist!')
+    if os.path.isdir(install_folder_orig):
+        sys.exit('folder '+install_folder_orig+' does already exist!')
+    if os.path.islink(install_folder_orig):
+        sys.exit('unlink '+install_folder_orig)
+
+
+
+    os.symlink(args.install_folder, install_folder_orig)
+    git_clone(args,specify_depth = True)
 
     os.chdir(args.install_folder)
     if "n2p2" in extension:
@@ -345,14 +372,15 @@ def install_lammps(args):
     list=["yes-CLASS2","yes-KSPACE","yes-MANYBODY","yes-MISC","yes-MOLECULE","yes-REPLICA","yes-RIGID","yes-USER-MISC" ]
     if "runner" in extension:
         list = list + [ "yes-USER-RUNNER" ]
-        my.cp(my.scripts()+"/lammps_scripts/src_runner/pair_runner.cpp", args.install_folder+'/src/pair_runner.cpp')
-        my.cp(my.scripts()+"/lammps_scripts/src_runner/pair_runner.h", args.install_folder+'/src/pair_runner.h')
-        my.cp(my.scripts()+"/lammps_scripts/src_runner/USER-RUNNER", args.install_folder+'/src/USER-RUNNER')
+        my.cp(scripts+"/lammps_scripts/src_runner/pair_runner.cpp", args.install_folder+'/src/pair_runner.cpp')
+        my.cp(scripts+"/lammps_scripts/src_runner/pair_runner.h", args.install_folder+'/src/pair_runner.h')
+        my.cp(scripts+"/lammps_scripts/src_runner/USER-RUNNER", args.install_folder+'/src/USER-RUNNER')
     if "n2p2"   in extension:  list = list + [ "yes-user-nnp" ]
     for i in list:
         subprocess.call(["make", i])
 
-    if args.install == "lammps_runner":
+    #if args.install == "lammps_runner":
+    if "runner" in extension:
         my.sed("pair_runner.h","^#define MAXNEIGH.*","#define MAXNEIGH 500")
 
     checkdir = []
@@ -363,15 +391,15 @@ def install_lammps(args):
             sys.exit(checkdir+" does not exist; Exit")
 
     ## copy the pythonfiel (adapted) to make
-    my.cp(my.scripts()+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
+    my.cp(scripts+'/lammps_makefiles/lammps.py',args.install_folder+'/python/lammps.py')  # this makes sure later on that liblammps.so is also found on mac (which was working when python;from lammps import lammps;lmp = lammps() but not in a script due to issues with LD_LIBRARY_PATH which was not recognized (even if set in python)
 
     ## compile serial or parallel
     if hostname == 'fidis':
         if not os.path.isdir(os.getcwd()+'/MAKE/MINE'):
-            my.cp(my.scripts()+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
+            my.cp(scripts+'/lammps_makefiles/fidis_deneb_2018-10-31/MINE',os.getcwd()+'/MAKE')
 
         print("module load ... && make fidis")
-        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make fidis",os.getcwd())
+        bash_command("source $MODULESHOME/init/bash && module purge && module load git intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make fidis",os.getcwd())
         print()
 
 
@@ -416,8 +444,8 @@ def install_lammps(args):
     executable = 'lmp_'+serialfidis
     if not os.path.isfile(executable):
         sys.exit(executable +" does not exist, .... was not created; Exit")
-    print('copy ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
-    my.cp(executable,my.scripts()+"/executables/lmp_"+hostname+"_"+ser_or_par) #_"+extension)
+    print('copy ',executable," to",scripts+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
+    my.cp(executable,scripts+"/executables/lmp_"+hostname+"_"+ser_or_par) #_"+extension)
     print()
 
     ##### now get the lammps libraries for python (to be able to use getEnergies_byLammps.py
@@ -430,7 +458,7 @@ def install_lammps(args):
     os.chdir(args.install_folder+"/src")
     print()
     if hostname == 'fidis':
-        bash_command("source $MODULESHOME/init/bash && module purge && module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make mode=shlib fidis",os.getcwd())
+        bash_command("source $MODULESHOME/init/bash && module purge && module load git intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make mode=shlib fidis",os.getcwd())
     else:
         bash_command("make mode=shlib "+serialfidis,os.getcwd())
     print()
@@ -440,7 +468,7 @@ def install_lammps(args):
     #print('pwd:',os.getcwd())
     #subprocess.call(["chmod", 'u+x','install.py'])
     #subprocess.call(['./install.py'])
-    print('copied ',executable," to",my.scripts()+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
+    print('copied ',executable," to",scripts+"/executables/"+executable+"_"+ser_or_par) #_"+extension)
     return
 
 def install_n2p2_edo_easybuild(args):
@@ -462,16 +490,15 @@ def install_n2p2(args):
     '''
     see https://compphysvienna.github.io/n2p2/ for more details
     '''
-    subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
-    os.chdir(args.install_folder)
-    subprocess.call(["git","branch"])
-    os.chdir("src")
-    print('pwd aa:',os.getcwd())
-    #my.cp("makefile","makefile.back")
-    #my.cp("makefile.intel","makefile.intel.back")
-    #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
 
+    pythonver=False
+    pythonname=False
     if myhostname in ["fidis", "helvetios"]:
+        pythonver='python/2.7.16'
+        pythonname='py2.7.16'
+
+        #pythonver='python/3.7.3'
+        #pythonname='py3.7.3'
         COMP="intel"
         GSL_ROOT = "GSL_ROOT"
         PROJECT_CC = "icpc # or icc"
@@ -525,6 +552,33 @@ def install_n2p2(args):
         #GLS = "/Users/glensk/miniconda2/pkgs/gsl-2.4-ha2d443c_1005/include/gsl"   # miniconda
         #EIGEN = /Users/glensk/miniconda2/   # miniconda
 
+    if pythonver == False:
+        sys.exit('define python version to work with')
+
+    ############################################
+    # download
+    ############################################
+    install_folder_orig = args.install_folder
+    args.install_folder = args.install_folder+"_"+pythonname
+    print('args.install_folder',args.install_folder)
+    print('install_folder_orig',install_folder_orig)
+    if os.path.isdir(args.install_folder):
+        sys.exit('folder '+args.install_folder+' does already exist!')
+    if os.path.isdir(install_folder_orig):
+        sys.exit('folder '+install_folder_orig+' does already exist!')
+    if os.path.islink(install_folder_orig):
+        sys.exit('unlink '+install_folder_orig)
+
+    os.symlink(args.install_folder, install_folder_orig)
+    subprocess.call(["git","clone","--depth","1","-b","develop","https://github.com/CompPhysVienna/n2p2.git",args.install_folder])
+    os.chdir(args.install_folder)
+    subprocess.call(["git","branch"])
+    os.chdir("src")
+    print('pwd aa:',os.getcwd())
+    #my.cp("makefile","makefile.back")
+    #my.cp("makefile.intel","makefile.intel.back")
+    #my.cp("libnnptrain/makefile","libnnptrain/makefile.back")
+
     # makefile
     my.sed("makefile","^COMP=.*","COMP="+COMP)
     my.sed("makefile","^PROJECT_DIR.*","PROJECT_DIR=./")
@@ -577,9 +631,9 @@ def install_n2p2(args):
     # module load on fidis
     print("*****cc",os.getcwd())
     if myhostname in ['fidis',"helvetios"]:
-        bash_command("module load intel intel-mpi intel-mkl fftw python/2.7.14 gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
+        bash_command("module purge && module load intel intel-mpi intel-mkl fftw "+pythonver+" gsl eigen && module list && make libnnpif-shared && make",os.getcwd())
     if myhostname == 'daint':
-        bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
+        bash_command('export EIGEN_ROOT="/users/aglensk/sources/eigen/" && module purge && module load daint-mc && module switch PrgEnv-cray PrgEnv-intel && module unload cray-libsci && module load GSL/2.5-CrayIntel-18.08 cray-python/2.7.15.1 cray-fftw && module list && make libnnpif-shared && make',os.getcwd())
         # with cray:
 	#
         # module load daint-mc && module unload cray-libsci && module load GSL/2.5-CrayCCE-18.08 cray-python/2.7.15.1 cray-fftw

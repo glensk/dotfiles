@@ -3,11 +3,10 @@ import numpy as np
 from numpy.linalg import norm
 from ase.atoms import Atoms
 from ase.parallel import paropen
-from ase.calculators.lammpslib import unit_convert
 from ase.utils import basestring
 
 
-def read_lammps_runner(fileobj, Z_of_type=None, style='full', sort_by_id=False,
+def read_lammpsrunner(fileobj, Z_of_type=None, style='full', sort_by_id=False,
                      units="metal"):
     """Method which reads a LAMMPS data file.
 
@@ -285,12 +284,19 @@ def read_lammps_runner(fileobj, Z_of_type=None, style='full', sort_by_id=False,
         if masses is not None:
             masses[ind] = mass_in[type]
     # convert units
-    positions *= unit_convert("distance", units)
-    cell *= unit_convert("distance", units)
-    if masses is not None:
-        masses *= unit_convert("mass", units)
-    if velocities is not None:
-        velocities *= unit_convert("velocity", units)
+    print('units',units)
+    print('masses',masses)
+    print('velocities',velocit)
+    print('cell')
+    print(cell)
+    if False:
+        from ase.calculators.lammpslib import unit_convert
+        positions *= unit_convert("distance", units)
+        cell *= unit_convert("distance", units)
+        if masses is not None:
+            masses *= unit_convert("mass", units)
+        if velocities is not None:
+            velocities *= unit_convert("velocity", units)
 
     # create ase.Atoms
     at = Atoms(positions=positions,
@@ -368,7 +374,9 @@ def convert_cell(cell,pos):
       to lower triangular matrix LAMMPS can accept. This
       function transposes cell matrix so the bases are column vectors
       """
-      cell = np.matrix.transpose(cell)
+      #print('cell1',cell)
+      #print('cell2',cell[:])
+      cell = np.matrix.transpose(cell[:])
 
       if not is_upper_triangular(cell):
           # rotate bases into triangular matrix
@@ -398,7 +406,7 @@ def convert_cell(cell,pos):
           return cell, pos
 
 
-def write_lammps_runner(fileobj, atoms,comment=None,append=False,runner=True,pot=False):
+def write_lammpsrunner(fileobj, atoms,comment=None,append=False,runner=True,pot=False):
     ''' atoms is the ase atoms object '''
     if pot == False:
         sys.exit('pot needs to be ace.pot')

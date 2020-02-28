@@ -25,7 +25,7 @@ def convert_cell(cell,pos):
     to lower triangular matrix LAMMPS can accept. This
     function transposes cell matrix so the bases are column vectors
     """
-    cell = np.matrix.transpose(cell)
+    cell = np.matrix.transpose(cell[:])
 
     if not is_upper_triangular(cell):
         #print('quippy cell is not upper_triangular')
