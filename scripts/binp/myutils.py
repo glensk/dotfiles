@@ -5846,7 +5846,6 @@ class ase_calculate_ene( object ):
             vinet.write_data()
             print('vinet.parameters:',vinet.parameters)
             os.chdir(hier)
-
         return
 
     def get_fh_phonopy(self,atomsin=False):

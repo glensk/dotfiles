@@ -1111,25 +1111,31 @@ if __name__ == '__main__':
 
 
     Fqh_surf_1 = "Fqh_32at_cell_per_atom_Surface_1st_order__16.6315_16.8822_17.1354_17.3912_17.6494_17.9103_18.1737_18.4396_e1_v1"
-    volumes = np.arange(16.6,18.4,0.1)
+    Fqh_surf_1 = "Fqh_81at_cell_per_atom_Surface_1st_order__16.1854_16.4293_16.6758_16.9247_17.1760_17.4299_17.6862_17.9450_e1_v1"
+    volumes = np.arange(16.0,17.3,0.01)
     fqh_ene = np.zeros(len(volumes))
     evinet = np.loadtxt('../evinet/EVinet_1')
     import feos
     vi = feos.eos()
     T = 0
-    vi.e0 = evient[0]
-    vi.v0 = evient[1]
-    vi.b0 = evient[2]
-    vi.b0der = evient[3]
+    vi.e0    = evinet[0]
+    vi.v0    = evinet[1]
+    vi.b0    = evinet[2]
+    vi.b0der = evinet[3]
     vi.parameters = [vi.e0, vi.v0, vi.b0, vi.b0der]
-    add = feos.vinet(V, *vi.parameters, convert_to_sympy=convert_to_sympy)
+    evinet_ene = feos.vinet(volumes, *vi.parameters)
+    print('evient_ene',evinet_ene)
+    np.savetxt("evinet_ene_"+str(T)+"K",np.transpose([volumes,evinet_ene]))
+
     if args.quickanalysis == 1:
-        fqh = np.loadtxt(Fqh_surf_1)
-        print(fqh)
-        Temperature = idx = fqh[:,0]
-        for vidx,v in enumerate(volumes):
-            fqh_ene[vidx] = fqh[T,1] + fqh[T,2]*v
-        np.savetxt("fqh_ene_"+str(T)+"K",np.transpose([volumes,fqh_ene]))
+        for T in [0,100,300,500]:
+            fqh = np.loadtxt(Fqh_surf_1)
+            print(fqh)
+            #Temperature = idx = fqh[:,0]
+            for vidx,v in enumerate(volumes):
+                fqh_ene[vidx] = fqh[T,1] + fqh[T,2]*v
+            np.savetxt("fqh_ene_"+str(T)+"K",np.transpose([volumes,fqh_ene]))
+            np.savetxt("sum_ene_"+str(T)+"K",np.transpose([volumes,fqh_ene+evinet_ene]))
         sys.exit()
 
 
