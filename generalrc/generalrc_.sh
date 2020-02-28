@@ -43,6 +43,7 @@ export host=$host
 
 export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
 export potentials="$dotfiles/scripts/potentials";
+export nninp="$potentials/aiida_get_structures_new/input_zeroth_5482.data"
 export MYVIMRC="$dotfiles/nvim/init.vim"
 export MYVIM="$HOME/sources/nvim/bin/nvim"
 #jecho "copy1:$copy1:"
