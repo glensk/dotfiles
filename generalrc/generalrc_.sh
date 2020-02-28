@@ -114,6 +114,9 @@ case $myhost in
 #    # brew install rust # necessary to get carge which itself is used for viu
 
 
+#    # on helvetios: (after module load python, that load python3)
+#    # pip install --upgrade --user phonopy
+#    # pip install --upgrade --user psutil
 #    # on mac: 
 #    # pip install --upgrade --user phonopy
 #    # pip install --upgrade --user ase              # or pip3 for python3
