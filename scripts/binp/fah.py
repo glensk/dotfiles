@@ -538,6 +538,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     steps = 40000
     steps = 20000
+    #steps = 4000
     #steps = 90000
     seeds = 2
 
@@ -703,17 +704,21 @@ def fah_submit_ipi_ti_job():
     if not os.path.isfile('joblist.dat'):
         sys.exit('joblist.dat does not exist in fah folder')
 
-    submitfile = os.environ['dotfiles']+'/scripts/i-pi-mc_scripts/submit_ipi_ti_joblist.sh'
+    submitbasename = 'submit_ipi_ti_joblist.sh'
+    submitfile = os.environ['dotfiles']+'/scripts/i-pi-mc_scripts/'+submitbasename
     if os.path.isfile(submitfile):
         #print('submitfile',submitfile,'does exist')
         get_into_fah_folder(verbose=False)
         shutil.copy2(submitfile,os.getcwd())  # copy submit_ipi_ti_joblist.sh
         print('copied submitfile to fah folder; now start the job by sbatch...')
-        if os.environ['myhost'] in ['helvetios']:
+        if os.environ['myhost'] in ['helvetios','fidis']:
             print()
             print()
             print()
             print('now submitting jobs')
+            if os.environ['myhost'] in ['fidis']: usen='28'
+            if os.environ['myhost'] in ['helvetios']: usen='36'
+            my.sed(os.getcwd()+'/'+submitbasename,'--ntasks .*','--ntasks '+usen)
             call(["sbatch submit_ipi_ti_joblist.sh"],shell=True)
             print()
             print()

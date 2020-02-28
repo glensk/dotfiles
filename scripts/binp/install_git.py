@@ -32,6 +32,11 @@ branch['ipi_cosmo']     = "feat/kmc"   #"feat/kmc-al6xxx"
 
 git_address["ipi"]          = "https://github.com/glensk/i-pi.git";
 branch['ipi']           = "feat/kmc"
+
+# ipi3
+git_address["ipi"] = "https://github.com/i-pi/i-pi.git"
+branch['ipi']           = "master-py3"
+
 #branch['ipi']           = False # get all the branches and not just feat/kmc
 
 git_address["aiida-alloy"]  = "https://gitlab.com/daniel.marchand/aiida-alloy.git"
