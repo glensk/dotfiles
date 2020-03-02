@@ -1,11 +1,11 @@
 
-SLURM_JOBID        = 20441608
-SLURM_JOB_NODELIST = nid00289
-SLURM_NNODES       = 1
+SLURM_JOBID        = 20625247
+SLURM_JOB_NODELIST = nid0[1290,1303,1306,1310-1312,1338,1370,1385,1426-1428,1434,1470,1473,1493,1504,1523,1545,1553-1554,1558-1559,1565,1569,1577,1585,1591-1592,1595,1604,1614,1646,1648,1655,1657]
+SLURM_NNODES       = 36
 SLURM_SUBMIT_DIR   = /scratch/snx3000/aglensk/qe_DB2/quantum_espresso_example_job_daint_from_get_Energies_many_2/pos_61
 
 system info:
- Linux nid00289 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
+ Linux nid01290 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
  
 
 work dir:
@@ -13,20 +13,20 @@ work dir:
 
 ESPRESSO_PSEUDO      = /scratch/snx3000/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
  
-Batch Job Summary Report for Job "submit.sh" (20441608) on daint
+Batch Job Summary Report for Job "submit.sh" (20625247) on daint
 -----------------------------------------------------------------------------------------------------
              Submit            Eligible               Start                 End    Elapsed  Timelimit 
 ------------------- ------------------- ------------------- ------------------- ---------- ---------- 
-2020-02-20T23:19:07 2020-02-20T23:19:07 2020-02-22T14:09:30 2020-02-22T14:13:02   00:03:32 1-00:00:00 
+2020-02-28T15:12:09 2020-02-28T15:12:09 2020-02-28T19:14:29 2020-02-28T23:58:59   04:44:30 1-00:00:00 
 -----------------------------------------------------------------------------------------------------
 Username    Account     Partition   NNodes   Energy
 ----------  ----------  ----------  ------  --------------
-aglensk     mr23        normal           1        0 joules
+aglensk     mr23        normal          36        0 joules
  
 This job did not utilize any GPUs
  
 ----------------------------------------------------------
 Scratch File System        Files       Quota
 --------------------  ----------  ----------
-/scratch/snx3000           17439     1000000
+/scratch/snx3000           17728     1000000
  

@@ -1,11 +1,11 @@
 
-SLURM_JOBID        = 20441607
-SLURM_JOB_NODELIST = nid00288
-SLURM_NNODES       = 1
+SLURM_JOBID        = 20579530
+SLURM_JOB_NODELIST = nid0[1636,1661,1667,1672,1681]
+SLURM_NNODES       = 5
 SLURM_SUBMIT_DIR   = /scratch/snx3000/aglensk/qe_DB2/quantum_espresso_example_job_daint_from_get_Energies_many_2/pos_60
 
 system info:
- Linux nid00288 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
+ Linux nid01636 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
  
 
 work dir:
@@ -13,20 +13,20 @@ work dir:
 
 ESPRESSO_PSEUDO      = /scratch/snx3000/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
  
-Batch Job Summary Report for Job "submit.sh" (20441607) on daint
+Batch Job Summary Report for Job "submit.sh" (20579530) on daint
 -----------------------------------------------------------------------------------------------------
              Submit            Eligible               Start                 End    Elapsed  Timelimit 
 ------------------- ------------------- ------------------- ------------------- ---------- ---------- 
-2020-02-20T23:19:07 2020-02-20T23:19:07 2020-02-22T14:09:30 2020-02-22T14:18:20   00:08:50 1-00:00:00 
+2020-02-26T10:27:56 2020-02-26T10:27:57 2020-02-27T01:46:17 2020-02-27T04:34:34   02:48:17 1-00:00:00 
 -----------------------------------------------------------------------------------------------------
 Username    Account     Partition   NNodes   Energy
 ----------  ----------  ----------  ------  --------------
-aglensk     mr23        normal           1  111.52K joules
+aglensk     mr23        normal           5        0 joules
  
 This job did not utilize any GPUs
  
 ----------------------------------------------------------
 Scratch File System        Files       Quota
 --------------------  ----------  ----------
-/scratch/snx3000           26424     1000000
+/scratch/snx3000           18109     1000000
  

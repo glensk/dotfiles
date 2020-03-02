@@ -43,3 +43,8 @@ TageRest
 4.0 11.0    14.4.2020 Ostern (14.4-17.4 = 4 tage)               (eingetragen)
 0.0 11.0    21.5.2020 Brueckentag Nottingham treffen            (epfl hat zu)
 1.0 10.0    22.5.2020 urlaubstag Nottingham treffen             (eingetragen)
+-----------------------
+
+1.0  9.0    17.7.2020 Medizinertreffen  nicht nehmen da sonst nicht genug -> fuer urlaub vivi/geny
+5.0  4.0    20-25.7   Urlaub Vivi Geny 
+5.0 -1.0    27-31.7   Urlaub Vivi Geny 

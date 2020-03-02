@@ -1,11 +1,11 @@
 
-SLURM_JOBID        = 20441541
-SLURM_JOB_NODELIST = nid01221
-SLURM_NNODES       = 1
+SLURM_JOBID        = 20579513
+SLURM_JOB_NODELIST = nid0[1324-1325,1362,1475,1525,1558,1694-1695]
+SLURM_NNODES       = 8
 SLURM_SUBMIT_DIR   = /scratch/snx3000/aglensk/qe_DB2/quantum_espresso_example_job_daint_from_get_Energies_many_2/pos_117
 
 system info:
- Linux nid01221 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
+ Linux nid01324 4.12.14-150.17_5.0.85-cray_ari_c #1 SMP Thu Aug 22 18:29:02 UTC 2019 (24c42de) x86_64 x86_64 x86_64 GNU/Linux 
  
 
 work dir:
@@ -13,20 +13,20 @@ work dir:
 
 ESPRESSO_PSEUDO      = /scratch/snx3000/aglensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/quantum_espresso/pseudo_SSSPefV1.1_alalloy
  
-Batch Job Summary Report for Job "submit.sh" (20441541) on daint
+Batch Job Summary Report for Job "submit.sh" (20579513) on daint
 -----------------------------------------------------------------------------------------------------
              Submit            Eligible               Start                 End    Elapsed  Timelimit 
 ------------------- ------------------- ------------------- ------------------- ---------- ---------- 
-2020-02-20T23:18:24 2020-02-20T23:18:24 2020-02-22T08:28:27 2020-02-22T08:29:04   00:00:37 1-00:00:00 
+2020-02-26T10:27:54 2020-02-26T10:27:54 2020-02-26T23:39:51 2020-02-27T02:23:41   02:43:50 1-00:00:00 
 -----------------------------------------------------------------------------------------------------
 Username    Account     Partition   NNodes   Energy
 ----------  ----------  ----------  ------  --------------
-aglensk     mr23        normal           1    5.42K joules
+aglensk     mr23        normal           8   24.73M joules
  
 This job did not utilize any GPUs
  
 ----------------------------------------------------------
 Scratch File System        Files       Quota
 --------------------  ----------  ----------
-/scratch/snx3000           17356     1000000
+/scratch/snx3000           17754     1000000
  

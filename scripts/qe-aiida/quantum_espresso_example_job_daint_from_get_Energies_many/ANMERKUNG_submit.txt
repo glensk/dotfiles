@@ -1,0 +1,104 @@
+10:27:43 aglensk@daint107 /scratch/snx3000/aglensk/qe_DB2/quantum_espresso_example_job_daint_from_get_Energies_many_2
+%./submit_pos_folder.sh
+nat = 256 :: mem:859.63: GB nodes:7.16358: round: 8 pos_10
+Submitted batch job 20579490
+nat = 256 :: mem:856.61: GB nodes:7.13842: round: 8 pos_101
+Submitted batch job 20579491
+nat = 256 :: mem:856.61: GB nodes:7.13842: round: 8 pos_102
+Submitted batch job 20579492
+nat = 256 :: mem:856.61: GB nodes:7.13842: round: 8 pos_103
+Submitted batch job 20579493
+nat = 256 :: mem:856.61: GB nodes:7.13842: round: 8 pos_104
+Submitted batch job 20579494
+nat = 254 :: mem:844.26: GB nodes:7.0355: round: 8 pos_105
+Submitted batch job 20579498
+nat = 254 :: mem:844.26: GB nodes:7.0355: round: 8 pos_106
+Submitted batch job 20579499
+nat = 254 :: mem:844.26: GB nodes:7.0355: round: 8 pos_108
+Submitted batch job 20579500
+nat = 254 :: mem:844.26: GB nodes:7.0355: round: 8 pos_109
+Submitted batch job 20579501
+nat = 255 :: mem:850.57: GB nodes:7.08808: round: 8 pos_110
+Submitted batch job 20579502
+nat = 255 :: mem:850.57: GB nodes:7.08808: round: 8 pos_111
+Submitted batch job 20579503
+nat = 255 :: mem:850.57: GB nodes:7.08808: round: 8 pos_112
+Submitted batch job 20579504
+nat = 255 :: mem:850.57: GB nodes:7.08808: round: 8 pos_113
+Submitted batch job 20579505
+nat = 255 :: mem:853.32: GB nodes:7.111: round: 8 pos_114
+Submitted batch job 20579506
+nat = 255 :: mem:853.32: GB nodes:7.111: round: 8 pos_115
+Submitted batch job 20579507
+nat = 255 :: mem:853.32: GB nodes:7.111: round: 8 pos_116
+Submitted batch job 20579508
+nat = 255 :: mem:853.32: GB nodes:7.111: round: 8 pos_117
+Submitted batch job 20579513
+nat = 196 :: mem:531.69: GB nodes:4.43075: round: 5 pos_16
+Submitted batch job 20579514
+nat = 256 :: mem:850.84: GB nodes:7.09033: round: 8 pos_17
+Submitted batch job 20579515
+nat = 255 :: mem:848.59: GB nodes:7.07158: round: 8 pos_19
+Submitted batch job 20579516
+nat = 256 :: mem:856.61: GB nodes:7.13842: round: 8 pos_20
+Submitted batch job 20579517
+nat = 256 :: mem:854.90: GB nodes:7.12417: round: 8 pos_21
+Submitted batch job 20579518
+nat = 256 :: mem:464.12: GB nodes:3.86767: round: 4 pos_3
+Submitted batch job 20579519
+nat = 256 :: mem:853.19: GB nodes:7.10992: round: 8 pos_4
+Submitted batch job 20579521
+nat = 256 :: mem:853.19: GB nodes:7.10992: round: 8 pos_5
+Submitted batch job 20579522
+nat = 300 :: mem:1160.96: GB nodes:9.67467: round: 10 pos_53
+Submitted batch job 20579523
+nat = 300 :: mem:1161.40: GB nodes:9.67833: round: 10 pos_54
+Submitted batch job 20579524
+nat = 300 :: mem:1160.18: GB nodes:9.66817: round: 10 pos_55
+Submitted batch job 20579525
+nat = 196 :: mem:531.86: GB nodes:4.43217: round: 5 pos_58
+Submitted batch job 20579526
+nat = 196 :: mem:531.52: GB nodes:4.42933: round: 5 pos_59
+Submitted batch job 20579527
+nat = 256 :: mem:853.19: GB nodes:7.10992: round: 8 pos_6
+Submitted batch job 20579528
+nat = 196 :: mem:527.28: GB nodes:4.394: round: 5 pos_60
+Submitted batch job 20579530
+nat = 256 :: mem:859.63: GB nodes:7.16358: round: 8 pos_7
+Submitted batch job 20579534
+nat = 2 :: mem:2.34: GB nodes:0.0195: round: 1 pos_78
+Submitted batch job 20579535
+nat = 256 :: mem:854.90: GB nodes:7.12417: round: 8 pos_79
+Submitted batch job 20579536
+nat = 256 :: mem:859.63: GB nodes:7.16358: round: 8 pos_8
+Submitted batch job 20579537
+nat = 256 :: mem:856.61: GB nodes:7.13842: round: 8 pos_80
+Submitted batch job 20579538
+nat = 264 :: mem:969.36: GB nodes:8.078: round: 9 pos_81
+Submitted batch job 20579539
+nat = 264 :: mem:968.04: GB nodes:8.067: round: 9 pos_82
+Submitted batch job 20579540
+nat = 176 :: mem:462.20: GB nodes:3.85167: round: 4 pos_83
+Submitted batch job 20579541
+nat = 176 :: mem:465.88: GB nodes:3.88233: round: 4 pos_84
+Submitted batch job 20579542
+nat = 176 :: mem:457.99: GB nodes:3.81658: round: 4 pos_86
+Submitted batch job 20579545
+nat = 264 :: mem:935.41: GB nodes:7.79508: round: 8 pos_87
+Submitted batch job 20579550
+nat = 264 :: mem:941.05: GB nodes:7.84208: round: 8 pos_88
+Submitted batch job 20579551
+nat = 264 :: mem:921.09: GB nodes:7.67575: round: 8 pos_89
+Submitted batch job 20579553
+nat = 256 :: mem:859.63: GB nodes:7.16358: round: 8 pos_9
+Submitted batch job 20579554
+nat = 220 :: mem:653.87: GB nodes:5.44892: round: 6 pos_90
+Submitted batch job 20579555
+
+
+nat = 484 :: mem:2911.32: GB nodes:24.261 : round: 3 pos_15
+nat = 484 :: mem:2849.59: GB nodes:23.7466: round: 3 pos_61
+nat = 484 :: mem:2849.17: GB nodes:23.7431: round: 3 pos_62
+nat = 484 :: mem:2811.69: GB nodes:23.4307: round: 3 pos_64
+
+

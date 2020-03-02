@@ -27,7 +27,3 @@ Currently Loaded Modulefiles:
  26) CrayIntel/.19.10
  27) QuantumESPRESSO/6.4.1-CrayIntel-19.10
 head: cannot open '/etc/issue' for reading: No such file or directory
-slurmstepd: error: Detected 1 oom-kill event(s) in step 20441522.0 cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.
-srun: error: nid01698: tasks 0-6,8-35: Out Of Memory
-srun: Terminating job step 20441522.0
-slurmstepd: error: Detected 1 oom-kill event(s) in step 20441522.batch cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.
