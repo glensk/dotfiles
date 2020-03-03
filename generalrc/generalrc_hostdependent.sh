@@ -100,6 +100,7 @@ fidis)
     #module load python/2.7.14;  # conflicts with miniconda
   ;;
 daint)
+    module load cray-python/3.6.5.7;
     #export myprompthostuser="blue";
     #export mypromptpath="blue";
 	#export SCRATCH /scratch/glensk;"  # DONT SET SCRATCH SINCE THIS IS DONE GLOBALY BY SYSADMINS

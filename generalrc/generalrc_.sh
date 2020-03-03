@@ -114,6 +114,9 @@ case $myhost in
 #    # solved by python -m pip uninstall pip
 #    # brew install rust # necessary to get carge which itself is used for viu
 
+     # on daint:
+     # module load cray-python/3.6.5.7
+     # pip install --upgrade --user lmfit
 
 #    # on helvetios: (after module load python, that load python3)
 #    # pip install --upgrade --user phonopy
