@@ -142,6 +142,8 @@ def help(p = None):
     p.add_argument('--pick_uuid','-pick_uuid'     ,default=-1.,type=str, nargs='*',required=False,help='detrmine uuis that will be calculated.')
 
     p.add_argument('--write_runner','-wr'    ,  action='store_true',help='write runnerfile from calculated structures using chosen pot; default filename out: runner.out')
+    p.add_argument('--write_runner_ene_forces','-wref'    ,  action='store_true',help='write runnerfile from calculated structures using chosen pot; default filename out: runnerFORCES.out')
+    p.add_argument('--write_DFT_ene_forces','-wrDFT'    ,  action='store_true',help='write runnerfile from calculated DFT structures; default filename out: DFT.runner')
     p.add_argument('--write_espresso_job','-we'    ,  action='store_true',help='write inputjobs for quantum espresso to be started on daint, instead of aiida.')
     p.add_argument('--write_runner_DFT','-wrd', action='store_true',help='write runnerfile with selected input structures (e.g. DFT); default filename out: runner_DFT.out')
     p.add_argument('--write_runner_repeated','-wrr',  action='store_true',help='default: runner_repeated.out')
@@ -172,6 +174,9 @@ def get_energies(args):
     ase_formats.check_if_default_formats_known(copy_and_adapt_formatspy_anyhow=False)
     print('time00 after ase_formats_check...',timeit.timeit() - start); start = timeit.timeit()
 
+
+    #frames = ase_read(args.inputfile,format=args.format_in,index=":")
+    #ase_write("DFT0.runner",frames,format='runner',append=True)
 
     #dudl = fah.get_dudl_from_file_with_energies_lambda_0_1('../simulation.ti',number_of_atoms=32)
     #dudlav = get_dudlav_from_dudl(dudl)
@@ -438,6 +443,7 @@ def get_energies(args):
         print('XXX args.format_in:',args.format_in)
         print('########################################################')
         frames = ase_read(args.inputfile,format=args.format_in,index=":")
+        #ase_write("DFT1.runner",frames,format='runner',append=True)
         print('type(frames)',type(frames))
         print('len(frames)',len(frames))
         DFT_FORCES_EV_ANG = []
@@ -458,6 +464,13 @@ def get_energies(args):
         print('getting DFT data DONE!')
         POT_FORCES_EV_ANG = np.copy(DFT_FORCES_EV_ANG)
         POT_ENERGIES_EV_CELL = np.copy(DFT_ENERGIES_EV_CELL)
+        print('DFT_FORCES_EV_ANG')
+        print(DFT_FORCES_EV_ANG)
+        #print('max',np.abs(DFT_FORCES_EV_ANG).max())
+        #np.savetxt('maxforce.txt',np.abs(DFT_FORCES_EV_ANG).max(),fmt='%2.4f')
+        if args.write_DFT_ene_forces:
+            ase_write("DFT.runner",frames,format='runner',append=True)
+        #sys.exit()
 
     print('430')
     if args.thermo or args.evinet or args.fqh or args.fah:
@@ -952,6 +965,7 @@ def get_energies(args):
         # begin main loop
         ################################################################
         for idx,i in enumerate(range(structures_to_calc)):
+            uuid = False
             try:
                 all_comment = frames[i].info['comment']
                 all_comment_split = all_comment.split()
@@ -1231,6 +1245,9 @@ def get_energies(args):
                     #print('att')
                     #print(atoms_tmp.positions)
                     forces_thisstruct = atoms_tmp.get_forces()
+
+                    if args.write_runner_ene_forces:
+                        ase_write("runnerFORCES.runner",atoms_tmp,format='runner',append=True)
                     #print('fff')
                     #print(forces_thisstruct)
                     #print('kkk')
@@ -1549,6 +1566,8 @@ def get_energies(args):
                     ana_vol_pa[idx],
                     ana_dist_min[idx],
                     ana_VOL_diff_norm[idx]),"ABC")
+                    #print('POT_FORCES_EV_ANG')
+                    #print(POT_FORCES_EV_ANG)
                     #print('sss',
                     if ene_diff_abs[idx] > 60 and False:
                         print('uuid:',uuid)
@@ -1593,6 +1612,8 @@ def get_energies(args):
             sum_atoms = 0
             aa = []
             bb = []
+            #print("POT_FORCES_EV_ANG")
+            #print(POT_FORCES_EV_ANG)
             for idx,x in enumerate(indexes):
                 aa = aa + list(np.abs(DFT_FORCES_EV_ANG[x]-POT_FORCES_EV_ANG[x]).flatten())
                 bb = bb + list(np.abs(DFT_ENERGIES_EV_CELL[x]-POT_ENERGIES_EV_CELL[x]).flatten())

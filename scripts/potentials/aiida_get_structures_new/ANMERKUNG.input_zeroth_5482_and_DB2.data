@@ -1,0 +1,3 @@
+4:07:55 glensk@mac /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/qe-aiida/quantum_espresso_example_job_daint_from_get_Energies_many
+%cat DB2.runner >> /Users/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/aiida_get_structures_new/input_zeroth_5482_and_DB2.data
+

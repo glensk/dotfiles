@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: d0b8266354189dcc4c5f0bf76eff50a8e4396e58
+# execution time: 0.2399129867553711 seconds.
+
+getEnergies_byLammps.py -p runner_v3ag_4998_3 -i aiida.out -fi espresso-out --units hartree -wrDFT

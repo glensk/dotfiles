@@ -21,6 +21,8 @@ for f in $ff;do
     #    continue
     #fi
     echo $nat ":$jd: mem:$mem: GB nodes:$nodes: nodesround: $nodesround used:$nodesused: nowuse:$nowuse:" $f
+    getEnergies_byLammps.py -p runner_v3ag_4998_3 -i aiida.out -fi espresso-out --units hartree -wrDFT
+
 
     #if [ "$jd" == "" ];then
     #    cp ../submit.sh .
