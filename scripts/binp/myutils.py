@@ -6522,6 +6522,8 @@ def ase_repeat_structure_using_listrepeat(atoms,ene_DFT,givenunits,listrepeat=[[
     if nat == 1: repeat = 5         # *125  at = 125
     for rp in listrepeat:
         if rp[0] <= nat <= rp[1]: repeat = rp[2]
+    print('listrep',listrepeat)
+    print('repeat',repeat)
     #if 2 <= nat <= 3: repeat = 4    # *64   at = 124 - 256
     #if 4 <= nat <= 10: repeat = 3    # *27   at = 135 - 270
     #if 11 <= nat <= 40: repeat = 2   # *8    at = 99 -
