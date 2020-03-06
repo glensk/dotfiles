@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: ac47efe4e017ddbc2f5ed11953fe203711d6a7c2
+# execution time: 0.3101160526275635 seconds.
+
+getEnergies_byLammps.py -p . --formation_energies beta2 --units eV
