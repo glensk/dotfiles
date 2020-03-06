@@ -539,6 +539,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     steps = 40000
     steps = 20000
     steps = 4000
+    steps = 9000
     #steps = 90000
     seeds = 2
     #temperatures = np.array([5,30])
