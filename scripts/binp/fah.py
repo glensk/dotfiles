@@ -538,7 +538,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     lambdas = [ 0.0, 0.15, 0.5, 0.85, 1.0 ]
     steps = 40000
     steps = 20000
-    #steps = 4000
+    steps = 4000
     #steps = 90000
     seeds = 2
     temperatures = np.array([5,30])
@@ -659,6 +659,27 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
         f.write(i+"\n")
     f.close()
     return joblist
+
+def go_through_all_fah_jobs_and_create_joblist_from_missing_jobs(filename="joblist_missing_lambas.dat"):
+    fahfolder =  get_fah_folder(verbose=False)
+    get_into_fah_folder(verbose=False)
+    hier = os.getcwd()
+    fvta = glob.glob(os.getcwd()+"/*_*K")
+    print('fvta',fvta)
+    sj=0
+    for fvt in fvta:
+        os.chdir(fvt)
+        print('os.getcwd() fvt',os.getcwd())
+        flsa = glob.glob(os.getcwd()+"/lambda*_*")
+        for fls in flsa:
+            os.chdir(fls)
+            print('os.getcwd() fls',os.getcwd())
+            if not os.path.isfile('simulation.ti'):
+                f = open(fahfolder+'/'+filename, "a")
+                f.write(os.getcwd()+"\n")
+                f.close()
+    return
+
 
 def go_through_all_fah_jobs_and_create_joblist():
     ''' can create joblist if some jobs are already finished '''
@@ -818,15 +839,20 @@ def write_avg_dudl(l_=False,dudl_mean_=False,err_uncor_=False,err_=False,dudl_st
     np.savetxt("avg_dudl",avg_dudl,fmt='   %.2f       %.3f          %.3f             %.3f        %.3f       %.3f    %.0f',header="lambda dudl_mean(meV/at)  err_uncor(meV/at)  err(meV/at) stdDev(meV/at) <T>(K) steps\n# averages to Fah (using tangens):"+str(fah)+" (meV/atom)")
     return
 
-def get_avg_dudl_fit_and_Fah_from_avg_dudl(verbose=True):
+def get_avg_dudl_fit_and_Fah_from_avg_dudl(verbose=True,filename='joblist_missing.dat'):
     #print('avg_dudl file in ',os.getcwd())
     if not os.path.isfile('avg_dudl'):
         print('Error/Warning: no avg_dudl in '+os.getcwd())
         fahfolder =  get_fah_folder(verbose=False)
-        if not os.path.isfile(fahfolder+'/joblist_missing.dat'):
-            f = open(fahfolder+'/joblist_missing.dat', "a")
+        lamb = get_sorted_lambda_folder(verbose=False)
+        if not os.path.isfile(fahfolder+'/'+filename):
+            f = open(fahfolder+'/'+filename, "a")
             f.close()
-        f = open(fahfolder+'/joblist_missing.dat', "a")
+        #for i in lamb:
+        #    print('i',i)
+        #    if not os.path.isfile(
+
+        f = open(fahfolder+'/'+filename, "a")
         f.write(os.getcwd()+"\n")
         f.close()
         return
@@ -861,11 +887,17 @@ def get_avg_dudl_fit_and_Fah_from_avg_dudl(verbose=True):
 
 def fah_get_Fah_surface():
     get_into_fah_folder(verbose=False)
-    fvta = glob.glob(os.getcwd()+"/*_*K")
+    fvta = glob.glob(os.getcwd()+"/*_*K")  # all angK folder
 
     if os.path.isfile('Fah_surface'):
         os.remove('Fah_surface')
+
     for fvt in fvta:
+        if not os.path.isfile(fvt+'/Fah'):
+            print('ERROR, missing:',fvt+'/Fah')
+            #with my.cd(fvt):
+            #    get_avg_dudl_fit_and_Fah_from_avg_dudl(verbose=False,filename='joblist_missing_Fah.dat')
+            continue
         v_str = fvt.split('fah/')[-1].split("_")[0]
         t_str = fvt.split('fah/')[-1].split("_")[1][:-1]
         #dudl  = np.loadtxt(fvt+'/Fah')
@@ -899,6 +931,58 @@ def fah_fit_surface(func,coef_lmfit_2d,temperatures,y,filename=False,order=3):
     np.savetxt(filename, surf_out,fmt=fmt)
     return
 
+def fqh_assess_stability_quick():
+
+    volumes = np.arange(16.0,17.3,0.01)
+    order = "1st"
+
+
+
+    fqhfolder = get_fqh_folder(verbose=False)
+    evinetfolder = get_evinet_folder(verbose=False)
+    Evinetfile = evinetfolder+"/EVinet_1"
+    if not os.path.isfile(Evinetfile):
+        print('evinetfolder',evinetfolder)
+        print('Evinetfile',Evinetfile)
+        sys.exit('no Evinetfile found')
+    #print('fqhfolder',fqhfolder)
+    os.chdir(fqhfolder)
+    globsurffile = fqhfolder+"/Fqh_*at_cell_per_atom_Surface_"+order+"_order__*"
+    #print('globsurffile',globsurffile)
+    surffile = glob.glob(globsurffile)
+    if len(surffile) == 1:
+        Fqh_surf_1 = surffile[0]
+    else:
+        sys.exit('surffile not foun')
+    print('surffile',surffile)
+    evinet = np.loadtxt(Evinetfile)
+
+    import feos
+    vi = feos.eos()
+    vi.e0    = evinet[0]
+    vi.v0    = evinet[1]
+    vi.b0    = evinet[2]
+    vi.b0der = evinet[3]
+    vi.parameters = [vi.e0, vi.v0, vi.b0, vi.b0der]
+    evinet_ene = feos.vinet(volumes, *vi.parameters)
+    print('evient_ene',evinet_ene)
+    T = 0
+    np.savetxt("evinet_ene_"+str(T)+"K",np.transpose([volumes,evinet_ene]))
+
+    fqh_ene = np.zeros(len(volumes))
+    if True: #args.quickanalysis == 1:
+        for T in [0,100,300,500]:
+            fqh = np.loadtxt(Fqh_surf_1)
+            print(fqh)
+            #Temperature = idx = fqh[:,0]
+            for vidx,v in enumerate(volumes):
+                fqh_ene[vidx] = fqh[T,1] + fqh[T,2]*v   # simple linear
+            np.savetxt("fqh_ene_"+str(T)+"K",np.transpose([volumes,fqh_ene]))
+            np.savetxt("evinet_plus_fqh_ene_"+str(T)+"K",np.transpose([volumes,fqh_ene+evinet_ene]))
+        sys.exit()
+
+
+
 def make_fqh_thermos_again():
     fqhfolder = get_fqh_folder(verbose=False)
     print('fqhfolder',fqhfolder)
@@ -922,7 +1006,7 @@ def make_fqh_thermos_again():
             call(["$dotfiles/thermodynamics/getThermodynamics.sh"],shell=True)
     return
 
-def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=False):
+def fit_fah_surface_lmfit2d(x=None,y=None,z=None,err=None,verbose=False,uptoT=1000):
     ''' x = Temperatrue, y = volume/atom, z=fah '''
     get_into_fah_folder(verbose=False)
     if x is None and y is None and z is None and os.path.isfile("Fah_surface"):
@@ -2150,6 +2234,7 @@ if __name__ == '__main__':
         my.print_args(args)
 
     if args.execute_function:
+        my.create_READMEtxt(os.getcwd())
         print('args.execute_function',args.execute_function)
         #sys.exit()
         if len(args.execute_function) == 1:

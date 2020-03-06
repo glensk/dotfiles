@@ -894,7 +894,7 @@ class qh(object):
             print('self._filessearchstring_common',self._filessearchstring_common)
             print('self._filessearchstring_suffix',self._filessearchstring_suffix)
             filename = self._filessearchstring_common+"Surface_1st_order_"+self._filessearchstring_suffix+"_e"+str(int(self._multiply_energy))+"_v"+str(int(self._multiply_volume))
-        np.savetxt(filename, self.surface_1st,fmt="%.0f %.12f %.12f")
+        np.savetxt(filename, self.surface_1st,fmt="%.0f %.16f %.16f")
         _printgreen(filename+" written")
         return
 
@@ -905,7 +905,7 @@ class qh(object):
             print('self._filessearchstring_common',self._filessearchstring_common)
             print('self._filessearchstring_suffix',self._filessearchstring_suffix)
             filename = self._filessearchstring_common+"Surface_2nd_order_"+self._filessearchstring_suffix+"_e"+str(int(self._multiply_energy))+"_v"+str(int(self._multiply_volume))
-        np.savetxt(filename, self.surface,fmt="%.0f %.12f %.12f %.12f")
+        np.savetxt(filename, self.surface,fmt="%.0f %.16f %.16f %.16f")
         _printgreen(filename+" written")
         return
 
@@ -916,7 +916,7 @@ class qh(object):
         if surface == None:
             np.savetxt(filename, self.surf_out_3rd,fmt="%.0f %.12f %.12f %.12f %.12f")
         else:
-            np.savetxt(filename, surface,fmt="%.0f %.12f %.12f %.12f %.12f")
+            np.savetxt(filename, surface,fmt="%.0f %.16f %.16f %.16f %.16f")
         #np.savetxt(filename, self.surf_out_3rd)
         _printgreen(filename+" written")
         return
@@ -1109,25 +1109,24 @@ if __name__ == '__main__':
     my.create_READMEtxt(os.getcwd())
     qh = qh(args)
 
-
-    Fqh_surf_1 = "Fqh_32at_cell_per_atom_Surface_1st_order__16.6315_16.8822_17.1354_17.3912_17.6494_17.9103_18.1737_18.4396_e1_v1"
-    Fqh_surf_1 = "Fqh_81at_cell_per_atom_Surface_1st_order__16.1854_16.4293_16.6758_16.9247_17.1760_17.4299_17.6862_17.9450_e1_v1"
-    volumes = np.arange(16.0,17.3,0.01)
-    fqh_ene = np.zeros(len(volumes))
-    evinet = np.loadtxt('../evinet/EVinet_1')
-    import feos
-    vi = feos.eos()
-    T = 0
-    vi.e0    = evinet[0]
-    vi.v0    = evinet[1]
-    vi.b0    = evinet[2]
-    vi.b0der = evinet[3]
-    vi.parameters = [vi.e0, vi.v0, vi.b0, vi.b0der]
-    evinet_ene = feos.vinet(volumes, *vi.parameters)
-    print('evient_ene',evinet_ene)
-    np.savetxt("evinet_ene_"+str(T)+"K",np.transpose([volumes,evinet_ene]))
-
     if args.quickanalysis == 1:
+        Fqh_surf_1 = "Fqh_32at_cell_per_atom_Surface_1st_order__16.6315_16.8822_17.1354_17.3912_17.6494_17.9103_18.1737_18.4396_e1_v1"
+        Fqh_surf_1 = "Fqh_81at_cell_per_atom_Surface_1st_order__16.1854_16.4293_16.6758_16.9247_17.1760_17.4299_17.6862_17.9450_e1_v1"
+        volumes = np.arange(16.0,17.3,0.01)
+        fqh_ene = np.zeros(len(volumes))
+        evinet = np.loadtxt('../evinet/EVinet_1')
+        import feos
+        vi = feos.eos()
+        T = 0
+        vi.e0    = evinet[0]
+        vi.v0    = evinet[1]
+        vi.b0    = evinet[2]
+        vi.b0der = evinet[3]
+        vi.parameters = [vi.e0, vi.v0, vi.b0, vi.b0der]
+        evinet_ene = feos.vinet(volumes, *vi.parameters)
+        print('evient_ene',evinet_ene)
+        np.savetxt("evinet_ene_"+str(T)+"K",np.transpose([volumes,evinet_ene]))
+
         for T in [0,100,300,500]:
             fqh = np.loadtxt(Fqh_surf_1)
             print(fqh)

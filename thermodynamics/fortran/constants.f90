@@ -1,5 +1,5 @@
 MODULE constants
-   real*8 :: Peps=1E-7        ! GPa for determining equal pressures
+   real*8 :: Peps=1E-4        ! GPa for determining equal pressures
    real*8 :: Veps=1E-4      ! Angstrom^3/atom for finite differences
    real*8 :: VratioMin=0.97   ! for determining volume range for formation energy fitting
    real*8 :: VratioMax=1.12 
