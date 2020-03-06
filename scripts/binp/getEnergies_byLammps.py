@@ -464,8 +464,9 @@ def get_energies(args):
         print('getting DFT data DONE!')
         POT_FORCES_EV_ANG = np.copy(DFT_FORCES_EV_ANG)
         POT_ENERGIES_EV_CELL = np.copy(DFT_ENERGIES_EV_CELL)
-        print('DFT_FORCES_EV_ANG')
-        print(DFT_FORCES_EV_ANG)
+        if False:  # this prints all the forces from all the structures
+            print('DFT_FORCES_EV_ANG')
+            print(DFT_FORCES_EV_ANG)
         #print('max',np.abs(DFT_FORCES_EV_ANG).max())
         #np.savetxt('maxforce.txt',np.abs(DFT_FORCES_EV_ANG).max(),fmt='%2.4f')
         if args.write_DFT_ene_forces:
@@ -1077,10 +1078,11 @@ def get_energies(args):
 
             #print('DFT_forces')
             #print(DFT_forces)
-            print('cell')
-            print(cell)
-            print('pos')
-            print(pos)
+            if False:
+                print('cell')
+                print(cell)
+                print('pos')
+                print(pos)
             #sys.exit()
             if args.write_runner_DFT:
                 try:
@@ -2913,7 +2915,7 @@ def get_elastic_constants_al_ext(ace,frames):
         print('ace.c44:',ace.c44,type(ace.c44))
         print('ace.elastic_constants:',ace.elastic_constants)
         file1 = open("elastic_constants_Al_fcc.txt","w")
-        file1.write(ace.elastic_constants)
+        file1.write(ace.elastic_constants.decode("utf-8") )
         file1.close()
         #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
         #if not os.path.isfile(filename):

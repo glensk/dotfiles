@@ -541,7 +541,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     steps = 4000
     #steps = 90000
     seeds = 2
-    temperatures = np.array([5,30])
+    #temperatures = np.array([5,30])
 
     if False:
         lambdas = [ 0.0, 1.0 ]

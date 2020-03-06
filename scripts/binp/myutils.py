@@ -5079,9 +5079,14 @@ class ase_calculate_ene( object ):
 
         if verbose:
             if type(text) != bool:
+                print('text:')
+                print(text)
                 text = printred(text)
                 #if get_all_constants == True:
-                ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
+                try:
+                    ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
+                except TypeError:
+                    ene_pot_lmp = "UNKNOWNXXX124"
                 #else:
                 #    ene_pot_lmp = ene_pot_lmp.replace('Elastic Constant ', 'Elastic Constant '+text+" ")
                 #ene_pot_lmp = ene_pot_lmp.replace('C44all =', printred('C44all ='))
