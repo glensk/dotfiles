@@ -114,14 +114,15 @@ case $myhost in
 #    # solved by python -m pip uninstall pip
 #    # brew install rust # necessary to get carge which itself is used for viu
 
+     # on daint:
+     # module load cray-python/3.6.5.7
+     # pip install --upgrade --user lmfit,ase,phonopy,psutil
 
 #    # on helvetios: (after module load python, that load python3)
-#    # pip install --upgrade --user phonopy
-#    # pip install --upgrade --user psutil
+     # pip install --upgrade --user lmfit,ase,phonopy,psutil
 #    # on mac: 
-#    # pip install --upgrade --user phonopy
-#    # pip install --upgrade --user ase              # or pip3 for python3
-#    # pip install --upgrade --user lmfit
+     # pip install --upgrade --user lmfit,ase,phonopy,psutil
+
 #    # pip install --upgrade --user intel-numpy    # to make numpy faster
 #    # pip install --upgrade --user tqdm
 #    # pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
