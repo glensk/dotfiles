@@ -1428,11 +1428,9 @@ def get_energies(args):
             if args.write_runner_repeated:
                 ace.get_calculator(frames[i])
                 listrepeat = [[1,1,5],[2,3,4], [4,12,3], [13,70,2]]
-<<<<<<< HEAD
-                listrepeat = [[1,1,5],[2,3,3], [4,12,3], [13,70,2]]
-=======
-                listrepeat = [[1,1,5],[2,3,2], [4,12,3], [13,70,2]]
->>>>>>> 7b1e19b919be450e407ece7cc150c74254de4109
+                listrepeat = [[1,1,5],[2,3,3], [4,12,3], [13,70,3]]
+                listrepeat = [[1,1,5],[2,3,4], [4,12,4], [13,70,4]]
+                listrepeat = [[1,1,5],[2,3,5], [4,12,5], [13,70,5]]
                 atoms_sc, forces_sc, ene_sc_ev, repeat = my.ase_repeat_structure_using_listrepeat(frames[i],ene_DFT[idx],ace.units,listrepeat=listrepeat)
                 ase_write(args.inputfile+".repeated",atoms_sc,format='runner',append=True,setforces_ase_units=forces_sc,setenergy_eV=ene_sc_ev)
                 ase_write(args.inputfile+".repeated_aiida",atoms_sc,format='espresso-in')
