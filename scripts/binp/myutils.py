@@ -6038,10 +6038,33 @@ class ase_calculate_ene( object ):
         pos0 = atoms_h.get_positions()
         #print('xx80.9')
         hessematrix=np.zeros((pos0.shape[0]*3,pos0.shape[0]*3))
+
+        #########################################################
+        ### schleife ueber alle atome, 1..32 ... dauert lange
+        #########################################################
+        self.fqh_folder = "fqh"
+        print('self.fqh_folder',self.fqh_folder)  # folder+fqh
+        vol = atoms_h.get_volume()/atoms_h.get_number_of_atoms()
+        volstr = "_"+str(vol)
+
+
+        subfolder = self.fqh_folder+"/Fqh_"+str(nat)+"at_cell_per_"
+        file1 = self.fqh_folder+"/Hessematrix"+volstr
+        file2 = subfolder+"atom"+volstr
+        file3 = subfolder+"cell"+volstr
+        file4 = self.fqh_folder+"/positions"+volstr+".extxyz"
+        file5 = self.fqh_folder+"/positions"+volstr+".POSCAR"
+        f1 = os.path.isfile(file1)
+        f2 = os.path.isfile(file2)
+        f3 = os.path.isfile(file3)
+        f4 = os.path.isfile(file4)
+        f5 = os.path.isfile(file5)
+        print('f1-f5',write_fqh,f1,f2,f3,f4,f5,'volstr',volstr)
+        if write_fqh and f1 and f2 and f3 and f4 and f5:
+            print('all files exist for:',volstr)
+            return
+
         print('xx81.0',nat)
-
-        ### schleife ueber alle atome, 1..32
-
         for iidx,i in enumerate(pos0): # loop over all atoms
             progress(iidx,len(pos0),status=try_readfile) #try_readfile)
             #print(iidx,"/",pos0.shape[0]) # loop over xyz 1..3
@@ -6082,16 +6105,12 @@ class ase_calculate_ene( object ):
         #if try_readfile:
         if write_fqh:
             #try_readfile = "Ni"
-            vol = atoms_h.get_volume()/atoms_h.get_number_of_atoms()
-            volstr = "_"+str(vol)
             folder = "Fqh_"+str(rep)+"x"+str(rep)+"x"+str(rep)
             if True: #hes.has_negative_eigenvalues == False:
                 # write in any case, if it has negative eigenvalues so be it
                 #hes.write_hessematrix(try_readfile+"_hessematrix"+volstr)
                 print('os.getcwd xx',os.getcwd())
                 print('write_fqh',write_fqh)
-                self.fqh_folder = "fqh"
-                print('self.fqh_folder',self.fqh_folder)  # folder+fqh
                 if not os.path.isdir(self.fqh_folder):
                     os.makedirs(self.fqh_folder)
                 # here we are now in the fqh folder
