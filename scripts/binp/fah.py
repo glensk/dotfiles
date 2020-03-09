@@ -540,7 +540,7 @@ def fah_create_jobs_and_joblist_from_fqh(ace):
     steps = 20000
     steps = 4000
     steps = 9000
-    #steps = 90000
+    #steps = 20000
     seeds = 2
     #temperatures = np.array([5,30])
 
@@ -595,8 +595,8 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 ipi_inp_basename = 'input.xml'
                 shutil.copy2(ipi_inp, folder+'/'+ipi_inp_basename)
                 print('ipi_inp_basename',ipi_inp_basename)
-                print('posfile',posfile)
-                print('to folder',folder)
+                #print('posfile',posfile)
+                #print('to folder',folder)
                 pos_basename = os.path.basename(posfile)
                 frame = ase_read(posfile)
                 #print('frame.pos',frame.positions[:3])
@@ -632,8 +632,6 @@ def ipi_thermodynamic_integration_from_fqh(ace,volume,temperature,hessefile,posf
                 my.lammps_write_inputfile(folder=folder,filename=lammps_in_file,positions='pos.lmp',ace=ace)
 
 
-                #print('fp',frame.positions)
-                #print('fp',frame.positions.flatten())
                 #ang_to_bohr = 1.8897261
                 #print('frame.positions[:3]',frame.positions[:3])
                 #print('frame.positions[:3]*atb',frame.positions[:3]*ang_to_bohr)
@@ -1411,7 +1409,13 @@ def get_dudl_from_ipi_job(verbose=False):
         print('desired_steps:',desired_steps)
 
     out = np.loadtxt('simulation.out')
+    #print('out',out)
     obtained_steps = len(out)
+    #print('obtained_steps',obtained_steps)
+    if obtained_steps == 0:
+        os.remove("simulation.out")
+        raise IOError
+
     t = out[:,3]
     if verbose:
         print("steps   :",obtained_steps)
@@ -1487,6 +1491,14 @@ def get_dudl_from_file_with_energies_lambda_0_1(filepath=False,number_of_atoms=F
 
 
     l01 = np.loadtxt(filepath)
+    fah_folder = get_fah_folder()
+    if os.path.isfile(fah_folder+'/AUSWERTUNG_xxx_steps'):
+        takesteps = int(np.loadtxt(fah_folder+'/AUSWERTUNG_xxx_steps'))
+        print('takesteps',takesteps)
+        #print(len(l01))
+        l01 = l01[:takesteps]
+        #print(len(l01))
+        #sys.exit('jo')
     if verbose:
         print(l01.shape)
     l0_column = 0

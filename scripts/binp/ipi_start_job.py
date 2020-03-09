@@ -20,7 +20,8 @@ def help(p = None):
     return p
 
 
-def ipi_start_job(inputfile="input.xml",sleep=6):
+def ipi_start_job(inputfile="input.xml",sleep=12):
+    ''' sleep of 6s is not enough for ~700 atoms '''
     if not os.path.isfile('in.lmp'):
         sys.exit('in.lmp does not exist! Exit')
     if not os.path.isfile(inputfile):
