@@ -2593,19 +2593,23 @@ def test_antisites(ace):
         ## get the antisites
         ######################################
         print('------- antisites (read or calculate) ----------')
-        read_antisites = "aiida_exported_group_out_antisites_rep"+phase+"_NEW.runner_calc__all_steps.input.data"
-
+        pot = os.environ['potentials']
+        read_antisites = pot+'/aiida_get_structures_new/'+"aiida_exported_group_out_antisites_rep"+phase+"_NEW.runner_calc__all_steps.input.data"
+        print('read_antisites:',read_antisites)
+        whichstruct=":"
         # read_antisites = xxx  (and relax)
         #antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites)
-        antisite_initial = ase_read(readpath,index=whichstruct,format="runner")
-        antisite_relaxed = ase_read(readpath,index=whichstruct,format="runner")
-        print('type(antisite_relaxed_by_nn:',type(antisite_relaxed_by_nn))
-        print('type(antisite_initial_by_nn:',type(antisite_initial))
+        #antisite_initial = ase_read(readpath,index=whichstruct,format="runner")
+        antisite_initial = ase_read(read_antisites,index=whichstruct,format="runner")
+        #antisite_relaxed = ase_read(readpath,index=whichstruct,format="runner")
+        #print('type(antisite_relaxed_by_nn:',type(antisite_relaxed_by_nn))
+        #print('type(antisite_initial_by_nn:',type(antisite_initial))
 
         ######################################
         ## get the original phase
         ######################################
         print('------- original phase -----')
+        sys.exit()
         read_orig_phase = "aiida_exported_group_NN_relaxed_"+phase+"_n2p2_v2ag_calc__all_steps.input.data"
         # read_orig_phase = xxx
 
