@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 65c44408e4b1c10a83e031b7e53ef28e2540f1d9
+# execution time: 0.19020795822143555 seconds.
+
+fqh.py -i out_ang3_vs_temp_lmfitsurf_14.996614860675587.dat out_ang3_vs_temp_lmfitsurf_15.222690704277133.dat out_ang3_vs_temp_lmfitsurf_15.451027287568921.dat out_ang3_vs_temp_lmfitsurf_15.681635858012108.dat out_ang3_vs_temp_lmfitsurf_15.914527663067823.dat out_ang3_vs_temp_lmfitsurf_16.14971395019721.dat out_ang3_vs_temp_lmfitsurf_16.387205966861465.dat out_ang3_vs_temp_lmfitsurf_16.627014960521663.dat -wqh1 -wqh2 -wqh3
