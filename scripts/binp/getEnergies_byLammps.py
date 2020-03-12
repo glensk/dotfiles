@@ -620,10 +620,17 @@ def get_energies(args):
         print('goover',goover)
         count = 0
         for epoch in goover: #ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
+            print('epoch',epoch)
             print('ELASTIC_ALL',elastic_all)
-            if epoch in elastic_all[:,0]:
-                print('epoch',str(epoch).ljust(5),'from file')
-            else:
+            #if len(elastic_all) >= 1:
+            #    gooverelastic = elastic_all[:,0]
+            #elif len(elastic_all) == 1:
+            #    gooverelastic = [elastic_all[0]]
+
+            #if epoch in int(gooverelastic):
+            #    print('epoch',str(epoch).ljust(5),'from file')
+            #else:
+            if True:
                 count += 1
                 print('epoch',str(epoch).ljust(5),'not already in, count('+str(count)+")")
                 ace = ase_calculate_ene(
@@ -640,7 +647,10 @@ def get_energies(args):
                 writeanew = True
                 #elastic_all.append([epoch,np.float(c44)])
                 #print('epoch',str(epoch).ljust(5),c44)
-                elastic_all= np.append(elastic_all, np.array([[epoch,np.float(c44)]]), axis=0)
+                if False: #in case we check as functio of epochs
+                    elastic_all= np.append(elastic_all, np.array([[epoch,np.float(c44)]]), axis=0)
+
+            sys.exit('elastic_all done! Exit uncomment if several epochs')
             if count == 20:
                 print()
                 print('saving ...')
