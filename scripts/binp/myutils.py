@@ -5487,7 +5487,7 @@ class ase_calculate_ene( object ):
         if os.path.isfile(logfile):
             os.remove(logfile)
         if verbose:
-            print('2: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
+            print('2: relaxed atomic positions (without volume relax); stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
         return
 
 

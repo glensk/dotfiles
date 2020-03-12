@@ -7,11 +7,12 @@ for f in $ff;do
     cd $f
         
         #getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
-        getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea
+		getEnergies_byLammps.py -p . --formation_energies beta2 --units eV -ea 
+        getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea  # needs to be redone
 
         #if [ ! -e "summary_formations_eV_peratom_beta2_DFT_T0.dat_per_formula_unit.dat" ]; then
         #    echo need to calculate
-		#    getEnergies_byLammps.py -p . --formation_energies beta2 --units eV
+		#    getEnergies_byLammps.py -p . --formation_energies beta2 --units eV -ea 
         #fi
 
 		#mkdir interstitials

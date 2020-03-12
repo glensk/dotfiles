@@ -43,14 +43,14 @@ def help(p = None):
 
     %
     % getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet -v # calculates c44 for al (TABLE I. Kobayashi)
-    % getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV  # get formation energies
+    % getEnergies_byLammps.py -p . --formation_energies beta2 -v -ea --units eV  # get formation energies
     % getEnergies_byLammps.py  -p Al_zhou.eam.alloy  -sys fcc -sys_ele Al -sys_ncell 1 -e -evinet
 
     % for paper:
         evinet (a,B,B')   : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -evinet
         elastic constants : getEnergies_byLammps.py -p . -sys fcc -sys_ele Al -sys_ncell 1 -ea
-        heats of solute/vac formation: getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV
-        formation energies AlXMgYSiZ : getEnergies_byLammps.py -p . --formation_energies beta2 -v --units eV
+        heats of solute/vac formation: getEnergies_byLammps.py -p . --formation_energies beta2 -v -ea --units eV
+        formation energies AlXMgYSiZ : getEnergies_byLammps.py -p . --formation_energies beta2 -v -ea --units eV
         antisite form energies       : getEnergies_byLammps.py -p .. -v --units eV --formation_energies beta2antisites
         interstitials                : getEnergies_byLammps.py -p .. -i ../../aiida_get_structures_new/aiida_exported_group_Al6xxxDB_structures_calc__all_steps.input.data -v --pick_atoms_al 33 --units meV_pa --interstitial_form
 
@@ -633,6 +633,12 @@ def get_energies(args):
             if True:
                 count += 1
                 print('epoch',str(epoch).ljust(5),'not already in, count('+str(count)+")")
+                print("############ -----------------")
+                print('args.units',args.units)  # hartree_pa
+                print('geopt',geopt)            # False
+                print('args.elastic',args.elastic)  # False
+                print('args.lmp',args.lmp)
+                print("############ -----------------")
                 ace = ase_calculate_ene(
                         potpath_in=args.potpath,
                         use_epoch=epoch,
@@ -643,6 +649,7 @@ def get_energies(args):
                 ace.lammps = args.lmp
                 #print('now getting the lmp cmd')
                 ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
+
                 c44 = get_elastic_constants_al_ext(ace,frames)
                 writeanew = True
                 #elastic_all.append([epoch,np.float(c44)])
@@ -2222,7 +2229,7 @@ def get_dilute_si_mg_f(ace):
     return
 
 
-def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=False,try_harmonic_readfile=False,debug=False,formula_unit=1.):
+def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=False,try_harmonic_readfile=False,debug=False,formula_unit=1.,name=""):
     ''' Bill sais that T=443 is the relevant temperature '''
     energy_NN_cell_unrelaxed_or_DFTrelaxed = ace.ene(frame.copy())  # needs a copy here, otherwise the DFT energy is evaluated and not the NN energy
     #print('energy_NN_cell_unrelaxed_or_DFTrelaxed (1)',energy_NN_cell_unrelaxed_or_DFTrelaxed)
@@ -2337,6 +2344,7 @@ def get_formation_energy(ace,frame,text,atomrelax=False,cellrelax=False,volumere
         f=open(ace.written_summary[2], "a+")
         f.write(str(conz)+"   "+str(heat_precip_T0K)+" "+text.replace(" ", "_")+"\n")
         f.close()
+        c44 = get_elastic_constants_al_ext(ace,frame,name=name+"_NN_relaxed")
         if formula_unit != False:
             eform = heat_precip_T0K*formula_unit
             f=open(ace.written_summary[2]+"_per_formula_unit.dat", "a+")
@@ -2834,7 +2842,7 @@ def test_inputfile_formation_energy(ace,args):
         #ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
     return
 
-def test_beta2_bulk(ace):
+def test_beta2_bulk(ace,args):
     print("######## test_beta2_bulk #############")
     #wsp = ace.savefolder+"summary_formations_beta_"
     wsp = os.getcwd()+"/summary_formations_eV_peratom_beta2_"
@@ -2864,11 +2872,25 @@ def test_beta2_bulk(ace):
         frame = ase_read(path,":",format="runner")
         #print('type(frame)',type(frame))
         frame = frame[-1] # DFT_relax
+
+        print('aea:!!!!!!',args.elastic_all)
+        if args.elastic_all: # elastic constants
+            print('ELASTIC CONSTANTS')
+            ace.lammps = False
+            #print('now getting the lmp cmd')
+            ace.pot_get_and_ase_lmp_cmd()  # need to update lmp_cmd when changing the potential
+            # this is unrelaxed!
+            c44 = get_elastic_constants_al_ext(ace,frame,name=i)
+
+
+
+
         if True:
             #hessematrix_try = ace.savefolder+"h_"+i+"_at_DFT_relaxed"
             #get_formation_energy(ace,frame,i+" (DFT@DFT fully relaxed)",atomrelax=False,cellrelax=False,volumerelax=False,DFT_ene=True,try_harmonic_readfile=hessematrix_try)
             hessematrix_try = ace.savefolder+"h_"+i+"_at_NN_relaxed"
-            get_formation_energy(ace,frame,i+" (@DFT  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=True,try_harmonic_readfile=hessematrix_try,formula_unit=formula_unit)
+            get_formation_energy(ace,frame,i+" (@DFT  fully relaxed)", atomrelax=True, cellrelax=True, volumerelax=True, DFT_ene=True,try_harmonic_readfile=hessematrix_try,formula_unit=formula_unit,name=i)
+
             ase_write(path+"NN_relaxed_"+i+"_"+ace.pot.pot+".runner",frame,format='runner')
     return
 
@@ -2901,7 +2923,7 @@ def formation_energies(ace,args):
     if args.formation_energies == "inputfile":
         test_inputfile_formation_energy(ace,args)
     if args.formation_energies == "beta2":
-        test_beta2_bulk(ace)
+        test_beta2_bulk(ace,args)
     if args.formation_energies == "beta2antisites":
         test_antisites(ace)
 
@@ -2916,7 +2938,7 @@ def formation_energies(ace,args):
 
 
 
-def get_elastic_constants_al_ext(ace,frames):
+def get_elastic_constants_al_ext(ace,frames,name="Al_fcc"):
     ace.elastic = True
     #get_basic_NN_energies_ace(ace)
     #get_al_fcc_equilibrium(ace)
@@ -2928,7 +2950,7 @@ def get_elastic_constants_al_ext(ace,frames):
         ace.get_elastic_external(atomsin=frame_al,verbose=ace.verbose,text="Al_fcc bulk 4at",get_all_constants=True)
         print('ace.c44:',ace.c44,type(ace.c44))
         print('ace.elastic_constants:',ace.elastic_constants)
-        file1 = open("elastic_constants_Al_fcc.txt","w")
+        file1 = open("elastic_constants_"+name+".txt","w")
         file1.write(ace.elastic_constants.decode("utf-8") )
         file1.close()
         #filename = ace.pot.potpath+"/elastic_"+str(ace.pot.potepoch_bestteste)+".dat"
