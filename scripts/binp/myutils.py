@@ -5052,6 +5052,12 @@ class ase_calculate_ene( object ):
         if atomsin == False:
             sys.exit('need to define atoms in this case XX')
         frame = atomsin.copy()
+        if type(frame) == list and len(frame) == 1:
+            frame = frame[0]
+        #print('FP',type(frame))
+        #print('FP[1]',len(frame))
+        #print(frame.positions)
+        #sys.exit()
         frame.wrap()
         #print('3')
 
@@ -5465,25 +5471,31 @@ class ase_calculate_ene( object ):
                 print('now asecalcLAMMPS defined',asecalcLAMMPS)
             atoms.set_calculator(asecalcLAMMPS)
             if self.verbose > 1:
-                print('now with calculator')
+                print('now with calculator 77')
         return
 
     def ase_relax_atomic_positions_only(self,atoms,fmax=0.0001,verbose=False,output_to_screen=False):
         ''' The strain filter is for optimizing the unit cell while keeping scaled positions fixed. '''
         self.keep_alive = True
+        print('before getting calculator 66')
         self.get_calculator(atoms)
+        print('after  getting calculator 66')
         #print('sssss')
         if False: #verbose:
             print('1: relax atomic positions; stress:',atoms.get_stress(),"volume per atom:",ase_vpa(atoms))
 
         logfile="-" # output to screen
         logfile="tmpxxase" # output to file and not to screen
+        logfile="-" # output to screen
         if output_to_screen == True:
             logfile = '-'
         #opt = LBFGS(atoms,logfile=logfile)
+        print('before run 11')
         opt = FIRE(atoms,logfile=logfile,dt = 0.1)
         #opt = BFGS(atoms,logfile=logfile)
+        print('before run 12')
         opt.run(fmax=fmax)
+        print('before run 13')
         if os.path.isfile(logfile):
             os.remove(logfile)
         if verbose:
