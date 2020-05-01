@@ -188,8 +188,8 @@ class get_all_disps():
         self.rmax_distmax = my_atom.rmax[self.element]         # which range to consider
         self.alatT0K      = my_atom.alatT0K[self.element]
         self.alatTmelt    = my_atom.alatTmelt[self.element]
-	self.nndistT0K    = self.alatT0K/np.sqrt(2.)
-	self.nndistTmelt  = self.alatTmelt/np.sqrt(2.)
+        self.nndistT0K    = self.alatT0K/np.sqrt(2.)
+        self.nndistTmelt  = self.alatTmelt/np.sqrt(2.)
         if self.verbose:
             print("self.sc           (1):",self.sc)
             print("self.dofor        (1):",self.dofor)
@@ -275,26 +275,26 @@ class get_all_disps():
 
         ####### get or check self.dofor
         recheck_dofor = True
-	if type(self.dofor) == str == type(dofor):
+        if type(self.dofor) == str == type(dofor):
             if self.dofor == dofor:
                 recheck_dofor = False
 
-	verbose1 = True
-	if verbose1 == True:
-		print('xx sfd',self.folder_alldisp)
+        verbose1 = True
+        if verbose1 == True:
+            print('xx sfd',self.folder_alldisp)
 
         if recheck_dofor == True:
             str_list = utils.common_prefix(self.folder_alldisp).split("/")
-	    if verbose1 == True:
+            if verbose1 == True:
             	print('xx sfd',str_list)
             str_list = filter(None, str_list)
-	    if verbose1 == True:
+            if verbose1 == True:
             	print('xx sdf',str_list)
             str_list= "/"+"/".join(str_list[:-1])
-	    if verbose1 == True:
+            if verbose1 == True:
             	print('xx sdf',str_list)
             dofor = str_list
-	    if verbose1 == True:
+            if verbose1 == True:
             	print('xx dof',dofor)
 
         if self.verbose:
@@ -517,7 +517,7 @@ class get_all_disps():
 
             if disp == 0.7:
                 if self.verbose:
-		    print('doing this for disp = ',disp)
+                    print('doing this for disp = ',disp)
                 self.pos = pos
                 self.forces = forces
 
@@ -531,7 +531,7 @@ class get_all_disps():
                 self.dist_to_0_05_05__01 = LA.norm(p_0_05_05 - pos[0])
                 self.forces__01 = forces
                 self.pos__01 = pos
-		self.f_110 = LA.norm(f_1_1_0)*np.sign(f_1_1_0[0])
+                self.f_110 = LA.norm(f_1_1_0)*np.sign(f_1_1_0[0])
 
                 if self.verbose:
                     print('force on 05_05_0:',disp,f_05_05_0,LA.norm(f_05_05_0))
@@ -539,7 +539,7 @@ class get_all_disps():
                     print('force on 0_05_05:',disp,LA.norm(f_0_05_05),f_0_05_05)
                 self.ratio0510  = (LA.norm(f_1_1_0)*np.sign(f_1_1_0[0]))/LA.norm(f_05_05_0)
                 self.ratio0510 = round(self.ratio0510,3)
-		add = "ATTRACTIVE_to_"
+                add = "ATTRACTIVE_to_"
                 if self.verbose:
                     print('ratio f[0.5,0.5,0]/f[1,1,0]',self.ratio0510)
                 #np.sign(ele.forces[0][0])
@@ -827,9 +827,9 @@ class get_all_disps():
         # Weight 4Morse 0_05_05
         ##############################################################################
         print("#########################################################################")
-	print("# xx@Forces on [0.5,0.5,0.0]")
+        print("# xx@Forces on [0.5,0.5,0.0]")
         print("#########################################################################")
-	print("  dist  VASP   morse  mc1    dmorse  dmc1  Columb")
+        print("  dist  VASP   morse  mc1    dmorse  dmc1  Columb")
         for i in fit_on_05_05_0:
             print(i)
         print("#########################################################################")
@@ -1328,12 +1328,12 @@ class get_all_disps():
             force_repulsive_mc1 = pot_energy_forces.mc1_derivative(self.dist_to_0_05_05__01,*fitmc1.parameters)
         force_repulsive_morse = pot_energy_forces.Morse_derivative(self.dist_to_0_05_05__01,*fit.parameters)
        	print()
-	print('----- now calcs --------')
+        print('----- now calcs --------')
         if type(fitmc1) != bool:
-	    print("force_repulsive_mc1  ",force_repulsive_mc1)
-	print("force_repulsive_morse",force_repulsive_morse)
+            print("force_repulsive_mc1  ",force_repulsive_mc1)
+        print("force_repulsive_morse",force_repulsive_morse)
 
-	morseforce_on_0_05_05 = getforce(self.vec_to_0_05_05__01,force_repulsive_morse)
+        morseforce_on_0_05_05 = getforce(self.vec_to_0_05_05__01,force_repulsive_morse)
         if type(fitmc1) != bool:
             mc1force_on_0_05_05   = getforce(self.vec_to_0_05_05__01,force_repulsive_mc1)
 
@@ -1344,11 +1344,11 @@ class get_all_disps():
         print('morse forces on 0_05_05',morseforce_on_0_05_05)
         if type(fitmc1) != bool:
             print('mc1 forces on 0_05_05  ',mc1force_on_0_05_05)
-	print()
+        print()
         print('remaining on 0_05_05 (VASP - morse)',remaining_on_0_05_05_morse)
         if type(fitmc1) != bool:
             print('remaining on 0_05_05 (VASP - mc1)  ',remaining_on_0_05_05_mc1)
-	print("")
+        print("")
 
 
 
@@ -1369,21 +1369,21 @@ class get_all_disps():
         #self.ratio0510  = (LA.norm(f_1_1_0)*np.sign(f_1_1_0[0]))/LA.norm(f_05_05_0)
         #self.ratio0510 = round(self.ratio0510,3)
 
-	self.ratio00505_morse  = round((LA.norm(remaining_on_0_05_05_morse)*np.sign(remaining_on_0_05_05_morse[0]))/LA.norm(f_05_05_0),3)
+        self.ratio00505_morse  = round((LA.norm(remaining_on_0_05_05_morse)*np.sign(remaining_on_0_05_05_morse[0]))/LA.norm(f_05_05_0),3)
         if type(fitmc1) != bool:
-	    self.ratio00505_mc1  = round((LA.norm(remaining_on_0_05_05_mc1)*np.sign(remaining_on_0_05_05_mc1[0]))/LA.norm(f_05_05_0),3)
+            self.ratio00505_mc1  = round((LA.norm(remaining_on_0_05_05_mc1)*np.sign(remaining_on_0_05_05_mc1[0]))/LA.norm(f_05_05_0),3)
 
-	print('ratio remaining morse f[0,0.5,0.5]/f[1,1,0]',self.ratio00505_morse)
+        print('ratio remaining morse f[0,0.5,0.5]/f[1,1,0]',self.ratio00505_morse)
         if type(fitmc1) != bool:
-	    print('ratio remaining mc1   f[0,0.5,0.5]/f[1,1,0]',self.ratio00505_mc1)
-	print()
-	print("@Forces on [0.5,0.5,0.0]")
-	print("    dist  VASP   morse  mc1    dmorse  dmc1  Columb")
+            print('ratio remaining mc1   f[0,0.5,0.5]/f[1,1,0]',self.ratio00505_mc1)
+        print()
+        print("@Forces on [0.5,0.5,0.0]")
+        print("    dist  VASP   morse  mc1    dmorse  dmc1  Columb")
         print(fit_on_05_05_0)
-	print()
+        print()
         if type(fitmc1) != bool:
-	    print(round(self.f_110,3),round(LA.norm(remaining_on_0_05_05_morse),3),round(LA.norm(remaining_on_0_05_05_mc1),3))
-	print()
+            print(round(self.f_110,3),round(LA.norm(remaining_on_0_05_05_morse),3),round(LA.norm(remaining_on_0_05_05_mc1),3))
+        print()
         if args.shift_parametrization_to_alat == False:
             if self.correct_for_110_forces == False:
                 print("DONE alat {alat:4.3f} ||| alat_mor {alat_mor:4.3f} a_mor {a_mor:7.5f}  D_mor {D_mor:7.5f}".format(alat=self.alat,alat_mor=fit.parameters[2]*np.sqrt(2.),a_mor=fit.parameters[1],D_mor=fit.parameters[0]))

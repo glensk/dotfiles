@@ -15,7 +15,7 @@ def help(p = None):
 def todo(args):
     #if not os.path.isfile(args.inputfile):
     #   sys.exit("inputfile "+args.inputfile+" does not exist")
-    packages = [ 'numpy', 'pandas', 'phonopy', 'cython', 'pyspglib', 'ase' , 'lmfit', 'intel-numpy', 'tqdm', 'jupyter', 'jupyter_contrib_nbextensions', 'plotly', 'virtualenv', 'pathlib', 'iterm2', 'yfinance', 'quandl', 'yahoo_finance','termcolor', 'BeautifulSoup4', 'html5lib','pandas_datareader', 'numba' ] # 'aiida-core', #, 'aiida-quantumespresso==3.0.0a5' ]
+    packages = [ 'numpy', 'pandas', 'phonopy', 'cython', 'pyspglib', 'ase' , 'lmfit', 'intel-numpy', 'tqdm', 'jupyter', 'jupyter_contrib_nbextensions', 'plotly', 'virtualenv', 'pathlib', 'iterm2', 'yfinance', 'quandl', 'yahoo_finance','termcolor', 'BeautifulSoup4', 'html5lib','pandas_datareader', 'numba' ,'python-varname'] # 'aiida-core', #, 'aiida-quantumespresso==3.0.0a5' ]
     # while installing aiida-core I got following errors:
     # ERROR: notebook 6.0.2 has requirement pyzmq>=17, but you'll have pyzmq 16.0.4 which is incompatible.
     # ERROR: notebook 6.0.2 has requirement tornado>=5.0, but you'll have tornado 4.5.3 which is incompatible.

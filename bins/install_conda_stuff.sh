@@ -1,5 +1,6 @@
 
 condaversion=2 # currently I dont see a reason to use python3
+condaversion=3 
 
 
 [ ! -e "$HOME/Downloads" ] && mkdir $HOME/Downloads 
@@ -58,11 +59,15 @@ echo "${RED}Snow install stuff CURRENTLY NEED TO ACCEPT EVERYTHIN WHITH IS NOT G
 echo
 echo "${RED}scikit-learn${NC}"
 conda install -y scikit-learn # for analyzing lifangs ipynb of correlationis
+
+conda install -y ipython
+conda install -y -c conda-forge jupyterlab
+
 echo "${RED}colorame${NC}"
 conda install -y colorama
 echo "${RED}click${NC}"
-conda install -y click       # actually comes with ase
-echo "${RED}ase${NC}"
+#conda install -y click       # actually comes with ase
+#echo "${RED}ase${NC}"
 conda install -y -c conda-forge ase
 echo "${RED}seaborn${NC}"
 conda install -y seaborn
@@ -75,10 +80,10 @@ conda install -y -c conda-forge jupyter_contrib_nbextensions   # get the noteboo
 echo "${RED}jupyter contrib nbextension install --user${NC}"
 jupyter contrib nbextension install --user # also necessary to get the notebook extensions working
 echo "${RED}nglview${NC}"  # to look at structures
-conda install -c omnia nglview
-conda install -y -c conda-forge atomsk  # checking for unwrapping atomic structures
-conda install -y -c conda-forge elastic # check for bill elastic constants mg9si5
-conda install gcc # to be able to (maybe) install a part of n2p2 on mac
+#conda install -c omnia nglview
+#conda install -y -c conda-forge atomsk  # checking for unwrapping atomic structures
+#conda install -y -c conda-forge elastic # check for bill elastic constants mg9si5
+#conda install gcc # to be able to (maybe) install a part of n2p2 on mac
 
 conda install -y -c numba # tried for faster SF_integrate with CurSel
 #conda install -c conda-forge pyfftw=0.10.4  # is this already installed using 
