@@ -23,6 +23,11 @@ print('time1, for ase_calc...',timeit.timeit() - start); start = timeit.timeit()
 
 def help(p = None):
     string = '''
+    what works for elastic constants:
+    getEnergies_byLammps.py -p n2p2_alcu_v2dm_31 -sys fcc -sys_ele Al -sys_ncell 1 -e -vvvv  -> to get Al elastic constants (fidis/helvetios)
+    getEnergies_byLammps.py -p n2p2_alcu_v2dm_31 -i POSCAR_ThetaPrime -e -vvvv
+        -> to get elastic constant ThetaPime with nnp
+
     Examples for using this script:
     -------------------------------
     % getEnergies_byLammps.py --units meV_pa -p Ni-Al-Mishin-2009.eam.alloy -thermo -v
@@ -431,6 +436,7 @@ def get_energies(args):
             print('relaxing the structure ...')
         print('406')
         ace.ase_relax_atomic_positions_only(frames,fmax=0.0001,verbose=args.verbose)
+        print('407')
         if args.verbose:
             for idx,i in enumerate(frames.positions):
                 print('after relax:',idx,frames.get_chemical_symbols()[idx],frames.positions[idx],frames.get_forces()[idx])
@@ -441,6 +447,9 @@ def get_energies(args):
         print('########################################################')
         print('XXX args.inputfile:',args.inputfile)
         print('XXX args.format_in:',args.format_in)
+        print('XXX args.inputfile:',args.inputfile[:6])
+        if len(args.inputfile) >= 6 and args.inputfile[:6] == "POSCAR":
+            args.format_in = 'vasp'
         print('########################################################')
         frames = ase_read(args.inputfile,format=args.format_in,index=":")
         #ase_write("DFT1.runner",frames,format='runner',append=True)
@@ -601,6 +610,8 @@ def get_energies(args):
     ### elastic / elastic_all
     ############
     if args.elastic:
+        #print('frames 77777:',frames)
+        #sys.exit('77777777777')
         get_elastic_constants_al_ext(ace,frames)
         sys.exit('get_elastic_constants_al_ext done! Exit')
 
@@ -613,11 +624,18 @@ def get_energies(args):
 
         writeanew = False
         goover = ace.pot.potepoch_all
-        goover = np.arange(1,goover[-1]+1)
+        print('goover1',goover)
+        print('args.potepoch',args.potepoch)
+        if len(goover) == 0:
+            goover = [1]
+        else:
+            goover = np.arange(1,goover[-1]+1)
+        print('goover2',goover)
         if args.potepoch != False:
             goover = np.array([args.potepoch])
+        print('goover3',goover)
         goover = np.array([ace.pot.use_epoch])
-        print('goover',goover)
+        print('goover4',goover)
         count = 0
         for epoch in goover: #ace.pot.potepoch_all: #[100]: #np.arange(1,100): #[7]: #ace.pot.potepoch_all:
             print('epoch',epoch)
@@ -2938,7 +2956,7 @@ def formation_energies(ace,args):
 
 
 
-def get_elastic_constants_al_ext(ace,frames,name="Al_fcc"):
+def get_elastic_constants_al_ext(ace,frames,name=""):
     ace.elastic = True
     #get_basic_NN_energies_ace(ace)
     #get_al_fcc_equilibrium(ace)
