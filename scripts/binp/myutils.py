@@ -5676,6 +5676,7 @@ class ase_calculate_ene( object ):
             alat_rel = np.arange(0.985,1.015,0.0025)
             alat_rel = np.arange(0.99,1.015,0.0025)  # otherwise repulsive part too strong
             alat_rel = np.arange(0.9865,1.015,0.0025)  # seems most symmetric for cu
+            alat_rel = np.arange(0.97,1.03,0.005)
         if write_evinet == False and write_fqh != False:
             print('getting volume range for Fqh, V0 (T=0K) - V0*1.1 (T=Tmelt) seems good for Cu and Al')
             alat_rel = np.arange(0.965,1.036,0.005)
