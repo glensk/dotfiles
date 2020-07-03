@@ -1611,6 +1611,14 @@ def get_energies(args):
                     if ene_diff_abs[idx] > 60 and False:
                         print('uuid:',uuid)
 
+                if ene_diff_abs[idx] > 100:
+                    print('save frames[i]',i)
+                    ase_write("ene_larger_100.runner",frames[i],format='runner',append=True)
+                if ene_diff_abs[idx] > 1000:
+                    print('save frames[i]',i)
+                    ase_write("ene_larger_1000.runner",frames[i],format='runner',append=True)
+
+
                 if idx >= 99:
                     #np.savetxt("e_pot_eV_cell",ene_pot_eV_cell)
                     #np.savetxt("e_har_eV_cell",ene_har_eV_cell)
