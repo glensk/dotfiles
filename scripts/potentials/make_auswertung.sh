@@ -13,13 +13,19 @@ for f in $ff;do
     #cd ..
     #fi
     
-    if [ ! -e "train_auswertung/ene_diff_abs.npy" ];then
-    mkdir train_auswertung
-    cd train_auswertung
-    getEnergies_byLammps.py --units meV_pa -p .. -i ../train.data -wa
+    #if [ ! -e "train_auswertung/ene_diff_abs.npy" ];then
+    #mkdir train_auswertung
+    #cd train_auswertung
+    #getEnergies_byLammps.py --units meV_pa -p .. -i ../train.data -wa
+    #cd ..
+    #fi
+
+    if [ ! -e "test_auswertung_dE_vs_dist/ene_diff_abs_vs_dist.npy" ];then
+    mkdir test_auswertung_dE_vs_dist
+    cd test_auswertung_dE_vs_dist
+    getEnergies_byLammps.py --units meV_pa -p .. -i ../test.data -wa -waf
     cd ..
     fi
-
 
     cd $hier
 done

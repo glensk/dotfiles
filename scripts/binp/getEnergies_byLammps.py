@@ -1611,6 +1611,8 @@ def get_energies(args):
                     if ene_diff_abs[idx] > 60 and False:
                         print('uuid:',uuid)
 
+                #ana_dist_min[idx],
+                #ene_diff_abs[idx],
                 if ene_diff_abs[idx] > 100:
                     print('save frames[i]',i)
                     ase_write("ene_larger_100.runner",frames[i],format='runner',append=True)
@@ -1650,6 +1652,7 @@ def get_energies(args):
 
         if args.write_analysis_full:
             np.savetxt("ene_diff_lam_ase.dat",ene_diff_lam_ase,header=ace.units)
+            np.savetxt("ene_diff_abs_vs_dist.dat",np.transpose([ana_dist_min,ene_diff_abs]))
 
         if args.write_analysis:
             print('get RMSE FORCES ...')
