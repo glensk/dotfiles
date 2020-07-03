@@ -598,14 +598,16 @@ class qh(object):
         # define surface
         np.set_printoptions(precision=12)   # to make the output exact
         self.surf_coefs_1st = np.empty((len(self.temperatures),2))  # -wf1
-        self.surf_coefs_2nd = np.empty((len(self.temperatures),3))  # -wf2
-        self.surf_coefs_3rd = np.empty((len(self.temperatures),4))  # -wf3
+        self.surface_1st    = np.empty((len(self.temperatures),3))
 
-        self.surface_1st  = np.empty((len(self.temperatures),3))
+        self.surf_coefs_2nd = np.empty((len(self.temperatures),3))  # -wf2
         self.surface      = np.empty((len(self.temperatures),4))
+
+        self.surf_coefs_3rd = np.empty((len(self.temperatures),4))  # -wf3
         self.surf_out_3rd = np.empty((len(self.temperatures),5))
 
         self.surf_function = []
+        self.surf_function1 = []
 
         # define fits
         self.data_fit = np.empty((len(self.volumes),len(self.temperatures)))
@@ -622,17 +624,37 @@ class qh(object):
 
         for i,t in enumerate(self.temperatures):
             energies = self.data[:,i]
-            if self.__verbose:
+            if self.__verbose or self._verbose:
                 print("temperature:", t)
                 print("vol        :", self.volumes)
                 print("energies   :", energies)
 
             # polynomial fit
             self.surf_coefs_1st[i] = np.polyfit(self.volumes, energies, 1)
-            self.surf_coefs_2nd[i] = np.polyfit(self.volumes, energies, 2)
             self.surface_1st[i]    = np.append(self.surf_coefs_1st[i],[t])[::-1]
+            vol = 14.382462939736
+            if self.__verbose or self._verbose:
+                print('i',i,'surf1st: self.surf_coefs_1st[i]',self.surf_coefs_1st[i])
+                print('i',i,'surf1st: self.surface_1st[i]',self.surface_1st[i])
+                print('i',i,'result',self.surface_1st[i][1] + self.surface_1st[i][2]*vol,'(meV/atom)')
+
+            self.surf_coefs_2nd[i] = np.polyfit(self.volumes, energies, 2)
             self.surface[i]        = np.append(self.surf_coefs_2nd[i],[t])[::-1]
+            if self.__verbose or self._verbose:
+                print()
+                print('i',i,'self.surf_coefs_2nd[i]',self.surf_coefs_2nd[i])
+                print('i',i,'self.surface[i]',self.surface[i])
+                print('i',i,'result',self.surface[i][1] + self.surface[i][2]*vol + self.surface[i][3]*vol*vol,'(meV/atom)')
+                print(self.volumes.min(),self.volumes.max())
+                volange = np.linspace(self.volumes.min(),self.volumes.max(),100)
+                sys.exit()
+
+            print('i',i,'t',t)
+            if i in [0,200,400,600]:
+                np.savetxt('out_'+str(i)+'.dat',np.transpose([self.volumes,energies]))
+
             self.surf_function.append(np.poly1d(self.surf_coefs_2nd[i]))
+            self.surf_function1.append(np.poly1d(self.surf_coefs_1st[i]))
 
 
             #bounds = [10, 12]
@@ -661,9 +683,12 @@ class qh(object):
             #function:    3        2
             #       -252 x + 2577 x - 9185 x + 1.106e+04
 
-            # fits
-            self.data_fit[:,i] = self.surf_function[i](self.volumes)
+            # fits 2nd
+            self.data_fit[:,i]  = self.surf_function[i](self.volumes)
             self._data_fit[:,i] = self.surf_function[i](fitgrid)
+            if i in [0,200,400,600]:
+                np.savetxt('out_fit_2nd_'+str(i)+'.dat',np.transpose([fitgrid,self._data_fit[:,i]]))
+                np.savetxt('out_fit_1st_'+str(i)+'.dat',np.transpose([fitgrid,self.surf_function1[i](fitgrid)]))
 
             if self.data.shape[0] > 3:
                 self.data_fit_3rd[:,i] = self.surf_function_3rd[i](self.volumes)
@@ -917,7 +942,6 @@ class qh(object):
             np.savetxt(filename, self.surf_out_3rd,fmt="%.0f %.12f %.12f %.12f %.12f")
         else:
             np.savetxt(filename, surface,fmt="%.0f %.16f %.16f %.16f %.16f")
-        #np.savetxt(filename, self.surf_out_3rd)
         _printgreen(filename+" written")
         return
 
@@ -1101,8 +1125,30 @@ if __name__ == '__main__':
     # 2 114.425456223140 -4.550048118149
     # 3 114.425456223140 -4.550048118149
     # --> (ouput in mev/atom), example for al
-    # 114.425456223140-4.550048118149*16.631514793360534 = 38.751263636
+    # 114.425456223140-4.550048118149*16.631514793360534 = 38.751263636  (meV/atom)
     # 114.425456223140-4.550048118149*18.43965773972576  = 30.524126225
+    #
+    # exapmple Al-Cu: !!!  -->> is wrong for wqh2, only works for wqh1
+    # /Users/glensk/Dropbox/Albert/proj/2020_EPFL/2020_03_Theta_to_ThetaPrime/potential_adp/Theta/Fqh_2x2x2
+    # %head Fqh_96at_cell_per_atom_Surface_2nd_order__14.4067_14.4933_14.6238_14.8432_15.0647_15.2885_15.5144_15.7425_e1_v1
+    # 0 -1690.432853986375 240.273331294440 -8.330535414703
+    # 1 -1690.432853986375 240.273331294440 -8.330535414703
+    # volume per atom is: 14.382429316248
+    # -1690.432853986375 + 240.273331294440*14.382429316248 -8.330535414703*14.382429316248 = 1.645  (meV/atom)  seems wrong! !!!!!!!!!!!!!!
+    #
+    # /Users/glensk/Dropbox/Albert/proj/2020_EPFL/2020_03_Theta_to_ThetaPrime/potential_adp/11_05_2020_Theta_ADP_fqh_96atoms/fqh
+    # %head Fqh_96at_cell_per_atom_Surface_2nd_order__14.4067_14.6238_14.8432_15.0647_15.2885_15.5144_15.7426_15.9729_e1_v1
+    # 0 -789.5263815260792626 119.8440397583540857 -4.3087217259595283
+    # volume is 14.382462939736
+    # -789.5263815260792626+119.8440397583540857*14.382462939736-4.3087217259595283*14.382462939736 = 872 (meV/atom) seems also wrong!
+
+    # example for Al-Cu
+    # %head Fqh_768at_cell_per_atom_Surface_1st_order__14.4067_14.4933_14.6238_14.8432_15.0647_15.2885_15.5144_15.7425_e1_v1
+    # 0 193.754978471322 -10.430737243054
+    # volume is 14.382462939736
+    # 193.754978471322-10.430737243054*14.382462939736 = 43 (meV/atom) yes!
+    #
+
 
     p = qh().help()
     args = p.parse_args()
