@@ -21,12 +21,11 @@ from scipy.ndimage        import map_coordinates
 
 # non general libraries
 import crystal_generator
-import importlib
-importlib.reload(crystal_generator)
+reload(crystal_generator)
 import utils_rename as utils
-importlib.reload(utils)
+reload(utils)
 import pot_parametrize
-importlib.reload(pot_parametrize)
+reload(pot_parametrize)
 import hesse
 #print list(sys.modules.keys())
 #print dir(utils)
@@ -265,14 +264,14 @@ class pot_energy_forces_class( object ):
 
         # We have to ensure we dont read in the EqCoords file every time;
         if self.verbose > 1:
-            print("")
-            print("0: cartesian coords: ---------------------")
-            print("1:","self.coordfile_cart:",  self.coordfile_cart)
-            print("2:","self.coord_cart    :",  self.coord_cart)
-            print("3:","self.cellfile      :",  self.cellfile)
-            print("4:","self.cell          :",  self.cell)
-            print("5:","self.coordfile_rrel:",  self.coordfile_rrel)
-            print("6:","self.coord_rrel    :",  self.coord_rrel)
+            print ""
+            print "0: cartesian coords: ---------------------"
+            print "1:","self.coordfile_cart:",  self.coordfile_cart
+            print "2:","self.coord_cart    :",  self.coord_cart
+            print "3:","self.cellfile      :",  self.cellfile
+            print "4:","self.cell          :",  self.cell
+            print "5:","self.coordfile_rrel:",  self.coordfile_rrel
+            print "6:","self.coord_rrel    :",  self.coord_rrel
         self.crystal = crystal_generator.crystal()
         self.crystal.load_positions_cell(coordfile_cart = self.coordfile_cart, coord_cart = self.coord_cart,
             cellfile = self.cellfile, cell = self.cell,
@@ -283,11 +282,11 @@ class pot_energy_forces_class( object ):
         # here we need: self.crystal.remove_mapping_into_originalcell()
         ##############################################################################
         if self.verbose > 3:
-            print("self.crystal.rcar")
-            print(self.crystal.rcar)
-            print("")
-            print("self.crystal0.rcar")
-            print(self.crystal0.rcar)
+            print "self.crystal.rcar"
+            print self.crystal.rcar
+            print ""
+            print "self.crystal0.rcar"
+            print self.crystal0.rcar
         u = self.crystal.rcar-self.crystal0.rcar
         #print "uorig:",u
         for ind,i in enumerate(u):
@@ -298,26 +297,26 @@ class pot_energy_forces_class( object ):
             if  u[ind][2] > self.crystal.cellvec[0,0]/2.:
                 u[ind][2] = u[ind][2] - self.crystal.cellvec[0,0]
         if self.verbose > 3:
-            print("u")
-            print(u)
+            print "u"
+            print u
         self.crystal.rcar = u + self.crystal0.rcar
         self.crystal.update_rrel_from_rcar()
         self.crystal.update_xyzcar_from_rcar()
         self.crystal.update_xyzrel_from_xyzcar()
         if self.verbose > 3:
-            print("self.crystal.rcar")
-            print(self.crystal.rcar)
+            print "self.crystal.rcar"
+            print self.crystal.rcar
 
 
         if self.verbose > 1:
-            print("")
-            print("0: EqCoordsDirect: ---------------------")
-            print("1:","self.coordfile0_cart:", self.coordfile0_cart)
-            print("2:","self.coord0_cart    :", self.coord0_cart)
-            print("3:","self.cellfile       :", self.cellfile)
-            print("4:","self.cell           :", self.cell)
-            print("5:","self.coordfile0_rrel:", self.coordfile0_rrel)
-            print("6:","self.coord0_rrel    :", self.coord0_rrel)
+            print ""
+            print "0: EqCoordsDirect: ---------------------"
+            print "1:","self.coordfile0_cart:", self.coordfile0_cart
+            print "2:","self.coord0_cart    :", self.coord0_cart
+            print "3:","self.cellfile       :", self.cellfile
+            print "4:","self.cell           :", self.cell
+            print "5:","self.coordfile0_rrel:", self.coordfile0_rrel
+            print "6:","self.coord0_rrel    :", self.coord0_rrel
 
         # copy class instance to not have to load in againg every time neighbors were found
         # (when neighbors are found relative positions (and car coords) are changed)
@@ -398,16 +397,16 @@ class pot_energy_forces_class( object ):
 
         check0 = utils.remove_duplicates_of_2d_array(self.sc0.rcar)
         if check0.shape != self.sc0.rcar.shape:
-            print("shape:",check0.shape,self.sc.rcar.shape)
+            print "shape:",check0.shape,self.sc.rcar.shape
             sys.exit("there were duplicates in self.sc0.rcar")
         check = utils.remove_duplicates_of_2d_array(self.sc.rcar)
         if check0.shape != self.sc.rcar.shape:
-            print("shape:",check0.shape,self.sc.rcar.shape)
+            print "shape:",check0.shape,self.sc.rcar.shape
             sys.exit("there were duplicates in self.sc.rcar")
         if np.array_equal(self.crystal.rcar,self.sc.rcar[:self.numberofatoms]) != True:
-            print(self.crystal.rcar)
-            print("-------------")
-            print(self.sc.rcar[:self.numberofatoms])
+            print self.crystal.rcar
+            print "-------------"
+            print self.sc.rcar[:self.numberofatoms]
             sys.exit("atoms have swiched 1")
         self.sc0neverchange = copy.deepcopy(self.sc0)
         self.scneverchange = copy.deepcopy(self.sc)
@@ -474,10 +473,10 @@ class pot_energy_forces_class( object ):
                 printelements = 15
                 if len(nnlist) > printelements:
                     if self.verbose > 1:
-                        print(nnatom,"\t",len(nnlist),"\t",abstandstr,nnlist[:printelements]," ...")
+                        print nnatom,"\t",len(nnlist),"\t",abstandstr,nnlist[:printelements]," ..."
                 else:
                     if self.verbose > 1:
-                        print(nnatom,"\t",len(nnlist),"\t",abstandstr,nnlist)
+                        print nnatom,"\t",len(nnlist),"\t",abstandstr,nnlist
                 if type(copy_of_sc0_instance) != bool:  # if we do have a supercell
                     self._info_nnlist_sc[nnatom-1] = int(nnatom)
                     self._info_nnatoms_sc[nnatom-1] = int(len(nnlist))
@@ -485,15 +484,15 @@ class pot_energy_forces_class( object ):
                     self._info_nnlist_pc[nnatom-1] = int(nnatom)
                     self._info_nnatoms_pc[nnatom-1] = int(len(nnlist))
             if self.verbose > 1:
-                print("-------------------"*4)
+                print "-------------------"*4
 
         if self.verbose > 1:
-            print("")
-            print("-------------------"*4)
-            print("NNabst:",NNabst,NNabstsmall)
-            print("len(NNabst):",len(NNabst))
-            print("NN     atoms       distance atomindex")
-            print("-------------------"*4)
+            print ""
+            print "-------------------"*4
+            print "NNabst:",NNabst,NNabstsmall
+            print "len(NNabst):",len(NNabst)
+            print "NN     atoms       distance atomindex"
+            print "-------------------"*4
 
             # zeige alle moeglichen NN in dieser zelle && welche schalen sind voll drin in sc?
             # 6 in der 2x2x2fcc superzelle
@@ -589,11 +588,11 @@ class pot_energy_forces_class( object ):
 
         with printoptions(precision=3, suppress=True):
             for shell in self.shells:
-                print("lon"+str(shell),utils.string_add_spaces(eval("self.params.u"+str(shell)+"nn_pottype"),4,False),utils.string_to_list(eval("self.params.u"+str(shell)+"nn_potparam")))
+                print "lon"+str(shell),utils.string_add_spaces(eval("self.params.u"+str(shell)+"nn_pottype"),4,False),utils.string_to_list(eval("self.params.u"+str(shell)+"nn_potparam"))
                 for xyz in [ 'x', 'y', 'z' ]:
                     try:
                         if type(eval("self.params.u1nn_top"+xyz)) != bool:
-                            print("top"+xyz+":",utils.string_add_spaces(eval("self.params.u1nn_top"+xyz),4,False))
+                            print "top"+xyz+":",utils.string_add_spaces(eval("self.params.u1nn_top"+xyz),4,False)
                     except AttributeError:
                         pass
 
@@ -609,13 +608,13 @@ class pot_energy_forces_class( object ):
     def print_energies(self):
         rou=4
         #print "energy / energy (mev):",round(energy,rou),"\t",round(energy*1000/(numberofatoms-1),rou)
-        print(2*"---------------------------------------------------------------------------")
+        print 2*"---------------------------------------------------------------------------"
         #print "energylong           :",round(np.sum(energylong)/2.,rou)    ,"\t",round(np.sum(energylong)/2.*1000/(numberofatoms-1)           ,rou)
         #print "energytrantopx       :",round(np.sum(energytrantopx)/2.,rou),"\t",round(np.sum(energytrantopx)/2.*1000/(numberofatoms-1)       ,rou)
         #print "energytrantopy       :",round(np.sum(energytrantopy)/2.,rou),"\t",round(np.sum(energytrantopy)/2.*1000/(numberofatoms-1)       ,rou)
         #print "energytrantopz       :",round(np.sum(energytrantopz)/2.,rou),"\t",round(np.sum(energytrantopz)/2.*1000/(numberofatoms-1)       ,rou)
         #print "hrestev/hrestmev     :",round(hrestev,rou),"\t",round(hrestmev,rou)
-        print(utils.printred("ENERGY (mev/atom):"+\
+        print utils.printred("ENERGY (mev/atom):"+\
                 str(round(self.energymev,rou))),\
                 \
                 utils.printgreen(
@@ -634,7 +633,7 @@ class pot_energy_forces_class( object ):
                 str(round(self.energymevtipx    ,rou))+" "+\
                 str(round(self.energymevtipy    ,rou))+" "+\
                 str(round(self.energymevtipz    ,rou))+" ",\
-                ))#,\
+                )#,\
                 #\
                 #utils.printyellow(
                 #"tip{x,y,z}:",\
@@ -643,11 +642,11 @@ class pot_energy_forces_class( object ):
                 #round(np.sum(energytrantipz)/2.*1000/(numberofatoms-1)       ,rou)\
                 #)
         if os.path.isfile("ene_free_last") == True:
-            print("noa:",self.numberofatoms)
+            print "noa:",self.numberofatoms
             self.energy_DFT = np.loadtxt("ene_free_last")*1000/(self.numberofatoms-1)
-            print("DFT:",self.energy_DFT)
-        print(utils.printred("ENERGY (DFT/atom):"))
-        print(2*"---------------------------------------------------------------------------")
+            print "DFT:",self.energy_DFT
+        print utils.printred("ENERGY (DFT/atom):")
+        print 2*"---------------------------------------------------------------------------"
         return
 
     def print_forces(self):
@@ -732,7 +731,7 @@ class pot_energy_forces_class( object ):
 
         if fab.shape[0] != self.numberofatoms:
             printforces[:] = np.nan
-            print("wrong OUTCAR (nuber of atoms not correct")
+            print "wrong OUTCAR (nuber of atoms not correct"
 
         ###################################################################################
         # print parametrization
@@ -754,9 +753,9 @@ class pot_energy_forces_class( object ):
 
         # print heading:
         #  lon:                   |tox:                   |tix:                   |SUM:                   |NUMAT: VASP:                   |SHELL: |DIFF:                  |pos:
-        print(b)
-        print(a)
-        print(b)
+        print b
+        print a
+        print b
 
         def printfield(printforces,start,stop,color):
             #print "start:",start,"stop:",stop,"shape:",printforces[printforces[:,16].argsort()].shape
@@ -775,7 +774,7 @@ class pot_energy_forces_class( object ):
         print_shells = self.shells
         if self.ss != False:
             print_shells = np.arange(0,self.ss)
-        print("print_shells:", self.ss,print_shells)
+        print "print_shells:", self.ss,print_shells
         for shell in print_shells:
             colorshell = [ 'yellow', 'red', 'blue', 'green', 'yellow' ]
             #print utils.printred("hallo")
@@ -794,10 +793,10 @@ class pot_energy_forces_class( object ):
             potaddparams_write = self.u_potaddparam
             if self.u_potadd == 'spline':
                 potaddparams_write = self.u_potaddparam.get_coeffs()[[0,-1]]
-            print("---------------------------------------------------------------")
-            print(utils.printred("++INDI"),utils.printred(utils.number_to_string_of_certain_length(self.indi,0,3)),\
+            print "---------------------------------------------------------------"
+            print utils.printred("++INDI"),utils.printred(utils.number_to_string_of_certain_length(self.indi,0,3)),\
             utils.printred("  shell:"),utils.printred(self.shell),"pottype:",utils.string_add_spaces(self.u_pottype,4,False),\
-            utils.printgreen("nndist:"),utils.printgreen(utils.number_to_string_of_certain_length(self.nndisteq,5,7)))#,\
+            utils.printgreen("nndist:"),utils.printgreen(utils.number_to_string_of_certain_length(self.nndisteq,5,7))#,\
             #" params:",self.u_potparam," potadd:",self.u_potadd," potaddparams:",potaddparams_write
         return
 
@@ -826,14 +825,14 @@ class pot_energy_forces_class( object ):
             #    self.flong,"flongadd:",self.flongadd
 
             if (abs(self.elong) > 1e-6 and self.verbose == 3) or self.verbose == 4:
-                print('>>indi',utils.printyellow(utils.number_to_string_of_certain_length(self.indi,0,3)),\
+                print '>>indi',utils.printyellow(utils.number_to_string_of_certain_length(self.indi,0,3)),\
                 "  shell:",self.shell,'indj',utils.printpink(utils.string_add_spaces(self.indj,3)),\
                 "|lon("+utils.string_add_spaces(self._u_pottype_curr,4)+")|:",\
                 utils.printgreen(utils.number_to_string_of_certain_length(self.longvecnorm,5,7)),\
                 utils.printblue("ene:"),\
                 utils.printblue(ene_print),utils.printblue(eneadd_print),\
                 "posj:",self.posj,"flong:",\
-                self.flong,"flongadd:",self.flongadd)
+                self.flong,"flongadd:",self.flongadd
         return
 
     def save_information_of_run_initialize(self):
@@ -961,36 +960,36 @@ class pot_energy_forces_class( object ):
     def check_forces_sum(self):
         ''' checks if sum of forces is 0 '''
         def fehlermelungforces(tol=None):
-            print("tolerance:",str(tol))
-            print("sum:",np.sum(self.forces))
-            print("sum forceslong:",np.sum(self.forceslong))
-            print("sum forcestrantopx:",np.sum(self.forcestrantopx))
-            print("sum forcestrantopy:",np.sum(self.forcestrantopy))
-            print("sum forcestrantopz:",np.sum(self.forcestrantopz))
-            print("sum forcestrantipx:",np.sum(self.forcestrantipx))
-            print("sum forcestrantipy:",np.sum(self.forcestrantipy))
-            print("topx:",np.sum(self.forcestrantopxcheck))
-            print("topy:",np.sum(self.forcestrantopycheck))
-            print("topz:",np.sum(self.forcestrantopzcheck))
-            print("tipx:",np.sum(self.forcestrantipxcheck))
-            print("tipy:",np.sum(self.forcestrantipycheck))
-            print("tipz:",np.sum(self.forcestrantipzcheck))
+            print "tolerance:",str(tol)
+            print "sum:",np.sum(self.forces)
+            print "sum forceslong:",np.sum(self.forceslong)
+            print "sum forcestrantopx:",np.sum(self.forcestrantopx)
+            print "sum forcestrantopy:",np.sum(self.forcestrantopy)
+            print "sum forcestrantopz:",np.sum(self.forcestrantopz)
+            print "sum forcestrantipx:",np.sum(self.forcestrantipx)
+            print "sum forcestrantipy:",np.sum(self.forcestrantipy)
+            print "topx:",np.sum(self.forcestrantopxcheck)
+            print "topy:",np.sum(self.forcestrantopycheck)
+            print "topz:",np.sum(self.forcestrantopzcheck)
+            print "tipx:",np.sum(self.forcestrantipxcheck)
+            print "tipy:",np.sum(self.forcestrantipycheck)
+            print "tipz:",np.sum(self.forcestrantipzcheck)
             for idxftix,ftix in enumerate(self.forcestrantipxcheck):
                 if np.sum(ftix) != 0.0:
-                    print("idxftix:",idxftix,np.sum(ftix))
-                    print(ftix)
+                    print "idxftix:",idxftix,np.sum(ftix)
+                    print ftix
             sys.exit("sum of forces is not 0")
 
         def fehlermelungenergy():
-            print("self.energylong:",self.energylong,    " sum:",np.sum(self.energylong),     " meV:",self.energymevlong," meV/2:",self.energymevlong/2.)
-            print("self.energytopx:",self.energytrantopx," sum:",np.sum(self.energytrantopx), " meV:",self.energymevtopx," meV/2:",self.energymevtopx/2.)
-            print("self.energytopy:",self.energytrantopy," sum:",np.sum(self.energytrantopy), " meV:",self.energymevtopy," meV/2:",self.energymevtopy/2.)
-            print("self.energytopz:",self.energytrantopz," sum:",np.sum(self.energytrantopz), " meV:",self.energymevtopz," meV/2:",self.energymevtopz/2.)
-            print("self.energytipx:",self.energytrantipx," sum:",np.sum(self.energytrantipx), " meV:",self.energymevtipx," meV/2:",self.energymevtipx/2.)
-            print("self.energytipy:",self.energytrantipy," sum:",np.sum(self.energytrantipy), " meV:",self.energymevtipy," meV/2:",self.energymevtipy/2.)
-            print("self.energytipz:",self.energytrantipz," sum:",np.sum(self.energytrantipz), " meV:",self.energymevtipz," meV/2:",self.energymevtipz/2.)
-            print("-----------------------------------------------------------------------")
-            print("SUM (mev) (all/2):",np.sum(self.energymevlong)/2,"+",np.sum(self.energymevtopx)/2.,"+",np.sum(self.energymevtopy)/2.,"+ ... =",self.energymev)
+            print "self.energylong:",self.energylong,    " sum:",np.sum(self.energylong),     " meV:",self.energymevlong," meV/2:",self.energymevlong/2.
+            print "self.energytopx:",self.energytrantopx," sum:",np.sum(self.energytrantopx), " meV:",self.energymevtopx," meV/2:",self.energymevtopx/2.
+            print "self.energytopy:",self.energytrantopy," sum:",np.sum(self.energytrantopy), " meV:",self.energymevtopy," meV/2:",self.energymevtopy/2.
+            print "self.energytopz:",self.energytrantopz," sum:",np.sum(self.energytrantopz), " meV:",self.energymevtopz," meV/2:",self.energymevtopz/2.
+            print "self.energytipx:",self.energytrantipx," sum:",np.sum(self.energytrantipx), " meV:",self.energymevtipx," meV/2:",self.energymevtipx/2.
+            print "self.energytipy:",self.energytrantipy," sum:",np.sum(self.energytrantipy), " meV:",self.energymevtipy," meV/2:",self.energymevtipy/2.
+            print "self.energytipz:",self.energytrantipz," sum:",np.sum(self.energytrantipz), " meV:",self.energymevtipz," meV/2:",self.energymevtipz/2.
+            print "-----------------------------------------------------------------------"
+            print "SUM (mev) (all/2):",np.sum(self.energymevlong)/2,"+",np.sum(self.energymevtopx)/2.,"+",np.sum(self.energymevtopy)/2.,"+ ... =",self.energymev
             #self.energymevlong = np.sum(self.energylong)    /2.*1000/(self.numberofatoms-1)
             #self.energymevtopx = np.sum(self.energytrantopx)/2.*1000/(self.numberofatoms-1)
             #self.energymevtopy = np.sum(self.energytrantopy)/2.*1000/(self.numberofatoms-1)
@@ -1022,31 +1021,31 @@ class pot_energy_forces_class( object ):
 
         tolerance = 0.0001
         if abs(np.sum(self.forceslong)) >= tolerance:
-            print("fehler,forceslong",abs(np.sum(self.forceslong)))
+            print "fehler,forceslong",abs(np.sum(self.forceslong))
             fehlermelungforces(tolerance)
         if abs(np.sum(self.forces)) >= tolerance:
-            print("fehler,forces")
+            print "fehler,forces"
             fehlermelungforces(tolerance)
 
 
         if abs(np.sum(self.forcestrantopx)) >= tolerance:
-            print("fehler,forcestrantopx")
+            print "fehler,forcestrantopx"
             fehlermelungforces(tolerance)
         if abs(np.sum(self.forcestrantopy)+np.sum(self.forcestrantopz)) >= 0.000001:
-            print("fehler,forcestrantop{y,z}",abs(np.sum(self.forcestrantopx)-np.sum(self.forcestrantopy)))
+            print "fehler,forcestrantop{y,z}",abs(np.sum(self.forcestrantopx)-np.sum(self.forcestrantopy))
             fehlermelungforces(tolerance)
 
         if abs(np.sum(self.forcestrantipx)) >= tolerance:
-            print("fehler,forcestrantipx")
+            print "fehler,forcestrantipx"
             fehlermelungforces(tolerance)
         if abs(np.sum(self.forcestrantipy)) >= tolerance:
-            print("fehler,forcestrantipy")
+            print "fehler,forcestrantipy"
             fehlermelungforces(tolerance)
 
 
 
         if self.energy < -1.0:
-            print("energy:",self.energy,"in meV:",self.energymev)
+            print "energy:",self.energy,"in meV:",self.energymev
             self.print_forces()
             fehlermelungenergy()
             sys.exit("Potential energy is negative! (probably there is a jump / change of poitions from equilibrium structure)")
@@ -1138,7 +1137,7 @@ class pot_energy_forces_class( object ):
 
             #def load_qubus_npz(filename):
                 folder = self.u_qubus
-                print(utils.printred("loading "+folder+"qubus.F.npz"))
+                print utils.printred("loading "+folder+"qubus.F.npz")
                 var = np.load(folder+'qubus.F.npz')
                 self.x = var['x']
                 self.y = var['y']
@@ -1158,7 +1157,7 @@ class pot_energy_forces_class( object ):
                 self.Ey = var['Ey']
                 self.Ez = var['Ez']
 
-                print(utils.printred("loading "+folder+"qubus.fml.npz"))
+                print utils.printred("loading "+folder+"qubus.fml.npz")
                 var = np.load(folder+'qubus.fml.npz')
                 self.fmlx = var['fmlx']
                 self.fmly = var['fmly']
@@ -1304,11 +1303,11 @@ class pot_energy_forces_class( object ):
     def determine_shells(self):
         ''' determine over which shells of nearest neighbours to loop '''
         self.shells = [1]
-        checkshells = list(range(2,6))  # check up to 5th shell
+        checkshells = range(2,6)  # check up to 5th shell
         for i in checkshells:
             try:
                 if type(eval("self.params.u"+str(i)+"nn_potparam")) != bool:
-                    self.shells = list(range(1,i+1)) # range(1,3) = [1,2]
+                    self.shells = range(1,i+1) # range(1,3) = [1,2]
             except AttributeError:
                 return self.shells
         return self.shells
@@ -1386,8 +1385,8 @@ class pot_energy_forces_class( object ):
             #print vecd,"eq,fq:",eq,fq,"fvec:",fvec
             if self.verbose > 2:
                 if abs(np.linalg.norm(self.Fq)) > 0.0000000001:
-                    print("")
-                    print("        ",utils.printpink(self.indj),"|||||",self.vec0,self.longvec,"============> Fq:",self.Fq,"Eq:",utils.printblue(self.Eq))
+                    print ""
+                    print "        ",utils.printpink(self.indj),"|||||",self.vec0,self.longvec,"============> Fq:",self.Fq,"Eq:",utils.printblue(self.Eq)
         #if self.shell == 2 or self.shell == 3:
         #    self.elong = self.elong/2.
         #    self.elongadd = self.elongadd/2.
@@ -1416,10 +1415,10 @@ class pot_energy_forces_class( object ):
         if type(params) == bool:
             return 0.0,np.array([0.0,0.0,0.0])
         if type(pot) == bool:
-            print("pot:",pot)
-            print("self.indi:",self.indi)
-            print("self.indj:",self.indj)
-            print("self.shell:",self.shell,"self.nndisteq:",self.nndisteq)
+            print "pot:",pot
+            print "self.indi:",self.indi
+            print "self.indj:",self.indj
+            print "self.shell:",self.shell,"self.nndisteq:",self.nndisteq
             sys.exit(" you have to define the pot as m, mc1, poly, ...")
         if vecnorm == False:
             vecnorm=np.linalg.norm(vec)
@@ -1496,7 +1495,7 @@ class pot_energy_forces_class( object ):
             #print "4,e,f:",e,f
             return e,f
         if function == None:
-            print("pot:",pot,type(pot))
+            print "pot:",pot,type(pot)
             sys.exit("pot not recognized")
         #e =    function(longvecnorm,*params)
         #f = functionder(longvecnorm,*params)
@@ -1948,29 +1947,29 @@ class pot_energy_forces_class( object ):
         new_i = lvalues_n.index(max(lvalues_n))
 
         def printinfo():
-            print("-------------------------------------ERROR--------------------------------------------------------------")
-            print(contr+str(self.shell)+": L0:",self.vec0_curr,"L!:",self.longvec,"||",vec_to_ti_normalized_corr_direction,"topnew_norm:",t11_norm,"---> oldF:",forces_to_ti,"newF_a:",forces_to_ti_orthbasis_a,"_b:",forces_to_ti_orthbasis_b)
-            print("-------------------------------------ERROR--------------------------------------------------------------")
-            print("old:",forces_to_ti)
-            print("new:",forces_to_ti_orthbasis_a)
-            print("-----------------------------------")
-            print("old_i:",old_i,"new_i:",new_i)
-            print("-----old---------------------------")
-            print(forces_to_ti[0])
-            print(forces_to_ti[1])
-            print(forces_to_ti[2])
-            print("-----new a-------------------------")
-            print(forces_to_ti_orthbasis_a[0])
-            print(forces_to_ti_orthbasis_a[1])
-            print(forces_to_ti_orthbasis_a[2])
-            print("-----new b-------------------------")
-            print(forces_to_ti_orthbasis_b[0])
-            print(forces_to_ti_orthbasis_b[1])
-            print(forces_to_ti_orthbasis_b[2])
-            print("---- ratio a-----------------------")
-            print(forces_to_ti[old_i]/forces_to_ti_orthbasis_a[new_i])
-            print(('greatest indizes (value positions) in ols and new basis differ:'+str(forces_to_ti)+"  new:"+str(forces_to_ti_orthbasis_a)))
-            print("--------------------------------------------------------------------------------------------------------")
+            print "-------------------------------------ERROR--------------------------------------------------------------"
+            print contr+str(self.shell)+": L0:",self.vec0_curr,"L!:",self.longvec,"||",vec_to_ti_normalized_corr_direction,"topnew_norm:",t11_norm,"---> oldF:",forces_to_ti,"newF_a:",forces_to_ti_orthbasis_a,"_b:",forces_to_ti_orthbasis_b
+            print "-------------------------------------ERROR--------------------------------------------------------------"
+            print "old:",forces_to_ti
+            print "new:",forces_to_ti_orthbasis_a
+            print "-----------------------------------"
+            print "old_i:",old_i,"new_i:",new_i
+            print "-----old---------------------------"
+            print forces_to_ti[0]
+            print forces_to_ti[1]
+            print forces_to_ti[2]
+            print "-----new a-------------------------"
+            print forces_to_ti_orthbasis_a[0]
+            print forces_to_ti_orthbasis_a[1]
+            print forces_to_ti_orthbasis_a[2]
+            print "-----new b-------------------------"
+            print forces_to_ti_orthbasis_b[0]
+            print forces_to_ti_orthbasis_b[1]
+            print forces_to_ti_orthbasis_b[2]
+            print "---- ratio a-----------------------"
+            print forces_to_ti[old_i]/forces_to_ti_orthbasis_a[new_i]
+            print('greatest indizes (value positions) in ols and new basis differ:'+str(forces_to_ti)+"  new:"+str(forces_to_ti_orthbasis_a))
+            print "--------------------------------------------------------------------------------------------------------"
             return
 
         #############################################################
@@ -2013,7 +2012,7 @@ class pot_energy_forces_class( object ):
 
         if False: # and self.shell == 2:
             #print "pot:",pot,"potparam:",potparam
-            print(contr+str(self.shell)+": L0:",self.vec0_curr,"L!:",self.longvec,"||",vec_to_ti_normalized_corr_direction,"topnew_norm:",t11_norm,"---> oldF:",forces_to_ti,"newF_a:",forces_to_ti_orthbasis_a,"_b:",forces_to_ti_orthbasis_b,aaa,bbb)
+            print contr+str(self.shell)+": L0:",self.vec0_curr,"L!:",self.longvec,"||",vec_to_ti_normalized_corr_direction,"topnew_norm:",t11_norm,"---> oldF:",forces_to_ti,"newF_a:",forces_to_ti_orthbasis_a,"_b:",forces_to_ti_orthbasis_b,aaa,bbb
 
         if contr == 'to':
             #print "forces_ti:",forces_ti
@@ -2056,7 +2055,7 @@ class pot_energy_forces_class( object ):
     def loop_over_atoms(self):
         ''' outer loop over atoms '''
         if self.verbose > 1:
-            print("self.shells:",self.shells)
+            print "self.shells:",self.shells
 
         ##################################################################################
         # loop over all atoms in the original cell == self.positions (not the created supercell)
@@ -2172,24 +2171,24 @@ class pot_energy_forces_class( object ):
         ''' cell, ... '''
         if os.path.isfile("cell") != True:
             if os.path.isfile("OUTCAR") == True or os.path.isfile("OUTCAR.gz") == True:
-                print("cell")
+                print "cell"
                 utils.run2("OUTCAR_cell-last-cartesian-ARRAY.sh > cell")
         if os.path.isfile("dUdL") != True:
             if os.path.isfile("forces_OUTCAR") != True:
                 if os.path.isfile("OUTCAR") == True or os.path.isfile("OUTCAR.gz") == True:
-                    print("forces_OUTCAR")
+                    print "forces_OUTCAR"
                     utils.run2("rm -f forces_OUTCAR; OUTCAR_forces-last-ARRAY.sh > forces_OUTCAR")
             if os.path.isfile("cartesian_coords") != True:
                 if os.path.isfile("OUTCAR") == True or os.path.isfile("OUTCAR.gz") == True:
-                    print("cartesian_coords")
+                    print "cartesian_coords"
                     utils.run2("rm -f cartesian_coords; OUTCAR_positions-last-ARRAY.sh > cartesian_coords")
         if os.path.isfile("dUdL") == True:
             if os.path.isfile("POSITIONs") != True:
                 if os.path.isfile("OUTCAR") == True or os.path.isfile("OUTCAR.gz") == True:
-                    print("POSITIONs")
+                    print "POSITIONs"
                     utils.run2("extractPOSITIONS.sh")
         if os.path.isfile("EqCoords_direct") != True:
-            print("EqCoords_direct")
+            print "EqCoords_direct"
             if os.path.isfile("../EqCoords_direct") == True:
                 eq = np.loadtxt("../EqCoords_direct")
                 if eq.shape[0] == self.numberofatoms:
@@ -2197,7 +2196,7 @@ class pot_energy_forces_class( object ):
         if os.path.isfile("EqCoords_direct_") == True:
             atoms = np.loadtxt("EqCoords_direct_").shape[0]
         if os.path.isfile("EqCoords_direct") != True:
-            print(utils.printred("EqCoords_direct still missing ...."))
+            print utils.printred("EqCoords_direct still missing ....")
             sys.exit()
 
             checkfor = False
@@ -2225,8 +2224,8 @@ class pot_energy_forces_class( object ):
             except ValueError:
                 sys.exit("cartesian coords file corrupt; check for XXCAR")
             if check0.shape != check1.shape:
-                print("check0:",check0)
-                print("check1:",check1)
+                print "check0:",check0
+                print "check1:",check1
                 sys.exit("check0.shape != check1.shape")
         return
 
@@ -2234,7 +2233,7 @@ class pot_energy_forces_class( object ):
         ''' returnes from POITIONs file (pos) the only coordinates of a certain given step '''
         if type(schritte) == np.ndarray:
             for i in schritte:
-                print(pos[atoms*schritte:atoms*schritte+atoms])
+                print pos[atoms*schritte:atoms*schritte+atoms]
         return pos[atoms*schritte:atoms*schritte+atoms]
 
 
@@ -2281,9 +2280,9 @@ class pot_energy_forces_class( object ):
         schritte_dudl = listdudl.shape[0]+1
 
         atoms = eqpos_rrel.shape[0]
-        print("atoms:",atoms)
+        print "atoms:",atoms
         schritte = pos.shape[0]/atoms
-        print("schritte:",schritte)
+        print "schritte:",schritte
         out = np.zeros((schritte,atoms))
 
         fhar_vs_steps = False
@@ -2313,7 +2312,7 @@ class pot_energy_forces_class( object ):
         self.longvecnorm_all_min_vs_steps = [ False for i in np.arange(len(self.shells)+1) ]
 
         #schritte = 200
-        print("steps_up_to:",self.steps_up_to,type(self.steps_up_to))
+        print "steps_up_to:",self.steps_up_to,type(self.steps_up_to)
         if type(self.steps_up_to) != bool:
             schritte = self.steps_up_to
 
@@ -2336,7 +2335,7 @@ class pot_energy_forces_class( object ):
             posforceaktuell = self.getpos_from_POSITIONs(i,pos,atoms)
             posaktuell = posforceaktuell[:,:3]  # those are the positions generated by the run
             fDFT = posforceaktuell[:,3:]
-            print("CURRENT:",os.getcwd())
+            print "CURRENT:",os.getcwd()
             #old
             #self.df.loc[i] = [ np.nan in range(self.df.shape[1]-1) ]
             #self.df.loc[i] = [False]*(self.df.shape[1]-1)
@@ -2368,9 +2367,9 @@ class pot_energy_forces_class( object ):
             #kb = np.concatenate((ka,self._info_tveclonallanglevsnorm),axis=0)
             #np.savetxt("a_vs_b.dat",kb)
             if type(self._info_lonvec_all) != bool:
-                print("self._info_lonvec_all.shape",self._info_lonvec_all.shape)
+                print "self._info_lonvec_all.shape",self._info_lonvec_all.shape
             else:
-                print("self._info_lonvec_all.shape",type(self._info_lonvec_all))
+                print "self._info_lonvec_all.shape",type(self._info_lonvec_all)
             #print '^^^^^^^^^^^^^^^^^^^^^^^^^^^'
             #print self._info_tvecoutall
             #print '^^^^^^^^^^^^^^^^^^^^^^^^^^^'
@@ -2410,7 +2409,7 @@ class pot_energy_forces_class( object ):
                 fhar_vs_steps = utils.append_row_to_2d_array(fhar_vs_steps, np.insert(fHAR.flatten(),0,i).flatten())
             energymev = self.energy*1000/(atoms-1)
             eNEW = self.energymev
-            print("listdudl.shape:",listdudl.shape,"i:",i,"enemevtot:",self.energymev,"enemevlon:",energymevlong,"enemevto:",energymevtopx)
+            print "listdudl.shape:",listdudl.shape,"i:",i,"enemevtot:",self.energymev,"enemevlon:",energymevlong,"enemevto:",energymevtopx
             self.df.loc[i]['uref'] = self.energymev
             if self.write_everything_to_pkl == True:
                 self.df.loc[i]['fref'] = self.forces
@@ -2437,9 +2436,9 @@ class pot_energy_forces_class( object ):
             else:
                 self.df.loc[i]['dudlhar'] = 0
 
-            print(utils.printred(">>>>>>"*4+" DOS_POSITIONS_auswerten.py "+"<<<<<<"*4))
-            print(utils.printred(">>>>>>>",i,"energymev:",energymev,"eDFT:",eDFT))  #,"eREF:",eREF)
-            print(utils.printred(">>>>>>"*4+" DOS_POSITIONS_auswerten.py "+"<<<<<<"*4))
+            print utils.printred(">>>>>>"*4+" DOS_POSITIONS_auswerten.py "+"<<<<<<"*4)
+            print utils.printred(">>>>>>>",i,"energymev:",energymev,"eDFT:",eDFT)  #,"eREF:",eREF)
+            print utils.printred(">>>>>>"*4+" DOS_POSITIONS_auswerten.py "+"<<<<<<"*4)
             listdudlnew[i-1][5] = energymev
             listdudlnew[i-1][6] = eDFT - energymev
             listdudlnew[i-1][7] = 0 #listdudlnew[:,6].mean()
@@ -2525,13 +2524,13 @@ class pot_energy_forces_class( object ):
                     np.savetxt("fref_vs_steps",fref_vs_steps,fmt="%.6f")
                     #np.savetxt("fref_vs_steps",fref_vs_steps,fmt="%.6f")
                     ka = fdft_vs_steps[:,1:].flatten()
-                    print("shape.ka:",ka.shape)
+                    print "shape.ka:",ka.shape
                     if ka.shape[0] == 0:
-                        print("YOU HAVE TO DO AN extractPOSITIONs.sh to get forces in POSITIONS file")
+                        print "YOU HAVE TO DO AN extractPOSITIONs.sh to get forces in POSITIONS file"
                     kb = fref_vs_steps[:,1:].flatten()
                     #print "shape.kb:",kb.shape
                     fref_vs_fdft = np.zeros((ka.shape[0],2))
-                    print("shape.kb:",kb.shape)
+                    print "shape.kb:",kb.shape
                     fref_vs_fdft[:,0] = ka
                     fref_vs_fdft[:,1] = kb
                     np.savetxt("fref_vs_fdft.dat",fref_vs_fdft,fmt="%.6f %.6f")
@@ -2570,7 +2569,7 @@ class pot_energy_forces_class( object ):
         else:
             dudlpkl = dudlpkl
         if verbose == True:
-            print("dudlpkl:",dudlpkl)
+            print "dudlpkl:",dudlpkl
         if os.path.isfile(dudlpkl) == True:
             df = pd.read_pickle(dudlpkl)
             if df.shape[0] > 3:
@@ -2581,13 +2580,13 @@ class pot_energy_forces_class( object ):
         if getdos:
             # to get the pot we need the element
             element = utils.run2("OUTCAR_elements.sh").rstrip()
-            print("element:",element)
+            print "element:",element
             import my_atom
             import getDOS
-            importlib.reload(getDOS)
+            reload(getDOS)
             import pot_parametrize
             self.element = my_atom.atom([element])
-            print("self.element:",self.element)
+            print "self.element:",self.element
             #self.df.loc[:,['lonvecnormmean1','dudlhar']].plot(x='lonvecnormmean1',y='dudlhar',style='.')
             #np.savetxt("uval",self.df.u.values[1:])
             #np.savetxt("urefharval",self.df.urefhar.values[1:])
@@ -2652,7 +2651,7 @@ class pot_energy_forces_class( object ):
             else:
                 sys.exit("harmdudl ../dUdL_harmonic.pkl not found")
             self.dfharm = copy.copy(self.df)
-            print(utils.printgreen("found harmonic "+str(harmdudl)+" file"))
+            print utils.printgreen("found harmonic "+str(harmdudl)+" file")
 
 
 
@@ -2661,7 +2660,7 @@ class pot_energy_forces_class( object ):
         minimum = [0,0,0,0, 1000000000000000000000000000000000000]
         for i in dudlpkls_all:
             #print ""
-            print("I:",i)
+            print "I:",i
             self.eval_dudl_pkl(dudlpkl = i)
             if whichplot == 'ene_dos':
                 plt.plot(self.udos[:,0],self.udos[:,1],'r-')
@@ -2675,7 +2674,7 @@ class pot_energy_forces_class( object ):
 
             if whichplot == 'std_conv': # used for ip
                 for a in as_:
-                    print("a:",a,"minimum:",minimum)
+                    print "a:",a,"minimum:",minimum
                     for b in bs_:
                         aip = self.df.uref*a
                         bhar = self.dfharm.uhar[:self.df.uref.shape[0]]*b    # due to definition in dario alfes paper
@@ -2697,7 +2696,7 @@ class pot_energy_forces_class( object ):
                         plt.plot(self.dudlref_std[:,0],self.dudlref_std[:,1],label='ref '+i)
                         plt.xlabel("steps")
                         plt.ylabel("< dUdL.std > (meV/atom)")
-                print("minimum:",minimum)
+                print "minimum:",minimum
             if whichplot == 'dudl_conv':
                 plt.plot(self.dudlhar_mean[:,0],self.dudlhar_mean[:,1],'k-',label='harmonic')
                 plt.plot(self.dudlref_mean[:,0],self.dudlref_mean[:,1],'r-',label='harmonic')
@@ -2734,10 +2733,10 @@ class pot_energy_forces_class( object ):
                 plt.ion()
 
         if whichplot != 'std_conv_plot':
-            print("")
+            print ""
             v1 = np.unique(pot.ip[:,2])
             for a in v1:
-                print("a:",a)
+                print "a:",a
                 data = self.ip[np.nonzero(self.ip[:,2] == a)][:,3:]
                 np.savetxt("auswertung_"+str(a),data)
         return
@@ -2774,7 +2773,7 @@ class pot_energy_forces_class( object ):
         bis = 0.013
         self.alv01 = self.al[np.nonzero((self.al[:,2] > von) & (self.al[:,2] < bis))]
         from math import atan2
-        print(self.alv01[:,[0,1]])
+        print self.alv01[:,[0,1]]
         self.alv01[:,[0,1]].sort(key=lambda c:atan2(c[0], c[1]))
         np.savetxt(filename+"__"+str(von)+"_"+str(bis),self.alv01[:,[0,1]])
 
@@ -2833,7 +2832,7 @@ class pot_energy_forces_class( object ):
 
         if self.steps_up_to != False:
             self.steps_up_to = int(self.steps_up_to)
-        print("self.pkl:",self.dudlpkl)
+        print "self.pkl:",self.dudlpkl
 
         if args.auswertung_lonvec_all:
             self.auswertung_lonvec_all()
@@ -2852,7 +2851,7 @@ class pot_energy_forces_class( object ):
             sys.exit()
 
         if args.p:
-            print("args.p:",args.p)
+            print "args.p:",args.p
             self.plot_dudl_pkl(args.p)
             sys.exit()
 

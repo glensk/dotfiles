@@ -90,12 +90,12 @@ ControlPath ~/.ssh/control:%h:%p:%r
 # ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub glensk@fidis.epfl.ch
+# normales pw mit zwei sternen
 Host fidis
  HostName fidis.epfl.ch
  User glensk
  ForwardX11 Yes
  #ForwardX11Timeout 596h
-
  #IdentitiFile ~/.ssh/fidis_rsa
 
 Host helvetios
@@ -110,9 +110,9 @@ Host cosmopc pc
  ForwardX11 Yes
 
 # ssh-copy-id -i ~/.ssh/id_rsa.pub aglensk@ela.cscs.ch (normal zwei ohne sterne 1234)
-# can go to ela from mac (without pw)
-# can go to ela from fidis (without pw)
-# can go to ela from cosmopc (without pw)
+# can go to mac->ela (without pw)
+# can go to fidis->ela (without pw)
+# can go to cosmopc->ela (without pw)
 # pw:  (normal zwei ohne sterne 1234)
 Host ela
  HostName ela.cscs.ch

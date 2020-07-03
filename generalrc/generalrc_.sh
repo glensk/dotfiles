@@ -106,9 +106,15 @@ case $myhost in
 #    # mac)       source $HOME/miniconda2/etc/profile.d/conda.sh && conda activate; ;;
 #    # on mac: 
 #    # https://opensource.com/article/19/5/python-3-default-mac
+#    # https://www.alfredo.motta.name/create-isolated-jupyter-ipython-kernels-with-pyenv-and-virtualenv/#easy-footnote-bottom-3-1172
+#    # brew update
 #    # brew install pyenv
 #    # pyenv install 3.7.5
 #    # pyenv global 3.7.5
+#    # pip install virtualenv
+#    # pip install virtualenvwrapper
+#    # brew install pyenv
+#    # brew install pyenv-virtualenv
 #    # when pip -V made problems after : pip install --upgrade --user pip
 #    # it was however suggested to run : pip install --upgrade pip (without user)
 #    # solved by python -m pip uninstall pip
@@ -148,7 +154,10 @@ case $myhost in
 esac
     # This would give me python 3 by default, quickly; uncomment it to get python2 by default
     if [ "`command -v pyenv`" != "" ]; then 
-        eval "$(pyenv init -)"   # this loads python 3.7.5
+        # on mac
+        eval "$(pyenv init -)"   # this loads python 3.7.5 on mac
+        #eval "$(pyenv virtualenv-init -)"
+        if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
     fi
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (5) : $gett CONDA"
 
