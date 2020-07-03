@@ -1,0 +1,6 @@
+fidis /scratch/glensk/2020_retrain_almgsi/tenth20
+
+a) copied input.data and input.nn in a folder (and extended input.data by some the structues of Daniel)
+b) n2p2_get_scaling_and_function_data.py -i input.data
+c) cp /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_31241/submit_auswertung_debug.sh .
+d) n2p2_create_random_seed_jobs_from_thisfolder.sh 20 
