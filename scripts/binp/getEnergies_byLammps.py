@@ -456,6 +456,7 @@ def get_energies(args):
         print('type(frames)',type(frames))
         print('len(frames)',len(frames))
         DFT_FORCES_EV_ANG = []
+        DFT_FORCES_EV_ANG_flattened = []
         DFT_ENERGIES_EV_CELL = []
         print('getting DFT data')
         for idx,i in enumerate(frames):
@@ -464,6 +465,8 @@ def get_energies(args):
                 forces_thisstruct = frames[idx].get_forces()
             except RuntimeError:
                 forces_thisstruct = False
+            #print(forces_thisstruct.flatten())
+            #sys.exit()
             DFT_FORCES_EV_ANG.append(forces_thisstruct)
             try:
                 ene_thisstruct = frames[idx].get_potential_energy()
@@ -1681,7 +1684,21 @@ def get_energies(args):
             print('std  for',std)
             print('rmse_e',rmse_e)
             np.savetxt("RMSE_FORCES.dat",np.array([rmse]),fmt='%.5f')
-            #np.savetxt("for_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
+            #print(DFT_FORCES_EV_ANG)
+            #print('hhh')
+            #print(POT_FORCES_EV_ANG)
+            #print('bbb')
+            o1 = np.concatenate(np.abs(DFT_FORCES_EV_ANG)).ravel()
+            o2 = np.concatenate(np.abs(POT_FORCES_EV_ANG)).ravel()
+            np.savetxt("for_DFT.dat",np.concatenate(np.abs(DFT_FORCES_EV_ANG)).ravel())
+            np.savetxt("for_POT.dat",np.concatenate(np.abs(POT_FORCES_EV_ANG)).ravel())
+            np.savetxt("for_diff_DFT_POT.dat",np.abs(o1-o2))
+
+            sys.exit()
+            np.savetxt("for_POT.dat",POT_FORCES_EV_ANG.flatten())
+            np.savetxt("for_DFT.dat",DFT_FORCES_EV_ANG.flatten())
+            #np.savetxt("for_POT.dat",POT_FORCES_EV_ANG[range(structures_to_calc)])
+            #np.savetxt("for_DFT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
             #np.savetxt("for_diff_DFT_POT.dat",DFT_FORCES_EV_ANG[range(structures_to_calc)])
 
         if args.write_runner:
