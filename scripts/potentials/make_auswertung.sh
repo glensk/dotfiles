@@ -20,10 +20,18 @@ for f in $ff;do
     #cd ..
     #fi
 
-    if [ ! -e "test_auswertung_dE_vs_dist/ene_diff_abs_vs_dist.npy" ];then
-    mkdir test_auswertung_dE_vs_dist
-    cd test_auswertung_dE_vs_dist
-    getEnergies_byLammps.py --units meV_pa -p .. -i ../test.data -wa -waf
+    #if [ ! -e "test_auswertung_dE_vs_dist/ene_diff_abs_vs_dist.npy" ];then
+    #mkdir test_auswertung_dE_vs_dist
+    #cd test_auswertung_dE_vs_dist
+    #getEnergies_byLammps.py --units meV_pa -p .. -i ../test.data -wa -waf
+    #cd ..
+    #fi
+    
+    
+    if [ ! -e "test_auswertung_Siconz/ene_diff_abs.npy" ];then
+    mkdir test_auswertung_Siconz
+    cd test_auswertung_Siconz
+    getEnergies_byLammps.py --units meV_pa -p .. -i ../test.data -v | tee -a out.dat
     cd ..
     fi
 
