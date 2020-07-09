@@ -1,0 +1,836 @@
+LAMMPS (18 Feb 2020)
+  using 1 OpenMP thread(s) per MPI task
+Total wall time: 0:00:00
+time0, for standardimports 4.875939339399338e-06
+time1, for myutils 1.7686747014522552e-05
+time1, for ase_calc... -1.0145828127861023e-05
+time3, after help  ... 3.0454248189926147e-06
+__main__ after p = help 1.0561197996139526e-05
+__main__ after parsing help -1.7385929822921753e-05
+########################################## argparse values (begin) #########
+# inputfile                           ../test.data         <class 'str'>   #
+# sys                                 False                <class 'bool'>  #
+# sys_ele                             False                <class 'bool'>  #
+# sys_ncell                           1                    <class 'int'>   #
+# sys_cell                            cubic                <class 'str'>   #
+# exectue_function_myutils                                 <class 'str'>   #
+# execute_function                                         <class 'str'>   #
+# format_in                           runner               <class 'str'>   #
+# remove_unknown_elements_from_structures False                <class 'bool'>  #
+# potpath                             ..                   <class 'str'>   #
+# show_availabel_pots                 False                <class 'bool'>  #
+# potepoch                            False                <class 'bool'>  #
+# structures_idx                      :                    <class 'str'>   #
+# units                               meV_pa               <class 'str'>   #
+# interstitial_form                   False                <class 'bool'>  #
+# geopt                               False                <class 'bool'>  #
+# elastic                             False                <class 'bool'>  #
+# thermo                              False                <class 'bool'>  #
+# evinet                              False                <class 'bool'>  #
+# fqh                                 False                <class 'bool'>  #
+# fah                                 False                <class 'bool'>  #
+# fqh_atoms_max                       200                  <class 'int'>   #
+# fqh_supercell                       None                 <class 'NoneType'> #
+# fah_atoms_max                       200                  <class 'int'>   #
+# fah_supercell                       None                 <class 'NoneType'> #
+# elastic_all                         False                <class 'bool'>  #
+# elastic_from_ene                    False                <class 'bool'>  #
+# ase                                 True                 <class 'bool'>  #
+# lmp                                 False                <class 'bool'>  #
+# ipi                                 False                <class 'bool'>  #
+# test_this_script                    False                <class 'bool'>  #
+# formation_energies                  None                 <class 'NoneType'> #
+# test3                               False                <class 'bool'>  #
+# testkmc                             False                <class 'bool'>  #
+# testkmc_b                           False                <class 'bool'>  #
+# testkmc_l                           False                <class 'bool'>  #
+# testkmc_a                           False                <class 'bool'>  #
+# testaccuracy_kmc_approx             False                <class 'bool'>  #
+# check_testdata                      False                <class 'bool'>  #
+# check_traindata                     False                <class 'bool'>  #
+# check_inputdata                     False                <class 'bool'>  #
+# check_kmc57data                     False                <class 'bool'>  #
+# check_outliers                      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ext      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ipi      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_post     False                <class 'bool'>  #
+# pick_concentration_al               -1.0                 <class 'float'> #
+# pick_concentration_mg               -1.0                 <class 'float'> #
+# pick_concentration_si               -1.0                 <class 'float'> #
+# pick_atoms_al                       -1.0                 <class 'float'> #
+# pick_atoms_mg                       -1.0                 <class 'float'> #
+# pick_atoms_si                       -1.0                 <class 'float'> #
+# pick_number_of_atoms                -1.0                 <class 'float'> #
+# pick_forcesmax                      -1.0                 <class 'float'> #
+# pick_cellshape                      -1.0                 <class 'float'> #
+# pick_c44                            False                <class 'bool'>  #
+# pick_amount_1NN                     False                <class 'bool'>  #
+# pick_uuid                           -1.0                 <class 'float'> #
+# write_runner                        False                <class 'bool'>  #
+# write_runner_ene_forces             False                <class 'bool'>  #
+# write_DFT_ene_forces                False                <class 'bool'>  #
+# write_espresso_job                  False                <class 'bool'>  #
+# write_runner_DFT                    False                <class 'bool'>  #
+# write_runner_repeated               False                <class 'bool'>  #
+# write_forces                        False                <class 'bool'>  #
+# write_forcesx                       False                <class 'bool'>  #
+# write_analysis                      False                <class 'bool'>  #
+# write_analysis_full                 False                <class 'bool'>  #
+# print_only_energies                 False                <class 'bool'>  #
+# get_harmonic_energy                 False                <class 'bool'>  #
+# debug                               False                <class 'bool'>  #
+# verbose                             1                    <class 'int'>   #
+# uuid                                False                <class 'bool'>  #
+########################################## argparse values (end  ) #########
+>> formats.py /home/glensk/.local/lib/python3.7/site-packages/ase/io/formats.py
+>> formats.py knows runner
+>> formats.py knows lammpsrunner
+>> formats.py knows lammps-data
+>> formats.py knows ipi
+>> formats.py knows quippy
+>> vasp.py adapted to write free energies by default.
+time00 after ase_formats_check... 2.4269800633192062e-05
+
+written  /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/test_auswertung_Siconz/README_2020-07-09_12:36:44.txt
+
+getEne(0.1) LD_LIBRARY_PATH            : /ssoft/spack/humagne/v1/opt/spack/linux-rhel7-x86_E5v4_Mellanox/intel-18.0.5/python-3.7.3-t6azvyfvc6hq72fnyfzvereqk54ng4xk/lib:/home/glensk/sources/n2p2/lib:/home/glensk/sources/lammps/src
+getEne(0.2) imported lammps
+getEne(0.3) lammps
+getEne(0.4) check if lammps woring with ase done
+getEne(p1) args.potepoch             : False
+>> ase_calculate_ene: initializing mypot .... to self.pot
+getEne(p2)                           : ace.pot_get_and_ase_lmp_cmd()
+PPi self.pot.get()
+PPk self.potpath_in ..
+PPk self.potpath    /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701
+PPk self.pottype    n2p2
+PPk self.pot        ..
+self.potepoch_all [329]
+self.use_epoch 329
+self.potpath_work /home/glensk/._tmp_pot_fidis/
+self.potepoch_linked False
+self.potepoch_using False
+self.potpath /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701
+self.potepoch_linked False
+We need to work in a different folder since other epoch is linked!
+PPf copy files ... 000329
+f_ /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.013.000329.out
+f_ /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.012.000329.out
+f_ /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.014.000329.out
+copying /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.013.000329.out to /home/glensk/._tmp_pot_fidis//weights.013.data
+copying /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.012.000329.out to /home/glensk/._tmp_pot_fidis//weights.012.data
+copying /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.014.000329.out to /home/glensk/._tmp_pot_fidis//weights.014.data
+self.pot_tmpdir /home/glensk/._tmp_pot_fidis/
+... copying potential 000329 to /home/glensk/._tmp_pot_fidis/
+ace.lmpcmd ['### lmpcmd.begin ###', 'mass 1 24.305', 'mass 2 26.9815386', 'mass 3 28.0855', 'variable nnpDir string "/home/glensk/._tmp_pot_fidis/"', 'pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261258369282 cfenergy 0.03674932247495664', 'pair_coeff * * 10.6', '### lmpcmd.end  ####']
+getEne(P): self.potpath_in              ..
+getEne(P): self.pot                     ..
+getEne(P): self.potpath (source = src)  /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701
+getEne(P): self.pottype                 n2p2
+getEne(P): self.potpath_work (typ src)  /home/glensk/._tmp_pot_fidis/
+getEne(P): self.inputnn                 /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/input.nn
+getEne(P): self.inputdata               /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/input.data
+getEne(P): self.learning_curve_file     /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/learning-curve.out
+getEne(P): self.potepoch_all            [329]
+getEne(P): self.assessed_epochs         []
+getEne(P): self.assessed_test           []
+getEne(P): self.assessed_train          []
+getEne(P): self.assessed_kmc57          []
+getEne(P): self.assessed_c44            []
+getEne(P): self.use_epoch (from input)  329
+getEne(P): self.potepoch_bestteste      12
+getEne(P): self.potepoch_linked         False
+getEne(P): self.potepoch_using (finaly) False
+getEne(P): self.c44_al_file             False
+getEne(P): self.c44_al                  False
+getEne(P): self.pot_tmpdir              /home/glensk/._tmp_pot_fidis/
+getEne(P): self.lammps_tmpdir           /home/glensk/._tmp_lammps_fidis/
+getEne(P): self.potlib                  /home/glensk/sources/lammps/src/USER-NNP
+getEne(P): self.potcutoff (Angstrom)    10.6
+getEne(P): self.elements                ['Al', 'Mg', 'Si']
+getEne(P): self.atom_energy             {'Al': -19.6283516, 'Mg': -16.7493351, 'Si': -5.5274864}
+getEne(P): self.reference_volumes       {'Al': 16.607531249999997, 'Mg': 23.259574096759252, 'Si': 20.012875874999995}
+getEne(P): self.atom_types              {'Mg': 1, 'Al': 2, 'Si': 3}
+getEne(P): self.atom_numbers            {'Al': 13, 'Mg': 12, 'Si': 14}
+getEne(P): self.atom_masses             {'Al': 26.9815386, 'Mg': 24.305, 'Si': 28.0855}
+getEne(P): self.atom_masses_str         ['mass 1 24.305', 'mass 2 26.9815386', 'mass 3 28.0855']
+getEne(P): self.potDONE                 True
+getEne(P): self.verbose                 1
+getEne(P): len(self.pot_all_dict)       170
+########################################## argparse values (begin) #########
+# inputfile                           ../test.data         <class 'str'>   #
+# sys                                 False                <class 'bool'>  #
+# sys_ele                             False                <class 'bool'>  #
+# sys_ncell                           1                    <class 'int'>   #
+# sys_cell                            cubic                <class 'str'>   #
+# exectue_function_myutils                                 <class 'str'>   #
+# execute_function                                         <class 'str'>   #
+# format_in                           runner               <class 'str'>   #
+# remove_unknown_elements_from_structures False                <class 'bool'>  #
+# potpath                             ..                   <class 'str'>   #
+# show_availabel_pots                 False                <class 'bool'>  #
+# potepoch                            False                <class 'bool'>  #
+# structures_idx                      :                    <class 'str'>   #
+# units                               meV_pa               <class 'str'>   #
+# interstitial_form                   False                <class 'bool'>  #
+# geopt                               False                <class 'bool'>  #
+# elastic                             False                <class 'bool'>  #
+# thermo                              False                <class 'bool'>  #
+# evinet                              False                <class 'bool'>  #
+# fqh                                 False                <class 'bool'>  #
+# fah                                 False                <class 'bool'>  #
+# fqh_atoms_max                       200                  <class 'int'>   #
+# fqh_supercell                       None                 <class 'NoneType'> #
+# fah_atoms_max                       200                  <class 'int'>   #
+# fah_supercell                       None                 <class 'NoneType'> #
+# elastic_all                         False                <class 'bool'>  #
+# elastic_from_ene                    False                <class 'bool'>  #
+# ase                                 True                 <class 'bool'>  #
+# lmp                                 False                <class 'bool'>  #
+# ipi                                 False                <class 'bool'>  #
+# test_this_script                    False                <class 'bool'>  #
+# formation_energies                  None                 <class 'NoneType'> #
+# test3                               False                <class 'bool'>  #
+# testkmc                             False                <class 'bool'>  #
+# testkmc_b                           False                <class 'bool'>  #
+# testkmc_l                           False                <class 'bool'>  #
+# testkmc_a                           False                <class 'bool'>  #
+# testaccuracy_kmc_approx             False                <class 'bool'>  #
+# check_testdata                      False                <class 'bool'>  #
+# check_traindata                     False                <class 'bool'>  #
+# check_inputdata                     False                <class 'bool'>  #
+# check_kmc57data                     False                <class 'bool'>  #
+# check_outliers                      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ext      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ipi      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_post     False                <class 'bool'>  #
+# pick_concentration_al               -1.0                 <class 'float'> #
+# pick_concentration_mg               -1.0                 <class 'float'> #
+# pick_concentration_si               -1.0                 <class 'float'> #
+# pick_atoms_al                       -1.0                 <class 'float'> #
+# pick_atoms_mg                       -1.0                 <class 'float'> #
+# pick_atoms_si                       -1.0                 <class 'float'> #
+# pick_number_of_atoms                -1.0                 <class 'float'> #
+# pick_forcesmax                      -1.0                 <class 'float'> #
+# pick_cellshape                      -1.0                 <class 'float'> #
+# pick_c44                            False                <class 'bool'>  #
+# pick_amount_1NN                     False                <class 'bool'>  #
+# pick_uuid                           -1.0                 <class 'float'> #
+# write_runner                        False                <class 'bool'>  #
+# write_runner_ene_forces             False                <class 'bool'>  #
+# write_DFT_ene_forces                False                <class 'bool'>  #
+# write_espresso_job                  False                <class 'bool'>  #
+# write_runner_DFT                    False                <class 'bool'>  #
+# write_runner_repeated               False                <class 'bool'>  #
+# write_forces                        False                <class 'bool'>  #
+# write_forcesx                       False                <class 'bool'>  #
+# write_analysis                      False                <class 'bool'>  #
+# write_analysis_full                 False                <class 'bool'>  #
+# print_only_energies                 False                <class 'bool'>  #
+# get_harmonic_energy                 False                <class 'bool'>  #
+# debug                               False                <class 'bool'>  #
+# verbose                             1                    <class 'int'>   #
+# uuid                                False                <class 'bool'>  #
+########################################## argparse values (end  ) #########
+getEne(0) args.inputfile             : ../test.data
+392
+410
+idx 0 ../test.data path (i) ../test.data
+########################################################
+XXX args.inputfile: ../test.data
+XXX args.format_in: runner
+XXX args.inputfile: ../tes
+########################################################
+type(frames) <class 'list'>
+len(frames) 545
+getting DFT data
+getting DFT data DONE!
+430
+501
+idx 0 ../test.data path (i) ../test.data
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@  allepochs: [False]
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+Epoch: False
+getEne (23): reading args.inputfile ...  : ../test.data
+YYY getEne (23): args.format_in ...          : runner
+YYY getEne (23): args.structures_idx ...     : :
+getEne (24): structures_to_calc          : 545
+
+ase                          : True
+lmp                          : False
+
+args.units                   : meV_pa
+ace.units                    : mev_pa
+geopt                        : False
+
+verbose                      : 1
+lmp                          : False
+ipi                          : False
+write_runner                 : False
+write_runner_repeated        : False
+--pick_concentration_al      : -1.0
+--pick_concentration_mg      : -1.0
+--pick_concentration_si      : -1.0
+--pick_atoms_al              : -1.0
+--pick_atoms_mg              : -1.0
+--pick_atoms_si              : -1.0
+--pick_number_of_atoms       : -1.0
+--pick_forcesmax             : -1.0
+--pick_cellshape             : -1.0
+--pick_c44                   : False
+
+
+#                         (mev_pa)                                (mev_pa)       (mev_pa)                  (mev_pa)     (eV/Ang)
+#                         (DFT-ref)                                                    ene_pot_wo_..      forces      (if geopt)     Vol per atom    min at dist   VOL_diff_norm
+#   i   idx /    from       diff  [atms   Si   Mg   Al]     ene_DFT       ene_pot      .._wo_atomic       DFTmax       E-E_geopt        (Ang^3)      (Angstrom)     (Ang^3)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+range(structures_to_calc) range(0, 545)
+    0     0 /    545 ?         3.051 [ 100    0    0  100]   -537443.224   -537440.173         0.089         0.000           nan        16.827         2.725         0.013  ABC
+    1     1 /    545 Q         0.461 [ 100   25    6   68]   -436800.387   -436799.926        -0.461         0.706           nan        16.694         2.568        -0.066  ABC
+    2     2 /    545 R         0.307 [ 100    0   50   50]   -496867.096   -496866.788        -0.307         0.000           nan        19.546         2.658        -0.019  ABC
+    3     3 /    545 ?         0.847 [ 100   36   36   27]   -369418.018   -369418.865         0.847         0.220           nan        18.994         2.458        -0.063  ABC
+    4     4 /    545 Q         3.328 [ 100    0    0  100]   -537183.230   -537179.901         8.479         0.087           nan        13.850         2.597        -0.166  ABC
+    5     5 /    545 Q         1.478 [ 100   25   75    0]   -381809.385   -381810.862         1.478         0.296           nan        22.674         3.032         0.010  ABC
+    6     6 /    545 Q         0.988 [ 100   25   75    0]   -381751.643   -381750.656        -0.988         0.580           nan        23.588         2.920         0.051  ABC
+    7     7 /    545 Q         1.367 [ 100    3    0   96]   -525055.296   -525053.929        -1.367         0.034           nan        18.808         2.888         0.125  ABC
+    8     8 /    545 Q         4.066 [ 100   26   26   46]   -414068.350   -414072.415         4.066         0.354           nan        17.807         2.551        -0.077  ABC
+    9     9 /    545 ?         0.051 [ 100   36   36   27]   -369414.025   -369413.974        -0.051         1.033           nan        17.972         2.417        -0.113  ABC
+   10    10 /    545 Q         0.765 [ 100    0    3   96]   -534827.923   -534828.688         0.765         0.893           nan        17.212         2.534         0.023  ABC
+   11    11 /    545 ?         0.537 [ 100    6   93    0]   -438436.166   -438436.702         0.537         0.847           nan        23.008         2.824        -0.002  ABC
+   12    12 /    545 Q         0.851 [ 100  100    0    0]   -154879.548   -154878.697        -0.851         1.427           nan        23.369         2.311         0.168  ABC
+   13    13 /    545 Q         0.058 [ 100   25    6   68]   -436797.020   -436796.963        -0.058         0.554           nan        16.694         2.621        -0.066  ABC
+   14    14 /    545 Q         0.066 [ 100   18   12   68]   -455693.851   -455693.917         0.066         0.666           nan        16.694         2.582        -0.077  ABC
+   15    15 /    545 Q         0.778 [ 100   25    6   68]   -436784.120   -436783.342        -0.778         0.957           nan        16.694         2.505        -0.066  ABC
+   16    16 /    545 Q         0.857 [ 100   33   66    0]   -356854.744   -356853.887        -0.857         0.577           nan        20.599         2.591        -0.071  ABC
+   17    17 /    545 Q         0.132 [ 100    0    6   93]   -532335.768   -532335.900         0.132         0.070           nan        14.296         2.702        -0.160  ABC
+   18    18 /    545 R         1.922 [ 100   75    0   25]   -250390.801   -250388.880        -1.922         0.000           nan        18.273         2.950        -0.046  ABC
+   19    19 /    545 ?         0.106 [ 100   36   36   27]   -369310.331   -369310.437         0.106         0.409           nan        15.190         2.239        -0.250  ABC
+   20    20 /    545 Q         0.101 [ 100   18   12   68]   -455699.964   -455700.065         0.101         0.839           nan        16.694         2.527        -0.077  ABC
+   21    21 /    545 Q         0.325 [ 100   25    6   68]   -436780.953   -436781.279         0.325         0.684           nan        16.694         2.567        -0.066  ABC
+   22    22 /    545 Q         1.367 [ 100  100    0    0]   -154886.643   -154885.276        -1.367         1.417           nan        23.369         2.293         0.168  ABC
+   23    23 /    545 Q         0.428 [ 100    6    0   93]   -513545.497   -513545.925         0.428         0.439           nan        16.674         2.719        -0.009  ABC
+   24    24 /    545 ?         0.361 [ 100   54   45    0]   -292614.549   -292614.189        -0.361         0.422           nan        18.199         2.383        -0.153  ABC
+   25    25 /    545 Q         0.226 [ 100    3    0   96]   -525752.796   -525753.022         0.226         1.812           nan        16.188         2.183        -0.031  ABC
+   26    26 /    545 R         1.648 [ 100    0    0  100]   -537415.780   -537417.428         0.180         0.000           nan        18.228         2.869         0.098  ABC
+   27    27 /    545 ?         0.169 [ 100    2    2   95]   -526265.650   -526265.818         0.169         0.054           nan        16.834         2.683        -0.001  ABC
+   28    28 /    545 R         0.062 [ 100    0    0  100]   -537462.155   -537462.093         0.002         0.000           nan        16.630         2.857         0.001  ABC
+   29    29 /    545 ?         0.763 [ 100   36   45   18]   -362186.348   -362185.585        -0.763         0.033           nan        18.573         2.389        -0.110  ABC
+   30    30 /    545 ?         1.802 [ 100   36   45   18]   -362168.980   -362167.178        -1.802         0.028           nan        17.946         2.357        -0.140  ABC
+   31    31 /    545 Q         0.154 [ 100    0   25   75]   -517435.363   -517435.209        -0.154         0.362           nan        17.717         2.820        -0.030  ABC
+   32    32 /    545 Q         0.419 [ 100   21    9   68]   -446233.110   -446233.529         0.419         1.373           nan        16.694         2.516        -0.071  ABC
+   33    33 /    545 Q         0.954 [ 100   15   34   50]   -450127.692   -450128.646         0.954         0.751           nan        16.694         2.514        -0.141  ABC
+   34    34 /    545 R         1.044 [ 100    6    0   93]   -513547.000   -513545.956        -1.044         0.064           nan        15.840         2.755        -0.058  ABC
+   35    35 /    545 Q         0.603 [ 100   75    0   25]   -250476.500   -250475.897        -0.603         0.396           nan        16.764         2.678        -0.125  ABC
+   36    36 /    545 R         1.127 [ 100   25    0   75]   -441783.327   -441784.454         1.127         0.000           nan        17.903         2.933         0.025  ABC
+   37    37 /    545 Q         0.213 [ 100    2    7   89]   -520897.131   -520897.345         0.213         0.296           nan        16.694         2.731        -0.029  ABC
+   38    38 /    545 Q         0.533 [ 100    3    0   96]   -525082.307   -525081.774        -0.533         0.594           nan        17.212         2.637         0.030  ABC
+   39    39 /    545 Q         0.363 [ 100    3    0   96]   -525074.280   -525073.917        -0.363         0.789           nan        17.212         2.637         0.030  ABC
+   40    40 /    545 Q         0.257 [ 100    6    0   93]   -513517.062   -513517.319         0.257         0.920           nan        16.674         2.586        -0.009  ABC
+   41    41 /    545 ?         2.914 [ 100   36   45   18]   -362150.074   -362147.159        -2.914         0.985           nan        18.501         2.349        -0.114  ABC
+   42    42 /    545 Q         1.731 [ 100   23   23   53]   -429478.004   -429476.273        -1.731         0.271           nan        17.647         2.524        -0.069  ABC
+   43    43 /    545 R         1.163 [ 100   75    0   25]   -250504.478   -250505.641         1.163         0.000           nan        16.205         2.834        -0.154  ABC
+   44    44 /    545 Q         0.298 [ 100   25    6   68]   -436795.582   -436795.880         0.298         0.825           nan        16.694         2.535        -0.066  ABC
+   45    45 /    545 Q         3.338 [ 100   75    0   25]   -250399.011   -250395.674        -3.338         0.247           nan        18.152         2.811        -0.053  ABC
+   46    46 /    545 Q         0.936 [ 100    0    3   96]   -534484.965   -534485.901         0.936         0.220           nan        12.970         2.556        -0.229  ABC
+   47    47 /    545 Q         1.792 [ 100    0   25   75]   -517216.880   -517215.088        -1.792         0.848           nan        14.251         2.621        -0.220  ABC
+   48    48 /    545 Q         1.168 [ 100    6    0   93]   -513213.425   -513212.257        -1.168         0.074           nan        12.565         2.571        -0.253  ABC
+   49    49 /    545 Q         6.334 [ 100   75    0   25]   -250385.092   -250378.759        -6.334         1.488           nan        13.028         2.370        -0.320  ABC
+   50    50 /    545 R         0.403 [ 100    3    0   96]   -525102.135   -525101.732        -0.403         0.021           nan        16.868         2.794         0.009  ABC
+   51    51 /    545 Q         0.178 [ 100    0   58   41]   -490540.503   -490540.325        -0.178         0.015           nan        20.598         2.713         0.004  ABC
+   52    52 /    545 Q         0.381 [ 100    6    0   93]   -513531.271   -513531.651         0.381         0.608           nan        16.674         2.683        -0.009  ABC
+   53    53 /    545 Q         0.092 [ 100   15   34   50]   -450134.575   -450134.668         0.092         0.578           nan        16.694         2.606        -0.141  ABC
+   54    54 /    545 Q         1.248 [ 100    0    0  100]   -537396.462   -537397.710         0.259         0.000           nan        18.887         2.989         0.137  ABC
+   55    55 /    545 ?         1.347 [ 100   54   45    0]   -292600.351   -292599.004        -1.347         0.680           nan        18.199         2.297        -0.153  ABC
+   56    56 /    545 Q         4.222 [ 100   75   25    0]   -230453.749   -230457.971         4.222         0.414           nan        13.338         2.553        -0.359  ABC
+   57    57 /    545 Q         0.259 [ 100   25    6   68]   -436789.324   -436789.065        -0.259         0.803           nan        16.694         2.563        -0.066  ABC
+   58    58 /    545 Q         0.263 [ 100   25    6   68]   -436799.974   -436800.237         0.263         0.558           nan        16.694         2.614        -0.066  ABC
+   59    59 /    545 R        25.516 [ 100   50    0   50]   -346078.742   -346104.257        25.516         0.000           nan        18.200         2.870        -0.006  DDD
+   60    60 /    545 R        21.015 [ 100   50    0   50]   -346114.074   -346135.089        21.015         0.000           nan        17.475         2.832        -0.046  DDD
+   61    61 /    545 Q         0.596 [ 100   25   75    0]   -381853.705   -381853.109        -0.596         0.444           nan        17.683         2.815        -0.212  ABC
+   62    62 /    545 R         1.244 [ 100   50   50    0]   -306045.159   -306043.916        -1.244         0.000           nan        14.659         2.670        -0.322  ABC
+   63    63 /    545 ?         0.387 [ 100   54   45    0]   -292614.923   -292615.310         0.387         0.303           nan        17.981         2.335        -0.163  ABC
+   64    64 /    545 Q         2.681 [ 100   50   50    0]   -306000.823   -305998.143        -2.681         0.681           nan        14.562         2.524        -0.327  ABC
+   65    65 /    545 Q         0.053 [ 100   25    6   68]   -436781.098   -436781.152         0.053         0.899           nan        16.694         2.515        -0.066  ABC
+   66    66 /    545 Q         0.064 [ 100    0    3   96]   -534838.145   -534838.209         0.064         0.630           nan        17.212         2.646         0.023  ABC
+   67    67 /    545 Q        16.728 [ 100   50    0   50]   -346126.847   -346143.574        16.728         0.000           nan        17.133         2.813        -0.064  DDD
+   68    68 /    545 R         0.116 [ 100    6    0   93]   -513554.948   -513554.832        -0.116         0.037           nan        16.341         2.797        -0.029  ABC
+   69    69 /    545 Q         0.103 [ 100    0    6   93]   -532414.408   -532414.305        -0.103         0.935           nan        16.674         2.613        -0.021  ABC
+   70    70 /    545 ?         0.671 [ 100    0   93    6]   -462350.587   -462349.917        -0.671         0.942           nan        23.008         2.799         0.007  ABC
+   71    71 /    545 Q         2.910 [ 100   30   16   53]   -409319.200   -409316.291        -2.910         0.264           nan        17.647         2.524        -0.058  ABC
+   72    72 /    545 Q         0.104 [ 100    0    0  100]   -537437.480   -537437.584         0.100         0.632           nan        16.694         2.699         0.005  ABC
+   73    73 /    545 Q         0.609 [ 100   21    9   68]   -446233.029   -446232.420        -0.609         0.804           nan        16.694         2.579        -0.071  ABC
+   74    74 /    545 ?         1.788 [ 100   36   36   27]   -369417.956   -369416.169        -1.788         0.468           nan        17.106         2.295        -0.156  ABC
+   75    75 /    545 R         1.896 [ 100   50    0   50]   -346153.458   -346155.354         1.896         0.000           nan        15.876         2.742        -0.133  ABC
+   76    76 /    545 Q         3.462 [ 100   33   13   53]   -399239.064   -399235.602        -3.462         0.311           nan        17.647         2.507        -0.053  ABC
+   77    77 /    545 R         3.460 [ 100   50   50    0]   -306215.778   -306219.238         3.460         0.000           nan        17.742         2.846        -0.180  ABC
+   78    78 /    545 ?         2.245 [ 100   54   45    0]   -292582.369   -292580.124        -2.245         0.261           nan        19.750         2.393        -0.081  ABC
+   79    79 /    545 R         0.816 [ 100   33   66    0]   -356873.722   -356872.906        -0.816         0.000           nan        21.490         2.756        -0.031  ABC
+   80    80 /    545 R         0.186 [ 100    0   50   50]   -496982.914   -496983.101         0.186         0.000           nan        23.552         2.854         0.182  ABC
+   81    81 /    545 Q         0.173 [ 100    6    0   93]   -513537.463   -513537.636         0.173         0.663           nan        16.674         2.609        -0.009  ABC
+   82    82 /    545 ?         1.057 [ 100   54   45    0]   -292589.757   -292590.813         1.057         0.661           nan        18.199         2.353        -0.153  ABC
+   83    83 /    545 ?         0.509 [ 100   36   37   26]   -368830.479   -368829.969        -0.509         0.246           nan        17.970         2.354        -0.115  ABC
+   84    84 /    545 ?         0.367 [ 100   35   46   18]   -364464.272   -364464.639         0.367         0.352           nan        18.486         2.355        -0.115  ABC
+   85    85 /    545 ?         0.061 [ 100   54   44    0]   -293222.064   -293222.125         0.061         0.302           nan        18.196         2.380        -0.151  ABC
+   86    86 /    545 ?         0.943 [ 100    4    4   90]   -515039.458   -515040.401         0.943         2.793           nan        16.834         2.160        -0.015  ABC
+   87    87 /    545 ?         1.214 [ 100    0    0  100]   -537160.890   -537162.105         0.300         0.000           nan        12.877        -1.000        -0.225  ABC
+   88    88 /    545 R         0.754 [ 100    0    3   96]   -534825.927   -534826.681         0.754         0.074           nan        18.417         2.841         0.095  ABC
+   89    89 /    545 R        15.320 [ 100    0   50   50]   -497155.842   -497171.163        15.320         0.000           nan        15.338         2.711        -0.231  DDD
+   90    90 /    545 ?         6.623 [ 100   21   21   57]   -438252.816   -438259.439         6.623         0.435           nan        19.169         2.597         0.022  ABC
+   91    91 /    545 R         2.827 [ 100   25    0   75]   -441815.051   -441817.878         2.827         0.000           nan        14.922         2.745        -0.145  ABC
+   92    92 /    545 Q         0.235 [ 100   18   12   68]   -455703.194   -455702.959        -0.235         0.666           nan        16.694         2.592        -0.077  ABC
+   93    93 /    545 R         2.227 [ 100    0   25   75]   -517339.551   -517341.778         2.227         0.000           nan        21.281         3.090         0.165  ABC
+   94    94 /    545 R         1.194 [ 100   33   66    0]   -356787.320   -356788.514         1.194         0.000           nan        18.516         2.623        -0.165  ABC
+   95    95 /    545 Q         0.999 [ 100   50   50    0]   -305790.547   -305791.546         0.999         2.042           nan        17.547         2.343        -0.189  ABC
+   96    96 /    545 Q         0.374 [ 100    0    3   96]   -534900.538   -534900.912         0.374         1.704           nan        16.188         2.430        -0.037  ABC
+   97    97 /    545 Q         0.080 [ 100    0    3   96]   -534854.749   -534854.829         0.080         0.018           nan        17.212         2.812         0.023  ABC
+   98    98 /    545 Q         0.624 [ 100    0    3   96]   -534850.086   -534849.462        -0.624         0.372           nan        17.212         2.689         0.023  ABC
+   99    99 /    545 ?         2.068 [ 100   54   45    0]   -292606.395   -292604.326        -2.068         0.194           nan        19.076         2.388        -0.112  ABC
+  100   100 /    545 Q         0.600 [ 100   25    6   68]   -436786.443   -436785.843        -0.600         1.242           nan        16.694         2.556        -0.066  ABC
+  101   101 /    545 ?         0.456 [ 100   54   45    0]   -292596.395   -292595.938        -0.456         0.580           nan        18.199         2.331        -0.153  ABC
+  102   102 /    545 Q         0.158 [ 100   21    9   68]   -446243.181   -446243.023        -0.158         0.862           nan        16.694         2.642        -0.071  ABC
+  103   103 /    545 ?         0.573 [ 100   54   45    0]   -292551.819   -292551.246        -0.573         0.675           nan        16.479         2.325        -0.233  ABC
+  104   104 /    545 R         1.407 [ 100    0    0  100]   -537426.695   -537428.102         0.138         0.000           nan        17.992         2.869         0.083  ABC
+  105   105 /    545 ?         1.357 [ 100    0    0  100]   -537457.150   -537455.792         0.027         0.000           nan        16.476         2.777        -0.008  ABC
+  106   106 /    545 ?         0.857 [ 100   36   35   28]   -370037.980   -370038.837         0.857         0.267           nan        17.970         2.355        -0.111  ABC
+  107   107 /    545 Q         0.634 [ 100    0    0  100]   -537354.355   -537353.721         0.435         0.000           nan        14.132         2.714        -0.149  ABC
+  108   108 /    545 R         0.812 [ 100    0    0  100]   -537451.283   -537450.470         0.048         0.356           nan        16.400         2.762        -0.012  ABC
+  109   109 /    545 R         0.224 [ 100    0    0  100]   -537446.482   -537446.257         0.065         0.514           nan        16.565         2.713        -0.003  ABC
+  110   110 /    545 Q         0.018 [ 100    0    0  100]   -537458.983   -537459.001         0.902         0.143           nan        16.759         2.869         0.009  ABC
+  111   111 /    545 ?         0.061 [ 100   54   45    0]   -292609.779   -292609.718        -0.061         0.477           nan        18.199         2.346        -0.153  ABC
+  112   112 /    545 Q         0.218 [ 100  100    0    0]   -155282.126   -155282.344         0.218         0.682           nan        22.372         2.363         0.118  ABC
+  113   113 /    545 Q         0.717 [ 100   33   13   53]   -399247.247   -399247.964         0.717         0.337           nan        17.647         2.448        -0.053  ABC
+  114   114 /    545 R         5.295 [ 100   75   25    0]   -230449.460   -230454.755         5.295         0.000           nan        13.249         2.653        -0.364  ABC
+  115   115 /    545 Q         0.085 [ 100    3    3   93]   -522946.945   -522946.860        -0.085         0.050           nan        14.752         2.720        -0.128  ABC
+  116   116 /    545 Q         7.024 [ 100   50    0   50]   -346146.436   -346153.461         7.024         0.000           nan        16.442         2.775        -0.102  ABC
+  117   117 /    545 ?         0.026 [ 100   27   22   50]   -415012.462   -415012.437        -0.026         0.051           nan        17.238         2.336        -0.095  ABC
+  118   118 /    545 R         0.569 [ 100    0    3   96]   -534914.656   -534914.087        -0.569         0.079           nan        15.406         2.731        -0.084  ABC
+  119   119 /    545 Q         0.428 [ 100    6    0   93]   -513542.226   -513542.654         0.428         0.658           nan        16.674         2.681        -0.009  ABC
+  120   120 /    545 Q         1.418 [ 100   12   37   50]   -459580.412   -459578.994        -1.418         0.680           nan        16.694         2.628        -0.145  ABC
+  121   121 /    545 Q         1.889 [ 100   26   26   46]   -414069.483   -414071.372         1.889         0.403           nan        17.807         2.489        -0.077  ABC
+  122   122 /    545 Q         4.116 [ 100    0  100    0]   -457334.111   -457338.227         4.116         0.000           nan        20.943         3.008        -0.100  ABC
+  123   123 /    545 ?         0.011 [ 100   54   45    0]   -292619.139   -292619.128        -0.011         0.130           nan        18.090         2.369        -0.158  ABC
+  124   124 /    545 ?         0.367 [ 100   36   36   27]   -369390.897   -369391.264         0.367         1.168           nan        17.972         2.274        -0.113  ABC
+  125   125 /    545 ?         2.029 [ 100   54   45    0]   -292565.799   -292567.828         2.029         0.876           nan        18.199         2.358        -0.153  ABC
+  126   126 /    545 Q         0.555 [ 100   21    9   68]   -446224.745   -446224.190        -0.555         1.250           nan        16.694         2.393        -0.071  ABC
+  127   127 /    545 Q         0.554 [ 100   21    9   68]   -446235.629   -446236.183         0.554         1.052           nan        16.694         2.506        -0.071  ABC
+  128   128 /    545 ?         2.294 [ 100   54   45    0]   -292586.853   -292584.559        -2.294         0.252           nan        19.641         2.392        -0.086  ABC
+  129   129 /    545 Q         1.829 [ 100    6    0   93]   -513214.560   -513212.731        -1.829         0.045           nan        12.565         2.581        -0.253  ABC
+  130   130 /    545 R         0.328 [ 100    0  100    0]   -457343.494   -457343.822         0.328         0.000           nan        25.072         3.183         0.078  ABC
+  131   131 /    545 Q         4.666 [ 100    0   75   25]   -477275.376   -477270.710        -4.666         0.234           nan        25.664         3.077         0.188  ABC
+  132   132 /    545 ?         0.787 [ 100    9    9   80]   -492315.648   -492316.435         0.787         0.074           nan        16.971         2.696        -0.035  ABC
+  133   133 /    545 R         0.477 [ 100    0    0  100]   -537462.502   -537462.025         0.002         0.000           nan        16.400         2.849        -0.012  ABC
+  134   134 /    545 R         0.515 [ 100    0    0  100]   -537462.439   -537461.925         0.002         0.000           nan        16.383         2.848        -0.013  ABC
+  135   135 /    545 Q         0.027 [ 100   25    6   68]   -436791.658   -436791.630        -0.027         0.777           nan        16.694         2.607        -0.066  ABC
+  136   136 /    545 R         1.607 [ 100    0   75   25]   -477334.481   -477336.088         1.607         0.000           nan        24.505         3.257         0.135  ABC
+  137   137 /    545 Q         0.037 [ 100    6    0   93]   -513373.360   -513373.398         0.037         0.078           nan        13.412         2.637        -0.203  ABC
+  138   138 /    545 Q         0.170 [ 100   25    6   68]   -436788.881   -436789.051         0.170         1.239           nan        16.694         2.546        -0.066  ABC
+  139   139 /    545 ?         0.567 [ 100   36   36   27]   -369410.484   -369409.917        -0.567         0.185           nan        19.275         2.368        -0.049  ABC
+  140   140 /    545 Q         0.146 [ 100   25    6   68]   -436797.472   -436797.327        -0.146         0.617           nan        16.694         2.582        -0.066  ABC
+  141   141 /    545 Q         0.700 [ 100   50    0   50]   -345882.087   -345881.387        -0.700         0.000           nan        14.275         2.426        -0.220  ABC
+  142   142 /    545 Q         0.930 [ 100   15   34   50]   -450139.923   -450138.993        -0.930         0.475           nan        16.694         2.560        -0.141  ABC
+  143   143 /    545 Q         0.385 [ 100   21    9   68]   -446223.393   -446223.008        -0.385         1.835           nan        16.694         2.436        -0.071  ABC
+  144   144 /    545 Q         1.422 [ 100    0    0  100]   -537350.248   -537351.670         3.659         1.273           nan        16.188         2.315        -0.025  ABC
+  145   145 /    545 ?         2.360 [ 100   54   45    0]   -292569.827   -292572.186         2.360         0.374           nan        20.018         2.476        -0.068  ABC
+  146   146 /    545 Q         0.331 [ 100    0    3   96]   -534739.942   -534740.273         0.331         0.092           nan        13.438         2.643        -0.201  ABC
+  147   147 /    545 R         1.035 [ 100    0    0  100]   -537275.568   -537276.604         0.744         0.000           nan        13.517         2.668        -0.186  ABC
+  148   148 /    545 R         2.618 [ 100   50   50    0]   -306075.284   -306077.903         2.618         0.000           nan        14.925         2.687        -0.310  ABC
+  149   149 /    545 R         0.076 [ 100    3    3   93]   -522993.368   -522993.292        -0.076         0.038           nan        17.341         2.839         0.025  ABC
+  150   150 /    545 R         0.864 [ 100    0    3   96]   -534921.505   -534920.641        -0.864         0.074           nan        15.507         2.739        -0.078  ABC
+  151   151 /    545 R         0.229 [ 100    0   75   25]   -477396.285   -477396.057        -0.229         0.000           nan        21.368         3.094        -0.011  ABC
+  152   152 /    545 ?         1.426 [ 100   54   45    0]   -292569.811   -292571.237         1.426         0.792           nan        18.199         2.363        -0.153  ABC
+  153   153 /    545 ?         3.397 [ 100   21   21   57]   -438244.302   -438247.698         3.397         0.689           nan        19.169         2.604         0.022  ABC
+  154   154 /    545 Q         0.018 [ 100   25    6   68]   -436787.095   -436787.113         0.018         0.825           nan        16.694         2.531        -0.066  ABC
+  155   155 /    545 ?         0.290 [ 100   36   45   18]   -362099.753   -362100.043         0.290         0.267           nan        21.694         2.502         0.040  ABC
+  156   156 /    545 R         0.039 [ 100    0    6   93]   -532401.583   -532401.545        -0.039         0.096           nan        15.340         2.732        -0.099  ABC
+  157   157 /    545 ?         0.850 [ 100   36   44   18]   -362786.593   -362787.444         0.850         0.320           nan        18.486         2.362        -0.112  ABC
+  158   158 /    545 Q         0.352 [ 100   25    6   68]   -436790.114   -436789.762        -0.352         0.837           nan        16.694         2.569        -0.066  ABC
+  159   159 /    545 ?         0.674 [ 100   54   45    0]   -292577.960   -292577.286        -0.674         0.722           nan        18.199         2.364        -0.153  ABC
+  160   160 /    545 Q         0.976 [ 100    0    0  100]   -537346.553   -537347.529         3.795         0.294           nan        16.188         2.322        -0.025  ABC
+  161   161 /    545 R         0.766 [ 100    0    0  100]   -537406.239   -537407.004         1.666         0.038           nan        18.141         2.811         0.092  ABC
+  162   162 /    545 Q         0.179 [ 100    0    0  100]   -537433.434   -537433.613         0.897         0.425           nan        17.212         2.705         0.036  ABC
+  163   163 /    545 Q         3.712 [ 100   26   26   46]   -414051.656   -414047.943        -3.712         0.377           nan        17.807         2.460        -0.077  ABC
+  164   164 /    545 Q         1.634 [ 100    3    0   96]   -524772.539   -524770.905        -1.634         0.146           nan        12.970         2.568        -0.224  ABC
+  165   165 /    545 Q         0.003 [ 100    0    6   93]   -532411.468   -532411.471         0.003         0.051           nan        15.218         2.754        -0.106  ABC
+  166   166 /    545 Q         0.203 [ 100   25    6   68]   -436797.901   -436797.698        -0.203         0.670           nan        16.694         2.595        -0.066  ABC
+  167   167 /    545 R         0.496 [ 100    3    0   96]   -525480.633   -525480.137        -0.496         0.067           nan        15.396         2.747        -0.079  ABC
+  168   168 /    545 R         0.359 [ 100    3    3   93]   -523004.822   -523005.181         0.359         0.029           nan        16.507         2.819        -0.024  ABC
+  169   169 /    545 ?         6.712 [ 100   21   21   57]   -438241.355   -438234.643        -6.712         0.561           nan        19.169         2.533         0.022  ABC
+  170   170 /    545 Q         1.794 [ 100    3    0   96]   -525580.258   -525582.052         1.794         5.158           nan        16.188         2.038        -0.031  ABC
+  171   171 /    545 Q         1.066 [ 100   12   37   50]   -459585.888   -459586.954         1.066         0.652           nan        16.694         2.610        -0.145  ABC
+  172   172 /    545 Q         2.970 [ 100   50   50    0]   -306018.911   -306015.942        -2.970         0.492           nan        14.562         2.577        -0.327  ABC
+  173   173 /    545 Q         0.055 [ 100   25    6   68]   -436783.945   -436783.890        -0.055         0.860           nan        16.694         2.559        -0.066  ABC
+  174   174 /    545 R         0.903 [ 100    6    0   93]   -513526.082   -513525.179        -0.903         0.072           nan        15.340         2.741        -0.088  ABC
+  175   175 /    545 Q         0.751 [ 100   23   23   53]   -429470.330   -429471.081         0.751         2.179           nan        17.647         2.159        -0.069  ABC
+  176   176 /    545 Q         0.150 [ 100    0    3   96]   -534833.787   -534833.937         0.150         0.580           nan        17.212         2.673         0.023  ABC
+  177   177 /    545 Q         0.482 [ 100    3    0   96]   -525031.555   -525031.073        -0.482         0.048           nan        19.361         2.903         0.158  ABC
+  178   178 /    545 Q         0.449 [ 100   21    9   68]   -446246.218   -446246.667         0.449         0.832           nan        16.694         2.590        -0.071  ABC
+  179   179 /    545 ?         0.435 [ 100    0    0  100]   -537459.253   -537458.818         0.015         0.000           nan        16.714         2.812         0.006  ABC
+  180   180 /    545 ?         0.800 [ 100   37   36   26]   -366536.007   -366536.807         0.800         0.251           nan        17.970         2.355        -0.114  ABC
+  181   181 /    545 ?         2.462 [ 100   55   44    0]   -290324.003   -290326.465         2.462         0.307           nan        18.196         2.381        -0.152  ABC
+  182   182 /    545 ?         2.013 [ 100   54   45    0]   -292548.368   -292546.354        -2.013         0.400           nan        15.988         2.282        -0.256  ABC
+  183   183 /    545 ?         2.717 [ 100    3    0   96]   -525084.012   -525081.296        -2.717         0.128           nan        17.169         2.684         0.027  ABC
+  184   184 /    545 Q         0.227 [ 100   25    6   68]   -436793.024   -436793.250         0.227         0.686           nan        16.694         2.562        -0.066  ABC
+  185   185 /    545 Q         0.101 [ 100   25    6   68]   -436783.538   -436783.639         0.101         0.743           nan        16.694         2.520        -0.066  ABC
+  186   186 /    545 Q        16.472 [ 100    0    0  100]   -537315.711   -537332.182         0.261         0.000           nan        19.148         2.919         0.153  DDD
+  187   187 /    545 Q         0.710 [ 100   25    6   68]   -436785.549   -436784.839        -0.710         0.678           nan        16.694         2.531        -0.066  ABC
+  188   188 /    545 R         1.861 [ 100    0    0  100]   -537444.957   -537443.096         0.078         0.000           nan        15.699         2.785        -0.055  ABC
+  189   189 /    545 Q         0.823 [ 100    0    3   96]   -534830.071   -534830.894         0.823         0.784           nan        17.212         2.650         0.023  ABC
+  190   190 /    545 ?         0.461 [ 100    0  100    0]   -457371.898   -457372.359         0.461         0.000           nan        21.899         3.084        -0.059  ABC
+  191   191 /    545 Q         0.048 [ 100   25   25   50]   -421795.219   -421795.267         0.048         0.668           nan        16.694         2.548        -0.127  ABC
+  192   192 /    545 ?         1.087 [ 100   54   45    0]   -292589.913   -292591.000         1.087         0.366           nan        19.750         2.382        -0.081  ABC
+  193   193 /    545 Q         0.136 [ 100    3    3   93]   -522980.723   -522980.859         0.136         1.055           nan        16.674         2.647        -0.015  ABC
+  194   194 /    545 R         1.476 [ 100   25    0   75]   -441797.712   -441799.188         1.476         0.000           nan        14.532         2.736        -0.168  ABC
+  195   195 /    545 Q         3.231 [ 100    0   50   50]   -497228.231   -497225.001        -3.231         0.641           nan        16.369         2.647        -0.179  ABC
+  196   196 /    545 Q         0.608 [ 100    0   25   75]   -517315.065   -517315.673         0.608         0.000           nan        14.905         2.762        -0.184  ABC
+  197   197 /    545 Q         0.045 [ 100   25    6   68]   -436787.119   -436787.164         0.045         0.751           nan        16.694         2.507        -0.066  ABC
+  198   198 /    545 ?         1.472 [ 100   54   45    0]   -292579.629   -292578.157        -1.472         1.318           nan        18.199         2.353        -0.153  ABC
+  199   199 /    545 ?         2.146 [ 100    3    0   96]   -525088.888   -525086.742        -2.146         0.103           nan        17.177         2.671         0.028  ABC
+  200   200 /    545 Q         0.340 [ 100    0    0  100]   -537313.251   -537313.591         4.468         0.072           nan        20.589         2.919         0.240  ABC
+  201   201 /    545 ?         0.091 [ 100    0  100    0]   -457284.227   -457284.317         0.091         0.576           nan        23.494         2.920         0.010  ABC
+  202   202 /    545 R         0.280 [ 100    0    6   93]   -532445.376   -532445.095        -0.280         0.065           nan        17.341         2.830         0.019  ABC
+  203   203 /    545 Q         0.453 [ 100   18   12   68]   -455684.760   -455684.307        -0.453         0.893           nan        16.694         2.551        -0.077  ABC
+  204   204 /    545 ?         0.390 [ 100    9    9   80]   -492323.679   -492323.288        -0.390         0.132           nan        16.971         2.658        -0.035  ABC
+  205   205 /    545 ?         0.037 [ 100   54   45    0]   -292620.804   -292620.767        -0.037         0.027           nan        18.287         2.393        -0.149  ABC
+  206   206 /    545 Q         1.289 [ 100  100    0    0]   -154863.251   -154861.962        -1.289         1.457           nan        23.369         2.299         0.168  ABC
+  207   207 /    545 Q         0.390 [ 100    0    3   96]   -534732.395   -534732.005        -0.390         3.456           nan        17.232         2.302         0.024  ABC
+  208   208 /    545 ?         0.740 [ 100   54   45    0]   -292569.080   -292569.820         0.740         0.811           nan        18.199         2.386        -0.153  ABC
+  209   209 /    545 R         0.517 [ 100   33   66    0]   -356789.011   -356789.529         0.517         0.000           nan        25.136         2.904         0.133  ABC
+  210   210 /    545 Q         1.766 [ 100    0    0  100]   -537238.537   -537236.771         0.903         0.870           nan        13.428         2.554        -0.191  ABC
+  211   211 /    545 Q         2.796 [ 100   25   75    0]   -381779.409   -381782.205         2.796         1.080           nan        16.929         2.618        -0.246  ABC
+  212   212 /    545 Q         1.472 [ 100    0    0  100]   -537421.725   -537423.196         0.157         0.773           nan        17.405         2.698         0.048  ABC
+  213   213 /    545 Q         0.045 [ 100   21    9   68]   -446225.095   -446225.050        -0.045         1.225           nan        16.694         2.412        -0.071  ABC
+  214   214 /    545 R         3.992 [ 100   75   25    0]   -230561.998   -230565.990         3.992         0.000           nan        17.110         2.889        -0.178  ABC
+  215   215 /    545 Q         0.072 [ 100   25    6   68]   -436790.065   -436789.993        -0.072         0.659           nan        16.694         2.578        -0.066  ABC
+  216   216 /    545 Q         1.982 [ 100   50   50    0]   -306087.013   -306088.995         1.982         0.564           nan        15.230         2.618        -0.296  ABC
+  217   217 /    545 Q        18.728 [ 100   75    0   25]   -250369.464   -250350.735       -18.728         0.629           nan        18.152         2.551        -0.053  DDD
+  218   218 /    545 Q         0.330 [ 100   25    0   75]   -441686.809   -441686.479        -0.330         0.294           nan        19.515         2.798         0.118  ABC
+  219   219 /    545 R        11.891 [ 100    0    0  100]   -537319.032   -537307.141         1.865         0.187           nan        19.425         2.868         0.170  DDD
+  220   220 /    545 Q         0.283 [ 100    0    6   93]   -532432.591   -532432.874         0.283         0.593           nan        16.674         2.642        -0.021  ABC
+  221   221 /    545 Q         0.434 [ 100    0    0  100]   -537352.710   -537352.276         3.308         0.097           nan        15.249         2.641        -0.082  ABC
+  222   222 /    545 R         0.877 [ 100   50   50    0]   -305936.194   -305935.317        -0.877         0.000           nan        19.595         2.660        -0.094  ABC
+  223   223 /    545 Q         0.564 [ 100    0   50   50]   -496836.441   -496835.878        -0.564         0.000           nan        19.071         2.672        -0.043  ABC
+  224   224 /    545 Q         0.192 [ 100   21    9   68]   -446255.150   -446254.958        -0.192         0.800           nan        16.694         2.552        -0.071  ABC
+  225   225 /    545 ?         0.630 [ 100   54   45    0]   -292603.485   -292604.115         0.630         0.470           nan        18.199         2.347        -0.153  ABC
+  226   226 /    545 R         6.687 [ 100    0    0  100]   -537382.940   -537389.627         1.458         0.050           nan        23.613         2.851         0.422  ABC
+  227   227 /    545 ?         8.081 [ 100  100    0    0]   -155311.451   -155319.532         8.081         0.942           nan        20.393         2.290         0.019  ABC
+  228   228 /    545 Q         0.171 [ 100    0    3   96]   -534946.080   -534945.909        -0.171         0.526           nan        16.842         2.732         0.002  ABC
+  229   229 /    545 Q         0.760 [ 100   21    9   68]   -446253.048   -446252.288        -0.760         0.502           nan        16.694         2.638        -0.071  ABC
+  230   230 /    545 ?         0.313 [ 100   36   45   18]   -362184.150   -362183.837        -0.313         0.249           nan        18.501         2.355        -0.114  ABC
+  231   231 /    545 R         0.733 [ 100    0    0  100]   -537375.654   -537376.387         2.584         0.086           nan        19.031         2.811         0.146  ABC
+  232   232 /    545 Q         1.383 [ 100    0    0  100]   -537354.498   -537355.881         0.427         0.000           nan        19.687         3.031         0.185  ABC
+  233   233 /    545 R         1.020 [ 100    3    0   96]   -525454.928   -525455.948         1.020         0.086           nan        15.031         2.717        -0.101  ABC
+  234   234 /    545 Q         1.637 [ 100   26   20   53]   -419402.830   -419404.467         1.637         0.315           nan        17.647         2.506        -0.064  ABC
+  235   235 /    545 Q         0.030 [ 100    6    0   93]   -513549.614   -513549.584        -0.030         0.340           nan        16.674         2.761        -0.009  ABC
+  236   236 /    545 Q         0.499 [ 100    0    3   96]   -534654.435   -534654.934         0.499         0.086           nan        13.845         2.610        -0.177  ABC
+  237   237 /    545 Q         1.689 [ 100    0    0  100]   -537367.255   -537365.566         2.909         0.039           nan        19.435         2.907         0.170  ABC
+  238   238 /    545 Q         2.334 [ 100    0    0  100]   -537000.312   -537002.647        13.797         0.497           nan        12.966         2.506        -0.219  ABC
+  239   239 /    545 Q         0.127 [ 100   21    9   68]   -446244.325   -446244.452         0.127         0.838           nan        16.694         2.557        -0.071  ABC
+  240   240 /    545 R         1.413 [ 100   50    0   50]   -346120.687   -346119.273        -1.413         0.000           nan        16.898         2.555        -0.077  ABC
+  241   241 /    545 Q         1.315 [ 100   50    0   50]   -346009.430   -346008.115        -1.315         0.730           nan        20.898         2.492         0.141  ABC
+  242   242 /    545 Q         0.249 [ 100   25    6   68]   -436808.478   -436808.727         0.249         0.635           nan        16.694         2.640        -0.066  ABC
+  243   243 /    545 Q         0.175 [ 100   12   37   50]   -459572.711   -459572.887         0.175         0.668           nan        16.694         2.542        -0.145  ABC
+  244   244 /    545 Q         0.516 [ 100   18   12   68]   -455678.208   -455677.692        -0.516         1.029           nan        16.694         2.459        -0.077  ABC
+  245   245 /    545 ?         2.391 [ 100    6    0   93]   -513541.826   -513539.435        -2.391         0.055           nan        16.640         2.723        -0.011  ABC
+  246   246 /    545 Q         0.179 [ 100   21    9   68]   -446239.128   -446238.949        -0.179         0.730           nan        16.694         2.527        -0.071  ABC
+  247   247 /    545 R         6.635 [ 100   75   25    0]   -230428.225   -230421.590        -6.635         0.000           nan        19.812         3.017        -0.049  ABC
+  248   248 /    545 Q         0.065 [ 100    2    7   89]   -520898.660   -520898.725         0.065         0.165           nan        16.694         2.688        -0.029  ABC
+  249   249 /    545 Q         0.585 [ 100   21    9   68]   -446231.091   -446231.676         0.585         1.229           nan        16.694         2.447        -0.071  ABC
+  250   250 /    545 Q         0.880 [ 100   87   12    0]   -192741.733   -192740.853        -0.880         1.900           nan        20.444         2.168         0.001  ABC
+  251   251 /    545 Q         1.127 [ 100   50   50    0]   -305766.883   -305765.756        -1.127         0.000           nan        16.778         2.560        -0.225  ABC
+  252   252 /    545 R         0.614 [ 100    0    3   96]   -534925.944   -534926.557         0.614         0.065           nan        18.063         2.850         0.074  ABC
+  253   253 /    545 Q         2.031 [ 100   25   75    0]   -381847.759   -381849.790         2.031         0.656           nan        20.918         2.907        -0.068  ABC
+  254   254 /    545 ?         0.138 [ 100   36   45   18]   -362172.476   -362172.614         0.138         0.632           nan        18.501         2.360        -0.114  ABC
+  255   255 /    545 Q         7.818 [ 100   50    0   50]   -346001.089   -345993.271        -7.818         1.045           nan        13.866         2.427        -0.243  ABC
+  256   256 /    545 R         0.090 [ 100    0    6   93]   -532440.439   -532440.348        -0.090         0.029           nan        16.007         2.783        -0.060  ABC
+  257   257 /    545 Q         3.268 [ 100    3    0   96]   -524750.463   -524753.730         3.268        13.192           nan        17.232         1.766         0.031  ABC
+  258   258 /    545 Q         2.178 [ 100   75    0   25]   -250374.793   -250372.615        -2.178         0.889           nan        12.465         2.470        -0.349  ABC
+  259   259 /    545 Q         0.028 [ 100    3    3   93]   -522893.551   -522893.579         0.028         0.052           nan        19.859         2.994         0.174  ABC
+  260   260 /    545 Q         0.452 [ 100   21    9   68]   -446237.434   -446237.886         0.452         1.000           nan        16.694         2.565        -0.071  ABC
+  261   261 /    545 Q         0.085 [ 100   25    6   68]   -436791.545   -436791.459        -0.085         0.668           nan        16.694         2.582        -0.066  ABC
+  262   262 /    545 Q         2.550 [ 100   33   13   53]   -399236.730   -399239.280         2.550         0.204           nan        17.647         2.636        -0.053  ABC
+  263   263 /    545 R         0.157 [ 100    6    0   93]   -513513.955   -513514.112         0.157         0.050           nan        18.008         2.853         0.071  ABC
+  264   264 /    545 R         0.882 [ 100    0   75   25]   -477379.397   -477380.278         0.882         0.000           nan        22.760         3.174         0.054  ABC
+  265   265 /    545 R         0.528 [ 100   50   50    0]   -305949.275   -305948.746        -0.528         0.000           nan        21.312         2.735        -0.015  ABC
+  266   266 /    545 Q         0.991 [ 100   50    0   50]   -346100.843   -346099.852        -0.991         0.411           nan        17.133         2.614        -0.064  ABC
+  267   267 /    545 Q         0.836 [ 100    0    6   93]   -532428.014   -532427.178        -0.836         0.045           nan        18.220         2.903         0.070  ABC
+  268   268 /    545 Q         0.127 [ 100    3    6   89]   -518102.119   -518101.992        -0.127         0.336           nan        16.694         2.657        -0.027  ABC
+  269   269 /    545 Q         0.035 [ 100   25    6   68]   -436791.588   -436791.553        -0.035         1.120           nan        16.694         2.522        -0.066  ABC
+  270   270 /    545 R         6.418 [ 100    0   50   50]   -497358.085   -497364.503         6.418         0.000           nan        19.881         2.956        -0.003  ABC
+  271   271 /    545 Q         1.192 [ 100    3    3   93]   -522970.697   -522969.506        -1.192         0.034           nan        18.220         2.927         0.077  ABC
+  272   272 /    545 R         0.418 [ 100    3    0   96]   -525073.260   -525072.842        -0.418         0.108           nan        15.835         2.712        -0.053  ABC
+  273   273 /    545 Q         0.214 [ 100   25    6   68]   -436800.089   -436799.875        -0.214         0.759           nan        16.694         2.628        -0.066  ABC
+  274   274 /    545 R         0.766 [ 100    0    0  100]   -537387.031   -537387.797         2.317         0.140           nan        15.451         2.681        -0.070  ABC
+  275   275 /    545 R         1.144 [ 100    3    3   93]   -522955.053   -522956.197         1.144         0.086           nan        18.342         2.839         0.084  ABC
+  276   276 /    545 R         0.664 [ 100    0    0  100]   -537452.630   -537451.966         0.042         0.000           nan        16.784         2.820         0.011  ABC
+  277   277 /    545 R         0.064 [ 100    0    0  100]   -537461.948   -537462.012         0.002         0.000           nan        16.694         2.867         0.005  ABC
+  278   278 /    545 Q         0.211 [ 100   25    6   68]   -436787.334   -436787.123        -0.211         0.918           nan        16.694         2.568        -0.066  ABC
+  279   279 /    545 R         0.197 [ 100    0    0  100]   -537371.405   -537371.207         1.827         0.090           nan        23.101         2.718         0.391  ABC
+  280   280 /    545 ?         0.191 [ 100   54   45    0]   -292607.667   -292607.476        -0.191         0.128           nan        19.325         2.430        -0.101  ABC
+  281   281 /    545 Q         0.340 [ 100    0    3   96]   -534819.025   -534819.364         0.340         0.919           nan        17.212         2.528         0.023  ABC
+  282   282 /    545 R         0.114 [ 100    0    0  100]   -537424.723   -537424.837         1.169         0.054           nan        17.885         2.811         0.077  ABC
+  283   283 /    545 Q         0.172 [ 100   21    9   68]   -446247.897   -446247.725        -0.172         1.319           nan        16.694         2.544        -0.071  ABC
+  284   284 /    545 Q         0.035 [ 100   18   12   68]   -455682.914   -455682.948         0.035         0.986           nan        16.694         2.576        -0.077  ABC
+  285   285 /    545 Q         0.685 [ 100   25    6   68]   -436782.354   -436783.039         0.685         0.921           nan        16.694         2.506        -0.066  ABC
+  286   286 /    545 ?         0.293 [ 100   36   36   27]   -369414.427   -369414.135        -0.293         0.663           nan        17.972         2.333        -0.113  ABC
+  287   287 /    545 Q         1.183 [ 100    0   50   50]   -496950.533   -496951.716         1.183         1.207           nan        22.728         2.568         0.140  ABC
+  288   288 /    545 Q         0.040 [ 100   25   25   50]   -421800.253   -421800.294         0.040         0.768           nan        16.694         2.533        -0.127  ABC
+  289   289 /    545 R         0.255 [ 100    0    0  100]   -537447.800   -537448.055         0.261         0.367           nan        17.131         2.868         0.032  ABC
+  290   290 /    545 R         0.900 [ 100    3    3   93]   -522962.902   -522963.802         0.900         0.078           nan        18.175         2.839         0.074  ABC
+  291   291 /    545 Q         0.178 [ 100    0    0  100]   -537434.554   -537434.732         0.862         0.013           nan        17.580         2.839         0.059  ABC
+  292   292 /    545 ?         0.552 [ 100    0  100    0]   -457113.101   -457112.548        -0.552         0.208           nan        33.114         3.274         0.424  ABC
+  293   293 /    545 Q         0.162 [ 100    0    3   96]   -534945.418   -534945.255        -0.162         0.407           nan        16.842         2.702         0.002  ABC
+  294   294 /    545 ?         0.715 [ 100   36   36   27]   -369429.529   -369428.814        -0.715         0.486           nan        17.972         2.385        -0.113  ABC
+  295   295 /    545 Q         0.607 [ 100   15   34   50]   -450126.539   -450127.146         0.607         0.712           nan        16.694         2.569        -0.141  ABC
+  296   296 /    545 ?         1.440 [ 100    6   93    0]   -438226.181   -438224.742        -1.440         5.657           nan        23.008         2.147        -0.002  ABC
+  297   297 /    545 Q         0.399 [ 100    3    0   96]   -525092.822   -525092.423        -0.399         0.370           nan        17.212         2.707         0.030  ABC
+  298   298 /    545 R         0.839 [ 100    3    0   96]   -525459.038   -525459.876         0.839         0.052           nan        18.217         2.848         0.090  ABC
+  299   299 /    545 Q         0.656 [ 100   21    9   68]   -446246.574   -446245.918        -0.656         1.003           nan        16.694         2.547        -0.071  ABC
+  300   300 /    545 R         3.322 [ 100    0    0  100]   -537339.089   -537335.767         1.521         0.156           nan        23.427         2.822         0.411  ABC
+  301   301 /    545 ?         0.556 [ 100   27   22   50]   -415012.832   -415013.388         0.556         0.140           nan        17.688         2.419        -0.071  ABC
+  302   302 /    545 R         0.481 [ 100    3    0   96]   -525478.033   -525478.514         0.481         0.040           nan        17.802         2.848         0.065  ABC
+  303   303 /    545 Q         0.134 [ 100   25    6   68]   -436772.285   -436772.418         0.134         1.088           nan        16.694         2.604        -0.066  ABC
+  304   304 /    545 Q         1.660 [ 100   87   12    0]   -192503.960   -192502.300        -1.660         2.798           nan        20.444         2.086         0.001  ABC
+  305   305 /    545 ?         0.212 [ 100    1    1   97]   -531004.580   -531004.792         0.212         0.077           nan        16.777         2.698         0.002  ABC
+  306   306 /    545 Q         0.069 [ 100   16   30   53]   -449640.717   -449640.647        -0.069         0.215           nan        17.647         2.687        -0.080  ABC
+  307   307 /    545 ?         7.217 [ 100   21   21   57]   -438210.927   -438218.144         7.217         0.294           nan        19.169         2.527         0.022  ABC
+  308   308 /    545 Q         0.493 [ 100    6    0   93]   -513427.231   -513426.737        -0.493         0.016           nan        19.859         3.024         0.181  ABC
+  309   309 /    545 Q         0.142 [ 100   18   12   68]   -455701.726   -455701.869         0.142         0.594           nan        16.694         2.557        -0.077  ABC
+  310   310 /    545 ?         1.618 [ 100   36   45   18]   -362160.883   -362159.264        -1.618         0.841           nan        18.501         2.361        -0.114  ABC
+  311   311 /    545 R         0.117 [ 100    6    0   93]   -513554.009   -513554.127         0.117         0.033           nan        16.174         2.809        -0.038  ABC
+  312   312 /    545 Q         4.713 [ 100   26   26   46]   -414072.539   -414067.827        -4.713         0.544           nan        17.807         2.448        -0.077  ABC
+  313   313 /    545 R         2.453 [ 100    0    0  100]   -537390.277   -537387.824         1.494         0.058           nan        23.101         2.802         0.391  ABC
+  314   314 /    545 Q         0.467 [ 100   25    6   68]   -436788.128   -436788.595         0.467         1.000           nan        16.694         2.631        -0.066  ABC
+  315   315 /    545 Q         1.272 [ 100   12   37   50]   -459579.898   -459578.626        -1.272         0.652           nan        16.694         2.638        -0.145  ABC
+  316   316 /    545 Q         0.903 [ 100    3    0   96]   -525071.807   -525070.904        -0.903         0.796           nan        17.212         2.640         0.030  ABC
+  317   317 /    545 Q         0.310 [ 100    3    3   93]   -522970.947   -522971.257         0.310         0.798           nan        16.674         2.631        -0.015  ABC
+  318   318 /    545 R         1.097 [ 100    0    0  100]   -537382.759   -537383.857         2.439         0.146           nan        15.399         2.677        -0.073  ABC
+  319   319 /    545 R         2.205 [ 100   75   25    0]   -230580.446   -230582.651         2.205         0.000           nan        16.173         2.820        -0.223  ABC
+  320   320 /    545 R         1.237 [ 100   75   25    0]   -230514.253   -230515.490         1.237         0.000           nan        18.298         2.948        -0.121  ABC
+  321   321 /    545 R         1.204 [ 100    0    3   96]   -534904.731   -534905.936         1.204         0.086           nan        18.526         2.850         0.102  ABC
+  322   322 /    545 ?         0.602 [ 100   36   45   18]   -362184.440   -362183.839        -0.602         0.081           nan        18.132         2.373        -0.131  ABC
+  323   323 /    545 R         2.568 [ 100    0   25   75]   -517311.503   -517314.071         2.568         0.000           nan        21.849         3.131         0.196  ABC
+  324   324 /    545 ?         0.706 [ 100   54   45    0]   -292566.883   -292567.589         0.706         0.892           nan        18.199         2.350        -0.153  ABC
+  325   325 /    545 Q         0.817 [ 100   75    0   25]   -250525.692   -250524.875        -0.817         0.142           nan        15.449         2.664        -0.194  ABC
+  326   326 /    545 Q         0.405 [ 100    0    3   96]   -534820.350   -534820.755         0.405         0.809           nan        17.212         2.594         0.023  ABC
+  327   327 /    545 R         0.286 [ 100    6    0   93]   -513505.995   -513506.281         0.286         0.054           nan        18.175         2.853         0.081  ABC
+  328   328 /    545 Q         0.134 [ 100   15   34   50]   -450140.700   -450140.566        -0.134         0.725           nan        16.694         2.551        -0.141  ABC
+  329   329 /    545 ?         1.047 [ 100    0  100    0]   -457325.594   -457324.547        -1.047         0.000           nan        20.722         2.979        -0.109  ABC
+  330   330 /    545 R         0.825 [ 100    0    0  100]   -537444.966   -537445.790         0.067         0.000           nan        17.520         2.869         0.055  ABC
+  331   331 /    545 ?         0.787 [ 100   37   35   27]   -367137.200   -367137.987         0.787         0.331           nan        17.970         2.352        -0.112  ABC
+  332   332 /    545 ?         0.598 [ 100   55   44    0]   -290323.055   -290322.457        -0.598         0.364           nan        18.196         2.363        -0.152  ABC
+  333   333 /    545 Q         1.209 [ 100   50    0   50]   -345958.828   -345957.619        -1.209         0.478           nan        21.740         2.575         0.187  ABC
+  334   334 /    545 R         0.704 [ 100    0    0  100]   -537448.176   -537448.880         0.055         0.000           nan        17.419         2.869         0.049  ABC
+  335   335 /    545 R         4.103 [ 100   75    0   25]   -250299.023   -250303.126         4.103         0.000           nan        11.839         2.555        -0.382  ABC
+  336   336 /    545 Q         0.519 [ 100   21    9   68]   -446267.108   -446266.589        -0.519         0.697           nan        16.694         2.609        -0.071  ABC
+  337   337 /    545 Q         0.414 [ 100    0    3   96]   -534730.392   -534730.806         0.414         0.052           nan        21.832         3.107         0.298  ABC
+  338   338 /    545 Q         8.642 [ 100   75    0   25]   -250484.020   -250475.378        -8.642         0.765           nan        16.098         2.599        -0.160  ABC
+  339   339 /    545 Q         0.178 [ 100    6    0   93]   -513512.424   -513512.602         0.178         0.815           nan        16.674         2.552        -0.009  ABC
+  340   340 /    545 ?         1.322 [ 100   36   36   27]   -369401.893   -369400.571        -1.322         0.214           nan        19.397         2.437        -0.043  ABC
+  341   341 /    545 R         0.856 [ 100    0    0  100]   -537309.115   -537309.971         0.610         0.000           nan        13.763         2.681        -0.171  ABC
+  342   342 /    545 Q         0.264 [ 100   25    6   68]   -436796.987   -436797.252         0.264         0.827           nan        16.694         2.498        -0.066  ABC
+  343   343 /    545 R         0.710 [ 100    3    3   93]   -522984.885   -522984.175        -0.710         0.072           nan        15.674         2.750        -0.074  ABC
+  344   344 /    545 Q         1.118 [ 100   75    0   25]   -250401.358   -250400.241        -1.118         0.142           nan        18.152         2.819        -0.053  ABC
+  345   345 /    545 Q         0.837 [ 100   25    6   68]   -436786.575   -436787.412         0.837         0.676           nan        16.694         2.522        -0.066  ABC
+  346   346 /    545 Q         0.036 [ 100    0    0   99]   -537148.878   -537148.914         0.036         0.019           nan        16.694         2.838         0.004  ABC
+  347   347 /    545 Q         1.599 [ 100    0    0  100]   -537391.258   -537392.857         0.279         0.224           nan        18.887         2.880         0.137  ABC
+  348   348 /    545 Q         0.106 [ 100   25    6   68]   -436788.316   -436788.422         0.106         0.643           nan        16.694         2.570        -0.066  ABC
+  349   349 /    545 Q         0.234 [ 100   18   12   68]   -455683.341   -455683.575         0.234         0.933           nan        16.694         2.525        -0.077  ABC
+  350   350 /    545 R         0.319 [ 100    6    0   93]   -513525.737   -513525.418        -0.319         0.075           nan        15.340         2.738        -0.088  ABC
+  351   351 /    545 ?         2.231 [ 100    0  100    0]   -457349.004   -457346.773        -2.231         0.066           nan        25.182         3.185         0.083  ABC
+  352   352 /    545 R         1.052 [ 100    0    0  100]   -537427.936   -537428.988         0.134         0.000           nan        17.043         2.800         0.026  ABC
+  353   353 /    545 Q        21.246 [ 100    0  100    0]   -457212.199   -457233.445        21.246         0.000           nan        18.344         2.878        -0.211  DDD
+  354   354 /    545 Q         1.171 [ 100   25    0   75]   -441762.009   -441760.838        -1.171         0.000           nan        14.006         2.706        -0.198  ABC
+  355   355 /    545 ?         0.308 [ 100  100    0    0]   -152159.476   -152159.784         0.308         0.000           nan        11.091         1.931        -0.446  ABC
+  356   356 /    545 ?         4.187 [ 100   36   45   18]   -362148.582   -362144.395        -4.187         0.048           nan        17.519         2.326        -0.161  ABC
+  357   357 /    545 ?         0.012 [ 100   54   45    0]   -292620.807   -292620.819         0.012         0.027           nan        18.305         2.394        -0.148  ABC
+  358   358 /    545 R         0.381 [ 100   13   16   70]   -473708.392   -473708.773         0.381         0.048           nan        16.694         2.351        -0.081  ABC
+  359   359 /    545 Q         0.053 [ 100    0    0   99]   -535967.709   -535967.761         0.053         0.010           nan        16.694         2.852         0.004  ABC
+  360   360 /    545 ?         0.679 [ 100   36   45   18]   -362179.675   -362178.996        -0.679         0.339           nan        18.501         2.363        -0.114  ABC
+  361   361 /    545 ?         1.683 [ 100   36   45   18]   -362156.527   -362154.844        -1.683         0.868           nan        18.074         2.227        -0.134  ABC
+  362   362 /    545 Q         3.943 [ 100   25    0   75]   -441704.532   -441700.589        -3.943         1.363           nan        14.006         2.492        -0.198  ABC
+  363   363 /    545 R         2.460 [ 100   25   75    0]   -381725.380   -381722.921        -2.460         0.000           nan        15.591         2.798        -0.305  ABC
+  364   364 /    545 Q         0.012 [ 100   25    6   68]   -436787.281   -436787.269        -0.012         1.096           nan        16.694         2.557        -0.066  ABC
+  365   365 /    545 Q         0.005 [ 100   18   31   50]   -440686.380   -440686.375        -0.005         0.649           nan        16.694         2.558        -0.136  ABC
+  366   366 /    545 Q         0.270 [ 100    6    0   93]   -513531.370   -513531.640         0.270         0.762           nan        16.674         2.607        -0.009  ABC
+  367   367 /    545 R         0.258 [ 100    0    6   93]   -532450.139   -532450.398         0.258         0.033           nan        16.507         2.804        -0.030  ABC
+  368   368 /    545 Q         1.036 [ 100    0   50   50]   -496963.703   -496964.739         1.036         0.584           nan        24.719         2.742         0.240  ABC
+  369   369 /    545 ?         1.613 [ 100   36   36   27]   -369424.960   -369423.347        -1.613         0.355           nan        17.269         2.309        -0.148  ABC
+  370   370 /    545 ?         1.746 [ 100    0  100    0]   -457149.787   -457148.041        -1.746         0.000           nan        32.072         3.558         0.379  ABC
+  371   371 /    545 ?         1.072 [ 100   36   45   18]   -362152.309   -362151.237        -1.072         0.876           nan        18.501         2.410        -0.114  ABC
+  372   372 /    545 R         0.197 [ 100    0    6   93]   -532447.655   -532447.851         0.197         0.033           nan        16.341         2.790        -0.040  ABC
+  373   373 /    545 ?         1.662 [ 100   36   45   18]   -362144.610   -362142.948        -1.662         1.078           nan        17.992         2.202        -0.138  ABC
+  374   374 /    545 R         5.226 [ 100    0   50   50]   -497230.245   -497235.471         5.226         0.000           nan        16.042         2.752        -0.195  ABC
+  375   375 /    545 Q         1.404 [ 100    0    0  100]   -537357.851   -537356.447         3.289         0.044           nan        14.712         2.675        -0.114  ABC
+  376   376 /    545 ?         1.705 [ 100   36   36   27]   -369379.202   -369377.497        -1.705         0.960           nan        16.547         2.249        -0.183  ABC
+  377   377 /    545 R         8.398 [ 100    0   50   50]   -497352.076   -497360.474         8.398         0.000           nan        18.528         2.887        -0.071  ABC
+  378   378 /    545 R         0.516 [ 100   50   50    0]   -305948.695   -305948.179        -0.516         0.000           nan        20.395         2.714        -0.057  ABC
+  379   379 /    545 Q         0.284 [ 100   21    9   68]   -446227.636   -446227.921         0.284         1.479           nan        16.694         2.388        -0.071  ABC
+  380   380 /    545 ?         1.062 [ 100   54   45    0]   -292579.377   -292580.439         1.062         0.402           nan        20.018         2.382        -0.068  ABC
+  381   381 /    545 ?         1.163 [ 100    0    0  100]   -537292.941   -537294.103         1.347         0.000           nan        20.706         3.082         0.247  ABC
+  382   382 /    545 Q         1.802 [ 100    0   75   25]   -477297.391   -477299.193         1.802         0.000           nan        17.623         2.921        -0.184  ABC
+  383   383 /    545 Q         0.156 [ 100    0    3   96]   -534770.111   -534769.955        -0.156         1.955           nan        17.232         2.397         0.024  ABC
+  384   384 /    545 R         1.445 [ 100    0    0  100]   -537425.203   -537426.647         0.144         0.000           nan        18.026         2.869         0.085  ABC
+  385   385 /    545 Q         1.207 [ 100   50    0   50]   -346022.419   -346021.213        -1.207         2.288           nan        16.297         2.292        -0.110  ABC
+  386   386 /    545 ?         0.120 [ 100   54   45    0]   -292599.095   -292598.975        -0.120         0.475           nan        18.199         2.341        -0.153  ABC
+  387   387 /    545 R         3.287 [ 100    0   50   50]   -497265.739   -497269.026         3.287         0.000           nan        16.478         2.777        -0.173  ABC
+  388   388 /    545 ?         0.054 [ 100    0  100    0]   -456945.893   -456945.948         0.054         1.012           nan        17.651         2.654        -0.241  ABC
+  389   389 /    545 Q         0.044 [ 100    0   75   25]   -477391.524   -477391.568         0.044         0.170           nan        21.841         3.083         0.011  ABC
+  390   390 /    545 Q         0.732 [ 100    0    3   96]   -534575.797   -534576.529         0.732         0.178           nan        13.403         2.584        -0.203  ABC
+  391   391 /    545 Q         0.058 [ 100    6    0   93]   -513524.644   -513524.702         0.058         0.859           nan        16.674         2.619        -0.009  ABC
+  392   392 /    545 R         0.700 [ 100    0    6   93]   -532418.862   -532419.562         0.700         0.108           nan        18.175         2.830         0.068  ABC
+  393   393 /    545 ?         0.783 [ 100    0  100    0]   -457324.619   -457325.402         0.783         0.103           nan        24.542         3.153         0.055  ABC
+  394   394 /    545 ?         0.219 [ 100   36   45   18]   -362158.810   -362158.592        -0.219         0.923           nan        18.501         2.342        -0.114  ABC
+  395   395 /    545 R         0.049 [ 100    6    0   93]   -513541.909   -513541.959         0.049         0.061           nan        15.674         2.767        -0.068  ABC
+  396   396 /    545 Q         0.797 [ 100    3    0   96]   -524810.528   -524809.732        -0.797         0.085           nan        22.909         3.084         0.370  ABC
+  397   397 /    545 ?         2.303 [ 100    0    0  100]   -537451.683   -537449.380         0.053         0.000           nan        16.476         2.745        -0.008  ABC
+  398   398 /    545 ?         2.495 [ 100   36   45   18]   -362178.234   -362175.739        -2.495         0.436           nan        18.501         2.355        -0.114  ABC
+  399   399 /    545 R         0.640 [ 100    3    0   96]   -525101.288   -525100.648        -0.640         0.033           nan        16.696         2.783        -0.001  ABC
+  400   400 /    545 Q         0.073 [ 100   21    9   68]   -446229.842   -446229.915         0.073         0.757           nan        16.694         2.562        -0.071  ABC
+  401   401 /    545 R         0.588 [ 100    3    3   93]   -522995.806   -522995.219        -0.588         0.044           nan        16.007         2.786        -0.054  ABC
+  402   402 /    545 R         0.057 [ 100    3    3   93]   -523003.618   -523003.675         0.057         0.021           nan        16.507         2.828        -0.024  ABC
+  403   403 /    545 Q         0.400 [ 100   25    6   68]   -436782.416   -436782.016        -0.400         0.835           nan        16.694         2.579        -0.066  ABC
+  404   404 /    545 R         0.613 [ 100    0    0  100]   -537354.776   -537354.162         0.433         0.000           nan        14.137         2.708        -0.149  ABC
+  405   405 /    545 Q         1.282 [ 100    0    3   96]   -534825.848   -534824.566        -1.282         1.152           nan        17.232         2.628         0.024  ABC
+  406   406 /    545 Q         1.741 [ 100    0    0  100]   -537401.824   -537400.082         1.874         0.028           nan        16.233         2.738        -0.023  ABC
+  407   407 /    545 R         1.459 [ 100    3    0   96]   -525097.330   -525095.870        -1.459         0.066           nan        16.351         2.722        -0.022  ABC
+  408   408 /    545 Q         1.148 [ 100   75   25    0]   -230493.356   -230492.207        -1.148         0.190           nan        18.671         2.861        -0.103  ABC
+  409   409 /    545 ?         0.628 [ 100   36   36   27]   -369405.850   -369405.222        -0.628         0.195           nan        19.397         2.368        -0.043  ABC
+  410   410 /    545 Q         1.382 [ 100    3    0   96]   -525000.984   -524999.602        -1.382         0.050           nan        19.925         2.944         0.192  ABC
+  411   411 /    545 R        15.548 [ 100   50    0   50]   -346018.526   -346034.075        15.548         0.000           nan        19.191         2.921         0.048  DDD
+  412   412 /    545 Q         0.253 [ 100   15   34   50]   -450127.518   -450127.265        -0.253         0.667           nan        16.694         2.543        -0.141  ABC
+  413   413 /    545 ?         0.399 [ 100   54   45    0]   -292598.195   -292597.796        -0.399         0.424           nan        18.199         2.347        -0.153  ABC
+  414   414 /    545 ?         0.650 [ 100   54   45    0]   -292580.744   -292581.394         0.650         0.940           nan        18.199         2.369        -0.153  ABC
+  415   415 /    545 Q         0.692 [ 100    0    0  100]   -537258.171   -537258.862         6.721         3.219           nan        16.188         2.177        -0.025  ABC
+  416   416 /    545 Q         0.381 [ 100   25    6   68]   -436783.227   -436782.846        -0.381         0.919           nan        16.694         2.521        -0.066  ABC
+  417   417 /    545 Q         1.698 [ 100   23   23   53]   -429486.578   -429488.276         1.698         0.224           nan        17.647         2.468        -0.069  ABC
+  418   418 /    545 ?         2.090 [ 100    3    3   93]   -522985.988   -522983.898        -2.090         0.071           nan        16.632         2.700        -0.017  ABC
+  419   419 /    545 ?         1.055 [ 100    0  100    0]   -457382.492   -457381.437        -1.055         0.017           nan        22.873         3.173        -0.017  ABC
+  420   420 /    545 Q         1.899 [ 100   33   13   53]   -399241.778   -399243.677         1.899         0.305           nan        17.647         2.511        -0.053  ABC
+  421   421 /    545 Q         6.275 [ 100   26   26   46]   -414077.641   -414071.366        -6.275         0.329           nan        17.807         2.481        -0.077  ABC
+  422   422 /    545 R         0.402 [ 100    0    0  100]   -537457.409   -537457.811         0.019         0.000           nan        17.048         2.869         0.027  ABC
+  423   423 /    545 R         0.158 [ 100    0    0  100]   -537436.637   -537436.479         0.104         0.000           nan        16.950         2.803         0.021  ABC
+  424   424 /    545 ?         0.621 [ 100    9    9   80]   -492332.309   -492332.930         0.621         0.164           nan        16.971         2.596        -0.035  ABC
+  425   425 /    545 Q         0.406 [ 100    0    0  100]   -537242.929   -537242.524         7.040         4.135           nan        16.483         2.233        -0.008  ABC
+  426   426 /    545 R         0.633 [ 100    0    0  100]   -537462.177   -537461.544         0.004         0.000           nan        16.334         2.844        -0.016  ABC
+  427   427 /    545 R         0.369 [ 100    0    0  100]   -537462.617   -537462.247         0.001         0.000           nan        16.450         2.854        -0.010  ABC
+  428   428 /    545 ?         0.771 [ 100   36   45   18]   -362186.327   -362185.556        -0.771         0.033           nan        18.591         2.389        -0.109  ABC
+  429   429 /    545 Q         1.497 [ 100   87   12    0]   -192644.811   -192643.315        -1.497         3.184           nan        20.444         2.095         0.001  ABC
+  430   430 /    545 R         0.365 [ 100    0    0  100]   -537416.950   -537416.585         1.379         0.093           nan        17.074         2.780         0.028  ABC
+  431   431 /    545 ?         1.012 [ 100    0  100    0]   -457256.856   -457255.845        -1.012         0.000           nan        18.633         2.969        -0.199  ABC
+  432   432 /    545 Q         0.158 [ 100    3    3   93]   -522980.135   -522980.292         0.158         0.786           nan        16.674         2.639        -0.015  ABC
+  433   433 /    545 R         0.452 [ 100    0   58   41]   -490461.238   -490460.787        -0.452         0.363           nan        18.043         2.559        -0.120  ABC
+  434   434 /    545 ?         0.708 [ 100   54   45    0]   -292587.308   -292588.016         0.708         0.539           nan        18.199         2.371        -0.153  ABC
+  435   435 /    545 Q         0.532 [ 100   18   12   68]   -455678.752   -455678.220        -0.532         1.089           nan        16.694         2.504        -0.077  ABC
+  436   436 /    545 Q         0.017 [ 100   18   12   68]   -455699.348   -455699.366         0.017         0.548           nan        16.694         2.626        -0.077  ABC
+  437   437 /    545 Q         0.907 [ 100    3    0   96]   -524978.591   -524977.684        -0.907         3.503           nan        17.232         2.303         0.031  ABC
+  438   438 /    545 R         0.497 [ 100    6    0   93]   -513534.699   -513534.202        -0.497         0.067           nan        15.507         2.752        -0.078  ABC
+  439   439 /    545 R         1.660 [ 100    0   75   25]   -477288.900   -477290.560         1.660         0.000           nan        17.506         2.911        -0.189  ABC
+  440   440 /    545 Q         0.475 [ 100    6    0   93]   -513426.834   -513427.309         0.475         0.036           nan        19.859         2.995         0.181  ABC
+  441   441 /    545 ?         0.826 [ 100   21   21   57]   -438252.141   -438251.314        -0.826         0.374           nan        19.169         2.582         0.022  ABC
+  442   442 /    545 R         3.825 [ 100    0    0  100]   -537267.035   -537270.860         3.450         0.201           nan        20.246         2.868         0.219  ABC
+  443   443 /    545 R        10.036 [ 100   25   75    0]   -381675.478   -381665.442       -10.036         0.000           nan        15.178         2.770        -0.324  DDD
+  444   444 /    545 Q         1.568 [ 100    0    0  100]   -537450.989   -537449.420         0.052         0.404           nan        16.002         2.733        -0.036  ABC
+  445   445 /    545 Q         6.150 [ 100   26   26   46]   -414068.810   -414062.660        -6.150         0.428           nan        17.807         2.449        -0.077  ABC
+  446   446 /    545 Q         0.042 [ 100    0   50   50]   -496975.208   -496975.250         0.042         0.301           nan        22.728         2.768         0.140  ABC
+  447   447 /    545 R         0.463 [ 100    6    0   93]   -513555.081   -513555.545         0.463         0.011           nan        16.507         2.839        -0.019  ABC
+  448   448 /    545 R         0.228 [ 100    0    0  100]   -537433.345   -537433.573         0.116         0.000           nan        16.985         2.802         0.023  ABC
+  449   449 /    545 ?         0.212 [ 100    1    1   97]   -531004.580   -531004.792         0.212         0.077           nan        16.777         2.698         0.002  ABC
+  450   450 /    545 Q       158.802 [ 100   87    0   12]   -201933.898   -202092.700       158.802        18.649           nan        20.444         1.716         0.044  DDD
+save frames[i] 450
+  451   451 /    545 Q         0.664 [ 100    3    0   96]   -525072.221   -525072.886         0.664         0.729           nan        17.212         2.536         0.030  ABC
+  452   452 /    545 Q         0.460 [ 100    0   50   50]   -496978.858   -496979.317         0.460         0.000           nan        24.719         2.913         0.240  ABC
+  453   453 /    545 Q         0.027 [ 100    1    8   89]   -523696.427   -523696.399        -0.027         0.258           nan        16.694         2.728        -0.031  ABC
+  454   454 /    545 Q         1.113 [ 100   26   20   53]   -419404.307   -419405.421         1.113         0.292           nan        17.647         2.456        -0.064  ABC
+  455   455 /    545 Q         0.057 [ 100    3    0   96]   -525472.814   -525472.757        -0.057         0.003           nan        18.119         2.933         0.084  ABC
+  456   456 /    545 Q         1.386 [ 100    0  100    0]   -457349.445   -457350.831         1.386         0.000           nan        21.861         3.051        -0.060  ABC
+  457   457 /    545 R         1.225 [ 100    0    0  100]   -537261.756   -537262.981         0.798         0.000           nan        13.429         2.661        -0.191  ABC
+  458   458 /    545 ?         1.021 [ 100   54   45    0]   -292593.855   -292594.876         1.021         0.350           nan        19.641         2.382        -0.086  ABC
+  459   459 /    545 ?         0.405 [ 100   36   36   27]   -369417.915   -369418.320         0.405         0.336           nan        17.106         2.330        -0.156  ABC
+  460   460 /    545 Q         1.574 [ 100    0   25   75]   -517395.916   -517397.490         1.574         0.562           nan        16.270         2.719        -0.109  ABC
+  461   461 /    545 R         0.649 [ 100    0    3   96]   -534819.468   -534818.819        -0.649         0.091           nan        18.589         2.807         0.105  ABC
+  462   462 /    545 ?         0.443 [ 100   21   21   57]   -438232.509   -438232.952         0.443         0.284           nan        19.169         2.477         0.022  ABC
+  463   463 /    545 Q         0.185 [ 100    0    0  100]   -537427.298   -537427.113         1.098         0.478           nan        17.232         2.681         0.038  ABC
+  464   464 /    545 Q         2.751 [ 100   50    0   50]   -345763.072   -345760.322        -2.751         1.925           nan        12.685         2.294        -0.307  ABC
+  465   465 /    545 R         0.038 [ 100    0    6   93]   -532448.905   -532448.944         0.038         0.028           nan        16.341         2.816        -0.040  ABC
+  466   466 /    545 Q         0.910 [ 100   50   50    0]   -305875.750   -305876.659         0.910         0.775           nan        23.599         2.606         0.091  ABC
+  467   467 /    545 R         0.316 [ 100    0   50   50]   -497272.619   -497272.303        -0.316         0.000           nan        23.361         3.119         0.172  ABC
+  468   468 /    545 R         2.861 [ 100   75   25    0]   -230536.285   -230539.146         2.861         0.000           nan        17.819         2.929        -0.144  ABC
+  469   469 /    545 ?         3.170 [ 100   36   45   18]   -362155.663   -362152.493        -3.170         1.008           nan        18.501         2.301        -0.114  ABC
+  470   470 /    545 Q         0.055 [ 100    3    3   93]   -522998.966   -522999.021         0.055         0.399           nan        16.674         2.745        -0.015  ABC
+  471   471 /    545 ?         0.199 [ 100   55   44    0]   -290322.879   -290323.078         0.199         0.334           nan        18.196         2.371        -0.152  ABC
+  472   472 /    545 R         0.272 [ 100    0    0  100]   -537462.626   -537462.354         0.001         0.000           nan        16.499         2.857        -0.007  ABC
+  473   473 /    545 ?         0.416 [ 100   36   36   27]   -369436.820   -369436.404        -0.416         0.042           nan        18.052         2.381        -0.109  ABC
+  474   474 /    545 Q         0.081 [ 100   25    6   68]   -436804.166   -436804.247         0.081         0.476           nan        16.694         2.634        -0.066  ABC
+  475   475 /    545 Q         1.006 [ 100    3    0   96]   -525086.555   -525087.561         1.006         0.381           nan        17.212         2.698         0.030  ABC
+  476   476 /    545 Q         0.112 [ 100   25    6   68]   -436784.993   -436785.105         0.112         0.795           nan        16.694         2.588        -0.066  ABC
+  477   477 /    545 Q         0.650 [ 100    3    0   96]   -525067.270   -525066.620        -0.650         1.040           nan        17.212         2.567         0.030  ABC
+  478   478 /    545 ?         4.419 [ 100   21   21   57]   -438236.896   -438232.477        -4.419         0.286           nan        19.169         2.522         0.022  ABC
+  479   479 /    545 Q         9.444 [ 100    0    0  100]   -537238.690   -537248.134         0.429         0.000           nan        20.734         2.998         0.248  ABC
+  480   480 /    545 Q         0.508 [ 100   15   34   50]   -450126.968   -450127.477         0.508         0.755           nan        16.694         2.562        -0.141  ABC
+  481   481 /    545 Q         0.062 [ 100   21    9   68]   -446237.406   -446237.344        -0.062         1.116           nan        16.694         2.607        -0.071  ABC
+  482   482 /    545 Q         3.153 [ 100   75   25    0]   -230332.598   -230329.445        -3.153         1.243           nan        12.754         2.409        -0.388  ABC
+  483   483 /    545 Q         0.184 [ 100   12   37   50]   -459572.608   -459572.424        -0.184         0.540           nan        16.694         2.576        -0.145  ABC
+  484   484 /    545 ?         3.070 [ 100   54   45    0]   -292591.022   -292594.091         3.070         0.297           nan        19.518         2.455        -0.092  ABC
+  485   485 /    545 ?         1.319 [ 100    3    0   96]   -525092.422   -525091.103        -1.319         0.091           nan        17.191         2.723         0.028  ABC
+  486   486 /    545 Q         0.004 [ 100   25    6   68]   -436794.888   -436794.891         0.004         0.878           nan        16.694         2.604        -0.066  ABC
+  487   487 /    545 Q         0.761 [ 100   15   34   50]   -450131.998   -450131.237        -0.761         0.437           nan        16.694         2.627        -0.141  ABC
+  488   488 /    545 Q         0.546 [ 100    3    3   93]   -522966.723   -522967.269         0.546         0.906           nan        16.674         2.606        -0.015  ABC
+  489   489 /    545 R         0.143 [ 100   33   66    0]   -356851.411   -356851.554         0.143         0.000           nan        23.189         2.827         0.046  ABC
+  490   490 /    545 Q         0.555 [ 100    3    3   93]   -522969.500   -522970.054         0.555         1.087           nan        16.674         2.565        -0.015  ABC
+  491   491 /    545 Q         1.760 [ 100    0   75   25]   -477289.728   -477287.968        -1.760         0.138           nan        25.664         3.187         0.188  ABC
+  492   492 /    545 ?         6.457 [ 100   21   21   57]   -438242.590   -438249.048         6.457         0.476           nan        19.169         2.556         0.022  ABC
+  493   493 /    545 Q         0.070 [ 100   18   12   68]   -455699.221   -455699.292         0.070         0.542           nan        16.694         2.562        -0.077  ABC
+  494   494 /    545 R         0.728 [ 100   50    0   50]   -345934.325   -345935.054         0.728         0.000           nan        14.630         2.413        -0.201  ABC
+  495   495 /    545 Q         1.546 [ 100    3    0   96]   -525067.882   -525069.428         1.546         1.280           nan        17.232         2.464         0.031  ABC
+  496   496 /    545 Q         0.252 [ 100  100    0    0]   -155155.138   -155154.886        -0.252         1.194           nan        17.651         2.196        -0.118  ABC
+  497   497 /    545 R         0.634 [ 100    0    3   96]   -534853.184   -534853.818         0.634         0.064           nan        16.868         2.781         0.003  ABC
+  498   498 /    545 Q         0.461 [ 100    0    0  100]   -537171.129   -537170.669         9.048         0.062           nan        22.710         3.092         0.367  ABC
+  499   499 /    545 Q         5.379 [ 100    0   50   50]   -497307.325   -497301.946        -5.379         0.278           nan        22.015         2.951         0.104  ABC
+  500   500 /    545 R         0.451 [ 100    0   75   25]   -477386.718   -477387.169         0.451         0.000           nan        22.304         3.149         0.033  ABC
+  501   501 /    545 R         0.813 [ 100    3    0   96]   -525099.106   -525098.293        -0.813         0.049           nan        16.523         2.769        -0.012  ABC
+  502   502 /    545 ?         0.041 [ 100   54   45    0]   -292601.120   -292601.162         0.041         0.587           nan        18.199         2.378        -0.153  ABC
+  503   503 /    545 R         0.995 [ 100    0    0  100]   -537440.275   -537441.271         0.085         0.000           nan        17.655         2.869         0.063  ABC
+  504   504 /    545 Q         0.110 [ 100    3    0   96]   -525781.429   -525781.539         0.110         0.476           nan        16.188         2.362        -0.031  ABC
+  505   505 /    545 Q         0.562 [ 100   30   16   53]   -409334.952   -409334.390        -0.562         0.679           nan        17.647         2.485        -0.058  ABC
+  506   506 /    545 Q         0.922 [ 100   33   66    0]   -356680.483   -356681.405         0.922         2.686           nan        18.077         2.325        -0.185  ABC
+  507   507 /    545 Q         3.922 [ 100    0  100    0]   -457038.834   -457042.756         3.922         0.000           nan        16.684         2.868        -0.283  ABC
+  508   508 /    545 Q         0.266 [ 100    3    6   89]   -518102.631   -518102.897         0.266         0.247           nan        16.694         2.610        -0.027  ABC
+  509   509 /    545 R         0.467 [ 100    0   50   50]   -496845.587   -496845.120        -0.467         0.000           nan        19.198         2.672        -0.037  ABC
+  510   510 /    545 ?         1.358 [ 100    0    3   96]   -534836.021   -534834.664        -1.358         0.131           nan        17.169         2.671         0.021  ABC
+  511   511 /    545 Q         0.053 [ 100    0    6   93]   -532433.927   -532433.980         0.053         0.044           nan        15.694         2.782        -0.078  ABC
+  512   512 /    545 Q         0.241 [ 100   18   12   68]   -455692.375   -455692.134        -0.241         0.928           nan        16.694         2.565        -0.077  ABC
+  513   513 /    545 Q         0.368 [ 100    6    0   93]   -513521.804   -513522.172         0.368         0.849           nan        16.674         2.546        -0.009  ABC
+  514   514 /    545 R         0.062 [ 100    0    0  100]   -537441.197   -537441.260         0.660         0.014           nan        16.892         2.797         0.017  ABC
+  515   515 /    545 ?         2.024 [ 100   36   36   27]   -369418.269   -369416.245        -2.024         0.528           nan        17.972         2.352        -0.113  ABC
+  516   516 /    545 ?         0.467 [ 100   36   36   27]   -369396.156   -369396.622         0.467         0.870           nan        17.972         2.339        -0.113  ABC
+  517   517 /    545 Q         0.169 [ 100   23   23   53]   -429494.165   -429494.334         0.169         0.260           nan        17.647         2.609        -0.069  ABC
+  518   518 /    545 R         0.696 [ 100   50    0   50]   -346128.705   -346129.402         0.696         0.000           nan        18.132         2.592        -0.010  ABC
+  519   519 /    545 R         0.460 [ 100    0   75   25]   -477397.884   -477397.424        -0.460         0.000           nan        21.089         3.094        -0.024  ABC
+  520   520 /    545 Q         1.751 [ 100   26   26   46]   -414067.985   -414069.735         1.751         0.460           nan        17.807         2.494        -0.077  ABC
+  521   521 /    545 Q         0.663 [ 100   25   25   50]   -421796.663   -421796.000        -0.663         0.513           nan        16.694         2.505        -0.127  ABC
+  522   522 /    545 Q        10.656 [ 100    0    0  100]   -537360.212   -537370.869         0.183         0.000           nan        17.646         2.841         0.063  DDD
+  523   523 /    545 R         2.234 [ 100    0   50   50]   -497329.903   -497327.670        -2.234         0.000           nan        21.574         3.038         0.082  ABC
+  524   524 /    545 Q         0.567 [ 100    3    0   96]   -525091.994   -525091.428        -0.567         0.364           nan        17.212         2.738         0.030  ABC
+  525   525 /    545 Q         0.894 [ 100   12   37   50]   -459583.087   -459582.193        -0.894         0.591           nan        16.694         2.628        -0.145  ABC
+  526   526 /    545 Q         0.411 [ 100    3    3   93]   -523004.802   -523005.213         0.411         0.021           nan        16.674         2.833        -0.015  ABC
+  527   527 /    545 Q         0.561 [ 100    0    6   93]   -532386.400   -532385.839        -0.561         0.048           nan        19.302         2.986         0.134  ABC
+  528   528 /    545 Q         0.676 [ 100    3    3   93]   -522622.977   -522623.653         0.676         0.158           nan        12.565         2.586        -0.257  ABC
+  529   529 /    545 R         0.792 [ 100    0    0  100]   -537419.308   -537418.516         1.365         0.085           nan        15.953         2.721        -0.039  ABC
+  530   530 /    545 ?         0.507 [ 100   27   22   50]   -415014.598   -415015.104         0.507         0.141           nan        17.521         2.419        -0.080  ABC
+  531   531 /    545 Q         0.268 [ 100   21    9   68]   -446244.171   -446243.903        -0.268         1.474           nan        16.694         2.439        -0.071  ABC
+  532   532 /    545 Q         0.448 [ 100    3    0   96]   -525499.643   -525499.196        -0.448         0.010           nan        15.627         2.791        -0.065  ABC
+  533   533 /    545 R         3.217 [ 100    0   50   50]   -497294.034   -497290.817        -3.217         0.000           nan        22.761         3.092         0.142  ABC
+  534   534 /    545 Q         0.505 [ 100  100    0    0]   -155314.040   -155314.545         0.505         0.600           nan        20.947         2.333         0.047  ABC
+  535   535 /    545 R         0.199 [ 100    0    6   93]   -532386.958   -532387.157         0.199         0.077           nan        15.173         2.695        -0.109  ABC
+  536   536 /    545 R         0.874 [ 100    0    0  100]   -537409.525   -537410.399         1.564         0.078           nan        16.896         2.716         0.017  ABC
+  537   537 /    545 ?         1.544 [ 100   21   21   57]   -438265.512   -438263.968        -1.544         0.430           nan        19.169         2.525         0.022  ABC
+  538   538 /    545 ?         1.050 [ 100   54   45    0]   -292580.042   -292581.092         1.050         0.798           nan        18.199         2.373        -0.153  ABC
+  539   539 /    545 ?         0.295 [ 100   36   36   27]   -369422.722   -369423.017         0.295         0.677           nan        17.972         2.310        -0.113  ABC
+  540   540 /    545 ?         1.844 [ 100   36   36   27]   -369411.353   -369409.509        -1.844         0.671           nan        17.972         2.354        -0.113  ABC
+  541   541 /    545 Q         0.059 [ 100    3    3   93]   -522945.132   -522945.073        -0.059         0.062           nan        14.752         2.710        -0.128  ABC
+  542   542 /    545 Q         0.418 [ 100    3    0   96]   -525091.670   -525091.252        -0.418         0.510           nan        17.212         2.737         0.030  ABC
+  543   543 /    545 ?         1.250 [ 100    0   93    6]   -462310.093   -462308.843        -1.250         1.174           nan        23.008         2.722         0.007  ABC
+  544   544 /    545 Q         0.337 [ 100   21    9   68]   -446243.795   -446244.132         0.337         0.730           nan        16.694         2.619        -0.071  ABC

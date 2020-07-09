@@ -1582,13 +1582,23 @@ def get_energies(args):
                         f.write("%3.6f %3.6f\n" % ((ene_DFT[idx]+537462.536751423380)*33/1000,(ene_pot[idx]+537462.536751423380)*33/1000))
                         f.close()
 
+                    textadd="ABC"
+                    atall=(at_si+at_mg+at_al)
+                    if ene_diff_abs[idx] > 10: textadd="DDD"
+                    at_sic=int(100*(at_si/atall))
+                    at_mgc=int(100*(at_mg/atall))
+                    at_alc=int(100*(at_al/atall))
+                    #print(at_si,at_mg,at_al,'sum:',atall,'-->',at_sic)
                     print(ka3 % (
                     i,
                     idx,
                     structures_to_calc,
                     ene_diff_abs[idx],
-                    frames[i].get_number_of_atoms(),
-                    at_si,at_mg,at_al,
+                    # [ here the conzentratioins
+                    #frames[i].get_number_of_atoms(),at_si,at_mg,at_al,
+                    100,at_sic,at_mgc,at_alc,
+                    # ]
+                    #at_sic,at_mgc,at_alc,
                     #(ene_DFT[idx]+537462.536751423380)*33/1000,
                     #(ene_pot[idx]+537462.536751423380)*33/1000,
 
@@ -1607,7 +1617,7 @@ def get_energies(args):
                     ene_pot_ase[idx]-ene_pot_ase_geop[idx],
                     ana_vol_pa[idx],
                     ana_dist_min[idx],
-                    ana_VOL_diff_norm[idx]),"ABC")
+                    ana_VOL_diff_norm[idx]),textadd)
                     #print('POT_FORCES_EV_ANG')
                     #print(POT_FORCES_EV_ANG)
                     #print('sss',
