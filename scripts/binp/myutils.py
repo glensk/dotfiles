@@ -6191,7 +6191,7 @@ def ase_mepa(atoms):
 def ase_fmax(atoms):
     return abs(atoms.get_forces()).max()
 
-def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False,whichstruct=":"):
+def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False,whichstruct=":",relaxit=True):
     if read != False:
         pathbase = os.environ['potentials']+"/aiida_get_structures_new/"
         readpath = pathbase + read
@@ -6244,7 +6244,8 @@ def ase_relax_structure_fully_and_save_to_pot(ace,read=False,read_fullpath=False
         #print(atoms.get_cell())
         #print(atoms.positions)
         #print('c')
-        ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
+        if relaxit == True:
+            ace.ase_relax_cellshape_volume_positions(atoms,verbose=True)
         ase_write(savepath,atoms,format='runner',append=True)
     frames_out = ase_read(savepath,":",format="runner")  # frames with DFT energies.
     print('savepath (created)',savepath)
