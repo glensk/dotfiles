@@ -2211,6 +2211,11 @@ def get_dilute_si_mg_f(ace):
     ace.fDFT_dilute_si      =  ace.eDFT_dilute_si - 107*ace.eDFT_pure_al/108    # eV per defect
     ace.fDFT_dilute_mg      =  ace.eDFT_dilute_mg - 107*ace.eDFT_pure_al/108    # eV per defect
 
+    print('ace.E_SS_Al(DFT) --> ace.fDFT_dilute_al:',ace.fDFT_dilute_al)
+    print('ace.E_SS_Mg(DFT) --> ace.fDFT_dilute_mg:',ace.fDFT_dilute_mg)
+    print('ace.E_SS_Si(DFT) --> ace.fDFT_dilute_si:',ace.fDFT_dilute_si)
+
+
     print('solid solution energies, this is an energy for one atom of the specific kind')
     print('ace.eform_dilute_{si,mg},ace.fDFT_dilute_{si,mg}')
     print('in Junge2017 (== doi: 10.1016/j.actamat.2017.08.017):')
@@ -2851,7 +2856,14 @@ def test_antisites(ace):
             #Eform_relaxed_dft = antisite_relaxedi_ene_dft - orig_relaxed_dft_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
             Eform_relaxed_dft = 0 # does not exist yet
             #Eform_initial_dft = antisite_initiali_ene_dft - orig_relaxed_dft_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
-            Eform_initial_dft = antisite_initiali_ene_dft - origphase_initial_ene_dft*f - al_d*ace.E_SS_Al - mg_d*ace.E_SS_Mg - si_d*ace.E_SS_Si
+            print('antisite_initiali_ene_dft',antisite_initiali_ene_dft)
+            print('origphase_initial_ene_dft',origphase_initial_ene_dft)
+            print('ace.E_SS_Al',ace.E_SS_Al,'ace.E_SS_Mg',ace.E_SS_Mg,'ace.E_SS_Si',ace.E_SS_Si)
+            print('ace.eDFT_pure_al',ace.eDFT_pure_al)
+            print('ace.E_SS_Al(DFT) --> ace.fDFT_dilute_al:',ace.fDFT_dilute_al)
+            print('ace.E_SS_Mg(DFT) --> ace.fDFT_dilute_mg:',ace.fDFT_dilute_mg)
+            print('ace.E_SS_Mg(DFT) --> ace.fDFT_dilute_si:',ace.fDFT_dilute_si)
+            Eform_initial_dft = antisite_initiali_ene_dft - origphase_initial_ene_dft*f - al_d*ace.fDFT_dilute_al - mg_d*ace.fDFT_dilute_mg - si_d*ace.fDFT_dilute_si
             #print("Eform_relaxed_nn :",Eform_relaxed_nn)
             #print("Eform_initial_nn :",Eform_initial_nn)
             #print("Eform_relaxed_dft:",Eform_relaxed_dft)
