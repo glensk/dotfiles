@@ -2661,7 +2661,7 @@ def test_antisites(ace):
     potpath_using = ace.pot.potpath+"/epoch_"+str(ace.pot.potepoch_using)
 
     doit = [ "Mg4Al3Si4", "Mg5Al2Si4", "Mg5Si6" ]
-    doit = [ "Mg4Al3Si4"] #, "Mg5Al2Si4", "Mg5Si6" ]
+    #doit = [ "Mg4Al3Si4"] #, "Mg5Al2Si4", "Mg5Si6" ]
     for phase in doit:
         ######################################
         ## get the antisites
@@ -2672,9 +2672,16 @@ def test_antisites(ace):
         print('read_antisites:',read_antisites)
         whichstruct=":"
         # read_antisites = xxx  (and relax)
-        #antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites)
+        #antisite_relaxed_by_nn, antisite_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read_antisites,relaxit=False)
         #antisite_initial = ase_read(readpath,index=whichstruct,format="runner")
         antisite_initial = ase_read(read_antisites,index=whichstruct,format="runner")
+
+        ##############################################
+        # antisites initial is a list of 22 structurs each having 132 atoms
+        ##############################################
+        print('len',len(antisite_initial))
+        print('anti',antisite_initial[0].positions)
+        print('anti',antisite_initial[0].get_number_of_atoms())
         #antisite_relaxed = ase_read(readpath,index=whichstruct,format="runner")
         #print('type(antisite_relaxed_by_nn:',type(antisite_relaxed_by_nn))
         #print('type(antisite_initial_by_nn:',type(antisite_initial))
@@ -2683,7 +2690,6 @@ def test_antisites(ace):
         ## get the original phase
         ######################################
         print('------- original phase -----')
-        sys.exit()
         read_orig_phase = "aiida_exported_group_NN_relaxed_"+phase+"_n2p2_v2ag_calc__all_steps.input.data"
         # read_orig_phase = xxx
 
@@ -2691,16 +2697,22 @@ def test_antisites(ace):
         potentialpath = os.environ['potentials']
         print('potentialpath',potentialpath)
         print('potpath_using',potpath_using)
-        if True:
-            read_orig_phase_fullpath = potentialpath+"/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
+        if False:
+            ####### THIS IS JUST A HACK NEVER COMMENT IN
+            #read_orig_phase_fullpath = potentialpath+"/n2p2_v4ag_ppl_987654_21cores/epoch_1383/export/aiida_exported_group_RELAXED_fully_aiida_exported_group_NN_relaxed_Mg5Al2Si4_n2p2_v2ag_calc__all_steps.input.data_calc__all_steps.input.data"
             print('read_orig_phase_fullpath',read_orig_phase_fullpath)
             print('os.path.ispath(read_orig_phase_fullpath)',os.path.isfile(read_orig_phase_fullpath))
             print()
             #read_orig_phase_fullpath = potpath_using+"/export/aiida_exported_group_out_reference_rep"+phase+".runner_calc__all_steps.input.data"
             #print('read_orig_phase_fullpath',read_orig_phase_fullpath)
             #print('os.path.ispath(read_orig_phase_fullpath)',os.path.isfile(read_orig_phase_fullpath))
-
-        origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read=read_orig_phase,read_fullpath=read_orig_phase_fullpath,whichstruct=-1)
+        origphase_relaxed,origphase_initial = my.ase_relax_structure_fully_and_save_to_pot(ace,read=read_orig_phase,read_fullpath=read_orig_phase_fullpath,whichstruct=-1,relaxit=False)
+        ##############################################
+        # origphase_{initial,relaxed} is one structurs of 22 atoms
+        ##############################################
+        print('len',len(origphase_relaxed))
+        print('orig not repeated',origphase_initial[0].positions)
+        print('orig not repeated or rel',origphase_relaxed[0].get_number_of_atoms())
         print('type(origphase_relaxed)',type(origphase_relaxed))
         print('type(origphase_initial)',type(origphase_initial))
         # origphase_relaxe is the DFT relaxed one!
@@ -2727,8 +2739,9 @@ def test_antisites(ace):
         print('(99) origphase_relaxed_ene_nn :',origphase_relaxed_ene_nn ,'max_nn_forces ',max_nn_forces)
 
         if False:
-            # DEL!!origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
+            origphase_relaxed_nn,origphase_relaxed_dft = origphase_relaxed[0],origphase_initial[0]
             # this was really minimized by dft
+            print(origphase_relaxed_dft)
             orig_relaxed_dft_ene_dft,kb_ = my.ase_enepot(origphase_relaxed_dft,units='eV')
             max_dft_forces_o = np.abs(origphase_relaxed_dft.get_forces()).max()
             print('orig_relaxed_dft_ene_dft:',orig_relaxed_dft_ene_dft,"max_dft_forces_o",max_dft_forces_o)
@@ -2751,12 +2764,14 @@ def test_antisites(ace):
         #print()
         #print()
         out = []
-        for idx,i in enumerate(antisite_relaxed_by_nn):
+        #for idx,i in enumerate(antisite_relaxed_by_nn):
+        for idx,i in enumerate(antisite_initial):
             f = i.get_number_of_atoms()/origphase_initial.get_number_of_atoms()
             print()
             print()
             antisite_initiali = antisite_initial[idx]
-            antisite_relaxedi_by_nn = antisite_relaxed_by_nn[idx]
+            #antisite_relaxedi_by_nn = antisite_relaxed_by_nn[idx]
+            antisite_relaxedi_by_nn = antisite_initial[idx]
 
             antisite_initiali_ene_dft,kb_ = my.ase_enepot(antisite_initiali,units='eV')
             max_dft_forces = np.abs(antisite_initiali.get_forces()).max()
@@ -2785,20 +2800,21 @@ def test_antisites(ace):
             #print('f',f)
 
 
-            dd = my.ase_get_chemical_symbols_to_number_of_species(i,known_elements_by_pot=["Al","Mg","Si"])
+            dd = my.ase_get_chemical_symbols_to_number_of_species(i,known_elements_by_pot=["Al","Mg","Si"]) # this seems to work
             al_antisite = dd["Al"]
             mg_antisite = dd["Mg"]
             si_antisite = dd["Si"]
+
+            #
             al_orig = d["Al"]*f
             mg_orig = d["Mg"]*f
             si_orig = d["Si"]*f
             print('f',f)
-            print('xxx al_orig',al_orig,al_antisite)
-            print('xxx mg_orig',mg_orig,mg_antisite)
-            print('xxx si_orig',si_orig,si_antisite)
+            print('xxx al_orig',al_orig,'al_antisite',al_antisite)
+            print('xxx mg_orig',mg_orig,'mg_antisite',mg_antisite)
+            print('xxx si_orig',si_orig,'si_antisite',si_antisite)
             print('xxx sum_orig',al_orig+mg_orig+si_orig)
             print('xxx sum_anti',al_antisite+mg_antisite+si_antisite)
-            sys.eixt()
 
             al_d = al_antisite - al_orig
             mg_d = mg_antisite - mg_orig
@@ -2808,12 +2824,20 @@ def test_antisites(ace):
             print('al_d',al_d,'al_orig',al_orig,-al_d*ace.E_SS_Al)
             print('mg_d',mg_d,'mg_orig',mg_orig,-mg_d*ace.E_SS_Mg)
             print('si_d',si_d,'si_orig',si_orig,-si_d*ace.E_SS_Si)
+            text1=""
+            text2=""
             if al_d == -1 : text1 = "Al->"
             if mg_d == -1 : text1 = "Mg->"
             if si_d == -1 : text1 = "Si->"
             if al_d == 1 : text2 = "Al"
             if mg_d == 1 : text2 = "Mg"
             if si_d == 1 : text2 = "Si"
+            print('al_d',al_d)
+            print('mg_d',mg_d)
+            print('si_d',si_d)
+            if text1 == "" or text2 == "":
+                sys.exit('Error: seems the phases got mixed, make sure the correct ones are loaded')
+            print('text2',text2)
             text2=text2+"_"+str(max_dft_forces2)
 
 

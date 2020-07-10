@@ -834,3 +834,324 @@ save frames[i] 450
   542   542 /    545 Q         0.418 [ 100    3    0   96]   -525091.670   -525091.252        -0.418         0.510           nan        17.212         2.737         0.030  ABC
   543   543 /    545 ?         1.250 [ 100    0   93    6]   -462310.093   -462308.843        -1.250         1.174           nan        23.008         2.722         0.007  ABC
   544   544 /    545 Q         0.337 [ 100   21    9   68]   -446243.795   -446244.132         0.337         0.730           nan        16.694         2.619        -0.071  ABC
+LAMMPS (18 Feb 2020)
+  using 1 OpenMP thread(s) per MPI task
+Total wall time: 0:00:00
+time0, for standardimports -4.785135388374329e-06
+time1, for myutils 4.817591980099678e-05
+time1, for ase_calc... -2.050679177045822e-05
+time3, after help  ... -1.8964987248182297e-05
+__main__ after p = help 4.117470234632492e-05
+__main__ after parsing help 3.133900463581085e-05
+########################################## argparse values (begin) #########
+# inputfile                           ../test.data         <class 'str'>   #
+# sys                                 False                <class 'bool'>  #
+# sys_ele                             False                <class 'bool'>  #
+# sys_ncell                           1                    <class 'int'>   #
+# sys_cell                            cubic                <class 'str'>   #
+# exectue_function_myutils                                 <class 'str'>   #
+# execute_function                                         <class 'str'>   #
+# format_in                           runner               <class 'str'>   #
+# remove_unknown_elements_from_structures False                <class 'bool'>  #
+# potpath                             ..                   <class 'str'>   #
+# show_availabel_pots                 False                <class 'bool'>  #
+# potepoch                            False                <class 'bool'>  #
+# structures_idx                      :                    <class 'str'>   #
+# units                               meV_pa               <class 'str'>   #
+# interstitial_form                   False                <class 'bool'>  #
+# geopt                               False                <class 'bool'>  #
+# elastic                             False                <class 'bool'>  #
+# thermo                              False                <class 'bool'>  #
+# evinet                              False                <class 'bool'>  #
+# fqh                                 False                <class 'bool'>  #
+# fah                                 False                <class 'bool'>  #
+# fqh_atoms_max                       200                  <class 'int'>   #
+# fqh_supercell                       None                 <class 'NoneType'> #
+# fah_atoms_max                       200                  <class 'int'>   #
+# fah_supercell                       None                 <class 'NoneType'> #
+# elastic_all                         False                <class 'bool'>  #
+# elastic_from_ene                    False                <class 'bool'>  #
+# ase                                 True                 <class 'bool'>  #
+# lmp                                 False                <class 'bool'>  #
+# ipi                                 False                <class 'bool'>  #
+# test_this_script                    False                <class 'bool'>  #
+# formation_energies                  None                 <class 'NoneType'> #
+# test3                               False                <class 'bool'>  #
+# testkmc                             False                <class 'bool'>  #
+# testkmc_b                           False                <class 'bool'>  #
+# testkmc_l                           False                <class 'bool'>  #
+# testkmc_a                           False                <class 'bool'>  #
+# testaccuracy_kmc_approx             False                <class 'bool'>  #
+# check_testdata                      False                <class 'bool'>  #
+# check_traindata                     False                <class 'bool'>  #
+# check_inputdata                     False                <class 'bool'>  #
+# check_kmc57data                     False                <class 'bool'>  #
+# check_outliers                      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ext      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ipi      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_post     False                <class 'bool'>  #
+# pick_concentration_al               -1.0                 <class 'float'> #
+# pick_concentration_mg               -1.0                 <class 'float'> #
+# pick_concentration_si               -1.0                 <class 'float'> #
+# pick_atoms_al                       -1.0                 <class 'float'> #
+# pick_atoms_mg                       -1.0                 <class 'float'> #
+# pick_atoms_si                       -1.0                 <class 'float'> #
+# pick_number_of_atoms                -1.0                 <class 'float'> #
+# pick_forcesmax                      -1.0                 <class 'float'> #
+# pick_cellshape                      -1.0                 <class 'float'> #
+# pick_c44                            False                <class 'bool'>  #
+# pick_amount_1NN                     False                <class 'bool'>  #
+# pick_uuid                           -1.0                 <class 'float'> #
+# write_runner                        False                <class 'bool'>  #
+# write_runner_ene_forces             False                <class 'bool'>  #
+# write_DFT_ene_forces                False                <class 'bool'>  #
+# write_espresso_job                  False                <class 'bool'>  #
+# write_runner_DFT                    False                <class 'bool'>  #
+# write_runner_repeated               False                <class 'bool'>  #
+# write_forces                        False                <class 'bool'>  #
+# write_forcesx                       False                <class 'bool'>  #
+# write_analysis                      False                <class 'bool'>  #
+# write_analysis_full                 False                <class 'bool'>  #
+# print_only_energies                 False                <class 'bool'>  #
+# get_harmonic_energy                 False                <class 'bool'>  #
+# debug                               False                <class 'bool'>  #
+# verbose                             1                    <class 'int'>   #
+# uuid                                False                <class 'bool'>  #
+########################################## argparse values (end  ) #########
+>> formats.py /home/glensk/.local/lib/python3.7/site-packages/ase/io/formats.py
+>> formats.py knows runner
+>> formats.py knows lammpsrunner
+>> formats.py knows lammps-data
+>> formats.py knows ipi
+>> formats.py knows quippy
+>> vasp.py adapted to write free energies by default.
+time00 after ase_formats_check... 3.984011709690094e-05
+
+written  /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/test_auswertung_Siconz/README_2020-07-10_17:19:15.txt
+
+getEne(0.1) LD_LIBRARY_PATH            : /ssoft/spack/humagne/v1/opt/spack/linux-rhel7-x86_E5v4_Mellanox/intel-18.0.5/python-3.7.3-t6azvyfvc6hq72fnyfzvereqk54ng4xk/lib:/home/glensk/sources/n2p2/lib:/home/glensk/sources/lammps/src
+getEne(0.2) imported lammps
+getEne(0.3) lammps
+getEne(0.4) check if lammps woring with ase done
+getEne(p1) args.potepoch             : False
+>> ase_calculate_ene: initializing mypot .... to self.pot
+getEne(p2)                           : ace.pot_get_and_ase_lmp_cmd()
+PPi self.pot.get()
+PPk self.potpath_in ..
+PPk self.potpath    /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701
+PPk self.pottype    n2p2
+PPk self.pot        ..
+self.potepoch_all [329]
+self.use_epoch 329
+self.potpath_work /home/glensk/._tmp_pot_fidis/
+self.potepoch_linked False
+self.potepoch_using False
+self.potpath /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701
+self.potepoch_linked False
+We need to work in a different folder since other epoch is linked!
+PPf copy files ... 000329
+f_ /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.013.000329.out
+f_ /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.012.000329.out
+f_ /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.014.000329.out
+copying /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.013.000329.out to /home/glensk/._tmp_pot_fidis//weights.013.data
+copying /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.012.000329.out to /home/glensk/._tmp_pot_fidis//weights.012.data
+copying /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/weights.014.000329.out to /home/glensk/._tmp_pot_fidis//weights.014.data
+self.pot_tmpdir /home/glensk/._tmp_pot_fidis/
+... copying potential 000329 to /home/glensk/._tmp_pot_fidis/
+ace.lmpcmd ['### lmpcmd.begin ###', 'mass 1 24.305', 'mass 2 26.9815386', 'mass 3 28.0855', 'variable nnpDir string "/home/glensk/._tmp_pot_fidis/"', 'pair_style nnp dir ${nnpDir} showew no resetew yes maxew 100000000 cflength 1.8897261258369282 cfenergy 0.03674932247495664', 'pair_coeff * * 10.6', '### lmpcmd.end  ####']
+getEne(P): self.potpath_in              ..
+getEne(P): self.pot                     ..
+getEne(P): self.potpath (source = src)  /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701
+getEne(P): self.pottype                 n2p2
+getEne(P): self.potpath_work (typ src)  /home/glensk/._tmp_pot_fidis/
+getEne(P): self.inputnn                 /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/input.nn
+getEne(P): self.inputdata               /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/input.data
+getEne(P): self.learning_curve_file     /home/glensk/Dropbox/Albert/scripts/dotfiles/scripts/potentials/n2p2_v7ag_neinth20_14701/learning-curve.out
+getEne(P): self.potepoch_all            [329]
+getEne(P): self.assessed_epochs         []
+getEne(P): self.assessed_test           []
+getEne(P): self.assessed_train          []
+getEne(P): self.assessed_kmc57          []
+getEne(P): self.assessed_c44            []
+getEne(P): self.use_epoch (from input)  329
+getEne(P): self.potepoch_bestteste      12
+getEne(P): self.potepoch_linked         False
+getEne(P): self.potepoch_using (finaly) False
+getEne(P): self.c44_al_file             False
+getEne(P): self.c44_al                  False
+getEne(P): self.pot_tmpdir              /home/glensk/._tmp_pot_fidis/
+getEne(P): self.lammps_tmpdir           /home/glensk/._tmp_lammps_fidis/
+getEne(P): self.potlib                  /home/glensk/sources/lammps/src/USER-NNP
+getEne(P): self.potcutoff (Angstrom)    10.6
+getEne(P): self.elements                ['Al', 'Mg', 'Si']
+getEne(P): self.atom_energy             {'Al': -19.6283516, 'Mg': -16.7493351, 'Si': -5.5274864}
+getEne(P): self.reference_volumes       {'Al': 16.607531249999997, 'Mg': 23.259574096759252, 'Si': 20.012875874999995}
+getEne(P): self.atom_types              {'Mg': 1, 'Al': 2, 'Si': 3}
+getEne(P): self.atom_numbers            {'Al': 13, 'Mg': 12, 'Si': 14}
+getEne(P): self.atom_masses             {'Al': 26.9815386, 'Mg': 24.305, 'Si': 28.0855}
+getEne(P): self.atom_masses_str         ['mass 1 24.305', 'mass 2 26.9815386', 'mass 3 28.0855']
+getEne(P): self.potDONE                 True
+getEne(P): self.verbose                 1
+getEne(P): len(self.pot_all_dict)       170
+########################################## argparse values (begin) #########
+# inputfile                           ../test.data         <class 'str'>   #
+# sys                                 False                <class 'bool'>  #
+# sys_ele                             False                <class 'bool'>  #
+# sys_ncell                           1                    <class 'int'>   #
+# sys_cell                            cubic                <class 'str'>   #
+# exectue_function_myutils                                 <class 'str'>   #
+# execute_function                                         <class 'str'>   #
+# format_in                           runner               <class 'str'>   #
+# remove_unknown_elements_from_structures False                <class 'bool'>  #
+# potpath                             ..                   <class 'str'>   #
+# show_availabel_pots                 False                <class 'bool'>  #
+# potepoch                            False                <class 'bool'>  #
+# structures_idx                      :                    <class 'str'>   #
+# units                               meV_pa               <class 'str'>   #
+# interstitial_form                   False                <class 'bool'>  #
+# geopt                               False                <class 'bool'>  #
+# elastic                             False                <class 'bool'>  #
+# thermo                              False                <class 'bool'>  #
+# evinet                              False                <class 'bool'>  #
+# fqh                                 False                <class 'bool'>  #
+# fah                                 False                <class 'bool'>  #
+# fqh_atoms_max                       200                  <class 'int'>   #
+# fqh_supercell                       None                 <class 'NoneType'> #
+# fah_atoms_max                       200                  <class 'int'>   #
+# fah_supercell                       None                 <class 'NoneType'> #
+# elastic_all                         False                <class 'bool'>  #
+# elastic_from_ene                    False                <class 'bool'>  #
+# ase                                 True                 <class 'bool'>  #
+# lmp                                 False                <class 'bool'>  #
+# ipi                                 False                <class 'bool'>  #
+# test_this_script                    False                <class 'bool'>  #
+# formation_energies                  None                 <class 'NoneType'> #
+# test3                               False                <class 'bool'>  #
+# testkmc                             False                <class 'bool'>  #
+# testkmc_b                           False                <class 'bool'>  #
+# testkmc_l                           False                <class 'bool'>  #
+# testkmc_a                           False                <class 'bool'>  #
+# testaccuracy_kmc_approx             False                <class 'bool'>  #
+# check_testdata                      False                <class 'bool'>  #
+# check_traindata                     False                <class 'bool'>  #
+# check_inputdata                     False                <class 'bool'>  #
+# check_kmc57data                     False                <class 'bool'>  #
+# check_outliers                      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ext      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_ipi      False                <class 'bool'>  #
+# analyze_kmc_number_1NN_2NN_post     False                <class 'bool'>  #
+# pick_concentration_al               -1.0                 <class 'float'> #
+# pick_concentration_mg               -1.0                 <class 'float'> #
+# pick_concentration_si               -1.0                 <class 'float'> #
+# pick_atoms_al                       -1.0                 <class 'float'> #
+# pick_atoms_mg                       -1.0                 <class 'float'> #
+# pick_atoms_si                       -1.0                 <class 'float'> #
+# pick_number_of_atoms                -1.0                 <class 'float'> #
+# pick_forcesmax                      -1.0                 <class 'float'> #
+# pick_cellshape                      -1.0                 <class 'float'> #
+# pick_c44                            False                <class 'bool'>  #
+# pick_amount_1NN                     False                <class 'bool'>  #
+# pick_uuid                           -1.0                 <class 'float'> #
+# write_runner                        False                <class 'bool'>  #
+# write_runner_ene_forces             False                <class 'bool'>  #
+# write_DFT_ene_forces                False                <class 'bool'>  #
+# write_espresso_job                  False                <class 'bool'>  #
+# write_runner_DFT                    False                <class 'bool'>  #
+# write_runner_repeated               False                <class 'bool'>  #
+# write_forces                        False                <class 'bool'>  #
+# write_forcesx                       False                <class 'bool'>  #
+# write_analysis                      False                <class 'bool'>  #
+# write_analysis_full                 False                <class 'bool'>  #
+# print_only_energies                 False                <class 'bool'>  #
+# get_harmonic_energy                 False                <class 'bool'>  #
+# debug                               False                <class 'bool'>  #
+# verbose                             1                    <class 'int'>   #
+# uuid                                False                <class 'bool'>  #
+########################################## argparse values (end  ) #########
+getEne(0) args.inputfile             : ../test.data
+392
+410
+idx 0 ../test.data path (i) ../test.data
+########################################################
+XXX args.inputfile: ../test.data
+XXX args.format_in: runner
+XXX args.inputfile: ../tes
+########################################################
+type(frames) <class 'list'>
+len(frames) 545
+getting DFT data
+getting DFT data DONE!
+430
+501
+idx 0 ../test.data path (i) ../test.data
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@  allepochs: [False]
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+Epoch: False
+getEne (23): reading args.inputfile ...  : ../test.data
+YYY getEne (23): args.format_in ...          : runner
+YYY getEne (23): args.structures_idx ...     : :
+getEne (24): structures_to_calc          : 545
+
+ase                          : True
+lmp                          : False
+
+args.units                   : meV_pa
+ace.units                    : mev_pa
+geopt                        : False
+
+verbose                      : 1
+lmp                          : False
+ipi                          : False
+write_runner                 : False
+write_runner_repeated        : False
+--pick_concentration_al      : -1.0
+--pick_concentration_mg      : -1.0
+--pick_concentration_si      : -1.0
+--pick_atoms_al              : -1.0
+--pick_atoms_mg              : -1.0
+--pick_atoms_si              : -1.0
+--pick_number_of_atoms       : -1.0
+--pick_forcesmax             : -1.0
+--pick_cellshape             : -1.0
+--pick_c44                   : False
+
+
+#                         (mev_pa)                                (mev_pa)       (mev_pa)                  (mev_pa)     (eV/Ang)
+#                         (DFT-ref)                                                    ene_pot_wo_..      forces      (if geopt)     Vol per atom    min at dist   VOL_diff_norm
+#   i   idx /    from       diff  [atms   Si   Mg   Al]     ene_DFT       ene_pot      .._wo_atomic       DFTmax       E-E_geopt        (Ang^3)      (Angstrom)     (Ang^3)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+range(structures_to_calc) range(0, 545)
+    0     0 /    545 ?         3.051 [ 100    0    0  100]   -537443.224   -537440.173         0.089         0.000           nan        16.827         2.725         0.013  ABC
+    1     1 /    545 Q         0.461 [ 100   25    6   68]   -436800.387   -436799.926        -0.461         0.706           nan        16.694         2.568        -0.066  ABC
+    2     2 /    545 R         0.307 [ 100    0   50   50]   -496867.096   -496866.788        -0.307         0.000           nan        19.546         2.658        -0.019  ABC
+    3     3 /    545 ?         0.847 [ 100   36   36   27]   -369418.018   -369418.865         0.847         0.220           nan        18.994         2.458        -0.063  ABC
+    4     4 /    545 Q         3.328 [ 100    0    0  100]   -537183.230   -537179.901         8.479         0.087           nan        13.850         2.597        -0.166  ABC
+    5     5 /    545 Q         1.478 [ 100   25   75    0]   -381809.385   -381810.862         1.478         0.296           nan        22.674         3.032         0.010  ABC
+    6     6 /    545 Q         0.988 [ 100   25   75    0]   -381751.643   -381750.656        -0.988         0.580           nan        23.588         2.920         0.051  ABC
+    7     7 /    545 Q         1.367 [ 100    3    0   96]   -525055.296   -525053.929        -1.367         0.034           nan        18.808         2.888         0.125  ABC
+    8     8 /    545 Q         4.066 [ 100   26   26   46]   -414068.350   -414072.415         4.066         0.354           nan        17.807         2.551        -0.077  ABC
+    9     9 /    545 ?         0.051 [ 100   36   36   27]   -369414.025   -369413.974        -0.051         1.033           nan        17.972         2.417        -0.113  ABC
+   10    10 /    545 Q         0.765 [ 100    0    3   96]   -534827.923   -534828.688         0.765         0.893           nan        17.212         2.534         0.023  ABC
+   11    11 /    545 ?         0.537 [ 100    6   93    0]   -438436.166   -438436.702         0.537         0.847           nan        23.008         2.824        -0.002  ABC
+   12    12 /    545 Q         0.851 [ 100  100    0    0]   -154879.548   -154878.697        -0.851         1.427           nan        23.369         2.311         0.168  ABC
+   13    13 /    545 Q         0.058 [ 100   25    6   68]   -436797.020   -436796.963        -0.058         0.554           nan        16.694         2.621        -0.066  ABC
+   14    14 /    545 Q         0.066 [ 100   18   12   68]   -455693.851   -455693.917         0.066         0.666           nan        16.694         2.582        -0.077  ABC
+   15    15 /    545 Q         0.778 [ 100   25    6   68]   -436784.120   -436783.342        -0.778         0.957           nan        16.694         2.505        -0.066  ABC
+   16    16 /    545 Q         0.857 [ 100   33   66    0]   -356854.744   -356853.887        -0.857         0.577           nan        20.599         2.591        -0.071  ABC
+   17    17 /    545 Q         0.132 [ 100    0    6   93]   -532335.768   -532335.900         0.132         0.070           nan        14.296         2.702        -0.160  ABC
+   18    18 /    545 R         1.922 [ 100   75    0   25]   -250390.801   -250388.880        -1.922         0.000           nan        18.273         2.950        -0.046  ABC
+   19    19 /    545 ?         0.106 [ 100   36   36   27]   -369310.331   -369310.437         0.106         0.409           nan        15.190         2.239        -0.250  ABC
+   20    20 /    545 Q         0.101 [ 100   18   12   68]   -455699.964   -455700.065         0.101         0.839           nan        16.694         2.527        -0.077  ABC
+   21    21 /    545 Q         0.325 [ 100   25    6   68]   -436780.953   -436781.279         0.325         0.684           nan        16.694         2.567        -0.066  ABC
+   22    22 /    545 Q         1.367 [ 100  100    0    0]   -154886.643   -154885.276        -1.367         1.417           nan        23.369         2.293         0.168  ABC
+   23    23 /    545 Q         0.428 [ 100    6    0   93]   -513545.497   -513545.925         0.428         0.439           nan        16.674         2.719        -0.009  ABC
+   24    24 /    545 ?         0.361 [ 100   54   45    0]   -292614.549   -292614.189        -0.361         0.422           nan        18.199         2.383        -0.153  ABC
+   25    25 /    545 Q         0.226 [ 100    3    0   96]   -525752.796   -525753.022         0.226         1.812           nan        16.188         2.183        -0.031  ABC
+   26    26 /    545 R         1.648 [ 100    0    0  100]   -537415.780   -537417.428         0.180         0.000           nan        18.228         2.869         0.098  ABC
+   27    27 /    545 ?         0.169 [ 100    2    2   95]   -526265.650   -526265.818         0.169         0.054           nan        16.834         2.683        -0.001  ABC
+   28    28 /    545 R         0.062 [ 100    0    0  100]   -537462.155   -537462.093         0.002         0.000           nan        16.630         2.857         0.001  ABC
+   29    29 /    545 ?         0.763 [ 100   36   45   18]   -362186.348   -362185.585        -0.763         0.033           nan        18.573         2.389        -0.110  ABC
+   30    30 /    545 ?         1.802 [ 100   36   45   18]   -362168.980   -362167.178        -1.802         0.028           nan        17.946         2.357        -0.140  ABC

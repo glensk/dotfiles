@@ -28,13 +28,19 @@ for f in $ff;do
     #fi
     
     
-    if [ ! -e "test_auswertung_Siconz/ene_diff_abs.npy" ];then
-    mkdir test_auswertung_Siconz
-    cd test_auswertung_Siconz
-    getEnergies_byLammps.py --units meV_pa -p .. -i ../test.data -v | tee -a out.dat
+    #if [ ! -e "test_auswertung_Siconz/ene_diff_abs.npy" ];then
+    #mkdir test_auswertung_Siconz
+    #cd test_auswertung_Siconz
+    #getEnergies_byLammps.py --units meV_pa -p .. -i ../test.data -v | tee -a out.dat
+    #cd ..
+    #fi
+
+    if [ ! -d "antisites" ];then
+    mkdir antisites 
+    cd antisites 
+    getEnergies_byLammps.py -p .. -v --units eV --formation_energies beta2antisites
     cd ..
     fi
-
     cd $hier
 done
 

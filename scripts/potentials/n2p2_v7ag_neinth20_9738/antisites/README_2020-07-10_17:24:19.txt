@@ -1,0 +1,6 @@
+# using https://github.com/glensk/dotfiles/trunk/scripts
+# to download it: svn checkout https://github.com/glensk/dotfiles/trunk/scripts
+# used sha: 922ff342005fa3ec950302868f8fad26420d2b41
+# execution time: 0.15882635116577148 seconds.
+
+getEnergies_byLammps.py -p .. -v --units eV --formation_energies beta2antisites
