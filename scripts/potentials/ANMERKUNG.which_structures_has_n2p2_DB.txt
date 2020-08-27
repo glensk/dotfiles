@@ -50,3 +50,21 @@ cat OQMD-Distorted_scf >> aiida_exported_group_Al6xxxDB_structures_calc__all_ste
 --> 5495 structures
 
 removed from daniels OQMC data: 5556d592-7d33-44b3-ad32-be232e82fb2b which had only one al atom and 451e8afd-e2a6-444b-b99a-fef23661f11c
+
+###########################
+### add DB2 from Daniele Giofre 
+###########################
+
+Summary:
+--------
++   4998 initial  (5000 - 2)
++   153  c44 + highstrain  5151
++    66  antisites          5217
++     3  antisites ref      5220
+     91  KMC 3x             5314
+D   181  OQMD (181)         5495
+D        OQMD -18 excluded  5477  (./n2p2_v6ag/ANMERKUNG_list_of_excluded_structures.txt)
++   122  DB2 Giofre         5599 
+
+ have 5599  missing 103
+
