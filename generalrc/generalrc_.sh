@@ -10,24 +10,26 @@
 ##################################################################################
 # this has to be the first line  (loads senenv for zsh/bash); defines: tab-color; mkalias
 ##################################################################################
+export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
+source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
 
 ##################################################################################
 # set global variables: currentshell, host, scripts, dotfiles
 ##################################################################################
+verbose="false"
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett"
 myprompttime="black"
 [ "$BASH_VERSION" != "" ] && currentshell="bash" && myprompttime="red"
 [ "$ZSH_VERSION" != "" ]  && currentshell="zsh"  && myprompttime="magenta"
-export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
-source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
+[ "$verbose" = "true" ] && echo "currentshell generalrc_.sh in0:$currentshell:"  # has been loaded in ~/.bash_profile
 
-echo "myhost generalrc_.sh in1:$myhost:"  # has been loaded in ~/.bash_profile
+[ "$verbose" = "true" ] && echo "myhost       generalrc_.sh in1:$myhost:"  # has been loaded in ~/.bash_profile
 #######################
 # this is crucial, even if it is loaded a second time!
 #######################
 myhost=`myhost_get`
 export myhost=$myhost
-echo "myhost generalrc_.sh in2:$myhost:"
+[ "$verbose" = "true" ] && echo "myhost       generalrc_.sh in3:$myhost:"
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (0) : $gett before s0"
 
 host=`hostname`   # 0.001s
@@ -47,8 +49,9 @@ export nninp="$potentials/aiida_get_structures_new/input_zeroth_5482.data"
 export MYVIMRC="$dotfiles/nvim/init.vim"
 export MYVIM="$HOME/sources/nvim/bin/nvim"
 #jecho "copy1:$copy1:"
-#echo "copy2:$copy2:"
+[ "$verbose" = "true" ] && echo "loading binp"
 [ ! -e "$HOME/.local/binp" ] && $dotfiles/bins/LINK_files.sh
+[ "$verbose" = "true" ] && echo "loading bins"
 [ ! -e "$HOME/.local/bins" ] && $dotfiles/bins/LINK_files.sh
 [ ! -d "$HOME/sources" ] && mkdir $HOME/sources 
 
@@ -58,30 +61,41 @@ export MYVIM="$HOME/sources/nvim/bin/nvim"
 ##################################################################################
 # COSMOSTUFF: PATH, PYTHONPATH, LD_LIBRARY_PATH, ESPRESSO_PSEUDO, IPI_COMMAND, LAMMPS_COMMAND, scripts,
 ##################################################################################
+[ "$verbose" = "true" ] && echo "loading $dotfiles/scripts/source_to_add_to_path.sh"
 source $dotfiles/scripts/source_to_add_to_path.sh
-#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (1) : $gett time source_to_add_to_path.sh"
+#[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (2) : $gett time source_to_add_to_path.sh"
 
 ##################################################################################
 # HOST dependent variables (myshell{=zsh,bash,tcsh}, module load, promptcolor, whichalias ...);  PATH due to module load
 ##################################################################################
+[ "$verbose" = "true" ] && echo "loading $generalrc/generalrc_hostdependent.sh"
 source $generalrc/generalrc_hostdependent.sh
 #[ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (3) : $gett time generalrc_hostdependent"
 
 ##################################################################################
 # PATH, PYTHONPATH, LD_LIBRARY_PATH, C_INCLUDE_PATH (PYTHONPATH should not be set)
 ##################################################################################
+[ "$verbose" = "true" ] && echo "loading xxx1"
 source $generalrc/generalrc_path.sh $myhost
 
 ##############################################
-# ALIASES & PROMPT & tabcolor
+# PROMPT & tabcolor
 ##############################################
-source $generalrc/aliases.sh   # shellscript containing aliases
+#source $generalrc/aliases.sh   # shellscript containing aliases
+[ "$verbose" = "true" ] && echo "loading xxx2"
 source $generalrc/generalrc_prompt_$currentshell.sh
     
 #limit coredumpsize 0    # Disable core dumps # limit command is not know in bash
 
+##############################################
+# ALIASES 
+##############################################
 # this would be for tcsh which will not be enabled since I curretnly dont use tcsh
 #source $generalrc/generalrc_alias_.sh $whichalias $currentshell
+
+# quick hack to load aliases on mac
+[ "$verbose" = "true" ] && echo "loading aliases"
+source $generalrc/generalrc_alias_mac
 
 tab-color $mypromptpath
 
@@ -119,6 +133,7 @@ case $myhost in
 #    # it was however suggested to run : pip install --upgrade pip (without user)
 #    # solved by python -m pip uninstall pip
 #    # brew install rust # necessary to get carge which itself is used for viu
+#    on mac also) while having loaded (base) conda environment: pip install --upgrade --user ccxt # for trading crypto
 
      # on daint:
      # module load cray-python/3.6.5.7
@@ -130,6 +145,7 @@ case $myhost in
      # pip install --upgrade --user lmfit,ase,phonopy,psutil
 
 #    # pip install --upgrade --user intel-numpy    # to make numpy faster
+#    # pip install --upgrade --user pandas 
 #    # pip install --upgrade --user tqdm
 #    # pip install --upgrade --user jupyter  # necessary to open ipynb notebooks
 #    # pip install --upgrade --user jupyter_contrib_nbextensions   # notebooks table of contents
@@ -195,10 +211,11 @@ fpath=($dotfiles/completions_fpath $fpath)
 ##############################################
 # general variables
 ##############################################
+[ "$verbose" = "true" ] && echo "loading general variables"
 #export PAGER=most   # dont! makes problems with %git branch fatal: cannot run most: No such file or directory
-export EDITOR=$MYVIM   
-export SVN_EDITOR=$MYVIM        # for svn (Thermodynamics folder)
-export GIT_EDITOR=$MYVIM 
+export EDITOR=$MYVIM            # my editor is nvim (instead of vi or vim)
+export SVN_EDITOR=$MYVIM        # for svn (Thermodynamics folder), using nvim instead of vi or vim
+export GIT_EDITOR=$MYVIM        # my editor is nvim (instead of vi or vim)
 export LESS="-R"
 #export LC_ALL=C   # necessary for perl git svn
 #export LANG C     # necessary for perl
@@ -242,7 +259,10 @@ fi
 # bindkeys for history-search-bakcward ...
 # bash/zsh completion
 ##############################################
+
+[ "$verbose" = "true" ] && echo "loading xxx3"
 source $dotfiles/$currentshell/$currentshell\_set
+[ "$verbose" = "true" ] && echo "loading xxx4"
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (7) : $gett zsh_set"
 
 ##############################################
@@ -250,11 +270,16 @@ source $dotfiles/$currentshell/$currentshell\_set
 
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett generalrc_AFTER_CONDA"
 
-########################## make sure that nvim is istalled
+########################## make sure that nvim is istalled (neovim)
 #if [ "`command -v curl`" = "" ] && pip install --upgrade --user curl
-[ ! -e "$MYVIM" ] && echo "MYVIM is not installed!" && install_git.py -i nvim
+[ "$verbose" = "true" ] && echo "loading xxx5"
+[ ! -e "$MYVIM" ] && echo "MYVIM is not installed! MY EDITOR is nvim and not vi or vim. IF nvim is not install, you will have problems with vi/vim !" && install_git.py -i nvim
+alias vi="$HOME/sources/nvim/bin/nvim"
+alias vim="$HOME/sources/nvim/bin/nvim"
+[ "$verbose" = "true" ] && echo "loading xxx6"
 
 ########################## make sure that nvim has xclip/pbcopy
+[ "$verbose" = "true" ] && echo "loading xxx9"
 copy1=`command -v pbcopy`
 copy2=`command -v xclip`
 if [ "$copy1" = "" ] && [ "$copy2" = "" ]; then 
@@ -264,3 +289,10 @@ if [ "$copy1" = "" ] && [ "$copy2" = "" ]; then
     xclip_local_install.sh
 fi
 
+
+################################################################
+# testing what needs to be installed
+if [ "true" = "false" ];then
+    echo "checking what to install .... (1)"
+    source $dotfiles/install/install_brew_necessary.sh
+fi

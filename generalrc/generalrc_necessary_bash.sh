@@ -150,29 +150,32 @@ load_local_anaconda() {
 }
 
 myhost_get() {
-    # shouls recognise: mac, helvetios, fidis, cmmd, cosmopc, f209, g308, h211
+    # shouls recognise: mac, runner, helvetios, fidis, cmmd, cosmopc, f209, g308, h211
     host=`hostname`
     case $host in
         "mac") echo "mac" && return;;
+        "runner") echo "runner" && return;;
         "daint") echo "daint" && return;;
         "helvetios") echo "helvetios" && return;;
         "fidis") echo "fidis" && return;;
         "cmmd") echo "cmmd" && return;;
         "cosmopc") echo "cosmopc" && return;;
     esac
-    first_five="${host:0:5}"
+    first_three="${host:0:3}"
+    case $first_three in
+        "mac") echo "mac" && return;;
+    esac
+    first_five="${host:0:6}"
     #echo first_five: $first_five
     case $first_five in
         "daint") echo "daint" && return;;
         "fidis") echo "fidis" && return;;
     esac
-    
-    first_seven="${host:0:7}"
+    first_seven="${host:0:8}"
     case $first_seven in
         "cosmopc") echo "cosmopc" && return;;
     esac
-
-    first_letter="${host:0:1}"
+    first_letter="${host:0:2}"
     remaining_letter="${host:1:999}"
     re='^[0-9]+$'
     #echo first_letter $first_letter
@@ -278,3 +281,4 @@ daint_modules () {
 mld () {
     daint_modules
 }
+

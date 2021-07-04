@@ -1,11 +1,15 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""" VUNDLE START """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""  I use nvim and not vi or vim, this is in $HOME/sources/nvim/bin/nvim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" VUNDLE START (i dont use pathogen, but vundle) """""""""""""""""""""""""""""""""
 """ VUNDLE PLUGINS USED (before this version: ~/.vim/startup/plugins_OLD.vim) """"""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ~/.vim/vim_cheatsheet     " move, lowercase, search, indent, copy-paste, 
 source ~/.vim/startup/ctags.vim
 source ~/.vim/startup/vundle_start.vim
-source ~/.vim/startup/vundle_colors-solarized.vim " MacVim:
+"source ~/.vim/startup/vundle_colors-solarized.vim " MacVim:
 "source ~/.vim/startup/vundle_ctrlp.vim        " ctrl+P OK (I dont use it)
 "source ~/.vim/startup/vundle_tagbar.vim       " <leader>t OK
 source ~/.vim/startup/vundle_supertab.vim      " tab completion for vim OK

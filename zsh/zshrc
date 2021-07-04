@@ -1,5 +1,5 @@
 if [[ $- == *i* ]];then  # only in interactive shell
-echo '... zsh start'
+echo '... zsh start since in interactive mode'
 
 gettime="false"
 loadzsh="true"          # shuts all zst settings on/off
@@ -31,6 +31,14 @@ autoload -U colors && colors                    # necessary for prompt colors (0
 autoload -U +X compinit && compinit  # (0.03s)  (Necessary, completion) 
 autoload -U +X bashcompinit && bashcompinit     # bash completion work (0.00s)
 [ "$gettime" = "true" ] && gett=`gt $gett` #&& echo "compinit    : $gett"
+
+
+export LDFLAGS="-L/opt/homebrew/opt/readline/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/readline/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/readline/lib/pkgconfig"
+export GUILE_LOAD_PATH="/opt/homebrew/share/guile/site/3.0"
+export GUILE_LOAD_COMPILED_PATH="/opt/homebrew/lib/guile/3.0/site-ccache"
+export GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
 
 #echo "load zsh2"
 #################################################################

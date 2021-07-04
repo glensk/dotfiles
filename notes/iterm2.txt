@@ -4,3 +4,8 @@ Characters considered part of words:  :/._=?&,-%;
 alt + cmd + a --> watch process and notice once finished
 
 hit "⌘Command + ⇧Shift + I" to run command in all panes.
+
+
+Send Hex Codes: 0x01          command;   (command<-     since set with better touch tool)
+oder
+

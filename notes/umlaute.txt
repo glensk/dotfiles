@@ -1,0 +1,6 @@
+ä	Umlaut a	[OPTION]+[u] then a
+ë	Umlaut e	[OPTION]+[u] then e
+ï	Umlaut i	[OPTION]+[u] then i
+ö	Umlaut o	[OPTION]+[u] then o
+ü	Umlaut u	[OPTION]+[u] then u
+ÿ	Umlaut y	[OPTION]+[u] then y

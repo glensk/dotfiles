@@ -19,12 +19,25 @@
 #currentshell=$2
 
 ####################################################################
+# ls
+# ls is now set in the generalrc_.sh
+####################################################################
 ## ls alias
 ## -v sorts numerical
 ## -H follows symbolic links
 ## -F shows control chars like / or *
 # This following ls command seems to work everywhere  (-v added to sort numbered files by true numerical number)
-$1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?" -v'
+if ls --color -d . >/dev/null 2>&1; then
+    GNU_LS=1
+    $1 ls 'ls -F --color=auto --group-directories-first --show-control-chars --hide="Icon?" -v'
+elif ls -G -d . >/dev/null 2>&1; then
+    BSD_LS=1
+    #$1 ls 'ls -F -G --group-directories-first --show-control-chars --hide="Icon?" -v'
+    $1 ls 'ls -F -G'
+else
+    SOLARIS_LS=1
+fi
+
 #ls='ls -b -F -H -v --color=tty --show-control-chars --ignore="*.log" --group-directories-first'
 #ls -F -H -v --color=tty --hide=Icon? --show-control-chars --ignore="*.log" --group-directories-first $*
 #ls 'ls -F -H -v --color=tty'    

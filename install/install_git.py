@@ -3,9 +3,15 @@ from __future__ import print_function
 import argparse
 
 import sys,os,socket
-import myutils as my
+#import myutils as my
+from myutils import cd as mycd
+from myutils import mkdir as mymkdir
 import subprocess
 
+
+print("###############################################################################")
+print("# install_git.py ...")
+print("###############################################################################")
 
 hostname = myhost = myhostname = os.environ["myhost"]
 scripts = os.environ["scripts"]
@@ -95,7 +101,7 @@ def install_(args,known):
     install        = args.install
     print('>> args.pwd                  :',args.pwd)
     print('>> dotfiles folder           :',os.environ.get('dotfiles'))
-    #with my.cd(os.environ.get('dotfiles')):
+    #with mycd(os.environ.get('dotfiles')):
     #    print('>> pwd (ssh key should was added: https://github.com/settings/keys) so that it should not be necessary to use git passwords.')
 
         # git config --global credential.helper store   ; before git push makes it work without password
@@ -160,8 +166,8 @@ def install_(args,known):
         print('args.install_folder',args.install_folder)
 
         sys.exit("args.install_folder does already exist (77)")
-    with my.cd(args.sources_folder):
-        #if args.install   in ['ipi']                    : git_clone(args,specify_depth = False,checkout="feat/kmc")
+    with mycd(args.sources_folder):
+        #if args.install   in ['ipi']                   : git_clone(args,specify_depth = False,checkout="feat/kmc")
         if args.install   in ['atomsk']                 : install_atomsk(args)
         elif args.install in ['miniconda','miniconda2','miniconda3'] : install_miniconda(args)
         elif args.install in ['nvim']                   : install_nvim(args)
@@ -211,20 +217,21 @@ def git_clone(args,specify_depth = True,checkout=False):
     return
 
 def install_nvim(args):
+    print('1')
     os.chdir(args.sources_folder)
+    print('2')
     print('myhostname',myhostname)
     if myhostname == "mac":
         dl_add='macos'
     else:
         dl_add='linux64'
         subprocess.call(["$dotfiles/aliases/xclip_local_install.sh"],shell=True)  # to be able to copy/paste seamlessly
-
     dl = 'nvim-'+dl_add+'.tar.gz'
     if os.path.isfile(args.sources_folder+'/'+dl):
         os.remove(args.sources_folder+'/'+dl)
     if os.path.isdir(args.sources_folder+"/nvim"):
         sys.exit(args.sources_folder+"/nvim does already exist!")
-    my.mkdir(args.sources_folder+"/nvim")
+    mymkdir(args.sources_folder+"/nvim")
     subprocess.call(["curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"],shell=True)
     subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/"+dl],shell=True)
     subprocess.call(["tar xvzf "+dl+" -C "+args.sources_folder+"/nvim --strip-components 1" ],shell=True)
@@ -264,7 +271,7 @@ def install_units(args):
     subprocess.call(["wget","http://ftp.gnu.org/gnu/units/units-2.18.tar.gz"])
     subprocess.call(["tar","-xvf","units-2.18.tar.gz"])
     print('HOME:',home)
-    with my.cd("units-2.18"):
+    with mycd("units-2.18"):
         print('configure ....')
         subprocess.call(['./configure','--prefix='+os.environ["HOME"]+'/.local'])
         print('make ....')
@@ -276,8 +283,9 @@ def install_units(args):
 def install_notes(args):
     ''' raw file from https://github.com/pimterry/notes/blob/master/notes '''
     # cd dotfiles/
-    os.chdir(os.environ["dotfiles"]+'/aliases')
-    subprocess.call(["wget https://raw.githubusercontent.com/pimterry/notes/master/notes && chmod +x notes && sed -i 's|^NOTES_EXT=.*|NOTES_EXT=\"txt\"|' notes"],shell=True)
+    print('notes installed already in bins/notes')
+    #os.chdir(os.environ["dotfiles"]+'/aliases')
+    #subprocess.call(["wget https://raw.githubusercontent.com/pimterry/notes/master/notes && chmod +x notes && sed -i 's|^NOTES_EXT=.*|NOTES_EXT=\"txt\"|' notes"],shell=True)
     return
 
 def install_lbzip(args):
@@ -300,8 +308,8 @@ def install_lbzip(args):
     #dotfiles = os.environ["dotfiles"]
     print('HOME:',home)
     print('!! pwd NOW',os.getcwd())
-    #with my.cd(home+'/sources/'):
-    with my.cd("lbzip2-2.5/"):
+    #with mycd(home+'/sources/'):
+    with mycd("lbzip2-2.5/"):
         print('configure ....')
         subprocess.call(['./configure','--prefix='+home+'/.local'])
         print('make ....')
@@ -661,12 +669,12 @@ def install_n2p2(args):
 
 def install_xmgrace(args):
     subprocess.call(["git","clone","--depth","1","https://github.com/fxcoudert/xmgrace",args.install_folder])
-    with my.cd(args.install_folder):
+    with mycd(args.install_folder):
         subprocess.call(["./configure"])  # this once complains about missing: configure: error: M*tif has not been found
 
 def install_miniconda(args):
-    #with my.cd(os.environ['HOME']):
-    with my.cd(args.pwd):
+    #with mycd(os.environ['HOME']):
+    with mycd(args.pwd):
         #if os.path.isdir(args.install):
         #    sys.exit(args.install+" does already exist!")
         print('-----------')

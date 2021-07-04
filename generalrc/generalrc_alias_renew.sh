@@ -13,9 +13,14 @@ mkalias () {
 #echo $whichalias
 #echo $currentshell
 
-[ "$onhost" = "UNKNOWN" ] && echo "onhost is UNKNOWN" && exit
+#[ "$onhost" = "UNKNOWN" ] && echo "onhost is UNKNOWN --> EXIT!" && exit
+#[ "$onhost" = "" ] && echo "onhost empty (not found) --> EXIT!" && exit
+onhost=$myhost
+#echo xxx $myhost
+echo "alias   : $onhost"
 
 aliasfile=$dotfiles/generalrc/generalrc_alias_$onhost
+echo "aliasfile: $aliasfile"
 #source $dotfiles/generalrc_alias_.sh $whichalias $currentshell 
 source $dotfiles/generalrc/generalrc_alias_.sh mkalias $currentshell 
 rm -f $aliasfile

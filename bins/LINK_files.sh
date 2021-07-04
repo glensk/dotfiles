@@ -257,6 +257,7 @@ loadeverywhere $HOME/.tmux.conf                     $dotfiles/tmux/tmux.conf
 
 [ ! -e "$HOME/.ssh" ] && mkdir $HOME/.ssh 
 loadeverywhere $HOME/.ssh/config                    $dotfiles/ssh/config 
+loadeverywhere $HOME/.ssh/known_hosts               $dotfiles/ssh/known_hosts
 [ ! -e "$dotfiles/ssh/known_hosts" ] && touch $dotfiles/ssh/known_hosts
 
 if [ -e "$HOME/.kde/share/apps/konsole" ];then
