@@ -1,6 +1,6 @@
 [user]
 	name = glensk
-	email = albert.glensk@gmail.com
+    email = albert.glensk@gmail.com
 [credential]
 	helper = osxkeychain
 [core]
