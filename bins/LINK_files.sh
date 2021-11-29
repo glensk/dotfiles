@@ -1,9 +1,10 @@
 #!/bin/sh
-
+echo 'executing dotfiles/bins/LINK_files.sh'
 echo 'Dropbox (DB) folder (required) is $HOME/Dropbox (either real or linked)'
 echo 'If Dropbox does not exist: mkdir -p $HOME/Dropbox/Albert/scripts and checkout dotfiles from git'
 echo 'Google Drive (GD) (not required) is $HOME/google_drive (either real or linked)'
 echo 
+[ ! -e "$HOME/.local" ] && mkdir $HOME/.local
 host=`hostname`
 onhost=`echo $host | sed 's/\..*$//'`
 mylaptop="mac"
@@ -62,17 +63,15 @@ createfolder () {
 DROPBOX=$HOME/Dropbox
 DROPBOXME=$DROPBOX/Albert
 DROPBOXMESCRIPTS=$DROPBOX/Albert/scripts
+DROPBOXMESCRIPTS=$HOME/Work/scripts
 #DROPBOXMEGOOGLEDRIVE=$DROPBOXME/google_drive   # it is nice to have one in the other so taht all my cosmo data are saved on dropbox automatically which they otherwise would not 
 #################################################################################################
 # where are the dotfiles (use from Dropbox when possible (is faster) otherwise from google_drive
 #################################################################################################
+#dotfiles=$DROPBOXMESCRIPTS/dotfiles
 dotfiles=$DROPBOXMESCRIPTS/dotfiles
 [ ! -e "$dotfiles" ] && echo "dotfiles folder $dotfiles does not exist" && exit
 echo "dotfiles are in $dotfiles"
-
-[ ! -e "$HOME/.local" ] && mkdir $HOME/.local
-[ ! -e "$HOME/.local/binp" ] && ln -s $dotfiles/scripts/binp $HOME/.local/binp
-[ ! -e "$HOME/.local/bins" ] && ln -s $dotfiles/bins $HOME/.local/bins
 
 ####################################################################
 # checking Dropbox folder

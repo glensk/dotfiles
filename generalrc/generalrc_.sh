@@ -10,8 +10,20 @@
 ##################################################################################
 # this has to be the first line  (loads senenv for zsh/bash); defines: tab-color; mkalias
 ##################################################################################
-export generalrc="$HOME/Dropbox/Albert/scripts/dotfiles/generalrc"
+echo "I should use gls instead of ls to get directories listed first; for this I have to set the colors with dircolors; do it when time"
+echo "# See generalrc/generalrc_alias_.sh"
+export dotfiles="$HOME/Work/scripts/dotfiles/";
+export PATH="$dotfiles/install:$local_bin:$PATH"  # NVIM
+export generalrc="$dotfiles/generalrc"
 source $generalrc/generalrc_necessary_bash.sh  # loads setenv for bash/zsh (not any more)
+
+# Check for bins and binp
+[ ! -e "$HOME/.local/bins" ] && ln -s $dotfiles/bins $HOME/.local/bins
+[ -L "$HOME/.local/binp" ]  && [ ! -e "$HOME/.local/binp" ] && echo "$HOME/.local/binp link does exist but is a broken!" && unlink "$HOME/.local/binp" && ln -s $dotfiles/scripts/binp $HOME/.local/binp
+[ ! -e "$HOME/.local/bins" ] && ln -s $dotfiles/bins $HOME/.local/bins
+[ -L "$HOME/.local/bins" ]  && [ ! -e "$HOME/.local/bins" ] && echo "$HOME/.local/bins link does exist but is a broken!" && unlink "$HOME/.local/bins" && ln -s $dotfiles/bins $HOME/.local/bins
+# Check for nvim   ~/.config/nvim/init.vim
+[ -L "$HOME/.config/nvim/init.vim" ]  && [ ! -e "$HOME/.config/nvim/init.vim" ] && echo "$HOME/.config/nvim/init.vim link does exist but is a broken!"  && unlink "$HOME/.config/nvim/init.vim" && ln -s $dotfiles/nvim/init.vim $HOME/.config/nvim/init.vim
 
 ##################################################################################
 # set global variables: currentshell, host, scripts, dotfiles
@@ -43,16 +55,24 @@ export host=$host
 #echo "22myhost:$myhost"
 #echo "22onhost:$onhost"
 
-export dotfiles="$HOME/Dropbox/Albert/scripts/dotfiles/";
 export potentials="$dotfiles/scripts/potentials";
 export nninp="$potentials/aiida_get_structures_new/input_zeroth_5482.data"
 export MYVIMRC="$dotfiles/nvim/init.vim"
 export MYVIM="$HOME/sources/nvim/bin/nvim"
 #jecho "copy1:$copy1:"
-[ "$verbose" = "true" ] && echo "loading binp"
-[ ! -e "$HOME/.local/binp" ] && $dotfiles/bins/LINK_files.sh
+if [ "true" = "false" ];then # binp contains all the material science related stuff
+	if [ ! -L "$HOME/.local/binp" ];then  # binp contains all the material science related stuff
+		echo "ERROR 11! $HOME/.local/binp does not exist; starting $dotfiles/bins/LINK_files.sh"
+		$dotfiles/bins/LINK_files.sh
+	fi
+fi
 [ "$verbose" = "true" ] && echo "loading bins"
-[ ! -e "$HOME/.local/bins" ] && $dotfiles/bins/LINK_files.sh
+if [ "true" = "true" ];then # bins contains all the shell script related stuff
+	if [ ! -L "$HOME/.local/bins" ];then
+	echo "ERROR 12! $HOME/.local/bins does not exist; starting $dotfiles/bins/LINK_files.sh"
+ 	$dotfiles/bins/LINK_files.sh
+	fi
+fi
 [ ! -d "$HOME/sources" ] && mkdir $HOME/sources 
 
 
@@ -226,8 +246,8 @@ export BROWSER=chrome
 export BROWSER=open # is necessary for opening jupyter notebook files
 export GREP_COLOR=31    # red; some greps have colorized ouput. enable...
 export GREPCOLOR=31     # dito here GREP_COLOR=1;32  # green
-export NOTES_DIRECTORY=$dotfiles/notes  # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
-export NOTES_EXT="txt" # /Users/glensk/Dropbox/Albert/scripts/dotfiles/aliases/notes
+export NOTES_DIRECTORY=$dotfiles/notes  #$dotfiles/aliases/notes
+export NOTES_EXT="txt" # $dotfiles/aliases/notes
 [ "$gettime" = "true" ] && gett=`gt $gett` && echo "general (6) : $gett setenv"
 
 ##############################################

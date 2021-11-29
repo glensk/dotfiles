@@ -86,16 +86,26 @@ iterm2_print_user_vars() {
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/glensk/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/Users/mac/opt/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/Users/mac/opt/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/mac/opt/miniconda3/etc/profile.d/conda.sh"
     else
-        export PATH="$HOME/miniconda3/bin:$PATH"
+        export PATH="/Users/mac/opt/miniconda3/bin:$PATH"
     fi
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
+# conda install -c conda-forge jupyterlab
+# conda install scikit-learn
+# conda install pandas 
+# conda install numpy 
+# conda install matplotlib
+# conda install ipython
+# conda install termcolor
+# conda install seaborn
+# conda install -c conda-forge web3
+# DONT DO pip install ftx .... leads to inconsistencies ....
+# conda update --update-deps conda

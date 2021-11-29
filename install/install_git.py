@@ -3,7 +3,6 @@ from __future__ import print_function
 import argparse
 
 import sys,os,socket
-#import myutils as my
 from myutils import cd as mycd
 from myutils import mkdir as mymkdir
 import subprocess
@@ -233,7 +232,8 @@ def install_nvim(args):
         sys.exit(args.sources_folder+"/nvim does already exist!")
     mymkdir(args.sources_folder+"/nvim")
     subprocess.call(["curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"],shell=True)
-    subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/"+dl],shell=True)
+    #subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.3.8/"+dl],shell=True)
+    subprocess.call(["wget https://github.com/neovim/neovim/releases/download/v0.5.0/"+dl],shell=True)
     subprocess.call(["tar xvzf "+dl+" -C "+args.sources_folder+"/nvim --strip-components 1" ],shell=True)
     subprocess.call(["mkdir $HOME/.config/nvim/"],shell=True)
     subprocess.call(["ln -s $dotfiles/nvim/init.vim $HOME/.config/nvim/init.vim"],shell=True)
